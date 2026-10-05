@@ -33,6 +33,10 @@ DWORD WINAPI xpal_GetFileAttributesA(LPCSTR name);
 BOOL WINAPI xpal_CopyFileA(LPCSTR from, LPCSTR to, BOOL failIfExists);
 /* the game's debug prints, into the port's log (codfh.log) as well as the debugger */
 VOID WINAPI xpal_OutputDebugStringA(LPCSTR text);
+/* the performance counter from the process's start, as the Xbox's counts from power-on: the
+   game's timers turn the count into seconds in single precision (unit_19B0F0's sub_19B9E0),
+   which a PC's count from boot (hours or days of it) leaves tens of milliseconds coarse */
+BOOL WINAPI xpal_QueryPerformanceCounter(LARGE_INTEGER *count);
 #ifdef __cplusplus
 }
 #endif
@@ -40,6 +44,7 @@ VOID WINAPI xpal_OutputDebugStringA(LPCSTR text);
 #define GetFileAttributesA xpal_GetFileAttributesA
 #define CopyFileA xpal_CopyFileA
 #define OutputDebugStringA xpal_OutputDebugStringA
+#define QueryPerformanceCounter xpal_QueryPerformanceCounter
 
 #include <d3d8.h>
 #include <dsound.h>

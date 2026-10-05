@@ -346,14 +346,19 @@ extern "C" void pdev_end_scene(void)
    with CODFH_SHOT_EVERY=1), for checking frames without watching them. */
 static void capture(unsigned frame)
 {
-    static int shot = -1, every;
+    static int shot = -1, every, from, to;
     if (shot < 0)
     {
         char v[32];
         shot = GetEnvironmentVariableA("CODFH_SHOT", v, sizeof(v)) ? atoi(v) : 0;
         every = GetEnvironmentVariableA("CODFH_SHOT_EVERY", v, sizeof(v)) ? atoi(v) : 0;
+        /* (CODFH_SHOT_FROM / CODFH_SHOT_TO: the frames CODFH_SHOT_EVERY captures between) */
+        from = GetEnvironmentVariableA("CODFH_SHOT_FROM", v, sizeof(v)) ? atoi(v) : 0;
+        to = GetEnvironmentVariableA("CODFH_SHOT_TO", v, sizeof(v)) ? atoi(v) : 0;
     }
     if (!shot || (every ? frame % shot : frame != (unsigned)shot))
+        return;
+    if ((from && frame < (unsigned)from) || (to && frame > (unsigned)to))
         return;
     /* (the game's 640x480 frame, not the window's buffer, so captures compare across window sizes;
        CODFH_SHOT_WINDOW=1 takes the window's buffer instead) */

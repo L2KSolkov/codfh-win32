@@ -302,7 +302,8 @@ XvshResult xvsh_from_microcode(const unsigned *program, unsigned declared)
                 /* the scalar result goes to r1: compute it first from the old values */
                 Ins s;
                 s.op = ilu_ops[ilu];
-                s.a = a; s.b = b; s.c = c;
+                /* (the scalar unit reads C only: its mov is of C, not of the MAC's A) */
+                s.a = c; s.b = b; s.c = c;
                 s.d.temp = -1;
                 s.d.tempMask = 0;
                 s.d.out = -1;
@@ -327,7 +328,7 @@ XvshResult xvsh_from_microcode(const unsigned *program, unsigned declared)
         {
             Ins in;
             in.op = ilu_ops[ilu];
-            in.a = a; in.b = b; in.c = c;
+            in.a = c; in.b = b; in.c = c;
             in.d.temp = field(ins, 3, 20, 4);
             in.d.tempMask = field(ins, 3, 16, 4);
             in.d.out = (outFromIlu && toOut) ? outReg : -1;

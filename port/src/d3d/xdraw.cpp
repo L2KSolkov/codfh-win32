@@ -1709,14 +1709,16 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
     {
         /* CODFH_DRAWID=n: in frame n every draw is a flat colour from its index (R = index & 255,
            G = index >> 8), and each draw's state is logged, so a capture's pixel names its draw. */
-        static int idframe = -1;
+        static int idframe = -1, idlastframe;
         static unsigned id, idlast;
         if (idframe < 0)
         {
             char v[16];
             idframe = GetEnvironmentVariableA("CODFH_DRAWID", v, sizeof(v)) ? atoi(v) : 0;
+            /* (CODFH_DRAWID_TO=m: frames n to m, each logged) */
+            idlastframe = GetEnvironmentVariableA("CODFH_DRAWID_TO", v, sizeof(v)) ? atoi(v) : idframe;
         }
-        if (idframe && port_frame == (unsigned)idframe)
+        if (idframe && port_frame >= (unsigned)idframe && port_frame <= (unsigned)idlastframe)
         {
             if (idlast != port_frame)
             {
@@ -1739,7 +1741,13 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
             idc[15][2] = 1.0f;
             idc[15][3] = 1.0f;
             /* (alpha-tested draws keep their holes) */
-            idc[14][0] = RS(D3DRS_ALPHATESTENABLE) && d.textures[0] ? 1.0f : 0.0f;
+            static int noalpha = -1;
+            if (noalpha < 0)
+            {
+                char v[8];
+                noalpha = GetEnvironmentVariableA("CODFH_DRAWID_NOALPHA", v, sizeof(v)) ? 1 : 0;
+            }
+            idc[14][0] = RS(D3DRS_ALPHATESTENABLE) && d.textures[0] && !noalpha ? 1.0f : 0.0f;
             idc[14][1] = (float)(RS(D3DRS_ALPHAREF) & 0xFF);
             d.psConstants = &idc[0][0];
             d.ps = idps;
@@ -1753,10 +1761,10 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
                 strncat(tex, one, sizeof(tex) - strlen(tex) - 1);
             }
             plog("draw %u: prim %d, %u vertices, %d indices, vs %08lX (%s, %d elements), ps %08lX,%s, blend %lu, alpha test %lu, "
-                 "z %lu/%lu, cull %lX", id, (int)prim, count, (int)nidx, xs.vertexShader,
+                 "z %lu/%lu, cull %lX, frame %u", id, (int)prim, count, (int)nidx, xs.vertexShader,
                  xs.programmable ? (xs.programmable->program ? "program" : "declaration") : "FVF", decl->count,
                  xs.pixelShader, tex, RS(D3DRS_ALPHABLENDENABLE), RS(D3DRS_ALPHATESTENABLE), RS(D3DRS_ZENABLE),
-                 RS(D3DRS_ZWRITEENABLE), RS(D3DRS_CULLMODE));
+                 RS(D3DRS_ZWRITEENABLE), RS(D3DRS_CULLMODE), port_frame);
             static std::map<DWORD, int> dumped;
             if (xs.programmable && xs.programmable->program && !dumped[xs.vertexShader]++)
             {
@@ -1778,7 +1786,9 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
                     strncat(el, one, sizeof(el) - strlen(el) - 1);
                 }
                 plog("vs %08lX elements%s", xs.vertexShader, el);
-                plog("vs %08lX microcode %s", xs.vertexShader, hex.c_str());
+                /* (in lines of 64 dwords: the log's lines are 1 KB) */
+                for (size_t at = 0; at < hex.size(); at += 9 * 64)
+                    plog("vs %08lX microcode %s", xs.vertexShader, hex.substr(at, 9 * 64).c_str());
                 const float *C = d.vsConstants;
                 for (int k = 0; k < 4; k++)
                     plog("  c[%d] %g %g %g %g", k, C[(96 + k) * 4], C[(96 + k) * 4 + 1], C[(96 + k) * 4 + 2], C[(96 + k) * 4 + 3]);
@@ -1799,7 +1809,23 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
                 char v[16];
                 detail = GetEnvironmentVariableA("CODFH_DRAWDETAIL", v, sizeof(v)) ? atoi(v) : 0;
             }
-            if (id <= 12 || (int)id == detail)
+            /* (CODFH_DRAWDETAIL=-1: the frame's first alpha-tested quad list drawn without a vertex
+               program, the effects' sprites) */
+            static unsigned picked_frame;
+            int this_one = (int)id == detail;
+            /* (-N, N > 1: the frame's first quad list of N vertices) */
+            if (detail < -1 && picked_frame != port_frame && prim == D3DPT_QUADLIST && (int)count == -detail)
+            {
+                picked_frame = port_frame;
+                this_one = 1;
+            }
+            if (detail == -1 && picked_frame != port_frame && prim == D3DPT_QUADLIST && xs.programmable &&
+                !xs.programmable->program && RS(D3DRS_ALPHATESTENABLE))
+            {
+                picked_frame = port_frame;
+                this_one = 1;
+            }
+            if (id <= 12 || this_one)
             {
                 char el[200] = "";
                 for (int k = 0; k < decl->count; k++)
@@ -1823,7 +1849,7 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
                         strncat(hex, one, sizeof(hex) - strlen(hex) - 1);
                     }
                     plog("  first vertex: %s", hex);
-                    if ((int)id == detail)
+                    if (this_one)
                         for (int st = 0; st < 4; st++)
                             if (xs.textures[st] && xs.textures[st]->Data)
                             {
@@ -1833,13 +1859,24 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
                                                        ? (const DWORD *)(ULONG_PTR)(xs.palettes[st]->Data | 0x80000000)
                                                        : NULL;
                                 plog("  stage %d texture: format %08lX size %08lX", st, t->Format, t->Size);
+                                if (!st)
+                                    plog("  alpha ref %lu func %lX, lighting %lu, colour vertex %lu, diffuse source %lu, "
+                                         "material diffuse %g %g %g %g, vertex data colour %08lX, alpha op %lu args %lX/%lX, "
+                                         "texture factor %08lX, z bias %lu, solid offset %lu, offset z %g slope %g, z func %lX",
+                                         RS(D3DRS_ALPHAREF), RS(D3DRS_ALPHAFUNC), RS(D3DRS_LIGHTING), RS(D3DRS_COLORVERTEX),
+                                         RS(D3DRS_DIFFUSEMATERIALSOURCE), xs.material.Diffuse.r, xs.material.Diffuse.g,
+                                         xs.material.Diffuse.b, xs.material.Diffuse.a, xs.vertexDataColor[3],
+                                         TSS(0, D3DTSS_ALPHAOP), TSS(0, D3DTSS_ALPHAARG1), TSS(0, D3DTSS_ALPHAARG2),
+                                         RS(D3DRS_TEXTUREFACTOR), RS(D3DRS_ZBIAS), RS(D3DRS_SOLIDOFFSETENABLE),
+                                         dword_float(RS(D3DRS_POLYGONOFFSETZOFFSET)),
+                                         dword_float(RS(D3DRS_POLYGONOFFSETZSLOPESCALE)), RS(D3DRS_ZFUNC));
                                 tex_dump = st;
                                 void *dt = upload_texture(t, pal);
                                 tex_dump = -1;
                                 if (dt)
                                     pdev_texture_release(dt);
                             }
-                    if ((int)id == detail)
+                    if (this_one)
                         for (UINT v = 0; v < 8 && v < count; v++)
                         {
                             const float *f = (const float *)(b0 + v * xs.strides[0]);
@@ -1853,7 +1890,22 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
                             plog("    clip %g %g %g %g -> screen %g %g", cl[0], cl[1], cl[2], cl[3],
                                  cl[0] / cl[3] * 320 + 320, -cl[1] / cl[3] * 240 + 240);
                         }
-                    if ((int)id == detail)
+                    if (this_one)
+                    {
+                        const float *K = d.vsConstants;
+                        static const int show[] = {4, 5, 6, 7, 8, 11, 12, 13, 14, 48, 49, 51, 52, 53, 54, 55, 56, 57, 58, 59};
+                        for (int i = 0; i < (int)(sizeof(show) / sizeof(show[0])); i++)
+                        {
+                            const float *C = K + (96 + show[i]) * 4;
+                            plog("  c[%d] %g %g %g %g", show[i], C[0], C[1], C[2], C[3]);
+                        }
+                        plog("  blend %lX/%lX op %lX, colour op %lu args %lX/%lX, ps constants tfactor %g %g %g %g",
+                             RS(D3DRS_SRCBLEND), RS(D3DRS_DESTBLEND), RS(D3DRS_BLENDOP), TSS(0, D3DTSS_COLOROP),
+                             TSS(0, D3DTSS_COLORARG1), TSS(0, D3DTSS_COLORARG2), d.psConstants ? d.psConstants[0] : -1.0f,
+                             d.psConstants ? d.psConstants[1] : -1.0f, d.psConstants ? d.psConstants[2] : -1.0f,
+                             d.psConstants ? d.psConstants[3] : -1.0f);
+                    }
+                    if (this_one)
                         for (int r = 0; r < 4; r++)
                         {
                             const float *C = d.vsConstants + (96 + r) * 4;
@@ -1881,6 +1933,27 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
                     }
                 }
             }
+        }
+    }
+    {
+        /* CODFH_QUADTEX=1: quad lists (the effects' particles) drawn with their texture alone,
+           opaque: what the stages and the blend make of them left out */
+        static int quadtex = -1;
+        if (quadtex < 0)
+        {
+            char v[8];
+            quadtex = GetEnvironmentVariableA("CODFH_QUADTEX", v, sizeof(v)) ? 1 : 0;
+        }
+        if (quadtex && prim == D3DPT_QUADLIST)
+        {
+            static void *texps;
+            if (!texps)
+                texps = pdev_pixel_shader("Texture2D t0 : register(t0); SamplerState s0 : register(s0);\n"
+                                          "float4 main(float4 p : SV_Position, float4 d0 : COLOR0, float4 d1 : COLOR1,\n"
+                                          "            float4 uv : TEXCOORD0) : SV_Target {\n"
+                                          "    return float4(t0.Sample(s0, uv.xy).rgb, 1); }\n");
+            d.ps = texps;
+            d.blendEnable = 0;
         }
     }
     {

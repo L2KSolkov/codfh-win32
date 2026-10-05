@@ -17,6 +17,7 @@
 #undef GetFileAttributesA
 #undef CopyFileA
 #undef OutputDebugStringA
+#undef QueryPerformanceCounter
 
 PortConfig port_config;
 void *port_hwnd;
@@ -210,6 +211,22 @@ extern "C" BOOL WINAPI xpal_CopyFileA(LPCSTR from, LPCSTR to, BOOL failIfExists)
 extern "C" int port_language(void)
 {
     return port_config.language >= 0 && port_config.language <= 8 ? port_config.language : 0;
+}
+
+extern "C" BOOL WINAPI xpal_QueryPerformanceCounter(LARGE_INTEGER *count)
+{
+    static LONGLONG base;
+    LARGE_INTEGER now;
+    BOOL ok = QueryPerformanceCounter(&now);
+    if (!base)
+    {
+        /* (a second before the first read, so no count is ever 0) */
+        LARGE_INTEGER f;
+        QueryPerformanceFrequency(&f);
+        InterlockedCompareExchange64(&base, now.QuadPart - f.QuadPart, 0);
+    }
+    count->QuadPart = now.QuadPart - base;
+    return ok;
 }
 
 extern "C" VOID WINAPI xpal_OutputDebugStringA(LPCSTR text)
