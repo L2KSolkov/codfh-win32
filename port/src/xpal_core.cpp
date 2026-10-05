@@ -115,6 +115,73 @@ static void make_dirs(const char *path)
     CreateDirectoryA(tmp, NULL);
 }
 
+/* The disc's files are under root: its COD.PAK is there. */
+static int has_data(const char *root)
+{
+    char path[MAX_PATH];
+    _snprintf(path, sizeof(path), "%s\\COD.PAK", root);
+    path[sizeof(path) - 1] = 0;
+    return GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES;
+}
+
+/*
+ * A data root with the disc's files when the configured one has none: the executable's directory
+ * and up to three above it, then \CODFH_DUMP on each drive. Found, it is written to codfh.ini
+ * ([data] root) for the next start; not found, the game cannot run (it would fail later, on the
+ * first sound or texture it cannot find), and says so.
+ */
+static void find_data_root(const char *ini)
+{
+    if (has_data(port_config.dataRoot))
+        return;
+    char tried[MAX_PATH];
+    strcpy(tried, port_config.dataRoot);
+    char dir[MAX_PATH];
+    exe_dir(dir, sizeof(dir));
+    for (int up = 0; up <= 3; up++)
+    {
+        size_t n = strlen(dir);
+        while (n > 3 && (dir[n - 1] == '\\' || dir[n - 1] == '/'))
+            dir[--n] = 0;
+        if (has_data(dir))
+        {
+            strcpy(port_config.dataRoot, dir);
+            break;
+        }
+        char *slash = strrchr(dir, '\\');
+        if (!slash || slash - dir < 3)
+            break;
+        *slash = 0;
+    }
+    for (char d = 'C'; !has_data(port_config.dataRoot) && d <= 'Z'; d++)
+    {
+        char root[16];
+        _snprintf(root, sizeof(root), "%c:\\CODFH_DUMP", d);
+        root[sizeof(root) - 1] = 0;
+        char drive[4] = {d, ':', '\\', 0};
+        if (GetDriveTypeA(drive) <= DRIVE_NO_ROOT_DIR)
+            continue;
+        if (has_data(root))
+            strcpy(port_config.dataRoot, root);
+    }
+    if (has_data(port_config.dataRoot))
+    {
+        WritePrivateProfileStringA("data", "root", port_config.dataRoot, ini);
+        plog("data root %s has no COD.PAK: using %s (written to codfh.ini)", tried, port_config.dataRoot);
+        return;
+    }
+    char text[1024];
+    _snprintf(text, sizeof(text),
+              "The game's files were not found (no COD.PAK in %s).\n\n"
+              "Set the folder that holds the disc's files (COD.PAK, AUDIO, SHELL...) in codfh.ini beside "
+              "the game:\n\n[data]\nroot=D:\\path\\to\\the\\files\n\n"
+              "or in the CODFH_DATA environment variable.", tried);
+    text[sizeof(text) - 1] = 0;
+    plog("no data root: %s has no COD.PAK", tried);
+    MessageBoxA(NULL, text, "Call of Duty: Finest Hour", MB_OK | MB_ICONERROR);
+    ExitProcess(1);
+}
+
 void port_config_load(void)
 {
     char ini[MAX_PATH];
@@ -126,6 +193,12 @@ void port_config_load(void)
     if (!GetEnvironmentVariableA("CODFH_DATA", def, sizeof(def)))
         exe_dir(def, sizeof(def));
     GetPrivateProfileStringA("data", "root", def, port_config.dataRoot, sizeof(port_config.dataRoot), ini);
+    {
+        size_t n = strlen(port_config.dataRoot);
+        while (n > 3 && (port_config.dataRoot[n - 1] == '\\' || port_config.dataRoot[n - 1] == '/'))
+            port_config.dataRoot[--n] = 0;
+    }
+    find_data_root(ini);
 
     char user[MAX_PATH] = "";
     if (FAILED(SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, user)))
