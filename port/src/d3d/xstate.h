@@ -76,5 +76,6 @@ void xdraw_inline(D3DPRIMITIVETYPE prim, const DWORD *data, UINT dwords);
 XVertexShader *xdraw_create_vs(const DWORD *decl, const DWORD *function);
 void xdraw_texture_dirty(const void *header);
 void xdraw_texture_forget(const void *header);
+void xdraw_frame_stats(void);
 
 #endif

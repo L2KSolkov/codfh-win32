@@ -500,6 +500,47 @@ static const unsigned char *vtx_regs_of(const XVertexShader *s)
     return r;
 }
 
+/* What the fixed-function shader depends on: the declaration's registers, and the lighting,
+   material-source and texture-coordinate states. */
+struct FFKey
+{
+    unsigned char regs[16];
+    int count, pretransformed;
+    DWORD rs[7];
+    DWORD tss[4][2];
+};
+
+static void *ff_shader_cached(const XVertexShader *s, int pretransformed)
+{
+    FFKey k;
+    memset(&k, 0, sizeof(k));
+    for (int i = 0; i < s->count && i < 16; i++)
+        k.regs[i] = s->elements[i].reg;
+    k.count = s->count;
+    k.pretransformed = pretransformed;
+    k.rs[0] = RS(D3DRS_LIGHTING);
+    k.rs[1] = RS(D3DRS_COLORVERTEX);
+    k.rs[2] = RS(D3DRS_DIFFUSEMATERIALSOURCE);
+    k.rs[3] = RS(D3DRS_AMBIENTMATERIALSOURCE);
+    k.rs[4] = RS(D3DRS_SPECULARMATERIALSOURCE);
+    k.rs[5] = RS(D3DRS_EMISSIVEMATERIALSOURCE);
+    k.rs[6] = RS(D3DRS_SPECULARENABLE);
+    for (int st = 0; st < 4; st++)
+    {
+        k.tss[st][0] = TSS(st, D3DTSS_TEXCOORDINDEX);
+        k.tss[st][1] = TSS(st, D3DTSS_TEXTURETRANSFORMFLAGS);
+    }
+    static std::map<std::string, void *> cache;
+    std::string key((const char *)&k, sizeof(k));
+    std::map<std::string, void *>::iterator it = cache.find(key);
+    if (it != cache.end())
+        return it->second;
+    std::string h = ff_vertex_shader(s, pretransformed);
+    void *vs = pdev_vertex_shader(h.c_str(), vtx_regs_of(s), s->count);
+    cache[key] = vs;
+    return vs;
+}
+
 /* The device's vertex shader for the current state. */
 static void *vertex_shader(XVertexShader **decl)
 {
@@ -517,15 +558,13 @@ static void *vertex_shader(XVertexShader **decl)
         s = &fvf_shader;
         *decl = s;
         ff_constants();
-        std::string h = ff_vertex_shader(s, fvf_pretransformed);
-        return pdev_vertex_shader(h.c_str(), vtx_regs_of(s), s->count);
+        return ff_shader_cached(s, fvf_pretransformed);
     }
     *decl = s;
     if (!s->program)
     {
         ff_constants();
-        std::string h = ff_vertex_shader(s, 0);
-        return pdev_vertex_shader(h.c_str(), vtx_regs_of(s), s->count);
+        return ff_shader_cached(s, 0);
     }
     if (!s->device && !s->failed)
     {
@@ -543,8 +582,7 @@ static void *vertex_shader(XVertexShader **decl)
     if (s->failed)
     {
         ff_constants();
-        std::string h = ff_vertex_shader(s, 0);
-        return pdev_vertex_shader(h.c_str(), vtx_regs_of(s), s->count);
+        return ff_shader_cached(s, 0);
     }
     for (int i = 0; i < 192; i++)
         if (s->constantMask[i / 32] & (1u << (i % 32)))
@@ -720,6 +758,14 @@ static std::string stage_pixel_shader(void)
     return h;
 }
 
+/* What the generated pixel shader depends on: the stages' operations, arguments and texture
+   kinds, and the alpha test, specular and fog states. */
+struct PSKey
+{
+    DWORD stage[4][12];
+    DWORD rs[6];
+};
+
 static void *pixel_shader(void)
 {
     if (xs.pixelShader)
@@ -728,8 +774,33 @@ static void *pixel_shader(void)
         if (!logged++)
             plog("Xbox pixel shaders drawn with the texture stages (W2.5: register combiners)");
     }
+    PSKey k;
+    memset(&k, 0, sizeof(k));
+    for (int st = 0; st < 4; st++)
+    {
+        static const int which[11] = {D3DTSS_COLOROP, D3DTSS_COLORARG0, D3DTSS_COLORARG1, D3DTSS_COLORARG2,
+                                      D3DTSS_ALPHAOP, D3DTSS_ALPHAARG0, D3DTSS_ALPHAARG1, D3DTSS_ALPHAARG2,
+                                      D3DTSS_RESULTARG, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTSS_ALPHAKILL};
+        for (int i = 0; i < 11; i++)
+            k.stage[st][i] = TSS(st, which[i]);
+        k.stage[st][11] = (DWORD)stage_texture_kind(st);
+        if (TSS(st, D3DTSS_COLOROP) == D3DTOP_DISABLE)
+            break;
+    }
+    k.rs[0] = RS(D3DRS_SPECULARENABLE);
+    k.rs[1] = RS(D3DRS_ALPHATESTENABLE);
+    k.rs[2] = RS(D3DRS_ALPHATESTENABLE) ? RS(D3DRS_ALPHAFUNC) : 0;
+    k.rs[3] = RS(D3DRS_FOGENABLE);
+    k.rs[4] = RS(D3DRS_FOGENABLE) ? RS(D3DRS_FOGTABLEMODE) : 0;
+    static std::map<std::string, void *> cache;
+    std::string key((const char *)&k, sizeof(k));
+    std::map<std::string, void *>::iterator it = cache.find(key);
+    if (it != cache.end())
+        return it->second;
     std::string h = stage_pixel_shader();
-    return pdev_pixel_shader(h.c_str());
+    void *ps = pdev_pixel_shader(h.c_str());
+    cache[key] = ps;
+    return ps;
 }
 
 /*
@@ -1156,17 +1227,57 @@ static int list_indices(D3DPRIMITIVETYPE prim, const WORD *in, UINT n, int *topo
     return 0;
 }
 
+/* Draw statistics, logged every 300 frames (CODFH_STATS=1). */
+static struct
+{
+    unsigned draws, vertices;
+    LONGLONG shaders, convert, state, device;
+} st;
+
+static LONGLONG now_ticks(void)
+{
+    LARGE_INTEGER t;
+    QueryPerformanceCounter(&t);
+    return t.QuadPart;
+}
+
+void xdraw_frame_stats(void)
+{
+    static int on = -1;
+    if (on < 0)
+    {
+        char v[8];
+        on = GetEnvironmentVariableA("CODFH_STATS", v, sizeof(v)) ? 1 : 0;
+    }
+    static unsigned frames;
+    if (!on || ++frames % 300)
+        return;
+    LARGE_INTEGER f;
+    QueryPerformanceFrequency(&f);
+    double ms = 1000.0 / f.QuadPart / 300;
+    plog("stats per frame: %u draws, %u vertices; shaders %.2f ms, convert %.2f ms, state %.2f ms, device %.2f ms",
+         st.draws / 300, st.vertices / 300, st.shaders * ms, st.convert * ms, st.state * ms, st.device * ms);
+    memset(&st, 0, sizeof(st));
+}
+
 static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *indices, UINT nidx, const BYTE *up,
                    UINT upStride)
 {
     if (!pdev_ready() || !count)
         return;
+    LONGLONG t0 = now_ticks();
     XVertexShader *decl = NULL;
     void *vs = vertex_shader(&decl);
     void *ps = pixel_shader();
     if (!vs || !ps || !decl)
         return;
+    LONGLONG t1 = now_ticks();
+    st.shaders += t1 - t0;
+    st.draws++;
+    st.vertices += count;
     convert_vertices(decl, first, count, up, upStride);
+    LONGLONG t2 = now_ticks();
+    st.convert += t2 - t1;
     for (int r = 0; r < 16; r++)
     {
         DWORD c = xs.vertexDataColor[r];
@@ -1180,6 +1291,8 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
     d.vsConstants = &xs.vsConstants[0][0];
     port_viewport_offset_scale(d.viewport, d.viewport + 4);
     fill_state(d);
+    LONGLONG t3 = now_ticks();
+    st.state += t3 - t2;
     int topology;
     int haveIdx = list_indices(prim, indices, indices ? nidx : count, &topology);
     d.primitive = topology;
@@ -1194,6 +1307,7 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
         d.indexCount = (int)idx.size();
     }
     pdev_draw(&d);
+    st.device += now_ticks() - t3;
 }
 
 void xdraw_vertices(D3DPRIMITIVETYPE prim, UINT start, UINT count)
