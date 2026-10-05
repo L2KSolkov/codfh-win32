@@ -9,6 +9,9 @@
 // ones (folded, /OPT:ICF); BaseMemClose and GetRawHeaderSize are empty
 // (folded, config/aliases.txt).
 
+#ifdef CODFH_WIN32
+#include <malloc.h>
+#endif
 #include <stdlib.h>
 
 #include "rw/ostypes.h"
@@ -54,7 +57,13 @@ void *BaseMemAlloc(size_t size, RwUInt32 userTypeNum)
    dword_4CF888 = 1;
    RtlEnterCriticalSection(&unk_4CF86C);
 
+#ifdef CODFH_WIN32
+   // (Win32: 16-byte aligned blocks, as the Xbox's heap gives them; RenderWare's SSE matrix
+   // and vector code loads them aligned)
+   void *pMem = _aligned_malloc(size ? size : 1, 16);
+#else
    void *pMem = malloc(size);
+#endif
 
    RtlLeaveCriticalSection(&unk_4CF86C);
    dword_4CF888 = 0;
@@ -68,7 +77,11 @@ void BaseMemFree(void *pMem)
    dword_4CF888 = 1;
    RtlEnterCriticalSection(&unk_4CF86C);
 
+#ifdef CODFH_WIN32
+   _aligned_free(pMem);
+#else
    free(pMem);
+#endif
 
    RtlLeaveCriticalSection(&unk_4CF86C);
    dword_4CF888 = 0;
@@ -80,7 +93,11 @@ void *BaseMemReAlloc(void *pMem, size_t size, RwUInt32 userTypeNum)
    dword_4CF888 = 1;
    RtlEnterCriticalSection(&unk_4CF86C);
 
+#ifdef CODFH_WIN32
+   void *pNewMem = _aligned_realloc(pMem, size, 16);
+#else
    void *pNewMem = realloc(pMem, size);
+#endif
 
    RtlLeaveCriticalSection(&unk_4CF86C);
    dword_4CF888 = 0;
@@ -94,7 +111,11 @@ void *BaseMemCalloc(size_t num, size_t size, RwUInt32 userTypeNum)
    dword_4CF888 = 1;
    RtlEnterCriticalSection(&unk_4CF86C);
 
+#ifdef CODFH_WIN32
+   void *pMem = _aligned_recalloc(0, num ? num : 1, size ? size : 1, 16);
+#else
    void *pMem = calloc(num, size);
+#endif
 
    RtlLeaveCriticalSection(&unk_4CF86C);
    dword_4CF888 = 0;

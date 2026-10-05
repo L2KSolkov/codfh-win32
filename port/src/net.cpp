@@ -32,9 +32,13 @@ static void wsa_start(void)
 extern "C" SOCKET WSAAPI xpal_socket(int af, int type, int protocol)
 {
     wsa_start();
-    if (protocol == IPPROTO_VDP)
+    int vdp = protocol == IPPROTO_VDP;
+    if (vdp)
         protocol = IPPROTO_UDP;
-    return socket(af, type, protocol);
+    SOCKET s = socket(af, type, protocol);
+    plog("socket(%d, %d, %s) = %d%s", af, type, vdp ? "VDP as UDP" : "UDP", (int)s,
+         s == INVALID_SOCKET ? " (failed)" : "");
+    return s;
 }
 
 /*

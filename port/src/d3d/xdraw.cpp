@@ -375,12 +375,12 @@ static const char *const vs_header =
 /* The fixed-function shader for the current state. */
 static std::string ff_vertex_shader(const XVertexShader *s, int pretransformed)
 {
-    char buf[512];
+    char buf[8192];
     std::string h = vs_header;
     h += "struct VSIn {\n";
     for (int k = 0; k < s->count; k++)
     {
-        sprintf(buf, "    float4 v%d : V%d;\n", s->elements[k].reg, s->elements[k].reg);
+        _snprintf(buf, sizeof(buf) - 1, "    float4 v%d : V%d;\n", s->elements[k].reg, s->elements[k].reg);
         h += buf;
     }
     h += "    uint vid : SV_VertexID;\n};\n";
@@ -389,9 +389,9 @@ static std::string ff_vertex_shader(const XVertexShader *s, int pretransformed)
     for (int r = 0; r < 16; r++)
     {
         if (d & (1u << r))
-            sprintf(buf, "i.v%d", r);
+            _snprintf(buf, sizeof(buf) - 1, "i.v%d", r);
         else
-            sprintf(buf, "c[%d]", XFF_DEFAULTS + r);
+            _snprintf(buf, sizeof(buf) - 1, "c[%d]", XFF_DEFAULTS + r);
         get[r] = buf;
     }
     h += "VSOut main(VSIn i) {\n    VSOut o;\n";
@@ -478,11 +478,11 @@ static std::string ff_vertex_shader(const XVertexShader *s, int pretransformed)
         else
             coord = set < 4 ? get[9 + set] : "float4(0, 0, 0, 1)";
         DWORD ttff = TSS(st, D3DTSS_TEXTURETRANSFORMFLAGS);
-        sprintf(buf, "    float4 tc%d = %s;\n", st, coord.c_str());
+        _snprintf(buf, sizeof(buf) - 1, "    float4 tc%d = %s;\n", st, coord.c_str());
         h += buf;
         if ((ttff & 0xFF) && !pretransformed)
         {
-            sprintf(buf, "    tc%d = xform(float4(tc%d.xyz, 1), %d);\n", st, st, XFF_TEX0 + st * 4);
+            _snprintf(buf, sizeof(buf) - 1, "    tc%d = xform(float4(tc%d.xyz, 1), %d);\n", st, st, XFF_TEX0 + st * 4);
             h += buf;
         }
     }
@@ -572,7 +572,7 @@ static std::string stage_arg(int st, DWORD a, bool alpha)
     {
     case 0: v = "i.d0"; break;                  /* diffuse */
     case 1: v = st ? "cur" : "i.d0"; break;     /* current */
-    case 2: sprintf(buf, "tex%d", st); v = buf; break;
+    case 2: _snprintf(buf, sizeof(buf) - 1, "tex%d", st); v = buf; break;
     case 3: v = "psc[0]"; break;                /* the texture factor */
     case 4: v = "i.d1"; break;                  /* specular */
     case 5: v = "tmp"; break;
@@ -589,7 +589,7 @@ static std::string stage_arg(int st, DWORD a, bool alpha)
 static std::string stage_op(int st, DWORD op, const std::string &a0, const std::string &a1, const std::string &a2)
 {
     char buf[32];
-    sprintf(buf, "tex%d", st);
+    _snprintf(buf, sizeof(buf) - 1, "tex%d", st);
     std::string tex = buf;
     switch (op)
     {
@@ -637,7 +637,7 @@ static const char *cmp_hlsl(DWORD f)
 
 static std::string stage_pixel_shader(void)
 {
-    char buf[256];
+    char buf[8192];
     std::string h =
         "cbuffer PS : register(b0) { float4 psc[16]; };\n"
         "Texture2D t2_0 : register(t0); Texture2D t2_1 : register(t1); Texture2D t2_2 : register(t2); Texture2D t2_3 : register(t3);\n"
@@ -655,7 +655,7 @@ static std::string stage_pixel_shader(void)
     for (int st = 0; st < 4; st++)
         if (stage_texture_kind(st) == 2)
         {
-            sprintf(buf, "TextureCube tc_%d : register(t%d);\n", st, st);
+            _snprintf(buf, sizeof(buf) - 1, "TextureCube tc_%d : register(t%d);\n", st, st);
             h += buf;
         }
     h += "float4 main(PSIn i) : SV_Target {\n"
@@ -669,18 +669,18 @@ static std::string stage_pixel_shader(void)
         int kind = stage_texture_kind(st);
         DWORD ttff = TSS(st, D3DTSS_TEXTURETRANSFORMFLAGS);
         if (kind == 2)
-            sprintf(buf, "    float4 tex%d = tc_%d.Sample(s%d, i.t%d.xyz);\n", st, st, st, st);
+            _snprintf(buf, sizeof(buf) - 1, "    float4 tex%d = tc_%d.Sample(s%d, i.t%d.xyz);\n", st, st, st, st);
         else if (kind == 1 && (ttff & 0x100))
-            sprintf(buf, "    float4 tex%d = t2_%d.Sample(s%d, i.t%d.xy / i.t%d.%c);\n", st, st, st, st, st,
+            _snprintf(buf, sizeof(buf) - 1, "    float4 tex%d = t2_%d.Sample(s%d, i.t%d.xy / i.t%d.%c);\n", st, st, st, st, st,
                     "wxyzw"[ttff & 0xFF]);
         else if (kind == 1)
-            sprintf(buf, "    float4 tex%d = t2_%d.Sample(s%d, i.t%d.xy);\n", st, st, st, st);
+            _snprintf(buf, sizeof(buf) - 1, "    float4 tex%d = t2_%d.Sample(s%d, i.t%d.xy);\n", st, st, st, st);
         else
-            sprintf(buf, "    float4 tex%d = float4(1, 1, 1, 1);\n", st);
+            _snprintf(buf, sizeof(buf) - 1, "    float4 tex%d = float4(1, 1, 1, 1);\n", st);
         h += buf;
         if (kind && TSS(st, D3DTSS_ALPHAKILL) == 1)
         {
-            sprintf(buf, "    clip(tex%d.a - 0.5 / 255.0);\n", st);
+            _snprintf(buf, sizeof(buf) - 1, "    clip(tex%d.a - 0.5 / 255.0);\n", st);
             h += buf;
         }
         std::string c = stage_op(st, cop, stage_arg(st, TSS(st, D3DTSS_COLORARG0), false),
@@ -692,7 +692,7 @@ static std::string stage_pixel_shader(void)
                                        stage_arg(st, TSS(st, D3DTSS_ALPHAARG1), true),
                                        stage_arg(st, TSS(st, D3DTSS_ALPHAARG2), true));
         const char *dst = TSS(st, D3DTSS_RESULTARG) == 5 ? "tmp" : "cur";
-        sprintf(buf, "    { float4 rc = saturate(%s);\n      float4 ra = saturate(%s);\n      %s = float4(rc.rgb, ra.a); }\n",
+        _snprintf(buf, sizeof(buf) - 1, "    { float4 rc = saturate(%s);\n      float4 ra = saturate(%s);\n      %s = float4(rc.rgb, ra.a); }\n",
                 c.c_str(), a.c_str(), dst);
         h += buf;
     }
@@ -700,7 +700,7 @@ static std::string stage_pixel_shader(void)
         h += "    cur.rgb = saturate(cur.rgb + i.d1.rgb);\n";
     if (RS(D3DRS_ALPHATESTENABLE))
     {
-        sprintf(buf, "    { float a = round(cur.a * 255), r = psc[2].x; if (!(%s)) discard; }\n",
+        _snprintf(buf, sizeof(buf) - 1, "    { float a = round(cur.a * 255), r = psc[2].x; if (!(%s)) discard; }\n",
                 cmp_hlsl(RS(D3DRS_ALPHAFUNC)));
         h += buf;
     }
