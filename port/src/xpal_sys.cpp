@@ -159,11 +159,28 @@ static int window_has_input(void)
 }
 
 extern volatile unsigned char port_keys[256];
+extern volatile LONG port_key_taps[256];
+
+/* The keys as one read sees them: held, or pressed in the last 60 ms (a tap shorter than a frame
+   still reaches the game, for a few frames, and reads as a press). */
+static unsigned char key_now[256];
+static DWORD key_until[256];
+
+static void read_keys(void)
+{
+    DWORD now = GetTickCount();
+    for (int vk = 0; vk < 256; vk++)
+    {
+        if (port_key_taps[vk] && InterlockedExchange(&port_key_taps[vk], 0))
+            key_until[vk] = now + 60;
+        key_now[vk] = port_keys[vk] || (key_until[vk] && (LONG)(key_until[vk] - now) > 0);
+    }
+}
 
 static int key(int vk)
 {
     /* (a key the window was sent is held whatever the foreground says) */
-    if (vk >= 0 && vk < 256 && port_keys[vk])
+    if (vk >= 0 && vk < 256 && key_now[vk])
         return 1;
     return window_has_input() && (GetAsyncKeyState(vk) & 0x8000);
 }
@@ -335,6 +352,14 @@ static void keyboard_state(XINPUT_GAMEPAD *g)
     if (!bindings_loaded)
         load_bindings();
     int menus = in_menus();
+    /* (where the keyboard is, every five seconds for the first half-minute: remote sessions) */
+    static DWORD next_note, notes;
+    if (notes < 6 && GetTickCount() >= next_note)
+    {
+        next_note = GetTickCount() + 5000;
+        notes++;
+        plog("input: foreground %p, ours %p, focus %ld, menus %d", GetForegroundWindow(), port_hwnd, port_has_focus, menus);
+    }
     static int was_menus = -1;
     if (menus != was_menus)
     {
@@ -527,6 +552,7 @@ extern "C" DWORD WINAPI XInputGetState(HANDLE hDevice, PXINPUT_STATE pState)
     if (port == 0)
     {
 #ifndef CODFH_DEDICATED
+        read_keys();
         keyboard_state(&s.Gamepad);
         mouse_state(&s.Gamepad);
 #endif

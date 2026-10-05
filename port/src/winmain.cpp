@@ -86,6 +86,15 @@ static void set_fullscreen(HWND hwnd, int on)
  * the asynchronous key state does not always see.
  */
 volatile unsigned char port_keys[256];
+/* presses since the controllers last read the keys: a tap shorter than a frame still counts
+   (xpal_sys.cpp holds each one for a few reads) */
+volatile LONG port_key_taps[256];
+
+static void press(unsigned vk)
+{
+    if (vk < 256)
+        InterlockedIncrement(&port_key_taps[vk]);
+}
 /* the window has the keyboard (WM_SETFOCUS until WM_KILLFOCUS): over Remote Desktop
    GetForegroundWindow can answer no window at all while it does */
 volatile LONG port_has_focus;
@@ -94,6 +103,8 @@ static void set_key(WPARAM vk, LPARAM lp, unsigned char down)
 {
     if (vk >= 256)
         return;
+    if (down && !port_keys[vk])
+        press((unsigned)vk);
     port_keys[vk] = down;
     /* (the left and right variants too, as GetAsyncKeyState gives them) */
     if (vk == VK_SHIFT)
@@ -108,15 +119,66 @@ static void set_key(WPARAM vk, LPARAM lp, unsigned char down)
         port_keys[(lp & (1 << 24)) ? VK_RMENU : VK_LMENU] = down;
 }
 
+/* Raw input counts while the window is in front or no window is (Remote Desktop can report
+   none), and while the keyboard is the window's; not while another program is in front. */
+static int raw_input_ours(HWND hwnd)
+{
+    HWND fg = GetForegroundWindow();
+    return fg == hwnd || fg == NULL || port_has_focus || port_input_background();
+}
+
+/* The first few of each kind of input the window sees, for finding where a remote session's
+   input goes (codfh.log). */
+static void note_input(const char *what, unsigned value)
+{
+    static const char *seen[16];
+    static int counts[16];
+    int i = 0;
+    while (i < 16 && seen[i] && seen[i] != what)
+        i++;
+    if (i == 16)
+        return;
+    seen[i] = what;
+    if (counts[i]++ < 3)
+        plog("input: %s %u (foreground %p, focus %p, ours %p)", what, value, GetForegroundWindow(), GetFocus(), port_hwnd);
+}
+
 static void track_input(UINT msg, WPARAM wp, LPARAM lp)
 {
     switch (msg)
     {
-    case WM_KEYDOWN: case WM_SYSKEYDOWN: set_key(wp, lp, 1); break;
+    case WM_KEYDOWN: note_input("key message", (unsigned)wp); break;
+    case WM_LBUTTONDOWN: note_input("click message", 0); break;
+    case WM_SETFOCUS: note_input("focus gained", 0); break;
+    case WM_KILLFOCUS: note_input("focus lost", 0); break;
+    case WM_ACTIVATE: note_input("activate", LOWORD(wp)); break;
+    }
+    /* a Remote Desktop client in Unicode keyboard mode sends characters (VK_PACKET, then
+       WM_CHAR): each becomes a tap of the key that types it */
+    static int packet;
+    switch (msg)
+    {
+    case WM_KEYDOWN: case WM_SYSKEYDOWN:
+        packet = wp == VK_PACKET;
+        if (!packet)
+            set_key(wp, lp, 1);
+        break;
+    case WM_CHAR:
+        if (packet)
+        {
+            packet = 0;
+            SHORT vks = VkKeyScanW((WCHAR)wp);
+            unsigned vk = (wp == '\r') ? VK_RETURN : (wp == 27) ? VK_ESCAPE : (wp == '\b') ? VK_BACK
+                        : (wp == '\t') ? VK_TAB : (vks != -1 ? (unsigned)(vks & 0xFF) : 0);
+            note_input("character", (unsigned)wp);
+            if (vk)
+                press(vk);
+        }
+        break;
     case WM_KEYUP: case WM_SYSKEYUP: set_key(wp, lp, 0); break;
-    case WM_LBUTTONDOWN: port_keys[VK_LBUTTON] = 1; break;
+    case WM_LBUTTONDOWN: press(VK_LBUTTON); port_keys[VK_LBUTTON] = 1; break;
     case WM_LBUTTONUP: port_keys[VK_LBUTTON] = 0; break;
-    case WM_RBUTTONDOWN: port_keys[VK_RBUTTON] = 1; break;
+    case WM_RBUTTONDOWN: press(VK_RBUTTON); port_keys[VK_RBUTTON] = 1; break;
     case WM_RBUTTONUP: port_keys[VK_RBUTTON] = 0; break;
     case WM_MBUTTONDOWN: port_keys[VK_MBUTTON] = 1; break;
     case WM_MBUTTONUP: port_keys[VK_MBUTTON] = 0; break;
@@ -141,9 +203,46 @@ static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
     {
         RAWINPUT ri;
         UINT size = sizeof(ri);
-        if (GetRawInputData((HRAWINPUT)lp, RID_INPUT, &ri, &size, sizeof(RAWINPUTHEADER)) != (UINT)-1 &&
-            ri.header.dwType == RIM_TYPEMOUSE)
+        if (GetRawInputData((HRAWINPUT)lp, RID_INPUT, &ri, &size, sizeof(RAWINPUTHEADER)) == (UINT)-1 ||
+            !raw_input_ours(hwnd))
+            break;
+        note_input("raw input", ri.header.dwType == RIM_TYPEKEYBOARD ? ri.data.keyboard.VKey : 0);
+        if (ri.header.dwType == RIM_TYPEKEYBOARD)
         {
+            /* the held keys from the keyboard itself (Remote Desktop's keys reach raw input even
+               when the window gets no key messages) */
+            USHORT vk = ri.data.keyboard.VKey;
+            unsigned char down = (ri.data.keyboard.Flags & RI_KEY_BREAK) ? 0 : 1;
+            if (vk == VK_SHIFT)
+                vk = (USHORT)MapVirtualKeyA(ri.data.keyboard.MakeCode, MAPVK_VSC_TO_VK_EX);
+            else if (vk == VK_CONTROL)
+                vk = (ri.data.keyboard.Flags & RI_KEY_E0) ? VK_RCONTROL : VK_LCONTROL;
+            else if (vk == VK_MENU)
+                vk = (ri.data.keyboard.Flags & RI_KEY_E0) ? VK_RMENU : VK_LMENU;
+            if (vk && vk < 255)
+            {
+                if (down && !port_keys[vk])
+                    press(vk);
+                port_keys[vk] = down;
+                /* (the generic modifiers too) */
+                if (vk == VK_LSHIFT || vk == VK_RSHIFT)
+                    port_keys[VK_SHIFT] = down || port_keys[vk == VK_LSHIFT ? VK_RSHIFT : VK_LSHIFT];
+                if (vk == VK_LCONTROL || vk == VK_RCONTROL)
+                    port_keys[VK_CONTROL] = down || port_keys[vk == VK_LCONTROL ? VK_RCONTROL : VK_LCONTROL];
+                if (vk == VK_LMENU || vk == VK_RMENU)
+                    port_keys[VK_MENU] = down || port_keys[vk == VK_LMENU ? VK_RMENU : VK_LMENU];
+            }
+        }
+        else if (ri.header.dwType == RIM_TYPEMOUSE)
+        {
+            /* the buttons from the mouse itself */
+            USHORT bf = ri.data.mouse.usButtonFlags;
+            if (bf & RI_MOUSE_LEFT_BUTTON_DOWN) { press(VK_LBUTTON); port_keys[VK_LBUTTON] = 1; }
+            if (bf & RI_MOUSE_LEFT_BUTTON_UP) port_keys[VK_LBUTTON] = 0;
+            if (bf & RI_MOUSE_RIGHT_BUTTON_DOWN) { press(VK_RBUTTON); port_keys[VK_RBUTTON] = 1; }
+            if (bf & RI_MOUSE_RIGHT_BUTTON_UP) port_keys[VK_RBUTTON] = 0;
+            if (bf & RI_MOUSE_MIDDLE_BUTTON_DOWN) port_keys[VK_MBUTTON] = 1;
+            if (bf & RI_MOUSE_MIDDLE_BUTTON_UP) port_keys[VK_MBUTTON] = 0;
             if (ri.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
             {
                 /* (Remote Desktop and tablets: positions, not movement) */
@@ -257,13 +356,18 @@ static void create_window(HINSTANCE inst)
     ShowWindow(hwnd, SW_SHOW);
     UpdateWindow(hwnd);
     port_hwnd = hwnd;
-    RAWINPUTDEVICE rid = {0x01, 0x02, port_input_background() ? (DWORD)RIDEV_INPUTSINK : 0, hwnd};    /* the mouse */
+    /* the mouse and the keyboard as raw input, delivered when the window is not the active one too
+       (RIDEV_INPUTSINK: over Remote Desktop the window can be shown and clicked without ever being
+       told it has the keyboard); used while no other window is in front (raw_input_ours) */
+    RAWINPUTDEVICE rids[2] = {{0x01, 0x02, RIDEV_INPUTSINK, hwnd}, {0x01, 0x06, RIDEV_INPUTSINK, hwnd}};
+    RAWINPUTDEVICE &rid = rids[0];
     if (GetSystemMetrics(SM_REMOTESESSION))
     {
         plog("input: a Remote Desktop session: look from the cursor");
         port_mouse_absolute = 1;
     }
-    RegisterRawInputDevices(&rid, 1, sizeof(rid));
+    if (!RegisterRawInputDevices(rids, 2, sizeof(rids[0])))
+        plog("input: raw input not registered (%lu)", GetLastError());
 #endif
 }
 
