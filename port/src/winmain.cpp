@@ -86,6 +86,9 @@ static void set_fullscreen(HWND hwnd, int on)
  * the asynchronous key state does not always see.
  */
 volatile unsigned char port_keys[256];
+/* the window has the keyboard (WM_SETFOCUS until WM_KILLFOCUS): over Remote Desktop
+   GetForegroundWindow can answer no window at all while it does */
+volatile LONG port_has_focus;
 
 static void set_key(WPARAM vk, LPARAM lp, unsigned char down)
 {
@@ -117,7 +120,11 @@ static void track_input(UINT msg, WPARAM wp, LPARAM lp)
     case WM_RBUTTONUP: port_keys[VK_RBUTTON] = 0; break;
     case WM_MBUTTONDOWN: port_keys[VK_MBUTTON] = 1; break;
     case WM_MBUTTONUP: port_keys[VK_MBUTTON] = 0; break;
+    case WM_SETFOCUS:
+        InterlockedExchange(&port_has_focus, 1);
+        break;
     case WM_KILLFOCUS:
+        InterlockedExchange(&port_has_focus, 0);
         /* (nothing stays held when the window loses the keyboard) */
         for (int i = 0; i < 256; i++)
             port_keys[i] = 0;

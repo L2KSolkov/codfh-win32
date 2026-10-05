@@ -151,16 +151,21 @@ enum { XB_A, XB_B, XB_X, XB_Y, XB_BLACK, XB_WHITE, XB_LTRIGGER, XB_RTRIGGER };
    input read while another window is in front). */
 extern "C" int port_input_background(void);
 
+extern volatile LONG port_has_focus;
+
 static int window_has_input(void)
 {
-    return port_hwnd && (GetForegroundWindow() == (HWND)port_hwnd || port_input_background());
+    return port_hwnd && (port_has_focus || GetForegroundWindow() == (HWND)port_hwnd || port_input_background());
 }
 
 extern volatile unsigned char port_keys[256];
 
 static int key(int vk)
 {
-    return window_has_input() && ((vk >= 0 && vk < 256 && port_keys[vk]) || (GetAsyncKeyState(vk) & 0x8000));
+    /* (a key the window was sent is held whatever the foreground says) */
+    if (vk >= 0 && vk < 256 && port_keys[vk])
+        return 1;
+    return window_has_input() && (GetAsyncKeyState(vk) & 0x8000);
 }
 
 /* The keyboard as a controller: WASD the left stick, the arrows the right, IJKL the d-pad;
