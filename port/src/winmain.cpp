@@ -11,6 +11,7 @@
 #include "port.h"
 
 int main();
+extern "C" void port_crash_handler_install(void);
 
 static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 {
@@ -78,6 +79,7 @@ static void create_window(HINSTANCE inst)
 
 int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR, int)
 {
+    port_crash_handler_install();
     port_config_load();
     timeBeginPeriod(1);
     create_window(inst);

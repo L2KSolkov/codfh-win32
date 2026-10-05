@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <wchar.h>
+#include <stdlib.h>
 
 #include "port.h"
 
@@ -183,6 +184,63 @@ static void keyboard_state(XINPUT_GAMEPAD *g)
 
 static DWORD packets[4];
 
+/* CODFH_INPUT: "frame:button,frame:button,..." holds pad 0's button for 8 frames from that
+   frame (A B X Y BLACK WHITE LT RT START BACK UP DOWN LEFT RIGHT; stick directions LUP LDOWN
+   LLEFT LRIGHT), for driving the game without a person. */
+struct ScriptedPress
+{
+    unsigned frame;
+    char button[8];
+};
+static ScriptedPress script[256];
+static int script_count = -1;
+
+static void load_script(void)
+{
+    script_count = 0;
+    char v[4096];
+    if (!GetEnvironmentVariableA("CODFH_INPUT", v, sizeof(v)))
+        return;
+    for (char *tok = strtok(v, ","); tok && script_count < 256; tok = strtok(NULL, ","))
+    {
+        char *colon = strchr(tok, ':');
+        if (!colon)
+            continue;
+        *colon = 0;
+        script[script_count].frame = (unsigned)atoi(tok);
+        strncpy(script[script_count].button, colon + 1, 7);
+        script_count++;
+    }
+    plog("scripted input: %d presses", script_count);
+}
+
+static void scripted_state(XINPUT_GAMEPAD *g)
+{
+    if (script_count < 0)
+        load_script();
+    unsigned f = port_frame;
+    for (int i = 0; i < script_count; i++)
+    {
+        if (f < script[i].frame || f >= script[i].frame + 8)
+            continue;
+        const char *b = script[i].button;
+        static const char *const analog[8] = {"A", "B", "X", "Y", "BLACK", "WHITE", "LT", "RT"};
+        for (int k = 0; k < 8; k++)
+            if (!strcmp(b, analog[k]))
+                g->bAnalogButtons[k] = 255;
+        if (!strcmp(b, "START")) g->wButtons |= XB_START;
+        if (!strcmp(b, "BACK")) g->wButtons |= XB_BACK;
+        if (!strcmp(b, "UP")) g->wButtons |= XB_DPAD_UP;
+        if (!strcmp(b, "DOWN")) g->wButtons |= XB_DPAD_DOWN;
+        if (!strcmp(b, "LEFT")) g->wButtons |= XB_DPAD_LEFT;
+        if (!strcmp(b, "RIGHT")) g->wButtons |= XB_DPAD_RIGHT;
+        if (!strcmp(b, "LUP")) g->sThumbLY = 32767;
+        if (!strcmp(b, "LDOWN")) g->sThumbLY = -32768;
+        if (!strcmp(b, "LLEFT")) g->sThumbLX = -32768;
+        if (!strcmp(b, "LRIGHT")) g->sThumbLX = 32767;
+    }
+}
+
 extern "C" DWORD WINAPI XInputGetState(HANDLE hDevice, PXINPUT_STATE pState)
 {
     DWORD port = (DWORD)(ULONG_PTR)hDevice - 1;
@@ -212,7 +270,10 @@ extern "C" DWORD WINAPI XInputGetState(HANDLE hDevice, PXINPUT_STATE pState)
     else if (port != 0)
         return ERROR_DEVICE_NOT_CONNECTED;
     if (port == 0)
+    {
         keyboard_state(&s.Gamepad);
+        scripted_state(&s.Gamepad);
+    }
     if (memcmp(&s.Gamepad, &pState->Gamepad, sizeof(s.Gamepad)))
         packets[port]++;
     s.dwPacketNumber = packets[port];

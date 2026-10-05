@@ -20,6 +20,7 @@
 PortConfig port_config;
 void *port_hwnd;
 volatile int port_quit;
+volatile unsigned port_frame;
 
 static FILE *log_file;
 static CRITICAL_SECTION log_lock;

@@ -36,6 +36,9 @@ void port_config_load(void);
 extern void *port_hwnd;
 /* Pumps window messages; returns 0 once the window was closed. */
 int port_pump_messages(void);
+/* Frames presented so far (scripted input and captures key on it). */
+extern volatile unsigned port_frame;
+
 /* Set when the window was closed (the game loop checks it to exit). */
 extern volatile int port_quit;
 

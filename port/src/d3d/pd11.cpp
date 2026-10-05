@@ -175,7 +175,10 @@ static void capture(unsigned frame)
             char path[MAX_PATH];
             GetModuleFileNameA(NULL, path, MAX_PATH);
             char *slash = strrchr(path, '\\');
-            strcpy(slash ? slash + 1 : path, "shot.bmp");
+            if (every)
+                sprintf(slash ? slash + 1 : path, "shot_%06u.bmp", frame);
+            else
+                strcpy(slash ? slash + 1 : path, "shot.bmp");
             FILE *f = fopen(path, "wb");
             if (f)
             {

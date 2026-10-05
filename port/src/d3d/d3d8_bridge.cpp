@@ -247,6 +247,7 @@ static void pace_frame(void)
 
 extern "C" HRESULT WINAPI IDirect3DDevice8_Present(D3DDevice *, const RECT *, const RECT *, void *, void *)
 {
+    port_frame++;
     pdev_present();
     pace_frame();
     port_pump_messages();
