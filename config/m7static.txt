@@ -1,0 +1,5 @@
+# M7 probe: COMDAT literals an object keeps as its own (OBJECT-SUFFIX NAME [ALIGN]), made plain and
+# file-local by comdatize.static_comdat.
+# (RenderWare's fsyst "" at 0x3EE8B8, which TkXboxFSystemFRead and FWrite push, is apart from
+# the "" unit_067B10 and xonlines share at 0x3D292F; config/m7rows.txt keys it)
+fsyst/xbox/rtfsxxbx.obj ??_C@_00CNPNBAHC@?$AA@ 4

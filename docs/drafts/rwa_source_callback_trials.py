@@ -1,0 +1,2 @@
+from pathlib import Path
+s=Path('src/rwa/unit_247430.c').read_text();d=Path('docs/drafts/rwa_source_draft.c').read_text();d=d[d.index('// match: _sub_248810'):d.index('// match: _sub_249160')];d=d.replace('static void','void',1);prefix='extern RwBool sub_247FE0(rwaDecoderState *, RwUInt32, RwUInt32);\nextern RwInt32 sub_247F20(rwaDecoderState *);\nextern RwInt32 sub_248520(rwaDecoderState *);\n';VS={'cb_base':[(s,s+'\n'+prefix+d)]}

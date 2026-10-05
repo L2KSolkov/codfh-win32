@@ -1,0 +1,5 @@
+# M7 probe: header inlines (COMDATs) another game object also defines whose image copy is
+# the row's object's: the other copies are disowned (_DisownGame), so the link takes the
+# row's whichever object it meets first.
+# (unit_1D0100's copy keeps its two locals the other way round: ebp-4 for the count)
+??0type_3E4E58@@QAE@ABU0@@Z

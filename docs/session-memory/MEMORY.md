@@ -1,0 +1,74 @@
+- [Push after commit](push-after-commit.md) — push master to origin after each commit; force-pushed once 2026-09-24
+- [Gate on build log](gate-on-build-log.md) — check build.py output for == PASS, never via a pipe to tail
+- [Python edit pitfalls](python-utf8-edits.md) — pass encoding='utf-8'; no backslash-continued macros in Python strings
+- [Local names first](local-names-first.md) — slot naming: local_names, then tools/bsolve/applyn, then tools/climb_names.py; structdiff first
+- [Inline reserve and placement delete](inline-reserve-and-placement-delete.md) — extra frame bytes = in-class deleting fn not inlined; extra new temp = matching placement delete
+- [RW macro operand order](rw-macro-operand-order.md) — wrong fld/fmul order in vector math: use rw/bavector.h macros
+- [MI thunk splits](mi-thunk-splits.md) — placement link fails after a matched function: split out the adjustor thunk or a neighbour's EH funclet chunk
+- [RWS behaviour workflow](rws-behaviour-workflow.md) — per-class pieces, thunk splits, ICF aliases, generators; where the behaviours stand
+- [Heredoc backslashes](heredoc-backslashes.md) — Bash heredocs drop \ and \n escapes; use the Write tool for them
+- [Trial misses reloc targets](trial-misses-reloc-targets.md) — trial passes but link fails: call bound elsewhere (class operator delete); "unverified" XDK import = add _Name@N alias
+- [Inline quirks](inline-return-slot-order.md) — 1/0 temp before an arg temp = if/return inline; no static inline; ctors with destructible members never inline
+- [FPU expression shapes](fpu-expression-shapes.md) — fabs one-temp = (RwReal)fabs((RwDouble)x); jnp = !(x<=c); A*(B/C); += store order
+- [/Zi fixes aligned frames](zi-fixes-aligned-frames.md) — /Zi (now in flags.txt) gives the 8-byte ebx prologue; retry aligned-frame functions
+- [SSE sqrt form](sse-sqrt-form.md) — movss/movaps/sqrtss block = __m128 do/while with _mm_set_ss/_mm_sqrt_ss/_mm_store_ss (xmmintrin.h)
+- [cm one at a time](cm-one-at-a-time.md) — batch all addresses into ONE cm.py run (not seqcm); pass -m when headers changed; wait for its notification; audit first; no edits meanwhile
+- [Int expression shapes](int-expression-shapes.md) — neg/sbb/neg = p ? 1 : 0; if/else-break; if/else into a local; cmp edx,eax = inline getter on the left
+- [No IDA edits](no-ida-edits.md) — never modify the IDA DB; missing functions go into symbols.txt/splits.txt by hand
+- [Entity destructors](entity-destructors.md) — virtual inline ~type_3D3548; derived ~X(){vf_230();}; empty class operator delete aliased to 0x19A750
+- [Empty if shifts registers](empty-if-register-shift.md) — registers one step off after a statement = compiled-out assert in an empty if
+- [Check existing headers](check-existing-headers.md) — git ls-files before copying a drafted header; merge, never overwrite
+- [Dead code slots](dead-code-slots.md) — frame gap + register shift = code after break; switch temp from garbage slot = direct-return inline getter
+- [Block-scoped locals below arrays](block-scoped-locals-below-arrays.md) — scalars under a /GS array are for/if-scoped; climb_names before resizing the array
+- [Block-local allocation](block-local-allocation.md) — nested-block locals get slots at first use; shared slot across cases = enclosing-block variable
+- [Paren cast temp](paren-cast-temp.md) — fst temp before fstp var after fmod/fabs = ((RwReal)f(...)); qword divisor = (RwDouble)x.f
+- [GodAsset unit](godasset-unit.md) — unit_18F3C0: 0x10-byte type_3DF8D8_base, second bases at +0x10, alias every vtable, parked sub_190640
+- [kuju UI units](kuju-ui-units.md) — kuju UI, cNetGame, players (bar sub_1CE650) and mask helpers done; type_1D0100 next; assert strings give real names
+- [TaskStop orphans](taskstop-orphans.md) — TaskStop leaves piped python running; kill by command line; name-search on _bn.cxx copies
+- [Message data bases](message-data-bases.md) — netmsg messages: empty X_data base (inline ctors) declared first gives the null-checked +4 temp before vtable stores
+- [String ctor out of line](string-ctor-out-of-line.md) — sub_E87E0 = type_1CB670() out of line (aliased); declare such objects type_1CB670; sub_1C5700 still open
+- [cm only](cm-replay-limits.md) — commit only via cm.py; match parked code instead of working around it
+- [Duplicate template copies](duplicate-template-copies.md) — "placed twice" STL template = byte-identical copy under another element type (RwUInt32)
+- [MI part interfaces](mi-part-interfaces.md) — all-purecall second base: pvf_ slot names, shared-name thunk, ICF aliases; check real callee before ODR theories
+- [Getter and bool shapes](getter-and-bool-shapes.md) — manager direct getters for vcall garbage slots; one-load stand-in check; bool setcc forms; mask test(); /GS on named strings
+- [Voice channel shapes](voice-channel-shapes.md) — src-first time stores = since()/zero(); B0 named local; /GS decl order; by-value inline slots; greedy check() search
+- [kujuUI library](kujuui-library.md) — 0x1DFBB0–0x1FA180 in namespace kujuUI (game/kujuui.h); widget/selectable/creator layouts; cm/climb fixes
+- [Unwind inline copies](unwind-inline-copies.md) — funclet calls another address than the body = inline base dtor's COMDAT copy; parked STL-reserve cases
+- [cm strip trailing lines](cm-strip-trailing-lines.md) — no bodiless match lines at a global-scope unit's end; no namespace } between match blocks
+- [cm EH addresses](cm-eh-addresses.md) — pass cm only function addresses; EH lines ride along; add them before the first cm
+- [Original asm only](asm-byte-swap-stays-binary.md) — 2026-10-01 rule: __asm only where the original had it, in begin/end original __asm regions; nothing else transcribed
+- [Library local names](library-local-names.md) — known libraries (dlmalloc 2.7.0): use their macros and local names; layouts match; parenthesize byte casts for the audit
+- [Unexpanded inline frame](unexpanded-inline-frame.md) — unused frame bytes = callee's locals + callee after caller => callee is an inline kept out of line
+- [STL member and pair shapes](stl-member-and-pair-shapes.md) — iterator member w/o null store = const_iterator copy-init; no ref slot = pair local conversion; ICF copy ctor
+- [Live menus units](live-menus-units.md) — 0x1FC320-0x2251F0 done (menus, in-game pages); class/cast/hook-alias/selector patterns; next 0x225220
+- [Free inline arg first](free-inline-arg-first.md) — literal stored before member address, slots after temporaries = free inline with own locals (r, m)
+- [Late service shapes](late-service-shapes.md) — empty switch temp; slot order; liveservice.h split; $E renumbering; by-value empty inline for discarded reads; tan_ref/cos_ref; adiff.py
+- [Scratch include overlay](scratch-include-overlay.md) — trial header edits during cm: build/ copy + build/tooltmp/inc first on /I; never write src/ meanwhile
+- [Aligned frame shapes](aligned-frame-shapes.md) — ebx frames: first-use slot order; (RwDouble)field*local; named float consts; field*-v; unsigned (RwUInt32) casts
+- [Weapon fire shapes](weapon-fire-shapes.md) — index-first subscripts via inline accessors; B*(x/A)+x; crand/fabs_ref; literal vs named float order; alias for new virtuals
+- [Fast build tools](fast-build-tools.md) — commit with tools/cmf.py (incremental ibuild.py, ~30 s); never edit cm.py; bsolve bucket-0 = declare farthest first
+- [Implicit conversion temp](implicit-conversion-temp.md) — temp passed by lea, no ctor-return slots = `s = "text"` implicit conversion
+- [Text temp type](text-temp-type.md) — frame too big by unused slots near texts = type_1A5EA0 temps; inline budget; too big: no-code inlines at the END shrink it
+- [Draft diff workflow](draft-diff-workflow.md) — xdis draft, slotmap/diffall all-diff loop, bsolve names; fucompp jp = equal
+- [Asm-only drafts](asm-only-drafts.md) — draft from xdis only (no IDA decompile); aligned frames = first-use slots; if (0) emitted; 64-bit test temp
+- [Global dynamic initializers](global-dynamic-initializers.md) — unplaced $E pair + out-of-line ctor = define the global in its unit; alias folded dtor to pDtor
+- [ICF placement](icf-placement.md) — place ICF-shared/library COMDATs: define one aliased owner, match line in any emitting unit; keep aliases
+- [RW source builds](rw-source-builds.md) — in-image RenderWare compiles from D:\RW_372_src with /O2 /Ob2 /arch:SSE /DRWGLOBALSIZE; src/rw + include/rw/sdk workflow
+- [RW differences doc](rw-differences-doc.md) — log every RW image-vs-3.7.2 difference in docs/rw-differences.md
+- [RW import then edit](rw-import-then-edit.md) — commit a new RW file pristine first, edits in the next commit
+- [Initializer batch](initializer-batch.md) — $E tail initializers: inits/initunit/emap --remap tools; define at unit end; inline/strlen/ctor-arg forms
+- [Xbox driver from asm](xbox-driver-from-asm.md) — RW 3.6 Xbox driver rebuilt in src/rw/driver/xbox/; ctry/rwbybytes/rwrank tools
+- [Godfather IDA reference](godfather-ida-reference.md) — ports 13339 (release) / 13340 (DEBUG) Godfather PDB: RW Xbox source shapes, names, types; read-only gf.py/gfpy.py
+- [Bink library](bink-library.md) — binkxbox.lib names every function; image layouts BINK2.H 1.6c; VC7.1 /O2; rest transcribed via tools/img2masm.py
+- [Godfather only for missing source](godfather-only-for-missing-source.md) — Godfather builds only for RW code absent from the RW tree (Xbox driver); tree files: tree source + image
+- [Xbox pipeline shapes](xbox-pipeline-shapes.md) — register-convention statics, static globals for xmm caching, nested-call args, param-scaled operand order, cmf CMUNIT/config staging, Godfather as 3.6 template
+- [C block layout and slots](c-block-layout-and-slots.md) — RW C: if-polarity sets layout after jump threading; slots follow first use/scope, not names; param slots by first param reference; if/else bitfield RMW; cmf static tables; tools/ptry.py
+- [RW 3.6 structural near misses](rw36-structural-near-misses.md) — rwrank entries: compare image control flow to source first (per-element I/O, file table args, tree edits, wrong DB names)
+- [RW Audio quirks](rwa-quirks.md) — src/rwa: /O2 /Ob1 x87, nop padding (addfn --trim), table handlers (addfn), volatile float = fld/fstp, structs in header
+- [XDK placement](xdk-placement.md) — M3: xdkplace.py + xdksplit.py placed 4,050 installed-lib functions; build/xdk extraction step
+- [No rm](no-rm.md) — never run rm, even on scratch dirs; use unique variant prefixes/globs
+- [XDK 5849 SDK](xdk-5849-sdk.md) — Downloads XDKSetup5849 libs may match better than C:\xdk; copy matching ones into the worktree
+- [sNetGameEP unit](snetgameep-unit.md) — matched 2026-10-01; guard = empty-if rotation; snchk.py; never cp stale ptry copies back
+- [chk2 first-diff search](chk2-first-diff-search.md) — long /Od rotation fixes: first diff -> /FAsc line -> checks/inline swaps; matched sub_1CE650
+- [others_checked and inline budget](others-checked-and-inline-budget.md) — others()/mask rotation fixes, show_message+hosting frame fix, pscore.py
+- [RW Xbox header shapes](rw-xbox-header-shapes.md) — null-driver headers/third-party edits cause RW near misses; Xbox vertex fixed 2D stroke/font

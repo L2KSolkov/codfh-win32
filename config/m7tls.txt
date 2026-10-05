@@ -1,0 +1,5 @@
+# M7 probe: NAME SECTION, thread-local variables in the image's .tls order (link.exe lays
+# .tls$ out in object order, which puts libcmt's tidtable before xapilib's error)
+_XapiLastErrorCode .tls$1
+___ptd_cur .tls$2
+_XapiTlsSlots .tls$3

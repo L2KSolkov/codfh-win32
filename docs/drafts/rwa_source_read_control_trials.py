@@ -1,0 +1,8 @@
+exec(open('docs/drafts/rwa_source_read_trials.py').read());VS={}
+for n in range(16):
+ u=d
+ if n&1:u=u.replace('else if (state->unk14C <= state->unk154)\n        {\n            free = state->unk154 - state->unk14C;\n        }\n        else\n        {\n            free = state->unk154 + state->noItems - state->unk14C;\n        }','else if (state->unk14C > state->unk154)\n        {\n            free = state->unk154 + state->noItems - state->unk14C;\n        }\n        else\n        {\n            free = state->unk154 - state->unk14C;\n        }')
+ if n&2:u=u.replace('                    ReleaseSemaphore(state->semaphore, 1, NULL);\n                    return 2;', '                    goto failed;').replace('    ReleaseSemaphore(state->semaphore, 1, NULL);\n    return 3;', '    ReleaseSemaphore(state->semaphore, 1, NULL);\n    return 3;\nfailed:\n    ReleaseSemaphore(state->semaphore, 1, NULL);\n    return 2;')
+ if n&4:u=u.replace('if (state->unkF0 == state->unkF4)\n                {\n                    region->unk0C = 0;\n                }\n                else\n                {\n                    region->unk0C = state->unkF4;\n                    state->unkF0 = state->unkF4;\n                }', 'if (state->unkF0 != state->unkF4)\n                {\n                    region->unk0C = state->unkF4;\n                    state->unkF0 = state->unkF4;\n                }\n                else\n                {\n                    region->unk0C = 0;\n                }')
+ if n&8:u=u.replace('                state->regions[last - 1].flags |= 0x10;', '                --last;\n                state->regions[last].flags |= 0x10;')
+ VS['rdctrl_%d'%n]=[(s,s+'\n'+prefix+u)]

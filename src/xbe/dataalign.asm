@@ -1,0 +1,24 @@
+; codfh-match: the 16-byte alignment fill in .data (PLAN M7, tools/session/dataalign.py)
+; Empty PARA-aligned sections, each sorting just before the 16-aligned row the image pads
+; to: the empty 16-aligned .data of a MASM library object the original link met there.
+
+        .686p
+
+da00427400 SEGMENT PARA PUBLIC USE32 ALIAS('.data$004273FF') 'DATA'
+da00427400 ENDS
+da00435800 SEGMENT PARA PUBLIC USE32 ALIAS('.data$004357FF') 'DATA'
+da00435800 ENDS
+da00435820 SEGMENT PARA PUBLIC USE32 ALIAS('.data$0043581F') 'DATA'
+da00435820 ENDS
+da00435830 SEGMENT PARA PUBLIC USE32 ALIAS('.data$0043582F') 'DATA'
+da00435830 ENDS
+da00435850 SEGMENT PARA PUBLIC USE32 ALIAS('.data$0043584F') 'DATA'
+da00435850 ENDS
+da00435860 SEGMENT PARA PUBLIC USE32 ALIAS('.data$0043585F') 'DATA'
+da00435860 ENDS
+da00435880 SEGMENT PARA PUBLIC USE32 ALIAS('.data$0043587F') 'DATA'
+da00435880 ENDS
+da004362D0 SEGMENT PARA PUBLIC USE32 ALIAS('.data$004362CF') 'DATA'
+da004362D0 ENDS
+
+        END

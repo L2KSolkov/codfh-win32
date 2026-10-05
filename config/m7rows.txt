@@ -1,0 +1,30 @@
+# M7 probe: rows the M7 link keys data by that the placement link (config/compiled.txt)
+# keeps as stand-in pieces (config/m7drop.txt drops those pieces from the M7 link).
+# ADDR OBJECT NAME
+0x0053A27C build/xdk/xonlines/obj_i386_storutil.obj _rgszLocalStoragePaths
+0x003D292F build/src/recovered/unit_067B10.obj ??_C@_00CNPNBAHC@?$AA@
+0x004260B0 build/xdk/libcpmt/obj_i386_string.obj $T11416
+# (a folded handler's funcinfo the image keeps without a row: sub_15A7B0 shares sub_14C820's
+# handler; its table lies between unit_1442C0's and unit_14C820's)
+0x0041DD70 build/src/recovered/unit_155470.obj __ehhandler$?sub_15A7B0@@YAPAUtype_3DC378@@PAUtype_712B0@@@Z>1
+0x0041DD68 build/src/recovered/unit_155470.obj __ehhandler$?sub_15A7B0@@YAPAUtype_3DC378@@PAUtype_712B0@@@Z>1>8
+# (dsound's zero-tail data the image keys by address: its _RW variables, then dsapi's static
+# (config/m7bssrw.txt) and ac97's, whose 8-aligned section otherwise opens the unkeyed rest)
+0x00341204 build/xdk/xdklib_dsound/obj_i386_mcpapu.obj ?dwMagicWriteValue@?1??WaitForMagicWrite@CMcpxAPU@DirectSound@@IAEXXZ@4KA
+0x00341208 build/xdk/xdklib_dsound/obj_i386_heap.obj ?m_pSlopMemoryHeap@CMcpxSlopMemoryHeap@DirectSound@@2PAV12@A
+0x0034120C build/xdk/xdklib_dsound/obj_i386_mcpvoice.obj ?m_dwStuckVoiceCount@CMcpxVoiceClient@DirectSound@@2KA
+0x00341218 build/xdk/xdklib_dsound/obj_i386_ac97.obj ?m_pDevice@CAc97Device@DirectSound@@2PAV12@A
+# (the libraries' initializers at the initializer table's end, in the image's order:
+# keyed by their addresses' low digits, comdatize.KEY_LOW)
+0x00427378 build/xdk/dsound/obj_i386_dscommon.obj .CRT$XCU+0
+0x00427380 build/xdk/dsound/obj_i386_heap.obj .CRT$XCU+0
+0x00427388 build/xdk/uix/obj_i386_engine.obj .CRT$XCU+0
+0x0042738C build/xdk/uix/obj_i386_friends.obj .CRT$XCU+0
+0x00427390 build/xdk/uix/obj_i386_uixlogon.obj .CRT$XCU+0
+0x00427394 build/xdk/uix/obj_i386_voicemail.obj .CRT$XCU+0
+0x00427398 build/xdk/uix/obj_i386_players.obj .CRT$XCU+0
+0x0042739C build/xdk/xvoice/obj_i386_hawk2.obj .CRT$XCU+0
+0x004273A4 build/xdk/xapilib/obj_i386_mu.obj .CRT$XCU+0
+0x004273A8 build/xdk/xgraphics/obj_i386_instructiongraph.obj .CRT$XCU+0
+# (RenderWare fsyst's own "" (config/m7static.txt), between rtfsmgr's literals and Bink's)
+0x003EE8B8 build/src/rw/tool/fsyst/xbox/rtfsxxbx.obj ??_C@_00CNPNBAHC@?$AA@

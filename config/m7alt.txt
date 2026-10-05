@@ -1,0 +1,3 @@
+# M7 probe: NAME TARGET, names the M7 link resolves to another definition (/ALTERNATENAME),
+# their own definitions dropped (config/m7drop.txt).
+?collections@Instruction@VS_GRAPH_OPTIMIZER@XGRAPHICS@@0V?$set@PAV?$collection@PAVInstruction@VS_GRAPH_OPTIMIZER@XGRAPHICS@@@VS_GRAPH_OPTIMIZER@XGRAPHICS@@U?$less@PAV?$collection@PAVInstruction@VS_GRAPH_OPTIMIZER@XGRAPHICS@@@VS_GRAPH_OPTIMIZER@XGRAPHICS@@@23@@23@A _xgrph_icoll

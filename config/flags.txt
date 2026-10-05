@@ -1,0 +1,32 @@
+# unit glob: compiler flags (first matching rule wins).
+#
+# Game flags, as far as M0 has proven them. docs/toolchain.md records the
+# probe or image evidence behind each; /G6, /GF, _XBOX and NDEBUG are still
+# unproven. No /arch:SSE and no /G7: both break probe p04.
+probes/*: /c /nologo /Od /Gy /GS /EHsc /GR- /G6 /GF /MT /W3 /D_XBOX /DNDEBUG
+# RenderWare's own sources built into the game (rtdict, rpuvanim): RenderWare's
+# release flags (/O2 /Ob2) with /arch:SSE, and RWGLOBALSIZE, which makes
+# RwEngineInstance the static ourGlobals array the image reads directly
+# (0x5200E0; the size only sizes its extern declaration). The SDK's generated
+# headers are in include/rw/sdk. Proven on the 12 rtdict and 37 rpuvanim
+# functions in the image (docs/units.md).
+src/rwa/xbox/*: /c /nologo /Og /Oi /Ot /Oy /Ob1 /Gs /G6 /Gy /W3 /D_XBOX /DNDEBUG /Isrc/rwa
+src/rwa/*: /compiler:vc70 /c /nologo /O2 /Ob1 /G6 /Gy /W3 /D_XBOX /DNDEBUG /Isrc/rwa
+src/bink/*: /c /nologo /O2 /QIfist /Gy /W3 /D_XBOX /DNDEBUG /Isrc/bink
+src/rw/plugin/dmorph/xbox/*: /c /nologo /O2 /Ob2 /G6 /Gy /arch:SSE /W3 /D_XBOX /DNDEBUG /DRWGLOBALSIZE=0x4000 /Iinclude/rw/sdk /Isrc/rw/src /Isrc/rw/src/plcore /Isrc/rw/driver/null /Isrc/rw/driver/common /Isrc/rw/os/win /Isrc/rw/src/pipe/p2 /Isrc/rw/world /Isrc/rw/world/pipe/p2 /Isrc/rw/src/pipe/p2/null /Isrc/rw/world/pipe/p2/null /DPLATFORM_PIPELINES /Isrc/rw/driver/xbox /Isrc/rw/world/pipe/p2/xbox /Isrc/rw/plugin/dmorph
+src/rw/plugin/dmorph/*: /c /nologo /O2 /Ob2 /G6 /Gy /arch:SSE /W3 /D_XBOX /DNDEBUG /DRWGLOBALSIZE=0x4000 /Iinclude/rw/sdk /Isrc/rw/src /Isrc/rw/src/plcore /Isrc/rw/driver/null /Isrc/rw/driver/common /Isrc/rw/os/win /Isrc/rw/src/pipe/p2 /Isrc/rw/world /Isrc/rw/world/pipe/p2 /Isrc/rw/src/pipe/p2/null /Isrc/rw/world/pipe/p2/null /DPLATFORM_PIPELINES
+src/rw/plugin/skin2/xbox/*: /c /nologo /O2 /Ob2 /G6 /Gy /arch:SSE /W3 /D_XBOX /DNDEBUG /DRWGLOBALSIZE=0x4000 /Iinclude/rw/sdk /Isrc/rw/src /Isrc/rw/src/plcore /Isrc/rw/driver/xbox /Isrc/rw/driver/null /Isrc/rw/driver/common /Isrc/rw/os/win /Isrc/rw/src/pipe/p2 /Isrc/rw/world /Isrc/rw/world/pipe/p2 /Isrc/rw/src/pipe/p2/null /Isrc/rw/world/pipe/p2/null /Isrc/rw/world/pipe/p2/xbox /Isrc/rw/plugin/skin2
+src/rw/world/pipe/p2/xbox/*: /c /nologo /O2 /Ob2 /G6 /Gy /arch:SSE /W3 /D_XBOX /DNDEBUG /DRWGLOBALSIZE=0x4000 /Iinclude/rw/sdk /Isrc/rw/src /Isrc/rw/src/plcore /Isrc/rw/driver/xbox /Isrc/rw/driver/null /Isrc/rw/driver/common /Isrc/rw/os/win /Isrc/rw/src/pipe/p2 /Isrc/rw/world /Isrc/rw/world/pipe/p2 /Isrc/rw/src/pipe/p2/null /Isrc/rw/world/pipe/p2/null
+src/rw/src/pipe/p2/xbox/*: /c /nologo /O2 /Ob2 /G6 /Gy /arch:SSE /W3 /D_XBOX /DNDEBUG /DRWGLOBALSIZE=0x4000 /Iinclude/rw/sdk /Isrc/rw/src /Isrc/rw/src/plcore /Isrc/rw/driver/xbox /Isrc/rw/driver/null /Isrc/rw/driver/common /Isrc/rw/os/win /Isrc/rw/src/pipe/p2 /Isrc/rw/world /Isrc/rw/world/pipe/p2 /Isrc/rw/src/pipe/p2/null /Isrc/rw/world/pipe/p2/null
+src/rw/plugin/ptank/xbox/*: /c /nologo /O2 /Ob2 /G6 /Gy /arch:SSE /W3 /D_XBOX /DNDEBUG /DRWGLOBALSIZE=0x4000 /Isrc/rw/plugin/ptank /Isrc/rw/plugin/ptank/generic /Isrc/rw/plugin/ptank/null /Iinclude/rw/sdk /Isrc/rw/src /Isrc/rw/src/plcore /Isrc/rw/driver/null /Isrc/rw/driver/common /Isrc/rw/os/win /Isrc/rw/src/pipe/p2 /Isrc/rw/world /Isrc/rw/world/pipe/p2 /Isrc/rw/src/pipe/p2/null /Isrc/rw/world/pipe/p2/null /Isrc/rw/driver/xbox /Isrc/rw/world/pipe/p2/xbox
+src/rw/plugin/ptank/*: /c /nologo /O2 /Ob2 /G6 /Gy /arch:SSE /W3 /D_XBOX /DNDEBUG /DRWGLOBALSIZE=0x4000 /Iinclude/rw/sdk /Isrc/rw/src /Isrc/rw/src/plcore /Isrc/rw/driver/null /Isrc/rw/driver/common /Isrc/rw/os/win /Isrc/rw/src/pipe/p2 /Isrc/rw/world /Isrc/rw/world/pipe/p2 /Isrc/rw/src/pipe/p2/null /Isrc/rw/world/pipe/p2/null /Isrc/rw/plugin/ptank/generic /Isrc/rw/plugin/ptank/null
+src/rw/plugin/matfx/xbox/*: /c /nologo /O2 /Ob2 /G6 /Gy /arch:SSE /W3 /D_XBOX /DNDEBUG /DRWGLOBALSIZE=0x4000 /Isrc/rw/plugin/matfx /Isrc/rw/plugin/matfx/null /Iinclude/rw/sdk /Isrc/rw/src /Isrc/rw/src/plcore /Isrc/rw/driver/null /Isrc/rw/driver/common /Isrc/rw/os/win /Isrc/rw/src/pipe/p2 /Isrc/rw/world /Isrc/rw/world/pipe/p2 /Isrc/rw/src/pipe/p2/null /Isrc/rw/world/pipe/p2/null /Isrc/rw/driver/xbox /Isrc/rw/world/pipe/p2/xbox
+src/rw/tool/fsyst/*: /compiler:vc70 /c /nologo /O2 /Ob2 /G6 /Gy /arch:SSE /W3 /D_XBOX /DNDEBUG /DRWGLOBALSIZE=0x4000 /Iinclude/rw/sdk /Isrc/rw/src /Isrc/rw/src/plcore /Isrc/rw/driver/null /Isrc/rw/driver/common /Isrc/rw/os/win /Isrc/rw/src/pipe/p2 /Isrc/rw/world /Isrc/rw/world/pipe/p2 /Isrc/rw/src/pipe/p2/null /Isrc/rw/world/pipe/p2/null
+src/rw/*: /c /nologo /O2 /Ob2 /G6 /Gy /arch:SSE /W3 /D_XBOX /DNDEBUG /DRWGLOBALSIZE=0x4000 /Iinclude/rw/sdk /Isrc/rw/src /Isrc/rw/src/plcore /Isrc/rw/driver/null /Isrc/rw/driver/common /Isrc/rw/os/win /Isrc/rw/src/pipe/p2 /Isrc/rw/world /Isrc/rw/world/pipe/p2 /Isrc/rw/src/pipe/p2/null /Isrc/rw/world/pipe/p2/null
+# SplinePath: /EHa retains the empty destructor's EH state (BA030); all
+# other functions and unwind pieces in this unit still match (docs/toolchain.md).
+src/recovered/unit_0B9EA0.cpp: /c /nologo /Od /Ob1 /Gy /GS /EHa /GR- /G6 /GF /MT /W3 /Zi /D_XBOX /DNDEBUG
+# unit_3DAB58: its texts survived the link though nothing reads them, so they were
+# not COMDAT literals: no /GF (one .rdata section of texts in source order).
+src/recovered/unit_3DAB58.cpp: /c /nologo /Od /Ob1 /Gy /GS /EHsc /GR- /G6 /MT /W3 /Zi /D_XBOX /DNDEBUG
+src/*: /c /nologo /Od /Ob1 /Gy /GS /EHsc /GR- /G6 /GF /MT /W3 /Zi /D_XBOX /DNDEBUG

@@ -1,0 +1,11 @@
+# Extra external symbols the M7 link gives an object (tools/session/objalias.py):
+# OBJ NAME TARGET, TARGET a static of OBJ. Bink's transcriptions call the C statics by
+# these names (config/aliases.txt) so VC7.0 keeps the statics' register conventions.
+build/src/bink/binkread.obj _binkread_inittimer _inittimer
+build/src/bink/binkread.obj _binkread_checksound _checksound@4
+build/src/bink/binkread.obj _binkread_endframe _endframe
+build/src/bink/binkread.obj _binkread_GotoFrame _GotoFrame
+build/src/bink/binkread.obj _binkread_high1secrate _high1secrate
+build/src/bink/binkread.obj _binkread_bpopmalloc _bpopmalloc
+build/src/bink/binkread.obj _binkread_dosilence _dosilence
+build/src/bink/binkread.obj _binkread_pending_cb_bink_IO _cb_bink_IO

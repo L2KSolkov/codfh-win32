@@ -1,0 +1,27 @@
+# M7 probe: stand-in pieces the probe leaves out (their bytes are imagebld's output: the
+# library member's definition is linked instead, and imagebld writes the image's bytes).
+# NAME
+__tls_used
+_unk_3CD300
+__imp__RtlLeaveCriticalSection@4
+_unk_3CD564
+_unk_3CD580
+_XapiTlsAllocBitmap
+___lc_clike
+*_s_StringURLs
+*?bFirstTime@?1??UpdateCrc32@@9@9
+*___@@_PchSym_@00@UcylcuivRwvxADUkirezgvUdrmwldhUwrivxgcUwctUctizksrxhUhszwvzhnUcylcUlyqUrDIGUkxshszwvzhnOlyq@shadeasm
+*___@@_PchSym_@00@UcylcuivRwvxADUkirezgvUdrmwldhUwrivxgcUwctUwDwIUhvUfhviUlyqUrDIGUkivxlnkOlyq@d3d8
+*___@@_PchSym_@00@UcylcuivRwvxADUkirezgvUdrmwldhUwrivxgcUwctUwDwcIUnzgsUlyqUrDIGUkxsnzgsOlyq@d3dxmath
+*___@@_PchSym_@00@UcylcuivRwvxADUkirezgvUdrmwldhUwrivxgcUwctUwDwcIUxlivUlyqUrDIGUkxsxlivOlyq@d3dxcore
+*___@@_PchSym_@00@UcylcuivRwvxADUkirezgvUdrmwldhUwrivxgcUwhlfmwUwhlfmwUlyqUrDIGUwhlfmwrOlyq@dsound
+*___@@_PchSym_@00@UcylcuivRwvxADUkirezgvUlmormvUfrUkoftrmUlyqUrDIGUkotkxsOlyq@UIXPLGP
+*___@@_PchSym_@00@UcylcuivRwvxADUkirezgvUlmormvUfrUvmtrmvUlyqUrDIGUvmtkxsOlyq@UIXENGP
+*___@@_PchSym_@00@UcylcuivRwvxADUkirezgvUlmormvUfrUxlnnlmUlyqUrDIGUxlnkxsOlyq@UIXCMNP
+*___@@_PchSym_@00@UcylcuivRwvxADUkirezgvUlmormvUoryhUlyqUrDIGUclmkOlyq@xonlines
+*___@@_PchSym_@00@UcylcuivRwvxADUkirezgvUmglhUczkrUpDCUoryUlyqUrDIGUyzhvwooOlyq@Xapi_k32
+*___@@_PchSym_@00@UcylcuivRwvxADUkirezgvUmglhUmvgUorychUlyqUrDIGUcmkOlyq@xnets
+*___@@_PchSym_@00@UcylcuivRwvxADUkirezgvUmglhUmvgUorylhUlyqUrDIGUcmkOlyq@xnetos
+_unk_53A279
+_unk_4260B0
+-?collections@Instruction@VS_GRAPH_OPTIMIZER@XGRAPHICS@@0V?$set@PAV?$collection@PAVInstruction@VS_GRAPH_OPTIMIZER@XGRAPHICS@@@VS_GRAPH_OPTIMIZER@XGRAPHICS@@U?$less@PAV?$collection@PAVInstruction@VS_GRAPH_OPTIMIZER@XGRAPHICS@@@VS_GRAPH_OPTIMIZER@XGRAPHICS@@@23@@23@A

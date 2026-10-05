@@ -1,0 +1,7 @@
+# M7 probe: section alignment for a function the image starts on a boundary its object's
+# section (an align-1 COMDAT) does not ask for; the image fills the gap with link's int3s.
+# NAME ALIGN
+_XNetGetEthernetLinkStatus@0 16
+# (xapilib's last error code opens .tls's variables at +8, as the 8-aligned .tls$ group did
+# before config/m7tls.txt split it)
+_XapiLastErrorCode 8

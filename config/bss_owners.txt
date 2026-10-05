@@ -1,0 +1,57 @@
+# .bss globals read by several units whose owner the anchors do not decide (tools/session/bssdefs.py
+# --owners): chosen by hand. Each line: ADDRESS UNIT, then why.
+0x44D490 unit_0C7CE0  # 0x44D490-0x44E874: unit_0C7CE0 reads every one (its other globals sit among them)
+0x44D4CC unit_0C7CE0
+0x44D4D4 unit_0C7CE0
+0x44D4D8 unit_0C7CE0
+0x44E814 unit_0C7CE0
+0x44E838 unit_0C7CE0
+0x44E83C unit_0C7CE0
+0x44E840 unit_0C7CE0
+0x44E844 unit_0C7CE0
+0x44E848 unit_0C7CE0
+0x44E84C unit_0C7CE0
+0x44E850 unit_0C7CE0
+0x44E854 unit_0C7CE0
+0x44E858 unit_0C7CE0
+0x44E85C unit_0C7CE0
+0x44E860 unit_0C7CE0
+0x44E864 unit_0C7CE0
+0x44E868 unit_0C7CE0
+0x44E86C unit_0C7CE0
+0x44E874 unit_0C7CE0
+0x4B8690 unit_09AD40  # the reader after the block below
+0x4B86A0 unit_09AD40
+0x4B88AC unit_0D9CF0  # the reader in link order between its neighbours' units
+0x4B8F14 unit_0B6EB0  # among unit_0B07D0's block; unit_0B6EB0 follows it in link order
+0x4B8F18 unit_0B6EB0
+0x4B8F1C unit_0B6EB0
+0x4B8F2C unit_0B07D0  # the neighbours' unit that reads it
+0x4B8F34 unit_0DC400  # the unit below that reads it
+0x4B8F38 unit_0DC400
+0x4B918C unit_0D6640  # the reader between unit_0B07D0 and unit_0EAA60
+0x4B92D4 unit_0EC750  # its type is unit_0EC750's (type_ECDA0, constructor at 0xECDA0)
+0x4B92D8 unit_0EC750  # with the singletons of unit_0EC750's types
+0x4B92FC unit_0EC750  # type_ED340
+0x4B9300 unit_0EC750  # type_ED850
+0x4B9304 unit_0EC750
+0x4B9E50 unit_19D920  # the unit below that reads it
+0x4B9E5C unit_19D920
+0x4C1940 unit_0FD730  # the reader nearest the block below
+0x4F30A8 unit_19B0F0  # with unit_19B0F0's globals at 0x4F30C4
+0x4F61F0 unit_0DA290
+0x4F61F1 unit_0DA290
+0x4F62F8 unit_1A8B20
+0x4F6300 unit_1A8B20
+0x4F8154 unit_1B46B0
+0x4FB9F8 unit_15F1B0
+0x4FBAA4 unit_1A8B20
+0x4FDA9C unit_1C3D20  # among unit_1C3D20's block
+0x4FDAA0 unit_1C3D20
+0x4FDAA4 unit_1C3D20
+0x504378 unit_1EF1E0  # the unit below
+0x4B69F8 unit_0CC8A0  # the unit below that reads it
+0x4B6A00 unit_0D5170  # the unit above that reads it
+0x4C00E8 astarpathfinder  # beside its globals at 0x4C00C8-0x4C00D8
+0x516C50 rwaobjdef    # the first reader in link order between rwallist and rwawave
+0x516C5C rwabase      # likewise

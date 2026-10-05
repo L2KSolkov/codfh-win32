@@ -1,0 +1,7 @@
+# M7 probe: uninitialized variables the image's library version holds initialized, among
+# its _RW section's variables: the probe places them (build/m7/bssmap.txt) under the _RW
+# name, so they sort among that section's keyed variables (comdatize.bss_layout).
+# NAME
+# (dsapi's XAudioSetEffectData static at 0x341210, between mcpvoice's m_dwStuckVoiceCount
+# and ac97's m_pDevice)
+?$S1@?1??XAudioSetEffectData@@9@12@4IA

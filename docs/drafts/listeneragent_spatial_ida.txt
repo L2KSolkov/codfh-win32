@@ -1,0 +1,174 @@
+==== 0x0023CD40 0x0023D141 sub_23CD40
+int __cdecl sub_23CD40(float a1, int a2, float *a3, float *a4, int a5)
+{
+  float *v5; // ebx
+  double v6; // st7
+  float v7; // edx
+  float *v8; // esi
+  float v9; // eax
+  double v10; // st6
+  double v11; // st5
+  float *v12; // ebp
+  double v13; // st7
+  float *v14; // edi
+  double v15; // st7
+  double v16; // st7
+  unsigned __int8 v18; // c0
+  unsigned __int8 v19; // c2
+  double v20; // st7
+  unsigned __int8 v22; // c0
+  unsigned __int8 v23; // c2
+  double v24; // st7
+  unsigned __int8 v26; // c0
+  unsigned __int8 v27; // c2
+  double v28; // st7
+  unsigned __int8 v30; // c0
+  unsigned __int8 v31; // c2
+  int v32; // eax
+  int result; // eax
+  double v34; // st7
+  float v35; // [esp+10h] [ebp-30h]
+  float v36; // [esp+14h] [ebp-2Ch]
+  float v37; // [esp+18h] [ebp-28h]
+  RwV3d v38; // [esp+1Ch] [ebp-24h] BYREF
+  RwV3d v39; // [esp+28h] [ebp-18h] BYREF
+  float v40; // [esp+3Ch] [ebp-4h]
+
+  v5 = a3;
+  v6 = *(*LODWORD(a1) + 40) - *(*LODWORD(a1) + 52);
+  v7 = *(*LODWORD(a1) + 100);
+  v8 = (*LODWORD(a1) + 40);
+  v9 = *(*LODWORD(a1) + 104);
+  v10 = *(*LODWORD(a1) + 44) - *(*LODWORD(a1) + 56);
+  v35 = *(*LODWORD(a1) + 108);
+  v40 = *(*LODWORD(a1) + 48) - *(*LODWORD(a1) + 60);
+  v37 = v7;
+  v11 = *a3 - a3[3];
+  v38.y = a3[1] - a3[4];
+  v12 = v8 + 9;
+  v36 = v9;
+  v38.z = a3[2] - a3[5];
+  v39.x = v11 - v6;
+  v39.y = v38.y - v10;
+  v39.z = v38.z - v40;
+  sub_242050(a1: &a3, a2: &v39.x);
+  v38.x = *v5 - *v8;
+  v38.y = v5[1] - v8[1];
+  v38.z = v5[2] - v8[2];
+  sub_242050(&a1, a2: &v38.x);
+  v13 = a1 - *&a3;
+  if ( v13 <= 150.0 )
+  {
+    if ( v13 < -150.0 )
+      v13 = -150.0;
+  }
+  else
+  {
+    v13 = 150.0;
+  }
+  v14 = a4;
+  a4[1] = (v35 * 340.0 - v13 * v36) / (v35 * 340.0);
+  if ( a1 <= v5[7] )
+  {
+    if ( a1 >= v5[6] )
+    {
+      a1 = a1 - v5[6];
+      v15 = v5[7] - v5[6];
+      *v14 = (v15 - a1) / (a1 * v37 + v15);
+    }
+    else
+    {
+      *v14 = 1.0;
+    }
+  }
+  else
+  {
+    *v14 = 0.0;
+  }
+  if ( v38.x == 0.0 && v38.y == 0.0 && v38.z == 0.0 )
+  {
+    v38.x = *v12;
+    v38.y = v8[10];
+    v38.z = v8[11];
+  }
+  else
+  {
+    RwV3dNormalize(out: &v38, in: &v38);
+  }
+  if ( v39.x == 0.0 && v39.y == 0.0 && v39.z == 0.0 )
+  {
+    v39.x = *v12;
+    v39.y = v8[10];
+    v39.z = v8[11];
+  }
+  else
+  {
+    RwV3dNormalize(out: &v39, in: &v39);
+  }
+  v16 = 0.5 - (v38.y * v8[13] + v38.x * v8[12] + v38.z * v8[14]) * 0.5;
+  v14[2] = v16;
+  if ( (v18 | v19) != 0 )
+  {
+    v16 = 0.0;
+  }
+  else if ( v16 > 1.0 )
+  {
+    v16 = 1.0;
+  }
+  v14[2] = v16;
+  v20 = 0.5 - (v38.y * v8[10] + v38.x * v8[9] + v38.z * v8[11]) * 0.5;
+  v14[3] = v20;
+  if ( (v22 | v23) != 0 )
+  {
+    v20 = 0.0;
+  }
+  else if ( v20 > 1.0 )
+  {
+    v20 = 1.0;
+  }
+  v14[3] = v20;
+  v24 = 0.5 - (v39.y * v8[13] + v39.x * v8[12] + v39.z * v8[14]) * 0.5;
+  v14[4] = v24;
+  if ( (v26 | v27) != 0 )
+  {
+    v24 = 0.0;
+  }
+  else if ( v24 > 1.0 )
+  {
+    v24 = 1.0;
+  }
+  v14[4] = v24;
+  v28 = 0.5 - (v39.y * v8[10] + v39.x * v8[9] + v39.z * v8[11]) * 0.5;
+  v14[5] = v28;
+  if ( (v30 | v31) != 0 )
+  {
+    v28 = 0.0;
+  }
+  else if ( v28 > 1.0 )
+  {
+    v28 = 1.0;
+  }
+  v32 = a5;
+  v14[5] = v28;
+  result = v32 - 2;
+  if ( result != 0 )
+  {
+    if ( --result != 0 )
+      return result;
+    v14[2] = v14[2] - 0.5;
+    v14[4] = v14[4] - 0.5;
+    v14[2] = v14[2] * 0.5;
+    v34 = v14[4] * 0.5;
+  }
+  else
+  {
+    v14[2] = v14[2] - 0.5;
+    v14[4] = v14[4] - 0.5;
+    v14[2] = v14[2] * 0.0;
+    v34 = v14[4] * 0.0;
+  }
+  v14[4] = v34;
+  v14[2] = v14[2] + 0.5;
+  v14[4] = v14[4] + 0.5;
+  return result;
+}
