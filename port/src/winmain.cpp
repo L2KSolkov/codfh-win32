@@ -80,8 +80,54 @@ static void set_fullscreen(HWND hwnd, int on)
     plog("display: %s", on ? "fullscreen" : "windowed");
 }
 
+/*
+ * The keys and mouse buttons held, from the window's own messages (port/src/xpal_sys.cpp reads
+ * them with GetAsyncKeyState as a fallback): Remote Desktop delivers its input as messages, which
+ * the asynchronous key state does not always see.
+ */
+volatile unsigned char port_keys[256];
+
+static void set_key(WPARAM vk, LPARAM lp, unsigned char down)
+{
+    if (vk >= 256)
+        return;
+    port_keys[vk] = down;
+    /* (the left and right variants too, as GetAsyncKeyState gives them) */
+    if (vk == VK_SHIFT)
+    {
+        UINT side = MapVirtualKeyA((UINT)(lp >> 16) & 0xFF, MAPVK_VSC_TO_VK_EX);
+        if (side == VK_LSHIFT || side == VK_RSHIFT)
+            port_keys[side] = down;
+    }
+    else if (vk == VK_CONTROL)
+        port_keys[(lp & (1 << 24)) ? VK_RCONTROL : VK_LCONTROL] = down;
+    else if (vk == VK_MENU)
+        port_keys[(lp & (1 << 24)) ? VK_RMENU : VK_LMENU] = down;
+}
+
+static void track_input(UINT msg, WPARAM wp, LPARAM lp)
+{
+    switch (msg)
+    {
+    case WM_KEYDOWN: case WM_SYSKEYDOWN: set_key(wp, lp, 1); break;
+    case WM_KEYUP: case WM_SYSKEYUP: set_key(wp, lp, 0); break;
+    case WM_LBUTTONDOWN: port_keys[VK_LBUTTON] = 1; break;
+    case WM_LBUTTONUP: port_keys[VK_LBUTTON] = 0; break;
+    case WM_RBUTTONDOWN: port_keys[VK_RBUTTON] = 1; break;
+    case WM_RBUTTONUP: port_keys[VK_RBUTTON] = 0; break;
+    case WM_MBUTTONDOWN: port_keys[VK_MBUTTON] = 1; break;
+    case WM_MBUTTONUP: port_keys[VK_MBUTTON] = 0; break;
+    case WM_KILLFOCUS:
+        /* (nothing stays held when the window loses the keyboard) */
+        for (int i = 0; i < 256; i++)
+            port_keys[i] = 0;
+        break;
+    }
+}
+
 static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 {
+    track_input(msg, wp, lp);
     switch (msg)
     {
     case WM_INPUT:

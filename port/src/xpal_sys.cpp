@@ -156,9 +156,11 @@ static int window_has_input(void)
     return port_hwnd && (GetForegroundWindow() == (HWND)port_hwnd || port_input_background());
 }
 
+extern volatile unsigned char port_keys[256];
+
 static int key(int vk)
 {
-    return window_has_input() && (GetAsyncKeyState(vk) & 0x8000);
+    return window_has_input() && ((vk >= 0 && vk < 256 && port_keys[vk]) || (GetAsyncKeyState(vk) & 0x8000));
 }
 
 /* The keyboard as a controller: WASD the left stick, the arrows the right, IJKL the d-pad;
@@ -285,6 +287,15 @@ static void menu_state(XINPUT_GAMEPAD *g)
     if (key(VK_RETURN) || key(VK_LBUTTON)) g->bAnalogButtons[XB_A] = 255;
     if (key(VK_ESCAPE) || key(VK_BACK) || key(VK_RBUTTON)) g->bAnalogButtons[XB_B] = 255;
     if (key(VK_TAB)) g->wButtons |= XB_START;
+    static unsigned told;
+    static WORD last;
+    WORD now = (WORD)(g->wButtons | (g->bAnalogButtons[XB_A] ? 0x1000 : 0) | (g->bAnalogButtons[XB_B] ? 0x2000 : 0));
+    if (now && now != last && told < 8)
+    {
+        told++;
+        plog("input: menu keys %04X", now);
+    }
+    last = now;
 }
 
 /* The wheel's notches as d-pad presses, one at a time (held 3 polls, released 3), so each one
