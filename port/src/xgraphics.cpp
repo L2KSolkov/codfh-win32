@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <vector>
+
 #include "port.h"
 
 /* Bits per pixel of an Xbox format code (0 unknown), and whether it is linear. */
@@ -327,9 +329,9 @@ extern "C" D3DXMATRIX *WINAPI D3DXMatrixPerspectiveFovRH(D3DXMATRIX *pOut, float
 }
 
 /*
- * Run-time shader assembly (the skin pipeline's permutations): the buffers hold the shader text
- * the game generated; the bridge maps it to its HLSL replacement when the shader is created
- * (W2.4). Splicing joins the texts.
+ * Run-time shader assembly (the skin pipeline's permutations): the text assembled to NV2A
+ * microcode (d3d/xvasm.cpp), then spliced as the Xbox's library does: the fragments'
+ * instructions one after another under one header, the last marked final.
  */
 struct XGBuffer
 {
@@ -357,21 +359,14 @@ extern "C" ULONG WINAPI XGBuffer_Release(XGBuffer *pThis)
     return 0;
 }
 
-/* The marker a spliced or assembled "program" starts with: the text follows. */
-#define PORT_SHADER_TEXT_TAG 0x54584554     /* 'TEXT' */
+std::vector<unsigned> xvasm_assemble(const char *text, size_t length, bool *ok);
 
 extern "C" HRESULT WINAPI XGAssembleShader(LPCSTR, LPCVOID pSrcData, UINT SrcDataLen, DWORD, LPXGBUFFER *pConstants,
                                            LPXGBUFFER *pCompiledShader, LPXGBUFFER *pErrorLog, LPXGBUFFER *pListing,
                                            SASM_ResolverCallback, LPVOID, LPDWORD pShaderType)
 {
-    DWORD hdr[2] = {PORT_SHADER_TEXT_TAG, SrcDataLen};
-    XGBuffer *b = buffer_new(NULL, 8 + SrcDataLen + 1);
-    memcpy(b->data, hdr, 8);
-    memcpy(b->data + 8, pSrcData, SrcDataLen);
-    if (pCompiledShader)
-        *pCompiledShader = b;
-    else
-        XGBuffer_Release(b);
+    bool ok;
+    std::vector<unsigned> code = xvasm_assemble((const char *)pSrcData, SrcDataLen, &ok);
     if (pConstants)
         *pConstants = NULL;
     if (pErrorLog)
@@ -380,6 +375,14 @@ extern "C" HRESULT WINAPI XGAssembleShader(LPCSTR, LPCVOID pSrcData, UINT SrcDat
         *pListing = NULL;
     if (pShaderType)
         *pShaderType = 0;
+    if (!ok)
+    {
+        if (pCompiledShader)
+            *pCompiledShader = NULL;
+        return E_FAIL;
+    }
+    if (pCompiledShader)
+        *pCompiledShader = buffer_new(&code[0], (DWORD)(code.size() * 4));
     return S_OK;
 }
 
@@ -387,29 +390,34 @@ extern "C" HRESULT WINAPI XGSpliceVertexShaders(DWORD *pNewShader, DWORD *pcbNew
                                                 DWORD *pNewInstructionCount, const DWORD *const *ppShaderArray,
                                                 DWORD NumShaders, BOOL)
 {
-    /* the texts joined, after one tag and the total length */
     DWORD total = 0;
     for (DWORD i = 0; i < NumShaders; i++)
-        if (ppShaderArray[i] && ppShaderArray[i][0] == PORT_SHADER_TEXT_TAG)
-            total += ppShaderArray[i][1];
+        if (ppShaderArray[i])
+            total += (ppShaderArray[i][0] >> 16) & 0xFF;
+    DWORD bytes = (1 + total * 4) * 4;
     if (pcbNewShaderBufferSize)
     {
-        if (*pcbNewShaderBufferSize && *pcbNewShaderBufferSize < total + 8)
+        if (*pcbNewShaderBufferSize && *pcbNewShaderBufferSize < bytes)
             return E_FAIL;
-        *pcbNewShaderBufferSize = total + 8;
+        *pcbNewShaderBufferSize = bytes;
     }
     if (pNewInstructionCount)
-        *pNewInstructionCount = 0;
+        *pNewInstructionCount = total;
     if (!pNewShader)
         return S_OK;
-    pNewShader[0] = PORT_SHADER_TEXT_TAG;
-    pNewShader[1] = total;
-    BYTE *out = (BYTE *)(pNewShader + 2);
+    pNewShader[0] = (total << 16) | (ppShaderArray[0] ? ppShaderArray[0][0] & 0xFFFF : 0x2078);
+    DWORD *out = pNewShader + 1;
     for (DWORD i = 0; i < NumShaders; i++)
-        if (ppShaderArray[i] && ppShaderArray[i][0] == PORT_SHADER_TEXT_TAG)
-        {
-            memcpy(out, ppShaderArray[i] + 2, ppShaderArray[i][1]);
-            out += ppShaderArray[i][1];
-        }
+    {
+        if (!ppShaderArray[i])
+            continue;
+        DWORD n = (ppShaderArray[i][0] >> 16) & 0xFF;
+        memcpy(out, ppShaderArray[i] + 1, n * 16);
+        for (DWORD k = 0; k < n; k++)
+            out[k * 4 + 3] &= ~1u;      /* (only the last is final) */
+        out += n * 4;
+    }
+    if (total)
+        pNewShader[total * 4] |= 1;
     return S_OK;
 }
