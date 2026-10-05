@@ -129,6 +129,15 @@ RenderWare's stock d3d8 or d3d9 driver.
 RenderWare's stock d3d9 driver stays the reference for device creation, resource management,
 device-lost handling and shader set-up.
 
+**Revised 2026-10-05 (owner): Direct3D 11 underneath, not 9.** Measured on the development
+machine over Remote Desktop: Direct3D 9 sees no adapter (`CreateDevice` gives
+`D3DERR_INVALIDCALL`, 9Ex `D3DERR_NOTAVAILABLE`), while Direct3D 11 creates a GPU device at
+feature level 11_0 and WARP always works. The bridge keeps the Xbox API on its Xbox side
+(`port/src/d3d/d3d8_bridge.cpp`); only its back end (`pd11.cpp`, behind `pdev.h`) sees Direct3D
+11. Shaders become HLSL `vs_4_0`/`ps_4_0` (constant buffers remove the 192-constant limit); the
+fixed-function paths (lights, materials, texture stages) are emulated with shaders, as the stock
+d3d9 driver's shader paths show. Where this document says Direct3D 9 below, read the back end.
+
 ## 5. Architecture
 
 ```
@@ -327,6 +336,15 @@ Effort for one experienced engineer with this repository's tooling and the disc 
 5. CI on the port branch: the port build, plus the gate and the M7 check.
 
 **Exit:** links; a window clears to a colour through the bridge's device.
+
+**State (2026-10-05):** done but CI. `tools/portbuild.py` compiles all 637 units and `port/src`
+and links `build/port/codfh.exe` (`build/port/link.md` lists unresolved symbols, `--link`
+relinks after a partial compile). `WinMain` loads `codfh.ini`, makes the window and calls the
+game's `main`; the bridge's Direct3D 11 device clears and presents at a paced 60 Hz (headless if
+no device); start-up reaches the front end. Debugging aids: `codfh.log` beside the executable
+(the port's log and the game's `OutputDebugStringA` text), `CODFH_DATA` for the data root,
+`CODFH_SHOT=n` to write frame n to `shot.bmp`. CI is not possible on hosted runners (the gate
+needs the XDK and the original image, which the repository does not hold).
 
 ### W1. Platform layer (2 weeks)
 

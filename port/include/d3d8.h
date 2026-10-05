@@ -1,9 +1,9 @@
 /*
  * Win32 port bridge (docs/WIN32_PORT.md W2): stands in for the XDK's d3d8.h (Xbox Direct3D 8).
  * The bridge keeps the Xbox API's names (D3DDevice_*, D3DTexture_*, D3D__RenderState...) and
- * implements them over Direct3D 9 (port/d3d9bridge). Nothing here includes d3d9.h: the Xbox and
- * Direct3D 9 share names with different values (d3d8values.h), so only the bridge's own sources,
- * which never include this header's constants, see Direct3D 9.
+ * implements them over Direct3D 11 (port/src/d3d). Nothing here includes a PC Direct3D header: the
+ * Xbox and the PC APIs share names with different values (d3d8values.h), so only the bridge's
+ * device back end (pd11.cpp), which never includes this header, sees Direct3D 11.
  *
  * Declared from what the RenderWare Xbox driver, pipelines and plugins and the game's direct
  * Direct3D units use. Every call that the XDK makes an inline (state setters, lock wrappers,
@@ -270,7 +270,7 @@ typedef struct _D3DPRESENT_PARAMETERS_
 #define D3DPUSH_ENCODE(method, count) (((count) << 18) + (method))
 
 /* The render-state and texture-stage-state shadows the driver's state cache compares against;
-   the bridge keeps them current and flushes them to Direct3D 9 before each draw. */
+   the bridge keeps them current and flushes them to the device before each draw. */
 extern DWORD D3D__RenderState[D3DRS_MAX];
 extern DWORD D3D__TextureState[D3DTSS_MAXSTAGES][D3DTSS_MAX];
 

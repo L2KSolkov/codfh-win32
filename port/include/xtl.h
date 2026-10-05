@@ -31,12 +31,15 @@ HANDLE WINAPI xpal_CreateFileA(LPCSTR name, DWORD access, DWORD share, LPSECURIT
                                DWORD disposition, DWORD flags, HANDLE templ);
 DWORD WINAPI xpal_GetFileAttributesA(LPCSTR name);
 BOOL WINAPI xpal_CopyFileA(LPCSTR from, LPCSTR to, BOOL failIfExists);
+/* the game's debug prints, into the port's log (codfh.log) as well as the debugger */
+VOID WINAPI xpal_OutputDebugStringA(LPCSTR text);
 #ifdef __cplusplus
 }
 #endif
 #define CreateFileA xpal_CreateFileA
 #define GetFileAttributesA xpal_GetFileAttributesA
 #define CopyFileA xpal_CopyFileA
+#define OutputDebugStringA xpal_OutputDebugStringA
 
 #include <d3d8.h>
 #include <dsound.h>

@@ -1,7 +1,7 @@
 /*
  * The D3D bridge's Xbox side (docs/WIN32_PORT.md W2): the Xbox Direct3D names the RenderWare
- * driver and the game call, over pd9 (Direct3D 9). This file sees only the bridge's Xbox
- * declarations (port/include/d3d8.h); pd9.cpp sees only d3d9.h.
+ * driver and the game call, over pdev (the device back end, Direct3D 11). This file sees only the bridge's Xbox
+ * declarations (port/include/d3d8.h); pd11.cpp sees only d3d11.h.
  *
  * State so far (W0): the device, clears, presentation, viewports, gamma and the render-state
  * and texture-stage-state shadows; surfaces and locks give the game memory laid out as the Xbox
@@ -13,7 +13,7 @@
 #include <string.h>
 
 #include "../port.h"
-#include "pd9.h"
+#include "pdev.h"
 
 DWORD D3D__RenderState[D3DRS_MAX];
 DWORD D3D__TextureState[D3DTSS_MAXSTAGES][D3DTSS_MAX];
@@ -110,8 +110,13 @@ extern "C" int WINAPI Direct3D_SetPushBufferSize(unsigned int, unsigned int)
 extern "C" HRESULT WINAPI Direct3D_CreateDevice(UINT, D3DDEVTYPE, void *, DWORD,
                                                 D3DPRESENT_PARAMETERS *pp, D3DDevice **ppDevice)
 {
-    if (!pd9_ready() && !pd9_init(port_hwnd, FRAME_W, FRAME_H, port_config.windowed, port_config.vsync))
-        return E_FAIL;
+    /* (without a device the bridge runs headless: the game goes on) */
+    static int tried;
+    if (!tried)
+    {
+        tried = 1;
+        pdev_init(port_hwnd, FRAME_W, FRAME_H, port_config.windowed, port_config.vsync);
+    }
     plog("CreateDevice: %ux%u format 0x%lX flags 0x%lX interval 0x%lX", pp->BackBufferWidth,
          pp->BackBufferHeight, pp->BackBufferFormat, pp->Flags, pp->FullScreen_PresentationInterval);
     surface_init(&back_buffer, pp->BackBufferFormat, FRAME_W, FRAME_H, 4);
@@ -129,23 +134,51 @@ extern "C" HRESULT WINAPI Direct3D_CreateDevice(UINT, D3DDEVTYPE, void *, DWORD,
 
 extern "C" ULONG WINAPI D3DDevice_Release(void)
 {
-    pd9_shutdown();
+    pdev_shutdown();
     return 0;
 }
 
 extern "C" void WINAPI D3DDevice_BeginScene(void)
 {
-    pd9_begin_scene();
+    pdev_begin_scene();
 }
 
 extern "C" void WINAPI D3DDevice_EndScene(void)
 {
-    pd9_end_scene();
+    pdev_end_scene();
+}
+
+/* The Xbox presents at the television's 60 Hz (interval ONE) and the game's timing assumes it;
+   the PC's vsync does not always block (Remote Desktop, some drivers), so frames are paced here. */
+static void pace_frame(void)
+{
+    static LARGE_INTEGER freq, next;
+    LARGE_INTEGER now;
+    if (!freq.QuadPart)
+    {
+        QueryPerformanceFrequency(&freq);
+        QueryPerformanceCounter(&next);
+    }
+    LONGLONG period = freq.QuadPart / 60;
+    next.QuadPart += period;
+    QueryPerformanceCounter(&now);
+    if (now.QuadPart > next.QuadPart + period)
+        next = now;     /* (behind: no catching up) */
+    for (;;)
+    {
+        QueryPerformanceCounter(&now);
+        LONGLONG left = next.QuadPart - now.QuadPart;
+        if (left <= 0)
+            break;
+        DWORD ms = (DWORD)(left * 1000 / freq.QuadPart);
+        Sleep(ms > 1 ? ms - 1 : 0);
+    }
 }
 
 extern "C" HRESULT WINAPI IDirect3DDevice8_Present(D3DDevice *, const RECT *, const RECT *, void *, void *)
 {
-    pd9_present();
+    pdev_present();
+    pace_frame();
     port_pump_messages();
     return D3D_OK;
 }
@@ -155,14 +188,17 @@ extern "C" void WINAPI D3DDevice_Clear(DWORD Count, const D3DRECT *pRects, DWORD
 {
     unsigned f = 0;
     if (Flags & D3DCLEAR_TARGET)
-        f |= 1;     /* Direct3D 9's TARGET */
+        f |= PDEV_CLEAR_TARGET;
     if (Flags & D3DCLEAR_ZBUFFER)
-        f |= 2;
+        f |= PDEV_CLEAR_DEPTH;
     if (Flags & D3DCLEAR_STENCIL)
-        f |= 4;
+        f |= PDEV_CLEAR_STENCIL;
     (void)Count;
     (void)pRects;
-    pd9_clear(f, Color, Z, Stencil);
+    static int logged;
+    if (!logged++)
+        plog("first clear: flags 0x%lX colour 0x%08lX z %g", Flags, Color, Z);
+    pdev_clear(f, Color, Z, Stencil);
 }
 
 extern "C" void WINAPI D3DDevice_BlockUntilVerticalBlank(void)
@@ -185,7 +221,7 @@ extern "C" void WINAPI D3DDevice_SetSoftDisplayFilter(BOOL)
 
 extern "C" void WINAPI D3DDevice_SetGammaRamp(DWORD, const D3DGAMMARAMP *pRamp)
 {
-    pd9_set_gamma(pRamp->red, pRamp->green, pRamp->blue);
+    pdev_set_gamma(pRamp->red, pRamp->green, pRamp->blue);
 }
 
 extern "C" BOOL WINAPI D3DDevice_IsFencePending(DWORD)
@@ -244,7 +280,7 @@ extern "C" void WINAPI D3DDevice_SetViewport(const D3DVIEWPORT8 *v)
 {
     viewport = *v;
     if (render_target == &back_buffer.xb)
-        pd9_set_viewport(v->X, v->Y, v->Width, v->Height, v->MinZ, v->MaxZ);
+        pdev_set_viewport(v->X, v->Y, v->Width, v->Height, v->MinZ, v->MaxZ);
 }
 
 extern "C" void WINAPI D3DDevice_GetViewportOffsetAndScale(D3DVECTOR4 *pOffset, D3DVECTOR4 *pScale)
@@ -263,7 +299,7 @@ extern "C" void WINAPI D3DDevice_GetViewportOffsetAndScale(D3DVECTOR4 *pOffset, 
 
 /*
  * State: kept in the Xbox's shadows (the driver's cache compares against them); W2.6 flushes
- * them to Direct3D 9 before each draw.
+ * them to the device before each draw.
  */
 
 extern "C" void WINAPI D3DDevice_SetRenderState(D3DRENDERSTATETYPE State, DWORD Value)

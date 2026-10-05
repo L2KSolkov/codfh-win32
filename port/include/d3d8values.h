@@ -1,9 +1,9 @@
 /*
  * Win32 port bridge (docs/WIN32_PORT.md W2): the Xbox Direct3D constants the sources use, with
- * their Xbox values. The values are the Xbox's, not Direct3D 9's: the disc's texture
+ * their Xbox values. The values are the Xbox's, not the PC Direct3D's: the disc's texture
  * dictionaries and native geometry store Xbox formats and vertex element types, and the driver's
  * state tables are indexed by Xbox render-state and texture-stage-state numbers. The bridge
- * (port/d3d9bridge) translates them to Direct3D 9 where it hands them on; only it sees d3d9.h.
+ * (port/src/d3d) translates them where it hands them to Direct3D 11; only its back end sees d3d11.h.
  *
  * The list is the names the sources use; the values were read from a probe compiled against the
  * XDK (5849), so each one is the number the Xbox build compiled.

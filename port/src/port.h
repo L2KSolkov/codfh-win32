@@ -1,7 +1,7 @@
 /*
  * The port layer's internal interface (docs/WIN32_PORT.md section 5): the log, the configuration
  * and the Xbox drive mapping that the platform layer (xpal_*) and the bridges share. Plain C
- * types only, so that both the Xbox-named side (sources including port/include) and the Direct3D 9
+ * types only, so that both the Xbox-named side (sources including port/include) and the Direct3D 11
  * and XAudio2 side can include it.
  */
 #ifndef PORT_PORT_H

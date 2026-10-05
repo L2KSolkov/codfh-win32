@@ -15,6 +15,7 @@
 #undef CreateFileA
 #undef GetFileAttributesA
 #undef CopyFileA
+#undef OutputDebugStringA
 
 PortConfig port_config;
 void *port_hwnd;
@@ -188,6 +189,12 @@ extern "C" BOOL WINAPI xpal_CopyFileA(LPCSTR from, LPCSTR to, BOOL failIfExists)
 {
     char a[520], b[520];
     return CopyFileA(port_map_path(from, a), port_map_path(to, b), failIfExists);
+}
+
+extern "C" VOID WINAPI xpal_OutputDebugStringA(LPCSTR text)
+{
+    if (text && text[0])
+        plog("game: %s", text);
 }
 
 extern "C" DWORD WINAPI XGetDiskSectorSizeA(LPCSTR root)
