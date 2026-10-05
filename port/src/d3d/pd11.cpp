@@ -1,10 +1,13 @@
 /*
  * The D3D bridge's device back end on Direct3D 11 (docs/WIN32_PORT.md W2.1): the device (the
  * GPU, or WARP when there is none, as over Remote Desktop), the swap chain, the depth buffer,
- * clears and presentation. The game draws a 640x480 frame (the Xbox's mode); the swap chain's
- * buffers are that size and DXGI stretches them to the window.
+ * clears and presentation. The game draws a 640x480 frame (the Xbox's mode) into an offscreen
+ * target; presenting copies it to the swap chain through the game's gamma ramp (the Xbox applies
+ * the ramp in the display hardware; a windowed swap chain has none), and DXGI stretches the
+ * swap chain's buffer to the window.
  */
 #include <d3d11.h>
+#include <d3dcompiler.h>
 #include <dxgi.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,23 +22,156 @@ ID3D11DeviceContext *pd11_ctx;
 #define dev pd11_dev
 #define ctx pd11_ctx
 static IDXGISwapChain *swap;
-static ID3D11RenderTargetView *rtv;
+static ID3D11RenderTargetView *rtv;          /* the game's frame (scene) */
+static ID3D11RenderTargetView *back_rtv;     /* the swap chain's buffer */
+static ID3D11Texture2D *scene;
+static ID3D11ShaderResourceView *scene_srv;
 static ID3D11DepthStencilView *dsv;
 static ID3D11Texture2D *depth;
 static int frame_w, frame_h, sync_interval;
 static unsigned char gamma_ramp[3][256];
-static int gamma_set;
+static int gamma_dirty;
+static D3D11_VIEWPORT last_viewport;
+
+/* The final pass: a triangle over the screen, the scene through the ramp (256x1, RGB). */
+static ID3D11VertexShader *final_vs;
+static ID3D11PixelShader *final_ps;
+static ID3D11Texture2D *ramp;
+static ID3D11ShaderResourceView *ramp_srv;
+static ID3D11SamplerState *final_point;
+static ID3D11RasterizerState *final_raster;
+static ID3D11DepthStencilState *final_depth;
+static ID3D11BlendState *final_blend;
+
+static const char final_hlsl[] =
+    "Texture2D scene : register(t0); Texture2D ramp : register(t1); SamplerState pt : register(s0);\n"
+    "struct V { float4 pos : SV_Position; float2 uv : TEXCOORD0; };\n"
+    "V vs(uint id : SV_VertexID) {\n"
+    "    V o; float2 t = float2((id << 1) & 2, id & 2);\n"
+    "    o.pos = float4(t * float2(2, -2) + float2(-1, 1), 0, 1); o.uv = t; return o; }\n"
+    "float4 ps(V i) : SV_Target {\n"
+    "    float4 c = scene.Sample(pt, i.uv);\n"
+    "    float3 idx = floor(saturate(c.rgb) * 255 + 0.5) / 256 + 1.0 / 512;\n"
+    "    return float4(ramp.Sample(pt, float2(idx.r, 0.5)).r, ramp.Sample(pt, float2(idx.g, 0.5)).g,\n"
+    "                  ramp.Sample(pt, float2(idx.b, 0.5)).b, 1); }\n";
+
+static void *compile(const char *entry, const char *target)
+{
+    ID3DBlob *code = NULL, *errors = NULL;
+    HRESULT hr = D3DCompile(final_hlsl, sizeof(final_hlsl) - 1, "final", NULL, NULL, entry, target,
+                            D3DCOMPILE_OPTIMIZATION_LEVEL3, 0, &code, &errors);
+    if (errors)
+    {
+        plog("final pass %s: %s", entry, (const char *)errors->GetBufferPointer());
+        errors->Release();
+    }
+    if (FAILED(hr))
+        return NULL;
+    void *out = NULL;
+    if (target[0] == 'v')
+        dev->CreateVertexShader(code->GetBufferPointer(), code->GetBufferSize(), NULL, (ID3D11VertexShader **)&out);
+    else
+        dev->CreatePixelShader(code->GetBufferPointer(), code->GetBufferSize(), NULL, (ID3D11PixelShader **)&out);
+    code->Release();
+    return out;
+}
+
+static int create_final_pass(void)
+{
+    final_vs = (ID3D11VertexShader *)compile("vs", "vs_4_0");
+    final_ps = (ID3D11PixelShader *)compile("ps", "ps_4_0");
+    if (!final_vs || !final_ps)
+        return 0;
+    D3D11_TEXTURE2D_DESC td;
+    memset(&td, 0, sizeof(td));
+    td.Width = 256;
+    td.Height = 1;
+    td.MipLevels = 1;
+    td.ArraySize = 1;
+    td.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    td.SampleDesc.Count = 1;
+    td.Usage = D3D11_USAGE_DEFAULT;
+    td.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    if (FAILED(dev->CreateTexture2D(&td, NULL, &ramp)) || FAILED(dev->CreateShaderResourceView(ramp, NULL, &ramp_srv)))
+        return 0;
+    for (int i = 0; i < 256; i++)
+        gamma_ramp[0][i] = gamma_ramp[1][i] = gamma_ramp[2][i] = (unsigned char)i;
+    gamma_dirty = 1;
+    D3D11_SAMPLER_DESC sd;
+    memset(&sd, 0, sizeof(sd));
+    sd.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    sd.AddressU = sd.AddressV = sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sd.MaxLOD = D3D11_FLOAT32_MAX;
+    D3D11_RASTERIZER_DESC rd;
+    memset(&rd, 0, sizeof(rd));
+    rd.FillMode = D3D11_FILL_SOLID;
+    rd.CullMode = D3D11_CULL_NONE;
+    rd.DepthClipEnable = TRUE;
+    D3D11_DEPTH_STENCIL_DESC dd;
+    memset(&dd, 0, sizeof(dd));
+    D3D11_BLEND_DESC bd;
+    memset(&bd, 0, sizeof(bd));
+    bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    return SUCCEEDED(dev->CreateSamplerState(&sd, &final_point)) && SUCCEEDED(dev->CreateRasterizerState(&rd, &final_raster)) &&
+           SUCCEEDED(dev->CreateDepthStencilState(&dd, &final_depth)) && SUCCEEDED(dev->CreateBlendState(&bd, &final_blend));
+}
+
+static void final_pass(void)
+{
+    if (gamma_dirty)
+    {
+        unsigned char px[256][4];
+        for (int i = 0; i < 256; i++)
+        {
+            px[i][0] = gamma_ramp[0][i];
+            px[i][1] = gamma_ramp[1][i];
+            px[i][2] = gamma_ramp[2][i];
+            px[i][3] = 255;
+        }
+        ctx->UpdateSubresource(ramp, 0, NULL, px, sizeof(px), 0);
+        gamma_dirty = 0;
+    }
+    ID3D11ShaderResourceView *none[4] = {NULL, NULL, NULL, NULL};
+    ctx->OMSetRenderTargets(1, &back_rtv, NULL);
+    D3D11_VIEWPORT vp = {0, 0, (float)frame_w, (float)frame_h, 0, 1};
+    ctx->RSSetViewports(1, &vp);
+    ctx->IASetInputLayout(NULL);
+    ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    ctx->VSSetShader(final_vs, NULL, 0);
+    ctx->PSSetShader(final_ps, NULL, 0);
+    ID3D11ShaderResourceView *srv[2] = {scene_srv, ramp_srv};
+    ctx->PSSetShaderResources(0, 2, srv);
+    ctx->PSSetSamplers(0, 1, &final_point);
+    ctx->RSSetState(final_raster);
+    ctx->OMSetDepthStencilState(final_depth, 0);
+    float zero[4] = {0, 0, 0, 0};
+    ctx->OMSetBlendState(final_blend, zero, 0xFFFFFFFF);
+    ctx->Draw(3, 0);
+    ctx->PSSetShaderResources(0, 4, none);
+}
 
 static int create_views(void)
 {
     ID3D11Texture2D *back = NULL;
     if (FAILED(swap->GetBuffer(0, __uuidof(ID3D11Texture2D), (void **)&back)))
         return 0;
-    HRESULT hr = dev->CreateRenderTargetView(back, NULL, &rtv);
+    HRESULT hr = dev->CreateRenderTargetView(back, NULL, &back_rtv);
     back->Release();
     if (FAILED(hr))
         return 0;
     D3D11_TEXTURE2D_DESC td;
+    memset(&td, 0, sizeof(td));
+    td.Width = frame_w;
+    td.Height = frame_h;
+    td.MipLevels = 1;
+    td.ArraySize = 1;
+    td.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    td.SampleDesc.Count = 1;
+    td.Usage = D3D11_USAGE_DEFAULT;
+    td.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+    if (FAILED(dev->CreateTexture2D(&td, NULL, &scene)) || FAILED(dev->CreateRenderTargetView(scene, NULL, &rtv)) ||
+        FAILED(dev->CreateShaderResourceView(scene, NULL, &scene_srv)) || !create_final_pass())
+        return 0;
     memset(&td, 0, sizeof(td));
     td.Width = frame_w;
     td.Height = frame_h;
@@ -105,12 +241,33 @@ extern "C" void pdev_shutdown(void)
     if (dsv) dsv->Release();
     if (depth) depth->Release();
     if (rtv) rtv->Release();
+    if (back_rtv) back_rtv->Release();
+    if (scene_srv) scene_srv->Release();
+    if (scene) scene->Release();
+    if (final_vs) final_vs->Release();
+    if (final_ps) final_ps->Release();
+    if (ramp_srv) ramp_srv->Release();
+    if (ramp) ramp->Release();
+    if (final_point) final_point->Release();
+    if (final_raster) final_raster->Release();
+    if (final_depth) final_depth->Release();
+    if (final_blend) final_blend->Release();
     if (swap) swap->Release();
     if (ctx) ctx->Release();
     if (dev) dev->Release();
     dsv = NULL;
     depth = NULL;
-    rtv = NULL;
+    rtv = back_rtv = NULL;
+    scene_srv = NULL;
+    scene = NULL;
+    final_vs = NULL;
+    final_ps = NULL;
+    ramp_srv = NULL;
+    ramp = NULL;
+    final_point = NULL;
+    final_raster = NULL;
+    final_depth = NULL;
+    final_blend = NULL;
     swap = NULL;
     ctx = NULL;
     dev = NULL;
@@ -206,12 +363,14 @@ extern "C" void pdev_present(void)
         plog("frame %u", frame);
     if (!swap)
         return;
+    final_pass();
     capture(frame);
     HRESULT hr = swap->Present(sync_interval, 0);
     if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
         plog("Direct3D 11 device lost (0x%08lX)", dev->GetDeviceRemovedReason());
-    /* (DISCARD: the targets are bound again each frame) */
+    /* the game's target and viewport again */
     ctx->OMSetRenderTargets(1, &rtv, dsv);
+    ctx->RSSetViewports(1, &last_viewport);
 }
 
 extern "C" void pdev_set_viewport(unsigned x, unsigned y, unsigned w, unsigned h, float minz, float maxz)
@@ -219,14 +378,19 @@ extern "C" void pdev_set_viewport(unsigned x, unsigned y, unsigned w, unsigned h
     if (!ctx)
         return;
     D3D11_VIEWPORT vp = {(float)x, (float)y, (float)w, (float)h, minz, maxz};
+    last_viewport = vp;
     ctx->RSSetViewports(1, &vp);
 }
 
 extern "C" void pdev_set_gamma(const unsigned char *red, const unsigned char *green, const unsigned char *blue)
 {
     /* (applied by the frame's final pass, W2.9: a windowed swap chain has no hardware ramp) */
+    if (!memcmp(gamma_ramp[0], red, 256) && !memcmp(gamma_ramp[1], green, 256) && !memcmp(gamma_ramp[2], blue, 256))
+        return;
     memcpy(gamma_ramp[0], red, 256);
     memcpy(gamma_ramp[1], green, 256);
     memcpy(gamma_ramp[2], blue, 256);
-    gamma_set = 1;
+    gamma_dirty = 1;
+    plog("gamma ramp: 0 -> %u, 64 -> %u, 128 -> %u, 192 -> %u, 255 -> %u", green[0], green[64], green[128], green[192],
+         green[255]);
 }
