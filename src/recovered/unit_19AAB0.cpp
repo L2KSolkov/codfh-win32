@@ -10,6 +10,10 @@
 #include "types/type_DA0A0.h"
 
 #include "types/type_4F2940.h"
+#ifdef CODFH_WIN32
+// (the port's configured language, for a start with no shell settings: port/src/xpal_core.cpp)
+extern "C" RwInt32 port_language(void);
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x0042B714
@@ -193,7 +197,12 @@ void sub_19AD20()
     {
         unk_4B9308.sub_EEAA0(0);
         dword_4B9E5C = 0;
+#ifdef CODFH_WIN32
+        // (a start with no shell settings: the configured language, not the debugger's French)
+        sub_19B0C0(port_language());
+#else
         sub_19B0C0(2);
+#endif
         dword_4F28F0->unk_22 = 1;
         dword_4F45F8->unk_14 = 0;
         set_4F28F0_unk_183(unk_4F5DD8[dword_4F45F8->unk_14].unk_00);

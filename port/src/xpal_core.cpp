@@ -122,7 +122,7 @@ void port_config_load(void)
     port_config.windowed = ini_int(ini, "video", "windowed", 1);
     port_config.vsync = ini_int(ini, "video", "vsync", 1);
     port_config.widescreen = ini_int(ini, "video", "widescreen", 0);
-    port_config.language = ini_int(ini, "game", "language", 1);
+    port_config.language = ini_int(ini, "game", "language", 0);
 
     /* (no trailing separator on the roots: the mapped paths add one) */
     for (char *r = port_config.dataRoot; r; r = r == port_config.dataRoot ? port_config.userRoot : NULL)
@@ -189,6 +189,13 @@ extern "C" BOOL WINAPI xpal_CopyFileA(LPCSTR from, LPCSTR to, BOOL failIfExists)
 {
     char a[520], b[520];
     return CopyFileA(port_map_path(from, a), port_map_path(to, b), failIfExists);
+}
+
+/* The game's language index (0 English, 1 German, 2 French, 5 Italian, 6 Spanish: sub_19BEA0's
+   mapping to the console's languages): codfh.ini [game] language. */
+extern "C" int port_language(void)
+{
+    return port_config.language >= 0 && port_config.language <= 8 ? port_config.language : 0;
 }
 
 extern "C" VOID WINAPI xpal_OutputDebugStringA(LPCSTR text)

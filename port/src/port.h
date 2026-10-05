@@ -26,7 +26,7 @@ typedef struct PortConfig
     int windowed;
     int vsync;
     int widescreen;
-    int language;           /* the Xbox's language setting (1 English) */
+    int language;           /* the game's language index (0 English; port_language) */
 } PortConfig;
 
 extern PortConfig port_config;
