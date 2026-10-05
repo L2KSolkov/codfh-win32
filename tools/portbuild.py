@@ -11,6 +11,10 @@ Objects go to build/port/obj; build/port/compile.log has every unit's compiler o
 build/port/errors.md a summary: units that fail, error codes by count, and the headers and
 identifiers the errors name most. Linking comes with W0's entry point.
 
+CODFH_IMGUI (the port's Dear ImGui overlay, port/third_party/imgui) is on in the game's build and
+off in the dedicated server's; --no-imgui leaves it out. ImGui itself is compiled with the current
+compiler's own rules, not the sources' VC7.1 ones.
+
 --dedicated builds the dedicated server instead (build/port/dedicated/codfh_server.exe, its own
 objects): every unit compiled with CODFH_DEDICATED too, which the port layer reads (no window,
 device, audio output or local input; it hosts from the command line and never plays).
@@ -70,6 +74,9 @@ DROP = re.compile(r'^/(compiler:.*|G[5-7B]|Gs\d*|QIfist|arch:.*|O[12bdgistxy].*|
                   r'EH.*|GR-?|MT.*|MD.*|W\d|Zi|nologo|c)$')
 
 SKIP_DIRS = ('src/xbe/', 'src/xdk/')
+IMGUI_DIR = 'port/third_party/imgui/'
+# Third-party sources (Dear ImGui): the current compiler's own rules, none of the VC7.1 ones.
+THIRD_PARTY_FLAGS = ['/c', '/nologo', '/O2', '/Zi', '/FS', '/MT', '/W1', '/EHsc', '/DWIN32', '/D_CRT_SECURE_NO_WARNINGS']
 ASM_DIRS = ('src/bink/',)
 
 
@@ -107,8 +114,13 @@ def compile_unit(job):
         # (ml's errors read "error A2xxx"; reported as the compiler's for the summary)
         return src, r.returncode, out.replace(': error A', ': error C')
     lang = '/TC' if src.endswith('.c') else '/TP'
-    cmd = ([CL] + PORT_FLAGS + flags + [lang, '/Iport/include', '/Iinclude']
-           + ['/Fo' + obj, '/Fd' + os.path.join(OBJ, 'port.pdb'), src])
+    if src.startswith('port/third_party/'):
+        cmd = ([CL] + THIRD_PARTY_FLAGS + [lang, '/I' + IMGUI_DIR] + ['/Fo' + obj, '/Fd' + os.path.join(OBJ, 'port.pdb'), src])
+    else:
+        # (the port layer's own sources also see ImGui's headers, which include each other by name)
+        extra = ['/I' + IMGUI_DIR] if src.startswith('port/src/') else []
+        cmd = ([CL] + PORT_FLAGS + flags + [lang, '/Iport/include', '/Iinclude'] + extra
+               + ['/Fo' + obj, '/Fd' + os.path.join(OBJ, 'port.pdb'), src])
     env = dict(os.environ)
     env['INCLUDE'] = ';'.join(SYSTEM_INCLUDES)
     env['LIB'] = ';'.join(SYSTEM_LIBS)
@@ -126,6 +138,9 @@ def main():
         OBJ = os.path.join(OUT, 'obj')
         EXE = 'codfh_server.exe'
         PORT_FLAGS.append('/DCODFH_DEDICATED')
+    imgui = '--dedicated' not in args and '--no-imgui' not in args
+    if imgui:
+        PORT_FLAGS.append('/DCODFH_IMGUI')
     os.makedirs(OUT, exist_ok=True)
     only = [args[i + 1] for i, a in enumerate(args) if a == '--only']
     jobs_n = int(args[args.index('--jobs') + 1]) if '--jobs' in args else (os.cpu_count() or 4)
@@ -138,6 +153,8 @@ def main():
     srcs += sorted(s.replace(os.sep, '/') for s in
                    glob.glob('port/src/**/*.c', recursive=True) + glob.glob('port/src/**/*.cpp', recursive=True))
     srcs += sorted(s.replace(os.sep, '/') for d in ASM_DIRS for s in glob.glob(d + '*.asm'))
+    if imgui:
+        srcs += sorted(s.replace(os.sep, '/') for s in glob.glob(IMGUI_DIR + '*.cpp') + glob.glob(IMGUI_DIR + 'backends/*.cpp'))
     srcs = [s for s in srcs if not s.startswith(SKIP_DIRS)]
     # (an .asm beside a .c of the same name gets its own object)
     def obj_of(s):
@@ -198,7 +215,7 @@ def main():
 
 
 LIBS = ['kernel32.lib', 'user32.lib', 'gdi32.lib', 'winmm.lib', 'd3d11.lib', 'dxgi.lib', 'd3dcompiler.lib', 'xaudio2.lib', 'ws2_32.lib',
-        'ntdll.lib', 'ole32.lib', 'shell32.lib', 'bcrypt.lib', 'iphlpapi.lib', 'dbghelp.lib', 'mfplat.lib', 'mfreadwrite.lib', 'mfuuid.lib', 'advapi32.lib']
+        'ntdll.lib', 'ole32.lib', 'shell32.lib', 'bcrypt.lib', 'iphlpapi.lib', 'dbghelp.lib', 'mfplat.lib', 'mfreadwrite.lib', 'mfuuid.lib', 'advapi32.lib', 'imm32.lib', 'dwmapi.lib']
 
 
 def link(objs):

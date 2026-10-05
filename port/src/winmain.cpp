@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 #include "port.h"
-#include "d3d/pdev.h"
+#include "d3d/pdev.h"  /* (also the overlay's entry points) */
 
 extern "C" void port_audio_shutdown(void);
 
@@ -62,6 +62,25 @@ static void set_fullscreen(HWND hwnd, int on)
 
 static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 {
+#ifdef CODFH_IMGUI
+    /* F1 shows and hides the overlay; while it is shown the cursor is free and ImGui has the
+       window's messages first */
+    if (msg == WM_KEYDOWN && wp == VK_F1 && !(lp & (1 << 30)))
+    {
+        port_imgui_toggle();
+        confine_cursor(hwnd, 0);
+        return 0;
+    }
+    if (port_imgui_wndproc(hwnd, msg, wp, lp))
+        return TRUE;
+    if (msg == WM_SETCURSOR && LOWORD(lp) == HTCLIENT && port_imgui_visible())
+    {
+        SetCursor(LoadCursor(NULL, IDC_ARROW));
+        return TRUE;
+    }
+    if (msg == WM_LBUTTONDOWN && port_imgui_visible())
+        return 0;   /* (the click is the overlay's: the cursor stays free) */
+#endif
     switch (msg)
     {
     case WM_INPUT:

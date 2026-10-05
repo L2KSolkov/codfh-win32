@@ -258,6 +258,9 @@ extern "C" int pdev_init(void *hwnd, int width, int height, int windowed, int vs
         {
             plog("Direct3D 11 on %s (feature level %X): %dx%d frame in a %dx%d window", names[i], got, width, height,
                  back_w, back_h);
+#ifdef CODFH_IMGUI
+            pdev_imgui_init(hwnd, names[i]);
+#endif
             /* (Alt+Enter stays the window's: fullscreen is WinMain's borderless window) */
             IDXGIFactory *f = NULL;
             if (SUCCEEDED(swap->GetParent(__uuidof(IDXGIFactory), (void **)&f)))
@@ -276,6 +279,9 @@ extern "C" int pdev_init(void *hwnd, int width, int height, int windowed, int vs
 
 extern "C" void pdev_shutdown(void)
 {
+#ifdef CODFH_IMGUI
+    pdev_imgui_shutdown();
+#endif
     if (ctx)
         ctx->ClearState();
     if (dsv) dsv->Release();
@@ -444,7 +450,13 @@ extern "C" void pdev_present(void)
         }
     }
     if (back_rtv)
+    {
         final_pass();
+#ifdef CODFH_IMGUI
+        /* (over the finished frame, in the window's buffer: captures of the frame leave it out) */
+        pdev_imgui_frame(back_w, back_h);
+#endif
+    }
     capture(frame);
     HRESULT hr = swap->Present(sync_interval, 0);
     if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)

@@ -58,6 +58,13 @@ logged; `CODFH_DRAWDETAIL=k` logs draw k's vertices, constants and textures),
 `CODFH_TRACE=n` (frame n's device calls), `CODFH_WAV=file` (the mixed audio), `CODFH_NETLOOP=n`
 (System Link on 127.0.0.n).
 
+The overlay (`CODFH_IMGUI`, on in the game's build; `--no-imgui` leaves it out, the dedicated server
+never has it): Dear ImGui 1.92.9 (`port/third_party/imgui`, MIT) drawn over the finished frame. F1
+shows it (`CODFH_OVERLAY=1` from the start): frame time and rate, the renderer's draws, vertices,
+untextured and dropped draws and its timings, the wireframe / no depth / no culling / no fog
+switches live, and the mouse sensitivity. Captures (`CODFH_SHOT`) leave it out unless
+`CODFH_SHOT_WINDOW=1`.
+
 Open: the DSP image's other effects (filters; the game sets reverb off), a two-PC LAN test (the loopback test covers the same code), single-player content (section 13).
 
 ![Two instances in one System Link match](port-systemlink-match.png)

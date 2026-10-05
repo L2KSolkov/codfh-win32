@@ -147,8 +147,18 @@ enum
 };
 enum { XB_A, XB_B, XB_X, XB_Y, XB_BLACK, XB_WHITE, XB_LTRIGGER, XB_RTRIGGER };
 
+#ifdef CODFH_IMGUI
+extern "C" int port_imgui_wants_mouse(void);
+extern "C" int port_imgui_wants_keyboard(void);
+#endif
+
 static int key(int vk)
 {
+#ifdef CODFH_IMGUI
+    /* (the overlay's: the mouse while it is shown, the keyboard while a field wants it) */
+    if ((vk == VK_LBUTTON || vk == VK_RBUTTON || vk == VK_MBUTTON) ? port_imgui_wants_mouse() : port_imgui_wants_keyboard())
+        return 0;
+#endif
     return port_hwnd && GetForegroundWindow() == (HWND)port_hwnd && (GetAsyncKeyState(vk) & 0x8000);
 }
 
@@ -291,6 +301,10 @@ extern volatile LONG port_mouse_dx, port_mouse_dy;
 static void mouse_state(XINPUT_GAMEPAD *g)
 {
     LONG dx = InterlockedExchange(&port_mouse_dx, 0), dy = InterlockedExchange(&port_mouse_dy, 0);
+#ifdef CODFH_IMGUI
+    if (port_imgui_wants_mouse())
+        return;
+#endif
     if (!port_hwnd || GetForegroundWindow() != (HWND)port_hwnd)
         return;
     float s = port_config.mouseSensitivity > 0 ? port_config.mouseSensitivity : 1.0f;

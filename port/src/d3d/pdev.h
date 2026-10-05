@@ -116,6 +116,31 @@ typedef struct PDevDraw
 } PDevDraw;
 
 void pdev_draw(const PDevDraw *draw);
+
+/* The renderer's last frame (xdraw.cpp), and its debugging switches (from CODFH_WIREFRAME,
+   CODFH_NODEPTH, CODFH_NOCULL and CODFH_NOFOG at start; the overlay changes them). */
+typedef struct PortRenderStats
+{
+    unsigned draws, vertices, untextured, dropped;
+    float shaderMs, convertMs, stateMs, deviceMs;
+} PortRenderStats;
+extern PortRenderStats port_render_stats;
+
+typedef struct PortRenderDebug
+{
+    int wireframe, nodepth, nocull, nofog;
+} PortRenderDebug;
+extern PortRenderDebug port_render_debug;
+
+/* The Dear ImGui overlay (CODFH_IMGUI, pd11_imgui.cpp): no-ops without it. */
+void pdev_imgui_init(void *hwnd, const char *device);
+void pdev_imgui_shutdown(void);
+void pdev_imgui_frame(int back_w, int back_h);
+int port_imgui_visible(void);
+void port_imgui_toggle(void);
+int port_imgui_wndproc(void *hwnd, unsigned msg, ULONG_PTR wp, LONG_PTR lp);
+int port_imgui_wants_mouse(void);
+int port_imgui_wants_keyboard(void);
 /* Draws the device dropped since the last call. */
 unsigned pdev_dropped(void);
 

@@ -40,15 +40,19 @@ extern "C" int port_xb_texture_level(const D3DBaseTexture *t, UINT level, int fa
 extern "C" int port_xb_format_linear(DWORD f);
 extern "C" int port_xb_format_bpp(DWORD f);
 
+/* The debugging switches (pdev.h), from the environment at start. */
+static int env_on(const char *name)
+{
+    char b[8];
+    return GetEnvironmentVariableA(name, b, sizeof(b)) ? 1 : 0;
+}
+PortRenderDebug port_render_debug = {env_on("CODFH_WIREFRAME"), env_on("CODFH_NODEPTH"), env_on("CODFH_NOCULL"),
+                                     env_on("CODFH_NOFOG")};
+PortRenderStats port_render_stats;
+
 static int no_fog(void)
 {
-    static int v = -1;
-    if (v < 0)
-    {
-        char b[8];
-        v = GetEnvironmentVariableA("CODFH_NOFOG", b, sizeof(b)) ? 1 : 0;
-    }
-    return v;
+    return port_render_debug.nofog;
 }
 #define RS(n) ((n) == D3DRS_FOGENABLE && no_fog() ? 0 : D3D__RenderState[n])
 #define TSS(s, n) D3D__TextureState[s][n]
@@ -1597,6 +1601,39 @@ void xdraw_frame_stats(void)
         char v[8];
         on = GetEnvironmentVariableA("CODFH_STATS", v, sizeof(v)) ? 1 : 0;
     }
+    /* the last frame's, for the overlay */
+    {
+        static unsigned last_draws, last_vertices, last_untextured, last_dropped;
+        static LONGLONG last_shaders, last_convert, last_state, last_device;
+        LARGE_INTEGER qf;
+        QueryPerformanceFrequency(&qf);
+        float tms = 1000.0f / (float)qf.QuadPart;
+        unsigned untextured = missing_textures + missing_data, dropped = drop_shader + drop_stream + drop_indices;
+        port_render_stats.draws = st.draws - last_draws;
+        port_render_stats.vertices = st.vertices - last_vertices;
+        port_render_stats.untextured = untextured - last_untextured;
+        port_render_stats.dropped = dropped - last_dropped;
+        port_render_stats.shaderMs = (float)(st.shaders - last_shaders) * tms;
+        port_render_stats.convertMs = (float)(st.convert - last_convert) * tms;
+        port_render_stats.stateMs = (float)(st.state - last_state) * tms;
+        port_render_stats.deviceMs = (float)(st.device - last_device) * tms;
+        last_draws = st.draws;
+        last_vertices = st.vertices;
+        last_untextured = untextured;
+        last_dropped = dropped;
+        last_shaders = st.shaders;
+        last_convert = st.convert;
+        last_state = st.state;
+        last_device = st.device;
+        static unsigned resets;
+        if (on && (resets + 1) % 300 == 0)
+        {
+            /* (the counters are cleared below) */
+            last_draws = last_vertices = last_untextured = last_dropped = 0;
+            last_shaders = last_convert = last_state = last_device = 0;
+        }
+        resets++;
+    }
     static unsigned frames;
     if (!on || ++frames % 300)
         return;
@@ -1937,30 +1974,13 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
         }
     }
     {
-        /* CODFH_WIREFRAME=1: everything as wireframe with no depth, blending or alpha test */
-        static int wire = -1;
-        if (wire < 0)
-        {
-            char v[8];
-            wire = GetEnvironmentVariableA("CODFH_WIREFRAME", v, sizeof(v)) ? 1 : 0;
-        }
-        static int nodepth = -1;
-        if (nodepth < 0)
-        {
-            char v[8];
-            nodepth = GetEnvironmentVariableA("CODFH_NODEPTH", v, sizeof(v)) ? 1 : 0;
-        }
-        if (nodepth)
+        /* CODFH_WIREFRAME=1: everything as wireframe with no depth, blending or alpha test (these
+           switches are port_render_debug's: the overlay changes them) */
+        if (port_render_debug.nodepth)
             d.depthEnable = 0;
-        static int nocull = -1;
-        if (nocull < 0)
-        {
-            char v[8];
-            nocull = GetEnvironmentVariableA("CODFH_NOCULL", v, sizeof(v)) ? 1 : 0;
-        }
-        if (nocull)
+        if (port_render_debug.nocull)
             d.cull = PDEV_CULL_NONE;
-        if (wire)
+        if (port_render_debug.wireframe)
         {
             d.wireframe = 1;
             d.depthEnable = 0;
