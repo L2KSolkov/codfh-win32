@@ -758,6 +758,225 @@ static std::string stage_pixel_shader(void)
     return h;
 }
 
+/*
+ * Xbox pixel shaders (W2.5): a D3DPIXELSHADERDEF (the NV2A register combiners) as HLSL. The
+ * definition's 60 dwords: alpha inputs 0-7, final combiner inputs ABCD 8 and EFG 9, stage
+ * constants 0 at 10-17 and 1 at 18-25, alpha outputs 26-33, RGB inputs 34-41, compare mode 42,
+ * final constants 43-44, RGB outputs 45-52, the combiner count 53, texture modes 54, dot mapping
+ * 55, input textures 56, the constants' mappings 57-58 (a register per stage, F for the stage's
+ * own value) and the final combiner's 59.
+ *
+ * A combiner stage computes AB = A*B (or A.B), CD = C*D (or C.D) and their sum (or r0.a's mux)
+ * for RGB and alpha apart, each input a register (zero, c0, c1, fog, v0, v1, t0-t3, r0, r1, the
+ * final combiner's v1+r0 and E*F), its RGB or alpha, mapped (unsigned, inverted, expanded,
+ * half-biased, signed, negated); outputs scaled and biased. r0.a starts as t0's alpha. Without
+ * a final combiner the result is r0, fogged as Xbox D3D's default final combiner does.
+ */
+
+static std::string ps_input(DWORD in, bool alpha, int stage, const DWORD *def)
+{
+    char buf[96];
+    int reg = in & 0xF, chan = (in >> 4) & 1, map = (in >> 5) & 7;
+    std::string v;
+    switch (reg)
+    {
+    case 0: v = "float4(0, 0, 0, 0)"; break;
+    case 1: sprintf(buf, "c0_%d", stage); v = buf; break;
+    case 2: sprintf(buf, "c1_%d", stage); v = buf; break;
+    case 3: v = "fogv"; break;
+    case 4: v = "v0"; break;
+    case 5: v = "v1"; break;
+    case 8: case 9: case 10: case 11: sprintf(buf, "t%d", reg - 8); v = buf; break;
+    case 12: v = "r0"; break;
+    case 13: v = "r1"; break;
+    case 14: v = "v1r0"; break;
+    case 15: v = "efp"; break;
+    default: v = "float4(0, 0, 0, 0)"; break;
+    }
+    (void)def;
+    /* the channel: alpha replicated, or the colour (with its blue as alpha, on the alpha side) */
+    v = chan ? "(" + v + ").aaaa" : (alpha ? "(" + v + ").bbbb" : v);
+    switch (map)
+    {
+    case 0: return "saturate(" + v + ")";
+    case 1: return "(1 - saturate(" + v + "))";
+    case 2: return "(2 * saturate(" + v + ") - 1)";
+    case 3: return "(1 - 2 * saturate(" + v + "))";
+    case 4: return "(saturate(" + v + ") - 0.5)";
+    case 5: return "(0.5 - saturate(" + v + "))";
+    case 6: return v;
+    default: return "(-" + v + ")";
+    }
+}
+
+static const char *ps_reg_name(int r)
+{
+    static const char *const names[16] = {0, "c0x", "c1x", "fogv", "v0", "v1", 0, 0, "t0", "t1", "t2", "t3", "r0", "r1", 0, 0};
+    return names[r & 15];
+}
+
+static std::string ps_combiner(int stage, DWORD inputs, DWORD outputs, bool alpha, const DWORD *def)
+{
+    std::string a = ps_input((inputs >> 24) & 0xFF, alpha, stage, def);
+    std::string b = ps_input((inputs >> 16) & 0xFF, alpha, stage, def);
+    std::string c = ps_input((inputs >> 8) & 0xFF, alpha, stage, def);
+    std::string d = ps_input(inputs & 0xFF, alpha, stage, def);
+    int cdOut = outputs & 0xF, abOut = (outputs >> 4) & 0xF, sumOut = (outputs >> 8) & 0xF;
+    bool cdDot = !alpha && (outputs & 0x1000), abDot = !alpha && (outputs & 0x2000), mux = (outputs & 0x4000) != 0;
+    int scale = (outputs >> 15) & 7;
+    bool cdBlueToAlpha = !alpha && (outputs & 0x40000), abBlueToAlpha = !alpha && (outputs & 0x80000);
+    const char *sw = alpha ? ".a" : ".rgb";
+    std::string h;
+    char buf[512];
+    h += "    {\n";
+    h += "        float4 ab = " + (abDot ? "dot((" + a + ").rgb, (" + b + ").rgb).xxxx" : a + " * " + b) + ";\n";
+    h += "        float4 cd = " + (cdDot ? "dot((" + c + ").rgb, (" + d + ").rgb).xxxx" : c + " * " + d) + ";\n";
+    h += std::string("        float4 sm = ") + (mux ? "(r0.a >= 0.5 ? cd : ab)" : "ab + cd") + ";\n";
+    static const char *const scales[8] = {"x", "(x - 0.5)", "(2 * x)", "(2 * (x - 0.5))", "(4 * x)", "x",
+                                          "(x / 2)", "x"};
+    std::string sc = scales[scale];
+    std::string::size_type p;
+    std::string sab = sc, scd = sc, ssm = sc;
+    while ((p = sab.find('x')) != std::string::npos) sab.replace(p, 1, "ab");
+    while ((p = scd.find('x')) != std::string::npos) scd.replace(p, 1, "cd");
+    while ((p = ssm.find('x')) != std::string::npos) ssm.replace(p, 1, "sm");
+    h += "        ab = clamp(" + sab + ", -1, 1); cd = clamp(" + scd + ", -1, 1); sm = clamp(" + ssm + ", -1, 1);\n";
+    /* writes (to temporaries first: the stage reads its inputs before writing) */
+    struct { int reg; const char *val; } w[3] = {{abOut, "ab"}, {cdOut, "cd"}, {sumOut, "sm"}};
+    for (int i = 0; i < 3; i++)
+    {
+        int r = w[i].reg;
+        if (!r || !ps_reg_name(r))
+            continue;
+        if (r == 1 || r == 2)
+            continue;   /* (constants are not written) */
+        sprintf(buf, "        %s%s = %s%s;\n", ps_reg_name(r), sw, w[i].val, sw);
+        h += buf;
+        if ((i == 0 && abBlueToAlpha) || (i == 1 && cdBlueToAlpha))
+        {
+            sprintf(buf, "        %s.a = %s.b;\n", ps_reg_name(r), w[i].val);
+            h += buf;
+        }
+    }
+    h += "    }\n";
+    return h;
+}
+
+static std::string xbox_pixel_shader(const DWORD *def)
+{
+    char buf[512];
+    std::string h =
+        "cbuffer PS : register(b0) { float4 psc[16]; };\n"
+        "SamplerState s0 : register(s0); SamplerState s1 : register(s1); SamplerState s2 : register(s2); SamplerState s3 : register(s3);\n"
+        "struct PSIn {\n"
+        "    float4 pos : SV_Position;\n"
+        "    float4 d0 : COLOR0;\n"
+        "    float4 d1 : COLOR1;\n"
+        "    float4 t0 : TEXCOORD0;\n"
+        "    float4 t1 : TEXCOORD1;\n"
+        "    float4 t2 : TEXCOORD2;\n"
+        "    float4 t3 : TEXCOORD3;\n"
+        "    float fog : FOG;\n"
+        "};\n"
+        "";
+    for (int st = 0; st < 4; st++)
+    {
+        sprintf(buf, stage_texture_kind(st) == 2 ? "TextureCube tc_%d : register(t%d);\n" : "Texture2D t2_%d : register(t%d);\n",
+                st, st);
+        h += buf;
+    }
+    h += "float4 main(PSIn i) : SV_Target {\n"
+         "    float4 v0 = i.d0, v1 = i.d1;\n";
+    /* the fog register: its colour, and the factor as alpha */
+    h += "    float fogf = 1;\n";
+    switch (RS(D3DRS_FOGTABLEMODE))
+    {
+    case 1: h += "    fogf = exp(-psc[10].w * i.fog);\n"; break;
+    case 2: h += "    fogf = exp(-(psc[10].w * i.fog) * (psc[10].w * i.fog));\n"; break;
+    case 3: h += "    fogf = (psc[10].z - i.fog) / max(psc[10].z - psc[10].y, 1e-6);\n"; break;
+    default: h += "    fogf = i.fog;\n"; break;
+    }
+    h += "    float4 fogv = float4(psc[9].rgb, saturate(fogf));\n";
+    DWORD modes = def[54];
+    for (int st = 0; st < 4; st++)
+    {
+        int mode = (modes >> (5 * st)) & 31;
+        int kind = stage_texture_kind(st);
+        if (mode == 0 || !kind)
+            sprintf(buf, "    float4 t%d = float4(0, 0, 0, %s);\n", st, mode == 4 ? "1" : "0");
+        else if (mode == 3 || kind == 2)
+            sprintf(buf, "    float4 t%d = tc_%d.Sample(s%d, i.t%d.xyz);\n", st, st, st, st);
+        else if (mode == 4)
+            sprintf(buf, "    float4 t%d = saturate(i.t%d);\n", st, st);
+        else
+            sprintf(buf, "    float4 t%d = t2_%d.Sample(s%d, i.t%d.xy / (i.t%d.w != 0 ? i.t%d.w : 1));\n", st, st, st, st,
+                    st, st);
+        h += buf;
+    }
+    h += "    float4 r0 = float4(0, 0, 0, t0.a), r1 = float4(0, 0, 0, 0);\n";
+    int count = def[53] & 0xFF;
+    if (count > 8)
+        count = 8;
+    for (int s = 0; s < count; s++)
+    {
+        /* the stage's constants: a register or its own value */
+        for (int k = 0; k < 2; k++)
+        {
+            int map = (def[57 + k] >> (4 * s)) & 0xF;
+            DWORD value = def[(k ? 18 : 10) + s];
+            if (map != 0xF)
+                sprintf(buf, "    float4 c%d_%d = psc[%d];\n", k, s, map & 7);
+            else
+                sprintf(buf, "    float4 c%d_%d = float4(%f, %f, %f, %f);\n", k, s, ((value >> 16) & 0xFF) / 255.0,
+                        ((value >> 8) & 0xFF) / 255.0, (value & 0xFF) / 255.0, ((value >> 24) & 0xFF) / 255.0);
+            h += buf;
+        }
+        h += ps_combiner(s, def[34 + s], def[45 + s], false, def);
+        h += ps_combiner(s, def[s], def[26 + s], true, def);
+    }
+    if (def[8] || def[9])
+    {
+        /* the final combiner: rgb = A*B + (1-A)*C + D, alpha = G */
+        int s = 8;  /* its constants */
+        for (int k = 0; k < 2; k++)
+        {
+            int map = (def[59] >> (4 * k)) & 0xF;
+            DWORD value = def[43 + k];
+            if (map != 0xF)
+                sprintf(buf, "    float4 c%d_%d = psc[%d];\n", k, s, map & 7);
+            else
+                sprintf(buf, "    float4 c%d_%d = float4(%f, %f, %f, %f);\n", k, s, ((value >> 16) & 0xFF) / 255.0,
+                        ((value >> 8) & 0xFF) / 255.0, (value & 0xFF) / 255.0, ((value >> 24) & 0xFF) / 255.0);
+            h += buf;
+        }
+        DWORD abcd = def[8], efg = def[9];
+        h += "    float4 efp = " + ps_input((efg >> 24) & 0xFF, false, s, def) + " * " +
+             ps_input((efg >> 16) & 0xFF, false, s, def) + ";\n";
+        h += std::string("    float4 v1r0 = ") + ((efg & 0x80) ? "saturate(v1 + r0)" : "(v1 + r0)") + ";\n";
+        std::string A = ps_input((abcd >> 24) & 0xFF, false, s, def), B = ps_input((abcd >> 16) & 0xFF, false, s, def);
+        std::string C = ps_input((abcd >> 8) & 0xFF, false, s, def), D = ps_input(abcd & 0xFF, false, s, def);
+        std::string G = ps_input((efg >> 8) & 0xFF, true, s, def);
+        h += "    float4 outc = float4((" + A + " * " + B + " + (1 - " + A + ") * " + C + " + " + D + ").rgb, (" + G + ").a);\n";
+    }
+    else
+    {
+        /* Xbox D3D's default final combiner: r0, fogged */
+        if (RS(D3DRS_FOGENABLE))
+            h += "    float4 outc = float4(lerp(fogv.rgb, r0.rgb, fogv.a), r0.a);\n";
+        else
+            h += "    float4 outc = r0;\n";
+    }
+    h += "    outc = saturate(outc);\n";
+    if (RS(D3DRS_ALPHATESTENABLE))
+    {
+        _snprintf(buf, sizeof(buf) - 1, "    { float a = round(outc.a * 255), r = psc[10].x; if (!(%s)) discard; }\n",
+                  cmp_hlsl(RS(D3DRS_ALPHAFUNC)));
+        h += buf;
+    }
+    h += "    return outc;\n}\n";
+    return h;
+}
+
 /* What the generated pixel shader depends on: the stages' operations, arguments and texture
    kinds, and the alpha test, specular and fog states. */
 struct PSKey
@@ -770,9 +989,29 @@ static void *pixel_shader(void)
 {
     if (xs.pixelShader)
     {
-        static int logged;
-        if (!logged++)
-            plog("Xbox pixel shaders drawn with the texture stages (W2.5: register combiners)");
+        /* an Xbox pixel shader: cached by its definition and the states its text uses */
+        struct
+        {
+            DWORD def[60];
+            DWORD rs[4];
+            int kinds[4];
+        } xk;
+        memcpy(xk.def, (const void *)(ULONG_PTR)xs.pixelShader, sizeof(xk.def));
+        xk.rs[0] = RS(D3DRS_FOGENABLE);
+        xk.rs[1] = RS(D3DRS_FOGTABLEMODE);
+        xk.rs[2] = RS(D3DRS_ALPHATESTENABLE);
+        xk.rs[3] = RS(D3DRS_ALPHATESTENABLE) ? RS(D3DRS_ALPHAFUNC) : 0;
+        for (int st = 0; st < 4; st++)
+            xk.kinds[st] = stage_texture_kind(st);
+        static std::map<std::string, void *> xcache;
+        std::string key((const char *)&xk, sizeof(xk));
+        std::map<std::string, void *>::iterator it = xcache.find(key);
+        if (it != xcache.end())
+            return it->second;
+        std::string h = xbox_pixel_shader(xk.def);
+        void *ps = pdev_pixel_shader(h.c_str());
+        xcache[key] = ps;
+        return ps;
     }
     PSKey k;
     memset(&k, 0, sizeof(k));
@@ -1152,12 +1391,17 @@ static void fill_state(PDevDraw &d)
     DWORD tf = RS(D3DRS_TEXTUREFACTOR), fc = RS(D3DRS_FOGCOLOR);
     float tfv[4] = {((tf >> 16) & 0xFF) / 255.0f, ((tf >> 8) & 0xFF) / 255.0f, (tf & 0xFF) / 255.0f, ((tf >> 24) & 0xFF) / 255.0f};
     float fcv[4] = {((fc >> 16) & 0xFF) / 255.0f, ((fc >> 8) & 0xFF) / 255.0f, (fc & 0xFF) / 255.0f, 1};
-    memcpy(psc[0], tfv, 16);
-    memcpy(psc[1], fcv, 16);
-    psc[2][0] = (float)(RS(D3DRS_ALPHAREF) & 0xFF);
-    psc[2][1] = dword_float(RS(D3DRS_FOGSTART));
-    psc[2][2] = dword_float(RS(D3DRS_FOGEND));
-    psc[2][3] = dword_float(RS(D3DRS_FOGDENSITY));
+    /* the stages' shaders: texture factor, fog colour, (alpha ref, fog start, end, density) at
+       0-2; an Xbox pixel shader's: its eight constant registers, then fog colour at 9 and the
+       rest at 10 */
+    int base = xs.pixelShader ? 9 : 1;
+    if (!xs.pixelShader)
+        memcpy(psc[0], tfv, 16);
+    memcpy(psc[base], fcv, 16);
+    psc[base + 1][0] = (float)(RS(D3DRS_ALPHAREF) & 0xFF);
+    psc[base + 1][1] = dword_float(RS(D3DRS_FOGSTART));
+    psc[base + 1][2] = dword_float(RS(D3DRS_FOGEND));
+    psc[base + 1][3] = dword_float(RS(D3DRS_FOGDENSITY));
     d.psConstants = &psc[0][0];
 }
 
