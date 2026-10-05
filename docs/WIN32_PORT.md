@@ -1,4 +1,4 @@
-# Win32 port plan (Direct3D 9)
+# Win32 port plan
 
 A plan for building *Call of Duty: Finest Hour* (multiplayer executable,
 `Game_XboxMultiplayer.xbe`) as a Windows x86 program from this repository's sources. State on
@@ -18,6 +18,53 @@ Companion documents:
   formats, measured (appendix B).
 - [LATENT_BUGS.md](LATENT_BUGS.md): bugs a non-matching build exposes; the port inherits all of
   them.
+
+## Port status (2026-10-05)
+
+The port builds, runs and plays: `python tools/portbuild.py` compiles every unit under `src/`
+(Bink included) and `port/src`, and links `build/port/codfh.exe`. Run it with the disc's files
+as the data root:
+
+    CODFH_DATA=D:\CODFH_DUMP build/port/codfh.exe [-map <n|name>] [-gametype DM|TDM|CTF|SD|SUP]
+
+| Workstream | State | Checked by |
+|---|---|---|
+| W0 build, entry point | Done | Every unit compiles and links; `codfh.log` beside the executable |
+| W1 platform | Done | Files (`d:\` to the data root, the pack unchanged), saves, memory (16-byte aligned heap), threads, launch, flags |
+| W2 rendering | Done for everything the game draws (Direct3D 11, section 4) | Front end, all 8 multiplayer levels, first-person, HUD and menus at 60 fps; no bridge stub is reached in the front end, a match or a movie |
+| W3 data | Done for textures, geometry and audio formats | The formats the bridge translates: swizzled/linear 32-bit, P8, DXT1/3/5; Xbox ADPCM and PCM; no WMA on the disc |
+| W4 input | Done | XInput pads, keyboard, raw-input mouse look (`[input] mouse_sensitivity`) |
+| W5 audio | Done but the DSP image's filters | Software mixer over XAudio2 (3D, mix bins, submixes, play/loop regions), I3DL2 reverb in software, WMA through Media Foundation (unexercised: the disc has none); recordings with `CODFH_WAV` |
+| W6 video | Done | The Xbox Bink library from `src/bink` (C and its x86 transcriptions); the Act 1 newsreel plays with sound (`-movie Act_1.bik`) |
+| W7 networking | Done for System Link | Two instances on one machine (`CODFH_NETLOOP=1`/`2`) find, join and play one match ("PC Client has joined the game" on both); Live answers "not signed in" |
+| W8 polish | Done but key rebinding | Resizable window (4:3 letterboxed), borderless fullscreen (`[video] windowed=0`, Alt+Enter), clean close, crash reports with symbols in `codfh.log` |
+
+The renderer's translations, all in `port/src/d3d`: the Xbox's vertex microcode to HLSL
+(`xvsh.cpp`, with the screen-space epilogue and the reserved viewport constants c[-38]/c[-37]),
+the vertex-shader assembler and splicer the skin pipeline uses (`xvasm.cpp`), the register
+combiners to HLSL (`xdraw.cpp`, `xbox_pixel_shader`), the fixed-function vertex and texture-stage
+pipelines as generated shaders, cached by state; the game's gamma ramp is applied in the final
+pass (`pd11.cpp`).
+
+Configuration (`codfh.ini` beside the executable): `[video] width height windowed vsync
+widescreen`, `[game] language name`, `[input] mouse_sensitivity`, `[data] root user`.
+
+Debugging switches (environment): `CODFH_SHOT=n` (frame n to `shot.bmp`; `CODFH_SHOT_EVERY=1`
+every n frames; `CODFH_SHOT_WINDOW=1` the window's buffer), `CODFH_INPUT=frame:button,...`
+(scripted pad presses), `CODFH_DRAWID=n` (frame n's draws as flat colours naming them, each
+logged; `CODFH_DRAWDETAIL=k` logs draw k's vertices, constants and textures),
+`CODFH_NODEPTH`, `CODFH_NOCULL`, `CODFH_NOFOG`, `CODFH_WIREFRAME`, `CODFH_STATS`,
+`CODFH_TRACE=n` (frame n's device calls), `CODFH_WAV=file` (the mixed audio), `CODFH_NETLOOP=n`
+(System Link on 127.0.0.n).
+
+Open: the DSP image's other effects (filters; the game sets reverb off), key rebinding, a
+two-PC LAN test (the loopback test covers the same code), single-player content (section 13).
+
+![Two instances in one System Link match](port-systemlink-match.png)
+
+![The Act 1 newsreel through the Xbox Bink library](port-movie.png)
+
+![MP_1, MP_2, MP_4 and MP_5 with the world shaders drawn](port-levels-world.png)
 
 ## 1. Goals and rules
 
