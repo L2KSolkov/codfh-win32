@@ -17,6 +17,9 @@
 #include "types/type_DC400.h"
 #include "game/kujuui.h"
 #include "game/livebase.h"
+#ifdef CODFH_WIN32
+extern "C" void port_cli_frame(void);
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003E7E5C
@@ -155,6 +158,10 @@ void InGameMenuManager::sub_1FBE70(RwCamera *arg_0)
                     processEvent(l114.sub_1E7610());
             }
         }
+#ifdef CODFH_WIN32
+        // (the port's command-line level: hosted once the menus are up, port/src/cli.cpp)
+        port_cli_frame();
+#endif
         if (dword_42926C == 0)
         {
             if (sub_188350() != 4)

@@ -77,10 +77,13 @@ static void create_window(HINSTANCE inst)
     port_hwnd = hwnd;
 }
 
-int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR, int)
+extern "C" void port_cli_parse(const char *cmd);
+
+int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR cmd, int)
 {
     port_crash_handler_install();
     port_config_load();
+    port_cli_parse(cmd);
     timeBeginPeriod(1);
     create_window(inst);
     port_pump_messages();
