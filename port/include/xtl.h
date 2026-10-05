@@ -18,6 +18,7 @@
 #undef _WINSOCKAPI_
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <xnet.h>
 
 #include <d3d8.h>
 #include <dsound.h>
