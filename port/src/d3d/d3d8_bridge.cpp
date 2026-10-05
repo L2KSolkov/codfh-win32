@@ -14,6 +14,7 @@
 
 #include "../port.h"
 #include "pdev.h"
+#include "xstate.h"
 
 DWORD D3D__RenderState[D3DRS_MAX];
 DWORD D3D__TextureState[D3DTSS_MAXSTAGES][D3DTSS_MAX];
@@ -47,7 +48,7 @@ static Direct3D the_d3d_dummy;
 static D3DDevice *the_device;
 static PortSurface back_buffer, depth_buffer;
 static D3DSurface *render_target, *depth_target;
-static D3DVIEWPORT8 viewport = {0, 0, FRAME_W, FRAME_H, 0.0f, 1.0f};
+XState xs;
 
 static void surface_init(PortSurface *s, D3DFORMAT fmt, int w, int h, int bpp)
 {
@@ -59,6 +60,72 @@ static void surface_init(PortSurface *s, D3DFORMAT fmt, int w, int h, int bpp)
     s->xb.Format = (2 << XB_FORMAT_DIMENSION_SHIFT) | (fmt << XB_FORMAT_FORMAT_SHIFT);
     s->xb.Size = (w - 1) | ((h - 1) << XB_SIZE_HEIGHT_SHIFT) | ((s->pitch / 64 - 1) << XB_SIZE_PITCH_SHIFT);
     s->bits = calloc(1, (size_t)s->pitch * h);
+}
+
+/* Xbox Direct3D's state after device creation (the driver sets most of it again itself). */
+static void default_states(void)
+{
+    static const float one = 1.0f, zero = 0.0f;
+    DWORD f1, f0;
+    memcpy(&f1, &one, 4);
+    memcpy(&f0, &zero, 4);
+    memset(D3D__RenderState, 0, sizeof(D3D__RenderState));
+    D3D__RenderState[D3DRS_ZENABLE] = 1;
+    D3D__RenderState[D3DRS_ZWRITEENABLE] = 1;
+    D3D__RenderState[D3DRS_ZFUNC] = D3DCMP_LESSEQUAL;
+    D3D__RenderState[D3DRS_ALPHAFUNC] = D3DCMP_ALWAYS;
+    D3D__RenderState[D3DRS_SRCBLEND] = D3DBLEND_ONE;
+    D3D__RenderState[D3DRS_DESTBLEND] = D3DBLEND_ZERO;
+    D3D__RenderState[D3DRS_BLENDOP] = 0x8006;   /* ADD */
+    D3D__RenderState[D3DRS_COLORWRITEENABLE] = D3DCOLORWRITEENABLE_ALL;
+    D3D__RenderState[D3DRS_CULLMODE] = D3DCULL_CCW;
+    D3D__RenderState[D3DRS_FRONTFACE] = 0x900;  /* CW */
+    D3D__RenderState[D3DRS_FILLMODE] = 0x1B02;  /* SOLID */
+    D3D__RenderState[D3DRS_BACKFILLMODE] = 0x1B02;
+    D3D__RenderState[D3DRS_SHADEMODE] = D3DSHADE_GOURAUD;
+    D3D__RenderState[D3DRS_STENCILFUNC] = D3DCMP_ALWAYS;
+    D3D__RenderState[D3DRS_STENCILMASK] = 0xFF;
+    D3D__RenderState[D3DRS_STENCILWRITEMASK] = 0xFF;
+    D3D__RenderState[D3DRS_STENCILFAIL] = D3DSTENCILOP_KEEP;
+    D3D__RenderState[D3DRS_STENCILZFAIL] = D3DSTENCILOP_KEEP;
+    D3D__RenderState[D3DRS_STENCILPASS] = D3DSTENCILOP_KEEP;
+    D3D__RenderState[D3DRS_LIGHTING] = 1;
+    D3D__RenderState[D3DRS_COLORVERTEX] = 1;
+    D3D__RenderState[D3DRS_DIFFUSEMATERIALSOURCE] = D3DMCS_COLOR1;
+    D3D__RenderState[D3DRS_SPECULARMATERIALSOURCE] = 2;   /* COLOR2 */
+    D3D__RenderState[D3DRS_AMBIENTMATERIALSOURCE] = D3DMCS_MATERIAL;
+    D3D__RenderState[D3DRS_EMISSIVEMATERIALSOURCE] = D3DMCS_MATERIAL;
+    D3D__RenderState[D3DRS_FOGSTART] = f0;
+    D3D__RenderState[D3DRS_FOGEND] = f1;
+    D3D__RenderState[D3DRS_FOGDENSITY] = f1;
+    D3D__RenderState[D3DRS_POINTSIZE] = f1;
+    D3D__RenderState[D3DRS_TEXTUREFACTOR] = 0xFFFFFFFF;
+    D3D__RenderState[D3DRS_MULTISAMPLEMASK] = 0xFFFFFFFF;
+    D3D__RenderState[D3DRS_MULTISAMPLEANTIALIAS] = 1;
+    memset(D3D__TextureState, 0, sizeof(D3D__TextureState));
+    for (int st = 0; st < D3DTSS_MAXSTAGES; st++)
+    {
+        D3D__TextureState[st][D3DTSS_COLOROP] = st ? D3DTOP_DISABLE : D3DTOP_MODULATE;
+        D3D__TextureState[st][D3DTSS_COLORARG1] = D3DTA_TEXTURE;
+        D3D__TextureState[st][D3DTSS_COLORARG2] = D3DTA_CURRENT;
+        D3D__TextureState[st][D3DTSS_ALPHAOP] = st ? D3DTOP_DISABLE : D3DTOP_SELECTARG1;
+        D3D__TextureState[st][D3DTSS_ALPHAARG1] = D3DTA_TEXTURE;
+        D3D__TextureState[st][D3DTSS_ALPHAARG2] = D3DTA_CURRENT;
+        D3D__TextureState[st][D3DTSS_ADDRESSU] = D3DTADDRESS_WRAP;
+        D3D__TextureState[st][D3DTSS_ADDRESSV] = D3DTADDRESS_WRAP;
+        D3D__TextureState[st][D3DTSS_ADDRESSW] = D3DTADDRESS_WRAP;
+        D3D__TextureState[st][D3DTSS_MAGFILTER] = D3DTEXF_POINT;
+        D3D__TextureState[st][D3DTSS_MINFILTER] = D3DTEXF_POINT;
+        D3D__TextureState[st][D3DTSS_MAXANISOTROPY] = 1;
+        D3D__TextureState[st][D3DTSS_TEXCOORDINDEX] = st;
+        D3D__TextureState[st][D3DTSS_RESULTARG] = D3DTA_CURRENT;
+    }
+    for (int i = 0; i < 8; i++)
+    {
+        memset(&xs.transforms[i], 0, sizeof(D3DMATRIX));
+        for (int k = 0; k < 4; k++)
+            xs.transforms[i].m[k][k] = 1.0f;
+    }
 }
 
 /*
@@ -122,6 +189,9 @@ extern "C" HRESULT WINAPI Direct3D_CreateDevice(UINT, D3DDEVTYPE, void *, DWORD,
     surface_init(&back_buffer, pp->BackBufferFormat, FRAME_W, FRAME_H, 4);
     surface_init(&depth_buffer, pp->AutoDepthStencilFormat, FRAME_W, FRAME_H, 4);
     render_target = &back_buffer.xb;
+    D3DVIEWPORT8 vp0 = {0, 0, FRAME_W, FRAME_H, 0.0f, 1.0f};
+    xs.viewport = vp0;
+    default_states();
     depth_target = &depth_buffer.xb;
     the_device = (D3DDevice *)&the_d3d_dummy;
     *ppDevice = the_device;
@@ -278,7 +348,7 @@ extern "C" void WINAPI D3DDevice_CopyRects(D3DSurface *, const RECT *, UINT, D3D
 
 extern "C" void WINAPI D3DDevice_SetViewport(const D3DVIEWPORT8 *v)
 {
-    viewport = *v;
+    xs.viewport = *v;
     if (render_target == &back_buffer.xb)
         pdev_set_viewport(v->X, v->Y, v->Width, v->Height, v->MinZ, v->MaxZ);
 }
@@ -287,14 +357,23 @@ extern "C" void WINAPI D3DDevice_GetViewportOffsetAndScale(D3DVECTOR4 *pOffset, 
 {
     /* The Xbox's screen-space transform for vertex shaders: clip space to pixels, with the
        Xbox's 24-bit Z scale. */
-    pScale->x = viewport.Width * 0.5f;
-    pScale->y = -(float)viewport.Height * 0.5f;
-    pScale->z = (viewport.MaxZ - viewport.MinZ) * 16777215.0f;
+    pScale->x = xs.viewport.Width * 0.5f;
+    pScale->y = -(float)xs.viewport.Height * 0.5f;
+    pScale->z = (xs.viewport.MaxZ - xs.viewport.MinZ) * 16777215.0f;
     pScale->w = 1.0f;
-    pOffset->x = viewport.X + viewport.Width * 0.5f;
-    pOffset->y = viewport.Y + viewport.Height * 0.5f;
-    pOffset->z = viewport.MinZ * 16777215.0f;
+    pOffset->x = xs.viewport.X + xs.viewport.Width * 0.5f;
+    pOffset->y = xs.viewport.Y + xs.viewport.Height * 0.5f;
+    pOffset->z = xs.viewport.MinZ * 16777215.0f;
     pOffset->w = 0.0f;
+}
+
+/* The same, as plain floats for the draws (xdraw.cpp). */
+extern "C" void port_viewport_offset_scale(float *offset, float *scale)
+{
+    D3DVECTOR4 o, sc;
+    D3DDevice_GetViewportOffsetAndScale(&o, &sc);
+    offset[0] = o.x; offset[1] = o.y; offset[2] = o.z; offset[3] = o.w;
+    scale[0] = sc.x; scale[1] = sc.y; scale[2] = sc.z; scale[3] = sc.w;
 }
 
 /*
@@ -325,94 +404,108 @@ extern "C" void WINAPI D3DDevice_SetTextureStageStateNotInline(DWORD Stage, D3DT
     D3DDevice_SetTextureStageState(Stage, Type, Value);
 }
 
-static D3DMATRIX transforms[8];
-static D3DMATERIAL8 material;
-static D3DLIGHT8 lights[8];
-static BOOL light_on[8];
-static D3DBaseTexture *textures[4];
-static D3DPalette *palettes[4];
-static DWORD vertex_shader, pixel_shader;
-
 extern "C" void WINAPI D3DDevice_SetTransform(D3DTRANSFORMSTATETYPE State, const D3DMATRIX *pMatrix)
 {
     if (State < 8)
-        transforms[State] = *pMatrix;
+        xs.transforms[State] = *pMatrix;
 }
 
 extern "C" void WINAPI D3DDevice_SetMaterial(const D3DMATERIAL8 *pMaterial)
 {
-    material = *pMaterial;
+    xs.material = *pMaterial;
 }
 
 extern "C" HRESULT WINAPI D3DDevice_SetLight(DWORD Index, const D3DLIGHT8 *pLight)
 {
     if (Index < 8)
-        lights[Index] = *pLight;
+        xs.lights[Index] = *pLight;
     return D3D_OK;
 }
 
 extern "C" HRESULT WINAPI D3DDevice_LightEnable(DWORD Index, BOOL Enable)
 {
     if (Index < 8)
-        light_on[Index] = Enable;
+        xs.lightOn[Index] = Enable;
     return D3D_OK;
 }
 
 extern "C" void WINAPI D3DDevice_SetTexture(DWORD Stage, D3DBaseTexture *pTexture)
 {
     if (Stage < 4)
-        textures[Stage] = pTexture;
+        xs.textures[Stage] = pTexture;
 }
 
 extern "C" void WINAPI D3DDevice_SetPalette(DWORD Stage, D3DPalette *pPalette)
 {
     if (Stage < 4)
-        palettes[Stage] = pPalette;
+        xs.palettes[Stage] = pPalette;
 }
 
-extern "C" void WINAPI D3DDevice_SetVertexDataColor(INT, D3DCOLOR)
+extern "C" void WINAPI D3DDevice_SetVertexDataColor(INT Register, D3DCOLOR Color)
 {
-    PORT_STUB();        /* W2.9: the immediate-mode vertex colour */
+    /* (the immediate-mode attribute: used where the declaration lacks the register) */
+    if (Register >= 0 && Register < 16)
+        xs.vertexDataColor[Register] = Color;
 }
 
 /*
- * Shaders: handles now, programs in W2.4/W2.5.
+ * Shaders (W2.4, W2.5)
  */
 
-static DWORD next_handle = 0x10000;
-
-extern "C" HRESULT WINAPI D3DDevice_CreateVertexShader(const DWORD *, const DWORD *, DWORD *pHandle, DWORD)
+extern "C" HRESULT WINAPI D3DDevice_CreateVertexShader(const DWORD *pDeclaration, const DWORD *pFunction,
+                                                       DWORD *pHandle, DWORD)
 {
-    PORT_STUB();
-    /* (odd: the Xbox tells programmable handles from FVF codes by bit 0) */
-    *pHandle = (next_handle += 2) | 1;
+    XVertexShader *s = xdraw_create_vs(pDeclaration, pFunction);
+    /* (bit 0 set: the Xbox tells shader handles from FVF codes by it) */
+    *pHandle = (DWORD)(ULONG_PTR)s | 1;
     return D3D_OK;
 }
 
-extern "C" void WINAPI D3DDevice_DeleteVertexShader(DWORD)
+extern "C" void WINAPI D3DDevice_DeleteVertexShader(DWORD Handle)
 {
+    XVertexShader *s = (XVertexShader *)(ULONG_PTR)(Handle & ~1u);
+    if (!(Handle & 1) || !s)
+        return;
+    if (xs.programmable == s)
+        xs.programmable = NULL;
+    free((void *)s->program);
+    free(s);
 }
 
 extern "C" void WINAPI D3DDevice_SetVertexShader(DWORD Handle)
 {
-    vertex_shader = Handle;
+    xs.vertexShader = Handle;
+    xs.programmable = (Handle & 1) ? (XVertexShader *)(ULONG_PTR)(Handle & ~1u) : NULL;
 }
 
-extern "C" void WINAPI D3DDevice_LoadVertexShaderProgram(const DWORD *, DWORD)
+extern "C" void WINAPI D3DDevice_LoadVertexShaderProgram(const DWORD *pFunction, DWORD Address)
 {
-    PORT_STUB();
+    if (Address < 192)
+        xs.loadedPrograms[Address] = pFunction;
 }
 
-extern "C" void WINAPI D3DDevice_SelectVertexShader(DWORD Handle, DWORD)
+extern "C" void WINAPI D3DDevice_SelectVertexShader(DWORD Handle, DWORD Address)
 {
-    vertex_shader = Handle;
+    D3DDevice_SetVertexShader(Handle);
+    /* a declaration-only handle runs the program loaded at Address */
+    if (xs.programmable && Address < 192 && xs.loadedPrograms[Address] &&
+        xs.programmable->program != xs.loadedPrograms[Address])
+    {
+        XVertexShader *s = xs.programmable;
+        if (!s->program || s->programIsText != -1)
+        {
+            free((void *)s->program);
+            s->program = xs.loadedPrograms[Address];
+            s->programIsText = -1;  /* borrowed: the caller's memory */
+            s->device = NULL;
+            s->failed = 0;
+        }
+    }
 }
 
 extern "C" void WINAPI D3DDevice_SetShaderConstantMode(D3DSHADERCONSTANTMODE)
 {
 }
-
-static float vs_constants[192][4];
 
 extern "C" void WINAPI D3DDevice_SetVertexShaderConstant(INT Register, const void *pConstantData, DWORD ConstantCount)
 {
@@ -420,7 +513,7 @@ extern "C" void WINAPI D3DDevice_SetVertexShaderConstant(INT Register, const voi
     int r = Register + 96;
     if (r < 0 || r + (int)ConstantCount > 192)
         return;
-    memcpy(vs_constants[r], pConstantData, ConstantCount * 16);
+    memcpy(xs.vsConstants[r], pConstantData, ConstantCount * 16);
 }
 
 extern "C" void WINAPI D3DDevice_SetVertexShaderConstantFast(INT Register, const void *pConstantData,
@@ -429,55 +522,62 @@ extern "C" void WINAPI D3DDevice_SetVertexShaderConstantFast(INT Register, const
     D3DDevice_SetVertexShaderConstant(Register, pConstantData, ConstantCount);
 }
 
-extern "C" void WINAPI D3DDevice_CreatePixelShader(const D3DPIXELSHADERDEF *, DWORD *pHandle)
+/* Pixel shaders (W2.5): the definition kept; the draws translate it. */
+extern "C" void WINAPI D3DDevice_CreatePixelShader(const D3DPIXELSHADERDEF *pPSDef, DWORD *pHandle)
 {
-    PORT_STUB();
-    *pHandle = (next_handle += 2);
+    void *copy = malloc(60 * 4);
+    memcpy(copy, pPSDef, 60 * 4);
+    *pHandle = (DWORD)(ULONG_PTR)copy;
 }
 
-extern "C" void WINAPI D3DDevice_DeletePixelShader(DWORD)
+extern "C" void WINAPI D3DDevice_DeletePixelShader(DWORD Handle)
 {
+    if (xs.pixelShader == Handle)
+        xs.pixelShader = 0;
+    free((void *)(ULONG_PTR)Handle);
 }
 
 extern "C" void WINAPI D3DDevice_SetPixelShader(DWORD Handle)
 {
-    pixel_shader = Handle;
+    xs.pixelShader = Handle;
 }
 
-extern "C" void WINAPI D3DDevice_SetPixelShaderConstant(DWORD, const void *, DWORD)
+extern "C" void WINAPI D3DDevice_SetPixelShaderConstant(DWORD Register, const void *pConstantData, DWORD ConstantCount)
 {
+    if (Register + ConstantCount <= 16)
+        memcpy(xs.psConstants[Register], pConstantData, ConstantCount * 16);
 }
 
 /*
  * Drawing (W2.3, W2.8)
  */
 
-static D3DVertexBuffer *streams[16];
-static UINT stream_strides[16];
-
 extern "C" void WINAPI D3DDevice_SetStreamSource(UINT StreamNumber, D3DVertexBuffer *pStreamData, UINT Stride)
 {
     if (StreamNumber < 16)
     {
-        streams[StreamNumber] = pStreamData;
-        stream_strides[StreamNumber] = Stride;
+        xs.streams[StreamNumber] = pStreamData;
+        xs.strides[StreamNumber] = Stride;
     }
 }
 
-extern "C" void WINAPI D3DDevice_DrawVertices(D3DPRIMITIVETYPE, UINT, UINT)
+extern "C" void WINAPI D3DDevice_DrawVertices(D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex, UINT VertexCount)
 {
-    PORT_STUB();
+    xdraw_vertices(PrimitiveType, StartVertex, VertexCount);
 }
 
-extern "C" void WINAPI D3DDevice_DrawIndexedVertices(D3DPRIMITIVETYPE, UINT, const WORD *)
+extern "C" void WINAPI D3DDevice_DrawIndexedVertices(D3DPRIMITIVETYPE PrimitiveType, UINT VertexCount,
+                                                     const WORD *pIndexData)
 {
-    PORT_STUB();
+    xdraw_indexed(PrimitiveType, VertexCount, pIndexData);
 }
 
-extern "C" void WINAPI D3DDevice_DrawVerticesUP(D3DPRIMITIVETYPE, UINT, const void *, UINT)
+extern "C" void WINAPI D3DDevice_DrawVerticesUP(D3DPRIMITIVETYPE PrimitiveType, UINT VertexCount,
+                                                const void *pVertexStreamZeroData, UINT VertexStreamZeroStride)
 {
-    PORT_STUB();
+    xdraw_up(PrimitiveType, VertexCount, pVertexStreamZeroData, VertexStreamZeroStride);
 }
+
 
 /* Push buffers (W2.7): the driver's own method words land in a scratch buffer for now. */
 static DWORD push_scratch[64 * 1024];
@@ -531,9 +631,14 @@ extern "C" HRESULT WINAPI D3DDevice_CreateDepthStencilSurface(UINT Width, UINT H
 
 extern "C" ULONG WINAPI D3DResource_Release(D3DResource *pThis)
 {
-    /* (the bridge's own surfaces live as long as the device; W2.2 frees textures) */
+    /* (the bridge's own surfaces live as long as the device; a texture's device copy goes when
+       its last reference does) */
     if (pThis && (pThis->Common & XB_COMMON_REFCOUNT_MASK))
+    {
         pThis->Common--;
+        if (!(pThis->Common & XB_COMMON_REFCOUNT_MASK))
+            xdraw_texture_forget(pThis);
+    }
     return pThis ? pThis->Common & XB_COMMON_REFCOUNT_MASK : 0;
 }
 
@@ -566,8 +671,10 @@ extern "C" void WINAPI D3DSurface_LockRect(D3DSurface *pThis, D3DLOCKED_RECT *pL
     pLockedRect->Pitch = (INT)((((pThis->Size >> XB_SIZE_PITCH_SHIFT) & 0xFF) + 1) * 64);
 }
 
-extern "C" void WINAPI D3DSurface_UnlockRect(D3DSurface *)
+extern "C" void WINAPI D3DSurface_UnlockRect(D3DSurface *pThis)
 {
+    if (pThis && pThis->Parent)
+        xdraw_texture_dirty(pThis->Parent);
 }
 
 /* Texture levels: decoded from the Xbox format word XGSetTextureHeader wrote (xgraphics.cpp). */
@@ -611,9 +718,10 @@ extern "C" void WINAPI D3DTexture_LockRect(D3DTexture *pThis, UINT Level, D3DLOC
     pLockedRect->Pitch = p;
 }
 
-extern "C" void WINAPI D3DTexture_UnlockRect(D3DTexture *, UINT)
+extern "C" void WINAPI D3DTexture_UnlockRect(D3DTexture *pThis, UINT)
 {
-    /* W2.2: the level is re-uploaded when next set */
+    /* (the texture is uploaded again when next drawn with) */
+    xdraw_texture_dirty(pThis);
 }
 
 extern "C" HRESULT WINAPI D3DCubeTexture_GetCubeMapSurface(D3DCubeTexture *pTexture, D3DCUBEMAP_FACES FaceType,
@@ -646,8 +754,9 @@ extern "C" void WINAPI D3DPalette_Lock(D3DPalette *pPalette, D3DCOLOR **ppColors
     *ppColors = (D3DCOLOR *)(pPalette->Data | 0x80000000);
 }
 
-extern "C" void WINAPI D3DPalette_Unlock(D3DPalette *)
+extern "C" void WINAPI D3DPalette_Unlock(D3DPalette *pThis)
 {
+    xdraw_texture_dirty(pThis);
 }
 
 extern "C" void WINAPI D3DVertexBuffer_Lock(D3DVertexBuffer *pBuffer, UINT OffsetToLock, UINT, BYTE **ppbData,

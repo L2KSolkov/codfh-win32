@@ -12,9 +12,12 @@
 
 #include "../port.h"
 #include "pdev.h"
+#include "pd11.h"
 
-static ID3D11Device *dev;
-static ID3D11DeviceContext *ctx;
+ID3D11Device *pd11_dev;
+ID3D11DeviceContext *pd11_ctx;
+#define dev pd11_dev
+#define ctx pd11_ctx
 static IDXGISwapChain *swap;
 static ID3D11RenderTargetView *rtv;
 static ID3D11DepthStencilView *dsv;
