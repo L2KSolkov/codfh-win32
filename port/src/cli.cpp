@@ -6,6 +6,9 @@
  *
  * The level is matched by number (the level list's index) or by a case-insensitive part of its
  * name; the list is written to codfh.log the first time the menus run.
+ *
+ * -movie <file> plays a movie from SHELL\MOVIES (Credits.bik, Act_1.bik...) through the game's
+ * player (sub_E8AC0, as the credits are played) when the menus first run.
  */
 #include <xtl.h>
 #include <ctype.h>
@@ -15,10 +18,11 @@
 #include "game/uiglue.h"
 #include "game/livemenu.h"
 #include "game/ingamemenu.h"
+#include "game/gameloop.h"
 
 #include "port.h"
 
-static char cli_map[64], cli_type[16], cli_name[64];
+static char cli_map[64], cli_type[16], cli_name[64], cli_movie[64];
 static int cli_pending;
 
 /* Reads the options from the command line (WinMain). */
@@ -58,6 +62,8 @@ extern "C" void port_cli_parse(const char *cmd)
             strncpy(cli_type, argv[++i], sizeof(cli_type) - 1);
         else if (!_stricmp(argv[i], "-name"))
             strncpy(cli_name, argv[++i], sizeof(cli_name) - 1);
+        else if (!_stricmp(argv[i], "-movie"))
+            strncpy(cli_movie, argv[++i], sizeof(cli_movie) - 1);
     }
     cli_pending = cli_map[0] != 0;
     if (cli_pending)
@@ -81,6 +87,24 @@ static int contains_nocase(const char *hay, const char *needle)
         if (!_strnicmp(hay, needle, n))
             return 1;
     return 0;
+}
+
+/* Run after each frame is presented: -movie once the game has a camera (a level is loaded; the
+   movie player draws through it), outside the movie's own frames. */
+extern "C" void port_cli_present(void)
+{
+    static int playing;
+    if (cli_movie[0] && dword_4E5C74 && port_frame > 30 && !playing)
+    {
+        playing = 1;
+        plog("command line: movie %s", cli_movie);
+        char name[64];
+        strcpy(name, cli_movie);
+        cli_movie[0] = 0;
+        sub_E8AC0(name, dword_4E5C74, 1, 0);
+        plog("command line: movie %s ended", name);
+        playing = 0;
+    }
 }
 
 /* Run once a frame by the menus' loop (InGameMenuManager::sub_1FBE70). */

@@ -841,13 +841,32 @@ extern "C" RwInt32 __stdcall IDirectSoundBuffer_SetI3DL2Source(void *, const voi
 extern "C" RwInt32 __stdcall IDirectSoundBuffer_Lock(void *buffer, RwUInt32 offset, RwUInt32 bytes, void **p1,
                                                      RwUInt32 *n1, void **p2, RwUInt32 *n2, RwUInt32)
 {
+    /* a region past the end wraps to the start (Bink's looping stream buffer) */
     Voice *v = (Voice *)buffer;
-    *p1 = (void *)(v->data + offset);
-    *n1 = bytes;
     if (p2)
         *p2 = NULL;
     if (n2)
         *n2 = 0;
+    if (!v->data || !v->size)
+    {
+        *p1 = NULL;
+        *n1 = 0;
+        return E_FAIL;
+    }
+    offset %= v->size;
+    if (bytes > v->size)
+        bytes = v->size;
+    *p1 = (void *)(v->data + offset);
+    *n1 = bytes;
+    if (offset + bytes > v->size)
+    {
+        *n1 = v->size - offset;
+        if (p2 && n2)
+        {
+            *p2 = (void *)v->data;
+            *n2 = bytes - *n1;
+        }
+    }
     return S_OK;
 }
 

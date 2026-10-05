@@ -49,6 +49,9 @@ struct Direct3D
 static Direct3D the_d3d_dummy;
 static D3DDevice *the_device;
 static PortSurface back_buffer, depth_buffer;
+/* the back buffer was locked this frame (the movie player writes its frames there): its memory
+   becomes the frame at Present */
+static int back_buffer_written;
 static D3DSurface *render_target, *depth_target;
 XState xs;
 
@@ -271,6 +274,8 @@ static void pace_frame(void)
     }
 }
 
+extern "C" void port_cli_present(void);
+
 extern "C" HRESULT WINAPI IDirect3DDevice8_Present(D3DDevice *, const RECT *, const RECT *, void *, void *)
 {
     if (port_trace_on())
@@ -280,9 +285,16 @@ extern "C" HRESULT WINAPI IDirect3DDevice8_Present(D3DDevice *, const RECT *, co
     }
     port_frame++;
     xdraw_frame_stats();
+    if (back_buffer_written)
+    {
+        back_buffer_written = 0;
+        if (back_buffer.bits)
+            pdev_upload_frame(back_buffer.bits, back_buffer.pitch);
+    }
     pdev_present();
     pace_frame();
     port_pump_messages();
+    port_cli_present();
     return D3D_OK;
 }
 
@@ -782,6 +794,8 @@ extern "C" void WINAPI D3DSurface_LockRect(D3DSurface *pThis, D3DLOCKED_RECT *pL
         PortSurface *s = (PortSurface *)pThis;
         pLockedRect->pBits = s->bits;
         pLockedRect->Pitch = s->pitch;
+        if (pThis == &back_buffer.xb)
+            back_buffer_written = 1;
         return;
     }
     /* a surface over the driver's own memory: its rows as the Xbox lays them out */

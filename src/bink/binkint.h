@@ -102,6 +102,12 @@ U32 __stdcall ResumeThread(HANDLE thread);
 S32 __stdcall CloseHandle(HANDLE handle);
 HANDLE __stdcall CreateFileA(const char *name, U32 access, U32 share, void *security, U32 creation,
   U32 flags, HANDLE templ);
+#ifdef CODFH_WIN32
+// the port: the Xbox's d:\ paths mapped to the data root (port/src/xpal_core.cpp)
+HANDLE __stdcall xpal_CreateFileA(const char *name, U32 access, U32 share, void *security, U32 creation,
+  U32 flags, HANDLE templ);
+#define CreateFileA xpal_CreateFileA
+#endif
 U32 __stdcall SetFilePointer(HANDLE file, S32 distance, S32 *distancehigh, U32 method);
 S32 __stdcall ReadFile(HANDLE file, void *buffer, U32 bytes, U32 *read, void *overlapped);
 void __stdcall Sleep(U32 milliseconds);

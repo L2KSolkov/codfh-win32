@@ -373,6 +373,12 @@ extern "C" void pdev_present(void)
     ctx->RSSetViewports(1, &last_viewport);
 }
 
+extern "C" void pdev_upload_frame(const void *pixels, int pitch)
+{
+    if (ctx && scene)
+        ctx->UpdateSubresource(scene, 0, NULL, pixels, pitch, 0);
+}
+
 extern "C" void pdev_set_viewport(unsigned x, unsigned y, unsigned w, unsigned h, float minz, float maxz)
 {
     if (!ctx)

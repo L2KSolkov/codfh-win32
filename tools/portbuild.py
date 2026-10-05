@@ -1,5 +1,5 @@
 """portbuild.py [--only GLOB]... [--link] [--jobs N]: the Win32 port's build (docs/WIN32_PORT.md): every source
-under src/ (bar the Xbox-only trees src/xbe, src/xdk and, until W6, src/bink) compiled for Win32 x86
+under src/ (bar the Xbox-only trees src/xbe and src/xdk) compiled for Win32 x86
 with MSVC 14.51 and Windows SDK 10.0.26100, against the port's bridge headers (port/include, ahead
 of everything; they stand in for the XDK's xtl.h, d3d8.h, dsound.h and the rest, which are not on
 the include path). Each unit keeps its include paths and defines from config/flags.txt (the first
@@ -10,6 +10,9 @@ itself), VC7.1-era language rules (/permissive, /Zc:forScope-, /Zc:wchar_t-...).
 Objects go to build/port/obj; build/port/compile.log has every unit's compiler output and
 build/port/errors.md a summary: units that fail, error codes by count, and the headers and
 identifiers the errors name most. Linking comes with W0's entry point.
+
+Bink (W6) is the Xbox library as the tree has it: its C, and its image transcriptions (.asm,
+assembled with ml.exe: the code is 32-bit x86 with symbolic relocations, so it runs as is).
 """
 import collections
 import concurrent.futures
@@ -61,7 +64,8 @@ PORT_FLAGS = [
 DROP = re.compile(r'^/(compiler:.*|G[5-7B]|Gs\d*|QIfist|arch:.*|O[12bdgistxy].*|GF-?|Gy-?|GS-?|'
                   r'EH.*|GR-?|MT.*|MD.*|W\d|Zi|nologo|c)$')
 
-SKIP_DIRS = ('src/xbe/', 'src/xdk/', 'src/bink/')
+SKIP_DIRS = ('src/xbe/', 'src/xdk/')
+ASM_DIRS = ('src/bink/',)
 
 
 def load_rules():
@@ -90,6 +94,13 @@ def unit_flags(src, rules):
 def compile_unit(job):
     src, obj, flags = job
     os.makedirs(os.path.dirname(obj), exist_ok=True)
+    if src.endswith('.asm'):
+        ml = os.path.join(os.path.dirname(CL), 'ml.exe')
+        cmd = [ml, '/c', '/nologo', '/coff', '/Zi', '/I' + os.path.dirname(src), '/Fo' + obj, src]
+        r = subprocess.run(cmd, capture_output=True, text=True, errors='replace')
+        out = r.stdout + r.stderr
+        # (ml's errors read "error A2xxx"; reported as the compiler's for the summary)
+        return src, r.returncode, out.replace(': error A', ': error C')
     lang = '/TC' if src.endswith('.c') else '/TP'
     cmd = ([CL] + PORT_FLAGS + flags + [lang, '/Iport/include', '/Iinclude']
            + ['/Fo' + obj, '/Fd' + os.path.join(OBJ, 'port.pdb'), src])
@@ -114,11 +125,16 @@ def main():
     # the port layer's own sources (port/src: the entry point, xpal, the bridges)
     srcs += sorted(s.replace(os.sep, '/') for s in
                    glob.glob('port/src/**/*.c', recursive=True) + glob.glob('port/src/**/*.cpp', recursive=True))
+    srcs += sorted(s.replace(os.sep, '/') for d in ASM_DIRS for s in glob.glob(d + '*.asm'))
     srcs = [s for s in srcs if not s.startswith(SKIP_DIRS)]
-    every = [os.path.join(OBJ, os.path.splitext(s)[0] + '.obj') for s in srcs]
+    # (an .asm beside a .c of the same name gets its own object)
+    def obj_of(s):
+        base = os.path.splitext(s)[0] + ('_asm' if s.endswith('.asm') and not s.endswith('_asm.asm') else '')
+        return os.path.join(OBJ, base + '.obj')
+    every = [obj_of(s) for s in srcs]
     if only:
         srcs = [s for s in srcs if any(fnmatch.fnmatch(s, p) for p in only)]
-    jobs = [(s, os.path.join(OBJ, os.path.splitext(s)[0] + '.obj'), unit_flags(s, rules)) for s in srcs]
+    jobs = [(s, obj_of(s), unit_flags(s, rules)) for s in srcs]
     os.makedirs(OBJ, exist_ok=True)
     with concurrent.futures.ThreadPoolExecutor(jobs_n) as pool:
         results = list(pool.map(compile_unit, jobs))

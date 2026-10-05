@@ -981,6 +981,10 @@ static const char str_erroropening[] = "Error opening file.";
 // alias analysis for the original C callback-handler global.
 extern U32 binkread_pending_cb_bink_IO;
 // symbol: _binkread_pending_cb_bink_IO = 0x0052B82C
+#ifdef CODFH_WIN32
+// the port links no object aliases: the transcription reads the static itself
+#define binkread_pending_cb_bink_IO cb_bink_IO
+#endif
 
 // Its data (PLAN M5): literals, constants and tables where the image has them.
 // match: _str_outofmemory @ 0x003EE8BC
@@ -3588,3 +3592,64 @@ RADEXPFUNC S32 RADEXPLINK BinkDoFrame(HBINK bink)
   bink->LastFrameNum = bink->FrameNum;
   return 0;
 }
+
+#ifdef CODFH_WIN32
+// The port: the BinkOpen transcription calls three statics with the register conventions VC7.0
+// gave them (the image's); current MSVC compiles the statics as plain cdecl, so these adapt.
+// ecx and edx are kept (the image's statics may keep them; none returns in edx).
+
+// GotoFrame: bink in ecx, frame in eax
+__declspec(naked) void binkread_GotoFrame(void)
+{
+  __asm
+  {
+    push ecx
+    push edx
+    push eax
+    push ecx
+    call GotoFrame
+    add esp, 8
+    pop edx
+    pop ecx
+    ret
+  }
+}
+
+// bpopmalloc: bink in edi, amount in esi
+__declspec(naked) void binkread_bpopmalloc(void)
+{
+  __asm
+  {
+    push ecx
+    push edx
+    push esi
+    push edi
+    call bpopmalloc
+    add esp, 8
+    pop edx
+    pop ecx
+    ret
+  }
+}
+
+// high1secrate: offs in ebx, the other four on the stack (the caller pops them)
+__declspec(naked) void binkread_high1secrate(void)
+{
+  __asm
+  {
+    mov eax, esp
+    push ecx
+    push edx
+    push dword ptr [eax + 16]
+    push dword ptr [eax + 12]
+    push dword ptr [eax + 8]
+    push dword ptr [eax + 4]
+    push ebx
+    call high1secrate
+    add esp, 20
+    pop edx
+    pop ecx
+    ret
+  }
+}
+#endif
