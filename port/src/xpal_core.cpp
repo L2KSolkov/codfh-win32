@@ -8,6 +8,7 @@
 #include <shlobj.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "port.h"
@@ -124,6 +125,9 @@ void port_config_load(void)
     port_config.vsync = ini_int(ini, "video", "vsync", 1);
     port_config.widescreen = ini_int(ini, "video", "widescreen", 0);
     port_config.language = ini_int(ini, "game", "language", 0);
+    char sens[32];
+    GetPrivateProfileStringA("input", "mouse_sensitivity", "1.0", sens, sizeof(sens), ini);
+    port_config.mouseSensitivity = (float)atof(sens);
 
     /* (no trailing separator on the roots: the mapped paths add one) */
     for (char *r = port_config.dataRoot; r; r = r == port_config.dataRoot ? port_config.userRoot : NULL)

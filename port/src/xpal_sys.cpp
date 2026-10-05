@@ -184,6 +184,25 @@ static void keyboard_state(XINPUT_GAMEPAD *g)
 
 static DWORD packets[4];
 
+extern volatile LONG port_mouse_dx, port_mouse_dy;
+
+/* The mouse's movement as the right stick: counts per read scaled by the sensitivity, full
+   deflection at about 25 counts a frame at 1.0 (codfh.ini [input] mouse_sensitivity). */
+static void mouse_state(XINPUT_GAMEPAD *g)
+{
+    LONG dx = InterlockedExchange(&port_mouse_dx, 0), dy = InterlockedExchange(&port_mouse_dy, 0);
+    if (!port_hwnd || GetForegroundWindow() != (HWND)port_hwnd)
+        return;
+    float s = port_config.mouseSensitivity > 0 ? port_config.mouseSensitivity : 1.0f;
+    float x = dx * s * 1300.0f, y = -dy * s * 1300.0f;
+    if (x || y)
+    {
+        float nx = g->sThumbRX + x, ny = g->sThumbRY + y;
+        g->sThumbRX = (SHORT)(nx > 32767 ? 32767 : nx < -32768 ? -32768 : nx);
+        g->sThumbRY = (SHORT)(ny > 32767 ? 32767 : ny < -32768 ? -32768 : ny);
+    }
+}
+
 /* CODFH_INPUT: "frame:button,frame:button,..." holds pad 0's button for 8 frames from that
    frame (A B X Y BLACK WHITE LT RT START BACK UP DOWN LEFT RIGHT; stick directions LUP LDOWN
    LLEFT LRIGHT), for driving the game without a person. */
@@ -272,6 +291,7 @@ extern "C" DWORD WINAPI XInputGetState(HANDLE hDevice, PXINPUT_STATE pState)
     if (port == 0)
     {
         keyboard_state(&s.Gamepad);
+        mouse_state(&s.Gamepad);
         scripted_state(&s.Gamepad);
     }
     if (memcmp(&s.Gamepad, &pState->Gamepad, sizeof(s.Gamepad)))

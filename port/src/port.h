@@ -26,6 +26,7 @@ typedef struct PortConfig
     int windowed;
     int vsync;
     int widescreen;
+    float mouseSensitivity;
     int language;           /* the game's language index (0 English; port_language) */
 } PortConfig;
 

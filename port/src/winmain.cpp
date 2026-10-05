@@ -13,10 +13,47 @@
 int main();
 extern "C" void port_crash_handler_install(void);
 
+/* The mouse's movement since the controllers last read it (xpal_sys.cpp turns it into the right
+   stick). */
+volatile LONG port_mouse_dx, port_mouse_dy;
+
+static void confine_cursor(HWND hwnd, int on)
+{
+    if (on)
+    {
+        RECT r;
+        GetClientRect(hwnd, &r);
+        MapWindowPoints(hwnd, NULL, (POINT *)&r, 2);
+        ClipCursor(&r);
+    }
+    else
+        ClipCursor(NULL);
+}
+
 static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 {
     switch (msg)
     {
+    case WM_INPUT:
+    {
+        RAWINPUT ri;
+        UINT size = sizeof(ri);
+        if (GetRawInputData((HRAWINPUT)lp, RID_INPUT, &ri, &size, sizeof(RAWINPUTHEADER)) != (UINT)-1 &&
+            ri.header.dwType == RIM_TYPEMOUSE && !(ri.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE))
+        {
+            InterlockedExchangeAdd(&port_mouse_dx, ri.data.mouse.lLastX);
+            InterlockedExchangeAdd(&port_mouse_dy, ri.data.mouse.lLastY);
+        }
+        break;
+    }
+    case WM_LBUTTONDOWN:
+        /* (the mouse is the game's once the player clicks into the window) */
+        confine_cursor(hwnd, 1);
+        break;
+    case WM_ACTIVATE:
+        if (LOWORD(wp) == WA_INACTIVE)
+            confine_cursor(hwnd, 0);
+        break;
     case WM_CLOSE:
         port_quit = 1;
         return 0;
@@ -75,6 +112,8 @@ static void create_window(HINSTANCE inst)
     ShowWindow(hwnd, SW_SHOW);
     UpdateWindow(hwnd);
     port_hwnd = hwnd;
+    RAWINPUTDEVICE rid = {0x01, 0x02, 0, hwnd};    /* the mouse */
+    RegisterRawInputDevices(&rid, 1, sizeof(rid));
 }
 
 extern "C" void port_cli_parse(const char *cmd);
