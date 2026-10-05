@@ -33,7 +33,7 @@ as the data root:
 | W1 platform | Done | Files (`d:\` to the data root, the pack unchanged), saves, memory (16-byte aligned heap), threads, launch, flags |
 | W2 rendering | Done for everything the game draws (Direct3D 11, section 4) | Front end, all 8 multiplayer levels, first-person, HUD and menus at 60 fps; no bridge stub is reached in the front end, a match or a movie |
 | W3 data | Done for textures, geometry and audio formats | The formats the bridge translates: swizzled/linear 32-bit, P8, DXT1/3/5; Xbox ADPCM and PCM; no WMA on the disc |
-| W4 input | Done | XInput pads; keyboard and mouse in play (move keys, mouse look `[input] mouse_sensitivity`, buttons as triggers) and in the menus (arrows and wheel move the selection, Enter or the left button choose, Escape or the right button go back); checked with real input (`SendInput`) |
+| W4 input | Done | XInput pads, keyboard, raw-input mouse look (`[input] mouse_sensitivity`) |
 | W5 audio | Done but the DSP image's filters | Software mixer over XAudio2 (3D, mix bins, submixes, play/loop regions), I3DL2 reverb in software, WMA through Media Foundation (unexercised: the disc has none); recordings with `CODFH_WAV` |
 | W6 video | Done | The Xbox Bink library from `src/bink` (C and its x86 transcriptions); the Act 1 newsreel plays with sound (`-movie Act_1.bik`) |
 | W7 networking | Done for System Link | Two instances on one machine (`CODFH_NETLOOP=1`/`2`) find, join and play one match ("PC Client has joined the game" on both); Live answers "not signed in" |
@@ -56,13 +56,7 @@ every n frames; `CODFH_SHOT_WINDOW=1` the window's buffer), `CODFH_INPUT=frame:b
 logged; `CODFH_DRAWDETAIL=k` logs draw k's vertices, constants and textures),
 `CODFH_NODEPTH`, `CODFH_NOCULL`, `CODFH_NOFOG`, `CODFH_WIREFRAME`, `CODFH_STATS`,
 `CODFH_TRACE=n` (frame n's device calls), `CODFH_WAV=file` (the mixed audio), `CODFH_NETLOOP=n`
-(System Link on 127.0.0.n), `CODFH_INPUT_BACKGROUND=1` (keyboard and mouse read while another window
-is in front, for scripted tests).
-
-The dedicated server: `python tools/portbuild.py --dedicated` builds
-`build/port/dedicated/codfh_server.exe` (every unit with `CODFH_DEDICATED`: no window, display, audio
-output or local input; it hosts from `-map`/`-gametype`/`-name` and starts each round itself without
-playing; its log is its console and `codfh_server.log`).
+(System Link on 127.0.0.n).
 
 Open: the DSP image's other effects (filters; the game sets reverb off), a two-PC LAN test (the loopback test covers the same code), single-player content (section 13).
 

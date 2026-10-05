@@ -145,15 +145,9 @@ extern "C" void port_cli_present(void)
     }
 }
 
-/* the last frame the menus' loop ran (the controllers map keys and the mouse for menus while it
-   runs, port/src/xpal_sys.cpp) */
-extern "C" unsigned port_menu_frame;
-unsigned port_menu_frame;
-
 /* Run once a frame by the menus' loop (InGameMenuManager::sub_1FBE70). */
 extern "C" void port_cli_frame(void)
 {
-    port_menu_frame = port_frame ? port_frame : 1;
     /* a player with no profile (a new install has none) plays under the configured name, not
        an empty one */
     if (dword_4F28F0 && !dword_4F28F0->unk_183[0])
