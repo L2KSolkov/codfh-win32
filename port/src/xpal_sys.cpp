@@ -364,11 +364,51 @@ extern volatile LONG port_mouse_dx, port_mouse_dy;
 
 /* The mouse's movement as the right stick: counts per read scaled by the sensitivity, full
    deflection at about 25 counts a frame at 1.0 (codfh.ini [input] mouse_sensitivity). */
+extern volatile LONG port_mouse_captured, port_mouse_absolute;
+
+/* Movement from the cursor (a mouse that reports positions, as over Remote Desktop): how far it
+   moved since the last read. It is not recentred: a Remote Desktop client keeps sending its own
+   cursor's position, so the turn is the cursor's travel across the client's window. */
+static void cursor_movement(LONG *dx, LONG *dy)
+{
+    static POINT last;
+    static int have_last;
+    POINT p;
+    if (!GetCursorPos(&p))
+        return;
+    if (!have_last)
+    {
+        last = p;
+        have_last = 1;
+    }
+    *dx = p.x - last.x;
+    *dy = p.y - last.y;
+    last = p;
+    static unsigned told;
+    if ((*dx || *dy) && told < 5)
+    {
+        told++;
+        plog("input: cursor look %ld,%ld", *dx, *dy);
+    }
+}
+
 static void mouse_state(XINPUT_GAMEPAD *g)
 {
     LONG dx = InterlockedExchange(&port_mouse_dx, 0), dy = InterlockedExchange(&port_mouse_dy, 0);
     if (!window_has_input() || in_menus())
         return;
+    static int told_capture = -1;
+    if (told_capture != (int)port_mouse_captured)
+    {
+        told_capture = port_mouse_captured;
+        plog("input: cursor %s", told_capture ? "captured" : "free");
+    }
+    if (port_mouse_absolute)
+    {
+        dx = dy = 0;
+        if (port_mouse_captured)
+            cursor_movement(&dx, &dy);
+    }
     float s = port_config.mouseSensitivity > 0 ? port_config.mouseSensitivity : 1.0f;
     float x = dx * s * 1300.0f, y = -dy * s * 1300.0f;
     if (x || y)

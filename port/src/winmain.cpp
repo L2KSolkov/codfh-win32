@@ -21,6 +21,10 @@ extern "C" void port_crash_handler_install(void);
 volatile LONG port_mouse_dx, port_mouse_dy;
 /* the wheel's notches since the controllers last read it (up positive) */
 volatile LONG port_mouse_wheel;
+/* the cursor is the game's (confined to the window after a click), and the mouse reports
+   positions rather than movement (Remote Desktop's): look then comes from the cursor kept at the
+   window's centre (port/src/xpal_sys.cpp) */
+volatile LONG port_mouse_captured, port_mouse_absolute;
 
 /* CODFH_INPUT_BACKGROUND=1: the keyboard and mouse read while another window is in front (for
    driving the game from a script when Windows will not give it the foreground). */
@@ -37,7 +41,7 @@ extern "C" int port_input_background(void)
 
 static void confine_cursor(HWND hwnd, int on)
 {
-    if (on)
+    if (on && !port_mouse_absolute)
     {
         RECT r;
         GetClientRect(hwnd, &r);
@@ -46,6 +50,7 @@ static void confine_cursor(HWND hwnd, int on)
     }
     else
         ClipCursor(NULL);
+    InterlockedExchange(&port_mouse_captured, on);
 }
 
 static int fullscreen;
@@ -84,10 +89,28 @@ static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         RAWINPUT ri;
         UINT size = sizeof(ri);
         if (GetRawInputData((HRAWINPUT)lp, RID_INPUT, &ri, &size, sizeof(RAWINPUTHEADER)) != (UINT)-1 &&
-            ri.header.dwType == RIM_TYPEMOUSE && !(ri.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE))
+            ri.header.dwType == RIM_TYPEMOUSE)
         {
-            InterlockedExchangeAdd(&port_mouse_dx, ri.data.mouse.lLastX);
-            InterlockedExchangeAdd(&port_mouse_dy, ri.data.mouse.lLastY);
+            if (ri.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
+            {
+                /* (Remote Desktop and tablets: positions, not movement) */
+                if (!port_mouse_absolute)
+                {
+                    plog("input: the mouse reports positions (Remote Desktop?): look from the cursor");
+                    InterlockedExchange(&port_mouse_absolute, 1);
+                }
+            }
+            else
+            {
+                /* (movement: a local mouse, or a Remote Desktop client in relative mouse mode) */
+                if (port_mouse_absolute && (ri.data.mouse.lLastX || ri.data.mouse.lLastY))
+                {
+                    plog("input: the mouse reports movement: look from it");
+                    InterlockedExchange(&port_mouse_absolute, 0);
+                }
+                InterlockedExchangeAdd(&port_mouse_dx, ri.data.mouse.lLastX);
+                InterlockedExchangeAdd(&port_mouse_dy, ri.data.mouse.lLastY);
+            }
             if (ri.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
                 InterlockedExchangeAdd(&port_mouse_wheel, (SHORT)ri.data.mouse.usButtonData / WHEEL_DELTA);
         }
@@ -182,6 +205,11 @@ static void create_window(HINSTANCE inst)
     UpdateWindow(hwnd);
     port_hwnd = hwnd;
     RAWINPUTDEVICE rid = {0x01, 0x02, port_input_background() ? (DWORD)RIDEV_INPUTSINK : 0, hwnd};    /* the mouse */
+    if (GetSystemMetrics(SM_REMOTESESSION))
+    {
+        plog("input: a Remote Desktop session: look from the cursor");
+        port_mouse_absolute = 1;
+    }
     RegisterRawInputDevices(&rid, 1, sizeof(rid));
 #endif
 }
