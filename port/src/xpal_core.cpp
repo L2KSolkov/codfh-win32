@@ -56,7 +56,11 @@ void plog(const char *fmt, ...)
     {
         char path[MAX_PATH];
         exe_dir(path, sizeof(path));
+#ifdef CODFH_DEDICATED
+        strcat(path, "codfh_server.log");
+#else
         strcat(path, "codfh.log");
+#endif
         log_file = fopen(path, "w");
     }
     if (log_file)
@@ -64,6 +68,15 @@ void plog(const char *fmt, ...)
         fprintf(log_file, "[%8lu] %s", GetTickCount(), line);
         fflush(log_file);
     }
+#ifdef CODFH_DEDICATED
+    /* (the server's log is its console too) */
+    {
+        HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+        DWORD n;
+        if (out && out != INVALID_HANDLE_VALUE)
+            WriteFile(out, line, (DWORD)strlen(line), &n, NULL);
+    }
+#endif
     LeaveCriticalSection(&log_lock);
     OutputDebugStringA(line);
 }

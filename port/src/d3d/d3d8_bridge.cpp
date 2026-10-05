@@ -211,7 +211,11 @@ extern "C" HRESULT WINAPI Direct3D_CreateDevice(UINT, D3DDEVTYPE, void *, DWORD,
     if (!tried)
     {
         tried = 1;
+#ifdef CODFH_DEDICATED
+        plog("dedicated server: no display (the bridge runs headless)");
+#else
         pdev_init(port_hwnd, FRAME_W, FRAME_H, port_config.windowed, port_config.vsync);
+#endif
     }
     plog("CreateDevice: %ux%u format 0x%lX flags 0x%lX interval 0x%lX", pp->BackBufferWidth,
          pp->BackBufferHeight, pp->BackBufferFormat, pp->Flags, pp->FullScreen_PresentationInterval);

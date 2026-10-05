@@ -11,6 +11,10 @@ Objects go to build/port/obj; build/port/compile.log has every unit's compiler o
 build/port/errors.md a summary: units that fail, error codes by count, and the headers and
 identifiers the errors name most. Linking comes with W0's entry point.
 
+--dedicated builds the dedicated server instead (build/port/dedicated/codfh_server.exe, its own
+objects): every unit compiled with CODFH_DEDICATED too, which the port layer reads (no window,
+device, audio output or local input; it hosts from the command line and never plays).
+
 Bink (W6) is the Xbox library as the tree has it: its C, and its image transcriptions (.asm,
 assembled with ml.exe: the code is 32-bit x86 with symbolic relocations, so it runs as is).
 """
@@ -27,6 +31,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
 OUT = os.path.join(ROOT, 'build', 'port')
 OBJ = os.path.join(OUT, 'obj')
+EXE = 'codfh.exe'
 
 VS = os.environ.get('CODFH_VS', r'C:\Program Files\Microsoft Visual Studio\18\Enterprise')
 MSVC_VER = os.environ.get('CODFH_MSVC', '14.51.36231')
@@ -114,7 +119,14 @@ def compile_unit(job):
 
 
 def main():
+    global OUT, OBJ, EXE
     args = sys.argv[1:]
+    if '--dedicated' in args:
+        OUT = os.path.join(ROOT, 'build', 'port', 'dedicated')
+        OBJ = os.path.join(OUT, 'obj')
+        EXE = 'codfh_server.exe'
+        PORT_FLAGS.append('/DCODFH_DEDICATED')
+    os.makedirs(OUT, exist_ok=True)
     only = [args[i + 1] for i, a in enumerate(args) if a == '--only']
     jobs_n = int(args[args.index('--jobs') + 1]) if '--jobs' in args else (os.cpu_count() or 4)
     if not os.path.exists(CL):
@@ -177,8 +189,9 @@ def main():
     md += ['', '## Failing units by error count', '', '| unit | errors |', '|---|---|']
     md += ['| %s | %d |' % (s, per_unit[s]) for s in sorted(failed, key=lambda s: -per_unit[s])]
     open(os.path.join(OUT, 'errors.md'), 'w', encoding='utf-8').write('\n'.join(md) + '\n')
-    print('%d units: %d compile, %d fail (build/port/errors.md, build/port/compile.log)' % (
-        len(results), len(results) - len(failed), len(failed)))
+    rel = os.path.relpath(OUT, ROOT).replace(os.sep, '/')
+    print('%d units: %d compile, %d fail (%s/errors.md, %s/compile.log)' % (
+        len(results), len(results) - len(failed), len(failed), rel, rel))
     # (--link: link after a partial compile, with the other units' objects as they are)
     if not failed and (not only or '--link' in args):
         link(every)
@@ -191,14 +204,14 @@ LIBS = ['kernel32.lib', 'user32.lib', 'gdi32.lib', 'winmm.lib', 'd3d11.lib', 'dx
 def link(objs):
     """Links build/port/codfh.exe; build/port/link.log has link.exe's output and build/port/link.md
     the unresolved symbols, each with the objects that reference it."""
-    exe = os.path.join(OUT, 'codfh.exe')
+    exe = os.path.join(OUT, EXE)
     rsp = os.path.join(OUT, 'link.rsp')
     open(rsp, 'w').write(''.join('"%s"\n' % os.path.abspath(o) for o in objs))
     env = dict(os.environ)
     env['LIB'] = ';'.join(SYSTEM_LIBS)
     cmd = [os.path.join(os.path.dirname(CL), 'link.exe'), '/nologo', '/MACHINE:X86', '/SUBSYSTEM:WINDOWS',
            '/DEBUG', '/INCREMENTAL:NO', '/OPT:REF', '/LARGEADDRESSAWARE', '/MAP:' + os.path.join(OUT, 'codfh.map'),
-           '/PDB:' + os.path.join(OUT, 'codfh.pdb'), '/OUT:' + exe, '@' + rsp] + LIBS
+           '/PDB:' + os.path.splitext(exe)[0] + '.pdb', '/OUT:' + exe, '@' + rsp] + LIBS
     r = subprocess.run(cmd, capture_output=True, text=True, errors='replace', env=env)
     log = r.stdout + r.stderr
     open(os.path.join(OUT, 'link.log'), 'w', encoding='utf-8').write(' '.join(cmd) + '\n' + log)
@@ -219,8 +232,8 @@ def link(objs):
                                                                     if len(unresolved[s]) > 6 else ''))
            for s in sorted(unresolved)]
     open(os.path.join(OUT, 'link.md'), 'w', encoding='utf-8').write('\n'.join(md) + '\n')
-    print('link exit %d: %d unresolved symbols, %d other errors (build/port/link.md)' % (
-        r.returncode, len(unresolved), len(others)))
+    print('link exit %d: %d unresolved symbols, %d other errors (%s)' % (
+        r.returncode, len(unresolved), len(others), os.path.relpath(os.path.join(OUT, 'link.md'), ROOT)))
 
 
 if __name__ == '__main__':

@@ -368,7 +368,11 @@ extern "C" DWORD WINAPI XInputGetState(HANDLE hDevice, PXINPUT_STATE pState)
     XINPUT_STATE s;
     memset(&s, 0, sizeof(s));
     WinXInputState w;
+#ifdef CODFH_DEDICATED
+    int have = 0;       /* (the server reads no controllers) */
+#else
     int have = win_get_state && win_get_state(port, &w) == ERROR_SUCCESS;
+#endif
     if (have)
     {
         XINPUT_GAMEPAD *g = &s.Gamepad;
@@ -390,8 +394,10 @@ extern "C" DWORD WINAPI XInputGetState(HANDLE hDevice, PXINPUT_STATE pState)
         return ERROR_DEVICE_NOT_CONNECTED;
     if (port == 0)
     {
+#ifndef CODFH_DEDICATED
         keyboard_state(&s.Gamepad);
         mouse_state(&s.Gamepad);
+#endif
         scripted_state(&s.Gamepad);
     }
     if (memcmp(&s.Gamepad, &pState->Gamepad, sizeof(s.Gamepad)))

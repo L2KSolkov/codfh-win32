@@ -7,6 +7,12 @@
  * The level is matched by number (the level list's index) or by a case-insensitive part of its
  * name; the list is written to codfh.log the first time the menus run.
  *
+ * The dedicated server (CODFH_DEDICATED) always hosts: the first level when no -map is given,
+ * as "Dedicated server" when no -name is. Its own player never plays: once a level is up, the
+ * server starts the round itself (what the host's press at the weapon selection does,
+ * type_4F7EB8::sub_1AADF0: the rules' "waiting for host" word cleared, dword_4FB9E0.sub_1B6EF0),
+ * without spawning.
+ *
  * -movie <file> plays a movie from SHELL\MOVIES (Credits.bik, Act_1.bik...) through the game's
  * player (sub_E8AC0, as the credits are played) when the menus first run.
  */
@@ -20,6 +26,8 @@
 #include "game/ingamemenu.h"
 #include "game/gameloop.h"
 #include "game/data.h"
+#include "game/mpgame.h"
+#include "game/parsedfile.h"
 
 #include "port.h"
 
@@ -66,6 +74,12 @@ extern "C" void port_cli_parse(const char *cmd)
         else if (!_stricmp(argv[i], "-movie"))
             strncpy(cli_movie, argv[++i], sizeof(cli_movie) - 1);
     }
+#ifdef CODFH_DEDICATED
+    if (!cli_map[0])
+        strcpy(cli_map, "0");
+    if (!cli_name[0])
+        strcpy(cli_name, "Dedicated server");
+#endif
     cli_pending = cli_map[0] != 0;
     if (cli_pending)
         plog("command line: map %s, game type %s, session %s", cli_map, cli_type[0] ? cli_type : "DM",
@@ -92,8 +106,31 @@ static int contains_nocase(const char *hay, const char *needle)
 
 /* Run after each frame is presented: -movie once the game has a camera (a level is loaded; the
    movie player draws through it), outside the movie's own frames. */
+#ifdef CODFH_DEDICATED
+/* The server's own frame: each new round started for the clients (twice a second while a level is
+   up; the rules ask again after a level change), and a heartbeat in the log. */
+static void dedicated_frame(void)
+{
+    static unsigned last_round;
+    if (port_frame % 30)
+        return;
+    /* (the rules' word as the HUD reads it: through the validator its getter folded into) */
+    if (dword_4E5C74 && ((kujuUI::cScopeValidator *)&dword_4FB9E0)->sub_1CA260() && !unk_4F61F8.unk_104)
+    {
+        dword_4FB9E0.sub_1B6EF0(0);
+        plog("dedicated server: round started (frame %u)", port_frame);
+        last_round = port_frame;
+    }
+    if (port_frame % (60 * 60) == 0)
+        plog("dedicated server: running, frame %u, %s", port_frame, dword_4E5C74 ? "in a level" : "between levels");
+}
+#endif
+
 extern "C" void port_cli_present(void)
 {
+#ifdef CODFH_DEDICATED
+    dedicated_frame();
+#endif
     static int playing;
     if (cli_movie[0] && dword_4E5C74 && port_frame > 30 && !playing)
     {

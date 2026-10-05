@@ -153,20 +153,48 @@ static void create_window(HINSTANCE inst)
     int y = (GetSystemMetrics(SM_CYSCREEN) - h) / 2;
     HWND hwnd = CreateWindowA("CODFH", "Call of Duty: Finest Hour", style, x < 0 ? 0 : x, y < 0 ? 0 : y,
                               w, h, NULL, NULL, inst, NULL);
+#ifndef CODFH_DEDICATED
     if (!port_config.windowed)
         set_fullscreen(hwnd, 1);
+#endif
+#ifdef CODFH_DEDICATED
+    /* (the server's window is never shown: it only carries the messages) */
+    port_hwnd = hwnd;
+#else
     ShowWindow(hwnd, SW_SHOW);
     UpdateWindow(hwnd);
     port_hwnd = hwnd;
     RAWINPUTDEVICE rid = {0x01, 0x02, 0, hwnd};    /* the mouse */
     RegisterRawInputDevices(&rid, 1, sizeof(rid));
+#endif
 }
 
 extern "C" void port_cli_parse(const char *cmd);
 
+#ifdef CODFH_DEDICATED
+/* Ctrl+C or closing the console ends the server as closing the window ends the game. */
+static BOOL WINAPI console_event(DWORD)
+{
+    port_quit = 1;
+    return TRUE;
+}
+
+/* The console the server writes to: the one it was started from, else its own. */
+static void server_console(void)
+{
+    if (!AttachConsole(ATTACH_PARENT_PROCESS))
+        AllocConsole();
+    SetConsoleTitleA("Call of Duty: Finest Hour dedicated server");
+    SetConsoleCtrlHandler(console_event, TRUE);
+}
+#endif
+
 int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR cmd, int)
 {
     port_crash_handler_install();
+#ifdef CODFH_DEDICATED
+    server_console();
+#endif
     port_config_load();
     port_cli_parse(cmd);
     timeBeginPeriod(1);
