@@ -53,6 +53,8 @@ PORT_FLAGS = [
     '/DCODFH_WIN32', '/DCODFH_PLAIN', '/D_WIN32', '/DWIN32', '/D_X86_',
     # C string functions return char * in C++ too (no const-correct overloads), as in VC7.1
     '/D_CONST_RETURN=',
+    # calls to undeclared functions reported (the sources' own C has some, as on the Xbox)
+    '/w14013',
     '/D_CRT_SECURE_NO_WARNINGS', '/D_CRT_NONSTDC_NO_DEPRECATE', '/D_WINSOCK_DEPRECATED_NO_WARNINGS',
 ]
 # Switches from config/flags.txt that MSVC 14.51 or the port does not take.

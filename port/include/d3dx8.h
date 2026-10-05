@@ -8,6 +8,8 @@
 
 #include <d3d8.h>
 
+#undef D3DXMatrixMultiply   /* xgmath.h's alias, when it came first */
+
 #ifdef __cplusplus
 struct D3DXMATRIX : public D3DMATRIX
 {

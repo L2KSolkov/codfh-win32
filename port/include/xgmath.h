@@ -20,6 +20,12 @@ typedef D3DMATRIX XGMATRIX;
 XGMATRIX *WINAPI XGMatrixMultiply(XGMATRIX *pOut, const XGMATRIX *pM1, const XGMATRIX *pM2);
 XGMATRIX *WINAPI XGMatrixTranspose(XGMATRIX *pOut, const XGMATRIX *pM);
 
+/* Without d3dx8.h the D3DX matrix names are the XG ones, as the XDK has it (the skin pipeline,
+   skinxboxrender.c, multiplies with D3DXMatrixMultiply). */
+#ifndef PORT_D3DX8_H
+#define D3DXMatrixMultiply XGMatrixMultiply
+#endif
+
 #ifdef __cplusplus
 }
 #endif
