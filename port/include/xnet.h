@@ -73,6 +73,9 @@ typedef struct
 #define XNET_QOS_LISTEN_SET_BITSPERSEC 0x08
 #define XNET_QOS_LISTEN_RELEASE 0x10
 
+/* The Xbox's voice/data protocol: UDP with an unencrypted voice section (the game's sockets). */
+#define IPPROTO_VDP 254
+
 /* XNetGetTitleXnAddr's result flags. */
 #define XNET_GET_XNADDR_PENDING 0x0000
 #define XNET_GET_XNADDR_NONE 0x0001
@@ -98,6 +101,9 @@ INT WINAPI XNetQosLookup(UINT cxna, const XNADDR *apxna[], const XNKID *apxnkid[
 INT WINAPI XNetQosRelease(XNQOS *pxnqos);
 DWORD WINAPI XNetGetTitleXnAddr(XNADDR *pxna);
 DWORD WINAPI XNetGetEthernetLinkStatus(void);
+
+typedef char port_check_XNADDR[sizeof(XNADDR) == 0x24 ? 1 : -1];
+typedef char port_check_XNQOSINFO[sizeof(XNQOSINFO) == 0x18 ? 1 : -1];
 
 #ifdef __cplusplus
 }

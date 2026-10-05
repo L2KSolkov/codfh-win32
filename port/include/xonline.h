@@ -194,6 +194,16 @@ HRESULT WINAPI XOnlineMutelistGet(DWORD dwUserIndex, DWORD dwMutelistUserBufferC
                                   PXONLINE_MUTELISTUSER pMutelistUsersBuffer,
                                   DWORD *pdwNumMutelistUsers);
 
+/* Layout checks: the sizes the Xbox build has (the game embeds these). */
+typedef char port_check_XUID[sizeof(XUID) == 0x0C ? 1 : -1];
+typedef char port_check_XONLINE_USER[sizeof(XONLINE_USER) == 0x70 ? 1 : -1];
+typedef char port_check_XONLINE_LOGON_STATE[sizeof(XONLINE_LOGON_STATE) == 0x204 ? 1 : -1];
+typedef char port_check_XONLINE_ATTRIBUTE[sizeof(XONLINE_ATTRIBUTE) == 0x10 ? 1 : -1];
+typedef char port_check_XONLINE_MATCH_SEARCHRESULT[sizeof(XONLINE_MATCH_SEARCHRESULT) == 0x54 ? 1 : -1];
+typedef char port_check_XONLINE_FRIEND[sizeof(XONLINE_FRIEND) == 0x56 ? 1 : -1];
+typedef char port_check_XONLINE_ACCEPTED_GAMEINVITE[sizeof(XONLINE_ACCEPTED_GAMEINVITE) == 0x9C ? 1 : -1];
+typedef char port_check_XONLINE_MUTELISTUSER[sizeof(XONLINE_MUTELISTUSER) == 0x10 ? 1 : -1];
+
 #ifdef __cplusplus
 }
 #endif

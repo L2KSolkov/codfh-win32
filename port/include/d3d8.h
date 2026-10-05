@@ -395,6 +395,13 @@ void WINAPI D3DVertexBuffer_Lock(D3DVertexBuffer *pBuffer, UINT OffsetToLock,
 BYTE *WINAPI D3DVertexBuffer_Lock2(D3DVertexBuffer *pThis, DWORD Flags);
 void WINAPI D3DVertexBuffer_Unlock(D3DVertexBuffer *pThis);
 
+/* Layout checks: the sizes the Xbox build has (the driver builds these headers itself). */
+typedef char port_check_D3DSurface[sizeof(D3DSurface) == 0x18 ? 1 : -1];
+typedef char port_check_D3DVertexBuffer[sizeof(D3DVertexBuffer) == 0x0C ? 1 : -1];
+typedef char port_check_D3DBaseTexture[sizeof(D3DBaseTexture) == 0x14 ? 1 : -1];
+typedef char port_check_D3DPRESENT_PARAMETERS[sizeof(D3DPRESENT_PARAMETERS) == 0x44 ? 1 : -1];
+typedef char port_check_D3DLIGHT8[sizeof(D3DLIGHT8) == 0x68 ? 1 : -1];
+
 #ifdef __cplusplus
 }
 
