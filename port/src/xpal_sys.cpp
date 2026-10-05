@@ -1,0 +1,569 @@
+/*
+ * The platform layer's Xbox system services (docs/WIN32_PORT.md W1, W4): peripherals and
+ * controllers (Windows XInput, and the keyboard as the first controller when no pad is in),
+ * saves (a folder per save under u:\, the Xbox's layout kept), save signatures (HMAC-SHA1 with
+ * a fixed local key), launch data (a file in the user directory), the console's settings (the
+ * configuration), and physical memory.
+ */
+#include <xtl.h>
+#include <bcrypt.h>
+#include <stdio.h>
+#include <string.h>
+#include <wchar.h>
+
+#include "port.h"
+
+#undef CreateFileA
+#undef GetFileAttributesA
+#undef CopyFileA
+
+/*
+ * Peripherals
+ */
+
+XPP_DEVICE_TYPE XDEVICE_TYPE_GAMEPAD_TABLE;
+XPP_DEVICE_TYPE XDEVICE_TYPE_VOICE_MICROPHONE_TABLE;
+XPP_DEVICE_TYPE XDEVICE_TYPE_VOICE_HEADPHONE_TABLE;
+
+/* Windows XInput (its header's names clash with the Xbox's: declared here under our own). */
+struct WinXInputGamepad
+{
+    WORD wButtons;
+    BYTE bLeftTrigger, bRightTrigger;
+    SHORT sThumbLX, sThumbLY, sThumbRX, sThumbRY;
+};
+struct WinXInputState
+{
+    DWORD dwPacketNumber;
+    WinXInputGamepad Gamepad;
+};
+struct WinXInputVibration
+{
+    WORD wLeftMotorSpeed, wRightMotorSpeed;
+};
+typedef DWORD(WINAPI *XInputGetStateFn)(DWORD, WinXInputState *);
+typedef DWORD(WINAPI *XInputSetStateFn)(DWORD, WinXInputVibration *);
+static XInputGetStateFn win_get_state;
+static XInputSetStateFn win_set_state;
+static int xinput_loaded;
+
+static void load_xinput(void)
+{
+    if (xinput_loaded)
+        return;
+    xinput_loaded = 1;
+    static const char *const dlls[] = {"xinput1_4.dll", "xinput1_3.dll", "xinput9_1_0.dll"};
+    for (int i = 0; i < 3; i++)
+    {
+        HMODULE m = LoadLibraryA(dlls[i]);
+        if (m)
+        {
+            win_get_state = (XInputGetStateFn)GetProcAddress(m, "XInputGetState");
+            win_set_state = (XInputSetStateFn)GetProcAddress(m, "XInputSetState");
+            plog("controllers: %s", dlls[i]);
+            return;
+        }
+    }
+    plog("controllers: no XInput; keyboard only");
+}
+
+static int pad_connected(DWORD port)
+{
+    WinXInputState s;
+    return win_get_state && win_get_state(port, &s) == ERROR_SUCCESS;
+}
+
+/* The ports with a controller: the XInput pads, and port 0 always (the keyboard). */
+static DWORD gamepad_mask(void)
+{
+    load_xinput();
+    DWORD mask = 1;
+    for (DWORD p = 0; p < 4; p++)
+        if (pad_connected(p))
+            mask |= 1u << p;
+    return mask;
+}
+
+static DWORD known_mask;
+
+extern "C" VOID WINAPI XInitDevices(DWORD, PXDEVICE_PREALLOC_TYPE)
+{
+    load_xinput();
+}
+
+extern "C" DWORD WINAPI XGetDevices(PXPP_DEVICE_TYPE DeviceType)
+{
+    if (DeviceType != XDEVICE_TYPE_GAMEPAD)
+        return 0;   /* no voice devices, no memory units */
+    known_mask = gamepad_mask();
+    return known_mask;
+}
+
+extern "C" BOOL WINAPI XGetDeviceChanges(PXPP_DEVICE_TYPE DeviceType, PDWORD pdwInsertions, PDWORD pdwRemovals)
+{
+    *pdwInsertions = *pdwRemovals = 0;
+    if (DeviceType != XDEVICE_TYPE_GAMEPAD)
+        return FALSE;
+    DWORD now = gamepad_mask();
+    *pdwInsertions = now & ~known_mask;
+    *pdwRemovals = known_mask & ~now;
+    known_mask = now;
+    return *pdwInsertions || *pdwRemovals;
+}
+
+/* Handles: the port + 1. */
+extern "C" HANDLE WINAPI XInputOpen(PXPP_DEVICE_TYPE DeviceType, DWORD dwPort, DWORD, PXINPUT_POLLING_PARAMETERS)
+{
+    if (DeviceType != XDEVICE_TYPE_GAMEPAD || dwPort > 3)
+        return NULL;
+    return (HANDLE)(ULONG_PTR)(dwPort + 1);
+}
+
+extern "C" VOID WINAPI XInputClose(HANDLE)
+{
+}
+
+extern "C" DWORD WINAPI XInputGetCapabilities(HANDLE hDevice, PXINPUT_CAPABILITIES pCapabilities)
+{
+    if (!hDevice)
+        return ERROR_DEVICE_NOT_CONNECTED;
+    memset(pCapabilities, 0, sizeof(*pCapabilities));
+    pCapabilities->SubType = 1;     /* a gamepad */
+    pCapabilities->In.Gamepad.wButtons = 0xFF;
+    memset(pCapabilities->In.Gamepad.bAnalogButtons, 0xFF, 8);
+    pCapabilities->In.Gamepad.sThumbLX = pCapabilities->In.Gamepad.sThumbLY = (SHORT)0xFFC0;
+    pCapabilities->In.Gamepad.sThumbRX = pCapabilities->In.Gamepad.sThumbRY = (SHORT)0xFFC0;
+    pCapabilities->Out.Rumble.wLeftMotorSpeed = pCapabilities->Out.Rumble.wRightMotorSpeed = 0xFFFF;
+    return ERROR_SUCCESS;
+}
+
+/* Xbox button bits and analog buttons (A B X Y black white left-trigger right-trigger). */
+enum
+{
+    XB_DPAD_UP = 1, XB_DPAD_DOWN = 2, XB_DPAD_LEFT = 4, XB_DPAD_RIGHT = 8,
+    XB_START = 0x10, XB_BACK = 0x20, XB_LTHUMB = 0x40, XB_RTHUMB = 0x80
+};
+enum { XB_A, XB_B, XB_X, XB_Y, XB_BLACK, XB_WHITE, XB_LTRIGGER, XB_RTRIGGER };
+
+static int key(int vk)
+{
+    return port_hwnd && GetForegroundWindow() == (HWND)port_hwnd && (GetAsyncKeyState(vk) & 0x8000);
+}
+
+/* The keyboard as a controller: WASD the left stick, the arrows the right, IJKL the d-pad;
+   Space A, LeftCtrl B, R X, F Y, Q black, E white, the mouse buttons the triggers; Enter
+   start, Escape back, Shift the left stick's click, C the right's. */
+static void keyboard_state(XINPUT_GAMEPAD *g)
+{
+    if (key('W')) g->sThumbLY = 32767;
+    if (key('S')) g->sThumbLY = -32768;
+    if (key('A')) g->sThumbLX = -32768;
+    if (key('D')) g->sThumbLX = 32767;
+    if (key(VK_UP)) g->sThumbRY = 32767;
+    if (key(VK_DOWN)) g->sThumbRY = -32768;
+    if (key(VK_LEFT)) g->sThumbRX = -32768;
+    if (key(VK_RIGHT)) g->sThumbRX = 32767;
+    if (key('I')) g->wButtons |= XB_DPAD_UP;
+    if (key('K')) g->wButtons |= XB_DPAD_DOWN;
+    if (key('J')) g->wButtons |= XB_DPAD_LEFT;
+    if (key('L')) g->wButtons |= XB_DPAD_RIGHT;
+    if (key(VK_RETURN)) g->wButtons |= XB_START;
+    if (key(VK_ESCAPE)) g->wButtons |= XB_BACK;
+    if (key(VK_SHIFT)) g->wButtons |= XB_LTHUMB;
+    if (key('C')) g->wButtons |= XB_RTHUMB;
+    if (key(VK_SPACE)) g->bAnalogButtons[XB_A] = 255;
+    if (key(VK_LCONTROL) || key(VK_BACK)) g->bAnalogButtons[XB_B] = 255;
+    if (key('R')) g->bAnalogButtons[XB_X] = 255;
+    if (key('F')) g->bAnalogButtons[XB_Y] = 255;
+    if (key('Q')) g->bAnalogButtons[XB_BLACK] = 255;
+    if (key('E')) g->bAnalogButtons[XB_WHITE] = 255;
+    if (key(VK_RBUTTON)) g->bAnalogButtons[XB_LTRIGGER] = 255;
+    if (key(VK_LBUTTON)) g->bAnalogButtons[XB_RTRIGGER] = 255;
+}
+
+static DWORD packets[4];
+
+extern "C" DWORD WINAPI XInputGetState(HANDLE hDevice, PXINPUT_STATE pState)
+{
+    DWORD port = (DWORD)(ULONG_PTR)hDevice - 1;
+    if (port > 3)
+        return ERROR_DEVICE_NOT_CONNECTED;
+    XINPUT_STATE s;
+    memset(&s, 0, sizeof(s));
+    WinXInputState w;
+    int have = win_get_state && win_get_state(port, &w) == ERROR_SUCCESS;
+    if (have)
+    {
+        XINPUT_GAMEPAD *g = &s.Gamepad;
+        g->wButtons = w.Gamepad.wButtons & 0xFF;    /* d-pad, start, back, thumbs: the same bits */
+        g->bAnalogButtons[XB_A] = (w.Gamepad.wButtons & 0x1000) ? 255 : 0;
+        g->bAnalogButtons[XB_B] = (w.Gamepad.wButtons & 0x2000) ? 255 : 0;
+        g->bAnalogButtons[XB_X] = (w.Gamepad.wButtons & 0x4000) ? 255 : 0;
+        g->bAnalogButtons[XB_Y] = (w.Gamepad.wButtons & 0x8000) ? 255 : 0;
+        g->bAnalogButtons[XB_BLACK] = (w.Gamepad.wButtons & 0x0200) ? 255 : 0;  /* right shoulder */
+        g->bAnalogButtons[XB_WHITE] = (w.Gamepad.wButtons & 0x0100) ? 255 : 0;  /* left shoulder */
+        g->bAnalogButtons[XB_LTRIGGER] = w.Gamepad.bLeftTrigger;
+        g->bAnalogButtons[XB_RTRIGGER] = w.Gamepad.bRightTrigger;
+        g->sThumbLX = w.Gamepad.sThumbLX;
+        g->sThumbLY = w.Gamepad.sThumbLY;
+        g->sThumbRX = w.Gamepad.sThumbRX;
+        g->sThumbRY = w.Gamepad.sThumbRY;
+    }
+    else if (port != 0)
+        return ERROR_DEVICE_NOT_CONNECTED;
+    if (port == 0)
+        keyboard_state(&s.Gamepad);
+    if (memcmp(&s.Gamepad, &pState->Gamepad, sizeof(s.Gamepad)))
+        packets[port]++;
+    s.dwPacketNumber = packets[port];
+    *pState = s;
+    return ERROR_SUCCESS;
+}
+
+extern "C" DWORD WINAPI XInputSetState(HANDLE hDevice, PXINPUT_FEEDBACK pFeedback)
+{
+    DWORD port = (DWORD)(ULONG_PTR)hDevice - 1;
+    if (port <= 3 && win_set_state)
+    {
+        WinXInputVibration v = {pFeedback->Rumble.wLeftMotorSpeed, pFeedback->Rumble.wRightMotorSpeed};
+        win_set_state(port, &v);
+    }
+    pFeedback->Header.dwStatus = ERROR_SUCCESS;
+    return ERROR_SUCCESS;
+}
+
+/*
+ * Saves: u:\<8 hex digits>\ per save, its name in SaveMeta.xbx as on the Xbox.
+ */
+
+static DWORD name_hash(LPCWSTR name)
+{
+    DWORD h = 2166136261u;
+    for (; *name; name++)
+        h = (h ^ (DWORD)*name) * 16777619u;
+    return h;
+}
+
+static void save_dir(LPCSTR root, LPCWSTR name, char *xboxDir, size_t n)
+{
+    _snprintf(xboxDir, n, "%c:\\%08lX\\", root && root[0] ? root[0] : 'u', name_hash(name));
+}
+
+static void write_meta(const char *dir, LPCWSTR name)
+{
+    char path[520];
+    _snprintf(path, sizeof(path), "%sSaveMeta.xbx", dir);
+    FILE *f = fopen(path, "wb");
+    if (!f)
+        return;
+    WORD bom = 0xFEFF;
+    fwrite(&bom, 2, 1, f);
+    fwrite(L"Name=", 2, 5, f);
+    fwrite(name, 2, wcslen(name), f);
+    fwrite(L"\r\n", 2, 2, f);
+    fclose(f);
+}
+
+static int read_meta(const char *dir, WCHAR *name, size_t n)
+{
+    char path[520];
+    _snprintf(path, sizeof(path), "%sSaveMeta.xbx", dir);
+    FILE *f = fopen(path, "rb");
+    if (!f)
+        return 0;
+    WCHAR buf[512] = {0};
+    size_t got = fread(buf, 2, 511, f);
+    fclose(f);
+    buf[got] = 0;
+    WCHAR *p = wcsstr(buf, L"Name=");
+    if (!p)
+        return 0;
+    p += 5;
+    size_t i = 0;
+    while (p[i] && p[i] != L'\r' && p[i] != L'\n' && i + 1 < n)
+    {
+        name[i] = p[i];
+        i++;
+    }
+    name[i] = 0;
+    return 1;
+}
+
+extern "C" DWORD WINAPI XCreateSaveGame(LPCSTR lpRootPathName, LPCWSTR lpSaveGameName, DWORD dwCreationDisposition,
+                                        DWORD, LPSTR lpPathBuffer, UINT uSize)
+{
+    char xdir[64], dir[520];
+    save_dir(lpRootPathName, lpSaveGameName, xdir, sizeof(xdir));
+    port_map_path(xdir, dir);
+    DWORD attr = GetFileAttributesA(dir);
+    int exists = attr != INVALID_FILE_ATTRIBUTES;
+    if (exists && dwCreationDisposition == CREATE_NEW)
+        return ERROR_ALREADY_EXISTS;
+    if (!exists && (dwCreationDisposition == OPEN_EXISTING))
+        return ERROR_FILE_NOT_FOUND;
+    if (!exists && !CreateDirectoryA(dir, NULL))
+        return GetLastError();
+    write_meta(dir, lpSaveGameName);
+    if (lpPathBuffer && uSize)
+    {
+        strncpy(lpPathBuffer, xdir, uSize - 1);
+        lpPathBuffer[uSize - 1] = 0;
+    }
+    return ERROR_SUCCESS;
+}
+
+static void delete_tree(const char *dir)
+{
+    char pat[520];
+    _snprintf(pat, sizeof(pat), "%s*", dir);
+    WIN32_FIND_DATAA fd;
+    HANDLE h = FindFirstFileA(pat, &fd);
+    if (h != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            if (!strcmp(fd.cFileName, ".") || !strcmp(fd.cFileName, ".."))
+                continue;
+            char p[520];
+            _snprintf(p, sizeof(p), "%s%s", dir, fd.cFileName);
+            if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+            {
+                strcat(p, "\\");
+                delete_tree(p);
+            }
+            else
+                DeleteFileA(p);
+        } while (FindNextFileA(h, &fd));
+        FindClose(h);
+    }
+    RemoveDirectoryA(dir);
+}
+
+extern "C" DWORD WINAPI XDeleteSaveGame(LPCSTR lpRootPathName, LPCWSTR lpSaveGameName)
+{
+    char xdir[64], dir[520];
+    save_dir(lpRootPathName, lpSaveGameName, xdir, sizeof(xdir));
+    port_map_path(xdir, dir);
+    if (GetFileAttributesA(dir) == INVALID_FILE_ATTRIBUTES)
+        return ERROR_FILE_NOT_FOUND;
+    delete_tree(dir);
+    return ERROR_SUCCESS;
+}
+
+struct SaveFind
+{
+    HANDLE find;
+    char root;
+    char dir[520];
+};
+
+static BOOL next_save(SaveFind *s, PXGAME_FIND_DATA out, int first, WIN32_FIND_DATAA *fd)
+{
+    for (;;)
+    {
+        if (!first && !FindNextFileA(s->find, fd))
+            return FALSE;
+        first = 0;
+        if (!(fd->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) || fd->cFileName[0] == '.')
+            continue;
+        char d[520];
+        _snprintf(d, sizeof(d), "%s%s\\", s->dir, fd->cFileName);
+        WCHAR name[MAX_GAMENAME];
+        if (!read_meta(d, name, MAX_GAMENAME))
+            continue;
+        memset(out, 0, sizeof(*out));
+        out->wfd = *fd;
+        _snprintf(out->szSaveGameDirectory, MAX_PATH, "%c:\\%s\\", s->root, fd->cFileName);
+        wcsncpy(out->szSaveGameName, name, MAX_GAMENAME - 1);
+        return TRUE;
+    }
+}
+
+extern "C" HANDLE WINAPI XFindFirstSaveGame(LPCSTR lpRootPathName, PXGAME_FIND_DATA pFindGameData)
+{
+    SaveFind *s = (SaveFind *)calloc(1, sizeof(SaveFind));
+    char xroot[4] = {lpRootPathName && lpRootPathName[0] ? lpRootPathName[0] : 'u', ':', '\\', 0};
+    s->root = xroot[0];
+    port_map_path(xroot, s->dir);
+    char pat[520];
+    _snprintf(pat, sizeof(pat), "%s*", s->dir);
+    WIN32_FIND_DATAA fd;
+    s->find = FindFirstFileA(pat, &fd);
+    if (s->find == INVALID_HANDLE_VALUE || !next_save(s, pFindGameData, 1, &fd))
+    {
+        if (s->find != INVALID_HANDLE_VALUE)
+            FindClose(s->find);
+        free(s);
+        SetLastError(ERROR_NO_MORE_FILES);
+        return INVALID_HANDLE_VALUE;
+    }
+    return (HANDLE)s;
+}
+
+extern "C" BOOL WINAPI XFindNextSaveGame(HANDLE hFindGame, PXGAME_FIND_DATA pFindGameData)
+{
+    SaveFind *s = (SaveFind *)hFindGame;
+    WIN32_FIND_DATAA fd;
+    if (!s || !next_save(s, pFindGameData, 0, &fd))
+    {
+        SetLastError(ERROR_NO_MORE_FILES);
+        return FALSE;
+    }
+    return TRUE;
+}
+
+extern "C" BOOL WINAPI XFindClose(HANDLE hFind)
+{
+    /* (the game closes only its save-game searches with it) */
+    SaveFind *s = (SaveFind *)hFind;
+    if (!s || hFind == INVALID_HANDLE_VALUE)
+        return FALSE;
+    if (s->find != INVALID_HANDLE_VALUE)
+        FindClose(s->find);
+    free(s);
+    return TRUE;
+}
+
+/*
+ * Save signatures: HMAC-SHA1 under a fixed key (saves are this machine's).
+ */
+
+static const BYTE sig_key[16] = {'C', 'O', 'D', 'F', 'H', '-', 'P', 'C', '-', 'S', 'A', 'V', 'E', 'K', 'E', 'Y'};
+
+struct SigState
+{
+    BCRYPT_ALG_HANDLE alg;
+    BCRYPT_HASH_HANDLE hash;
+};
+
+extern "C" HANDLE WINAPI XCalculateSignatureBegin(DWORD)
+{
+    SigState *s = (SigState *)calloc(1, sizeof(SigState));
+    if (BCryptOpenAlgorithmProvider(&s->alg, BCRYPT_SHA1_ALGORITHM, NULL, BCRYPT_ALG_HANDLE_HMAC_FLAG) ||
+        BCryptCreateHash(s->alg, &s->hash, NULL, 0, (PUCHAR)sig_key, sizeof(sig_key), 0))
+    {
+        free(s);
+        return INVALID_HANDLE_VALUE;
+    }
+    return (HANDLE)s;
+}
+
+extern "C" DWORD WINAPI XCalculateSignatureUpdate(HANDLE hCalcSig, const BYTE *pbData, ULONG cbData)
+{
+    SigState *s = (SigState *)hCalcSig;
+    BCryptHashData(s->hash, (PUCHAR)pbData, cbData, 0);
+    return ERROR_SUCCESS;
+}
+
+extern "C" DWORD WINAPI XCalculateSignatureEnd(HANDLE hCalcSig, PVOID pSignature)
+{
+    SigState *s = (SigState *)hCalcSig;
+    BCryptFinishHash(s->hash, (PUCHAR)pSignature, XCALCSIG_SIGNATURE_SIZE, 0);
+    BCryptDestroyHash(s->hash);
+    BCryptCloseAlgorithmProvider(s->alg, 0);
+    free(s);
+    return ERROR_SUCCESS;
+}
+
+/*
+ * Launch data: the port "launches" itself by leaving launch.bin in the user directory.
+ */
+
+static void launch_file(char *path, size_t n)
+{
+    _snprintf(path, n, "%s\\launch.bin", port_config.userRoot);
+}
+
+extern "C" DWORD WINAPI XGetLaunchInfo(PDWORD pdwLaunchDataType, PLAUNCH_DATA pLaunchData)
+{
+    char path[520];
+    launch_file(path, sizeof(path));
+    FILE *f = fopen(path, "rb");
+    memset(pLaunchData, 0, sizeof(*pLaunchData));
+    if (f)
+    {
+        DWORD type = LDT_TITLE;
+        fread(&type, 4, 1, f);
+        fread(pLaunchData, 1, sizeof(*pLaunchData), f);
+        fclose(f);
+        DeleteFileA(path);
+        *pdwLaunchDataType = type;
+        plog("launch data: type %lu", type);
+        return ERROR_SUCCESS;
+    }
+    /* none: a start as from the debugger */
+    *pdwLaunchDataType = LDT_FROM_DEBUGGER_CMDLINE;
+    return ERROR_SUCCESS;
+}
+
+extern "C" DWORD WINAPI XLaunchNewImageA(LPCSTR lpImagePath, PLAUNCH_DATA pLaunchData)
+{
+    plog("XLaunchNewImage(%s)", lpImagePath ? lpImagePath : "(dashboard)");
+    if (!lpImagePath)
+    {
+        /* the dashboard (its memory screen when saves would not fit): PC saves have no limit */
+        MessageBoxA((HWND)port_hwnd, "The game asked for the Xbox dashboard; there is none on PC.",
+                    "Call of Duty: Finest Hour", MB_OK | MB_ICONINFORMATION);
+    }
+    else if (pLaunchData)
+    {
+        char path[520];
+        launch_file(path, sizeof(path));
+        FILE *f = fopen(path, "wb");
+        if (f)
+        {
+            DWORD type = LDT_TITLE;
+            fwrite(&type, 4, 1, f);
+            fwrite(pLaunchData, 1, sizeof(*pLaunchData), f);
+            fclose(f);
+        }
+    }
+    /* (no other title to start on PC: the port exits, as the Xbox leaves the title) */
+    ExitProcess(0);
+    return ERROR_SUCCESS;
+}
+
+/*
+ * The console's settings
+ */
+
+extern "C" DWORD WINAPI XGetVideoFlags(VOID)
+{
+    return port_config.widescreen ? XC_VIDEO_FLAGS_WIDESCREEN : 0;
+}
+
+extern "C" DWORD WINAPI XGetVideoStandard(VOID)
+{
+    return 1;   /* NTSC-M: 60 Hz */
+}
+
+extern "C" DWORD WINAPI XGetAudioFlags(VOID)
+{
+    return 0;   /* stereo */
+}
+
+/*
+ * Physical memory: RenderWare keeps an address's low 31 bits and restores bit 31 (the Xbox's
+ * contiguous mapping), so the memory comes from the top of the address space, where bit 31 is
+ * set (the executable is large-address aware).
+ */
+
+extern "C" LPVOID WINAPI XPhysicalAlloc(SIZE_T dwSize, ULONG_PTR, ULONG_PTR ulAlignment, DWORD flProtect)
+{
+    (void)ulAlignment;      /* (allocations are 64 KB aligned) */
+    (void)flProtect;
+    void *p = VirtualAlloc(NULL, dwSize, MEM_RESERVE | MEM_COMMIT | MEM_TOP_DOWN, PAGE_READWRITE);
+    if (p && !((ULONG_PTR)p & 0x80000000))
+    {
+        plog("XPhysicalAlloc: %lu bytes at %p, below 2 GB (the driver's addresses would break)",
+             (unsigned long)dwSize, p);
+        VirtualFree(p, 0, MEM_RELEASE);
+        return NULL;
+    }
+    return p;
+}
+
+extern "C" VOID WINAPI XPhysicalFree(LPVOID lpAddress)
+{
+    VirtualFree(lpAddress, 0, MEM_RELEASE);
+}

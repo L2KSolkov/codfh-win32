@@ -102,6 +102,10 @@ INT WINAPI XNetQosRelease(XNQOS *pxnqos);
 DWORD WINAPI XNetGetTitleXnAddr(XNADDR *pxna);
 DWORD WINAPI XNetGetEthernetLinkStatus(void);
 
+/* The game's sockets through the port, which opens the Xbox's VDP ones as UDP (port/src/net.cpp). */
+SOCKET WSAAPI xpal_socket(int af, int type, int protocol);
+#define socket(af, type, protocol) xpal_socket(af, type, protocol)
+
 typedef char port_check_XNADDR[sizeof(XNADDR) == 0x24 ? 1 : -1];
 typedef char port_check_XNQOSINFO[sizeof(XNQOSINFO) == 0x18 ? 1 : -1];
 

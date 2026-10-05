@@ -1,4 +1,4 @@
-"""portbuild.py [--only GLOB]... [--jobs N]: the Win32 port's build (docs/WIN32_PORT.md): every source
+"""portbuild.py [--only GLOB]... [--link] [--jobs N]: the Win32 port's build (docs/WIN32_PORT.md): every source
 under src/ (bar the Xbox-only trees src/xbe, src/xdk and, until W6, src/bink) compiled for Win32 x86
 with MSVC 14.51 and Windows SDK 10.0.26100, against the port's bridge headers (port/include, ahead
 of everything; they stand in for the XDK's xtl.h, d3d8.h, dsound.h and the rest, which are not on
@@ -111,7 +111,11 @@ def main():
     rules = load_rules()
     srcs = sorted(s.replace(os.sep, '/') for s in
                   glob.glob('src/**/*.c', recursive=True) + glob.glob('src/**/*.cpp', recursive=True))
+    # the port layer's own sources (port/src: the entry point, xpal, the bridges)
+    srcs += sorted(s.replace(os.sep, '/') for s in
+                   glob.glob('port/src/**/*.c', recursive=True) + glob.glob('port/src/**/*.cpp', recursive=True))
     srcs = [s for s in srcs if not s.startswith(SKIP_DIRS)]
+    every = [os.path.join(OBJ, os.path.splitext(s)[0] + '.obj') for s in srcs]
     if only:
         srcs = [s for s in srcs if any(fnmatch.fnmatch(s, p) for p in only)]
     jobs = [(s, os.path.join(OBJ, os.path.splitext(s)[0] + '.obj'), unit_flags(s, rules)) for s in srcs]
@@ -159,6 +163,48 @@ def main():
     open(os.path.join(OUT, 'errors.md'), 'w', encoding='utf-8').write('\n'.join(md) + '\n')
     print('%d units: %d compile, %d fail (build/port/errors.md, build/port/compile.log)' % (
         len(results), len(results) - len(failed), len(failed)))
+    # (--link: link after a partial compile, with the other units' objects as they are)
+    if not failed and (not only or '--link' in args):
+        link(every)
+
+
+LIBS = ['kernel32.lib', 'user32.lib', 'gdi32.lib', 'winmm.lib', 'd3d9.lib', 'xaudio2.lib', 'ws2_32.lib',
+        'ntdll.lib', 'ole32.lib', 'shell32.lib', 'bcrypt.lib', 'iphlpapi.lib']
+
+
+def link(objs):
+    """Links build/port/codfh.exe; build/port/link.log has link.exe's output and build/port/link.md
+    the unresolved symbols, each with the objects that reference it."""
+    exe = os.path.join(OUT, 'codfh.exe')
+    rsp = os.path.join(OUT, 'link.rsp')
+    open(rsp, 'w').write(''.join('"%s"\n' % os.path.abspath(o) for o in objs))
+    env = dict(os.environ)
+    env['LIB'] = ';'.join(SYSTEM_LIBS)
+    cmd = [os.path.join(os.path.dirname(CL), 'link.exe'), '/nologo', '/MACHINE:X86', '/SUBSYSTEM:WINDOWS',
+           '/DEBUG', '/INCREMENTAL:NO', '/OPT:REF', '/LARGEADDRESSAWARE', '/MAP:' + os.path.join(OUT, 'codfh.map'),
+           '/PDB:' + os.path.join(OUT, 'codfh.pdb'), '/OUT:' + exe, '@' + rsp] + LIBS
+    r = subprocess.run(cmd, capture_output=True, text=True, errors='replace', env=env)
+    log = r.stdout + r.stderr
+    open(os.path.join(OUT, 'link.log'), 'w', encoding='utf-8').write(' '.join(cmd) + '\n' + log)
+    unresolved = collections.defaultdict(set)
+    for l in log.splitlines():
+        m = re.match(r'(\S+?)\.obj : error LNK2019: unresolved external symbol (\S+) referenced in function', l)
+        m = m or re.match(r'(\S+?)\.obj : error LNK2001: unresolved external symbol (\S+)', l)
+        if m:
+            unresolved[m.group(2)].add(m.group(1))
+    others = [l for l in log.splitlines() if ' error ' in l and 'LNK2019' not in l and 'LNK2001' not in l
+              and 'LNK1120' not in l]
+    md = ['# Port build: link', '', '`python tools/portbuild.py`: exit %d, %d unresolved symbols.' % (
+        r.returncode, len(unresolved)), '']
+    if others:
+        md += ['## Other errors', ''] + ['    ' + l for l in others[:100]] + ['']
+    md += ['## Unresolved symbols', '', '| symbol | referenced from |', '|---|---|']
+    md += ['| `%s` | %s |' % (s, ', '.join(sorted(unresolved[s])[:6]) + (' +%d' % (len(unresolved[s]) - 6)
+                                                                    if len(unresolved[s]) > 6 else ''))
+           for s in sorted(unresolved)]
+    open(os.path.join(OUT, 'link.md'), 'w', encoding='utf-8').write('\n'.join(md) + '\n')
+    print('link exit %d: %d unresolved symbols, %d other errors (build/port/link.md)' % (
+        r.returncode, len(unresolved), len(others)))
 
 
 if __name__ == '__main__':

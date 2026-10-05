@@ -21,6 +21,23 @@
 #include <xnet.h>
 #include <xbox.h>
 
+/* The path-taking Win32 calls the sources make, through the platform layer's mapping of the
+   Xbox drives (d:\ the disc's data, t:\ u:\ z:\ the user directories; port/src/xpal_core.cpp).
+   CreateFile and GetFileAttributes reach these through windows.h's A forms. */
+#ifdef __cplusplus
+extern "C" {
+#endif
+HANDLE WINAPI xpal_CreateFileA(LPCSTR name, DWORD access, DWORD share, LPSECURITY_ATTRIBUTES sa,
+                               DWORD disposition, DWORD flags, HANDLE templ);
+DWORD WINAPI xpal_GetFileAttributesA(LPCSTR name);
+BOOL WINAPI xpal_CopyFileA(LPCSTR from, LPCSTR to, BOOL failIfExists);
+#ifdef __cplusplus
+}
+#endif
+#define CreateFileA xpal_CreateFileA
+#define GetFileAttributesA xpal_GetFileAttributesA
+#define CopyFileA xpal_CopyFileA
+
 #include <d3d8.h>
 #include <dsound.h>
 

@@ -9,10 +9,16 @@
 // and its cleanup calls placement delete at 0x19A750. This unit needs
 // declarations only; the transitive XDK <new> include supplies inline
 // definitions otherwise (and removes both original calls).
+#ifdef CODFH_WIN32
+// (Win32: <new>'s inline placement forms, which the port's library emits in every unit using them)
+#include <new>
+#include "rw/ostypes.h"
+#else
 #define __PLACEMENT_NEW_INLINE
 #include "rw/ostypes.h"
 void *operator new(RwUInt32, void *) throw();
 inline void operator delete(void *, void *) throw();
+#endif
 #include "game/data.h"
 #include "game/functions.h"
 #include "types/AIData.h"
@@ -658,14 +664,18 @@ void sub_19A750(RwReal arg_0)
 
 // ??2@YAPAXIPAX@Z (folded into 0x6CCF0): the global placement new sub_3EEE0 calls out of
 // line (defined here for the authentic link, so no library's copy comes in)
+#ifndef CODFH_WIN32
 void *operator new(RwUInt32 arg_0, void *arg_4) throw()
 {
     return arg_4;
 }
+#endif
 
 // ??3@YAXPAX0@Z (folded into 0x19A750): the global placement delete its cleanup calls
 // (inline, as the XDK <new> defines it: the units that emit <new>'s copy share it; the body
 // after its callers keeps their calls out of line)
+#ifndef CODFH_WIN32
 inline void operator delete(void *arg_0, void *arg_4) throw()
 {
 }
+#endif
