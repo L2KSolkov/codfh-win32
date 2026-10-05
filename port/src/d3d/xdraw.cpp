@@ -1222,3 +1222,26 @@ void xdraw_up(D3DPRIMITIVETYPE prim, UINT count, const void *data, UINT stride)
 {
     submit(prim, 0, count, NULL, 0, (const BYTE *)data, stride);
 }
+
+void xdraw_inline(D3DPRIMITIVETYPE prim, const DWORD *data, UINT dwords)
+{
+    XVertexShader fvf;
+    const XVertexShader *s = xs.programmable;
+    if (!s)
+    {
+        int pretransformed;
+        fvf_declaration(xs.vertexShader, &fvf, &pretransformed);
+        s = &fvf;
+    }
+    UINT stride = 0;
+    for (int k = 0; k < s->count; k++)
+        if (s->elements[k].stream == 0)
+        {
+            UINT e = s->elements[k].offset + element_size(s->elements[k].type);
+            if (e > stride)
+                stride = e;
+        }
+    if (!stride)
+        return;
+    submit(prim, 0, dwords * 4 / stride, NULL, 0, (const BYTE *)data, stride);
+}

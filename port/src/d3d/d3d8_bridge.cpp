@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <vector>
+
 #include "../port.h"
 #include "pdev.h"
 #include "xstate.h"
@@ -580,18 +582,79 @@ extern "C" void WINAPI D3DDevice_DrawVerticesUP(D3DPRIMITIVETYPE PrimitiveType, 
 }
 
 
-/* Push buffers (W2.7): the driver's own method words land in a scratch buffer for now. */
-static DWORD push_scratch[64 * 1024];
+/*
+ * Push buffers (W2.7): the NV2A method words the driver writes itself (the no-light submit, the
+ * sprites, the device's overlay quad, the skin constants), decoded when they end.
+ */
+
+static std::vector<DWORD> push_buf;
 
 extern "C" DWORD *WINAPI D3DDevice_BeginPush(DWORD Count)
 {
-    PORT_STUB();
-    return Count <= 64 * 1024 ? push_scratch : (DWORD *)calloc(Count, 4);
+    push_buf.resize(Count + 16);
+    return &push_buf[0];
+}
+
+static void push_decode(const DWORD *p, const DWORD *end)
+{
+    static DWORD prim;
+    static std::vector<DWORD> verts;
+    static int load;
+    while (p < end)
+    {
+        DWORD w = *p++;
+        DWORD count = (w >> 18) & 0x7FF;
+        DWORD method = w & 0x3FFFC;
+        if (p + count > end)
+            break;
+        switch (method)
+        {
+        case D3DPUSH_SET_BEGIN_END:
+            if (count && p[0])
+            {
+                prim = p[0];
+                verts.clear();
+            }
+            else if (prim && !verts.empty())
+            {
+                xdraw_inline((D3DPRIMITIVETYPE)prim, &verts[0], (UINT)verts.size());
+                prim = 0;
+            }
+            break;
+        case D3DPUSH_INLINE_ARRAY:
+            verts.insert(verts.end(), p, p + count);
+            break;
+        case D3DPUSH_SET_TRANSFORM_CONSTANT_LOAD:
+            if (count)
+                load = (int)p[0];
+            break;
+        case D3DPUSH_SET_TRANSFORM_CONSTANT:
+            for (DWORD i = 0; i < count; i++, load += (i % 4 == 0))
+                if (load >= 0 && load < 192)
+                    memcpy(&xs.vsConstants[load][i % 4], &p[i], 4);
+            break;
+        default:
+        {
+            static DWORD logged[32];
+            static int n;
+            int seen = 0;
+            for (int i = 0; i < n; i++)
+                seen |= logged[i] == method;
+            if (!seen && n < 32)
+            {
+                logged[n++] = method;
+                plog("push buffer: method 0x%04lX (%lu words) not decoded", method, count);
+            }
+        }
+        }
+        p += count;
+    }
 }
 
 extern "C" void WINAPI D3DDevice_EndPush(DWORD *pPush)
 {
-    (void)pPush;
+    if (!push_buf.empty())
+        push_decode(&push_buf[0], pPush);
 }
 
 extern "C" DWORD *WINAPI D3DDevice_BeginState(DWORD Count)

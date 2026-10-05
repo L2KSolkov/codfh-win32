@@ -71,6 +71,8 @@ extern XState xs;
 void xdraw_vertices(D3DPRIMITIVETYPE prim, UINT start, UINT count);
 void xdraw_indexed(D3DPRIMITIVETYPE prim, UINT count, const WORD *indices);
 void xdraw_up(D3DPRIMITIVETYPE prim, UINT count, const void *data, UINT stride);
+/* Vertices inline in a push buffer, in the current declaration's stream-0 layout. */
+void xdraw_inline(D3DPRIMITIVETYPE prim, const DWORD *data, UINT dwords);
 XVertexShader *xdraw_create_vs(const DWORD *decl, const DWORD *function);
 void xdraw_texture_dirty(const void *header);
 void xdraw_texture_forget(const void *header);
