@@ -259,13 +259,31 @@ static void unpack_color(unsigned c, float *out)
     out[3] = ((c >> 24) & 0xFF) / 255.0f;
 }
 
+static unsigned dropped;
+
+extern "C" unsigned pdev_dropped(void)
+{
+    unsigned n = dropped;
+    dropped = 0;
+    return n;
+}
+
 extern "C" void pdev_draw(const PDevDraw *d)
 {
     if (!dev || !d->vs || !d->ps || !ensure_buffers())
+    {
+        dropped++;
         return;
+    }
     VSEntry *vse = (VSEntry *)d->vs;
     if (!vse->vs || (!vse->layout && d->stride))
+    {
+        static int told;
+        if (!told++)
+            plog("draw dropped: vertex shader %p, layout %p (stride %d)", vse->vs, vse->layout, d->stride);
+        dropped++;
         return;
+    }
 
     UINT stride = d->stride ? d->stride : 16;
     UINT vbytes = d->stride * d->vertexCount;
@@ -273,7 +291,10 @@ extern "C" void pdev_draw(const PDevDraw *d)
     if (vbytes)
     {
         if (vbytes > vb_size)
+        {
+            dropped++;
             return;
+        }
         voff = ring_write(vb, vb_size, &vb_pos, d->vertices, vbytes, stride);
         if (voff == 0xFFFFFFFF)
             return;

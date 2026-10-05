@@ -857,14 +857,3 @@ extern "C" RwInt32 __stdcall IDirectSoundBuffer_Unlock(void *buffer, void *, RwU
     LOCKED(v->adpcmBlock = -1);
     return S_OK;
 }
-
-/*
- * WMA (the soundtrack streams): no decoder yet; RenderWare Audio drops the source.
- */
-extern "C" RwInt32 __stdcall WmaCreateDecoderEx(const char *fileName, void *, RwInt32, RwUInt32, RwUInt32,
-                                                RwUInt32, void *, void **decoder)
-{
-    plog("audio: WMA source %s not played", fileName ? fileName : "(file)");
-    *decoder = NULL;
-    return E_FAIL;
-}

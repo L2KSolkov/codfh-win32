@@ -52,6 +52,30 @@ static PortSurface back_buffer, depth_buffer;
 static D3DSurface *render_target, *depth_target;
 XState xs;
 
+/* CODFH_TRACE=n: frame n's render-target changes, viewports, clears and draw counts logged. */
+static int trace_frame = -1;
+static unsigned trace_draws;
+int port_trace_on(void)
+{
+    if (trace_frame < 0)
+    {
+        char v[16];
+        trace_frame = GetEnvironmentVariableA("CODFH_TRACE", v, sizeof(v)) ? atoi(v) : 0;
+    }
+    return trace_frame && port_frame == (unsigned)trace_frame;
+}
+static void trace_flush(void)
+{
+    if (trace_draws && port_trace_on())
+        plog("  trace: %u draws", trace_draws);
+    trace_draws = 0;
+}
+void port_trace_draw(void)
+{
+    if (port_trace_on())
+        trace_draws++;
+}
+
 static void surface_init(PortSurface *s, D3DFORMAT fmt, int w, int h, int bpp)
 {
     memset(s, 0, sizeof(*s));
@@ -249,6 +273,11 @@ static void pace_frame(void)
 
 extern "C" HRESULT WINAPI IDirect3DDevice8_Present(D3DDevice *, const RECT *, const RECT *, void *, void *)
 {
+    if (port_trace_on())
+    {
+        trace_flush();
+        plog("  trace: present");
+    }
     port_frame++;
     xdraw_frame_stats();
     pdev_present();
@@ -272,6 +301,13 @@ extern "C" void WINAPI D3DDevice_Clear(DWORD Count, const D3DRECT *pRects, DWORD
     static int logged;
     if (!logged++)
         plog("first clear: flags 0x%lX colour 0x%08lX z %g", Flags, Color, Z);
+    if (port_trace_on())
+    {
+        trace_flush();
+        plog("  trace: clear flags 0x%lX colour %08lX rects %lu (first %ld,%ld-%ld,%ld) viewport %lu,%lu %lux%lu", Flags,
+             Color, Count, Count ? pRects[0].x1 : 0, Count ? pRects[0].y1 : 0, Count ? pRects[0].x2 : 0,
+             Count ? pRects[0].y2 : 0, xs.viewport.X, xs.viewport.Y, xs.viewport.Width, xs.viewport.Height);
+    }
     pdev_clear(f, Color, Z, Stencil);
 }
 
@@ -338,6 +374,12 @@ extern "C" HRESULT WINAPI D3DDevice_GetDepthStencilSurface(D3DSurface **pp)
 
 extern "C" void WINAPI D3DDevice_SetRenderTarget(D3DSurface *pRenderTarget, D3DSurface *pNewZStencil)
 {
+    if (port_trace_on())
+    {
+        trace_flush();
+        plog("  trace: render target %p (%s, size %08lX) depth %p", pRenderTarget,
+             pRenderTarget == &back_buffer.xb ? "back buffer" : "other", pRenderTarget ? pRenderTarget->Size : 0, pNewZStencil);
+    }
     if (pRenderTarget)
         render_target = pRenderTarget;
     depth_target = pNewZStencil;
@@ -345,13 +387,23 @@ extern "C" void WINAPI D3DDevice_SetRenderTarget(D3DSurface *pRenderTarget, D3DS
         PORT_STUB();    /* W2.2: render-to-texture */
 }
 
-extern "C" void WINAPI D3DDevice_CopyRects(D3DSurface *, const RECT *, UINT, D3DSurface *, const POINT *)
+extern "C" void WINAPI D3DDevice_CopyRects(D3DSurface *a, const RECT *, UINT, D3DSurface *b, const POINT *)
 {
+    if (port_trace_on())
+    {
+        trace_flush();
+        plog("  trace: copy rects %p -> %p", a, b);
+    }
     PORT_STUB();        /* W2.2 */
 }
 
 extern "C" void WINAPI D3DDevice_SetViewport(const D3DVIEWPORT8 *v)
 {
+    if (port_trace_on() && memcmp(v, &xs.viewport, sizeof(*v)))
+    {
+        trace_flush();
+        plog("  trace: viewport %lu,%lu %lux%lu z %g-%g", v->X, v->Y, v->Width, v->Height, v->MinZ, v->MaxZ);
+    }
     xs.viewport = *v;
     if (render_target == &back_buffer.xb)
         pdev_set_viewport(v->X, v->Y, v->Width, v->Height, v->MinZ, v->MaxZ);
@@ -507,8 +559,9 @@ extern "C" void WINAPI D3DDevice_SelectVertexShader(DWORD Handle, DWORD Address)
     }
 }
 
-extern "C" void WINAPI D3DDevice_SetShaderConstantMode(D3DSHADERCONSTANTMODE)
+extern "C" void WINAPI D3DDevice_SetShaderConstantMode(D3DSHADERCONSTANTMODE Mode)
 {
+    xs.shaderConstantMode = Mode;
 }
 
 extern "C" void WINAPI D3DDevice_SetVertexShaderConstant(INT Register, const void *pConstantData, DWORD ConstantCount)

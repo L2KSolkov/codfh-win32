@@ -48,6 +48,7 @@ enum
 struct XState
 {
     float vsConstants[192 + XFF_COUNT][4];
+    DWORD shaderConstantMode;   /* D3DSCM_*: without NORESERVEDCONSTANTS, c[-38]/c[-37] hold the viewport */
     DWORD vertexShader;             /* a handle (bit 0 set) or an FVF code */
     XVertexShader *programmable;    /* the handle's shader, when it is one */
     const DWORD *loadedPrograms[192];   /* LoadVertexShaderProgram's, by address */

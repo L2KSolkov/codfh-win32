@@ -111,6 +111,8 @@ typedef struct PDevDraw
 } PDevDraw;
 
 void pdev_draw(const PDevDraw *draw);
+/* Draws the device dropped since the last call. */
+unsigned pdev_dropped(void);
 
 #ifdef __cplusplus
 }

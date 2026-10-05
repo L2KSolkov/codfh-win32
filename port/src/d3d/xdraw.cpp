@@ -30,12 +30,27 @@
 #include "xstate.h"
 #include "xvsh.h"
 
+void port_trace_draw(void);
+/* RenderWare's texture cache (src/rw/driver/xbox/xbcache.c), for diagnostics */
+extern "C" D3DBaseTexture *RwXbTextureCache[];
+extern "C" D3DBaseTexture *_RwXbTextureCacheBuffer[];
+
 extern "C" int port_xb_texture_level(const D3DBaseTexture *t, UINT level, int face, DWORD *offset, int *width,
                                      int *height, int *pitch);
 extern "C" int port_xb_format_linear(DWORD f);
 extern "C" int port_xb_format_bpp(DWORD f);
 
-#define RS(n) D3D__RenderState[n]
+static int no_fog(void)
+{
+    static int v = -1;
+    if (v < 0)
+    {
+        char b[8];
+        v = GetEnvironmentVariableA("CODFH_NOFOG", b, sizeof(b)) ? 1 : 0;
+    }
+    return v;
+}
+#define RS(n) ((n) == D3DRS_FOGENABLE && no_fog() ? 0 : D3D__RenderState[n])
 #define TSS(s, n) D3D__TextureState[s][n]
 
 /* Xbox values the declarations above do not name. */
@@ -1049,6 +1064,7 @@ static void *pixel_shader(void)
 struct TexEntry
 {
     DWORD data, format, size;
+    unsigned contentHash;
     DWORD palette;
     unsigned paletteHash;
     int dirty;
@@ -1112,7 +1128,16 @@ static inline DWORD argb_from(DWORD fmt, const BYTE *p, const DWORD *pal)
         DWORD v = *(const DWORD *)p;
         return (v & 0xFF00FF00) | ((v >> 16) & 0xFF) | ((v & 0xFF) << 16);
     }
-    default: return 0xFFFF00FF;     /* (magenta: a format to add) */
+    default:
+    {
+        static unsigned char told[256];
+        if (!told[fmt])
+        {
+            told[fmt] = 1;
+            plog("texture format 0x%02lX not decoded (drawn magenta)", fmt);
+        }
+        return 0xFFFF00FF;     /* (magenta: a format to add) */
+    }
     }
 }
 
@@ -1177,9 +1202,38 @@ static void decode_dxt(DWORD fmt, const BYTE *src, int w, int h, DWORD *out)
 
 static std::vector<DWORD> tex_scratch, tex_linear;
 
+/* CODFH_DRAWDETAIL: the detailed draw's stage textures, every level, as tex_<stage>_<level>.bmp */
+static int tex_dump = -1;
+
+static void dump_bmp(const char *name, const DWORD *px, int w, int h)
+{
+    FILE *f = fopen(name, "wb");
+    if (!f)
+        return;
+    BITMAPFILEHEADER fh = {0x4D42, (DWORD)(54 + w * h * 4), 0, 0, 54};
+    BITMAPINFOHEADER ih = {sizeof(ih), w, -h, 1, 32, BI_RGB};
+    fwrite(&fh, sizeof(fh), 1, f);
+    fwrite(&ih, sizeof(ih), 1, f);
+    fwrite(px, 4, (size_t)w * h, f);
+    fclose(f);
+}
+
 static void *upload_texture(const D3DBaseTexture *t, const DWORD *pal)
 {
     DWORD fmt = (t->Format >> 8) & 0xFF;
+    {
+        /* each format once, and its first texture's shape (finding formats still to add) */
+        static unsigned char seen[256];
+        if (!seen[fmt])
+        {
+            seen[fmt] = 1;
+            DWORD off;
+            int w0, h0, p0;
+            port_xb_texture_level(t, 0, 0, &off, &w0, &h0, &p0);
+            plog("texture format 0x%02lX first seen: %dx%d, word %08lX size %08lX%s%s", fmt, w0, h0, t->Format, t->Size,
+                 (t->Format & 4) ? " (cube)" : "", (fmt == 0x0B && !pal) ? " (no palette bound)" : "");
+        }
+    }
     int cube = (t->Format & 4) != 0;
     int linear = port_xb_format_linear(fmt);
     int levels = linear ? 1 : (int)((t->Format >> 16) & 0xF);
@@ -1233,16 +1287,64 @@ static void *upload_texture(const D3DBaseTexture *t, const DWORD *pal)
                     for (int x = 0; x < w; x++)
                         tex_scratch[y * w + x] = argb_from(fmt, rows + y * pitch + x * bpp, pal);
             }
+            if (tex_dump >= 0 && !face)
+            {
+                char name[32];
+                _snprintf(name, sizeof(name), "tex_%d_%d.bmp", tex_dump, lv);
+                dump_bmp(name, &tex_scratch[0], w, h);
+            }
             pdev_texture_upload(dt, lv, face, &tex_scratch[0], w * 4);
         }
     return dt;
 }
 
+/* A sample of a texture's memory (its first, middle and last 64 bytes of level 0), to see the
+   driver write new contents under the same header. */
+static unsigned content_hash(const D3DBaseTexture *t)
+{
+    DWORD off;
+    int w, h, p;
+    port_xb_texture_level(t, 0, 0, &off, &w, &h, &p);
+    DWORD fmt = (t->Format >> 8) & 0xFF;
+    size_t bytes = (size_t)p * ((fmt == 0x0C || fmt == 0x0E || fmt == 0x0F) ? (h + 3) / 4 : h);
+    const BYTE *m = (const BYTE *)(ULONG_PTR)(t->Data | 0x80000000);
+    if (bytes < 192)
+        return hash_bytes(m, bytes);
+    return hash_bytes(m, 64) ^ (hash_bytes(m + bytes / 2, 64) * 31) ^ (hash_bytes(m + bytes - 64, 64) * 131);
+}
+
+static unsigned missing_textures, missing_data;
+/* draws dropped, by reason: no shader, no stream data, nothing to index */
+static unsigned drop_shader, drop_stream, drop_indices;
+
 static void *stage_texture(int st)
 {
     D3DBaseTexture *t = xs.textures[st];
     if (!t || !t->Data)
+    {
+        /* (counted when the stage samples it: drawn white) */
+        DWORD a1 = TSS(st, D3DTSS_COLORARG1) & 0xF, a2 = TSS(st, D3DTSS_COLORARG2) & 0xF;
+        if (TSS(st, D3DTSS_COLOROP) != D3DTOP_DISABLE && (a1 == 2 || a2 == 2))
+        {
+            if (t)
+                missing_data++;
+            else
+                missing_textures++;
+            static int told;
+            if (told < 12 && port_frame > 800)
+            {
+                told++;
+                plog("untextured: stage %d op %lu args %lX/%lX alpha op %lu args %lX/%lX; stage 0 tex %p, 1 tex %p op1 %lu; "
+                     "vs %08lX (%s), ps %08lX, blend %lu %lX/%lX", st, TSS(st, D3DTSS_COLOROP), TSS(st, D3DTSS_COLORARG1),
+                     TSS(st, D3DTSS_COLORARG2), TSS(st, D3DTSS_ALPHAOP), TSS(st, D3DTSS_ALPHAARG1),
+                     TSS(st, D3DTSS_ALPHAARG2), xs.textures[0], xs.textures[1], TSS(1, D3DTSS_COLOROP), xs.vertexShader,
+                     xs.programmable ? (xs.programmable->program ? "program" : "declaration") : "FVF", xs.pixelShader,
+                     RS(D3DRS_ALPHABLENDENABLE), RS(D3DRS_SRCBLEND), RS(D3DRS_DESTBLEND));
+                plog("  RenderWare's cache: bound %p, wanted %p", RwXbTextureCache[st], _RwXbTextureCacheBuffer[st]);
+            }
+        }
         return NULL;
+    }
     DWORD fmt = (t->Format >> 8) & 0xFF;
     const DWORD *pal = NULL;
     unsigned ph = 0;
@@ -1255,9 +1357,11 @@ static void *stage_texture(int st)
         ph = hash_bytes(pal, entries[(xs.palettes[st]->Common >> 30) & 3] * 4);
     }
     TexEntry &e = textures[t];
+    unsigned ch = content_hash(t);
     if (e.device && !e.dirty && e.data == t->Data && e.format == t->Format && e.size == t->Size &&
-        e.palette == palData && e.paletteHash == ph)
+        e.palette == palData && e.paletteHash == ph && e.contentHash == ch)
         return e.device;
+    e.contentHash = ch;
     if (e.device)
         pdev_texture_release(e.device);
     e.data = t->Data;
@@ -1499,8 +1603,14 @@ void xdraw_frame_stats(void)
     LARGE_INTEGER f;
     QueryPerformanceFrequency(&f);
     double ms = 1000.0 / f.QuadPart / 300;
-    plog("stats per frame: %u draws, %u vertices; shaders %.2f ms, convert %.2f ms, state %.2f ms, device %.2f ms",
-         st.draws / 300, st.vertices / 300, st.shaders * ms, st.convert * ms, st.state * ms, st.device * ms);
+    plog("stats per frame: %u draws, %u vertices; shaders %.2f ms, convert %.2f ms, state %.2f ms, device %.2f ms; "
+         "untextured draws %u (no texture %u, no data %u)",
+         st.draws / 300, st.vertices / 300, st.shaders * ms, st.convert * ms, st.state * ms, st.device * ms,
+         (missing_textures + missing_data) / 300, missing_textures / 300, missing_data / 300);
+    plog("  dropped per frame: shader %u, stream without a buffer %u, no indices %u; device drops %u",
+         drop_shader / 300, drop_stream / 300, drop_indices / 300, pdev_dropped() / 300);
+    missing_textures = missing_data = 0;
+    drop_shader = drop_stream = drop_indices = 0;
     memset(&st, 0, sizeof(st));
 }
 
@@ -1514,10 +1624,46 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
     void *vs = vertex_shader(&decl);
     void *ps = pixel_shader();
     if (!vs || !ps || !decl)
+    {
+        drop_shader++;
         return;
+    }
+    if (!up)
+        for (int k = 0; k < decl->count; k++)
+            if (!xs.streams[decl->elements[k].stream])
+            {
+                drop_stream++;
+                break;
+            }
     LONGLONG t1 = now_ticks();
     st.shaders += t1 - t0;
     st.draws++;
+    port_trace_draw();
+    {
+        /* draws per programmable shader (its instruction count and first word identify it) */
+        static std::map<const void *, unsigned> per;
+        static unsigned frame_seen;
+        if (xs.programmable && xs.programmable->program)
+            per[xs.programmable->program]++;
+        if (port_frame / 300 != frame_seen && port_frame % 300 == 299)
+        {
+            frame_seen = port_frame / 300;
+            static int on = -1;
+            if (on < 0)
+            {
+                char v[8];
+                on = GetEnvironmentVariableA("CODFH_STATS", v, sizeof(v)) ? 1 : 0;
+            }
+            if (on)
+                for (std::map<const void *, unsigned>::iterator it = per.begin(); it != per.end(); ++it)
+                {
+                    const DWORD *pr = (const DWORD *)it->first;
+                    plog("  shader %p: %lu instructions, word1 %08lX %08lX: %u draws in 300 frames", pr,
+                         (pr[0] >> 16) & 0xFF, pr[2], pr[3], it->second);
+                }
+            per.clear();
+        }
+    }
     st.vertices += count;
     convert_vertices(decl, first, count, up, upStride);
     LONGLONG t2 = now_ticks();
@@ -1534,6 +1680,13 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
     d.ps = ps;
     d.vsConstants = &xs.vsConstants[0][0];
     port_viewport_offset_scale(d.viewport, d.viewport + 4);
+    if (!(xs.shaderConstantMode & D3DSCM_NORESERVEDCONSTANTS))
+    {
+        /* the Xbox runtime keeps the viewport's scale in c[-38] and its offset in c[-37]; the
+           world shaders do their own screen-space mapping from them */
+        memcpy(xs.vsConstants[96 - 38], d.viewport + 4, 16);
+        memcpy(xs.vsConstants[96 - 37], d.viewport, 16);
+    }
     fill_state(d);
     LONGLONG t3 = now_ticks();
     st.state += t3 - t2;
@@ -1546,9 +1699,202 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
     if (haveIdx)
     {
         if (idx.empty())
+        {
+            drop_indices++;
             return;
+        }
         d.indices = &idx[0];
         d.indexCount = (int)idx.size();
+    }
+    {
+        /* CODFH_DRAWID=n: in frame n every draw is a flat colour from its index (R = index & 255,
+           G = index >> 8), and each draw's state is logged, so a capture's pixel names its draw. */
+        static int idframe = -1;
+        static unsigned id, idlast;
+        if (idframe < 0)
+        {
+            char v[16];
+            idframe = GetEnvironmentVariableA("CODFH_DRAWID", v, sizeof(v)) ? atoi(v) : 0;
+        }
+        if (idframe && port_frame == (unsigned)idframe)
+        {
+            if (idlast != port_frame)
+            {
+                idlast = port_frame;
+                id = 0;
+            }
+            id++;
+            static void *idps;
+            if (!idps)
+                idps = pdev_pixel_shader("cbuffer PS : register(b0) { float4 psc[16]; };\n"
+                                         "Texture2D t0 : register(t0); SamplerState s0 : register(s0);\n"
+                                         "float4 main(float4 p : SV_Position, float4 d0 : COLOR0, float4 d1 : COLOR1,\n"
+                                         "            float4 uv : TEXCOORD0) : SV_Target {\n"
+                                         "    if (psc[14].x > 0 && t0.Sample(s0, uv.xy).a * d0.a * 255 < psc[14].y) discard;\n"
+                                         "    return psc[15]; }\n");
+            static float idc[16][4];
+            memcpy(idc, d.psConstants, sizeof(idc));
+            idc[15][0] = (id & 255) / 255.0f;
+            idc[15][1] = ((id >> 8) & 255) / 255.0f;
+            idc[15][2] = 1.0f;
+            idc[15][3] = 1.0f;
+            /* (alpha-tested draws keep their holes) */
+            idc[14][0] = RS(D3DRS_ALPHATESTENABLE) && d.textures[0] ? 1.0f : 0.0f;
+            idc[14][1] = (float)(RS(D3DRS_ALPHAREF) & 0xFF);
+            d.psConstants = &idc[0][0];
+            d.ps = idps;
+            d.blendEnable = 0;
+            char tex[200] = "";
+            for (int st = 0; st < 4 && TSS(st, D3DTSS_COLOROP) != D3DTOP_DISABLE; st++)
+            {
+                char one[48];
+                _snprintf(one, sizeof(one), " t%d=%p/f%02lX/op%lu", st, xs.textures[st],
+                          xs.textures[st] ? (xs.textures[st]->Format >> 8) & 0xFF : 0, TSS(st, D3DTSS_COLOROP));
+                strncat(tex, one, sizeof(tex) - strlen(tex) - 1);
+            }
+            plog("draw %u: prim %d, %u vertices, %d indices, vs %08lX (%s, %d elements), ps %08lX,%s, blend %lu, alpha test %lu, "
+                 "z %lu/%lu, cull %lX", id, (int)prim, count, (int)nidx, xs.vertexShader,
+                 xs.programmable ? (xs.programmable->program ? "program" : "declaration") : "FVF", decl->count,
+                 xs.pixelShader, tex, RS(D3DRS_ALPHABLENDENABLE), RS(D3DRS_ALPHATESTENABLE), RS(D3DRS_ZENABLE),
+                 RS(D3DRS_ZWRITEENABLE), RS(D3DRS_CULLMODE));
+            static std::map<DWORD, int> dumped;
+            if (xs.programmable && xs.programmable->program && !dumped[xs.vertexShader]++)
+            {
+                const DWORD *pr = xs.programmable->program;
+                unsigned n = 1 + ((pr[0] >> 16) & 0xFF) * 4;
+                std::string hex;
+                for (unsigned k = 0; k < n; k++)
+                {
+                    char w[12];
+                    _snprintf(w, sizeof(w), "%08lX ", pr[k]);
+                    hex += w;
+                }
+                char el[200] = "";
+                for (int k = 0; k < decl->count; k++)
+                {
+                    char one[24];
+                    _snprintf(one, sizeof(one), " v%d:%02X@%d/s%d", decl->elements[k].reg, decl->elements[k].type,
+                              decl->elements[k].offset, decl->elements[k].stream);
+                    strncat(el, one, sizeof(el) - strlen(el) - 1);
+                }
+                plog("vs %08lX elements%s", xs.vertexShader, el);
+                plog("vs %08lX microcode %s", xs.vertexShader, hex.c_str());
+                const float *C = d.vsConstants;
+                for (int k = 0; k < 4; k++)
+                    plog("  c[%d] %g %g %g %g", k, C[(96 + k) * 4], C[(96 + k) * 4 + 1], C[(96 + k) * 4 + 2], C[(96 + k) * 4 + 3]);
+                plog("  c[-38] %g %g %g %g; c[-37] %g %g %g %g", C[58 * 4], C[58 * 4 + 1], C[58 * 4 + 2], C[58 * 4 + 3],
+                     C[59 * 4], C[59 * 4 + 1], C[59 * 4 + 2], C[59 * 4 + 3]);
+                plog("  viewport offset %g %g %g %g scale %g %g %g %g", d.viewport[0], d.viewport[1], d.viewport[2],
+                     d.viewport[3], d.viewport[4], d.viewport[5], d.viewport[6], d.viewport[7]);
+                if (count && !up && xs.streams[0])
+                {
+                    const float *f = (const float *)(ULONG_PTR)(xs.streams[0]->Data | 0x80000000);
+                    plog("  stream0 Data %08lX first %u: v0 %g %g %g", xs.streams[0]->Data, first, f[first * xs.strides[0] / 4],
+                         f[first * xs.strides[0] / 4 + 1], f[first * xs.strides[0] / 4 + 2]);
+                }
+            }
+            static int detail = -1;
+            if (detail < 0)
+            {
+                char v[16];
+                detail = GetEnvironmentVariableA("CODFH_DRAWDETAIL", v, sizeof(v)) ? atoi(v) : 0;
+            }
+            if (id <= 12 || (int)id == detail)
+            {
+                char el[200] = "";
+                for (int k = 0; k < decl->count; k++)
+                {
+                    char one[24];
+                    _snprintf(one, sizeof(one), " v%d:%02X@%d/s%d", decl->elements[k].reg, decl->elements[k].type,
+                              decl->elements[k].offset, decl->elements[k].stream);
+                    strncat(el, one, sizeof(el) - strlen(el) - 1);
+                }
+                plog("  elements%s; stride %u; tci %lX ttff %lX; tex0 matrix diag %g %g", el, xs.strides[0],
+                     TSS(0, D3DTSS_TEXCOORDINDEX), TSS(0, D3DTSS_TEXTURETRANSFORMFLAGS), xs.transforms[D3DTS_TEXTURE0]._11,
+                     xs.transforms[D3DTS_TEXTURE0]._22);
+                if (count && !up && xs.streams[0])
+                {
+                    const BYTE *b0 = (const BYTE *)(ULONG_PTR)(xs.streams[0]->Data | 0x80000000) + (size_t)first * xs.strides[0];
+                    char hex[200] = "";
+                    for (UINT k = 0; k < xs.strides[0] && k < 40; k++)
+                    {
+                        char one[4];
+                        _snprintf(one, sizeof(one), "%02X", b0[k]);
+                        strncat(hex, one, sizeof(hex) - strlen(hex) - 1);
+                    }
+                    plog("  first vertex: %s", hex);
+                    if ((int)id == detail)
+                        for (int st = 0; st < 4; st++)
+                            if (xs.textures[st] && xs.textures[st]->Data)
+                            {
+                                const D3DBaseTexture *t = xs.textures[st];
+                                DWORD fmt = (t->Format >> 8) & 0xFF;
+                                const DWORD *pal = fmt == 0x0B && xs.palettes[st] && xs.palettes[st]->Data
+                                                       ? (const DWORD *)(ULONG_PTR)(xs.palettes[st]->Data | 0x80000000)
+                                                       : NULL;
+                                plog("  stage %d texture: format %08lX size %08lX", st, t->Format, t->Size);
+                                tex_dump = st;
+                                void *dt = upload_texture(t, pal);
+                                tex_dump = -1;
+                                if (dt)
+                                    pdev_texture_release(dt);
+                            }
+                    if ((int)id == detail)
+                        for (UINT v = 0; v < 8 && v < count; v++)
+                        {
+                            const float *f = (const float *)(b0 + v * xs.strides[0]);
+                            plog("  vertex %u: %g %g %g | %g %g | %08lX %08lX %08lX %08lX", v, f[0], f[1], f[2], f[3], f[4],
+                                 ((const DWORD *)f)[5], ((const DWORD *)f)[6], ((const DWORD *)f)[7], ((const DWORD *)f)[8]);
+                            const float *C = d.vsConstants;
+                            float cl[4];
+                            for (int r = 0; r < 4; r++)
+                                cl[r] = f[0] * C[(96 + r) * 4] + f[1] * C[(96 + r) * 4 + 1] + f[2] * C[(96 + r) * 4 + 2] +
+                                        C[(96 + r) * 4 + 3];
+                            plog("    clip %g %g %g %g -> screen %g %g", cl[0], cl[1], cl[2], cl[3],
+                                 cl[0] / cl[3] * 320 + 320, -cl[1] / cl[3] * 240 + 240);
+                        }
+                    if ((int)id == detail)
+                        for (int r = 0; r < 4; r++)
+                        {
+                            const float *C = d.vsConstants + (96 + r) * 4;
+                            plog("  c[%d] %g %g %g %g", r, C[0], C[1], C[2], C[3]);
+                        }
+                }
+            }
+        }
+    }
+    {
+        /* CODFH_WIREFRAME=1: everything as wireframe with no depth, blending or alpha test */
+        static int wire = -1;
+        if (wire < 0)
+        {
+            char v[8];
+            wire = GetEnvironmentVariableA("CODFH_WIREFRAME", v, sizeof(v)) ? 1 : 0;
+        }
+        static int nodepth = -1;
+        if (nodepth < 0)
+        {
+            char v[8];
+            nodepth = GetEnvironmentVariableA("CODFH_NODEPTH", v, sizeof(v)) ? 1 : 0;
+        }
+        if (nodepth)
+            d.depthEnable = 0;
+        static int nocull = -1;
+        if (nocull < 0)
+        {
+            char v[8];
+            nocull = GetEnvironmentVariableA("CODFH_NOCULL", v, sizeof(v)) ? 1 : 0;
+        }
+        if (nocull)
+            d.cull = PDEV_CULL_NONE;
+        if (wire)
+        {
+            d.wireframe = 1;
+            d.depthEnable = 0;
+            d.blendEnable = 0;
+            d.cull = PDEV_CULL_NONE;
+            d.writeMask = 0xF;
+        }
     }
     pdev_draw(&d);
     st.device += now_ticks() - t3;
