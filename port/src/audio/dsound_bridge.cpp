@@ -504,6 +504,36 @@ static void start_output(void)
     plog("audio: XAudio2, 48 kHz stereo");
 }
 
+/* The mixer stopped and the output closed (the window's close, before the process exits). */
+extern "C" void port_audio_shutdown(void)
+{
+    if (!running)
+        return;
+    running = 0;
+    if (thread)
+    {
+        WaitForSingleObject(thread, 1000);
+        CloseHandle(thread);
+        thread = NULL;
+    }
+    if (source)
+    {
+        source->Stop();
+        source->DestroyVoice();
+        source = NULL;
+    }
+    if (master)
+    {
+        master->DestroyVoice();
+        master = NULL;
+    }
+    if (xa)
+    {
+        xa->Release();
+        xa = NULL;
+    }
+}
+
 /*
  * The DirectSound object
  */

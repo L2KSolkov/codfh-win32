@@ -9,6 +9,9 @@
 #include <stdlib.h>
 
 #include "port.h"
+#include "d3d/pdev.h"
+
+extern "C" void port_audio_shutdown(void);
 
 int main();
 extern "C" void port_crash_handler_install(void);
@@ -28,6 +31,33 @@ static void confine_cursor(HWND hwnd, int on)
     }
     else
         ClipCursor(NULL);
+}
+
+static int fullscreen;
+static RECT windowed_rect;
+static const DWORD windowed_style = WS_OVERLAPPEDWINDOW;
+
+static void set_fullscreen(HWND hwnd, int on)
+{
+    if (on == fullscreen)
+        return;
+    if (on)
+    {
+        GetWindowRect(hwnd, &windowed_rect);
+        MONITORINFO mi = {sizeof(mi)};
+        GetMonitorInfoA(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST), &mi);
+        SetWindowLongA(hwnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+        SetWindowPos(hwnd, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left,
+                     mi.rcMonitor.bottom - mi.rcMonitor.top, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+    }
+    else
+    {
+        SetWindowLongA(hwnd, GWL_STYLE, windowed_style | WS_VISIBLE);
+        SetWindowPos(hwnd, HWND_NOTOPMOST, windowed_rect.left, windowed_rect.top, windowed_rect.right - windowed_rect.left,
+                     windowed_rect.bottom - windowed_rect.top, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+    }
+    fullscreen = on;
+    plog("display: %s", on ? "fullscreen" : "windowed");
 }
 
 static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -57,6 +87,17 @@ static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
     case WM_CLOSE:
         port_quit = 1;
         return 0;
+    case WM_SIZE:
+        pdev_window_resized();
+        break;
+    case WM_SYSKEYDOWN:
+        /* Alt+Enter: windowed and fullscreen (a borderless window over the monitor) */
+        if (wp == VK_RETURN && (lp & (1 << 29)) && !(lp & (1 << 30)))
+        {
+            set_fullscreen(hwnd, !fullscreen);
+            return 0;
+        }
+        break;
     case WM_SETCURSOR:
         if (LOWORD(lp) == HTCLIENT)
         {
@@ -83,8 +124,11 @@ extern "C" int port_pump_messages(void)
     }
     if (port_quit)
     {
-        /* (the game's own shutdown is unreachable on the Xbox: W8 makes it reachable) */
+        /* (the game has no shutdown path of its own: the Xbox never returns from a title; the
+           port stops what runs beside the game, then exits) */
         plog("window closed: exiting");
+        port_audio_shutdown();
+        ClipCursor(NULL);
         ExitProcess(0);
     }
     return !port_quit;
@@ -101,14 +145,16 @@ static void create_window(HINSTANCE inst)
     wc.lpszClassName = "CODFH";
     RegisterClassA(&wc);
 
-    DWORD style = port_config.windowed ? (WS_OVERLAPPEDWINDOW & ~(WS_THICKFRAME | WS_MAXIMIZEBOX)) : WS_POPUP;
+    DWORD style = windowed_style;
     RECT r = {0, 0, port_config.width, port_config.height};
     AdjustWindowRect(&r, style, FALSE);
     int w = r.right - r.left, h = r.bottom - r.top;
-    int x = port_config.windowed ? (GetSystemMetrics(SM_CXSCREEN) - w) / 2 : 0;
-    int y = port_config.windowed ? (GetSystemMetrics(SM_CYSCREEN) - h) / 2 : 0;
+    int x = (GetSystemMetrics(SM_CXSCREEN) - w) / 2;
+    int y = (GetSystemMetrics(SM_CYSCREEN) - h) / 2;
     HWND hwnd = CreateWindowA("CODFH", "Call of Duty: Finest Hour", style, x < 0 ? 0 : x, y < 0 ? 0 : y,
                               w, h, NULL, NULL, inst, NULL);
+    if (!port_config.windowed)
+        set_fullscreen(hwnd, 1);
     ShowWindow(hwnd, SW_SHOW);
     UpdateWindow(hwnd);
     port_hwnd = hwnd;

@@ -36,6 +36,8 @@ void pdev_set_gamma(const unsigned char *red, const unsigned char *green, const 
 /* The frame replaced by CPU pixels (A8R8G8B8, the frame's size): what the game wrote into a
    locked back buffer (the movie player's blit). */
 void pdev_upload_frame(const void *pixels, int pitch);
+/* The window's size changed (any thread). */
+void pdev_window_resized(void);
 
 /*
  * Drawing. The Xbox side hands over vertices already converted to float4 per vertex register

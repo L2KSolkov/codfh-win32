@@ -3,8 +3,9 @@
  * GPU, or WARP when there is none, as over Remote Desktop), the swap chain, the depth buffer,
  * clears and presentation. The game draws a 640x480 frame (the Xbox's mode) into an offscreen
  * target; presenting copies it to the swap chain through the game's gamma ramp (the Xbox applies
- * the ramp in the display hardware; a windowed swap chain has none), and DXGI stretches the
- * swap chain's buffer to the window.
+ * the ramp in the display hardware; a windowed swap chain has none). The swap chain is the
+ * window's size; the frame keeps its 4:3 shape in it (black bars), or fills it with [video]
+ * widescreen.
  */
 #include <d3d11.h>
 #include <d3dcompiler.h>
@@ -28,7 +29,10 @@ static ID3D11Texture2D *scene;
 static ID3D11ShaderResourceView *scene_srv;
 static ID3D11DepthStencilView *dsv;
 static ID3D11Texture2D *depth;
-static int frame_w, frame_h, sync_interval;
+static int frame_w, frame_h, sync_interval, fill_window;
+static int back_w, back_h;
+static void *the_hwnd;
+static volatile LONG resize_pending;
 static unsigned char gamma_ramp[3][256];
 static int gamma_dirty;
 static D3D11_VIEWPORT last_viewport;
@@ -38,19 +42,20 @@ static ID3D11VertexShader *final_vs;
 static ID3D11PixelShader *final_ps;
 static ID3D11Texture2D *ramp;
 static ID3D11ShaderResourceView *ramp_srv;
-static ID3D11SamplerState *final_point;
+static ID3D11SamplerState *final_point, *final_linear;
 static ID3D11RasterizerState *final_raster;
 static ID3D11DepthStencilState *final_depth;
 static ID3D11BlendState *final_blend;
 
 static const char final_hlsl[] =
-    "Texture2D scene : register(t0); Texture2D ramp : register(t1); SamplerState pt : register(s0);\n"
+    "Texture2D scene : register(t0); Texture2D ramp : register(t1);\n"
+    "SamplerState pt : register(s0); SamplerState lin : register(s1);\n"
     "struct V { float4 pos : SV_Position; float2 uv : TEXCOORD0; };\n"
     "V vs(uint id : SV_VertexID) {\n"
     "    V o; float2 t = float2((id << 1) & 2, id & 2);\n"
     "    o.pos = float4(t * float2(2, -2) + float2(-1, 1), 0, 1); o.uv = t; return o; }\n"
     "float4 ps(V i) : SV_Target {\n"
-    "    float4 c = scene.Sample(pt, i.uv);\n"
+    "    float4 c = scene.Sample(lin, i.uv);\n"
     "    float3 idx = floor(saturate(c.rgb) * 255 + 0.5) / 256 + 1.0 / 512;\n"
     "    return float4(ramp.Sample(pt, float2(idx.r, 0.5)).r, ramp.Sample(pt, float2(idx.g, 0.5)).g,\n"
     "                  ramp.Sample(pt, float2(idx.b, 0.5)).b, 1); }\n";
@@ -102,6 +107,11 @@ static int create_final_pass(void)
     sd.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
     sd.AddressU = sd.AddressV = sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
     sd.MaxLOD = D3D11_FLOAT32_MAX;
+    if (FAILED(dev->CreateSamplerState(&sd, &final_point)))
+        return 0;
+    sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    if (FAILED(dev->CreateSamplerState(&sd, &final_linear)))
+        return 0;
     D3D11_RASTERIZER_DESC rd;
     memset(&rd, 0, sizeof(rd));
     rd.FillMode = D3D11_FILL_SOLID;
@@ -112,7 +122,7 @@ static int create_final_pass(void)
     D3D11_BLEND_DESC bd;
     memset(&bd, 0, sizeof(bd));
     bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-    return SUCCEEDED(dev->CreateSamplerState(&sd, &final_point)) && SUCCEEDED(dev->CreateRasterizerState(&rd, &final_raster)) &&
+    return SUCCEEDED(dev->CreateRasterizerState(&rd, &final_raster)) &&
            SUCCEEDED(dev->CreateDepthStencilState(&dd, &final_depth)) && SUCCEEDED(dev->CreateBlendState(&bd, &final_blend));
 }
 
@@ -133,7 +143,24 @@ static void final_pass(void)
     }
     ID3D11ShaderResourceView *none[4] = {NULL, NULL, NULL, NULL};
     ctx->OMSetRenderTargets(1, &back_rtv, NULL);
-    D3D11_VIEWPORT vp = {0, 0, (float)frame_w, (float)frame_h, 0, 1};
+    float bars[4] = {0, 0, 0, 1};
+    ctx->ClearRenderTargetView(back_rtv, bars);
+    /* the frame's 4:3 in the window, centred */
+    float w = (float)back_w, h = (float)back_h, x = 0, y = 0;
+    if (!fill_window)
+    {
+        if (w * frame_h > h * frame_w)
+        {
+            w = h * frame_w / frame_h;
+            x = (back_w - w) / 2;
+        }
+        else
+        {
+            h = w * frame_h / frame_w;
+            y = (back_h - h) / 2;
+        }
+    }
+    D3D11_VIEWPORT vp = {x, y, w, h, 0, 1};
     ctx->RSSetViewports(1, &vp);
     ctx->IASetInputLayout(NULL);
     ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -141,7 +168,8 @@ static void final_pass(void)
     ctx->PSSetShader(final_ps, NULL, 0);
     ID3D11ShaderResourceView *srv[2] = {scene_srv, ramp_srv};
     ctx->PSSetShaderResources(0, 2, srv);
-    ctx->PSSetSamplers(0, 1, &final_point);
+    ID3D11SamplerState *smp[2] = {final_point, final_linear};
+    ctx->PSSetSamplers(0, 2, smp);
     ctx->RSSetState(final_raster);
     ctx->OMSetDepthStencilState(final_depth, 0);
     float zero[4] = {0, 0, 0, 0};
@@ -188,17 +216,28 @@ static int create_views(void)
     return 1;
 }
 
+static void client_size(void *hwnd, int *w, int *h)
+{
+    RECT r;
+    GetClientRect((HWND)hwnd, &r);
+    *w = r.right - r.left > 0 ? r.right - r.left : 1;
+    *h = r.bottom - r.top > 0 ? r.bottom - r.top : 1;
+}
+
 extern "C" int pdev_init(void *hwnd, int width, int height, int windowed, int vsync)
 {
     frame_w = width;
     frame_h = height;
     sync_interval = vsync ? 1 : 0;
+    fill_window = port_config.widescreen;
+    the_hwnd = hwnd;
     (void)windowed;
+    client_size(hwnd, &back_w, &back_h);
 
     DXGI_SWAP_CHAIN_DESC sd;
     memset(&sd, 0, sizeof(sd));
-    sd.BufferDesc.Width = width;
-    sd.BufferDesc.Height = height;
+    sd.BufferDesc.Width = back_w;
+    sd.BufferDesc.Height = back_h;
     sd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     sd.SampleDesc.Count = 1;
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -217,7 +256,8 @@ extern "C" int pdev_init(void *hwnd, int width, int height, int windowed, int vs
                                                    D3D11_SDK_VERSION, &sd, &swap, &dev, &got, &ctx);
         if (SUCCEEDED(hr) && create_views())
         {
-            plog("Direct3D 11 on %s (feature level %X): %dx%d frame", names[i], got, width, height);
+            plog("Direct3D 11 on %s (feature level %X): %dx%d frame in a %dx%d window", names[i], got, width, height,
+                 back_w, back_h);
             /* (Alt+Enter stays the window's: fullscreen is WinMain's borderless window) */
             IDXGIFactory *f = NULL;
             if (SUCCEEDED(swap->GetParent(__uuidof(IDXGIFactory), (void **)&f)))
@@ -249,6 +289,7 @@ extern "C" void pdev_shutdown(void)
     if (ramp_srv) ramp_srv->Release();
     if (ramp) ramp->Release();
     if (final_point) final_point->Release();
+    if (final_linear) final_linear->Release();
     if (final_raster) final_raster->Release();
     if (final_depth) final_depth->Release();
     if (final_blend) final_blend->Release();
@@ -264,7 +305,7 @@ extern "C" void pdev_shutdown(void)
     final_ps = NULL;
     ramp_srv = NULL;
     ramp = NULL;
-    final_point = NULL;
+    final_point = final_linear = NULL;
     final_raster = NULL;
     final_depth = NULL;
     final_blend = NULL;
@@ -314,9 +355,20 @@ static void capture(unsigned frame)
     }
     if (!shot || (every ? frame % shot : frame != (unsigned)shot))
         return;
-    ID3D11Texture2D *back = NULL, *staging = NULL;
-    if (FAILED(swap->GetBuffer(0, __uuidof(ID3D11Texture2D), (void **)&back)))
-        return;
+    /* (the game's 640x480 frame, not the window's buffer, so captures compare across window sizes;
+       CODFH_SHOT_WINDOW=1 takes the window's buffer instead) */
+    static int window_shot = -1;
+    if (window_shot < 0)
+    {
+        char v[8];
+        window_shot = GetEnvironmentVariableA("CODFH_SHOT_WINDOW", v, sizeof(v)) ? 1 : 0;
+    }
+    ID3D11Texture2D *back = scene, *staging = NULL;
+    if (!window_shot || FAILED(swap->GetBuffer(0, __uuidof(ID3D11Texture2D), (void **)&back)))
+    {
+        back = scene;
+        back->AddRef();
+    }
     D3D11_TEXTURE2D_DESC td;
     back->GetDesc(&td);
     td.Usage = D3D11_USAGE_STAGING;
@@ -363,7 +415,31 @@ extern "C" void pdev_present(void)
         plog("frame %u", frame);
     if (!swap)
         return;
-    final_pass();
+    if (InterlockedExchange(&resize_pending, 0))
+    {
+        int w, h;
+        client_size(the_hwnd, &w, &h);
+        if (w != back_w || h != back_h)
+        {
+            ctx->OMSetRenderTargets(0, NULL, NULL);
+            back_rtv->Release();
+            back_rtv = NULL;
+            if (SUCCEEDED(swap->ResizeBuffers(0, w, h, DXGI_FORMAT_UNKNOWN, 0)))
+            {
+                back_w = w;
+                back_h = h;
+            }
+            ID3D11Texture2D *back = NULL;
+            if (SUCCEEDED(swap->GetBuffer(0, __uuidof(ID3D11Texture2D), (void **)&back)))
+            {
+                dev->CreateRenderTargetView(back, NULL, &back_rtv);
+                back->Release();
+            }
+            plog("window %dx%d", back_w, back_h);
+        }
+    }
+    if (back_rtv)
+        final_pass();
     capture(frame);
     HRESULT hr = swap->Present(sync_interval, 0);
     if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
@@ -371,6 +447,12 @@ extern "C" void pdev_present(void)
     /* the game's target and viewport again */
     ctx->OMSetRenderTargets(1, &rtv, dsv);
     ctx->RSSetViewports(1, &last_viewport);
+}
+
+/* The window changed size: the swap chain follows at the next present (the game's thread). */
+extern "C" void pdev_window_resized(void)
+{
+    InterlockedExchange(&resize_pending, 1);
 }
 
 extern "C" void pdev_upload_frame(const void *pixels, int pitch)
