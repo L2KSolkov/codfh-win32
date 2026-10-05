@@ -19,6 +19,21 @@ extern "C" void port_crash_handler_install(void);
 /* The mouse's movement since the controllers last read it (xpal_sys.cpp turns it into the right
    stick). */
 volatile LONG port_mouse_dx, port_mouse_dy;
+/* the wheel's notches since the controllers last read it (up positive) */
+volatile LONG port_mouse_wheel;
+
+/* CODFH_INPUT_BACKGROUND=1: the keyboard and mouse read while another window is in front (for
+   driving the game from a script when Windows will not give it the foreground). */
+extern "C" int port_input_background(void)
+{
+    static int on = -1;
+    if (on < 0)
+    {
+        char v[8];
+        on = GetEnvironmentVariableA("CODFH_INPUT_BACKGROUND", v, sizeof(v)) ? 1 : 0;
+    }
+    return on;
+}
 
 static void confine_cursor(HWND hwnd, int on)
 {
@@ -73,6 +88,8 @@ static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         {
             InterlockedExchangeAdd(&port_mouse_dx, ri.data.mouse.lLastX);
             InterlockedExchangeAdd(&port_mouse_dy, ri.data.mouse.lLastY);
+            if (ri.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
+                InterlockedExchangeAdd(&port_mouse_wheel, (SHORT)ri.data.mouse.usButtonData / WHEEL_DELTA);
         }
         break;
     }
@@ -164,7 +181,7 @@ static void create_window(HINSTANCE inst)
     ShowWindow(hwnd, SW_SHOW);
     UpdateWindow(hwnd);
     port_hwnd = hwnd;
-    RAWINPUTDEVICE rid = {0x01, 0x02, 0, hwnd};    /* the mouse */
+    RAWINPUTDEVICE rid = {0x01, 0x02, port_input_background() ? (DWORD)RIDEV_INPUTSINK : 0, hwnd};    /* the mouse */
     RegisterRawInputDevices(&rid, 1, sizeof(rid));
 #endif
 }

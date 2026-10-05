@@ -147,9 +147,18 @@ enum
 };
 enum { XB_A, XB_B, XB_X, XB_Y, XB_BLACK, XB_WHITE, XB_LTRIGGER, XB_RTRIGGER };
 
+/* The window has the keyboard and mouse: it is in front, or CODFH_INPUT_BACKGROUND=1 (testing:
+   input read while another window is in front). */
+extern "C" int port_input_background(void);
+
+static int window_has_input(void)
+{
+    return port_hwnd && (GetForegroundWindow() == (HWND)port_hwnd || port_input_background());
+}
+
 static int key(int vk)
 {
-    return port_hwnd && GetForegroundWindow() == (HWND)port_hwnd && (GetAsyncKeyState(vk) & 0x8000);
+    return window_has_input() && (GetAsyncKeyState(vk) & 0x8000);
 }
 
 /* The keyboard as a controller: WASD the left stick, the arrows the right, IJKL the d-pad;
@@ -252,13 +261,80 @@ static void load_bindings(void)
         plog("input: %d key bindings from codfh.ini", changed);
 }
 
+extern "C" unsigned port_menu_frame;
+
+/* The menus are up: their loop ran this frame or the one before. */
+static int in_menus(void)
+{
+    return port_menu_frame && port_frame - port_menu_frame <= 2;
+}
+
+/*
+ * In the menus the keyboard and mouse drive them as the pad's d-pad and face buttons do: the
+ * arrows (and the move keys, as the left stick) move the selection, Enter and the left button
+ * choose (A), Escape, Backspace and the right button go back (B), and the wheel steps up and
+ * down. The play bindings that mean something else there (looking, the triggers, Start and Back)
+ * are left out.
+ */
+static void menu_state(XINPUT_GAMEPAD *g)
+{
+    if (key(VK_UP)) g->wButtons |= XB_DPAD_UP;
+    if (key(VK_DOWN)) g->wButtons |= XB_DPAD_DOWN;
+    if (key(VK_LEFT)) g->wButtons |= XB_DPAD_LEFT;
+    if (key(VK_RIGHT)) g->wButtons |= XB_DPAD_RIGHT;
+    if (key(VK_RETURN) || key(VK_LBUTTON)) g->bAnalogButtons[XB_A] = 255;
+    if (key(VK_ESCAPE) || key(VK_BACK) || key(VK_RBUTTON)) g->bAnalogButtons[XB_B] = 255;
+    if (key(VK_TAB)) g->wButtons |= XB_START;
+}
+
+/* The wheel's notches as d-pad presses, one at a time (held 3 polls, released 3), so each one
+   reads as a press. */
+extern volatile LONG port_mouse_wheel;
+static void wheel_state(XINPUT_GAMEPAD *g, int menus)
+{
+    static LONG pending;
+    static int phase;
+    pending += InterlockedExchange(&port_mouse_wheel, 0);
+    if (!menus || !window_has_input())
+    {
+        pending = 0;
+        phase = 0;
+        return;
+    }
+    if (pending > 8) pending = 8;
+    if (pending < -8) pending = -8;
+    if (!pending && !phase)
+        return;
+    if (phase < 3 && pending)
+        g->wButtons |= pending > 0 ? XB_DPAD_UP : XB_DPAD_DOWN;
+    if (++phase >= 6)
+    {
+        phase = 0;
+        pending += pending > 0 ? -1 : pending < 0 ? 1 : 0;
+    }
+}
+
 static void keyboard_state(XINPUT_GAMEPAD *g)
 {
     if (!bindings_loaded)
         load_bindings();
+    int menus = in_menus();
+    static int was_menus = -1;
+    if (menus != was_menus)
+    {
+        plog("input: %s", menus ? "menus (keys and mouse drive the selection)" : "play");
+        was_menus = menus;
+    }
+    wheel_state(g, menus);
+    if (menus)
+        menu_state(g);
     for (size_t i = 0; i < sizeof(bindings) / sizeof(bindings[0]); i++)
     {
         const Binding &b = bindings[i];
+        /* (in the menus: no looking, triggers, Start or Back from the play bindings) */
+        if (menus && ((b.kind == 2 && b.value >= 4) || (b.kind == 0 && (b.value == XB_LTRIGGER || b.value == XB_RTRIGGER)) ||
+                      (b.kind == 1 && (b.value == XB_START || b.value == XB_BACK))))
+            continue;
         int down = 0;
         for (int k = 0; k < BIND_KEYS && b.keys[k] && !down; k++)
             down = key(b.keys[k]);
@@ -291,7 +367,7 @@ extern volatile LONG port_mouse_dx, port_mouse_dy;
 static void mouse_state(XINPUT_GAMEPAD *g)
 {
     LONG dx = InterlockedExchange(&port_mouse_dx, 0), dy = InterlockedExchange(&port_mouse_dy, 0);
-    if (!port_hwnd || GetForegroundWindow() != (HWND)port_hwnd)
+    if (!window_has_input() || in_menus())
         return;
     float s = port_config.mouseSensitivity > 0 ? port_config.mouseSensitivity : 1.0f;
     float x = dx * s * 1300.0f, y = -dy * s * 1300.0f;
