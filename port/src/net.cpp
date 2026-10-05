@@ -6,10 +6,15 @@
  *
  * Xbox Live is not available: nobody is signed in (four empty users), and the matchmaking,
  * friends, mute-list and logon-state calls fail as with no connection.
+ *
+ * CODFH_NETLOOP=n (1-4): System Link between instances on one machine. The instance is the
+ * console at 127.0.0.n (its sockets bound there, its XNADDR that address), and a broadcast goes
+ * to 127.0.0.1-4 at the same port.
  */
 #include <xtl.h>
 #include <xonline.h>
 #include <iphlpapi.h>
+
 #include <bcrypt.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,7 +23,63 @@
 
 #undef socket
 
+#ifndef SIO_UDP_CONNRESET
+#define SIO_UDP_CONNRESET _WSAIOW(IOC_VENDOR, 12)
+#endif
+#undef bind
+#undef sendto
+
 static int wsa_ready;
+
+/* CODFH_NETLOOP: this instance's loopback address 127.0.0.n, or 0 */
+static int net_loop(void)
+{
+    static int n = -1;
+    if (n < 0)
+    {
+        char v[8];
+        n = GetEnvironmentVariableA("CODFH_NETLOOP", v, sizeof(v)) ? atoi(v) : 0;
+        if (n < 0 || n > 4)
+            n = 0;
+        if (n)
+            plog("network: loopback test mode, this console is 127.0.0.%d", n);
+    }
+    return n;
+}
+
+static ULONG loop_address(int n)
+{
+    return htonl(0x7F000000u | (ULONG)n);
+}
+
+extern "C" int WSAAPI xpal_bind(SOCKET s, const struct sockaddr *name, int namelen)
+{
+    int n = net_loop();
+    if (n && name && name->sa_family == AF_INET && ((const sockaddr_in *)name)->sin_addr.s_addr == INADDR_ANY)
+    {
+        sockaddr_in sin = *(const sockaddr_in *)name;
+        sin.sin_addr.s_addr = loop_address(n);
+        return bind(s, (const sockaddr *)&sin, sizeof(sin));
+    }
+    return bind(s, name, namelen);
+}
+
+extern "C" int WSAAPI xpal_sendto(SOCKET s, const char *buf, int len, int flags, const struct sockaddr *to, int tolen)
+{
+    if (net_loop() && to && to->sa_family == AF_INET && ((const sockaddr_in *)to)->sin_addr.s_addr == INADDR_BROADCAST)
+    {
+        sockaddr_in sin = *(const sockaddr_in *)to;
+        int r = len;
+        for (int i = 1; i <= 4; i++)
+        {
+            sin.sin_addr.s_addr = loop_address(i);
+            if (sendto(s, buf, len, flags, (const sockaddr *)&sin, sizeof(sin)) < 0)
+                r = -1;
+        }
+        return r < 0 && WSAGetLastError() != WSAECONNRESET ? r : len;
+    }
+    return sendto(s, buf, len, flags, to, tolen);
+}
 
 static void wsa_start(void)
 {
@@ -36,6 +97,15 @@ extern "C" SOCKET WSAAPI xpal_socket(int af, int type, int protocol)
     if (vdp)
         protocol = IPPROTO_UDP;
     SOCKET s = socket(af, type, protocol);
+    if (s != INVALID_SOCKET && type == SOCK_DGRAM)
+    {
+        /* no WSAECONNRESET from recvfrom after a send to a port nobody listens on (Windows
+           reports the ICMP reply that way; the Xbox does not, and the game would drop the
+           socket) */
+        BOOL off = FALSE;
+        DWORD got = 0;
+        WSAIoctl(s, SIO_UDP_CONNRESET, &off, sizeof(off), NULL, 0, &got, NULL, NULL);
+    }
     plog("socket(%d, %d, %s) = %d%s", af, type, vdp ? "VDP as UDP" : "UDP", (int)s,
          s == INVALID_SOCKET ? " (failed)" : "");
     return s;
@@ -72,6 +142,14 @@ extern "C" INT WINAPI XNetUnregisterKey(const XNKID *)
 /* This machine's LAN address and Ethernet address: the first adapter that is up with IPv4. */
 static int local_address(IN_ADDR *ina, BYTE *mac)
 {
+    if (int n = net_loop())
+    {
+        ina->s_addr = loop_address(n);
+        memset(mac, 0, 6);
+        mac[0] = 0x02;      /* a locally administered address */
+        mac[5] = (BYTE)n;
+        return 1;
+    }
     ULONG size = 16 * 1024;
     IP_ADAPTER_ADDRESSES *list = (IP_ADAPTER_ADDRESSES *)malloc(size);
     int found = 0;

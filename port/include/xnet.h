@@ -105,6 +105,11 @@ DWORD WINAPI XNetGetEthernetLinkStatus(void);
 /* The game's sockets through the port, which opens the Xbox's VDP ones as UDP (port/src/net.cpp). */
 SOCKET WSAAPI xpal_socket(int af, int type, int protocol);
 #define socket(af, type, protocol) xpal_socket(af, type, protocol)
+/* (bind and sendto too, for the loopback test mode: CODFH_NETLOOP) */
+int WSAAPI xpal_bind(SOCKET s, const struct sockaddr *name, int namelen);
+int WSAAPI xpal_sendto(SOCKET s, const char *buf, int len, int flags, const struct sockaddr *to, int tolen);
+#define bind(s, name, namelen) xpal_bind(s, name, namelen)
+#define sendto(s, buf, len, flags, to, tolen) xpal_sendto(s, buf, len, flags, to, tolen)
 
 typedef char port_check_XNADDR[sizeof(XNADDR) == 0x24 ? 1 : -1];
 typedef char port_check_XNQOSINFO[sizeof(XNQOSINFO) == 0x18 ? 1 : -1];

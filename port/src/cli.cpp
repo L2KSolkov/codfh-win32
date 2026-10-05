@@ -19,6 +19,7 @@
 #include "game/livemenu.h"
 #include "game/ingamemenu.h"
 #include "game/gameloop.h"
+#include "game/data.h"
 
 #include "port.h"
 
@@ -110,6 +111,13 @@ extern "C" void port_cli_present(void)
 /* Run once a frame by the menus' loop (InGameMenuManager::sub_1FBE70). */
 extern "C" void port_cli_frame(void)
 {
+    /* a player with no profile (a new install has none) plays under the configured name, not
+       an empty one */
+    if (dword_4F28F0 && !dword_4F28F0->unk_183[0])
+    {
+        set_4F28F0_unk_183(port_config.playerName);
+        plog("player name: %s", port_config.playerName);
+    }
     if (!cli_pending || !dword_4FD974 || !dword_4FD970)
         return;
     cli_pending = 0;

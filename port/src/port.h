@@ -28,6 +28,8 @@ typedef struct PortConfig
     int widescreen;
     float mouseSensitivity;
     int language;           /* the game's language index (0 English; port_language) */
+    char playerName[16];    /* the name a player with no profile plays under ([game] name; the
+                               Windows user name by default) */
 } PortConfig;
 
 extern PortConfig port_config;

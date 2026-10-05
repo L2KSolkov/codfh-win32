@@ -125,6 +125,15 @@ void port_config_load(void)
     port_config.vsync = ini_int(ini, "video", "vsync", 1);
     port_config.widescreen = ini_int(ini, "video", "widescreen", 0);
     port_config.language = ini_int(ini, "game", "language", 0);
+    {
+        char user[64] = "Player";
+        DWORD n = sizeof(user);
+        if (!GetUserNameA(user, &n) || !user[0])
+            strcpy(user, "Player");
+        GetPrivateProfileStringA("game", "name", user, port_config.playerName, sizeof(port_config.playerName), ini);
+        if (!port_config.playerName[0])
+            strcpy(port_config.playerName, "Player");
+    }
     char sens[32];
     GetPrivateProfileStringA("input", "mouse_sensitivity", "1.0", sens, sizeof(sens), ini);
     port_config.mouseSensitivity = (float)atof(sens);
