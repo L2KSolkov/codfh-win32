@@ -466,6 +466,31 @@ extern "C" void pdev_present(void)
     ctx->RSSetViewports(1, &last_viewport);
 }
 
+/* A position in the window's client area as a position in the 640x480 frame (where final_pass
+   draws it); 0 outside the picture. */
+extern "C" int pdev_window_to_frame(int x, int y, float *fx, float *fy)
+{
+    float w = (float)back_w, h = (float)back_h, ox = 0, oy = 0;
+    if (!back_w || !back_h || !frame_w || !frame_h)
+        return 0;
+    if (!fill_window)
+    {
+        if (w * frame_h > h * frame_w)
+        {
+            w = h * frame_w / frame_h;
+            ox = (back_w - w) / 2;
+        }
+        else
+        {
+            h = w * frame_h / frame_w;
+            oy = (back_h - h) / 2;
+        }
+    }
+    *fx = (x - ox) * frame_w / w;
+    *fy = (y - oy) * frame_h / h;
+    return *fx >= 0 && *fy >= 0 && *fx < frame_w && *fy < frame_h;
+}
+
 /* The window changed size: the swap chain follows at the next present (the game's thread). */
 extern "C" void pdev_window_resized(void)
 {

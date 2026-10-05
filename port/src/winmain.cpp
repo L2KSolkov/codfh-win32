@@ -60,8 +60,57 @@ static void set_fullscreen(HWND hwnd, int on)
     plog("display: %s", on ? "fullscreen" : "windowed");
 }
 
+/* The mouse in the menus (menumouse.cpp): the cursor's position, clicks, backs and the wheel. */
+extern "C" volatile LONG port_menu_mouse_x, port_menu_mouse_y, port_menu_mouse_moved, port_menu_mouse_pressed;
+extern "C" volatile LONG port_menu_mouse_clicks, port_menu_mouse_backs, port_menu_mouse_wheel;
+extern "C" int port_in_menus(void);
+
+static int menu_mouse(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+    if (!port_in_menus())
+        return 0;
+    switch (msg)
+    {
+    case WM_MOUSEMOVE:
+        InterlockedExchange(&port_menu_mouse_x, (SHORT)LOWORD(lp));
+        InterlockedExchange(&port_menu_mouse_y, (SHORT)HIWORD(lp));
+        InterlockedExchange(&port_menu_mouse_moved, 1);
+        return 0;
+    case WM_LBUTTONDOWN:
+        /* (the click's own position first: the item under it takes the focus before A) */
+        InterlockedExchange(&port_menu_mouse_x, (SHORT)LOWORD(lp));
+        InterlockedExchange(&port_menu_mouse_y, (SHORT)HIWORD(lp));
+        InterlockedExchange(&port_menu_mouse_moved, 1);
+        InterlockedIncrement(&port_menu_mouse_pressed);
+        return 1;   /* (no capture for mouse look in the menus) */
+    case WM_RBUTTONDOWN:
+        InterlockedIncrement(&port_menu_mouse_backs);
+        return 1;
+    case WM_MOUSEWHEEL:
+        InterlockedExchangeAdd(&port_menu_mouse_wheel, (SHORT)HIWORD(wp) / WHEEL_DELTA);
+        return 1;
+    case WM_SETCURSOR:
+        if (LOWORD(lp) == HTCLIENT)
+        {
+            /* an arrow over the menus, and the cursor free */
+            SetCursor(LoadCursor(NULL, IDC_ARROW));
+            ClipCursor(NULL);
+            return 2;
+        }
+        return 0;
+    }
+    return 0;
+}
+
 static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 {
+    {
+        int r = menu_mouse(hwnd, msg, wp, lp);
+        if (r == 2)
+            return TRUE;
+        if (r == 1)
+            return 0;
+    }
 #ifdef CODFH_IMGUI
     /* F1 shows and hides the overlay; while it is shown the cursor is free and ImGui has the
        window's messages first */

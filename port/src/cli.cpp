@@ -145,9 +145,15 @@ extern "C" void port_cli_present(void)
     }
 }
 
+extern "C" unsigned port_menu_frame;
+extern "C" void port_menu_mouse_frame(void);
+
 /* Run once a frame by the menus' loop (InGameMenuManager::sub_1FBE70). */
 extern "C" void port_cli_frame(void)
 {
+    /* (the menus are up: the mouse points at their items, menumouse.cpp) */
+    port_menu_frame = port_frame ? port_frame : 1;
+    port_menu_mouse_frame();
     /* a player with no profile (a new install has none) plays under the configured name, not
        an empty one */
     if (dword_4F28F0 && !dword_4F28F0->unk_183[0])

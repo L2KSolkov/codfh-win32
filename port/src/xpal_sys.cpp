@@ -317,6 +317,57 @@ static void mouse_state(XINPUT_GAMEPAD *g)
     }
 }
 
+/* The mouse's buttons in the menus (menumouse.cpp, winmain.cpp) as the pad's: a click A (on a
+   setting's arrows the d-pad's left or right), the right button B, the wheel the d-pad's up and
+   down; each held 60 ms so the menus read a press,
+   the wheel's notches one at a time (held 60 ms, released 60 ms). */
+extern "C" volatile LONG port_menu_mouse_clicks, port_menu_mouse_backs, port_menu_mouse_wheel;
+extern "C" volatile LONG port_menu_mouse_lefts, port_menu_mouse_rights;
+extern "C" int port_in_menus(void);
+
+static void menu_mouse_state(XINPUT_GAMEPAD *g)
+{
+    static DWORD a_until, b_until, wheel_until, left_until, right_until;
+    static int wheel_dir;
+    static LONG wheel_pending;
+    DWORD now = GetTickCount();
+    if (!port_in_menus())
+    {
+        InterlockedExchange(&port_menu_mouse_clicks, 0);
+        InterlockedExchange(&port_menu_mouse_backs, 0);
+        InterlockedExchange(&port_menu_mouse_wheel, 0);
+        InterlockedExchange(&port_menu_mouse_lefts, 0);
+        InterlockedExchange(&port_menu_mouse_rights, 0);
+        wheel_pending = 0;
+        return;
+    }
+    if (InterlockedExchange(&port_menu_mouse_lefts, 0))
+        left_until = now + 60;
+    if (InterlockedExchange(&port_menu_mouse_rights, 0))
+        right_until = now + 60;
+    if ((LONG)(left_until - now) > 0)
+        g->wButtons |= XB_DPAD_LEFT;
+    if ((LONG)(right_until - now) > 0)
+        g->wButtons |= XB_DPAD_RIGHT;
+    if (InterlockedExchange(&port_menu_mouse_clicks, 0))
+        a_until = now + 60;
+    if (InterlockedExchange(&port_menu_mouse_backs, 0))
+        b_until = now + 60;
+    wheel_pending += InterlockedExchange(&port_menu_mouse_wheel, 0);
+    if (wheel_pending && (LONG)(now - wheel_until) > 60)
+    {
+        wheel_dir = wheel_pending > 0 ? 1 : -1;
+        wheel_pending -= wheel_dir;
+        wheel_until = now + 60;
+    }
+    if ((LONG)(a_until - now) > 0)
+        g->bAnalogButtons[XB_A] = 255;
+    if ((LONG)(b_until - now) > 0)
+        g->bAnalogButtons[XB_B] = 255;
+    if ((LONG)(wheel_until - now) > 0)
+        g->wButtons |= wheel_dir > 0 ? XB_DPAD_UP : XB_DPAD_DOWN;
+}
+
 /* CODFH_INPUT: "frame:button,frame:button,..." holds pad 0's button for 8 frames from that
    frame (A B X Y BLACK WHITE LT RT START BACK UP DOWN LEFT RIGHT; stick directions LUP LDOWN
    LLEFT LRIGHT), for driving the game without a person. */
@@ -411,6 +462,7 @@ extern "C" DWORD WINAPI XInputGetState(HANDLE hDevice, PXINPUT_STATE pState)
 #ifndef CODFH_DEDICATED
         keyboard_state(&s.Gamepad);
         mouse_state(&s.Gamepad);
+        menu_mouse_state(&s.Gamepad);
 #endif
         scripted_state(&s.Gamepad);
     }

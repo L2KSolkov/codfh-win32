@@ -33,7 +33,7 @@ as the data root:
 | W1 platform | Done | Files (`d:\` to the data root, the pack unchanged), saves, memory (16-byte aligned heap), threads, launch, flags |
 | W2 rendering | Done for everything the game draws (Direct3D 11, section 4) | Front end, all 8 multiplayer levels, first-person, HUD and menus at 60 fps; no bridge stub is reached in the front end, a match or a movie |
 | W3 data | Done for textures, geometry and audio formats | The formats the bridge translates: swizzled/linear 32-bit, P8, DXT1/3/5; Xbox ADPCM and PCM; no WMA on the disc |
-| W4 input | Done | XInput pads, keyboard, raw-input mouse look (`[input] mouse_sensitivity`) |
+| W4 input | Done | XInput pads, keyboard, raw-input mouse look (`[input] mouse_sensitivity`); the mouse in the menus (`port/src/menumouse.cpp`): pointing focuses an item (or its row), a click chooses it, on a setting's arrows changes it, the right button goes back, the wheel moves up and down |
 | W5 audio | Done but the DSP image's filters | Software mixer over XAudio2 (3D, mix bins, submixes, play/loop regions), I3DL2 reverb in software, WMA through Media Foundation (unexercised: the disc has none); recordings with `CODFH_WAV` |
 | W6 video | Done | The Xbox Bink library from `src/bink` (C and its x86 transcriptions); the Act 1 newsreel plays with sound (`-movie Act_1.bik`) |
 | W7 networking | Done for System Link | Two instances on one machine (`CODFH_NETLOOP=1`/`2`) find, join and play one match ("PC Client has joined the game" on both); Live answers "not signed in" |

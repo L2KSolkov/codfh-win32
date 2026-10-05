@@ -38,6 +38,8 @@ void pdev_set_gamma(const unsigned char *red, const unsigned char *green, const 
 void pdev_upload_frame(const void *pixels, int pitch);
 /* The window's size changed (any thread). */
 void pdev_window_resized(void);
+/* A position in the window's client area as one in the 640x480 frame; 0 outside the picture. */
+int pdev_window_to_frame(int x, int y, float *fx, float *fy);
 
 /*
  * Drawing. The Xbox side hands over vertices already converted to float4 per vertex register
