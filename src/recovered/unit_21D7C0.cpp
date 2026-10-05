@@ -146,4 +146,7 @@ type_21D470 *type_21DDC0::sub_21DF90(RwUInt32 arg_0)
 // match: __ehhandler$?_Incsize@?$list@PAUtype_21D470@@V?$allocator@PAUtype_21D470@@@std@@@std@@IAEXI@Z @ 0x003080A8
 
 // The rows' list's insertion, reached through push_back.
+#ifndef CODFH_WIN32
+// (not on Win32: _Insert is VC7.1's list internals; the port's library has none)
 template void std::list<type_21D470 *>::_Insert(std::list<type_21D470 *>::iterator, type_21D470 *const &);
+#endif

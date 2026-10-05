@@ -3433,6 +3433,10 @@ typedef RwChar plain_check_unk_4F8184[offsetof(type_4F7EB8, unk_2CC) == 0x2CC ? 
 type_4F8184 &unk_4F8184 = unk_4F7EB8.unk_2CC;
 typedef RwChar plain_check_dword_4F8288[offsetof(type_4F7EB8, unk_3D0) == 0x3D0 ? 1 : -1];
 type_4F8288 &dword_4F8288 = unk_4F7EB8.unk_3D0;
+#ifndef CODFH_WIN32
+// (not on Win32: unk_490 holds a std::string, 0x1C bytes in the Xbox build's library and 0x18 in
+// the port's, so the fields after it are 4 bytes lower; the reference binds by name either way)
 typedef RwChar plain_check_dword_4F83D8[offsetof(type_4F7EB8, unk_520) == 0x520 ? 1 : -1];
+#endif
 RwInt32 &dword_4F83D8 = unk_4F7EB8.unk_520;
 #endif

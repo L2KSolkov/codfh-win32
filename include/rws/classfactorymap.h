@@ -9,6 +9,10 @@
 #define RWS_CLASSFACTORYMAP_H
 
 #include <map>
+#ifdef CODFH_WIN32
+// (std::binary_function: VC7.1's <map> brings in <functional>, the port's library does not)
+#include <functional>
+#endif
 #include <string.h>
 
 #include "rw/ostypes.h"

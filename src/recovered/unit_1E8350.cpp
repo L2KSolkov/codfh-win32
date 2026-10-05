@@ -204,7 +204,14 @@ void cLayoutPage::sub_1E8980(type_3E7D08 *arg_0, type_3E7D08 *arg_4, RwInt32 arg
     std::pair<std::set<type_1F8040>::iterator, bool> var_14 = unk_1C.insert(type_1F8040(arg_0, arg_4, arg_8));
     if (!var_14.second)
     {
+#ifdef CODFH_WIN32
+        // (the port's library makes a set's elements const; VC7.1's iterator did not)
+        type_1F8040 *var_18 = const_cast<type_1F8040 *>(&*var_14.first);
+#else
+#line 221 "\\COD\\SHARED\\UI\\cLayoutPage.cpp"
         type_1F8040 *var_18 = &*var_14.first;
+#endif
+#line 222 "\\COD\\SHARED\\UI\\cLayoutPage.cpp"
         var_18->sub_1E7540(arg_4);
     }
 }

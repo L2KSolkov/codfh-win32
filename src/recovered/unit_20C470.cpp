@@ -693,7 +693,10 @@ template <class T> void type_3E7CE8<T>::pvf_008()
 
 // The rows' list's insertion, which the parked sessions' fill (sub_20D8D0)
 // reaches through push_back.
+#ifndef CODFH_WIN32
+// (not on Win32: _Insert is VC7.1's list internals; the port's library has none)
 template void std::list<type_1FB520 *>::_Insert(std::list<type_1FB520 *>::iterator, type_1FB520 *const &);
+#endif
 
 // Members /OPT:ICF folded into shared trivial bodies (config/aliases.txt): defined here for
 // the authentic link (PLAN M7); the placement link takes the shared bodies.

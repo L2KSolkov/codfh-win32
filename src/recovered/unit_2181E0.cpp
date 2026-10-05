@@ -250,7 +250,10 @@ template <class T> void type_3E7CE8<T>::pvf_008()
 }
 
 // The rows' list's insertion, reached through push_back.
+#ifndef CODFH_WIN32
+// (not on Win32: _Insert is VC7.1's list internals; the port's library has none)
 template void std::list<type_21CE60 *>::_Insert(std::list<type_21CE60 *>::iterator, type_21CE60 *const &);
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
