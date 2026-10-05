@@ -11,7 +11,9 @@
  * relative to the listener. A voice routed to another (SetOutputBuffer) mixes into that one's
  * input, which then plays as a source of its own. Play cursors come from the mixer.
  *
- * Not yet: the DSP image's effects (I3DL2 reverb, the filters), Doppler, cones.
+ * The DSP image's I3DL2 reverb is a software one (a Freeverb-style network tuned from the
+ * listener's settings), fed by the reverb mix bin (10) and the 3D voices' room sends.
+ * Not yet: the image's other effects (the filters), Doppler, cones.
  */
 #include <windows.h>
 #include <xaudio2.h>
@@ -96,6 +98,7 @@ struct Voice
     double pos;             /* in source frames from the start of the data */
     LONG volume;            /* hundredths of a dB */
     MixBinLevel bins[8];
+    LONG room;              /* I3DL2 source: the reverb send of a 3D voice (millibels) */
     int nbins;
     int is3D;
     V3 position;
@@ -220,10 +223,11 @@ static float sample(Voice *v, long frame, int c)
 }
 
 /* The voice's gains to the stereo output, per source channel. */
-static void voice_gains(const Voice *v, float g[2][2])
+static void voice_gains(const Voice *v, float g[2][2], float *send)
 {
     float vol = db(v->volume);
     memset(g, 0, sizeof(float) * 4);
+    *send = 0;
     int ch = v->format.channels ? v->format.channels : 1;
     if (v->is3D && v->mode3D != 2)
     {
@@ -257,6 +261,8 @@ static void voice_gains(const Voice *v, float g[2][2])
             g[c][0] = vol * att * level * cosf(a) / (ch > 1 ? 2 : 1);
             g[c][1] = vol * att * level * sinf(a) / (ch > 1 ? 2 : 1);
         }
+        /* the room send falls off more slowly than the direct sound */
+        *send = vol * sqrtf(att) * db(v->room) / (ch > 1 ? 2 : 1);
         return;
     }
     if (!v->nbins)
@@ -276,7 +282,8 @@ static void voice_gains(const Voice *v, float g[2][2])
         case 0: case 4: g[c][0] += lv; break;               /* front and back left */
         case 1: case 5: g[c][1] += lv; break;               /* right */
         case 2: g[c][0] += lv * 0.707f; g[c][1] += lv * 0.707f; break;    /* centre */
-        default: break;                                     /* LFE, reverb and effect sends */
+        case 10: *send += lv / (ch > 1 ? 2 : 1); break;      /* I3DL2 reverb */
+        default: break;                                     /* LFE and effect sends */
         }
     }
 }
@@ -325,8 +332,73 @@ static int render_source(Voice *v, float out[2][BLOCK])
     return 1;
 }
 
+/*
+ * I3DL2 reverb: four combs and two all-passes a side (Freeverb's tunings at 48 kHz). The decay
+ * time sets the combs' feedback, the HF ratio their damping, room + reverb (millibels) the wet
+ * level; a room of -10000 (the default) turns it off.
+ */
+static const int comb_len[4] = {1215, 1293, 1390, 1476};
+static const int pass_len[2] = {605, 480};
+enum { SPREAD = 25 };
+static float comb_buf[2][4][1500 + SPREAD], pass_buf[2][2][620 + SPREAD];
+static int comb_at[2][4], pass_at[2][2];
+static float comb_store[2][4];
+static volatile float reverb_feedback[4], reverb_damp, reverb_wet, reverb_diffusion = 0.5f;
+
+static void set_reverb(LONG room, LONG reverb, float decayTime, float hfRatio, float diffusion)
+{
+    float wet = room <= -10000 ? 0 : db(room + (reverb < 2000 ? reverb : 2000));
+    if (decayTime < 0.1f)
+        decayTime = 0.1f;
+    for (int i = 0; i < 4; i++)
+        reverb_feedback[i] = powf(10.0f, -3.0f * comb_len[i] / (OUT_RATE * decayTime));
+    float d = 1.0f - (hfRatio > 0 ? hfRatio : 0.5f);
+    reverb_damp = d < 0 ? 0 : d > 0.9f ? 0.9f : d;
+    reverb_diffusion = 0.3f + 0.4f * (diffusion < 0 ? 0 : diffusion > 1 ? 1 : diffusion);
+    reverb_wet = wet;
+}
+
+static void run_reverb(const float *in, float *stereo)
+{
+    float wet = reverb_wet;
+    if (wet <= 0)
+        return;
+    for (int s = 0; s < BLOCK; s++)
+    {
+        float x = in[s] * 0.015f;
+        for (int c = 0; c < 2; c++)
+        {
+            float out = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                int len = comb_len[i] + c * SPREAD;
+                float *b = comb_buf[c][i];
+                float y = b[comb_at[c][i]];
+                comb_store[c][i] = y * (1 - reverb_damp) + comb_store[c][i] * reverb_damp;
+                b[comb_at[c][i]] = x + comb_store[c][i] * reverb_feedback[i];
+                if (++comb_at[c][i] >= len)
+                    comb_at[c][i] = 0;
+                out += y;
+            }
+            for (int i = 0; i < 2; i++)
+            {
+                int len = pass_len[i] + c * SPREAD;
+                float *b = pass_buf[c][i];
+                float y = b[pass_at[c][i]];
+                b[pass_at[c][i]] = out + y * reverb_diffusion;
+                out = y - out;
+                if (++pass_at[c][i] >= len)
+                    pass_at[c][i] = 0;
+            }
+            stereo[s * 2 + c] += out * 3.0f * wet;
+        }
+    }
+}
+
 static void mix_block(float *stereo)
 {
+    static float send[BLOCK];
+    memset(send, 0, sizeof(send));
     memset(stereo, 0, sizeof(float) * 2 * BLOCK);
     EnterCriticalSection(&lock);
     for (size_t i = 0; i < voices.size(); i++)
@@ -369,16 +441,18 @@ static void mix_block(float *stereo)
                 v->target->hasInput = 1;
                 continue;
             }
-            float g[2][2];
-            voice_gains(v, g);
+            float g[2][2], sg;
+            voice_gains(v, g, &sg);
             for (int c = 0; c < ch; c++)
                 for (int s = 0; s < BLOCK; s++)
                 {
                     stereo[s * 2] += buf[c][s] * g[c][0];
                     stereo[s * 2 + 1] += buf[c][s] * g[c][1];
+                    send[s] += buf[c][s] * sg;
                 }
         }
     LeaveCriticalSection(&lock);
+    run_reverb(send, stereo);
     for (int s = 0; s < BLOCK * 2; s++)
         stereo[s] = stereo[s] > 1 ? 1 : stereo[s] < -1 ? -1 : stereo[s];
 }
@@ -549,7 +623,29 @@ extern "C" RwInt32 __stdcall DirectSoundCreate(void *, void **dsound, void *)
 extern "C" RwInt32 __stdcall DirectSoundUseFullHRTF(void) { return S_OK; }
 extern "C" void __stdcall DirectSoundDoWork(void) {}
 extern "C" RwUInt32 __stdcall IDirectSound_Release(void *) { return 0; }
-extern "C" RwInt32 __stdcall IDirectSound_SetI3DL2Listener(void *, const void *, RwUInt32) { return S_OK; }
+/* dsound.h's DSI3DL2LISTENER */
+struct I3DL2Listener
+{
+    LONG room, roomHF;
+    float roomRolloffFactor, decayTime, decayHFRatio;
+    LONG reflections;
+    float reflectionsDelay;
+    LONG reverb;
+    float reverbDelay, diffusion, density, hfReference;
+};
+
+extern "C" RwInt32 __stdcall IDirectSound_SetI3DL2Listener(void *, const void *settings, RwUInt32)
+{
+    const I3DL2Listener *l = (const I3DL2Listener *)settings;
+    if (!l)
+        return S_OK;
+    set_reverb(l->room, l->reverb, l->decayTime, l->decayHFRatio, l->diffusion / 100.0f);
+    static int told;
+    if (told++ < 8)
+        plog("audio: I3DL2 reverb room %ld mB, reverb %ld mB, decay %.2f s, HF ratio %.2f, diffusion %.0f%%", l->room,
+             l->reverb, l->decayTime, l->decayHFRatio, l->diffusion);
+    return S_OK;
+}
 
 extern "C" RwInt32 __stdcall IDirectSound_GetOutputLevels(void *, void *levels, RwInt32)
 {
@@ -866,7 +962,14 @@ extern "C" RwInt32 __stdcall IDirectSoundBuffer_SetVolume(void *buffer, RwInt32 
     return S_OK;
 }
 
-extern "C" RwInt32 __stdcall IDirectSoundBuffer_SetI3DL2Source(void *, const void *, RwUInt32) { return S_OK; }
+/* dsound.h's DSI3DL2BUFFER: direct, direct HF, room, room HF (millibels), then the rest */
+extern "C" RwInt32 __stdcall IDirectSoundBuffer_SetI3DL2Source(void *buffer, const void *settings, RwUInt32)
+{
+    Voice *v = (Voice *)buffer;
+    if (settings)
+        v->room = ((const LONG *)settings)[2];
+    return S_OK;
+}
 
 extern "C" RwInt32 __stdcall IDirectSoundBuffer_Lock(void *buffer, RwUInt32 offset, RwUInt32 bytes, void **p1,
                                                      RwUInt32 *n1, void **p2, RwUInt32 *n2, RwUInt32)
