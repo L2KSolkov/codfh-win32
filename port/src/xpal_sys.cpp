@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <wchar.h>
+#include <ctype.h>
 #include <stdlib.h>
 
 #include "port.h"
@@ -154,32 +155,131 @@ static int key(int vk)
 /* The keyboard as a controller: WASD the left stick, the arrows the right, IJKL the d-pad;
    Space A, LeftCtrl B, R X, F Y, Q black, E white, the mouse buttons the triggers; Enter
    start, Escape back, Shift the left stick's click, C the right's. */
+/*
+ * Keyboard and mouse buttons as the pad, rebindable in codfh.ini's [keys] section: an action,
+ * then up to four keys separated by commas (a letter or digit, F1-F12, SPACE ENTER ESCAPE TAB
+ * BACKSPACE SHIFT CTRL ALT UP DOWN LEFT RIGHT, MOUSE1-3, or VK<number>). For example
+ *     [keys]
+ *     fire = MOUSE1, CTRL
+ */
+enum { BIND_KEYS = 4 };
+struct Binding
+{
+    const char *action;
+    const char *defaults;
+    int kind;               /* 0 analog button (index), 1 digital button (mask), 2 stick (axis*2+sign) */
+    int value;
+    int keys[BIND_KEYS];
+};
+static Binding bindings[] = {
+    {"forward", "W", 2, 1 * 2 + 1}, {"back", "S", 2, 1 * 2 + 0},
+    {"left", "A", 2, 0 * 2 + 0}, {"right", "D", 2, 0 * 2 + 1},
+    {"look_up", "UP", 2, 3 * 2 + 1}, {"look_down", "DOWN", 2, 3 * 2 + 0},
+    {"look_left", "LEFT", 2, 2 * 2 + 0}, {"look_right", "RIGHT", 2, 2 * 2 + 1},
+    {"dpad_up", "I", 1, XB_DPAD_UP}, {"dpad_down", "K", 1, XB_DPAD_DOWN},
+    {"dpad_left", "J", 1, XB_DPAD_LEFT}, {"dpad_right", "L", 1, XB_DPAD_RIGHT},
+    {"start", "ENTER", 1, XB_START}, {"back_button", "ESCAPE", 1, XB_BACK},
+    {"left_stick", "SHIFT", 1, XB_LTHUMB}, {"right_stick", "C", 1, XB_RTHUMB},
+    {"a", "SPACE", 0, XB_A}, {"b", "LCTRL, BACKSPACE", 0, XB_B},
+    {"x", "R", 0, XB_X}, {"y", "F", 0, XB_Y},
+    {"black", "Q", 0, XB_BLACK}, {"white", "E", 0, XB_WHITE},
+    {"aim", "MOUSE2", 0, XB_LTRIGGER}, {"fire", "MOUSE1", 0, XB_RTRIGGER},
+};
+static int bindings_loaded;
+
+static int key_code(const char *n)
+{
+    static const struct { const char *name; int vk; } names[] = {
+        {"SPACE", VK_SPACE}, {"ENTER", VK_RETURN}, {"RETURN", VK_RETURN}, {"ESCAPE", VK_ESCAPE}, {"ESC", VK_ESCAPE},
+        {"TAB", VK_TAB}, {"BACKSPACE", VK_BACK}, {"SHIFT", VK_SHIFT}, {"LSHIFT", VK_LSHIFT}, {"RSHIFT", VK_RSHIFT},
+        {"CTRL", VK_CONTROL}, {"LCTRL", VK_LCONTROL}, {"RCTRL", VK_RCONTROL}, {"ALT", VK_MENU},
+        {"UP", VK_UP}, {"DOWN", VK_DOWN}, {"LEFT", VK_LEFT}, {"RIGHT", VK_RIGHT},
+        {"MOUSE1", VK_LBUTTON}, {"MOUSE2", VK_RBUTTON}, {"MOUSE3", VK_MBUTTON},
+    };
+    if (!n[0])
+        return 0;
+    if (!n[1] && ((n[0] >= 'A' && n[0] <= 'Z') || (n[0] >= '0' && n[0] <= '9')))
+        return n[0];
+    if (n[0] == 'F' && n[1] >= '1' && n[1] <= '9')
+    {
+        int f = atoi(n + 1);
+        if (f >= 1 && f <= 12)
+            return VK_F1 + f - 1;
+    }
+    if (!_strnicmp(n, "VK", 2) && n[2] >= '0' && n[2] <= '9')
+        return atoi(n + 2);
+    for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); i++)
+        if (!_stricmp(n, names[i].name))
+            return names[i].vk;
+    return 0;
+}
+
+static void parse_keys(Binding *b, const char *list)
+{
+    char buf[128];
+    strncpy(buf, list, sizeof(buf) - 1);
+    buf[sizeof(buf) - 1] = 0;
+    int k = 0;
+    memset(b->keys, 0, sizeof(b->keys));
+    for (char *t = strtok(buf, ", "); t && k < BIND_KEYS; t = strtok(NULL, ", "))
+    {
+        for (char *c = t; *c; c++)
+            *c = (char)toupper((unsigned char)*c);
+        int vk = key_code(t);
+        if (vk)
+            b->keys[k++] = vk;
+        else
+            plog("input: [keys] %s: unknown key \"%s\"", b->action, t);
+    }
+}
+
+static void load_bindings(void)
+{
+    bindings_loaded = 1;
+    char ini[MAX_PATH];
+    GetModuleFileNameA(NULL, ini, MAX_PATH);
+    char *slash = strrchr(ini, '\\');
+    strcpy(slash ? slash + 1 : ini, "codfh.ini");
+    int changed = 0;
+    for (size_t i = 0; i < sizeof(bindings) / sizeof(bindings[0]); i++)
+    {
+        char v[128];
+        GetPrivateProfileStringA("keys", bindings[i].action, bindings[i].defaults, v, sizeof(v), ini);
+        parse_keys(&bindings[i], v);
+        changed += strcmp(v, bindings[i].defaults) != 0;
+    }
+    if (changed)
+        plog("input: %d key bindings from codfh.ini", changed);
+}
+
 static void keyboard_state(XINPUT_GAMEPAD *g)
 {
-    if (key('W')) g->sThumbLY = 32767;
-    if (key('S')) g->sThumbLY = -32768;
-    if (key('A')) g->sThumbLX = -32768;
-    if (key('D')) g->sThumbLX = 32767;
-    if (key(VK_UP)) g->sThumbRY = 32767;
-    if (key(VK_DOWN)) g->sThumbRY = -32768;
-    if (key(VK_LEFT)) g->sThumbRX = -32768;
-    if (key(VK_RIGHT)) g->sThumbRX = 32767;
-    if (key('I')) g->wButtons |= XB_DPAD_UP;
-    if (key('K')) g->wButtons |= XB_DPAD_DOWN;
-    if (key('J')) g->wButtons |= XB_DPAD_LEFT;
-    if (key('L')) g->wButtons |= XB_DPAD_RIGHT;
-    if (key(VK_RETURN)) g->wButtons |= XB_START;
-    if (key(VK_ESCAPE)) g->wButtons |= XB_BACK;
-    if (key(VK_SHIFT)) g->wButtons |= XB_LTHUMB;
-    if (key('C')) g->wButtons |= XB_RTHUMB;
-    if (key(VK_SPACE)) g->bAnalogButtons[XB_A] = 255;
-    if (key(VK_LCONTROL) || key(VK_BACK)) g->bAnalogButtons[XB_B] = 255;
-    if (key('R')) g->bAnalogButtons[XB_X] = 255;
-    if (key('F')) g->bAnalogButtons[XB_Y] = 255;
-    if (key('Q')) g->bAnalogButtons[XB_BLACK] = 255;
-    if (key('E')) g->bAnalogButtons[XB_WHITE] = 255;
-    if (key(VK_RBUTTON)) g->bAnalogButtons[XB_LTRIGGER] = 255;
-    if (key(VK_LBUTTON)) g->bAnalogButtons[XB_RTRIGGER] = 255;
+    if (!bindings_loaded)
+        load_bindings();
+    for (size_t i = 0; i < sizeof(bindings) / sizeof(bindings[0]); i++)
+    {
+        const Binding &b = bindings[i];
+        int down = 0;
+        for (int k = 0; k < BIND_KEYS && b.keys[k] && !down; k++)
+            down = key(b.keys[k]);
+        if (!down)
+            continue;
+        if (b.kind == 0)
+            g->bAnalogButtons[b.value] = 255;
+        else if (b.kind == 1)
+            g->wButtons |= (WORD)b.value;
+        else
+        {
+            SHORT v = (b.value & 1) ? 32767 : -32768;
+            switch (b.value >> 1)
+            {
+            case 0: g->sThumbLX = v; break;
+            case 1: g->sThumbLY = v; break;
+            case 2: g->sThumbRX = v; break;
+            default: g->sThumbRY = v; break;
+            }
+        }
+    }
 }
 
 static DWORD packets[4];
