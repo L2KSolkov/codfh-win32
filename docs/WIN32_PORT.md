@@ -52,7 +52,9 @@ draw in every run).
 
 Configuration (`codfh.ini` beside the executable): `[video] width height windowed vsync
 widescreen render_scale` (the frame drawn at 640x480 times `render_scale`; 0, the default, is as
-large as the window holds, up to 4x), `[game] language name`, `[input] mouse_sensitivity`, `[keys]` (an action, then keys: `fire = MOUSE1, CTRL`; the actions are
+large as the window holds, up to 4x), `[video] adapter` (a part of the GPU's name; by default the high-performance
+GPU, the discrete one where there are two: the executable also exports `NvOptimusEnablement` and
+`AmdPowerXpressRequestHighPerformance`), `[game] language name`, `[input] mouse_sensitivity`, `[keys]` (an action, then keys: `fire = MOUSE1, CTRL`; the actions are
 `port/src/xpal_sys.cpp`'s binding table), `[data] root user`.
 
 Debugging switches (environment): `CODFH_SHOT=n` (frame n to `shot.bmp`; `CODFH_SHOT_EVERY=1`

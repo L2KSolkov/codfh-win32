@@ -228,6 +228,7 @@ void port_config_load(void)
     {
         char rs[32];
         GetPrivateProfileStringA("video", "render_scale", "0", rs, sizeof(rs), ini);
+        GetPrivateProfileStringA("video", "adapter", "", port_config.adapter, sizeof(port_config.adapter), ini);
         port_config.renderScale = (float)atof(rs);
     }
 

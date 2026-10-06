@@ -12,7 +12,7 @@
  */
 #include <d3d11.h>
 #include <d3dcompiler.h>
-#include <dxgi.h>
+#include <dxgi1_6.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -236,6 +236,58 @@ static void client_size(void *hwnd, int *w, int *h)
     *h = r.bottom - r.top > 0 ? r.bottom - r.top : 1;
 }
 
+/* The adapters, logged; the one named by [video] adapter, else the high-performance one. */
+static IDXGIAdapter1 *pick_adapter(void)
+{
+    IDXGIFactory6 *f6 = NULL;
+    IDXGIFactory1 *f1 = NULL;
+    if (FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void **)&f1)))
+        return NULL;
+    f1->QueryInterface(__uuidof(IDXGIFactory6), (void **)&f6);
+    IDXGIAdapter1 *chosen = NULL, *a = NULL;
+    for (UINT i = 0;; i++)
+    {
+        HRESULT hr = f6 ? f6->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, __uuidof(IDXGIAdapter1),
+                                                         (void **)&a)
+                        : f1->EnumAdapters1(i, &a);
+        if (FAILED(hr))
+            break;
+        DXGI_ADAPTER_DESC1 ad;
+        a->GetDesc1(&ad);
+        char name[128];
+        WideCharToMultiByte(CP_UTF8, 0, ad.Description, -1, name, sizeof(name), NULL, NULL);
+        int software = (ad.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0;
+        plog("adapter %u: %s, %u MB%s", i, name, (unsigned)(ad.DedicatedVideoMemory >> 20), software ? " (software)" : "");
+        int want = 0;
+        if (port_config.adapter[0])
+        {
+            /* (a case-blind part of the name) */
+            char lname[128], lwant[64];
+            strncpy(lname, name, sizeof(lname));
+            lname[sizeof(lname) - 1] = 0;
+            strncpy(lwant, port_config.adapter, sizeof(lwant));
+            lwant[sizeof(lwant) - 1] = 0;
+            _strlwr(lname);
+            _strlwr(lwant);
+            want = strstr(lname, lwant) != NULL;
+        }
+        else
+            want = !software;   /* the first in high-performance order */
+        if (want && !chosen)
+        {
+            chosen = a;
+            continue;
+        }
+        a->Release();
+    }
+    if (f6)
+        f6->Release();
+    f1->Release();
+    if (port_config.adapter[0] && !chosen)
+        plog("adapter: none named \"%s\" ([video] adapter): the default", port_config.adapter);
+    return chosen;
+}
+
 extern "C" int pdev_init(void *hwnd, int width, int height, int windowed, int vsync)
 {
     frame_w = width;
@@ -272,14 +324,32 @@ extern "C" int pdev_init(void *hwnd, int width, int height, int windowed, int vs
     sd.Windowed = TRUE;     /* fullscreen: a borderless window over the screen (WinMain) */
     sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
+    /* the adapter: [video] adapter (a part of its name), else the high-performance one (a
+       discrete GPU over an integrated one, as Windows' graphics settings rank them) */
+    IDXGIAdapter1 *adapter = pick_adapter();
+    static char gpu_name[128] = "the GPU";
+    if (adapter)
+    {
+        DXGI_ADAPTER_DESC1 ad;
+        adapter->GetDesc1(&ad);
+        WideCharToMultiByte(CP_UTF8, 0, ad.Description, -1, gpu_name, sizeof(gpu_name), NULL, NULL);
+    }
     static const D3D_DRIVER_TYPE drivers[] = {D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE_WARP};
-    static const char *const names[] = {"the GPU", "WARP"};
+    const char *const names[] = {gpu_name, "WARP"};
     static const D3D_FEATURE_LEVEL levels[] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0};
     for (int i = 0; i < 2; i++)
     {
         D3D_FEATURE_LEVEL got;
-        HRESULT hr = D3D11CreateDeviceAndSwapChain(NULL, drivers[i], NULL, D3D11_CREATE_DEVICE_BGRA_SUPPORT, levels, 3,
-                                                   D3D11_SDK_VERSION, &sd, &swap, &dev, &got, &ctx);
+        /* (an adapter given needs the driver type UNKNOWN) */
+        IDXGIAdapter *use = i == 0 ? adapter : NULL;
+        HRESULT hr = D3D11CreateDeviceAndSwapChain(use, use ? D3D_DRIVER_TYPE_UNKNOWN : drivers[i], NULL,
+                                                   D3D11_CREATE_DEVICE_BGRA_SUPPORT, levels, 3, D3D11_SDK_VERSION, &sd,
+                                                   &swap, &dev, &got, &ctx);
+        if (adapter && i == 0)
+        {
+            adapter->Release();
+            adapter = NULL;
+        }
         if (SUCCEEDED(hr) && create_views())
         {
             plog("Direct3D 11 on %s (feature level %X): %dx%d frame drawn at %dx%d (scale %.2f) in a %dx%d window",

@@ -239,6 +239,11 @@ static void create_window(HINSTANCE inst)
 
 extern "C" void port_cli_parse(const char *cmd);
 
+/* Run on the discrete GPU where a machine has two: NVIDIA's and AMD's drivers read these exports
+   (Optimus, PowerXpress / switchable graphics). */
+extern "C" __declspec(dllexport) DWORD NvOptimusEnablement = 1;
+extern "C" __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+
 #ifdef CODFH_DEDICATED
 /* Ctrl+C or closing the console ends the server as closing the window ends the game. */
 static BOOL WINAPI console_event(DWORD)
