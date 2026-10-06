@@ -262,7 +262,10 @@ static void pace_frame(void)
         QueryPerformanceFrequency(&freq);
         QueryPerformanceCounter(&next);
     }
-    LONGLONG period = freq.QuadPart / 60;
+    /* ([video] max_fps; 0 runs uncapped) */
+    if (port_config.maxFps <= 0)
+        return;
+    LONGLONG period = freq.QuadPart / port_config.maxFps;
     next.QuadPart += period;
     QueryPerformanceCounter(&now);
     if (now.QuadPart > next.QuadPart + period)

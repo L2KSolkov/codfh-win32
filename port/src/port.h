@@ -28,7 +28,9 @@ typedef struct PortConfig
     int widescreen;
     float mouseSensitivity;
     char adapter[64];       /* [video] adapter: a part of the GPU's name ("" the high-performance one) */
-    float renderScale;      /* [video] render_scale: the frame drawn at 640x480 times this (0: as
+    float renderScale;
+    int maxFps;             /* [video] max_fps: the frame rate the frames are paced to (60, as the
+                               Xbox's display; 0 uncapped) */      /* [video] render_scale: the frame drawn at 640x480 times this (0: as
                                large as the window holds, from 1 to 4) */
     int language;           /* the game's language index (0 English; port_language) */
     char playerName[16];    /* the name a player with no profile plays under ([game] name; the
