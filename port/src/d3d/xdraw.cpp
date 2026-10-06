@@ -47,14 +47,17 @@ static int env_on(const char *name)
     return GetEnvironmentVariableA(name, b, sizeof(b)) ? 1 : 0;
 }
 PortRenderDebug port_render_debug = {env_on("CODFH_WIREFRAME"), env_on("CODFH_NODEPTH"), env_on("CODFH_NOCULL"),
-                                     env_on("CODFH_NOFOG")};
+                                     env_on("CODFH_NOFOG"), env_on("CODFH_FULLBRIGHT"), env_on("CODFH_LIGHTINGONLY"),
+                                     env_on("CODFH_NOALPHATEST"), env_on("CODFH_NOBLEND"), env_on("CODFH_POINTFILTER"),
+                                     env_on("CODFH_HIDEPARTICLES"), env_on("CODFH_HIDE2D"), env_on("CODFH_NOGAMMA")};
 PortRenderStats port_render_stats;
 
 static int no_fog(void)
 {
     return port_render_debug.nofog;
 }
-#define RS(n) ((n) == D3DRS_FOGENABLE && no_fog() ? 0 : D3D__RenderState[n])
+#define RS(n) ((n) == D3DRS_FOGENABLE && no_fog() ? 0 : \
+               (n) == D3DRS_ALPHATESTENABLE && port_render_debug.noAlphaTest ? 0 : D3D__RenderState[n])
 #define TSS(s, n) D3D__TextureState[s][n]
 
 /* Xbox values the declarations above do not name. */
@@ -561,6 +564,23 @@ static void *ff_shader_cached(const XVertexShader *s, int pretransformed)
 }
 
 /* The device's vertex shader for the current state. */
+/* The draw's vertex shader is a 2D one (pre-transformed positions, or a program with no dot
+   products): the overlay's hide-2D switch. */
+static int draw_is_2d;
+
+/* A microcode program that transforms no position: none of its MAC operations is dp3, dph or dp4. */
+static int program_is_2d(const DWORD *p)
+{
+    unsigned n = (p[0] >> 16) & 0xFF;
+    for (unsigned i = 0; i < n; i++)
+    {
+        unsigned mac = (p[1 + i * 4 + 1] >> 21) & 0xF;
+        if (mac == 5 || mac == 6 || mac == 7)
+            return 0;
+    }
+    return 1;
+}
+
 static void *vertex_shader(XVertexShader **decl)
 {
     static XVertexShader fvf_shader;
@@ -576,15 +596,20 @@ static void *vertex_shader(XVertexShader **decl)
         }
         s = &fvf_shader;
         *decl = s;
+        draw_is_2d = fvf_pretransformed;
         ff_constants();
         return ff_shader_cached(s, fvf_pretransformed);
     }
     *decl = s;
     if (!s->program)
     {
+        draw_is_2d = 0;
         ff_constants();
         return ff_shader_cached(s, 0);
     }
+    if (!s->screenSpace)
+        s->screenSpace = s->programIsText == 1 || !program_is_2d(s->program) ? -1 : 1;
+    draw_is_2d = s->screenSpace > 0;
     if (!s->device && !s->failed)
     {
         XvshResult r = s->programIsText == 1 ? xvsh_from_text((const char *)(s->program + 2), s->program[1], s->declared)
@@ -1975,6 +2000,41 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
         }
     }
     {
+        /* the overlay's view switches (port_render_debug) */
+        if (port_render_debug.hide2D && draw_is_2d)
+            return;
+        if (port_render_debug.hideParticles && prim == D3DPT_QUADLIST)
+            return;
+        if (port_render_debug.noBlend)
+            d.blendEnable = 0;
+        if (port_render_debug.pointFilter)
+            for (int i = 0; i < 4; i++)
+                d.samplers[i].filterMin = d.samplers[i].filterMag = 0;
+        if (port_render_debug.fullbright || port_render_debug.lightingOnly)
+        {
+            /* one shader for both: the first stage's texture (fullbright) or the vertex colour
+               (lighting only), with the draw's alpha test kept */
+            static void *dbgps;
+            if (!dbgps)
+                dbgps = pdev_pixel_shader("cbuffer PS : register(b0) { float4 psc[16]; };\n"
+                                          "Texture2D t0 : register(t0); SamplerState s0 : register(s0);\n"
+                                          "float4 main(float4 p : SV_Position, float4 d0 : COLOR0, float4 d1 : COLOR1,\n"
+                                          "            float4 uv : TEXCOORD0) : SV_Target {\n"
+                                          "    float4 t = psc[13].y > 0 ? t0.Sample(s0, uv.xy) : float4(1, 1, 1, 1);\n"
+                                          "    float4 c = psc[13].x > 1.5 ? float4(d0.rgb, t.a * d0.a) : float4(t.rgb, t.a * d0.a);\n"
+                                          "    if (psc[14].x > 0 && c.a * 255 < psc[14].y) discard;\n"
+                                          "    return c; }\n");
+            static float dbgc[16][4];
+            if (d.psConstants)
+                memcpy(dbgc, d.psConstants, sizeof(dbgc));
+            dbgc[13][0] = port_render_debug.lightingOnly ? 2.0f : 1.0f;
+            dbgc[13][1] = d.textures[0] ? 1.0f : 0.0f;
+            dbgc[14][0] = RS(D3DRS_ALPHATESTENABLE) ? 1.0f : 0.0f;
+            dbgc[14][1] = (float)(RS(D3DRS_ALPHAREF) & 0xFF);
+            d.psConstants = &dbgc[0][0];
+            if (dbgps)
+                d.ps = dbgps;
+        }
         /* CODFH_WIREFRAME=1: everything as wireframe with no depth, blending or alpha test (these
            switches are port_render_debug's: the overlay changes them) */
         if (port_render_debug.nodepth)

@@ -166,14 +166,21 @@ static int create_final_pass(void)
 
 static void final_pass(void)
 {
+    /* (the overlay's no-gamma switch: an identity ramp while it is on) */
+    static int gamma_off;
+    if (port_render_debug.noGamma != gamma_off)
+    {
+        gamma_off = port_render_debug.noGamma;
+        gamma_dirty = 1;
+    }
     if (gamma_dirty)
     {
         unsigned char px[256][4];
         for (int i = 0; i < 256; i++)
         {
-            px[i][0] = gamma_ramp[0][i];
-            px[i][1] = gamma_ramp[1][i];
-            px[i][2] = gamma_ramp[2][i];
+            px[i][0] = gamma_off ? (unsigned char)i : gamma_ramp[0][i];
+            px[i][1] = gamma_off ? (unsigned char)i : gamma_ramp[1][i];
+            px[i][2] = gamma_off ? (unsigned char)i : gamma_ramp[2][i];
             px[i][3] = 255;
         }
         ctx->UpdateSubresource(ramp, 0, NULL, px, sizeof(px), 0);

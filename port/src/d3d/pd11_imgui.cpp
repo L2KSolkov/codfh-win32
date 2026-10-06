@@ -163,6 +163,18 @@ static void port_window(int back_w, int back_h)
         check("no culling", &port_render_debug.nocull);
         ImGui::SameLine();
         check("no fog", &port_render_debug.nofog);
+        check("fullbright", &port_render_debug.fullbright);
+        ImGui::SameLine();
+        check("lighting only", &port_render_debug.lightingOnly);
+        check("no alpha test", &port_render_debug.noAlphaTest);
+        ImGui::SameLine();
+        check("no blending", &port_render_debug.noBlend);
+        check("point filtering", &port_render_debug.pointFilter);
+        ImGui::SameLine();
+        check("no gamma", &port_render_debug.noGamma);
+        check("hide particles", &port_render_debug.hideParticles);
+        ImGui::SameLine();
+        check("hide 2D (HUD, menus)", &port_render_debug.hide2D);
     }
     if (ImGui::CollapsingHeader("Input"))
         ImGui::SliderFloat("mouse sensitivity", &port_config.mouseSensitivity, 0.1f, 5.0f, "%.2f");

@@ -27,6 +27,8 @@ struct XVertexShader
     unsigned constantMask[6];   /* which of them it set */
     void *device;               /* the device's shader (pdev) */
     int failed;
+    int screenSpace;            /* its program transforms nothing (no dot products): a 2D one;
+                                   0 unknown, 1 yes, -1 no */
 };
 
 /* The fixed-function block of the vertex constant buffer (after the Xbox's 192). */

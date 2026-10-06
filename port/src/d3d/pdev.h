@@ -137,6 +137,13 @@ extern volatile long port_shader_compiles, port_texture_uploads;
 typedef struct PortRenderDebug
 {
     int wireframe, nodepth, nocull, nofog;
+    int fullbright;     /* the first stage's texture alone: no lighting, vertex colour or fog */
+    int lightingOnly;   /* the vertex colour and lighting alone: no textures */
+    int noAlphaTest, noBlend, pointFilter;
+    int hideParticles;  /* no quad lists (the effects' sprites) */
+    int hide2D;         /* no 2D draws (pre-transformed, or programs that transform nothing:
+                           the HUD, the menus, the weapon select) */
+    int noGamma;        /* the frame without the game's gamma ramp */
 } PortRenderDebug;
 extern PortRenderDebug port_render_debug;
 
