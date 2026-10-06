@@ -224,6 +224,11 @@ void port_config_load(void)
     char sens[32];
     GetPrivateProfileStringA("input", "mouse_sensitivity", "1.0", sens, sizeof(sens), ini);
     port_config.mouseSensitivity = (float)atof(sens);
+    {
+        char rs[32];
+        GetPrivateProfileStringA("video", "render_scale", "0", rs, sizeof(rs), ini);
+        port_config.renderScale = (float)atof(rs);
+    }
 
     /* (no trailing separator on the roots: the mapped paths add one) */
     for (char *r = port_config.dataRoot; r; r = r == port_config.dataRoot ? port_config.userRoot : NULL)

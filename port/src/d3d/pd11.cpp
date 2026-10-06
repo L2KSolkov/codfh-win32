@@ -3,7 +3,10 @@
  * GPU, or WARP when there is none, as over Remote Desktop), the swap chain, the depth buffer,
  * clears and presentation. The game draws a 640x480 frame (the Xbox's mode) into an offscreen
  * target; presenting copies it to the swap chain through the game's gamma ramp (the Xbox applies
- * the ramp in the display hardware; a windowed swap chain has none). The swap chain is the
+ * the ramp in the display hardware; a windowed swap chain has none). The target is the frame times
+ * the render scale ([video] render_scale; by default as large as the window holds): the game's
+ * coordinates stay 640x480 and only the device's viewports are scaled, so everything it draws
+ * comes out at the larger size. The swap chain is the
  * window's size; the frame keeps its 4:3 shape in it (black bars), or fills it with [video]
  * widescreen.
  */
@@ -30,6 +33,13 @@ static ID3D11ShaderResourceView *scene_srv;
 static ID3D11DepthStencilView *dsv;
 static ID3D11Texture2D *depth;
 static int frame_w, frame_h, sync_interval, fill_window;
+/* the target the frame is drawn into: frame_w x frame_h times render_scale */
+static int target_w, target_h;
+static float render_scale = 1.0f;
+/* a movie's 640x480 frame (pdev_upload_frame), stretched over the target */
+static ID3D11Texture2D *movie;
+static ID3D11ShaderResourceView *movie_srv;
+static ID3D11PixelShader *copy_ps;
 static int back_w, back_h;
 static void *the_hwnd;
 static volatile LONG resize_pending;
@@ -58,7 +68,8 @@ static const char final_hlsl[] =
     "    float4 c = scene.Sample(lin, i.uv);\n"
     "    float3 idx = floor(saturate(c.rgb) * 255 + 0.5) / 256 + 1.0 / 512;\n"
     "    return float4(ramp.Sample(pt, float2(idx.r, 0.5)).r, ramp.Sample(pt, float2(idx.g, 0.5)).g,\n"
-    "                  ramp.Sample(pt, float2(idx.b, 0.5)).b, 1); }\n";
+    "                  ramp.Sample(pt, float2(idx.b, 0.5)).b, 1); }\n"
+    "float4 copy(V i) : SV_Target { return float4(scene.Sample(lin, i.uv).rgb, 1); }\n";
 
 static void *compile(const char *entry, const char *target)
 {
@@ -85,7 +96,8 @@ static int create_final_pass(void)
 {
     final_vs = (ID3D11VertexShader *)compile("vs", "vs_4_0");
     final_ps = (ID3D11PixelShader *)compile("ps", "ps_4_0");
-    if (!final_vs || !final_ps)
+    copy_ps = (ID3D11PixelShader *)compile("copy", "ps_4_0");
+    if (!final_vs || !final_ps || !copy_ps)
         return 0;
     D3D11_TEXTURE2D_DESC td;
     memset(&td, 0, sizeof(td));
@@ -189,8 +201,8 @@ static int create_views(void)
         return 0;
     D3D11_TEXTURE2D_DESC td;
     memset(&td, 0, sizeof(td));
-    td.Width = frame_w;
-    td.Height = frame_h;
+    td.Width = target_w;
+    td.Height = target_h;
     td.MipLevels = 1;
     td.ArraySize = 1;
     td.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -201,8 +213,8 @@ static int create_views(void)
         FAILED(dev->CreateShaderResourceView(scene, NULL, &scene_srv)) || !create_final_pass())
         return 0;
     memset(&td, 0, sizeof(td));
-    td.Width = frame_w;
-    td.Height = frame_h;
+    td.Width = target_w;
+    td.Height = target_h;
     td.MipLevels = 1;
     td.ArraySize = 1;
     td.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -233,6 +245,20 @@ extern "C" int pdev_init(void *hwnd, int width, int height, int windowed, int vs
     the_hwnd = hwnd;
     (void)windowed;
     client_size(hwnd, &back_w, &back_h);
+    /* the render scale: configured, or the largest the window holds (whole and half steps are
+       not needed: the final pass filters) */
+    render_scale = port_config.renderScale;
+    if (render_scale <= 0)
+    {
+        float sx = (float)back_w / width, sy = (float)back_h / height;
+        render_scale = sx < sy ? sx : sy;
+    }
+    if (render_scale < 1)
+        render_scale = 1;
+    if (render_scale > 4)
+        render_scale = 4;
+    target_w = (int)(width * render_scale + 0.5f);
+    target_h = (int)(height * render_scale + 0.5f);
 
     DXGI_SWAP_CHAIN_DESC sd;
     memset(&sd, 0, sizeof(sd));
@@ -256,8 +282,8 @@ extern "C" int pdev_init(void *hwnd, int width, int height, int windowed, int vs
                                                    D3D11_SDK_VERSION, &sd, &swap, &dev, &got, &ctx);
         if (SUCCEEDED(hr) && create_views())
         {
-            plog("Direct3D 11 on %s (feature level %X): %dx%d frame in a %dx%d window", names[i], got, width, height,
-                 back_w, back_h);
+            plog("Direct3D 11 on %s (feature level %X): %dx%d frame drawn at %dx%d (scale %.2f) in a %dx%d window",
+                 names[i], got, width, height, target_w, target_h, render_scale, back_w, back_h);
 #ifdef CODFH_IMGUI
             pdev_imgui_init(hwnd, names[i]);
 #endif
@@ -291,6 +317,9 @@ extern "C" void pdev_shutdown(void)
     if (scene_srv) scene_srv->Release();
     if (scene) scene->Release();
     if (final_vs) final_vs->Release();
+    if (copy_ps) copy_ps->Release();
+    if (movie_srv) movie_srv->Release();
+    if (movie) movie->Release();
     if (final_ps) final_ps->Release();
     if (ramp_srv) ramp_srv->Release();
     if (ramp) ramp->Release();
@@ -308,6 +337,9 @@ extern "C" void pdev_shutdown(void)
     scene_srv = NULL;
     scene = NULL;
     final_vs = NULL;
+    copy_ps = NULL;
+    movie_srv = NULL;
+    movie = NULL;
     final_ps = NULL;
     ramp_srv = NULL;
     ramp = NULL;
@@ -499,15 +531,59 @@ extern "C" void pdev_window_resized(void)
 
 extern "C" void pdev_upload_frame(const void *pixels, int pitch)
 {
-    if (ctx && scene)
-        ctx->UpdateSubresource(scene, 0, NULL, pixels, pitch, 0);
+    if (!ctx || !rtv)
+        return;
+    if (!movie)
+    {
+        D3D11_TEXTURE2D_DESC td;
+        memset(&td, 0, sizeof(td));
+        td.Width = frame_w;
+        td.Height = frame_h;
+        td.MipLevels = 1;
+        td.ArraySize = 1;
+        td.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        td.SampleDesc.Count = 1;
+        td.Usage = D3D11_USAGE_DEFAULT;
+        td.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        if (FAILED(dev->CreateTexture2D(&td, NULL, &movie)) || FAILED(dev->CreateShaderResourceView(movie, NULL, &movie_srv)))
+            return;
+    }
+    ctx->UpdateSubresource(movie, 0, NULL, pixels, pitch, 0);
+    /* the 640x480 frame over the scaled target */
+    ctx->OMSetRenderTargets(1, &rtv, NULL);
+    D3D11_VIEWPORT vp = {0, 0, (float)target_w, (float)target_h, 0, 1};
+    ctx->RSSetViewports(1, &vp);
+    ctx->IASetInputLayout(NULL);
+    ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    ctx->VSSetShader(final_vs, NULL, 0);
+    ctx->PSSetShader(copy_ps, NULL, 0);
+    ctx->PSSetShaderResources(0, 1, &movie_srv);
+    ID3D11SamplerState *smp[2] = {final_point, final_linear};
+    ctx->PSSetSamplers(0, 2, smp);
+    ctx->RSSetState(final_raster);
+    ctx->OMSetDepthStencilState(final_depth, 0);
+    float zero[4] = {0, 0, 0, 0};
+    ctx->OMSetBlendState(final_blend, zero, 0xFFFFFFFF);
+    ctx->Draw(3, 0);
+    ID3D11ShaderResourceView *none = NULL;
+    ctx->PSSetShaderResources(0, 1, &none);
+    ctx->OMSetRenderTargets(1, &rtv, dsv);
+    ctx->RSSetViewports(1, &last_viewport);
+}
+
+/* The target the frame is drawn into (the frame times the render scale). */
+extern "C" void pdev_render_size(int *w, int *h)
+{
+    *w = target_w;
+    *h = target_h;
 }
 
 extern "C" void pdev_set_viewport(unsigned x, unsigned y, unsigned w, unsigned h, float minz, float maxz)
 {
     if (!ctx)
         return;
-    D3D11_VIEWPORT vp = {(float)x, (float)y, (float)w, (float)h, minz, maxz};
+    /* (the game's 640x480 coordinates onto the scaled target) */
+    D3D11_VIEWPORT vp = {x * render_scale, y * render_scale, w * render_scale, h * render_scale, minz, maxz};
     last_viewport = vp;
     ctx->RSSetViewports(1, &vp);
 }

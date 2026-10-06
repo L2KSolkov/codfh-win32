@@ -47,7 +47,8 @@ pipelines as generated shaders, cached by state; the game's gamma ramp is applie
 pass (`pd11.cpp`).
 
 Configuration (`codfh.ini` beside the executable): `[video] width height windowed vsync
-widescreen`, `[game] language name`, `[input] mouse_sensitivity`, `[keys]` (an action, then keys: `fire = MOUSE1, CTRL`; the actions are
+widescreen render_scale` (the frame drawn at 640x480 times `render_scale`; 0, the default, is as
+large as the window holds, up to 4x), `[game] language name`, `[input] mouse_sensitivity`, `[keys]` (an action, then keys: `fire = MOUSE1, CTRL`; the actions are
 `port/src/xpal_sys.cpp`'s binding table), `[data] root user`.
 
 Debugging switches (environment): `CODFH_SHOT=n` (frame n to `shot.bmp`; `CODFH_SHOT_EVERY=1`

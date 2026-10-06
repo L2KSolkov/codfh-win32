@@ -27,6 +27,8 @@ typedef struct PortConfig
     int vsync;
     int widescreen;
     float mouseSensitivity;
+    float renderScale;      /* [video] render_scale: the frame drawn at 640x480 times this (0: as
+                               large as the window holds, from 1 to 4) */
     int language;           /* the game's language index (0 English; port_language) */
     char playerName[16];    /* the name a player with no profile plays under ([game] name; the
                                Windows user name by default) */

@@ -104,7 +104,9 @@ static void port_window(int back_w, int back_h)
     ImGuiIO &io = ImGui::GetIO();
     ImGui::Text("%.1f fps, %.2f ms   frame %u", io.Framerate, 1000.0f / (io.Framerate > 0 ? io.Framerate : 1), port_frame);
     ImGui::PlotLines("##ms", frame_ms, 120, frame_at, "frame ms", 0.0f, 50.0f, ImVec2(-1, 40));
-    ImGui::Text("Direct3D 11 on %s, 640x480 in %dx%d", device_name, back_w, back_h);
+    int rw, rh;
+    pdev_render_size(&rw, &rh);
+    ImGui::Text("Direct3D 11 on %s, drawn at %dx%d in %dx%d", device_name, rw, rh, back_w, back_h);
 
     if (ImGui::CollapsingHeader("Renderer", ImGuiTreeNodeFlags_DefaultOpen))
     {

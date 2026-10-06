@@ -40,6 +40,8 @@ void pdev_upload_frame(const void *pixels, int pitch);
 void pdev_window_resized(void);
 /* A position in the window's client area as one in the 640x480 frame; 0 outside the picture. */
 int pdev_window_to_frame(int x, int y, float *fx, float *fy);
+/* The size the frame is drawn at (640x480 times [video] render_scale). */
+void pdev_render_size(int *w, int *h);
 
 /*
  * Drawing. The Xbox side hands over vertices already converted to float4 per vertex register
