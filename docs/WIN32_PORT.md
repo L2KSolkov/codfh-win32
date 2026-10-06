@@ -57,6 +57,11 @@ GPU, the discrete one where there are two: the executable also exports `NvOptimu
 `AmdPowerXpressRequestHighPerformance`), `[game] language name`, `[input] mouse_sensitivity`, `[keys]` (an action, then keys: `fire = MOUSE1, CTRL`; the actions are
 `port/src/xpal_sys.cpp`'s binding table), `[data] root user`.
 
+The log (`codfh.log` beside the executable) also goes to a console window of its own
+(`[debug] console`, 1 by default; 0, or `CODFH_CONSOLE=0`, none). It carries the game's debug
+prints, which the retail build compiled out (`sub_19A750`: the port gives it a body), and its
+`printf` output (the game event log and others).
+
 Debugging switches (environment): `CODFH_SHOT=n` (frame n to `shot.bmp`; `CODFH_SHOT_EVERY=1`
 every n frames; `CODFH_SHOT_WINDOW=1` the window's buffer), `CODFH_INPUT=frame:button,...`
 (scripted pad presses), `CODFH_DRAWID=n` (frame n's draws as flat colours naming them, each

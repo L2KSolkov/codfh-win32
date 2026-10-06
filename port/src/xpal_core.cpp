@@ -28,6 +28,14 @@ volatile unsigned port_frame;
 static FILE *log_file;
 static CRITICAL_SECTION log_lock;
 static int log_ready;
+static HANDLE log_console;
+
+void plog_to_console(void)
+{
+    HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (out && out != INVALID_HANDLE_VALUE)
+        log_console = out;
+}
 
 static void exe_dir(char *out, size_t n)
 {
@@ -70,15 +78,12 @@ void plog(const char *fmt, ...)
         fprintf(log_file, "[%8lu] %s", GetTickCount(), line);
         fflush(log_file);
     }
-#ifdef CODFH_DEDICATED
-    /* (the server's log is its console too) */
+    /* (the server's console, or the game's log window) */
+    if (log_console)
     {
-        HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
         DWORD n;
-        if (out && out != INVALID_HANDLE_VALUE)
-            WriteFile(out, line, (DWORD)strlen(line), &n, NULL);
+        WriteFile(log_console, line, (DWORD)strlen(line), &n, NULL);
     }
-#endif
     LeaveCriticalSection(&log_lock);
     OutputDebugStringA(line);
 }
@@ -230,6 +235,10 @@ void port_config_load(void)
         GetPrivateProfileStringA("video", "render_scale", "0", rs, sizeof(rs), ini);
         GetPrivateProfileStringA("video", "adapter", "", port_config.adapter, sizeof(port_config.adapter), ini);
         port_config.maxFps = ini_int(ini, "video", "max_fps", 60);
+        char con[8];
+        port_config.console = ini_int(ini, "debug", "console", 1);
+        if (GetEnvironmentVariableA("CODFH_CONSOLE", con, sizeof(con)))
+            port_config.console = atoi(con);
         port_config.renderScale = (float)atof(rs);
     }
 

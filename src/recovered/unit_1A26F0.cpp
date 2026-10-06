@@ -103,7 +103,12 @@ type_42C848 unk_42C848[31] = {
     { 0, 13, sub_1A32B0, sub_1AE300, 0 },
     { 0, 27, sub_1A3330, sub_1AE420, 0 },
     { 0, 14, sub_1A3B40, sub_1AE8F0, 0 },
+#ifdef CODFH_WIN32
+    // (the empty function without the print: the port's sub_19A750 prints its first argument)
+    { 0, 15, sub_1A3650, (void (*)(RwInt32, RwInt32, struct type_3DA44C *))(void (*)())sub_19A750, 0 },
+#else
     { 0, 15, sub_1A3650, (void (*)(RwInt32, RwInt32, struct type_3DA44C *))(void (*)(const RwChar *, ...))sub_19A750, 0 },
+#endif
     { 0, 16, sub_1A3880, sub_1AE5C0, 0 },
     { 0, 17, sub_1A38D0, sub_1AE650, 0 },
     { 0, 18, sub_1A3950, sub_1AE810, 0 },
@@ -121,7 +126,12 @@ type_42C848 unk_42C848[31] = {
     { 0, 31, sub_1A34A0, sub_1AE460, 0 },
     { 0, 32, sub_1A3020, sub_1AE4D0, 0 },
     { 0, 33, sub_1A31A0, sub_1AEC30, 0 },
+#ifdef CODFH_WIN32
+    // (the empty function without the print: the port's sub_19A750 prints its first argument)
+    { 0, 34, sub_1A3790, (void (*)(RwInt32, RwInt32, struct type_3DA44C *))(void (*)())sub_19A750, 0 },
+#else
     { 0, 34, sub_1A3790, (void (*)(RwInt32, RwInt32, struct type_3DA44C *))(void (*)(const RwChar *, ...))sub_19A750, 0 },
+#endif
 };
 // 0x0042CAB4
 RwUInt32 dword_42CAB4 = 31;

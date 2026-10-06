@@ -16,6 +16,8 @@ void plog(const char *fmt, ...);
 /* Logs a call the port does not implement yet, once per name. */
 void plog_stub(const char *name);
 #define PORT_STUB() plog_stub(__FUNCTION__)
+/* The log also goes to the process's console (the server's, or the game's [debug] console). */
+void plog_to_console(void);
 
 /* The configuration (codfh.ini beside the executable; defaults otherwise). */
 typedef struct PortConfig
@@ -28,10 +30,12 @@ typedef struct PortConfig
     int widescreen;
     float mouseSensitivity;
     char adapter[64];       /* [video] adapter: a part of the GPU's name ("" the high-performance one) */
-    float renderScale;
-    int maxFps;             /* [video] max_fps: the frame rate the frames are paced to (60, as the
-                               Xbox's display; 0 uncapped) */      /* [video] render_scale: the frame drawn at 640x480 times this (0: as
+    float renderScale;      /* [video] render_scale: the frame drawn at 640x480 times this (0: as
                                large as the window holds, from 1 to 4) */
+    int maxFps;             /* [video] max_fps: the frame rate the frames are paced to (60, as the
+                               Xbox's display; 0 uncapped) */
+    int console;            /* [debug] console: the log in a console window of its own (1; 0 none;
+                               CODFH_CONSOLE overrides) */
     int language;           /* the game's language index (0 English; port_language) */
     char playerName[16];    /* the name a player with no profile plays under ([game] name; the
                                Windows user name by default) */

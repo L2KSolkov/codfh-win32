@@ -6,6 +6,7 @@
  */
 #include <xtl.h>
 #include <mmsystem.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "port.h"
@@ -259,6 +260,25 @@ static void server_console(void)
         AllocConsole();
     SetConsoleTitleA("Call of Duty: Finest Hour dedicated server");
     SetConsoleCtrlHandler(console_event, TRUE);
+    plog_to_console();
+}
+#else
+/* The log window ([debug] console): the port's log, the game's debug prints and its printf
+   output, in a console of its own. Its close button is off (closing a console ends its process). */
+static void log_console(void)
+{
+    if (!port_config.console || !AllocConsole())
+        return;
+    SetConsoleTitleA("Call of Duty: Finest Hour log");
+    HMENU menu = GetSystemMenu(GetConsoleWindow(), FALSE);
+    if (menu)
+        DeleteMenu(menu, SC_CLOSE, MF_BYCOMMAND);
+    FILE *f;
+    freopen_s(&f, "CONOUT$", "w", stdout);
+    freopen_s(&f, "CONOUT$", "w", stderr);
+    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stderr, NULL, _IONBF, 0);
+    plog_to_console();
 }
 #endif
 
@@ -269,6 +289,9 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR cmd, int)
     server_console();
 #endif
     port_config_load();
+#ifndef CODFH_DEDICATED
+    log_console();
+#endif
     port_cli_parse(cmd);
     timeBeginPeriod(1);
     create_window(inst);
