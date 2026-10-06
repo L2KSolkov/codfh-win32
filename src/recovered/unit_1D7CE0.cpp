@@ -76,7 +76,7 @@ HRESULT CSystemLinkQuery::Query(cXboxSocket *arg_0, LONGLONG arg_4, LONGLONG arg
     unk_1040 = sub_1CCA10();
     if (!unk_103C->is_open() && !unk_103C->create(2))
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("CSystemLinkQuery::Query() : failed to create broadcast socket\n");
         return S_OK;
     }

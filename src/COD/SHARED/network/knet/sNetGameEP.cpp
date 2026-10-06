@@ -420,7 +420,7 @@ RwInt32 type_1D7200::sub_1D7200(type_4F8054 *arg_0, const type_1DDE20_mask &arg_
     a.sub_1F89D0(unk_01, 0xC0);
     if (!sub_1D8810()->sub_1DA0C0(unk_19, &var_84))
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
         {
             off_42CD14("convertInternetAddressToXboxAddress() failed in packAndSend\n");
         }
@@ -450,7 +450,7 @@ RwInt32 type_1D7200::sub_1D7340(type_1F8560 *arg_0, RwInt32 arg_4)
     arg_0->sub_1F8A40((RwChar *)&var_30, 0x120);
     if (!sub_1D8810()->sub_1DA110(&var_30, unk_19))
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
         {
             off_42CD14("convertXboxAddressToInternetAddress() failed in unpack\n");
         }
@@ -521,7 +521,7 @@ RwInt32 type_1D7560::sub_1D7650(type_1F8560 *arg_0, RwInt32 arg_4)
     if (var_4 == arg_4)
         return 1;
 #line 1264 "\\COD\\SHARED\\network\\knet\\sNetGameEP.cpp"
-    if (0)
+    if (CODFH_DEBUG_LOGS)
     {
         off_42CD14("sNetGameEP:: broken packet %s:%d\n", __FILE__, __LINE__);
     }

@@ -334,11 +334,11 @@ RwInt32 type_1D0100::sub_1D0F60(const type_1DDE20_mask &arg_0, type_1F8560 *arg_
         lv_10 = &m_10C;
     if (!lv_10->vf_004(arg_4->get_unk_00(), arg_8))
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("addPacket ran out of ram, packet chucked!! %s : %d\n", "\\COD\\SHARED\\network\\knet\\cPacketEngine.cpp", 450);
         if (arg_10 != 0 && arg_10 != 3)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("addPacket ran out of ram on a guaranteed packet... send less, or increase sizes of buffers!!\n");
         }
         unk_794 = 1;
@@ -357,7 +357,7 @@ RwInt32 type_1D0100::sub_1D0F60(const type_1DDE20_mask &arg_0, type_1F8560 *arg_
         if (!unk_04.sub_1D3F80(var_128))
         {
             lv_10->vf_008();
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("addPacket ran out of ram, packet chucked!! %s : %d\n", "\\COD\\SHARED\\network\\knet\\cPacketEngine.cpp", 489);
             unk_794 = 1;
             return 0;
@@ -379,7 +379,7 @@ RwInt32 type_1D0100::sub_1D0F60(const type_1DDE20_mask &arg_0, type_1F8560 *arg_
         if (!unk_4C.sub_1D3F80(var6C))
         {
             lv_10->vf_008();
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("addPacket ran out of ram, packet chucked!! %s : %d\n", "\\COD\\SHARED\\network\\knet\\cPacketEngine.cpp", 532);
             unk_794 = 1;
             return 0;
@@ -1208,7 +1208,7 @@ RwInt32 type_1D0100::sub_1D2CC0(RwInt32 arg_0, RwUInt8 *arg_4, RwUInt32 arg_8, R
             var_AC.unk_04 = w98;
             if (!unk_34.sub_1D3F80(var_AC))
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("Just ran out of ram in ACK que!");
                 unk_794 = 1;
             }
@@ -1339,7 +1339,7 @@ void type_1D0100::sub_1D3770(RwUInt32 arg_0, RwUInt32 arg_4, RwInt32 arg_8, type
         x428.unk_08 = 0;
         if (!x428.sub_1D7C30(var_418, arg_10))
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Just ran out of ram in receive in order - guaranteed packed que!");
             unk_794 = 1;
             return;
@@ -1348,7 +1348,7 @@ void type_1D0100::sub_1D3770(RwUInt32 arg_0, RwUInt32 arg_4, RwInt32 arg_8, type
         if (!l8)
         {
             x428.sub_1D7CA0();
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Just ran out of ram in receive in order - guaranteed packed que!");
             unk_794 = 1;
             return;
@@ -1433,7 +1433,7 @@ void type_1D0100::sub_1D3C80(RwUInt32 arg_0, RwUInt32 arg_4, RwInt32 arg_8, type
 
             if (!var_1C)
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("Just ran out of ram in receive unordered - guaranteed packed que!");
                 unk_794 = 1;
                 return;

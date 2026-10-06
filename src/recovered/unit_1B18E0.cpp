@@ -825,26 +825,26 @@ void type_3E1E3C::sub_1B3030(RwInt32 arg_0, type_4F823C_flag *arg_4, type_4F823C
         if (arg_4->unk_00 == 0 && arg_8->unk_00 == 1)
         {
             unk_04[arg_8->unk_08] += 5;
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("SCORE: %d points for getting flag from enemy base\n", 5);
         }
         else if (arg_4->unk_00 == 2 && arg_8->unk_00 == 1)
         {
             unk_04[arg_8->unk_08] += 3;
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("SCORE: %d points for picking up flag off ground\n", 3);
         }
         else if (arg_4->unk_00 == 1 && arg_8->unk_00 == 0)
         {
             unk_04[arg_8->unk_08] += 5;
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("SCORE: %d points for returning enemy flag to home base\n", 5);
         }
     }
     else if (arg_4->unk_00 == 1 && arg_8->unk_00 == 0)
     {
         unk_04[arg_8->unk_08] += 3;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("SCORE: %d points for returning OWN flag to base\n", 3);
     }
     sub_1B3400();
@@ -858,19 +858,19 @@ void type_3E1E3C::sub_1B3190(RwInt32 arg_0, type_4F8184_site *arg_4, type_4F8184
     if (arg_4->unk_00 == 2 && arg_8->unk_00 == 3)
     {
         unk_04[arg_8->unk_0C] += 5;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("SCORE: %d points for planting a bomb\n", 5);
     }
     else if (arg_4->unk_00 == 4 && arg_8->unk_00 == 0)
     {
         unk_04[arg_8->unk_0C] += 3;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("SCORE: %d points for defusing a bomb\n", 3);
     }
     else if (arg_4->unk_00 == 3 && arg_8->unk_00 == 5)
     {
         unk_04[arg_8->unk_14] += 5;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("SCORE: %d points for destroying a target\n", 5);
     }
     sub_1B3400();

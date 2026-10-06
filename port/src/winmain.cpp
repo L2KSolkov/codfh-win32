@@ -267,12 +267,27 @@ static void server_console(void)
    output, in a console of its own. Its close button is off (closing a console ends its process). */
 static void log_console(void)
 {
-    if (!port_config.console || !AllocConsole())
+    if (!port_config.console)
+        return;
+    /* (a console of its own, not one inherited from whatever started the game) */
+    FreeConsole();
+    if (!AllocConsole())
         return;
     SetConsoleTitleA("Call of Duty: Finest Hour log");
     HMENU menu = GetSystemMenu(GetConsoleWindow(), FALSE);
     if (menu)
         DeleteMenu(menu, SC_CLOSE, MF_BYCOMMAND);
+    /* (no quick edit: a click in it would select text and stop every write to it, the game
+       with them) */
+    HANDLE in = CreateFileA("CONIN$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                            OPEN_EXISTING, 0, NULL);
+    if (in != INVALID_HANDLE_VALUE)
+    {
+        DWORD mode = 0;
+        GetConsoleMode(in, &mode);
+        SetConsoleMode(in, (mode & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS);
+        CloseHandle(in);
+    }
     FILE *f;
     freopen_s(&f, "CONOUT$", "w", stdout);
     freopen_s(&f, "CONOUT$", "w", stderr);

@@ -103,7 +103,7 @@ void cNetTriggerViewControl::HandleAttributes(const RWS::CAttributePacket &attr)
             sub_1C2F50(attrIt);
             break;
         default:
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Unknown renderware studio attribute\n");
         }
         ++attrIt;

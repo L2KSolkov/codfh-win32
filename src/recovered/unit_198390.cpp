@@ -750,7 +750,7 @@ type_199010 *sub_199010(type_3DF8D8_04 *arg_0, RwInt32 arg_4)
 #ifdef CODFH_WIN32
 #include <stdarg.h>
 // (port/src/xpal_core.cpp: the port's log and its console)
-extern "C" void __stdcall xpal_OutputDebugStringA(const RwChar *arg_0);
+extern "C" void port_debug_vprint(const RwChar *arg_0, va_list arg_4);
 #endif
 
 // match: ?sub_19A750@@YAXPBDZZ @ 0x0019A750
@@ -759,26 +759,13 @@ void sub_19A750(const RwChar *arg_0, ...)
 {
 #ifdef CODFH_WIN32
     // The port prints what the retail build compiled out. (Some callers' arguments do not match
-    // their formats: those print a note.)
-    RwChar var_400[0x400];
+    // their formats: those print a note. Some pass a number, not a format: the pak reader its
+    // reads' sizes, hundreds of thousands a level, left out.)
     va_list var_4;
 
-    // (some callers pass a number, not a format: the pak reader its reads' sizes, hundreds of
-    // thousands a level, left out)
-    if ((RwUInt32)arg_0 < 0x10000)
-        return;
     va_start(var_4, arg_0);
-    __try
-    {
-        _vsnprintf(var_400, sizeof(var_400) - 1, arg_0, var_4);
-        var_400[sizeof(var_400) - 1] = 0;
-    }
-    __except (1)
-    {
-        strcpy(var_400, "(a debug print with bad arguments)");
-    }
+    port_debug_vprint(arg_0, var_4);
     va_end(var_4);
-    xpal_OutputDebugStringA(var_400);
 #endif
 }
 

@@ -529,12 +529,20 @@ RwInt32 AIData::sub_29940(type_154C0_5BC *arg_0, RwInt32 arg_4, RwInt32 arg_8, R
     return var_4;
 }
 
+#ifdef CODFH_WIN32
+extern "C" void port_debug_print(const RwChar *arg_0, ...);
+#endif
+
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ?sub_19A750@@YAXPAUtype_3D3548@@HPBD1H@Z (folded into 0x19A750)
 void sub_19A750(struct type_3D3548 * arg_0, RwInt32 arg_4, RwChar const * arg_8, RwChar const * arg_C, RwInt32 arg_10)
 {
+#ifdef CODFH_WIN32
+    // The A* debug log (the entity, a value, the message, where): the port prints it.
+    port_debug_print("%s (entity %p, %d; %s:%d)", arg_8, arg_0, arg_4, arg_C, arg_10);
+#endif
 }
 
 // match: __ehhandler$?sub_2E580@AIData@@QAEHPAUtype_3DAFC8_1DDC@@PAURwMatrixTag@@PAURwV3d@@2MMMPAM@Z>1>8 @ 0x0041AEE4

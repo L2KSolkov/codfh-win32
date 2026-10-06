@@ -142,7 +142,7 @@ void type_1E5A60::sub_1E6690(const RwChar *arg_0, RwInt32 arg_4, RwUInt32 arg_8,
         return;
     if (!arg_8)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("Tried to draw text in an area 0 width. Text was %d chars long.\n", sub_1E6160(arg_0));
         return;
     }

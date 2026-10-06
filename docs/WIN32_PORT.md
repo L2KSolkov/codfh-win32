@@ -58,9 +58,13 @@ GPU, the discrete one where there are two: the executable also exports `NvOptimu
 `port/src/xpal_sys.cpp`'s binding table), `[data] root user`.
 
 The log (`codfh.log` beside the executable) also goes to a console window of its own
-(`[debug] console`, 1 by default; 0, or `CODFH_CONSOLE=0`, none). It carries the game's debug
-prints, which the retail build compiled out (`sub_19A750`: the port gives it a body), and its
-`printf` output (the game event log and others).
+(`[debug] console`, 1 by default; 0, or `CODFH_CONSOLE=0`, none). It carries the game's
+`printf` output (the game event log and others) and every debug log the retail build compiled
+out: the empty debug print `sub_19A750` and its overloads (the A* log, the objective and sound
+logs), the path finder's `sub_F7B90`, and the 293 log calls the image keeps behind `if (0)`
+(`if (CODFH_DEBUG_LOGS)` in the source: `include/rw/ostypes.h` makes it 1 under `CODFH_WIN32`).
+They go through `port_debug_vprint`, which catches a bad argument's fault; values passed where
+a text is taken (the pak reader's read sizes) are left out.
 
 Debugging switches (environment): `CODFH_SHOT=n` (frame n to `shot.bmp`; `CODFH_SHOT_EVERY=1`
 every n frames; `CODFH_SHOT_WINDOW=1` the window's buffer), `CODFH_INPUT=frame:button,...`

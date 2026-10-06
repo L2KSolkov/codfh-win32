@@ -127,7 +127,7 @@ void type_3E3884::sub_1C6C00(RwUInt32 arg_0, RwInt32 arg_4)
     if (!unk_0C)
     {
     }
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("microphoneBitMask = %x, headphoneBitMask = %x\n", v2C, var_30);
     if (((1 << unk_E8) & v2C) && ((1 << unk_E8) & var_30) ||
         ((1 << (unk_E8 + 16)) & v2C) && ((1 << (unk_E8 + 16)) & var_30))
@@ -429,12 +429,12 @@ bool type_3E3884::sub_1C7840(RwInt32 arg_0, type_3E0F54 *arg_4, RwInt32 arg_8)
         lv_E = true;
         if (arg_4->get_unk_04())
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Player %d has headset\n", arg_0);
         }
         else
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Player %d has NO headset\n", arg_0);
         }
         unk_1C.assign(arg_0, arg_4->get_unk_04());
@@ -444,12 +444,12 @@ bool type_3E3884::sub_1C7840(RwInt32 arg_0, type_3E0F54 *arg_4, RwInt32 arg_8)
         lv_E = true;
         if (arg_4->get_unk_08())
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Player %d has speakers\n", arg_0);
         }
         else
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Player %d has NO speakers\n", arg_0);
         }
         unk_1E.assign(arg_0, arg_4->get_unk_08());
@@ -459,12 +459,12 @@ bool type_3E3884::sub_1C7840(RwInt32 arg_0, type_3E0F54 *arg_4, RwInt32 arg_8)
         var_F = true;
         if (arg_4->get_unk_0C())
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Player %d has muted me\n", arg_0);
         }
         else
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Player %d has unmuted me\n", arg_0);
         }
         unk_1A.assign(arg_0, arg_4->get_unk_0C());
@@ -517,12 +517,12 @@ bool type_3E3884::sub_1C7C70(RwInt32 arg_0, bool arg_4)
 
         if (arg_4)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Player %d to be muted\n", arg_0);
         }
         else
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Player %d to be unmuted\n", arg_0);
         }
         unk_18.assign(arg_0, arg_4);

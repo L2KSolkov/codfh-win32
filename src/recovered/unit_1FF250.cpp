@@ -287,7 +287,7 @@ void type_1FF250::sub_2003E0(RwReal arg_0)
     }
     if (dword_42926C == 0 && sub_188350() != 4)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
         {
             sub_1C8A30("IngameScreens InGameMenuManager::ShowMenu() %d\n", sub_186D00());
         }
@@ -295,7 +295,7 @@ void type_1FF250::sub_2003E0(RwReal arg_0)
     }
     else if (sub_188350() == 4 && dword_42926C != 0)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
         {
             sub_1C8A30("IngameScreens InGameMenuManager::KillMenu() %d\n", sub_186D00());
         }

@@ -150,7 +150,7 @@ RwInt32 cTimeKeeper::sub_1D5010(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, typ
         return 0;
     if (!var_C.sub_1D7650(arg_C, arg_10))
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Warning: error in unpack of ping packet!\n");
         return 0;
     }
@@ -170,7 +170,7 @@ RwInt32 cTimeKeeper::sub_1D5010(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, typ
             return 1;
         }
     }
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("KNET: cTimeKeeper() - Packet sent back to us, which we don't remember sending... could "
                    "just be big time lapse!\n");
     return 1;

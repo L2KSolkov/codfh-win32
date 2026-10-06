@@ -113,7 +113,7 @@ HRESULT CUITextBoxObject::vf_020(DWORD arg_0, LPCWSTR arg_4, DWORD arg_8, const 
 
             if (FAILED(unk_0C->unk_19C->GetImage(arg_C[var_8].IconResID, &unk_28[var_8].unk_00)))
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     sub_1C8A30("CUITextBoxObject: Failed to get icon texture\n");
             }
             unk_28[var_8].unk_00->GetLevelDesc(0, &var_24);
@@ -643,7 +643,7 @@ HRESULT type_22A630::sub_22A6F0(DWORD arg_0, type_22A6F0_image *arg_4)
     if (FAILED(unk_19C->GetImage(arg_0, &arg_4->unk_00)))
     {
         arg_4->unk_00 = 0;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("Failed to find UIX resource ID %d - check skin is up-to-date.\n", arg_0);
         return E_FAIL;
     }

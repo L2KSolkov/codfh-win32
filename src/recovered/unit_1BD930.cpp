@@ -252,7 +252,7 @@ void type_4FBB20::sub_1BDE70(RwUInt32 arg_0, RwUInt32 arg_4, RwUInt32 arg_8)
         unk_04[arg_0] = sub_1BD450(arg_4, arg_8, &var_50, 50.0f, 1, 0);
         if (unk_04[arg_0])
             unk_04[arg_0]->sub_1BD680(arg_0);
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("Swap pickup id: %d\n   X: %f   Y: %f   Z: %f\n", arg_0, var_50.pos.x, var_50.pos.y,
                        var_50.pos.z);
     }
@@ -278,7 +278,7 @@ void type_4FBB20::sub_1BDFC0(type_1AE520 *arg_0, PickupTrigger *arg_4)
             return;
         }
     }
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("Did not find an empty slot for a triggerd pickup on host");
 }
 

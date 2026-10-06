@@ -281,7 +281,7 @@ type_E8780<type_1E5A60> sub_1E5A80(const RwChar *arg_0)
             RwUInt32 frm_10C = var_C4.unk_14;
             if (frm_10C > 4)
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     sub_1C8A30("Maximum number of textures per font exceded - %d in \"%s\".\n", frm_10C, arg_0);
             }
             for (RwUInt32 var_A33C = 0; var_A33C != frm_10C; ++var_A33C)

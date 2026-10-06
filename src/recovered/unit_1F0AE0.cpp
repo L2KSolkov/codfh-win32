@@ -66,7 +66,7 @@ void type_3E79E4::vf_008(type_1C8DF0 *arg_0, RwInt32 arg_4, RwInt32 arg_8, type_
             sub_1F7A60(arg_0, "a source");
             if (!lcl_44)
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     sub_1C8A30("Widget factory - source missing! Widget \"%s\" type \"%s\"\n",
                                arg_0->sub_1C8FC0() ? arg_0->sub_1C8FC0() : "(none)",
                                arg_0->sub_1C8FE0()->sub_1CA280());
@@ -80,7 +80,7 @@ void type_3E79E4::vf_008(type_1C8DF0 *arg_0, RwInt32 arg_4, RwInt32 arg_8, type_
             sub_1F7A60(arg_0, "a source");
             if (1)
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     sub_1C8A30("Widget factory - source missing! Widget \"%s\" type \"%s\"\n",
                                arg_0->sub_1C8FC0() ? arg_0->sub_1C8FC0() : "(none)",
                                arg_0->sub_1C8FE0()->sub_1CA280());

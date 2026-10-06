@@ -131,7 +131,7 @@ RwInt32 cXboxSocket::create(RwUInt32 arg_0)
             }
             else
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("cXboxSocket::create() failed to bind socket, closing it\n");
                 sub_1DC130();
             }
@@ -142,7 +142,7 @@ RwInt32 cXboxSocket::create(RwUInt32 arg_0)
             }
             else
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("cXboxSocket::create() failed to set broadcast socket, closing it\n");
                 sub_1DC130();
             }
@@ -150,7 +150,7 @@ RwInt32 cXboxSocket::create(RwUInt32 arg_0)
             var_28 = ioctlsocket(unk_04, FIONBIO, &lv_10);
             if (var_28 == 0)
                 return 1;
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("cXboxSocket::create() failed to make socket non-blocking\n");
             sub_1DC130();
         }
@@ -166,12 +166,12 @@ RwInt32 cXboxSocket::create(RwUInt32 arg_0)
             bp_4 = bind(unk_04, (sockaddr *)&var_38, sizeof(var_38));
             if (bp_4 == 0)
                 return 1;
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("cXboxSocket::create() failed to bind socket, closing it\n");
             sub_1DC130();
         }
     }
-    else if (0)
+    else if (CODFH_DEBUG_LOGS)
         off_42CD14("cXboxSocket::create() failed to create socket\n");
     return 0;
 }
@@ -207,20 +207,20 @@ RwInt32 cXboxSocket::receiveMessage(RwUInt8 *arg_0, RwInt32 arg_4, RwUInt8 *arg_
         bp_4 = recvfrom(unk_04, (RwChar *)&unk_08, 0xA32, 0, (sockaddr *)arg_18, &bp_8);
         if (bp_4 == SOCKET_ERROR)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("cXboxSocket::receiveMessage() - SOCKET_ERROR (%s)\n", sub_1DC5C0());
             sub_1DC600();
             return 0;
         }
         if (bp_8 != sizeof(sockaddr_in))
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("cXboxSocket::receiveMessage() - Returned socket address of unexpected size\n");
             return 0;
         }
         if (bp_4 < 2)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("cXboxSocket::receiveMessage() - Got VDP packet with less than 2 bytes in it\n");
             return 0;
         }
@@ -228,20 +228,20 @@ RwInt32 cXboxSocket::receiveMessage(RwUInt8 *arg_0, RwInt32 arg_4, RwUInt8 *arg_
         *arg_14 = bp_4 - *arg_10 - 2;
         if ((RwUInt32)*arg_10 > (RwUInt32)(bp_4 - 2))
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("cXboxSocket::receiveMessage() - Game message size in packet is invalid (larger than "
                            "remaining data)\n");
             return 0;
         }
         if (arg_0 && (RwUInt32)*arg_10 > (RwUInt32)arg_4)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("cXboxSocket::receiveMessage() - Game message larger than provided buffer\n");
             return 0;
         }
         if (arg_8 && (RwUInt32)*arg_14 > (RwUInt32)arg_C)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("cXboxSocket::receiveMessage() - Voice message larger than provided buffer\n");
             return 0;
         }
@@ -279,7 +279,7 @@ RwInt32 cXboxSocket::broadcast(const RwChar *arg_0, RwInt32 arg_4)
     var_4 = sendto(unk_04, arg_0, arg_4, 0, (sockaddr *)&var_18, sizeof(var_18));
     if (var_4 == arg_4)
         return 1;
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("cXboxSocket::broadcast() - Failure\n");
     return 0;
 }
@@ -301,14 +301,14 @@ RwInt32 cXboxSocket::sendMessage(const void *arg_0, RwInt32 arg_4, RwInt32 arg_8
     var_4 = sendto(unk_04, (const RwChar *)&unk_08, arg_4 + arg_C + 2, 0, (const sockaddr *)arg_10, sizeof(sockaddr_in));
     if (var_4 == SOCKET_ERROR)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cXboxSocket::sendMessage() - SOCKET_ERROR (%s)\n", sub_1DC5C0());
         sub_1DC600();
         return 0;
     }
     if (var_4 != arg_4 + arg_C + 2)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cXboxSocket::sendMessage() - Incorrect number of bytes sent\n");
         return 0;
     }
@@ -332,7 +332,7 @@ RwInt32 cXboxSocket::incomingMessageWaiting()
     var_4 = select(0, &var_110, NULL, NULL, &var_118);
     if (var_4 == SOCKET_ERROR)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cXboxSocket::incomingMessageWaiting() - SOCKET_ERROR (%s)\n", sub_1DC5C0());
         sub_1DC600();
         return 0;
@@ -371,7 +371,7 @@ void cXboxSocket::sub_1DC600()
     case WSAESHUTDOWN:
     case WSAETIMEDOUT:
     case WSANOTINITIALISED:
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cXboxSocket : Unrecoverable error encountered, closing socket\n");
         sub_1DC130();
         break;

@@ -19192,6 +19192,10 @@ void sub_67200(RwUInt32 arg_0, type_44350 *arg_4)
     sub_44350(arg_4, &var_4->unk_3E0.unk_04);
 }
 
+#ifdef CODFH_WIN32
+extern "C" void port_debug_print(const RwChar *arg_0, ...);
+#endif
+
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
@@ -19217,14 +19221,28 @@ type_439A48::type_439A48()
 // ?sub_19A750@@YAXPAUtype_3D3548@@HUtype_3DF8D8_04@@H@Z (folded into 0x19A750)
 void sub_19A750(struct type_3D3548 * arg_0, RwInt32 arg_4, struct type_3DF8D8_04 arg_8, RwInt32 arg_C)
 {
+#ifdef CODFH_WIN32
+    // The sound log (an entity, a level, the sound's key, how it was asked for): the port prints it.
+    port_debug_print("sound 0x%X 0x%X (entity %p, %d, %d)", ((const RwUInt32 *)&arg_8)[0],
+                     ((const RwUInt32 *)&arg_8)[1], arg_0, arg_4, arg_C);
+#endif
 }
 
 // ?sub_19A750@@YAXPAUtype_3DF8D8_04@@@Z (folded into 0x19A750)
 void sub_19A750(struct type_3DF8D8_04 * arg_0)
 {
+#ifdef CODFH_WIN32
+    // "PrintObjective": the port prints the objective's key.
+    port_debug_print("objective 0x%X 0x%X", ((const RwUInt32 *)arg_0)[0], ((const RwUInt32 *)arg_0)[1]);
+#endif
 }
 
 // ?sub_19A750@@YAXPAUtype_3DF8D8_04@@H@Z (folded into 0x19A750)
 void sub_19A750(struct type_3DF8D8_04 * arg_0, RwInt32 arg_4)
 {
+#ifdef CODFH_WIN32
+    // "SetObjectiveCounter", "ModifyObjectiveCounter": the port prints the key and the count.
+    port_debug_print("objective 0x%X 0x%X counter %d", ((const RwUInt32 *)arg_0)[0],
+                     ((const RwUInt32 *)arg_0)[1], arg_4);
+#endif
 }

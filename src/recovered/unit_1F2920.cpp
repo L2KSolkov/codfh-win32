@@ -217,7 +217,7 @@ void cTopLayoutPage::sub_1F32D0()
     unk_A8 = 2;
     if (!unk_9C)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("Layout file %s not found or parsable.\n", unk_80.c_str());
     }
 }
@@ -271,7 +271,7 @@ void cTopLayoutPage::sub_1F3430()
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void cTopLayoutPage::sub_1F3510()
 {
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("Parsing file %s\n", unk_80.c_str());
     RwInt32 ebp_14 = 0;
     type_1C8DF0_104 *l2448 = unk_9C->sub_1E3480()->sub_1C90B0(sub_1F2920()->get_unk_A60());
@@ -290,7 +290,7 @@ void cTopLayoutPage::sub_1F3510()
 
     if (loc35 && !l34)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("Missing border dimensions!\n");
     }
     type_3E7D08 *o30 = 0;
@@ -411,7 +411,7 @@ void cTopLayoutPage::sub_1F3510()
             sub_1F4540(var_24A4, var_2484, l34->sub_1C9890(0)->sub_1E3480(), l34->sub_1C9890(1)->sub_1E3480(),
                        l34->sub_1C9890(2)->sub_1E3480());
         }
-        else if (0)
+        else if (CODFH_DEBUG_LOGS)
             sub_1C8A30("Missing font in page title: %s\n", unk_80.c_str());
     }
     else if (lcl_44 && l34)
@@ -433,7 +433,7 @@ void cTopLayoutPage::throwLoadError()
     unk_A0 = 0;
     unk_A4 = 0;
     unk_A8 = 6;
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("Failed to load script %s", unk_80.c_str());
 #line 635 "\\COD\\SHARED\\UI\\cTopLayoutPage.cpp"
     sub_1C7F20(false, __FILE__, __LINE__, __FUNCSIG__, 3);
@@ -470,7 +470,7 @@ bool cTopLayoutPage::sub_1F4100(type_1C8DF0 *arg_0, type_1EFCF0<type_1E6350> *ar
                 loc40[lcl_68] = bp_5c << 8 | loc54 | m_58 << 16 | q4c << 24;
                 lcl_25 = true;
             }
-            else if (0)
+            else if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Font %s not found.\n", loc50);
         }
     }

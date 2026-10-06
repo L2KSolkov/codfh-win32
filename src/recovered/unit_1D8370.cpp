@@ -146,16 +146,16 @@ BOOL cXboxLive::sub_1D8880()
     if (!unk_3DAC)
     {
     }
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("Starting Xbox online library...");
     var_4 = XOnlineStartup(NULL);
     if (var_4 == S_OK)
     {
         unk_3DAC |= 8;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("success\n");
     }
-    else if (0)
+    else if (CODFH_DEBUG_LOGS)
         off_42CD14("failure\n");
     return var_4 == S_OK;
 }
@@ -220,7 +220,7 @@ void cXboxLive::sub_1D8B40(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 
                 sub_1DA1D0(arg_0);
         }
     }
-    else if (0)
+    else if (CODFH_DEBUG_LOGS)
         off_42CD14("Trying to send message to non-connected player %d\n", arg_0);
 }
 // match: ?sub_1D8C00@cXboxLive@@QAEHXZ @ 0x001D8C00
@@ -279,7 +279,7 @@ RwInt32 cXboxLive::sub_1D8C00()
     }
     else
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cXboxLive::createSession() - ERROR: attempting session creation with no open slots\n");
         unk_291C = 0;
         return 0;
@@ -314,7 +314,7 @@ RwInt32 cXboxLive::sub_1D8E10()
     var_8 = XNetCreateKey(&unk_41A6.unk_24, &unk_41A6.unk_2C);
     var_8 = XNetRegisterKey(&unk_41A6.unk_24, &unk_41A6.unk_2C);
     unk_291C = 2;
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("cXboxLive::createSession() - Created system-link session ok\n");
     return 1;
 }
@@ -516,12 +516,12 @@ RwInt32 cXboxLive::sub_1D9700(XNADDR *arg_0, XNKID *arg_4, XNKEY *arg_8, const t
 
     if (is_system_link() || voice_running())
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cXboxLive::joinServer() : not logged in\n");
     }
     if (!unk_2934.is_open() && !unk_2934.create(1))
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cXboxLive::joinServer() : failed to create socket\n");
         return 0;
     }
@@ -529,7 +529,7 @@ RwInt32 cXboxLive::sub_1D9700(XNADDR *arg_0, XNKID *arg_4, XNKEY *arg_8, const t
     if (l4 != 0)
     {
         unk_2934.sub_1DC130();
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cXboxLive::joinServer() : failed to register session key\n");
         return 0;
     }
@@ -538,7 +538,7 @@ RwInt32 cXboxLive::sub_1D9700(XNADDR *arg_0, XNKID *arg_4, XNKEY *arg_8, const t
     {
         XNetUnregisterKey(arg_4);
         unk_2934.sub_1DC130();
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cXboxLive::joinServer() : failed to convert network address to console context\n");
         return 0;
     }
@@ -548,7 +548,7 @@ RwInt32 cXboxLive::sub_1D9700(XNADDR *arg_0, XNKID *arg_4, XNKEY *arg_8, const t
     {
         XNetUnregisterKey(arg_4);
         unk_2934.sub_1DC130();
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cXboxLive::joinServer() : send join message failed\n");
         return 0;
     }
@@ -646,7 +646,7 @@ RwInt32 cXboxLive::sub_1D9C30(RwInt32 arg_0, type_1D9C30_peer *arg_4, const type
     var_15 = unk_3DB0->get_unk_B0()->sub_1CFF90();
     sprintf(var_98, "%d.%d.%d.%d:%d", arg_4->unk_18[0], arg_4->unk_18[1], arg_4->unk_18[2], arg_4->unk_18[3],
             arg_4->unk_20);
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("Attempting connection to player %s at %s\n", arg_4->unk_00, var_98);
     var_14.sin_family = AF_INET;
     var_14.sin_port = htons(1000);
@@ -656,7 +656,7 @@ RwInt32 cXboxLive::sub_1D9C30(RwInt32 arg_0, type_1D9C30_peer *arg_4, const type
     var_14.sin_addr.S_un.S_un_b.s_b4 = arg_4->unk_18[0];
     if (!sub_1DA270(&var_14, 0, 0))
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cXboxLive::peerConnectToNewPlayer() - connection failed!\n");
         return 0;
     }
@@ -672,7 +672,7 @@ void cXboxLive::sub_1D9DD0(RwInt32 arg_0)
     ULONGLONG var_8;
     ULONGLONG var_10;
 
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("cXboxLive::disconnectPlayer %d\n", arg_0);
     // A compiled-out check (docs/toolchain.md).
     if (!unk_3DAC)
@@ -680,7 +680,7 @@ void cXboxLive::sub_1D9DD0(RwInt32 arg_0)
     }
     if (!unk_292C.test(arg_0))
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cXboxLive::disconnectPlayer - connection has already gone, bailing!\n");
         memset(&unk_3DB4[arg_0], 0, sizeof(unk_3DB4[arg_0]));
     }
@@ -784,7 +784,7 @@ void cXboxLive::sub_1DA1D0(RwUInt32 arg_0)
 {
     if (arg_0 < 16)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Player %d has been lost\n", arg_0);
         unk_3DB0->get_unk_B0()->sub_1CFC20(arg_0);
         sub_1D9DD0(arg_0);
@@ -908,7 +908,7 @@ void cXboxLive::sub_1DA4D0(const type_1CCA10 &arg_0)
             var_8 = arg_0 - unk_4088[l4];
             if (var_8 > 10000)
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("cXboxLive: Connection attempt to player %d timed out\n", l4);
                 if (l4 == 0)
                 {
@@ -924,7 +924,7 @@ void cXboxLive::sub_1DA4D0(const type_1CCA10 &arg_0)
                 var_8 = arg_0 - unk_4048[l4];
                 if (var_8 > 750)
                 {
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14("cXboxLive: No response to connection attempt to player %d, resending request\n",
                                    l4);
                     sub_1DA270(&unk_3DB4[l4], l4 == 0, l4 == 0 ? unk_3DAC & 0x10 : 0);
@@ -940,7 +940,7 @@ void cXboxLive::sub_1DA680(XUID arg_0)
     XUID var_C = arg_0;
 
     unk_40DC.sub_1DBE30(&var_C);
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("Blocking player XUID %I64u\n", arg_0.qwUserID);
 }
 // match: ?sub_1DA6D0@cXboxLive@@QAEXPBEHPBUsockaddr_in@@@Z @ 0x001DA6D0
@@ -971,7 +971,7 @@ void cXboxLive::sub_1DA6D0(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
             memcpy(&m_18, arg_0 + 3, sizeof(XUID));
             if (unk_40DC.sub_1DBED0(&m_18))
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("Connection rejected - player blocked (XUID: %I64u)\n", m_18.qwUserID);
                 sub_1DA430(arg_8, 2);
             }
@@ -982,7 +982,7 @@ void cXboxLive::sub_1DA6D0(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
                 {
                     if (!unk_292C.test(bp_4))
                     {
-                        if (0)
+                        if (CODFH_DEBUG_LOGS)
                             off_42CD14("KNET: accepting player %d\n", bp_4);
                         unk_292C.add(bp_4);
                         unk_3DB4[bp_4] = *arg_8;
@@ -1016,13 +1016,13 @@ void cXboxLive::sub_1DA6D0(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
             }
             else
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("Ran out of slots ---- connection Attempt rejected!\n");
                 sub_1DA430(arg_8, 1);
             }
         }
     }
-    else if (0)
+    else if (CODFH_DEBUG_LOGS)
         off_42CD14("Non-host peer received peer-to-host request, ignoring it.\n");
 }
 // match: ?sub_1DAA60@cXboxLive@@QAEXPBEHPBUsockaddr_in@@@Z @ 0x001DAA60
@@ -1032,7 +1032,7 @@ void cXboxLive::sub_1DAA60(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
 
     if (unk_3DAC & 1)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Host peer received host-to-peer accept, ignoring it.\n");
     }
     else
@@ -1045,7 +1045,7 @@ void cXboxLive::sub_1DAA60(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
                 var_4 = arg_0[2];
                 if (var_4 < 16)
                 {
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14("Peer got accept from host, connection successful\n");
                     {
                         RwInt32 bp_8 = 0;
@@ -1065,13 +1065,13 @@ void cXboxLive::sub_1DAA60(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
                     memcpy(&unk_3EB4[0], arg_0 + 3, sizeof(XUID));
                     unk_4038 = 2;
                 }
-                else if (0)
+                else if (CODFH_DEBUG_LOGS)
                     off_42CD14("Peer host-to-peer accept with invalid player index, ignoring it\n");
             }
-            else if (0)
+            else if (CODFH_DEBUG_LOGS)
                 off_42CD14("Peer received host-to-peer accept from host, but peer already in game, ignoring it.\n");
         }
-        else if (0)
+        else if (CODFH_DEBUG_LOGS)
             off_42CD14("Peer received host-to-peer accept not from the host, ignoring it.\n");
     }
 }
@@ -1088,7 +1088,7 @@ void cXboxLive::sub_1DABA0(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
     }
     if (unk_3DAC & 1)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Host peer received host-to-peer reject, ignoring it.\n");
     }
     else
@@ -1101,7 +1101,7 @@ void cXboxLive::sub_1DABA0(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
                 var_8 = arg_0[2];
                 if (arg_0[2] < 4)
                 {
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14("Peer got reject from host, connection failed\n");
                     {
                         RwInt32 var_C = 0;
@@ -1115,13 +1115,13 @@ void cXboxLive::sub_1DABA0(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
                     unk_4038 = 3;
                     unk_403C = var_8;
                 }
-                else if (0)
+                else if (CODFH_DEBUG_LOGS)
                     off_42CD14("Peer got host-to-peer reject with invalid reason code - ignoring it\n");
             }
-            else if (0)
+            else if (CODFH_DEBUG_LOGS)
                 off_42CD14("Peer received host-to-peer reject from host, but peer already in game, ignoring it.\n");
         }
-        else if (0)
+        else if (CODFH_DEBUG_LOGS)
             off_42CD14("Peer received host-to-peer reject not from the host, ignoring it.\n");
     }
 }
@@ -1134,7 +1134,7 @@ void cXboxLive::sub_1DACB0(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
 
     if (unk_3DAC & 1)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Host peer received peer-to-peer request, ignoring it.\n");
     }
     else
@@ -1148,7 +1148,7 @@ void cXboxLive::sub_1DACB0(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
                 if (!sub_1DA350(arg_8, unk_3DB0->get_unk_B0()->sub_1CFF90()))
                     sub_1DA1D0(var_8);
             }
-            else if (0)
+            else if (CODFH_DEBUG_LOGS)
                 off_42CD14("Peer received peer-to-peer connection request from player already in game, but with "
                            "different index, ignoring request\n");
         }
@@ -1160,13 +1160,13 @@ void cXboxLive::sub_1DACB0(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
             }
             if (unk_292C.test(l4))
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("Peer received peer-to-peer connection request for a player index already in use, "
                                "ignoring request\n");
             }
             else
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("KNET: accepting player %d\n", l4);
                 // A compiled-out check (docs/toolchain.md).
                 if (!unk_3DAC)
@@ -1187,7 +1187,7 @@ void cXboxLive::sub_1DACB0(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
         }
         else
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Ran out of slots ---- connection Attempt rejected!\n");
             sub_1DA430(arg_8, 1);
         }
@@ -1202,7 +1202,7 @@ void cXboxLive::sub_1DAF00(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
 
     if (unk_3DAC & 1)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Host peer received peer-to-peer accept, ignoring it.\n");
     }
     else
@@ -1220,21 +1220,21 @@ void cXboxLive::sub_1DAF00(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
                         unk_2932.clear(var_8);
                         unk_292C.add(var_8);
                         memcpy(&unk_3EB4[var_8], arg_0 + 3, sizeof(XUID));
-                        if (0)
+                        if (CODFH_DEBUG_LOGS)
                             off_42CD14("Peer got accept from peer, connection successful\n");
                     }
-                    else if (0)
+                    else if (CODFH_DEBUG_LOGS)
                         off_42CD14("Peer received peer-to-peer accept from peer, but peer already accepted, "
                                    "ignoring it.\n");
                 }
-                else if (0)
+                else if (CODFH_DEBUG_LOGS)
                     off_42CD14("Peer received peer-to-peer accept with player index that doesn't match the "
                                "address, ignoring it.\n");
             }
-            else if (0)
+            else if (CODFH_DEBUG_LOGS)
                 off_42CD14("Peer received peer-to-peer accept from unrecognised address, ignoring it.\n");
         }
-        else if (0)
+        else if (CODFH_DEBUG_LOGS)
             off_42CD14("Peer received peer-to-peer accept with invalid player index, ignoring it.\n");
     }
 }
@@ -1251,7 +1251,7 @@ void cXboxLive::sub_1DB060(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
     }
     if (unk_3DAC & 1)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Host peer received peer-to-peer reject, ignoring it.\n");
     }
     else
@@ -1271,21 +1271,21 @@ void cXboxLive::sub_1DB060(const RwUInt8 *arg_0, RwInt32 arg_4, const sockaddr_i
                     if (unk_2932.test(var_8))
                     {
                         unk_2932.clear(var_8);
-                        if (0)
+                        if (CODFH_DEBUG_LOGS)
                             off_42CD14("Peer got reject from peer, connection failed\n");
                         sub_1DA1D0(var_8);
                     }
-                    else if (0)
+                    else if (CODFH_DEBUG_LOGS)
                         off_42CD14("Peer received peer-to-peer reject from peer, but peer not pending, ignoring it.\n");
                 }
-                else if (0)
+                else if (CODFH_DEBUG_LOGS)
                     off_42CD14("Peer received peer-to-peer reject with player index that doesn't match the "
                                "address, ignoring it.\n");
             }
-            else if (0)
+            else if (CODFH_DEBUG_LOGS)
                 off_42CD14("Peer received peer-to-peer reject from unrecognised address, ignoring it.\n");
         }
-        else if (0)
+        else if (CODFH_DEBUG_LOGS)
             off_42CD14("Peer received peer-to-peer reject with invalid player index, ignoring it.\n");
     }
 }

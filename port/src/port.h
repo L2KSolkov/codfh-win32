@@ -7,6 +7,8 @@
 #ifndef PORT_PORT_H
 #define PORT_PORT_H
 
+#include <stdarg.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,6 +20,9 @@ void plog_stub(const char *name);
 #define PORT_STUB() plog_stub(__FUNCTION__)
 /* The log also goes to the process's console (the server's, or the game's [debug] console). */
 void plog_to_console(void);
+/* The game's debug prints: formatted safely (a bad argument prints a note), then logged. */
+void port_debug_print(const char *fmt, ...);
+void port_debug_vprint(const char *fmt, va_list ap);
 
 /* The configuration (codfh.ini beside the executable; defaults otherwise). */
 typedef struct PortConfig

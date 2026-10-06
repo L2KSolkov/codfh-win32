@@ -169,7 +169,7 @@ void type_222960::vf_014(RwReal arg_0)
     var_4.unset(0);
     if (!(unk_340 == var_4))
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("Change in players... refreshing list\n");
         sub_222D20();
     }

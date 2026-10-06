@@ -165,7 +165,7 @@ void type_4F8054_B0::sub_1CCD60(const type_1CCA10 &arg_0)
 
         if (!unk_00->vf_018(unk_08))
             return;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Connecting - sent joinPlayerDetails\n");
         strcpy(var_2C.unk_00, unk_00->unk_80);
         var_2C.unk_18 = unk_00->sub_1CCB40();
@@ -184,7 +184,7 @@ void type_4F8054_B0::sub_1CCD60(const type_1CCA10 &arg_0)
         }
         if (unk_00->get_unk_AC()->sub_1D17B0(unk_318).empty())
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Connecting - sent joinPlayerDetails - got ack\n");
             unk_310 = 3;
             set_unk_31C(arg_0 + 40000);
@@ -193,7 +193,7 @@ void type_4F8054_B0::sub_1CCD60(const type_1CCA10 &arg_0)
     case 3:
         if (unk_314 == 2)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Now waiting for JoinPeerDetails\n");
             set_unk_31C(arg_0 + 40000);
         }
@@ -206,7 +206,7 @@ void type_4F8054_B0::sub_1CCD60(const type_1CCA10 &arg_0)
     case 4:
         if (unk_48.empty())
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Connection attempted to all peers...\n");
             memset(unk_50, 0, sizeof(unk_50));
             unk_310 = 5;
@@ -215,21 +215,21 @@ void type_4F8054_B0::sub_1CCD60(const type_1CCA10 &arg_0)
     case 5:
         if (unk_314 == 4)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Now waiting briefly for any players we failed NATNeg with to be kicked\n");
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Which would explain why the NATNeg failed\n");
             set_unk_31C(arg_0 + 33000);
         }
         if (unk_4C.empty())
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("All connections successful, proceeding to wait for join done message\n");
             unk_310 = 6;
         }
         else if (arg_0 > unk_31C)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Failed to connect to player %d, bailing out\n", unk_4C.sub_1D4900());
             v8 = 1;
             ebp_C = 3;
@@ -252,7 +252,7 @@ void type_4F8054_B0::sub_1CCD60(const type_1CCA10 &arg_0)
     {
         unk_00->setError(3, ebp_C);
         unk_310 = 8;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Swapping to not-connected client mode\n");
         sub_1CFC20(unk_08);
         unk_08 = 0;
@@ -274,7 +274,7 @@ void type_4F8054_B0::sub_1CD370()
 
     if (unk_310 != 8)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("cNetGameSessionManagement: Closing game...\n");
         for (i = 0; i < 0x10; i++)
         {
@@ -357,7 +357,7 @@ void type_4F8054_B0::handlePossibleDisconnections()
     }
     if (ebp_10)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("handlePossibleDisconnections:: We've lost the server!\n");
         sub_1CD370();
         unk_00->setError(7, 6);
@@ -367,7 +367,7 @@ void type_4F8054_B0::handlePossibleDisconnections()
     {
         if (bp_4.test(x8))
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Kicking player %d - %s due to timeout\n", x8, unk_90[x8].unk_00);
             sub_1CD690(x8);
         }
@@ -391,7 +391,7 @@ void type_4F8054_B0::sub_1CD6E0(RwInt32 arg_0)
 
     lv_C = 0;
     var_8 = var_1.sub_1D7870(unk_00, type_1DDE20_mask(1 << arg_0), &lv_C) == 0;
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("Sent playerKickNotification - player idx %d", arg_0);
     if (!var_8)
     {
@@ -450,19 +450,19 @@ void type_4F8054_B0::sub_1CD780(const type_1CCA10 &arg_0)
         if (!unk_00->vf_014(unk_30.sub_1D4900()))
             return;
         unk_3C = unk_30.sub_1D4900();
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("KNET SESSION: join game stage 0, player index selected %d\n", unk_3C);
         lcl_1a.unk_00 = (RwUInt8)unk_3C;
         x8 = lcl_1a.sub_1D5DC0(unk_00, type_1DDE20_mask(1 << get_unk_3C()), &unk_40) == 0;
         set_unk_44(arg_0 + 40000);
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Connecting - sent joinBegin\n");
         unk_34 = 2;
         break;
     case 2:
         if (unk_00->get_unk_AC()->sub_1D17B0(unk_40).empty())
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Connecting - send joinBegin - got ack\n");
             set_unk_44(arg_0 + 40000);
             unk_34 = 3;
@@ -477,7 +477,7 @@ void type_4F8054_B0::sub_1CD780(const type_1CCA10 &arg_0)
     case 3:
         if (unk_38 != 3)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Connecting - Waiting player details\n");
         }
         if (!unk_2C)
@@ -487,7 +487,7 @@ void type_4F8054_B0::sub_1CD780(const type_1CCA10 &arg_0)
         }
         else
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Connecting - got joinPlayer - player name %s\n", unk_10);
             strcpy(unk_90[unk_3C].unk_00, unk_10);
             unk_90[unk_3C].unk_1C = unk_28;
@@ -528,7 +528,7 @@ void type_4F8054_B0::sub_1CD780(const type_1CCA10 &arg_0)
         x8 = details.sub_1D6700(unk_00, type_1DDE20_mask(1 << get_unk_3C()), &unk_40) == 0;
         set_unk_44(arg_0 + 40000);
         unk_34 = 5;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Connecting - sent joinPeerDetails for %d other players\n", count);
         break;
     }
@@ -536,7 +536,7 @@ void type_4F8054_B0::sub_1CD780(const type_1CCA10 &arg_0)
         if (unk_00->get_unk_AC()->sub_1D17B0(unk_40).empty())
         {
             unk_34 = 6;
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Connecting - sent joinPeerDetails  - got ACK\n");
         }
         if (arg_0 > unk_44)
@@ -564,7 +564,7 @@ void type_4F8054_B0::sub_1CD780(const type_1CCA10 &arg_0)
 
         m.clear(joiner());
         m.clear(self());
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Sending addPlayer() to following players - %s\n", m.sub_1D4990());
         if (!m.empty())
             x8 = add.sub_1D6EB0(unk_00, m, &ebp_10) == 0;
@@ -577,19 +577,19 @@ void type_4F8054_B0::sub_1CD780(const type_1CCA10 &arg_0)
 
         if (unk_38 != 7)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Connecting - Waiting peer connection confirmations\n");
             set_unk_44(arg_0 + 40000);
         }
         if (unk_48.empty())
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Connecting - got confirmation that client attempted connection to all peers\n");
             unk_34 = 8;
         }
         if (arg_0 > unk_44)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Failed waiting for peer connection confirmation\nClient connections failed = ");
             for (k = 0; k < 0x10; k++)
             {
@@ -603,11 +603,11 @@ void type_4F8054_B0::sub_1CD780(const type_1CCA10 &arg_0)
                 }
                 if (unk_48.test(k))
                 {
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14(" %d", k);
                 }
             }
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("\n");
             x8 = 1;
             y14 = 1;
@@ -617,7 +617,7 @@ void type_4F8054_B0::sub_1CD780(const type_1CCA10 &arg_0)
     case 8:
         if (unk_38 != 8)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Connecting - Waiting for player drop/kicks to explain any connection failures\n");
             set_unk_44(arg_0 + 33000);
         }
@@ -625,10 +625,10 @@ void type_4F8054_B0::sub_1CD780(const type_1CCA10 &arg_0)
         {
             type_1D6C60 done;
 
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Connecting - got confirmation that client connected to all peers\n");
             strcpy(done.unk_00, unk_90[unk_08].unk_00);
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Sending joinDone to %d\n", unk_3C);
             done.sub_1D6C60(unk_00, type_1DDE20_mask(1 << get_unk_3C()), &ebp_10);
             if (unk_00->get_unk_A8())
@@ -644,7 +644,7 @@ void type_4F8054_B0::sub_1CD780(const type_1CCA10 &arg_0)
         }
         else if (arg_0 > unk_44)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Player %d failed to connect to player %d, dropping player %d\n", unk_3C,
                            unk_4C.sub_1D4900(), unk_3C);
             x8 = 1;
@@ -657,13 +657,13 @@ void type_4F8054_B0::sub_1CD780(const type_1CCA10 &arg_0)
     {
         if (locc == 3)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("JOIN FAILURE (DUE TO PEER CONNECTION FAILURE)\n");
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("PLAYER %d: %s REMOVED (CONNECT FAILED TO %d)\n", unk_3C, unk_90[unk_3C].unk_00,
                            unk_4C.sub_1D4900());
         }
-        else if (0)
+        else if (CODFH_DEBUG_LOGS)
             off_42CD14("JOIN FAILURE (DUE TO TIMEOUT).. PLAYER %d: %s REMOVED\n", unk_3C, unk_90[unk_3C].unk_00);
         if (y14)
             sub_1CD690(unk_3C);
@@ -700,7 +700,7 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
         type_1D6EB0 add;
 
         add.sub_1D7010(arg_C, arg_10);
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("eNetGameEP_addPlayer - (index:%d name %s)\n", add.unk_00, add.unk_01);
         PLAYERS_CHECK(unk_04);
         unk_90[add.unk_00].unk_18[0] = add.unk_25[0];
@@ -729,7 +729,7 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
 
         if (!a.sub_1D7340(arg_C, arg_10))
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("WARNING: Kick request failed to unpack - assuming platform-specific data was invalid!\n");
             PLAYERS_CHECK(unk_04);
             return 1;
@@ -742,13 +742,13 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
             if (unk_0C.test(a.unk_00))
             {
                 b = 1;
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("WARNING: Interesting kick request sent.. player details do not match ours!\n");
             }
             else
             {
                 c = 0;
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("Kick request received for a player not in our connection set, ignoring it\n");
             }
         }
@@ -758,7 +758,7 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
             {
                 if (b || a.unk_00 == unk_08)
                 {
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14("KILLING PLAYER who sent broken kick request");
                     unk_00->vf_04C(type_1DDE20_mask(1 << arg_8));
                     sub_1CFC20(arg_8);
@@ -777,27 +777,27 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
                     PLAYERS_CHECK(unk_04);
                     if (unk_48.test(a.unk_00))
                     {
-                        if (0)
+                        if (CODFH_DEBUG_LOGS)
                             off_42CD14("Removing player being kicked from set of clients we're waiting");
-                        if (0)
+                        if (CODFH_DEBUG_LOGS)
                             off_42CD14("for confirmation that new client has NATNeg'd successfully with");
                         unk_48.discard(a.unk_00);
                     }
                     PLAYERS_CHECK(unk_04);
                     if (unk_4C.test(a.unk_00))
                     {
-                        if (0)
+                        if (CODFH_DEBUG_LOGS)
                             off_42CD14("Removing player being kicked from set of clients that");
-                        if (0)
+                        if (CODFH_DEBUG_LOGS)
                             off_42CD14("new client has failed to NATNeg successfully with");
                         unk_4C.discard(a.unk_00);
                     }
                     PLAYERS_CHECK(unk_04);
                     if (unk_4A.test(a.unk_00))
                     {
-                        if (0)
+                        if (CODFH_DEBUG_LOGS)
                             off_42CD14("Removing player being kicked from set of clients that");
-                        if (0)
+                        if (CODFH_DEBUG_LOGS)
                             off_42CD14("new client has NATNeg'd successfully with");
                         unk_4A.discard(a.unk_00);
                     }
@@ -814,33 +814,33 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
             }
             else
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("Kicking player %d at host's request", a.unk_00);
                 unk_00->vf_04C(type_1DDE20_mask(1 << a.unk_00));
                 sub_1CFC20(a.unk_00);
                 if (unk_48.test(a.unk_00))
                 {
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14("Removing player being kicked from set of clients we're waiting");
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14("to attempt NATNeg with");
                     unk_48.discard(a.unk_00);
                     PLAYERS_CHECK(unk_04);
                 }
                 if (unk_4C.test(a.unk_00))
                 {
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14("Removing player being kicked from set of clients we've failed");
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14("to NATNeg with");
                     unk_4C.discard(a.unk_00);
                     PLAYERS_CHECK(unk_04);
                 }
                 if (unk_4A.test(a.unk_00))
                 {
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14("Removing player being kicked from set of clients we've completed");
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14("NATNeg with");
                     unk_4A.discard(a.unk_00);
                 }
@@ -878,7 +878,7 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
             begin.sub_1D5E80(arg_C, arg_10);
             unk_04 = begin.unk_00;
             unk_310 = 1;
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("eNetGameEp_joinBegin (index: %d)\n", unk_04);
             sub_1CF750(unk_04);
             dword_4FEC70 = 1;
@@ -890,7 +890,7 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
             type_1D6020 wait;
 
             wait.sub_1D60D0(arg_C, arg_10);
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("RECEIVED: eNetGameEp_joinBeginPleaseWait from server\n");
             unk_31C = unk_00->get_unk_7C() + type_1CCA10(40000);
         }
@@ -902,7 +902,7 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
         done.sub_1D6D20(arg_C, arg_10);
         PLAYERS_CHECK(unk_04);
         unk_310 = 7;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("eNetGameEp_joinDone - server name %s\n", done.unk_00);
         PLAYERS_CHECK(unk_04);
         unk_0C.add(unk_08);
@@ -914,7 +914,7 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
         return 1;
     }
     case 3:
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("eNetGameEP_joinPeerDetails, connection stage = %d\n", unk_310);
         PLAYERS_CHECK(unk_04);
         if (unk_310 == 3 || unk_310 == 2)
@@ -935,7 +935,7 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
                 unk_48.include(c);
                 unk_00->vf_034(c, (RwInt32)a.unk_254[b], 12);
                 unk_00->vf_02C(c, 2);
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("eNetGameEP_joinPeerDetails (index %d, name %s, ip %d.%d.%d.%d port %d - cookie %d)\n", c,
                                unk_90[c].unk_00, unk_90[c].unk_18[0], unk_90[c].unk_18[1], unk_90[c].unk_18[2],
                                unk_90[c].unk_18[3], unk_90[c].unk_20, unk_90[c].unk_1C);
@@ -957,7 +957,7 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
             report.sub_1D6550(arg_C, arg_10);
             PLAYERS_CHECK(unk_04);
             PLAYERS_CHECK(unk_04);
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("eNetGameEP_peerConnectionCompleted, player = %d, success = %d\n", report.unk_00, report.unk_04);
             PLAYERS_CHECK(unk_04);
             if (unk_48.test(report.unk_00))
@@ -972,15 +972,15 @@ RwInt32 type_4F8054_B0::sub_1CE650(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, 
         }
         return 1;
     case 2:
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("eNetGameEP_joinPlayerDetails : our playerIndex %d\n", unk_04);
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("Current mServerConnectionStage == %d\n", unk_34);
         if ((unk_34 == 3 || unk_34 == 2) && arg_8 == unk_3C)
         {
             unk_2C = 1;
             ((type_1D6230 *)unk_10)->sub_1D62F0(arg_C, arg_10);
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("eNetGameEP_joinPlayerDetails : name %s\n", unk_10);
         }
         return 1;
@@ -1042,7 +1042,7 @@ void type_4F8054_B0::sendPlayerKicks(RwInt32 arg_0)
             {
             }
             others.clear(arg_0);
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("sendPlayerKicks() : Telling clients to purge %d:%s\n", arg_0, unk_90[arg_0].unk_00);
             if (!others.empty())
                 msg.sub_1D7200(unk_00, others, &var_28);
@@ -1054,9 +1054,9 @@ void type_4F8054_B0::sendPlayerKicks(RwInt32 arg_0)
             }
             if (unk_48.test(msg.unk_00))
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("Removing player being kicked from set of clients we're waiting");
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("for confirmation that new client has NATNeg'd successfully with");
                 unk_48.clear(msg.unk_00);
             }
@@ -1065,9 +1065,9 @@ void type_4F8054_B0::sendPlayerKicks(RwInt32 arg_0)
             }
             if (unk_4C.test(msg.unk_00))
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("Removing player being kicked from set of clients that");
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("new client has failed to NATNeg successfully with");
                 unk_4C.clear(msg.unk_00);
             }
@@ -1076,17 +1076,17 @@ void type_4F8054_B0::sendPlayerKicks(RwInt32 arg_0)
             }
             if (unk_4A.test(msg.unk_00))
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("Removing player being kicked from set of clients that");
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("new client has NATNeg'd successfully with");
                 unk_4A.clear(msg.unk_00);
             }
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("sendPlayerKicks() : killing player %d:%s\n", arg_0, unk_90[arg_0].unk_00);
             if (arg_0 != unk_08)
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("Kicking player %d now we've told all clients to kick them\n", arg_0);
                 unk_00->vf_04C(type_1DDE20_mask(1 << arg_0));
                 sub_1CFC20(arg_0);
@@ -1094,7 +1094,7 @@ void type_4F8054_B0::sendPlayerKicks(RwInt32 arg_0)
         }
         else
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("sendPlayerKicks() : Tell server to purge %d:%s\n", arg_0, unk_90[arg_0].unk_00);
             msg.sub_1D7200(unk_00, type_1DDE20_mask(1 << get_unk_08()), &var_28);
         }
@@ -1129,14 +1129,14 @@ void type_4F8054_B0::sub_1CFB80()
     name = unk_00->unk_80;
     strcpy(unk_90[unk_08].unk_00, name);
     unk_0C.add(unk_08);
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("Added player %d - %s as Server\n", unk_08, name);
 }
 
 // match: ?sub_1CFC20@type_4F8054_B0@@QAEXH@Z @ 0x001CFC20
 void type_4F8054_B0::sub_1CFC20(RwInt32 arg_0)
 {
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("cNetGameSessionManagement:: close player %d - %s\n", arg_0, unk_90[arg_0].unk_00);
     // A compiled-out check (docs/toolchain.md): the registers after it
     // are one load on.
@@ -1267,13 +1267,13 @@ void type_4F8054_B0::sub_1CFFF0(RwInt32 arg_0, RwInt32 arg_4)
         if (arg_4)
         {
             unk_4A.set(arg_0);
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Connecting - informing host that we successfully connected to player %d\n", arg_0);
         }
         else
         {
             unk_4C.insert(arg_0);
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Connecting - informing host that we failed to connect to player %d\n", arg_0);
         }
         msg.unk_00 = (RwUInt8)arg_0;

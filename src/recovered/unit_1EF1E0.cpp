@@ -106,7 +106,7 @@ bool type_1EF3A0::sub_1EF460(const RwChar *arg_0)
     type_E8780<type_1ECCE0> var_10(sub_1ED040(arg_0));
     if (!var_10.sub_E87C0())
         unk_00.take(new type_E8780<type_1ECCE0>(var_10));
-    else if (0)
+    else if (CODFH_DEBUG_LOGS)
         sub_1C8A30("Image %s failed to load.\n", arg_0);
     return !var_10.sub_E87C0();
 }
@@ -141,10 +141,10 @@ bool type_1EF3A0::sub_1EF560(type_1C8DF0 *arg_0, type_1EFCF0<type_1E3BA0> *arg_4
                     frm_24[var_44] = (type_1E3BA0_state *)var_48;
                     bp_29 = true;
                 }
-                else if (0)
+                else if (CODFH_DEBUG_LOGS)
                     sub_1C8A30("Image %s in component %s not found.\n", l3C, arg_0->sub_1C8FC0());
             }
-            else if (0)
+            else if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("State %s in component %s is invalid.\n", l3C, arg_0->sub_1C8FC0());
         }
     }
@@ -167,7 +167,7 @@ type_1E7410 *type_1EF3A0::sub_1EF780(const RwChar *arg_0)
         if (var_14)
             return var_14;
     }
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("Image %s not found in any loaded images.\n", arg_0);
     return 0;
 }

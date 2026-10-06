@@ -132,14 +132,14 @@ void type_1F2A00::sub_1F7960(type_1C8DF0 *arg_0, type_1EFCF0<type_1E3BA0> *arg_4
         {
             if (arg_0->sub_1C8FC0())
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                 {
                     sub_1C8A30("Failed to create widget %s, name \"%s\".\n", varC, arg_0->sub_1C8FC0());
                 }
             }
             else
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                 {
                     sub_1C8A30("Failed to create widget %s.\n", varC);
                 }

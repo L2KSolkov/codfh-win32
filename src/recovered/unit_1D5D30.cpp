@@ -25,6 +25,10 @@ extern void (*dword_4FECF8)(const RwChar *arg_0);
 // Its data (PLAN M5): literals, constants and tables where the image has them.
 // match: ?off_42CD14@@3P6AXPBDZZA @ 0x0042CD14
 
+#ifdef CODFH_WIN32
+extern "C" void port_debug_vprint(const RwChar *arg_0, va_list arg_4);
+#endif
+
 // match: ?sub_1D5D30@@YAXPBDZZ @ 0x001D5D30
 
 void sub_1D5D30(const RwChar *arg_0, ...)
@@ -33,10 +37,21 @@ void sub_1D5D30(const RwChar *arg_0, ...)
     va_list var_4;
 
     va_start(var_4, arg_0);
+#ifdef CODFH_WIN32
+    // (the port's safe print: a bad argument prints a note; the text is printed once, not
+    // handed to sub_19A750 as a format too)
+    port_debug_vprint(arg_0, var_4);
+    var_808[0] = 0;
+    if (dword_4FECF8)
+        _vsnprintf(var_808, sizeof(var_808) - 1, arg_0, var_4);
+    var_808[sizeof(var_808) - 1] = 0;
+    va_end(var_4);
+#else
     vsprintf(var_808, arg_0, var_4);
     va_end(var_4);
     OutputDebugStringA(var_808);
     sub_19A750(var_808);
+#endif
     if (dword_4FECF8)
         dword_4FECF8(var_808);
 }

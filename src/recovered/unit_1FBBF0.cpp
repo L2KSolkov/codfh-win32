@@ -166,7 +166,7 @@ void InGameMenuManager::sub_1FBE70(RwCamera *arg_0)
         {
             if (sub_188350() != 4)
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                 {
                     sub_1C8A30("cContextSequencer InGameMenuManager::ShowMenu() %d\n", sub_186D00());
                 }
@@ -178,7 +178,7 @@ void InGameMenuManager::sub_1FBE70(RwCamera *arg_0)
         {
             if (sub_188350() == 4)
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                 {
                     sub_1C8A30("cContextSequencer InGameMenuManager::KillMenu() %d\n", sub_186D00());
                 }

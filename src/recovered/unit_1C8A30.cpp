@@ -40,6 +40,10 @@ RwFileFunctions *dword_4FEAAC;
 // match: ?unk_42CC5C@@3PBDB @ 0x0042CC5C
 // match: ?dword_42CC60@@3PBDB @ 0x0042CC60
 
+#ifdef CODFH_WIN32
+extern "C" void port_debug_vprint(const RwChar *arg_0, va_list arg_4);
+#endif
+
 // match: ?sub_1C8A30@@YAXPBDZZ @ 0x001C8A30
 
 void sub_1C8A30(const RwChar *arg_0, ...)
@@ -47,8 +51,13 @@ void sub_1C8A30(const RwChar *arg_0, ...)
     va_list var_4;
 
     va_start(var_4, arg_0);
+#ifdef CODFH_WIN32
+    // (the port's safe print: a bad argument prints a note)
+    port_debug_vprint(arg_0, var_4);
+#else
     vsprintf(OutputString, arg_0, var_4);
     OutputDebugStringA(OutputString);
+#endif
 }
 
 // match: ??4type_1C8A60@@QAEAAU0@ABU0@@Z @ 0x001C8A60
@@ -162,7 +171,7 @@ void kujuUI::sub_1C8CA0(const RwChar *arg_0, cFileIn **arg_4)
     var_10 = dword_4FEAAC->rwfopen(var_114, "rb");
     if (var_10)
         *arg_4 = new cFileIn(var_10);
-    else if (0)
+    else if (CODFH_DEBUG_LOGS)
         sub_1C8A30("Unable to open file %s!\n", arg_0);
 }
 

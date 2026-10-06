@@ -239,7 +239,7 @@ void type_4FB9E0::sub_1B4AA0()
     RwUInt32 var_4;
 
     sub_1C5340();
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("Clean game flow manager\n");
     unk_04 = 0;
     unk_08.sub_1B46F0();
@@ -300,7 +300,7 @@ void type_4FB9E0::sub_1B4CF0(RwInt32 arg_0)
     if (!unk_04)
     {
     }
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("(%s) Entering %s game state\n", off_42CAD0[unk_4F61F8.unk_104], off_42CAC0[arg_0]);
     unk_04 = arg_0;
 }
@@ -358,7 +358,7 @@ void type_4FB9E0::sub_1B4DF0()
         bp_8 = type_4F8054::get()->get_unk_B0()->sub_1A8050();
         unk_00->sub_1DDDB0(&bp_4, bp_8);
         unk_3C = 0;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("(HOST) Broadcast level load start to clients\n");
     }
     sub_1B2810();
@@ -374,7 +374,7 @@ void type_4FB9E0::sub_1B4EA0(RwInt32 arg_0)
 
     if (!unk_4F61F8.unk_104)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("(HOST) Client index: %d joined game \n", arg_0);
         if (((kujuUI::type_1C8DF0_104_00 *)this)->sub_1E3480() == 1 || ((kujuUI::type_1C8DF0_104_00 *)this)->sub_1E3480() == 2)
         {
@@ -385,7 +385,7 @@ void type_4FB9E0::sub_1B4EA0(RwInt32 arg_0)
             }
             bp_8.only(arg_0);
             unk_00->sub_1DDDB0(&bp_4, bp_8);
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("(HOST) Send load level message (id: %d) to client index: %d\n", unk_08.unk_28, arg_0);
         }
     }
@@ -441,7 +441,7 @@ void type_4FB9E0::sub_1B4F40()
             }
             lv_10.just(0);
             unk_00->sub_1DDDB0(&slot_C, lv_10);
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("(CLIENT) Level load complete; Send game synchronise request to host\n");
         }
     }
@@ -450,7 +450,7 @@ void type_4FB9E0::sub_1B4F40()
         lv_10 = sub_1B4D40();
         unk_00->sub_1DDDB0(&bp_4, lv_10);
         sub_1B4DB0();
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("(HOST) Level load complete; Send game synchronise message to all clients\n");
         sub_1B6470();
         sub_1B51D0();
@@ -588,7 +588,7 @@ void type_4FB9E0::sub_1B52D0()
             }
             slot_C.just(0);
             unk_00->sub_1DDDB0(&bp_8, slot_C);
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("(CLIENT) Level load complete; Send game synchronise request to host\n");
         }
     }
@@ -597,7 +597,7 @@ void type_4FB9E0::sub_1B52D0()
         slot_C = sub_1B4D40();
         unk_00->sub_1DDDB0(&bp_4, slot_C);
         sub_1B4DB0();
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("(HOST) Level load complete; Send game synchronise message to all clients\n");
         sub_1B6470();
         sub_1B51D0();
@@ -612,7 +612,7 @@ void type_4FB9E0::sub_1B5470(const type_3E1074 &arg_0)
     if (unk_B8)
     {
         unk_B8 = 0;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("(CLIENT) Reveived level load message from host\n");
     }
 }
@@ -628,7 +628,7 @@ void type_4FB9E0::sub_1B54B0(RwInt32 arg_0)
     unk_08.unk_28 = arg_0;
     sub_19B000(unk_08.unk_28 + 1);
     sub_1C3D80(unk_08.unk_28);
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("(%s) Set level index to load: %d\n", off_42CAD0[unk_4F61F8.unk_104], arg_0);
 }
 
@@ -652,13 +652,13 @@ void type_4FB9E0::sub_1B5510(RwInt32 arg_0)
         }
         bp_8.only(arg_0);
         unk_00->sub_1DDDB0(&bp_4, bp_8);
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("(HOST) (In game) received game synchronise request from client id: %d\n", arg_0);
     }
     else
     {
         unk_74[arg_0].unk_00 = 1;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("(HOST) (Loading level) received game synchronise request from client id: %d\n", arg_0);
     }
 }
@@ -867,12 +867,12 @@ void type_4FB9E0::sub_1B5B50(RwInt32 arg_0)
     if (unk_08.unk_28 != arg_0)
     {
         unk_F4 = 1;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("Level change to %d selected\n", arg_0);
     }
     else
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("Level change to %d (NO CHANGE)\n", arg_0);
         unk_F4 = 0;
     }
@@ -1088,7 +1088,7 @@ void type_4FB9E0::sub_1B6130()
         return;
     if (unk_C0 > unk_08.unk_14 || sub_1B6770())
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("(HOST) Round %d finished\n", unk_B4);
         unk_4F7EB8.unk_D0.sub_1B38E0();
         unk_B4++;
@@ -1116,7 +1116,7 @@ void type_4FB9E0::sub_1B6250()
     type_1DDE20_mask bp_8;
     type_3E0EB8 bp_4;
 
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("(HOST) Game over, send message to clients\n");
     sub_1B4CF0(3);
     unk_4F7EB8.sub_1AB400(2);
@@ -1147,7 +1147,7 @@ void type_4FB9E0::sub_1B6360()
     type_1DDE20_mask bp_8;
     type_3E1044 bp_4;
 
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("(HOST) Round over, send message to clients\n");
     sub_1B4CF0(3);
     unk_4F7EB8.sub_1AB400(2);
@@ -1362,7 +1362,7 @@ RwInt32 type_4FB9E0::sub_1B6770()
 // match: ?sub_1B69B0@type_4FB9E0@@QAEXXZ @ 0x001B69B0
 void type_4FB9E0::sub_1B69B0()
 {
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("(CLIENT) Receive round end notify\n");
     unk_B8 = 1;
     unk_E0 = 0;
@@ -1400,7 +1400,7 @@ void type_4FB9E0::sub_1B6A50()
 // match: ?sub_1B6AA0@type_4FB9E0@@QAEXXZ @ 0x001B6AA0
 void type_4FB9E0::sub_1B6AA0()
 {
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("(CLIENT) Receive round end notify\n");
     unk_E0 = 0;
     unk_E4 = 0;
@@ -1460,7 +1460,7 @@ RwInt32 type_4FB9E0::sub_1B6BB0()
         unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 1);
     else
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("(CLIENT) Load level message received from host\n");
         return 1;
     }
@@ -1526,7 +1526,7 @@ RwInt32 type_4FB9E0::sub_1B6CF0()
     bp_8 = bp_4->get_unk_B0()->sub_1A8050();
     if (unk_CC >= flt_3E20D8 || bp_4->get_unk_04() != 2 || bp_8.empty())
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("(HOST) All clients have quit the game or the wait timer ran out, so end the net game\n");
         return 1;
     }
@@ -1614,7 +1614,7 @@ void sub_1B6F90()
 {
     if (unk_4F61F8.unk_104)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("(CLIENT) waiting for level load directive\n");
         while (!dword_4FB9E0.sub_1B6BB0())
         {

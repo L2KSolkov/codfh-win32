@@ -169,7 +169,7 @@ void cNetSpawnPoint::HandleAttributes(const RWS::CAttributePacket &attr)
             unk_EC = attrIt->GetAs_RwUInt32();
             break;
         default:
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Unknown renderware studio attribute\n");
         }
         ++attrIt;
@@ -546,7 +546,7 @@ RwInt32 type_1C0F60::sub_1C16B0(RwUInt32 arg_0, type_4FBC50_player *arg_4, RwInt
     if (q28 == -1)
     {
         q28 = 0;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
         {
             sub_1C8A30("FAILED TO FIND VALID SPAWN POINT\n");
         }
@@ -615,7 +615,7 @@ RwInt32 type_1C0F60::sub_1C1820(RwUInt32 arg_0, type_4FBC50_player *arg_4, RwInt
         return l34;
     if (bp_4 != 0x7FFFFFFF)
         return bp_4;
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("Unable to find a spawn point at min distance");
     return -1;
 }
@@ -785,7 +785,7 @@ void type_4FBC50::sub_1C1CE0(cNetSpawnPoint *arg_0)
             }
             break;
         default:
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Unknown game type\n");
         }
         if (l4)

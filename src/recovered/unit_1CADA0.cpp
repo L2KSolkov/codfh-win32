@@ -78,7 +78,7 @@ const RwUInt16 *type_1CAC10::sub_1CAEA0(const RwChar *arg_0, RwInt32 arg_4)
         var_4 = unk_00[0]->sub_1CB640(arg_0);
     if (var_4)
         return var_4;
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("Translation for string '%s' could not be found\n", arg_0);
     return 0;
 }

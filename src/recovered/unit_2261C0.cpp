@@ -112,7 +112,7 @@ RwInt32 type_5051E8::sub_226360()
     unk_A4 = 0;
     unk_144 = 0;
     unk_7C = D3DDevice_GetBackBuffer2(0);
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("cUIXInit: Creating the UIX Live engine...\n");
     m_18 = UIXCreateLiveEngine(pSkinFileName, sub_19BEA0(), &unk_84);
     if (XOnlineFriendsGetAcceptedGameInvite(&uBC) == S_OK)
@@ -213,20 +213,20 @@ void type_5051E8::sub_2266D0(const type_1CCA10 &arg_0)
         switch (stk_40.ExitCode)
         {
         case UIX_EXIT_LOGON_FAILED:
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("UIX_EXIT_LOGON_FAILED\n");
             sub_228120(&stk_40, frm_30);
             break;
         case UIX_EXIT_FRIENDS_JOIN_GAME:
             if (sub_2281F0(&stk_40, frm_30) == 1)
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     sub_1C8A30("UIX_EXIT_FRIENDS_JOIN_GAME => UIX_EXIT_LOGON_SUCCESSFUL\n");
                 sub_228240(&stk_40, frm_30);
             }
             break;
         case UIX_EXIT_LOGON_SUCCESSFUL:
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("UIX_EXIT_LOGON_SUCCESSFUL\n");
             sub_228240(&stk_40, frm_30);
             break;
@@ -235,7 +235,7 @@ void type_5051E8::sub_2266D0(const type_1CCA10 &arg_0)
             break;
         case UIX_EXIT_FRIENDS_JOIN_GAME_CROSS_TITLE:
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("JOIN_GAME_CROSS_TITLE\n");
             DWORD v44 = (DWORD)stk_40.pExitData;
             break;
@@ -656,7 +656,7 @@ bool type_5051E8::sub_2279D0(bool arg_0)
         unk_15C = arg_0;
         if (unk_15C)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Player muting update started\n");
             switch (XOnlineMutelistStartup(0, &unk_160))
             {
@@ -683,7 +683,7 @@ bool type_5051E8::sub_2279D0(bool arg_0)
                     break;
                 }
             }
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Player muting update stopped\n");
         }
     }
@@ -869,7 +869,7 @@ void type_5051E8::sub_228090(RwInt32 arg_0)
 {
     unk_1118 = arg_0;
     unk_84->SetProperty(UIX_PROPERTY_DISPLAY_CONNECTION_ERRORS, arg_0);
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("UIX_PROPERTY_DISPLAY_CONNECTION_ERRORS=%d\n", arg_0);
 }
 
@@ -933,7 +933,7 @@ void type_5051E8::sub_228120(UIX_EXIT_INFO *arg_0, RwInt32 arg_4)
 // match: ?sub_2281F0@type_5051E8@@QAEHPAU_UIX_EXIT_INFO@@H@Z @ 0x002281F0
 RwInt32 type_5051E8::sub_2281F0(UIX_EXIT_INFO *arg_0, RwInt32 arg_4)
 {
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("JOIN_GAME\n");
     sub_227D70((const XONLINE_FRIEND *)arg_0->pExitData);
     if (!dword_4F45F8->unk_38 && !dword_4F45F8->unk_3C)

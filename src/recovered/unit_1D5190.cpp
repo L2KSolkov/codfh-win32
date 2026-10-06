@@ -90,7 +90,7 @@ void cXboxLiveNetGame::stateServerTakeUp(const type_1CCA10 &arg_0)
                     unk_0C = 1;
                 else
                 {
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14("ERROR: Could not create server (socket)\n");
                     setError(1, 10);
                     unk_04 = 0;
@@ -99,7 +99,7 @@ void cXboxLiveNetGame::stateServerTakeUp(const type_1CCA10 &arg_0)
             }
             else
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("ERROR: Failed to create Xbox Live Session\n");
                 setError(4, 10);
                 unk_04 = 0;
@@ -115,7 +115,7 @@ void cXboxLiveNetGame::stateServerTakeUp(const type_1CCA10 &arg_0)
                     unk_0C = 1;
                 else
                 {
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         off_42CD14("ERROR: Could not create server (socket)\n");
                     setError(1, 10);
                     unk_04 = 0;
@@ -124,7 +124,7 @@ void cXboxLiveNetGame::stateServerTakeUp(const type_1CCA10 &arg_0)
             }
             else
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     off_42CD14("ERROR: Failed to create Xbox System Link Session\n");
                 setError(4, 10);
                 unk_04 = 0;
@@ -137,23 +137,23 @@ void cXboxLiveNetGame::stateServerTakeUp(const type_1CCA10 &arg_0)
         switch (sub_1D8810()->get_unk_291C())
         {
         case 2:
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("cXboxLiveNetGame::stateServerTakeUp SESSION_STATUS_RUNNING\n");
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("mState = eStateServerUp\n");
             unk_04 = 2;
             unk_0C = 0;
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Success\n");
             break;
         case 0:
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("cXboxLiveNetGame::stateServerTakeUp SERVER_CONNECTION_NONE\n");
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("mState = eStateNone\n");
             unk_04 = 0;
             unk_0C = 0;
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("Failed\n");
         }
     }

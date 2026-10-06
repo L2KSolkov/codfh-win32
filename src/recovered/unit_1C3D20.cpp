@@ -267,7 +267,7 @@ void startServer(bool arg_0)
 {
     RwInt32 var_4;
 
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("cUIInterface::startServer %s\n", arg_0 ? "WANPlay" : "Syslink");
     // A compiled-out check: the registers after it are one load on
     // (docs/toolchain.md); its condition is a stand-in with one load.

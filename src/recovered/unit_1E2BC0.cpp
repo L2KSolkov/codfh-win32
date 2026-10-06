@@ -130,7 +130,7 @@ void type_3E6FA4::vf_008(type_1C8DF0 *arg_0, RwInt32 arg_4, RwInt32 arg_8, type_
         sub_1F7A60(arg_0, "a source");
         if (!frm_3C)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Widget factory - source missing! Widget \"%s\" type \"%s\"\n",
                            arg_0->sub_1C8FC0() ? arg_0->sub_1C8FC0() : "(none)", arg_0->sub_1C8FE0()->sub_1CA280());
         }
@@ -149,7 +149,7 @@ void type_3E6FA4::vf_008(type_1C8DF0 *arg_0, RwInt32 arg_4, RwInt32 arg_8, type_
 
             if (var_90 != 1)
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     sub_1C8A30("Combobox - font not found: %s\n", unk_5033CC.unk_00);
             }
             if (local_8C && slot_48)
@@ -163,7 +163,7 @@ void type_3E6FA4::vf_008(type_1C8DF0 *arg_0, RwInt32 arg_4, RwInt32 arg_8, type_
             }
             else
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     sub_1C8A30("Combobox - missing %s\n", unk_5034D4.unk_00);
             }
         }

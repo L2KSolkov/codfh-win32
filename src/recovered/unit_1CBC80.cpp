@@ -111,9 +111,9 @@ void type_4F8054::vf_008()
 {
     if (unk_04 == 1 || unk_04 == 2)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("cNetGame::deinitialise\n");
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30(" mState = eStateServerTakeDown\n");
         unk_04 = 3;
         vf_00C(sub_1CCA10());
@@ -127,11 +127,11 @@ void type_4F8054::vf_008()
 // match: ?vf_05C@type_4F8054@@UAEXPBUtype_1CC1F0@@@Z @ 0x001CC1F0
 void type_4F8054::vf_05C(const type_1CC1F0 *arg_0)
 {
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("cNetGame::createServer name=\"%s\"\n", arg_0->unk_0C);
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30(" map = %d\n", arg_0->unk_10);
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30(" mState = eStateServerTakeUp\n");
     unk_18 = 0x34;
     memcpy(unk_34, arg_0->unk_05, 4);
@@ -187,9 +187,9 @@ void type_4F8054::vf_070(const type_1CC1F0 *arg_0, const type_4F8054_4C *arg_4, 
 // match: ?vf_060@type_4F8054@@UAEXPBUtype_1CC1F0@@PBUtype_1CC3C0@@H@Z @ 0x001CC3C0
 void type_4F8054::vf_060(const type_1CC1F0 *arg_0, const type_1CC3C0 *arg_4, RwInt32 arg_8)
 {
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30("cNetGame::joinServer\n");
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         sub_1C8A30(" mState = eStateServerTakeUp\n");
     memcpy(unk_34, arg_4->unk_04, 4);
     unk_38 = arg_4->unk_08;
@@ -369,7 +369,7 @@ extern void (*off_42CD14)(const RwChar *arg_0, ...);
 // match: ?setError@type_4F8054@@QAEXHH@Z @ 0x001CC8F0
 void type_4F8054::setError(RwInt32 arg_0, RwInt32 arg_4)
 {
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("cNetGame::setError(%d : %s)\n", arg_0, errorToString(arg_0));
     // A compiled-out check: the registers after it are one load on
     // (docs/toolchain.md).
@@ -383,7 +383,7 @@ void type_4F8054::setError(RwInt32 arg_0, RwInt32 arg_4)
 // match: ?packetEngineHasRunOutOfRam@type_4F8054@@QAEXXZ @ 0x001CC940
 void type_4F8054::packetEngineHasRunOutOfRam()
 {
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("packetEngineHasRunOutOfRam - has been called... Panic!\n");
     unk_B0->sub_1CD370();
     setError(6, 10);

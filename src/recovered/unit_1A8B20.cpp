@@ -511,7 +511,7 @@ void type_4F7EB8::sub_1A9160()
     {
         locC = type_4F8054::get()->get_unk_B0()->sub_1A8050();
         unk_1A0->sub_1DDDB0(&x8, locC);
-        if (0)
+        if (CODFH_DEBUG_LOGS)
         {
             off_42CD14("(HOST) Broadcast level load start to clients\n");
         }
@@ -755,7 +755,7 @@ bool type_4F7EB8::sub_1A9CE0(const type_1CC1F0 *arg_0, const type_1CC3C0 *arg_4,
 {
     // The locals' names state their slots (docs/toolchain.md).
     dword_4FB9E0.sub_1B57C0();
-    if (0)
+    if (CODFH_DEBUG_LOGS)
     {
         off_42CD14("name : %s, ip : %d.%d.%d.%d - port %d, number players %d/%d\n", arg_4->unk_10,
                    arg_4->unk_04[0], arg_4->unk_04[1], arg_4->unk_04[2], arg_4->unk_04[3], arg_4->unk_08,
@@ -984,11 +984,11 @@ void type_4F7EB8::updateVoiceSubSystem()
                 {
                     if (o124)
                     {
-                        if (0)
+                        if (CODFH_DEBUG_LOGS)
                         {
                             sub_1C8A30("cNetController::updateVoiceSubSystem() Player %d is not in player set but remote player\n", locC);
                         }
-                        if (0)
+                        if (CODFH_DEBUG_LOGS)
                         {
                             sub_1C8A30(" is not NULL.  If you get a lot of these messages then something may be wrong somewhere\n");
                         }
@@ -1435,7 +1435,7 @@ void type_4F7EB8::sub_1AB440()
             }
             if (unk_2A4 == 4 && unk_1AC)
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                 {
                     sub_1C8A30("Remove LOCAL KILLCAM PLAYER\n");
                 }
@@ -1558,7 +1558,7 @@ void type_4F7EB8::sub_1ABC00()
                 {
                     if (unk_1B0[i])
                     {
-                        if (0)
+                        if (CODFH_DEBUG_LOGS)
                         {
                             sub_1C8A30("Deleting Remote KILL CAM player: %d\n", i);
                         }
@@ -1579,7 +1579,7 @@ void type_4F7EB8::sub_1ABC00()
                         unk_1B0[i] = 0;
                         if (mask.test(i))
                         {
-                            if (0)
+                            if (CODFH_DEBUG_LOGS)
                             {
                                 sub_1C8A30("Bind from KILL CAM: %d\n", i);
                             }
@@ -2673,7 +2673,7 @@ void type_4F7EB8::sub_1AE750(type_1AE520 *arg_0, RwUInt32 arg_4, RwUInt32 arg_8)
     if (!unk_4FC)
     {
     }
-    if (0)
+    if (CODFH_DEBUG_LOGS)
     {
         sub_1C8A30("Send swap pickup\n");
     }
@@ -2696,7 +2696,7 @@ void sub_1AE810(RwInt32 arg_0, RwInt32 arg_4, type_3DA44C *arg_8)
     {
         return;
     }
-    if (0)
+    if (CODFH_DEBUG_LOGS)
     {
         sub_1C8A30("Received swap pickup\n");
     }

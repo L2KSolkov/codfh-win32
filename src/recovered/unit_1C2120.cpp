@@ -90,7 +90,7 @@ void cNetStaticCamTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
             unk_C0[3] = attrIt->GetAs_RwInt32();
             break;
         default:
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Unknown renderware studio attribute\n");
         }
         ++attrIt;

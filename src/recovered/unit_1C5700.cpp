@@ -149,7 +149,7 @@ void sub_1C58C0()
 
         if (lv_C)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Waiting for sections to finish loading 2\n");
         }
     }

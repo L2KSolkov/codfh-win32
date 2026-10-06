@@ -43,4 +43,14 @@ typedef unsigned __int64 RwUInt64;
 #define RWALIGN(type, x)   __declspec(align(x)) type
 #define rwMATRIXALIGNMENT 16
 
+/*
+ * The game's debug logs its retail build compiled out (an if (0) round each call in the image):
+ * the Win32 port runs them. (Here since every unit that logs takes RwChar from this header.)
+ */
+#ifdef CODFH_WIN32
+#define CODFH_DEBUG_LOGS 1
+#else
+#define CODFH_DEBUG_LOGS 0
+#endif
+
 #endif /* WIN_OSTYPES_H */

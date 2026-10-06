@@ -99,13 +99,13 @@ void type_4F8348::sub_1C31D0(RwReal arg_0)
         unk_0C -= var_4;
         if (unk_0C <= 0.0f)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("VOTE update (server only): vote countdown has ended\n");
             sub_1C3970();
         }
         else if (unk_10 + unk_14 >= unk_18)
         {
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 off_42CD14("VOTE update (server only): all votes are in\n");
             sub_1C3970();
         }
@@ -121,7 +121,7 @@ void type_4F8348::sub_1C32B0(RwInt32 arg_0, RwInt32 arg_4)
 {
     if (unk_4F61F8.unk_104)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("VOTE localVoteCall (client)\n");
         type_3E0FE4 var_24;
         var_24.unk_04 = arg_0;
@@ -134,7 +134,7 @@ void type_4F8348::sub_1C32B0(RwInt32 arg_0, RwInt32 arg_4)
     }
     else if (unk_00 == -1)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("VOTE localVoteCall (server) - sending out vote call\n");
         unk_00 = arg_0;
         unk_04 = arg_4;
@@ -160,7 +160,7 @@ void type_4F8348::sub_1C3520(RwInt32 arg_0, RwUInt32 arg_4, RwUInt32 arg_8, RwUI
 {
     if (unk_4F61F8.unk_104)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("VOTE remoteVoteCall (client)  idx %d %d\n", arg_8, unk_08);
         if (arg_8 >= unk_08)
         {
@@ -173,7 +173,7 @@ void type_4F8348::sub_1C3520(RwInt32 arg_0, RwUInt32 arg_4, RwUInt32 arg_8, RwUI
     }
     else if (unk_00 == -1)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("VOTE remoteVoteCall (server) - sending out vote call\n");
         unk_00 = arg_0;
         unk_04 = arg_4;
@@ -210,13 +210,13 @@ void type_4F8348::sub_1C37E0(RwInt32 arg_0)
 {
     if (unk_38)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("VOTE localVoteRespond  - **** CANT VOTE more than once\n");
         return;
     }
     if (unk_00 == -1)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("VOTE localVoteRespond  - **** CANT VOTE: no current vote\n");
         return;
     }
@@ -228,7 +228,7 @@ void type_4F8348::sub_1C37E0(RwInt32 arg_0)
         type_1DDE20_mask var_4;
         var_4.put(0);
         type_4F8058::get()->sub_1DDE20(&var_10, var_4);
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("VOTE localVoteRespond (client) - agree:%d\n", arg_0);
     }
     else
@@ -237,7 +237,7 @@ void type_4F8348::sub_1C37E0(RwInt32 arg_0)
             unk_10++;
         else
             unk_14++;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("VOTE localVoteRespond (server) - for: %d against: %d\n", unk_10, unk_14);
     }
     unk_38 = 1;
@@ -256,7 +256,7 @@ void type_4F8348::sub_1C3900(RwUInt32 arg_0, RwUInt32 arg_4)
             unk_10++;
         else
             unk_14++;
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             off_42CD14("VOTE remoteVoteRespond (server only) - for: %d against: %d\n", unk_10, unk_14);
     }
 }
@@ -268,7 +268,7 @@ void type_4F8348::sub_1C3970()
     if (!unk_08)
     {
     }
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("VOTE localVoteEnd (server only) - for: %d against: %d\n", unk_10, unk_14);
     type_3E1014 var_10;
     var_10.unk_04 = unk_10;
@@ -305,7 +305,7 @@ void type_4F8348::sub_1C3B40(RwUInt32 arg_0, RwUInt32 arg_4, RwUInt32 arg_8)
     if (!unk_08)
     {
     }
-    if (0)
+    if (CODFH_DEBUG_LOGS)
         off_42CD14("VOTE remoteVoteEnd (client only) - for: %d against: %d\n", arg_0, arg_4);
     if (arg_8 >= unk_08)
     {

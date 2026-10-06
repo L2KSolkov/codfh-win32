@@ -191,7 +191,7 @@ bool type_1ECCE0::sub_1ED290()
     cParsedFile::loadBinaryFile(var_34.c_str(), sub_1ED1E0(), &lv_10);
     if (lv_10)
     {
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30("Enumerating images in \"%s\": ", unk_08.c_str());
         lv_11 = true;
         type_1C8DF0 *var_3C = lv_10->sub_1E3480();
@@ -212,15 +212,15 @@ bool type_1ECCE0::sub_1ED290()
                 var_50 = unk_28.sub_1E7310(var_4C->unk_00, &var_4C);
                 if (!var_50)
                 {
-                    if (0)
+                    if (CODFH_DEBUG_LOGS)
                         sub_1C8A30("\n!!! tried to insert an already existing image name - %s !!!\n", var_54);
                     lv_11 = false;
                 }
-                else if (0)
+                else if (CODFH_DEBUG_LOGS)
                     sub_1C8A30("%s, ", var_54);
             }
         }
-        if (0)
+        if (CODFH_DEBUG_LOGS)
             sub_1C8A30(" finished.\n");
         delete lv_10;
     }

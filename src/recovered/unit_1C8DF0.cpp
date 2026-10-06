@@ -170,7 +170,7 @@ bool kujuUI::type_1C8DF0::sub_1C9190(cFileIn *arg_0, type_1CA4E0 *arg_4)
             }
             else
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     sub_1C8A30("Failed binary load.\n");
             }
         }
@@ -199,7 +199,7 @@ bool kujuUI::type_1C8DF0::sub_1C9190(cFileIn *arg_0, type_1CA4E0 *arg_4)
             }
             if (!local_5)
             {
-                if (0)
+                if (CODFH_DEBUG_LOGS)
                     sub_1C8A30("Binary file load failed.\n");
             }
             sub_1C8FE0()->sub_1CA110(local_74, local_7C, var_50, var80, &local_78);

@@ -1101,10 +1101,19 @@ void type_3CE1FC::sub_F7B00()
     }
 }
 
+#ifdef CODFH_WIN32
+extern "C" void port_debug_print(const RwChar *arg_0, ...);
+#endif
+
 // match: ?sub_F7B90@type_4BFED0@@QAEXPAUtype_3D3548@@HPAUtype_169D0@@PBD2H@Z @ 0x000F7B90
 void type_4BFED0::sub_F7B90(type_3D3548 *arg_0, RwInt32 arg_4, type_169D0 *arg_8, const RwChar *arg_C,
                             const RwChar *arg_10, RwInt32 arg_14)
 {
+#ifdef CODFH_WIN32
+    // The path finder's debug log (the entity, a value, the path, the message, where): the port
+    // prints it.
+    port_debug_print("%s (entity %p, %d, path %p; %s:%d)", arg_C, arg_0, arg_4, arg_8, arg_10, arg_14);
+#endif
 }
 
 

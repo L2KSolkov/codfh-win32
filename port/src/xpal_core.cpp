@@ -32,7 +32,12 @@ static HANDLE log_console;
 
 void plog_to_console(void)
 {
-    HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+    /* (the console itself, not the standard output: a game started from a shell inherits its
+       pipe as that) */
+    HANDLE out = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                             OPEN_EXISTING, 0, NULL);
+    if (out == INVALID_HANDLE_VALUE)
+        out = GetStdHandle(STD_OUTPUT_HANDLE);
     if (out && out != INVALID_HANDLE_VALUE)
         log_console = out;
 }
@@ -349,6 +354,50 @@ extern "C" DWORD WINAPI xpal_GetTickCount(void)
         freq = f.QuadPart;
     }
     return t0 + (DWORD)((now.QuadPart - q0) * 1000 / freq);
+}
+
+/* The game's debug prints (its compiled-out logs): formatted with the faults a bad argument
+   raises caught (the format alone then), to the log. */
+extern "C" void port_debug_vprint(const char *fmt, va_list ap)
+{
+    char text[2048];
+    int bad = 0;
+    if ((DWORD_PTR)fmt < 0x10000)
+        return;
+    __try
+    {
+        _vsnprintf(text, sizeof(text) - 1, fmt, ap);
+        text[sizeof(text) - 1] = 0;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        bad = 1;
+    }
+    if (bad)
+    {
+        /* (the format alone, if it reads) */
+        __try
+        {
+            _snprintf(text, sizeof(text) - 1, "(bad arguments) %.200s", fmt);
+            text[sizeof(text) - 1] = 0;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            /* (no text at all: a value passed where the print takes one, as the pak reader's
+               sizes; left out) */
+            text[0] = 0;
+        }
+    }
+    if (text[0])
+        plog("game: %s", text);
+}
+
+extern "C" void port_debug_print(const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    port_debug_vprint(fmt, ap);
+    va_end(ap);
 }
 
 extern "C" VOID WINAPI xpal_OutputDebugStringA(LPCSTR text)

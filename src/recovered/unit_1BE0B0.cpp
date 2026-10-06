@@ -135,7 +135,7 @@ void cNetPickupTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
             sub_15FB30(&unk_4FD6D4);
             break;
         default:
-            if (0)
+            if (CODFH_DEBUG_LOGS)
                 sub_1C8A30("Unknown renderware studio attribute\n");
         }
         ++attrIt;
