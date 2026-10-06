@@ -66,6 +66,12 @@ logs), the path finder's `sub_F7B90`, and the 293 log calls the image keeps behi
 They go through `port_debug_vprint`, which catches a bad argument's fault; values passed where
 a text is taken (the pak reader's read sizes) are left out.
 
+Supremacy (`-gametype SUP`, game type 0x10): the retail build lists it (its name, every level's
+game types) but never finished it: no rules, spawn choice, page text, hint or loading picture,
+and starting it crashed. Under `CODFH_WIN32` it plays as a team game: the team game's spawn
+points, spawn sets and spawn choice, entities, team-kill and round scoring, HUD scores, hint and
+loading picture (its pre-match page shows its name). Its own objective is unknown.
+
 Debugging switches (environment): `CODFH_SHOT=n` (frame n to `shot.bmp`; `CODFH_SHOT_EVERY=1`
 every n frames; `CODFH_SHOT_WINDOW=1` the window's buffer), `CODFH_INPUT=frame:button,...`
 (scripted pad presses), `CODFH_DRAWID=n` (frame n's draws as flat colours naming them, each

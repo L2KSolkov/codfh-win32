@@ -770,11 +770,21 @@ void type_3E1E3C::sub_1B2D00(RwInt32 arg_0, RwInt32 arg_4, bool arg_8)
                     dword_4FB9E0.sub_1B6550(4);
                 else
                     dword_4FB9E0.sub_1B6550(2);
+#ifdef CODFH_WIN32
+                // (Supremacy, cut from the retail build: the port plays it with the team game's rules, its team kills)
+                if (dword_4FB9E0.get_unk_08() == 2 || dword_4FB9E0.get_unk_08() == 8 ||
+                    dword_4FB9E0.get_unk_08() == 16)
+#else
                 if (dword_4FB9E0.get_unk_08() == 2 || dword_4FB9E0.get_unk_08() == 8)
+#endif
                     loc11 = true;
             }
         }
+#ifdef CODFH_WIN32
+        else if (dword_4FB9E0.get_unk_08() == 2 || dword_4FB9E0.get_unk_08() == 16)
+#else
         else if (dword_4FB9E0.get_unk_08() == 2)
+#endif
             loc11 = true;
         if (bp_4 != bp_8)
         {
@@ -1064,7 +1074,12 @@ void type_3E1FC4::sub_1B38E0()
         unk_C4[0] = 0;
         unk_C4[1] = 0;
     }
+#ifdef CODFH_WIN32
+    // (Supremacy, cut from the retail build: the port plays it with the team game's rules, the round to the team that scored more)
+    if (dword_4FB9E0.get_unk_08() == 4 || dword_4FB9E0.get_unk_08() == 2 || dword_4FB9E0.get_unk_08() == 16)
+#else
     if (dword_4FB9E0.get_unk_08() == 4 || dword_4FB9E0.get_unk_08() == 2)
+#endif
     {
         bp_8 = unk_4F7EB8.unk_04.sub_1B33C0(2);
         slot_C = unk_4F7EB8.unk_04.sub_1B33C0(4);

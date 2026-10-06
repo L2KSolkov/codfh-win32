@@ -98,7 +98,13 @@ void cNetPickupTrigger::HandleEvents(RWS::CMsg &pMsg)
     {
         if (!unk_4F61F8.unk_104)
         {
+#ifdef CODFH_WIN32
+            // (Supremacy, cut from the retail build: the port plays it with the team game's rules, its entities)
+            if ((unk_E0 & (dword_4FB9E0.get_unk_08() == 16 ? 2 : dword_4FB9E0.get_unk_08())) &&
+                (unk_E4 & unk_4F61F8.unk_108))
+#else
             if ((unk_E0 & dword_4FB9E0.get_unk_08()) && (unk_E4 & unk_4F61F8.unk_108))
+#endif
             {
                 bp_4 = vf_020();
                 dword_4FBB20.sub_1BDFC0((type_1AE520 *)bp_4, this);

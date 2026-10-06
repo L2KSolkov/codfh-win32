@@ -718,7 +718,13 @@ void type_4FBC50::sub_1C1CE0(cNetSpawnPoint *arg_0)
     RwInt32 local_C;
     RwInt32 var_8;
 
+#ifdef CODFH_WIN32
+    // (Supremacy, cut from the retail build: the port plays it with the team game's rules, the maps tag no spawn point for it: the team game's)
+    RwInt32 port_type = dword_4FB9E0.get_unk_08() == 16 ? 2 : dword_4FB9E0.get_unk_08();
+    if ((arg_0->unk_C4 & port_type) && (arg_0->unk_C8 & unk_4F61F8.unk_108))
+#else
     if ((arg_0->unk_C4 & dword_4FB9E0.get_unk_08()) && (arg_0->unk_C8 & unk_4F61F8.unk_108))
+#endif
     {
         switch (dword_4FB9E0.get_unk_08_00())
         {
@@ -729,6 +735,9 @@ void type_4FBC50::sub_1C1CE0(cNetSpawnPoint *arg_0)
             break;
         case 2:
         case 4:
+#ifdef CODFH_WIN32
+        case 16:
+#endif
             if (arg_0->unk_CC & get_mask(2))
             {
                 unk_26C[0].sub_1C0FE0(arg_0);
@@ -744,7 +753,9 @@ void type_4FBC50::sub_1C1CE0(cNetSpawnPoint *arg_0)
             unk_268 = 2;
             break;
         case 8:
+#ifndef CODFH_WIN32
         case 16:
+#endif
             if (arg_0->get_unk_D0())
                 var_8 = arg_0->unk_D4;
             else

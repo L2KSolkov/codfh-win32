@@ -247,6 +247,10 @@ void type_4B8EF0::sub_E9CA0()
     case 1:
         sprintf(var_110, "%s%s_DM.txd", "SHELL\\LOAD\\", bp_4);
         break;
+#ifdef CODFH_WIN32
+    // (Supremacy, cut from the retail build: the port plays it with the team game's rules, its loading picture)
+    case 16:
+#endif
     case 2:
         sprintf(var_110, "%s%s_TDM.txd", "SHELL\\LOAD\\", bp_4);
         break;

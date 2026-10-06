@@ -357,6 +357,14 @@ void type_21A5E0::vf_03C()
         var_20 = 2;
         q28 = "info_type_ctf";
         break;
+#ifdef CODFH_WIN32
+    case 16:
+        // (Supremacy: the retail build lists it but has no page text or map image for it; the
+        // team map image, and the mode's name)
+        var_20 = 0;
+        q28 = "Supremacy";
+        break;
+#endif
     }
     unk_2B8.sub_1F28C0(type_1CB670(q28, 0));
     sub_21C740();

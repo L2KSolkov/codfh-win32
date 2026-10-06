@@ -1783,7 +1783,12 @@ RwInt32 type_4F7EB8::sub_1AC4E0(RwInt32 arg_0)
         r = unk_4FBC50.sub_1C2050(arg_0, -1);
         break;
     case 16:
+#ifdef CODFH_WIN32
+        // (Supremacy, cut from the retail build: the port plays it with the team game's rules, its team's spawn set)
+        r = unk_4FBC50.sub_1C2050(arg_0, -1);
+#else
         r = 0;
+#endif
         break;
     }
     return r;
@@ -2196,7 +2201,12 @@ RwInt32 sub_1AD380(RwInt32 arg_0, RwInt32 arg_4)
         m_10C = unk_4FBC50.sub_1C1C80(arg_0, x8, u108, 5, q114);
         break;
     case 16:
+#ifdef CODFH_WIN32
+        // (Supremacy, cut from the retail build: the port plays it with the team game's rules, the team game's spawn choice; the retail build has none)
+        m_10C = unk_4FBC50.sub_1C1C80(arg_0, x8, u108, 3, q114);
+#else
         m_10C = -1;
+#endif
         break;
     }
     return m_10C;

@@ -1014,7 +1014,12 @@ type_1CB670 sub_1C5350()
     bool bp_D = false;
     type_1A5EA0 stk_30("HINT_");
 
+#ifdef CODFH_WIN32
+    // (Supremacy, cut from the retail build: the port plays it with the team game's rules, its hint: the retail text has no HINT_SUP)
+    stk_30.sub_1C84F0(sub_1A3CB0(dword_4FB9E0.get_unk_08() == 16 ? 2 : dword_4FB9E0.get_unk_08()));
+#else
     stk_30.sub_1C84F0(sub_1A3CB0(dword_4FB9E0.get_unk_08()));
+#endif
     if (dword_4FB9E0.get_unk_08() == 8)
     {
         bool ebp_35 = false;

@@ -643,6 +643,10 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
             }
             switch (dword_4FB9E0.get_game_type())
             {
+#ifdef CODFH_WIN32
+            // (Supremacy, cut from the retail build: the port plays it with the team game's rules, the team scores)
+            case 16:
+#endif
             case 2:
                 sub_E09E0(0x4B, 0);
                 sub_E09E0(0x4C, 0);
