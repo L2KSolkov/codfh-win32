@@ -9,6 +9,10 @@
 #include "types/asynchload.h"
 #include "types/animbank.h"
 #include "rw/bastream.h"
+#ifdef CODFH_WIN32
+// (as windows.h declares it: kernel32's)
+extern "C" __declspec(dllimport) void __stdcall Sleep(RwUInt32 dwMilliseconds);
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D3D64
@@ -501,6 +505,12 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
         if (!p10C || !p10C->unk_48)
         {
             dword_428E14 = 1;
+#ifdef CODFH_WIN32
+            // (the port: nothing queued, a millisecond's rest. On the Xbox the lowest priority and
+            // the render's suspending it kept this loop to idle time on the one core; a PC gives
+            // it a core of its own, which it spun at 100%.)
+            Sleep(1);
+#endif
         }
     }
     dword_44BF98 = 1;
