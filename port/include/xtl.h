@@ -37,6 +37,8 @@ VOID WINAPI xpal_OutputDebugStringA(LPCSTR text);
    game's timers turn the count into seconds in single precision (unit_19B0F0's sub_19B9E0),
    which a PC's count from boot (hours or days of it) leaves tens of milliseconds coarse */
 BOOL WINAPI xpal_QueryPerformanceCounter(LARGE_INTEGER *count);
+/* a millisecond count as the Xbox's (Windows' GetTickCount moves in 15.6 ms steps) */
+DWORD WINAPI xpal_GetTickCount(void);
 #ifdef __cplusplus
 }
 #endif
@@ -45,6 +47,7 @@ BOOL WINAPI xpal_QueryPerformanceCounter(LARGE_INTEGER *count);
 #define CopyFileA xpal_CopyFileA
 #define OutputDebugStringA xpal_OutputDebugStringA
 #define QueryPerformanceCounter xpal_QueryPerformanceCounter
+#define GetTickCount xpal_GetTickCount
 
 #include <d3d8.h>
 #include <dsound.h>

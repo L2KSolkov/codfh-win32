@@ -18,6 +18,7 @@
 #undef CopyFileA
 #undef OutputDebugStringA
 #undef QueryPerformanceCounter
+#undef GetTickCount
 
 PortConfig port_config;
 void *port_hwnd;
@@ -318,6 +319,25 @@ extern "C" BOOL WINAPI xpal_QueryPerformanceCounter(LARGE_INTEGER *count)
     }
     count->QuadPart = now.QuadPart - base;
     return ok;
+}
+
+/* Milliseconds from the high-resolution counter, starting from Windows' own count (the Xbox's
+   GetTickCount moves every millisecond; Windows' every 15.6). */
+extern "C" DWORD WINAPI xpal_GetTickCount(void)
+{
+    static LONGLONG q0, freq;
+    static DWORD t0;
+    LARGE_INTEGER now;
+    QueryPerformanceCounter(&now);
+    if (!freq)
+    {
+        LARGE_INTEGER f;
+        QueryPerformanceFrequency(&f);
+        t0 = GetTickCount();
+        q0 = now.QuadPart;
+        freq = f.QuadPart;
+    }
+    return t0 + (DWORD)((now.QuadPart - q0) * 1000 / freq);
 }
 
 extern "C" VOID WINAPI xpal_OutputDebugStringA(LPCSTR text)

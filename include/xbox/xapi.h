@@ -25,6 +25,12 @@ RwInt32 __stdcall SetThreadPriority(void *hThread, RwInt32 nPriority);
 RwUInt32 __stdcall ResumeThread(void *hThread);
 // The time in milliseconds (RenderWare Studio's Time::GetTime reads it).
 RwUInt32 __stdcall GetTickCount(void);
+#ifdef CODFH_WIN32
+// The port's: a millisecond count as the Xbox's (Windows' moves in 15.6 ms steps, which made the
+// game's frame times 15, 16 or 31 ms at a steady 60 frames a second; port/src/xpal_core.cpp).
+RwUInt32 __stdcall xpal_GetTickCount(void);
+#define GetTickCount xpal_GetTickCount
+#endif
 __declspec(noreturn) void __stdcall ExitThread(RwUInt32 dwExitCode);
 
 // Launching the dashboard, as the XDK's xbox.h declares it (the not enough
