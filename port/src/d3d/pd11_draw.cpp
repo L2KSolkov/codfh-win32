@@ -8,11 +8,14 @@
 #include <d3dcompiler.h>
 
 #include <map>
+#include <unordered_map>
 #include <string>
 #include <string.h>
 
 #include "../port.h"
 #include "pdev.h"
+
+volatile long port_shader_compiles, port_texture_uploads;
 #include "pd11.h"
 
 #define dev pd11_dev
@@ -77,9 +80,73 @@ static void set_constants(ID3D11Buffer *buf, const void *data, UINT bytes)
     }
 }
 
+/* FNV-1a, 64 bits. */
+static unsigned long long fnv64(const void *data, size_t n, unsigned long long h = 0xCBF29CE484222325ull)
+{
+    const unsigned char *p = (const unsigned char *)data;
+    for (size_t i = 0; i < n; i++)
+        h = (h ^ p[i]) * 0x100000001B3ull;
+    return h;
+}
+
+/*
+ * Compiled shaders on disk (the user directory's shaders folder, a file per shader named by the
+ * hash of its target and source): a shader compiles once, not at its first draw in every run,
+ * where its 30 to 60 ms stall the frame.
+ */
+static void shader_path(const char *hlsl, const char *target, char *out, size_t n)
+{
+    unsigned long long h = fnv64(target, strlen(target));
+    h = fnv64(hlsl, strlen(hlsl), h);
+    _snprintf(out, n, "%s\\shaders\\%016llx.%s", port_config.userRoot, h, target);
+    out[n - 1] = 0;
+}
+
+static ID3DBlob *cached(const char *path)
+{
+    HANDLE f = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    if (f == INVALID_HANDLE_VALUE)
+        return NULL;
+    ID3DBlob *code = NULL;
+    DWORD size = GetFileSize(f, NULL), got = 0;
+    if (size && size < (16u << 20) && SUCCEEDED(D3DCreateBlob(size, &code)) &&
+        !(ReadFile(f, code->GetBufferPointer(), size, &got, NULL) && got == size))
+    {
+        code->Release();
+        code = NULL;
+    }
+    CloseHandle(f);
+    return code;
+}
+
+static void store(const char *path, ID3DBlob *code)
+{
+    static int made;
+    if (!made)
+    {
+        char dir[MAX_PATH];
+        _snprintf(dir, sizeof(dir), "%s\\shaders", port_config.userRoot);
+        dir[sizeof(dir) - 1] = 0;
+        CreateDirectoryA(port_config.userRoot, NULL);
+        CreateDirectoryA(dir, NULL);
+        made = 1;
+    }
+    HANDLE f = CreateFileA(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+    if (f == INVALID_HANDLE_VALUE)
+        return;
+    DWORD put = 0;
+    WriteFile(f, code->GetBufferPointer(), (DWORD)code->GetBufferSize(), &put, NULL);
+    CloseHandle(f);
+}
+
 static ID3DBlob *compile(const char *hlsl, const char *target)
 {
+    char path[MAX_PATH];
+    shader_path(hlsl, target, path, sizeof(path));
+    if (ID3DBlob *code = cached(path))
+        return code;
     ID3DBlob *code = NULL, *errors = NULL;
+    port_shader_compiles++;
     HRESULT hr = D3DCompile(hlsl, strlen(hlsl), NULL, NULL, NULL, "main", target, D3DCOMPILE_OPTIMIZATION_LEVEL1, 0,
                             &code, &errors);
     if (FAILED(hr))
@@ -89,6 +156,8 @@ static ID3DBlob *compile(const char *hlsl, const char *target)
     }
     if (errors)
         errors->Release();
+    if (SUCCEEDED(hr))
+        store(path, code);
     return SUCCEEDED(hr) ? code : NULL;
 }
 
@@ -223,19 +292,30 @@ extern "C" void pdev_texture_release(void *texture)
  * State objects, cached by their descriptions
  */
 
+/* The device's state objects by their descriptions: a hash of the bytes, the description kept
+   to tell collisions apart (a string-keyed map was a measurable share of every draw). */
 template <class D, class S> struct StateCache
 {
-    std::map<std::string, S *> map;
+    struct Entry
+    {
+        D desc;
+        S *state;
+    };
+    std::unordered_multimap<unsigned long long, Entry> map;
     S *get(const D &d, HRESULT (STDMETHODCALLTYPE ID3D11Device::*create)(const D *, S **))
     {
-        std::string key((const char *)&d, sizeof(d));
-        typename std::map<std::string, S *>::iterator it = map.find(key);
-        if (it != map.end())
-            return it->second;
-        S *s = NULL;
-        (dev->*create)(&d, &s);
-        map[key] = s;
-        return s;
+        unsigned long long h = fnv64(&d, sizeof(d));
+        typedef typename std::unordered_multimap<unsigned long long, Entry>::iterator It;
+        std::pair<It, It> r = map.equal_range(h);
+        for (It it = r.first; it != r.second; ++it)
+            if (!memcmp(&it->second.desc, &d, sizeof(d)))
+                return it->second.state;
+        Entry e;
+        e.desc = d;
+        e.state = NULL;
+        (dev->*create)(&d, &e.state);
+        map.insert(std::make_pair(h, e));
+        return e.state;
     }
 };
 static StateCache<D3D11_BLEND_DESC, ID3D11BlendState> blend_cache;

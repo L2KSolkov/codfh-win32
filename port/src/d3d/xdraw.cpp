@@ -1375,6 +1375,7 @@ static void *stage_texture(int st)
     e.paletteHash = ph;
     e.dirty = 0;
     e.device = upload_texture(t, pal);
+    port_texture_uploads++;
     return e.device;
 }
 

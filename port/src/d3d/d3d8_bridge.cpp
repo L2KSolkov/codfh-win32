@@ -279,6 +279,17 @@ static void pace_frame(void)
 }
 
 extern "C" void port_cli_present(void);
+extern "C" void port_profile_start(void);
+extern "C" void port_profile_report(LONGLONG start, LONGLONG end);
+
+/* The slow-frame log's clock: when the game's work on a frame began (after the last present). */
+static int work_start_pending;
+static LARGE_INTEGER *work_start_slot;
+static void mark_work_start(void)
+{
+    if (work_start_slot)
+        QueryPerformanceCounter(work_start_slot);
+}
 
 extern "C" HRESULT WINAPI IDirect3DDevice8_Present(D3DDevice *, const RECT *, const RECT *, void *, void *)
 {
@@ -289,6 +300,34 @@ extern "C" HRESULT WINAPI IDirect3DDevice8_Present(D3DDevice *, const RECT *, co
     }
     port_frame++;
     xdraw_frame_stats();
+    /* a frame whose work took over 25 ms (the pacing's wait left out), in the log with what it
+       did that ordinary frames do not: shaders compiled, textures uploaded */
+    {
+        static LARGE_INTEGER qf, work_start;
+        work_start_slot = &work_start;
+        LARGE_INTEGER now;
+        if (!qf.QuadPart)
+        {
+            QueryPerformanceFrequency(&qf);
+            port_profile_start();
+        }
+        QueryPerformanceCounter(&now);
+        long compiles = port_shader_compiles, uploads = port_texture_uploads;
+        port_shader_compiles = port_texture_uploads = 0;
+        if (work_start.QuadPart)
+        {
+            double ms = (now.QuadPart - work_start.QuadPart) * 1000.0 / qf.QuadPart;
+            static unsigned told;
+            if (ms > 25 && port_frame > 300 && told < 200)
+            {
+                told++;
+                plog("slow frame %u: %.1f ms of work; %ld shaders compiled, %ld textures uploaded, %u draws", port_frame,
+                     ms, compiles, uploads, port_render_stats.draws);
+                port_profile_report(work_start.QuadPart, now.QuadPart);
+            }
+        }
+        work_start_pending = 1;
+    }
     if (back_buffer_written)
     {
         back_buffer_written = 0;
@@ -298,6 +337,12 @@ extern "C" HRESULT WINAPI IDirect3DDevice8_Present(D3DDevice *, const RECT *, co
     pdev_present();
     pace_frame();
     port_pump_messages();
+    /* (the next frame's work starts now) */
+    if (work_start_pending)
+    {
+        work_start_pending = 0;
+        mark_work_start();
+    }
     port_cli_present();
     return D3D_OK;
 }

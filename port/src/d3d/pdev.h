@@ -129,6 +129,8 @@ typedef struct PortRenderStats
     float shaderMs, convertMs, stateMs, deviceMs;
 } PortRenderStats;
 extern PortRenderStats port_render_stats;
+/* Shaders compiled and textures uploaded since the counters were last read (the slow-frame log). */
+extern volatile long port_shader_compiles, port_texture_uploads;
 
 typedef struct PortRenderDebug
 {

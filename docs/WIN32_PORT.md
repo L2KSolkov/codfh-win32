@@ -46,6 +46,10 @@ combiners to HLSL (`xdraw.cpp`, `xbox_pixel_shader`), the fixed-function vertex 
 pipelines as generated shaders, cached by state; the game's gamma ramp is applied in the final
 pass (`pd11.cpp`).
 
+Frames whose work takes over 25 ms are logged with the shaders compiled and textures uploaded in them.
+Compiled shaders are kept in `%LOCALAPPDATA%\CODFH\shaders` (each compiles once, not at its first
+draw in every run).
+
 Configuration (`codfh.ini` beside the executable): `[video] width height windowed vsync
 widescreen render_scale` (the frame drawn at 640x480 times `render_scale`; 0, the default, is as
 large as the window holds, up to 4x), `[game] language name`, `[input] mouse_sensitivity`, `[keys]` (an action, then keys: `fire = MOUSE1, CTRL`; the actions are
@@ -57,7 +61,7 @@ every n frames; `CODFH_SHOT_WINDOW=1` the window's buffer), `CODFH_INPUT=frame:b
 logged; `CODFH_DRAWDETAIL=k` logs draw k's vertices, constants and textures),
 `CODFH_NODEPTH`, `CODFH_NOCULL`, `CODFH_NOFOG`, `CODFH_WIREFRAME`, `CODFH_STATS`,
 `CODFH_TRACE=n` (frame n's device calls), `CODFH_WAV=file` (the mixed audio), `CODFH_NETLOOP=n`
-(System Link on 127.0.0.n).
+(System Link on 127.0.0.n), `CODFH_PROFILE=1` (a sampling profiler: each slow frame's functions, most first).
 
 The overlay (`CODFH_IMGUI`, on in the game's build; `--no-imgui` leaves it out, the dedicated server
 never has it): Dear ImGui 1.92.9 (`port/third_party/imgui`, MIT) drawn over the finished frame. F1
