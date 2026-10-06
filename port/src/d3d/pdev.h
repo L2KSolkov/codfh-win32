@@ -42,6 +42,8 @@ void pdev_window_resized(void);
 int pdev_window_to_frame(int x, int y, float *fx, float *fy);
 /* The size the frame is drawn at (640x480 times [video] render_scale). */
 void pdev_render_size(int *w, int *h);
+/* Whether the display's refresh paces the frames (vsync on, the monitor at or under the cap). */
+int pdev_display_paces(int max_fps);
 
 /*
  * Drawing. The Xbox side hands over vertices already converted to float4 per vertex register

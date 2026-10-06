@@ -262,8 +262,8 @@ static void pace_frame(void)
         QueryPerformanceFrequency(&freq);
         QueryPerformanceCounter(&next);
     }
-    /* ([video] max_fps; 0 runs uncapped) */
-    if (port_config.maxFps <= 0)
+    /* ([video] max_fps; 0 runs uncapped; with vsync on a 60 Hz display, the display paces) */
+    if (port_config.maxFps <= 0 || pdev_display_paces(port_config.maxFps))
         return;
     LONGLONG period = freq.QuadPart / port_config.maxFps;
     next.QuadPart += period;

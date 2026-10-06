@@ -33,6 +33,32 @@ static ID3D11ShaderResourceView *scene_srv;
 static ID3D11DepthStencilView *dsv;
 static ID3D11Texture2D *depth;
 static int frame_w, frame_h, sync_interval, fill_window;
+static float display_hz;
+
+/* The refresh rate of the monitor the window is on (0 unknown). */
+static float window_refresh(void *hwnd)
+{
+    HMONITOR mon = MonitorFromWindow((HWND)hwnd, MONITOR_DEFAULTTONEAREST);
+    MONITORINFOEXA mi;
+    memset(&mi, 0, sizeof(mi));
+    mi.cbSize = sizeof(mi);
+    if (!GetMonitorInfoA(mon, &mi))
+        return 0;
+    DEVMODEA dm;
+    memset(&dm, 0, sizeof(dm));
+    dm.dmSize = sizeof(dm);
+    if (!EnumDisplaySettingsA(mi.szDevice, ENUM_CURRENT_SETTINGS, &dm))
+        return 0;
+    return (float)dm.dmDisplayFrequency;
+}
+
+/* The display paces the frames: vsync is on and the monitor refreshes about as often as the
+   frame cap asks (the port's own timer, on a clock of its own, would drift against it and show
+   a frame twice every so often). */
+extern "C" int pdev_display_paces(int max_fps)
+{
+    return sync_interval && display_hz > 0 && max_fps > 0 && display_hz <= max_fps + 1.5f;
+}
 /* the target the frame is drawn into: frame_w x frame_h times render_scale */
 static int target_w, target_h;
 static float render_scale = 1.0f;
@@ -319,10 +345,12 @@ extern "C" int pdev_init(void *hwnd, int width, int height, int windowed, int vs
     sd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     sd.SampleDesc.Count = 1;
     sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    sd.BufferCount = 1;
+    /* the flip model (the compositor shows the buffers rather than copying them: steadier frame
+       timing in a window), two buffers */
+    sd.BufferCount = 2;
     sd.OutputWindow = (HWND)hwnd;
     sd.Windowed = TRUE;     /* fullscreen: a borderless window over the screen (WinMain) */
-    sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+    sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
     /* the adapter: [video] adapter (a part of its name), else the high-performance one (a
        discrete GPU over an integrated one, as Windows' graphics settings rank them) */
@@ -354,6 +382,15 @@ extern "C" int pdev_init(void *hwnd, int width, int height, int windowed, int vs
         {
             plog("Direct3D 11 on %s (feature level %X): %dx%d frame drawn at %dx%d (scale %.2f) in a %dx%d window",
                  names[i], got, width, height, target_w, target_h, render_scale, back_w, back_h);
+            /* one frame queued ahead at most (smoother, and the input closer to the picture) */
+            IDXGIDevice1 *dxdev = NULL;
+            if (SUCCEEDED(dev->QueryInterface(__uuidof(IDXGIDevice1), (void **)&dxdev)))
+            {
+                dxdev->SetMaximumFrameLatency(1);
+                dxdev->Release();
+            }
+            display_hz = window_refresh(hwnd);
+            plog("display: %.2f Hz, vsync %s", display_hz, sync_interval ? "on" : "off");
 #ifdef CODFH_IMGUI
             pdev_imgui_init(hwnd, names[i]);
 #endif
