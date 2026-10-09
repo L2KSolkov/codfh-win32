@@ -19,69 +19,77 @@ extern "C" void port_crash_handler_install(void);
 /* The mouse's movement since the controllers last read it (xpal_sys.cpp turns it into the right
    stick). */
 volatile LONG port_mouse_dx, port_mouse_dy;
-static volatile LONG port_menu_mouse_clicks;
+static volatile LONG port_menu_mouse_button_down, port_menu_mouse_button_dirty;
 static volatile LONG port_menu_cursor_visible;
 
-/* Consume menu-only mouse input. A modest movement moves one menu item; accumulated movement
-   is drained one item per frame so a quick sweep cannot skip an entire menu. */
-static LONG port_menu_pending_x, port_menu_pending_y;
+/* Translate the visible cursor into the game's 640x480 menu canvas and report RenderWare
+   mouse-move/button state changes for the SP front-end. */
 static POINT port_menu_last_cursor;
 static int port_menu_have_cursor;
 
 extern "C" void port_menu_mouse_reset(void)
 {
     InterlockedExchange(&port_menu_cursor_visible, 1);
-    port_menu_pending_x = port_menu_pending_y = 0;
     port_menu_have_cursor = 0;
-    InterlockedExchange(&port_menu_mouse_clicks, 0);
+    InterlockedExchange(&port_menu_mouse_button_down, 0);
+    InterlockedExchange(&port_menu_mouse_button_dirty, 0);
 }
 
 extern "C" void port_menu_mouse_hide(void)
 {
     InterlockedExchange(&port_menu_cursor_visible, 0);
+    InterlockedExchange(&port_menu_mouse_button_down, 0);
+    InterlockedExchange(&port_menu_mouse_button_dirty, 0);
+    port_menu_have_cursor = 0;
 }
 
-extern "C" int port_menu_mouse_poll(void)
+extern "C" int port_menu_mouse_poll(int *x, int *y, int *buttonState)
 {
     if (!port_hwnd || GetForegroundWindow() != (HWND)port_hwnd)
     {
-        InterlockedExchange(&port_menu_mouse_clicks, 0);
-        port_menu_pending_x = port_menu_pending_y = 0;
         port_menu_have_cursor = 0;
+        InterlockedExchange(&port_menu_mouse_button_down, 0);
+        InterlockedExchange(&port_menu_mouse_button_dirty, 0);
         return 0;
     }
 
+    int input = 0;
     POINT cursor;
     if (GetCursorPos(&cursor) && ScreenToClient((HWND)port_hwnd, &cursor))
     {
-        if (port_menu_have_cursor)
+        RECT client;
+        GetClientRect((HWND)port_hwnd, &client);
+        int width = client.right - client.left;
+        int height = client.bottom - client.top;
+        int left = 0, top = 0, drawWidth = width, drawHeight = height;
+        if (!port_config.widescreen && width > 0 && height > 0)
         {
-            port_menu_pending_x += cursor.x - port_menu_last_cursor.x;
-            port_menu_pending_y += cursor.y - port_menu_last_cursor.y;
+            if (width * 480 > height * 640)
+            {
+                drawWidth = height * 640 / 480;
+                left = (width - drawWidth) / 2;
+            }
+            else
+            {
+                drawHeight = width * 480 / 640;
+                top = (height - drawHeight) / 2;
+            }
         }
-        else
+        if (drawWidth > 0 && drawHeight > 0)
+        {
+            int frameX = (cursor.x - left) * 640 / drawWidth;
+            int frameY = (cursor.y - top) * 480 / drawHeight;
+            if (!port_menu_have_cursor || cursor.x != port_menu_last_cursor.x || cursor.y != port_menu_last_cursor.y)
+                input |= PORT_MENU_MOUSE_MOVE;
+            *x = frameX;
+            *y = frameY;
+            port_menu_last_cursor = cursor;
             port_menu_have_cursor = 1;
-        port_menu_last_cursor = cursor;
-    }
-    int input = 0;
-    const LONG threshold = 28;
-    LONG ax = port_menu_pending_x < 0 ? -port_menu_pending_x : port_menu_pending_x;
-    LONG ay = port_menu_pending_y < 0 ? -port_menu_pending_y : port_menu_pending_y;
-    if (ax >= threshold || ay >= threshold)
-    {
-        if (ay > ax)
-        {
-            input |= port_menu_pending_y < 0 ? PORT_MENU_MOUSE_UP : PORT_MENU_MOUSE_DOWN;
-            port_menu_pending_y += port_menu_pending_y < 0 ? threshold : -threshold;
-        }
-        else
-        {
-            input |= port_menu_pending_x < 0 ? PORT_MENU_MOUSE_LEFT : PORT_MENU_MOUSE_RIGHT;
-            port_menu_pending_x += port_menu_pending_x < 0 ? threshold : -threshold;
         }
     }
-    if (InterlockedExchange(&port_menu_mouse_clicks, 0) > 0)
-        input |= PORT_MENU_MOUSE_ACCEPT;
+    if (InterlockedExchange(&port_menu_mouse_button_dirty, 0))
+        input |= PORT_MENU_MOUSE_BUTTON;
+    *buttonState = InterlockedCompareExchange(&port_menu_mouse_button_down, 0, 0) != 0;
     return input;
 }
 
@@ -144,7 +152,12 @@ static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
     case WM_LBUTTONDOWN:
         /* (the mouse is the game's once the player clicks into the window) */
         confine_cursor(hwnd, 1);
-        InterlockedIncrement(&port_menu_mouse_clicks);
+        InterlockedExchange(&port_menu_mouse_button_down, 1);
+        InterlockedExchange(&port_menu_mouse_button_dirty, 1);
+        break;
+    case WM_LBUTTONUP:
+        InterlockedExchange(&port_menu_mouse_button_down, 0);
+        InterlockedExchange(&port_menu_mouse_button_dirty, 1);
         break;
     case WM_ACTIVATE:
         if (LOWORD(wp) == WA_INACTIVE)

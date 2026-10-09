@@ -652,35 +652,29 @@ void type_sp_AD970::sp_sub_AE0D0(RwReal arg_0)
             sp_flt_3B4828[i] = v;
         }
 #ifdef CODFH_WIN32
-        /* The mouse uses the same menu labels as the pad: movement steps the focus and a
-           left click activates the selected item. Keep it in this screen-only input path so
-           clicks remain the fire trigger while playing a level. */
-        RwInt32 mouse = port_menu_mouse_poll();
-        if (mouse)
+        /* Feed the pointer into RenderWare's native pick-region button state machine. */
+        RwInt32 mouseX, mouseY, mouseButton;
+        RwInt32 mouse = port_menu_mouse_poll(&mouseX, &mouseY, &mouseButton);
+        Rt2dMessage mouseMessages[2];
+        RwInt32 mouseMessageCount = 0;
+        if (mouse & PORT_MENU_MOUSE_MOVE)
         {
-            data[1] = 0x40;
-            if (mouse & PORT_MENU_MOUSE_UP)
-                data[0] = unk_14C;
-            else if (mouse & PORT_MENU_MOUSE_DOWN)
-                data[0] = unk_150;
-            else if (mouse & PORT_MENU_MOUSE_LEFT)
-                data[0] = unk_154;
-            else if (mouse & PORT_MENU_MOUSE_RIGHT)
-                data[0] = unk_158;
-            else
-                data[0] = 0;
-            if (data[0])
-            {
-                if (dword_4F3130.sp_sub_12AAD0())
-                    data[0] = 0;
-                Rt2dMaestroForAllVisibleAnimations(unk_17C, sp_sub_ADDF0, data);
-            }
-            if (mouse & PORT_MENU_MOUSE_ACCEPT)
-            {
-                data[0] = dword_4F3130.sp_sub_12AAD0() ? 0 : unk_15C;
-                Rt2dMaestroForAllVisibleAnimations(unk_17C, sp_sub_ADDF0, data);
-            }
+            mouseMessages[mouseMessageCount].messageType = 10; /* MOUSEMOVETO */
+            mouseMessages[mouseMessageCount].index = -1;
+            mouseMessages[mouseMessageCount].intParam1 = mouseX;
+            mouseMessages[mouseMessageCount].intParam2 = mouseY;
+            mouseMessageCount++;
         }
+        if (mouse & PORT_MENU_MOUSE_BUTTON)
+        {
+            mouseMessages[mouseMessageCount].messageType = 11; /* MOUSEBUTTONSTATE */
+            mouseMessages[mouseMessageCount].index = -1;
+            mouseMessages[mouseMessageCount].intParam1 = mouseButton;
+            mouseMessages[mouseMessageCount].intParam2 = 0;
+            mouseMessageCount++;
+        }
+        if (mouseMessageCount)
+            Rt2dMaestroPostMessages(unk_17C, mouseMessages, mouseMessageCount);
 #endif
     }
     Rt2dFontTexDictionarySet(unk_184);

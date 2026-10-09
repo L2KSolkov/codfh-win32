@@ -6,15 +6,13 @@ extern "C" {
 #endif
 enum
 {
-    PORT_MENU_MOUSE_UP = 1,
-    PORT_MENU_MOUSE_DOWN = 2,
-    PORT_MENU_MOUSE_LEFT = 4,
-    PORT_MENU_MOUSE_RIGHT = 8,
-    PORT_MENU_MOUSE_ACCEPT = 16
+    PORT_MENU_MOUSE_MOVE = 1,
+    PORT_MENU_MOUSE_BUTTON = 2
 };
 void port_menu_mouse_reset(void);
 void port_menu_mouse_hide(void);
-int port_menu_mouse_poll(void);
+/* Coordinates are in the 640x480 game frame; buttonState is 1 while left is held. */
+int port_menu_mouse_poll(int *x, int *y, int *buttonState);
 #ifdef __cplusplus
 }
 #endif
