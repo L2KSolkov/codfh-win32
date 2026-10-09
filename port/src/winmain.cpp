@@ -30,6 +30,7 @@ static int port_menu_have_cursor;
 extern "C" void port_menu_mouse_reset(void)
 {
     InterlockedExchange(&port_menu_cursor_visible, 1);
+    SetCursor(LoadCursor(NULL, IDC_ARROW));
     port_menu_have_cursor = 0;
     InterlockedExchange(&port_menu_mouse_button_down, 0);
     InterlockedExchange(&port_menu_mouse_button_dirty, 0);
@@ -38,6 +39,7 @@ extern "C" void port_menu_mouse_reset(void)
 extern "C" void port_menu_mouse_hide(void)
 {
     InterlockedExchange(&port_menu_cursor_visible, 0);
+    SetCursor(NULL);
     InterlockedExchange(&port_menu_mouse_button_down, 0);
     InterlockedExchange(&port_menu_mouse_button_dirty, 0);
     port_menu_have_cursor = 0;
