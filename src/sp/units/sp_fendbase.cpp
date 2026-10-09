@@ -175,6 +175,7 @@ void type_sp_AD970::sp_sub_ADA70()
     }
     if (unk_17C)
     {
+        sp_profileMouseMaestroDestroyed(unk_17C);
         Rt2dMaestroDestroy(unk_17C);
         unk_17C = 0;
     }
@@ -657,63 +658,6 @@ void type_sp_AD970::sp_sub_AE0D0(RwReal arg_0)
         /* Feed the pointer into RenderWare's native pick-region button state machine. */
         RwInt32 mouseX, mouseY, mouseButton;
         RwInt32 mouse = port_menu_mouse_poll(&mouseX, &mouseY, &mouseButton);
-        RwBool profileClick = false;
-        if ((mouse & PORT_MENU_MOUSE_BUTTON) && mouseButton)
-        {
-            RwInt32 selectProfileLabel = -1;
-            sp_sub_ADE30("selectProfile", &selectProfileLabel, 6);
-            if (selectProfileLabel != -1)
-            {
-                type_sp_AE5D0 *menu = (type_sp_AE5D0 *)this;
-                RwReal rowY[4];
-                RwReal bestDistance = 2.0f;
-                RwReal hitRadius = 0.0f;
-                RwInt32 slot = -1;
-                RwReal pointY = 1.0f - (RwReal)mouseY / 480.0f;
-                for (RwInt32 row = 0; row < 4; row++)
-                {
-                    if (!menu->unk_610[row][0])
-                    {
-                        slot = -1;
-                        break;
-                    }
-                    RwMatrix *ltm = Rt2dObjectGetLTM(menu->unk_610[row][0]);
-                    rowY[row] = ltm->pos.y;
-                    RwReal distance = rowY[row] - pointY;
-                    if (distance < 0.0f)
-                        distance = -distance;
-                    if (distance < bestDistance)
-                    {
-                        bestDistance = distance;
-                        slot = row;
-                    }
-                }
-                if (slot >= 0)
-                {
-                    RwReal nearestGap = 1.0f;
-                    for (RwInt32 row = 0; row < 4; row++)
-                    {
-                        if (row == slot)
-                            continue;
-                        RwReal gap = rowY[row] - rowY[slot];
-                        if (gap < 0.0f)
-                            gap = -gap;
-                        if (gap < nearestGap)
-                            nearestGap = gap;
-                    }
-                    hitRadius = nearestGap * 0.55f;
-                    if (bestDistance <= hitRadius)
-                    {
-                        type_sp_ADF20 selection = sp_sub_ADF20("/imcProfileSelection/");
-                        Rt2dAnimGotoKeyFrameListByIndex(selection.unk_00, selection.unk_04, slot);
-                        data[0] = selectProfileLabel;
-                        data[1] = 0x40;
-                        Rt2dMaestroForAllVisibleAnimations(unk_17C, sp_sub_ADDF0, data);
-                        profileClick = true;
-                    }
-                }
-            }
-        }
         Rt2dMessage mouseMessages[2];
         RwInt32 mouseMessageCount = 0;
         if (mouse & PORT_MENU_MOUSE_MOVE)
@@ -724,7 +668,7 @@ void type_sp_AD970::sp_sub_AE0D0(RwReal arg_0)
             mouseMessages[mouseMessageCount].intParam2 = mouseY;
             mouseMessageCount++;
         }
-        if ((mouse & PORT_MENU_MOUSE_BUTTON) && !profileClick)
+        if (mouse & PORT_MENU_MOUSE_BUTTON)
         {
             mouseMessages[mouseMessageCount].messageType = 11; /* MOUSEBUTTONSTATE */
             mouseMessages[mouseMessageCount].index = -1;
@@ -736,7 +680,7 @@ void type_sp_AD970::sp_sub_AE0D0(RwReal arg_0)
             Rt2dMaestroPostMessages(unk_17C, mouseMessages, mouseMessageCount);
         /* The title's Press Start prompt has no pick region in its animation. Preserve its
            controller Start transition as a mouse fallback on screens that expose btnStart. */
-        if (!profileClick && (mouse & PORT_MENU_MOUSE_BUTTON) && mouseButton && (RwUInt32)unk_168 != 0xFFFFFFFFu)
+        if ((mouse & PORT_MENU_MOUSE_BUTTON) && mouseButton && (RwUInt32)unk_168 != 0xFFFFFFFFu)
         {
             data[0] = dword_4F3130.sp_sub_12AAD0() ? 0 : unk_168;
             data[1] = 0x40;

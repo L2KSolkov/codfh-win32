@@ -44,6 +44,39 @@
 #include "xbox/xapi.h"
 #include "sp/sp_fend.h"
 
+typedef struct _rt2dPath Rt2dPath;
+typedef struct Rt2dCel Rt2dCel;
+typedef struct Rt2dCelList Rt2dCelList;
+
+extern "C"
+{
+extern RwMatrix *Rt2dObjectGetLTM(Rt2dObject *object);
+extern Rt2dObject *Rt2dObjectSetVisible(Rt2dObject *object, RwBool visible);
+extern Rt2dObject *Rt2dSceneCreate(void);
+extern Rt2dObject *Rt2dSceneLock(Rt2dObject *scene);
+extern Rt2dObject *Rt2dSceneUnlock(Rt2dObject *scene);
+extern RwInt32 Rt2dSceneGetChildCount(Rt2dObject *scene);
+extern Rt2dObject *Rt2dSceneGetNewChildScene(Rt2dObject *scene);
+extern Rt2dObject *Rt2dSceneGetNewChildPickRegion(Rt2dObject *scene);
+extern Rt2dObject *Rt2dSceneAddChild(Rt2dObject *scene, Rt2dObject *child);
+extern Rt2dPath *Rt2dPickRegionGetPath(Rt2dObject *pickRegion);
+extern Rt2dPath *Rt2dPathRect(Rt2dPath *path, RwReal x, RwReal y, RwReal w, RwReal h);
+extern Rt2dObject *Rt2dObjectMTMSetIdentity(Rt2dObject *object);
+extern Rt2dObject *Rt2dObjectMTMTranslate(Rt2dObject *object, RwReal x, RwReal y);
+extern Rt2dMaestro *Rt2dMaestroAddStringLabel(Rt2dMaestro *maestro, RwInt32 entityType,
+                                               const RwChar *name, void *internalData,
+                                               RwInt32 *index);
+extern Rt2dMaestro *Rt2dMaestroAddMessageList(Rt2dMaestro *maestro, Rt2dMessage *messages,
+                                              RwInt32 count, RwInt32 *index);
+extern Rt2dMaestro *Rt2dMaestroAddButton(Rt2dMaestro *maestro, RwInt32 labelIndex,
+                                          RwInt32 objectIndex, RwUInt32 stateFlags,
+                                          RwInt32 *actionListIndices, RwInt32 *index);
+extern Rt2dCelList *Rt2dMaestroGetCelListByIndex(Rt2dMaestro *maestro, RwInt32 index);
+extern RwInt32 Rt2dAnimGetNumberOfKeyFrames(Rt2dAnim *anim);
+extern Rt2dCel *_rt2dCelListGetCelByIndex(Rt2dCelList *celList, RwInt32 index);
+extern Rt2dCel *Rt2dCelAddButtonIndex(Rt2dCel *cel, RwInt32 buttonIndex, RwInt32 *index);
+}
+
 // Its data definitions (PLAN SP5): single player's own .bss, in the image's address order (its
 // .data and .rdata are defined further down, where the image's order puts them).
 // SP 0x003B4718
@@ -613,9 +646,145 @@ void type_sp_AE5D0::sp_sub_AF760(RwInt32 arg_0)
     Rt2dMaestroForAllVisibleAnimations(unk_17C, sp_sub_ADDF0, data);
 }
 
+#ifdef CODFH_WIN32
+static Rt2dMaestro *sp_profilePickMaestro;
+static Rt2dObject *sp_profilePickRegions[4];
+static RwInt32 sp_profilePickUrls[4] = {-1, -1, -1, -1};
+static bool sp_profilePickPending;
+
+/* Build invisible RenderWare pick-region buttons beside the profile strings. Each button's
+   native GETURL action identifies its slot; the menu then selects that keyframe and invokes
+   the existing selectProfile button. */
+static bool sp_addProfilePickRegions(type_sp_AE5D0 *menu)
+{
+    static const RwChar *const urlNames[4] = {
+        "mouseProfileSlot1", "mouseProfileSlot2", "mouseProfileSlot3", "mouseProfileSlot4"};
+    static const RwChar *const buttonNames[4] = {
+        "mouseProfileButton1", "mouseProfileButton2", "mouseProfileButton3", "mouseProfileButton4"};
+    Rt2dMaestro *maestro = menu->unk_17C;
+    Rt2dObject *rootScene;
+    Rt2dAnim *rootAnim;
+    Rt2dCelList *rootCels;
+    RwInt32 frameCount;
+
+    if (!maestro || !menu->unk_610[0][0])
+        return false;
+    if (sp_profilePickMaestro == maestro)
+        return true;
+
+    rootScene = Rt2dMaestroGetScene(maestro);
+    rootAnim = Rt2dMaestroGetAnimationsByIndex(maestro, 0);
+    rootCels = Rt2dMaestroGetCelListByIndex(maestro, 0);
+    if (!rootScene || !rootAnim || !rootCels)
+        return false;
+
+    Rt2dSceneUpdateLTM(rootScene);
+    frameCount = Rt2dAnimGetNumberOfKeyFrames(rootAnim);
+    for (RwInt32 slot = 0; slot < 4; slot++)
+    {
+        RwInt32 urlLabel = -1, buttonLabel = -1, messageList = -1, buttonIndex = -1;
+        RwInt32 objectIndex = Rt2dSceneGetChildCount(rootScene);
+        RwInt32 actionList[32];
+        Rt2dMessage urlMessage;
+        Rt2dObject *buttonScene = Rt2dSceneCreate();
+        Rt2dObject *pickScene;
+        Rt2dObject *pickRegion;
+        RwMatrix *textMatrix;
+
+        if (!menu->unk_610[slot][0] || !buttonScene)
+            return false;
+        if (!Rt2dMaestroAddStringLabel(maestro, 6, urlNames[slot], NULL, &urlLabel) ||
+            !Rt2dMaestroAddStringLabel(maestro, 3, buttonNames[slot], NULL, &buttonLabel))
+            return false;
+
+        urlMessage.messageType = 7; /* GETURL */
+        urlMessage.index = -1;
+        urlMessage.intParam1 = urlLabel;
+        urlMessage.intParam2 = 0;
+        if (!Rt2dMaestroAddMessageList(maestro, &urlMessage, 1, &messageList))
+            return false;
+        for (RwInt32 i = 0; i < 32; i++)
+            actionList[i] = -1;
+        actionList[0] = messageList;
+
+        if (!Rt2dSceneLock(buttonScene))
+            return false;
+        pickScene = Rt2dSceneGetNewChildScene(buttonScene);
+        Rt2dSceneUnlock(buttonScene);
+        if (!pickScene || !Rt2dSceneLock(pickScene))
+            return false;
+        pickRegion = Rt2dSceneGetNewChildPickRegion(pickScene);
+        Rt2dSceneUnlock(pickScene);
+        if (!pickRegion)
+            return false;
+
+        /* The text anchor is the region's origin. The rectangle covers the rendered label. */
+        Rt2dPathRect(Rt2dPickRegionGetPath(pickRegion), -0.015f, -0.025f, 0.30f, 0.055f);
+        textMatrix = Rt2dObjectGetLTM(menu->unk_610[slot][0]);
+        if (!textMatrix || !Rt2dObjectMTMSetIdentity(buttonScene) ||
+            !Rt2dObjectMTMTranslate(buttonScene, textMatrix->pos.x, textMatrix->pos.y))
+            return false;
+
+        if (!Rt2dSceneLock(rootScene))
+            return false;
+        Rt2dSceneAddChild(rootScene, buttonScene);
+        Rt2dSceneUnlock(rootScene);
+
+        if (!Rt2dMaestroAddButton(maestro, buttonLabel, objectIndex,
+                                  0x0001 | 0x0040, actionList, &buttonIndex))
+            return false;
+        for (RwInt32 frame = 0; frame < frameCount; frame++)
+        {
+            Rt2dCel *cel = _rt2dCelListGetCelByIndex(rootCels, frame);
+            if (!cel || !Rt2dCelAddButtonIndex(cel, buttonIndex, NULL))
+                return false;
+        }
+        sp_profilePickRegions[slot] = pickRegion;
+        sp_profilePickUrls[slot] = urlLabel;
+    }
+
+    Rt2dSceneUpdateLTM(rootScene);
+    sp_profilePickMaestro = maestro;
+    return true;
+}
+
+static void sp_setProfilePickRegions(Rt2dMaestro *maestro, RwBool visible)
+{
+    if (maestro != sp_profilePickMaestro)
+        return;
+    for (RwInt32 slot = 0; slot < 4; slot++)
+    {
+        if (sp_profilePickRegions[slot])
+            Rt2dObjectSetVisible(sp_profilePickRegions[slot], visible);
+    }
+}
+
+extern "C" void sp_profileMouseMaestroDestroyed(Rt2dMaestro *maestro)
+{
+    if (maestro == sp_profilePickMaestro)
+    {
+        sp_profilePickMaestro = NULL;
+        sp_profilePickPending = false;
+        for (RwInt32 slot = 0; slot < 4; slot++)
+        {
+            sp_profilePickRegions[slot] = NULL;
+            sp_profilePickUrls[slot] = -1;
+        }
+    }
+}
+#endif
+
 // sp-match: ?sp_sub_AF7A0@type_sp_AE5D0@@QAEXM@Z @ 0x000AF7A0
 void type_sp_AE5D0::sp_sub_AF7A0(RwReal arg_0)
 {
+#ifdef CODFH_WIN32
+    if (sp_profilePickPending)
+    {
+        if (sp_addProfilePickRegions(this))
+            sp_setProfilePickRegions(unk_17C, TRUE);
+        sp_profilePickPending = false;
+    }
+#endif
     sp_sub_B1A10();
     unk_7D4 += arg_0;
     if (unk_610[0][0])
@@ -1231,6 +1400,19 @@ void type_sp_AE5D0::vf_000(RwInt32 arg_0)
     bool busy = false;
 
     sp_dword_3B4744 = 5;
+#ifdef CODFH_WIN32
+    for (RwInt32 slot = 0; slot < 4; slot++)
+    {
+        if (arg_0 == sp_profilePickUrls[slot] && arg_0 != -1)
+        {
+            type_sp_ADF20 selection = sp_sub_ADF20("/imcProfileSelection/");
+            Rt2dAnimGotoKeyFrameListByIndex(selection.unk_00, selection.unk_04, slot);
+            RwInt32 button[2] = {unk_49C, 0x40};
+            Rt2dMaestroForAllVisibleAnimations(unk_17C, sp_sub_ADDF0, button);
+            return;
+        }
+    }
+#endif
     if (sp_sub_B0770(arg_0))
     {
     }
@@ -1479,6 +1661,9 @@ void type_sp_AE5D0::vf_000(RwInt32 arg_0)
     }
     else if (arg_0 == unk_494) // enteringProfileSelect
     {
+#ifdef CODFH_WIN32
+        sp_profilePickPending = true;
+#endif
         if (unk_7CF)
         {
             unk_7CF = false;
@@ -1493,6 +1678,10 @@ void type_sp_AE5D0::vf_000(RwInt32 arg_0)
     }
     else if (arg_0 == unk_4A4) // leavingSelectProfile
     {
+#ifdef CODFH_WIN32
+        sp_setProfilePickRegions(unk_17C, FALSE);
+        sp_profilePickPending = false;
+#endif
         sp_sub_AE9A0();
     }
     else if (arg_0 == unk_5F0) // enteringLevelSelect
