@@ -1687,7 +1687,11 @@ _rpXboxDefaultInstance(RpXboxVtxFmt *fmt,
                                  texCoordSets[fmt->bnt - 1], instancedHeader,
                                  numVertices, instancedHeader->stride);
         }
+#ifdef CODFH_WIN32
         else if (packedNormals)
+#else
+        else
+#endif
         {
             _rpXboxVtxFmtInstBNTComp(lockedVertexBuffer, positions, packedNormals,
                                      texCoordSets[fmt->bnt - 1], instancedHeader,
