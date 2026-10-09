@@ -69,8 +69,7 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
                               WS_CHILD | WS_VISIBLE | SS_LEFT, 14, 12, 650, 24,
                               hwnd, NULL, instance, NULL);
     list = CreateWindowExA(WS_EX_CLIENTEDGE, "LISTBOX", NULL,
-                           WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | WS_HSCROLL |
-                               LBS_NOINTEGRALHEIGHT | LBS_EXTENDEDSEL,
+                           WS_CHILD | WS_VISIBLE | WS_TABSTOP | LBS_NOINTEGRALHEIGHT,
                            14, 42, 656, 390, hwnd, (HMENU)1001, instance, NULL);
     close_button = CreateWindowExA(0, "BUTTON", "Close",
                                    WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_DEFPUSHBUTTON,
@@ -90,8 +89,6 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
         SendMessageA(list, LB_ADDSTRING, 0, (LPARAM)trace[i]);
     if (!trace_count)
         SendMessageA(list, LB_ADDSTRING, 0, (LPARAM)"<no stack frames were available>");
-    SendMessageA(list, LB_SETHORIZONTALEXTENT, 1600, 0);
-
     SendMessageA(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), TRUE);
     SendMessageA(summary, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), TRUE);
     SendMessageA(list, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), TRUE);
