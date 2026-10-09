@@ -19,6 +19,9 @@
 #include "rw/batextur.h"
 #include "rw/badevice.h"
 #include "rw/rt2d.h"
+#ifdef CODFH_WIN32
+#include "port_mouse.h"
+#endif
 #include "game/data.h"
 #include "game/gameloop.h"
 #include "game/xboxlive.h"
@@ -115,6 +118,9 @@ type_sp_AD970::~type_sp_AD970()
 // sp-match: ?sp_sub_AD990@type_sp_AD970@@QAE_NPAURwCamera@@@Z @ 0x000AD990
 bool type_sp_AD970::sp_sub_AD990(RwCamera *arg_0)
 {
+#ifdef CODFH_WIN32
+    port_menu_mouse_reset();
+#endif
     RwChar path[0x80];
     RwUInt64 defaults = ((RwUInt64)(RwUInt32)arg_0 << 32) | 0xFFFFFFFFui64;
     sp_path_encoding context;
@@ -642,6 +648,37 @@ void type_sp_AD970::sp_sub_AE0D0(RwReal arg_0)
             }
             sp_flt_3B4828[i] = v;
         }
+#ifdef CODFH_WIN32
+        /* The mouse uses the same menu labels as the pad: movement steps the focus and a
+           left click activates the selected item. Keep it in this screen-only input path so
+           clicks remain the fire trigger while playing a level. */
+        RwInt32 mouse = port_menu_mouse_poll();
+        if (mouse)
+        {
+            data[1] = 0x40;
+            if (mouse & PORT_MENU_MOUSE_UP)
+                data[0] = unk_14C;
+            else if (mouse & PORT_MENU_MOUSE_DOWN)
+                data[0] = unk_150;
+            else if (mouse & PORT_MENU_MOUSE_LEFT)
+                data[0] = unk_154;
+            else if (mouse & PORT_MENU_MOUSE_RIGHT)
+                data[0] = unk_158;
+            else
+                data[0] = 0;
+            if (data[0])
+            {
+                if (dword_4F3130.sp_sub_12AAD0())
+                    data[0] = 0;
+                Rt2dMaestroForAllVisibleAnimations(unk_17C, sp_sub_ADDF0, data);
+            }
+            if (mouse & PORT_MENU_MOUSE_ACCEPT)
+            {
+                data[0] = dword_4F3130.sp_sub_12AAD0() ? 0 : unk_15C;
+                Rt2dMaestroForAllVisibleAnimations(unk_17C, sp_sub_ADDF0, data);
+            }
+        }
+#endif
     }
     Rt2dFontTexDictionarySet(unk_184);
     RwTexDictionarySetCurrent(unk_180);

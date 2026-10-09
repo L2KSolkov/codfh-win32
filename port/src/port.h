@@ -7,6 +7,8 @@
 #ifndef PORT_PORT_H
 #define PORT_PORT_H
 
+#include "port_mouse.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

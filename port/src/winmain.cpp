@@ -19,6 +19,64 @@ extern "C" void port_crash_handler_install(void);
 /* The mouse's movement since the controllers last read it (xpal_sys.cpp turns it into the right
    stick). */
 volatile LONG port_mouse_dx, port_mouse_dy;
+static volatile LONG port_menu_mouse_clicks;
+
+/* Consume menu-only mouse input. A modest movement moves one menu item; accumulated movement
+   is drained one item per frame so a quick sweep cannot skip an entire menu. */
+static LONG port_menu_pending_x, port_menu_pending_y;
+static POINT port_menu_last_cursor;
+static int port_menu_have_cursor;
+
+extern "C" void port_menu_mouse_reset(void)
+{
+    port_menu_pending_x = port_menu_pending_y = 0;
+    port_menu_have_cursor = 0;
+    InterlockedExchange(&port_menu_mouse_clicks, 0);
+}
+
+extern "C" int port_menu_mouse_poll(void)
+{
+    if (!port_hwnd || GetForegroundWindow() != (HWND)port_hwnd)
+    {
+        InterlockedExchange(&port_menu_mouse_clicks, 0);
+        port_menu_pending_x = port_menu_pending_y = 0;
+        port_menu_have_cursor = 0;
+        return 0;
+    }
+
+    POINT cursor;
+    if (GetCursorPos(&cursor) && ScreenToClient((HWND)port_hwnd, &cursor))
+    {
+        if (port_menu_have_cursor)
+        {
+            port_menu_pending_x += cursor.x - port_menu_last_cursor.x;
+            port_menu_pending_y += cursor.y - port_menu_last_cursor.y;
+        }
+        else
+            port_menu_have_cursor = 1;
+        port_menu_last_cursor = cursor;
+    }
+    int input = 0;
+    const LONG threshold = 28;
+    LONG ax = port_menu_pending_x < 0 ? -port_menu_pending_x : port_menu_pending_x;
+    LONG ay = port_menu_pending_y < 0 ? -port_menu_pending_y : port_menu_pending_y;
+    if (ax >= threshold || ay >= threshold)
+    {
+        if (ay > ax)
+        {
+            input |= port_menu_pending_y < 0 ? PORT_MENU_MOUSE_UP : PORT_MENU_MOUSE_DOWN;
+            port_menu_pending_y += port_menu_pending_y < 0 ? threshold : -threshold;
+        }
+        else
+        {
+            input |= port_menu_pending_x < 0 ? PORT_MENU_MOUSE_LEFT : PORT_MENU_MOUSE_RIGHT;
+            port_menu_pending_x += port_menu_pending_x < 0 ? threshold : -threshold;
+        }
+    }
+    if (InterlockedExchange(&port_menu_mouse_clicks, 0) > 0)
+        input |= PORT_MENU_MOUSE_ACCEPT;
+    return input;
+}
 
 static void confine_cursor(HWND hwnd, int on)
 {
@@ -79,6 +137,7 @@ static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
     case WM_LBUTTONDOWN:
         /* (the mouse is the game's once the player clicks into the window) */
         confine_cursor(hwnd, 1);
+        InterlockedIncrement(&port_menu_mouse_clicks);
         break;
     case WM_ACTIVATE:
         if (LOWORD(wp) == WA_INACTIVE)
@@ -96,13 +155,6 @@ static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         {
             set_fullscreen(hwnd, !fullscreen);
             return 0;
-        }
-        break;
-    case WM_SETCURSOR:
-        if (LOWORD(lp) == HTCLIENT)
-        {
-            SetCursor(NULL);
-            return TRUE;
         }
         break;
     case WM_SYSCOMMAND:
