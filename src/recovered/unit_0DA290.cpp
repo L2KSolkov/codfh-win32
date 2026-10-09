@@ -563,12 +563,14 @@ void sp_sub_129240(RwUInt8 arg_0);
 // sp-match: ?sp_sub_A58C0@@YAXPAURwCamera@@@Z @ 0x000A58C0
 void sp_sub_A58C0(RwCamera *arg_0)
 {
+#if !defined(CODFH_WIN32)
     if (!((sp_type_3EC3B0 *)dword_4F45F8)->unk_10)
     {
         sub_E8AC0("atvi.bik", (RwInt32)arg_0, 0, 0);
         sub_E8AC0("spark.bik", (RwInt32)arg_0, 0, 0);
         sub_E8AC0("kuju.bik", (RwInt32)arg_0, 0, 0);
     }
+#endif
     dword_4B88AC = 0;
     if (sub_1A1790(0))
     {
@@ -589,10 +591,12 @@ void sp_sub_A58C0(RwCamera *arg_0)
     }
     sub_186880(0);
     sp_dword_3B4724->sp_sub_AF7F0();
+#if !defined(CODFH_WIN32)
     if (!((sp_type_3EC3B0 *)dword_4F45F8)->unk_10)
     {
         sub_E8AC0("Intro.bik", (RwInt32)arg_0, 0, 0);
     }
+#endif
     sp_sub_129240(0);
 }
 #endif
