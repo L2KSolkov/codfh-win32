@@ -53,9 +53,7 @@ const RwUInt32 rpWorldVSDETexFlags[4] =
     D3DVSDE_TEXCOORD3
 };
 
-/* The plugin's constructor and destructor: nothing to do. /OPT:ICF folded it
- * into colldata.c's CollisionDataConstructor (aliased), so it has no place of
- * its own here. */
+/* The plugin's destructor: nothing to do. */
 static void *
 rxXboxVertexFmtConst(void *object,
                      RwInt32 offsetInObject __RWUNUSED__,
@@ -63,6 +61,20 @@ rxXboxVertexFmtConst(void *object,
 {
     return object;
 }
+
+/* Xbox geometry allocations begin zeroed; the Win32 allocator does not. Keep
+ * the lazy RpXboxVtxFmtInit check in _rpXboxDefaultInstance equivalent by
+ * initializing this extension when a geometry or world is created. */
+#if defined(CODFH_WIN32)
+static void *
+rxXboxVertexFmtInit(void *object,
+                    RwInt32 offsetInObject,
+                    RwInt32 sizeInObject)
+{
+    memset((RwUInt8 *)object + offsetInObject, 0, sizeInObject);
+    return object;
+}
+#endif
 
 /* Finds fmt in the sorted buffer: its index, or -(insertion point + 1).
  * /OPT:ICF kept the skin plugin's identical copy, SkinBinaryFindVertexFormat. */
@@ -1795,15 +1807,22 @@ rxXboxVtxFmtWorldRead(RwStream *stream,
 RwBool
 _rpXboxVtxFmtPluginAttach(void)
 {
+    RwPluginObjectConstructor constructor;
+
     if (RwEngineRegisterPlugin(0, rwID_VERTEXFMTPLUGIN,
                                rpXboxVtxFmtOpen, rpXboxVtxFmtClose) < 0)
     {
         return FALSE;
     }
 
+    constructor = rxXboxVertexFmtConst;
+#if defined(CODFH_WIN32)
+    constructor = rxXboxVertexFmtInit;
+#endif
+
     _rpXboxGeomVtxFmtOffset = RpGeometryRegisterPlugin(sizeof(RpXboxVtxFmt),
                                                        rwID_VERTEXFMTPLUGIN,
-                                                       rxXboxVertexFmtConst,
+                                                       constructor,
                                                        rxXboxVertexFmtConst,
                                                        rxXboxVertexFmtCopy);
     if (_rpXboxGeomVtxFmtOffset < 0)
@@ -1818,7 +1837,7 @@ _rpXboxVtxFmtPluginAttach(void)
 
     rpXboxWorldVtxFmtOffset = RpWorldRegisterPlugin(sizeof(RpXboxVtxFmt),
                                                     rwID_VERTEXFMTPLUGIN,
-                                                    rxXboxVertexFmtConst,
+                                                    constructor,
                                                     rxXboxVertexFmtConst,
                                                     rxXboxVertexFmtCopy);
     if (rpXboxWorldVtxFmtOffset < 0)
