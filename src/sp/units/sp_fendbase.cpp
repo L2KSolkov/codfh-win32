@@ -376,9 +376,9 @@ Rt2dFont *sp_sub_ADF80(Rt2dFont *arg_0, const RwChar *arg_4, RwReal arg_8, RwV2d
     }
     if (trace && port_frame >= 1500 && trace_count++ < 32)
     {
-        plog("frontend text[%d] font=%p text='%s' height=%g brush=%p colour=%u,%u,%u,%u", trace_count, arg_0,
-             arg_4, arg_8, arg_10, (RwUInt8)arg_10->bottom.col.red, (RwUInt8)arg_10->bottom.col.green,
-             (RwUInt8)arg_10->bottom.col.blue, (RwUInt8)arg_10->bottom.col.alpha);
+        plog("frontend text[%d] font=%p text='%s' height=%g pos=%g,%g brush=%p colour=%u,%u,%u,%u", trace_count,
+             arg_0, arg_4, arg_8, arg_C->x, arg_C->y, arg_10, (RwUInt8)arg_10->bottom.col.red,
+             (RwUInt8)arg_10->bottom.col.green, (RwUInt8)arg_10->bottom.col.blue, (RwUInt8)arg_10->bottom.col.alpha);
     }
 #endif
 
