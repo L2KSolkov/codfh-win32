@@ -103,6 +103,12 @@ RwInt32 sub_D99F0(type_D9950 *arg_0)
                         var_1C.Orthogonal = 0.01f;
                         var_1C.Identity = 0.1f;
                         RwEngineSetMatrixTolerances(&var_1C);
+#if defined(CODFH_SP) && defined(CODFH_WIN32)
+                        // The Win32 keyboard is controller port 0. Initialize SP's default
+                        // profile before the first pad enumeration reads its control index;
+                        // the front end calls this same once-guarded setup later on Xbox.
+                        sub_19AD20();
+#endif
                         unk_4B9308.sub_EE590();
                         sub_83100();
                         sub_19A750();
