@@ -59,6 +59,12 @@ type_16C2A0 dword_4391EC;
 // match: _$E6 @ 0x0030DC60
 // match: _$E8 @ 0x003097D0
 // match: _$E9 @ 0x0030DC70
+// sp-match: _$E9 @ 0x0021E0A0
+// sp-match: _$E2 @ 0x0021C210
+// sp-match: _$E5 @ 0x0021C230
+// sp-match: _$E8 @ 0x0021C250
+// sp-match: _$E3 @ 0x0021E080
+// sp-match: _$E6 @ 0x0021E090
 
 RwInt32 sub_353A0(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C);
 RwInt32 sub_35A60(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C);
@@ -86,6 +92,7 @@ void sub_366D0(type_365A0 arg_0);
 type_35120 *sub_36700(type_365A0 arg_0);
 
 // match: sub_34FA0 @ 0x00034FA0
+// sp-match: sub_34FA0 @ 0x0002A390
 void sub_34FA0()
 {
     dword_4391EC.sub_16C2C0(0x61, 0x24, "m_freeDistanceParams", 4, 0);
@@ -97,6 +104,7 @@ void sub_34FA0()
 }
 
 // match: sub_35020 @ 0x00035020
+// sp-match: sub_35020 @ 0x00029DC0
 void sub_35020()
 {
     RwInt32 var_4;
@@ -113,6 +121,7 @@ void sub_35020()
 }
 
 // match: sub_35080 @ 0x00035080
+// sp-match: sub_35080 @ 0x00029DF0
 void sub_35080()
 {
     RwInt32 var_4;
@@ -129,10 +138,13 @@ void sub_35080()
 // match: sub_350D0 @ 0x000350D0
 void sub_350D0()
 {
+#ifndef CODFH_SP
     sub_19A750("Somebody forgot to unregister in the Distance Scheduler!");
+#endif
 }
 
 // match: sub_350F0 @ 0x000350F0
+// sp-match: sub_350F0 @ 0x000294A0
 void sub_350F0(RwReal arg_0)
 {
     dword_4391A0.sub_72560(arg_0);
@@ -140,6 +152,7 @@ void sub_350F0(RwReal arg_0)
 }
 
 // match: sub_35120 @ 0x00035120
+// sp-match: sub_35120 @ 0x00029E20
 type_35120 *sub_35120(RwReal arg_0, RwReal arg_4, RwInt32 arg_8, RwInt32 arg_C, RwInt32 arg_10,
                       type_3D2E7C *arg_14, RwInt32 arg_18, RwInt32 arg_1C)
 {
@@ -166,6 +179,7 @@ type_35120 *sub_35120(RwReal arg_0, RwReal arg_4, RwInt32 arg_8, RwInt32 arg_C, 
 }
 
 // match: sub_35200 @ 0x00035200
+// sp-match: sub_35200 @ 0x00029EC0
 // Registers arg_0 for the test arg_C between the distances arg_4 and arg_8
 // (see type_35120); test 6 registers both a test-6 entry on dword_4391A0
 // and a test-5 one on dword_439210.
@@ -192,6 +206,7 @@ type_67620 *sub_35200(type_67620 *arg_0, RwReal arg_4, RwReal arg_8, RwInt32 arg
 }
 
 // match: sub_35330 @ 0x00035330
+// sp-match: sub_35330 @ 0x000294C0
 void sub_35330(type_67620 *arg_0)
 {
     if (arg_0 != 0) {
@@ -201,6 +216,7 @@ void sub_35330(type_67620 *arg_0)
 }
 
 // match: sub_35360 @ 0x00035360
+// sp-match: sub_35360 @ 0x000294F0
 void sub_35360(alfasched_entry *arg_0)
 {
     if (arg_0 != 0) {
@@ -211,7 +227,11 @@ void sub_35360(alfasched_entry *arg_0)
     }
 }
 
+#ifdef CODFH_SP
+type_67620 *sp_sub_67620_h(type_365A0 arg_0);
+#endif
 // match: sub_353A0 @ 0x000353A0
+// sp-match: sub_353A0 @ 0x00029FA0
 // The schedules' first callback: runs the registration arg_4 for the object
 // arg_0, answering each target through sub_35FD0 (in range) or sub_362F0
 // (out of range). Returns 0 to end a registration with flag 0 whose answer
@@ -296,7 +316,6 @@ RwInt32 sub_353A0(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
             }
         }
     } else if (var_10->unk_04 == 9 || var_10->unk_04 == 0xB) {
-        RwReal local_50;
         RwInt32 stk_4C;
         type_3D3548 *loc48;
         type_3D2E7C *var_44;
@@ -307,7 +326,11 @@ RwInt32 sub_353A0(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
             loc48 = 0;
             var_44 = 0;
             if (var_10->unk_10 != 0) {
+#ifdef CODFH_SP // shape: the handle passed as a type_365A0 by value (SP 0x2A15E: `mov ecx, eax; push ecx`)
+                var_44 = (type_3D2E7C *)sp_sub_67620_h(*(type_365A0 *)&var_10->unk_10);
+#else
                 var_44 = (type_3D2E7C *)sub_67620(var_10->unk_10);
+#endif
                 if (var_44 != 0 && var_44->get_unk_24() == var_10->unk_14)
                     loc48 = var_44->sub_71300();
             } else {
@@ -315,6 +338,8 @@ RwInt32 sub_353A0(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
                 var_44 = v8->vf_098();
             }
             if (loc48 != 0) {
+                RwReal local_50;
+
                 stk_4C = 0;
                 if (var_10->unk_04 == 0xB)
                     stk_4C = 1;
@@ -372,6 +397,7 @@ RwInt32 sub_353A0(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 }
 
 // match: sub_35A60 @ 0x00035A60
+// sp-match: sub_35A60 @ 0x0002A360
 // The schedules' second callback: ends the registration arg_4.
 RwInt32 sub_35A60(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 {
@@ -386,6 +412,7 @@ RwInt32 sub_35A60(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 }
 
 // match: ?sub_35AA0@@YAHPAUtype_3D3548@@0PAUtype_35120@@@Z @ 0x00035AA0
+// sp-match: ?sub_35AA0@@YAHPAUtype_3D3548@@0PAUtype_35120@@@Z @ 0x00029530
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_35AA0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_35120 *arg_8)
 {
@@ -405,9 +432,15 @@ RwInt32 sub_35AA0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_35120 *arg_8)
     case 3:
     case 10:
         bp_4 = arg_4->vf_098();
+#ifdef CODFH_SP // shape: the handle through its struct's conversion (SP 0x29558 reuses ecx for the serial)
+        return bp_4 &&
+            bp_4->get_unk_04_h() == arg_8->unk_10 &&
+            bp_4->get_unk_24() == arg_8->unk_14 ? 1 : 0;
+#else
         return bp_4 &&
             (m_18 = bp_4->unk_04, m_18 == arg_8->unk_10) &&
             bp_4->get_unk_24() == arg_8->unk_14 ? 1 : 0;
+#endif
     case 5:
         lv_10 = arg_4->vf_098();
         var_C = 0;
@@ -418,9 +451,15 @@ RwInt32 sub_35AA0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_35120 *arg_8)
             if (ebp_14)
                 var_C = ebp_14->vf_098();
         }
+#ifdef CODFH_SP // shape: lv_10's handle through its struct's conversion (SP 0x295B7 reuses eax for the serial)
+        return lv_10 && var_C &&
+            lv_10->get_unk_04_h() == var_C->get_unk_04() &&
+            lv_10->get_unk_24() == var_C->get_unk_24() ? 1 : 0;
+#else
         return lv_10 && var_C &&
             (l1C = lv_10->unk_04, var_20 = var_C->unk_04, l1C == var_20) &&
             lv_10->get_unk_24() == var_C->get_unk_24() ? 1 : 0;
+#endif
     case 4:
         return arg_4->unk_2C_4;
     case 6:
@@ -431,6 +470,7 @@ RwInt32 sub_35AA0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_35120 *arg_8)
 }
 
 // match: ?sub_35C20@@YAHPAUtype_3D3548@@0MMPAM@Z @ 0x00035C20
+// sp-match: ?sub_35C20@@YAHPAUtype_3D3548@@0MMPAM@Z @ 0x00029620
 RwInt32 sub_35C20(type_3D3548 *arg_0, type_3D3548 *arg_4, RwReal arg_8, RwReal arg_C, RwReal *arg_10)
 {
     RwV3d *var_10;
@@ -464,6 +504,7 @@ RwInt32 sub_35C20(type_3D3548 *arg_0, type_3D3548 *arg_4, RwReal arg_8, RwReal a
 }
 
 // match: ?sub_35D90@@YAHPAUtype_3D3548@@0MMPAM@Z @ 0x00035D90
+// sp-match: ?sub_35D90@@YAHPAUtype_3D3548@@0MMPAM@Z @ 0x00029700
 RwInt32 sub_35D90(type_3D3548 *arg_0, type_3D3548 *arg_4, RwReal arg_8, RwReal arg_C, RwReal *arg_10)
 {
     RwV3d var_18;
@@ -509,6 +550,7 @@ RwInt32 sub_35D90(type_3D3548 *arg_0, type_3D3548 *arg_4, RwReal arg_8, RwReal a
 }
 
 // match: sub_35F60 @ 0x00035F60
+// sp-match: sub_35F60 @ 0x00029850
 // Sends arg_0's "in range" message for the registration arg_4 (its unk_18,
 // or "TargetInRange"), with the arg_C dwords at arg_8.
 void sub_35F60(type_3D3548 *arg_0, type_35120 *arg_4, type_35FD0 *arg_8, RwInt32 arg_C)
@@ -520,6 +562,7 @@ void sub_35F60(type_3D3548 *arg_0, type_35120 *arg_4, type_35FD0 *arg_8, RwInt32
 }
 
 // match: ?sub_35FD0@@YAXPAUtype_3D3548@@0PAUtype_35120@@M@Z @ 0x00035FD0
+// sp-match: ?sub_35FD0@@YAXPAUtype_3D3548@@0PAUtype_35120@@M@Z @ 0x000298C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_35FD0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_35120 *arg_8, RwReal arg_C)
 {
@@ -533,6 +576,16 @@ void sub_35FD0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_35120 *arg_8, RwReal
     RwUInt32 fp_40;
     type_154C0_80 *l3C;
     AIData *var38;
+#ifdef CODFH_SP // shape: one message buffer for every case
+    type_3D2E7C *frm_24;
+    type_3D3548 *var_20;
+    AIData *l1C;
+    type_35FD0 bp_8;
+    type_35FD0 &r34 = bp_8;
+    type_35FD0 &fp_2C = bp_8;
+    type_35FD0 &m_18 = bp_8;
+    type_35FD0 &lv_10 = bp_8;
+#else
     type_35FD0 r34;
     type_35FD0 fp_2C;
     type_3D2E7C *frm_24;
@@ -541,6 +594,7 @@ void sub_35FD0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_35120 *arg_8, RwReal
     type_35FD0 m_18;
     type_35FD0 lv_10;
     type_35FD0 bp_8;
+#endif
 
     if (arg_8->unk_04 == 7 || arg_8->unk_04 == 12)
     {
@@ -633,6 +687,7 @@ void sub_35FD0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_35120 *arg_8, RwReal
 }
 
 // match: sub_36280 @ 0x00036280
+// sp-match: sub_36280 @ 0x00029A90
 // Sends arg_0's "out of range" message for the registration arg_4 (its
 // unk_1C, or "TargetOutOfRange"), with the arg_C dwords at arg_8.
 void sub_36280(type_3D3548 *arg_0, type_35120 *arg_4, type_35FD0 *arg_8, RwInt32 arg_C)
@@ -644,6 +699,7 @@ void sub_36280(type_3D3548 *arg_0, type_35120 *arg_4, type_35FD0 *arg_8, RwInt32
 }
 
 // match: ?sub_362F0@@YAXPAUtype_3D3548@@0PAUtype_35120@@M@Z @ 0x000362F0
+// sp-match: ?sub_362F0@@YAXPAUtype_3D3548@@0PAUtype_35120@@M@Z @ 0x00029B00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_362F0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_35120 *arg_8, RwReal arg_C)
 {
@@ -657,6 +713,16 @@ void sub_362F0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_35120 *arg_8, RwReal
     RwUInt32 fp_40;
     type_154C0_80 *l3C;
     AIData *var38;
+#ifdef CODFH_SP // shape: one message buffer for every case
+    type_3D2E7C *frm_24;
+    type_3D3548 *var_20;
+    AIData *l1C;
+    type_35FD0 bp_8;
+    type_35FD0 &r34 = bp_8;
+    type_35FD0 &fp_2C = bp_8;
+    type_35FD0 &m_18 = bp_8;
+    type_35FD0 &lv_10 = bp_8;
+#else
     type_35FD0 r34;
     type_35FD0 fp_2C;
     type_3D2E7C *frm_24;
@@ -665,6 +731,7 @@ void sub_362F0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_35120 *arg_8, RwReal
     type_35FD0 m_18;
     type_35FD0 lv_10;
     type_35FD0 bp_8;
+#endif
 
     if (arg_8->unk_04 == 7 || arg_8->unk_04 == 12)
     {
@@ -757,6 +824,7 @@ void sub_362F0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_35120 *arg_8, RwReal
 }
 
 // match: sub_365A0 @ 0x000365A0
+// sp-match: sub_365A0 @ 0x00029CD0
 // Gives the registration arg_0 a handle: the pending one in dword_438E88 if
 // set, else the first free entry of dword_438E90 with a new serial.
 RwUInt32 sub_365A0(type_35120 *arg_0)
@@ -792,6 +860,7 @@ RwUInt32 sub_365A0(type_35120 *arg_0)
 }
 
 // match: sub_366D0 @ 0x000366D0
+// sp-match: sub_366D0 @ 0x00029D80
 // Frees the handle arg_0's entry.
 void sub_366D0(type_365A0 arg_0)
 {
@@ -800,6 +869,7 @@ void sub_366D0(type_365A0 arg_0)
 }
 
 // match: sub_36700 @ 0x00036700
+// sp-match: sub_36700 @ 0x00029DA0
 // The registration of the handle arg_0, 0 when it is stale.
 type_35120 *sub_36700(type_365A0 arg_0)
 {

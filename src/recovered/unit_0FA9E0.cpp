@@ -16,6 +16,7 @@
 #include "types/PickupTrigger.h"
 #include "rws/clumphelper.h"
 #include "types/type_3DF8D8.h"
+#if !defined(CODFH_SP) || CODFH_SP_PART != 2 // single player compiles the rest in another file (src/sp/units/sp_unit_0FA9E0_2.cpp)
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D94B4
@@ -46,6 +47,12 @@ type_4C09B0 dword_4C09B0[0x6E];
 // match: ?sub_FA9E0@@YAPAUtype_3D3548@@PAVPickupTrigger@@@Z @ 0x000FA9E0
 // match: __ehhandler$?sub_FA9E0@@YAPAUtype_3D3548@@PAVPickupTrigger@@@Z-0x27 @ 0x00301170
 // match: __ehhandler$?sub_FA9E0@@YAPAUtype_3D3548@@PAVPickupTrigger@@@Z @ 0x00301197
+// sp-match: _$E2 @ 0x0021D7B0
+// sp-match: _$E3 @ 0x0021E950
+// sp-match: ?sub_FA9E0@@YAPAUtype_3D3548@@PAVPickupTrigger@@@Z @ 0x000BEDD0
+// Single player calls the inline constructor (types/type_3D94B8.h) out of line
+// (SP 0xBEE36); this file emits it:
+// sp-match: ??0type_3D94B8@@QAE@PAVPickupTrigger@@@Z @ 0x000BED70
 
 type_3D3548 *sub_FA9E0(PickupTrigger *arg_0)
 {
@@ -61,26 +68,31 @@ type_3D3548 *sub_FA9E0(PickupTrigger *arg_0)
             var_10 = 0;
         }
     }
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xBEDD0)
     else
     {
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
                    "location(%6.2f,%6.2f,%6.2f)",
                    arg_0->unk_90, arg_0->unk_94, arg_0->unk_98);
     }
+#endif
     return var_10;
 }
 
 // match: ??_Gtype_3D94B8@@UAEPAXI@Z @ 0x000FAB20
+// sp-match: ??_Gtype_3D94B8@@UAEPAXI@Z @ 0x000BEC90
 // (Its scalar deleting destructor, compiler-written.)
 
 // match: ??1type_3D94B8@@UAE@XZ @ 0x000FAB50
 // match: __ehhandler$??1type_3D94B8@@UAE@XZ-0x16 @ 0x003011B0
 // match: __ehhandler$??1type_3D94B8@@UAE@XZ @ 0x003011C6
+// sp-match: ??1type_3D94B8@@UAE@XZ @ 0x000BECB0
 // (In the class.)
 
 // match: ?sub_FABC0@@YAPAUtype_3D94B8@@HHPAURwMatrixTag@@MHH@Z @ 0x000FABC0
 // match: __ehhandler$?sub_FABC0@@YAPAUtype_3D94B8@@HHPAURwMatrixTag@@MHH@Z-0x11 @ 0x003011D0
 // match: __ehhandler$?sub_FABC0@@YAPAUtype_3D94B8@@HHPAURwMatrixTag@@MHH@Z @ 0x003011E1
+// sp-match: ?sub_FABC0@@YAPAUtype_3D94B8@@HHPAURwMatrixTag@@MHH@Z @ 0x000BEE70
 type_3D94B8 *sub_FABC0(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, RwReal arg_C, RwInt32 arg_10, RwInt32 arg_14)
 {
     type_3D94B8 *var_10 = 0;
@@ -96,6 +108,7 @@ type_3D94B8 *sub_FABC0(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, RwReal arg
 // match: ??0type_3D94B8@@QAE@HHPAURwMatrixTag@@MHH@Z @ 0x000FAC70
 // match: __ehhandler$??0type_3D94B8@@QAE@HHPAURwMatrixTag@@MHH@Z-0x16 @ 0x003011F0
 // match: __ehhandler$??0type_3D94B8@@QAE@HHPAURwMatrixTag@@MHH@Z @ 0x00301206
+// sp-match: ??0type_3D94B8@@QAE@HHPAURwMatrixTag@@MHH@Z @ 0x000BEBF0
 type_3D94B8::type_3D94B8(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, RwReal arg_C, RwInt32 arg_10,
                          RwInt32 arg_14)
 {
@@ -106,6 +119,7 @@ type_3D94B8::type_3D94B8(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, RwReal a
 }
 
 // match: ?sub_FAD20@type_3D94B8@@QAEHPAVPickupTrigger@@@Z @ 0x000FAD20
+// sp-match: ?sub_FAD20@type_3D94B8@@QAEHPAVPickupTrigger@@@Z @ 0x000BED10
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3D94B8::sub_FAD20(PickupTrigger *arg_0)
 {
@@ -126,6 +140,7 @@ RwInt32 type_3D94B8::sub_FAD20(PickupTrigger *arg_0)
 }
 
 // match: ?sub_FADB0@type_3D94B8@@QAEHHHPAURwMatrixTag@@MHH@Z @ 0x000FADB0
+// sp-match: ?sub_FADB0@type_3D94B8@@QAEHHHPAURwMatrixTag@@MHH@Z @ 0x000BE700
 // Sets the pickup up from the settings arg_0 (count arg_4): its size, its
 // physics (falling unless placed with a height of -1), a clone of the model
 // arg_14 (else the settings' named object's), placed at arg_8 raised by
@@ -242,6 +257,7 @@ RwInt32 type_3D94B8::sub_FADB0(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, Rw
 }
 
 // match: ?vf_230@type_3D94B8@@UAEXXZ @ 0x000FB330
+// sp-match: ?vf_230@type_3D94B8@@UAEXXZ @ 0x000BEAF0
 void type_3D94B8::vf_230()
 {
     if (unk_3C4)
@@ -257,6 +273,7 @@ void type_3D94B8::vf_230()
 }
 
 // match: ?vf_1C4@type_3D94B8@@UAEXH@Z @ 0x000FB390
+// sp-match: ?vf_1C4@type_3D94B8@@UAEXH@Z @ 0x000BEB40
 void type_3D94B8::vf_1C4(RwInt32 arg_0)
 {
     RwV3d *var_4 = &unk_10C;
@@ -274,18 +291,21 @@ void type_3D94B8::vf_1C4(RwInt32 arg_0)
 }
 
 // match: ?vf_03C@type_3D94B8@@UAEXM@Z @ 0x000FB410
+// sp-match: ?vf_03C@type_3D94B8@@UAEXM@Z @ 0x000BEB80
 void type_3D94B8::vf_03C(RwReal arg_0)
 {
     type_3D3548::vf_03C(arg_0);
 }
 
 // match: ?vf_040@type_3D94B8@@UAEXM@Z @ 0x000FB430
+// sp-match: ?vf_040@type_3D94B8@@UAEXM@Z @ 0x00106CA0
 void type_3D94B8::vf_040(RwReal arg_0)
 {
     type_3D3548::vf_040(arg_0);
 }
 
 // match: ?vf_044@type_3D94B8@@UAEXM@Z @ 0x000FB450
+// sp-match: ?vf_044@type_3D94B8@@UAEXM@Z @ 0x000BEB90
 void type_3D94B8::vf_044(RwReal arg_0)
 {
     type_3D3548::vf_044(arg_0);
@@ -297,6 +317,7 @@ void type_3D94B8::vf_044(RwReal arg_0)
 }
 
 // match: ?vf_058@type_3D94B8@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x000FB4A0
+// sp-match: ?vf_058@type_3D94B8@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x000BEBB0
 RwInt32 type_3D94B8::vf_058(type_3DF8D8_04 *arg_0)
 {
     type_4C09B0 *var_4 = sub_FB6C0(unk_3B0.sub_FB710());
@@ -308,7 +329,10 @@ RwInt32 type_3D94B8::vf_058(type_3DF8D8_04 *arg_0)
     return 0;
 }
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART != 1 // single player: sp_unit_0FA9E0_2.cpp, the second file
 // match: ?sub_FB4F0@@YAXXZ @ 0x000FB4F0
+// sp-match: ?sub_FB4F0@@YAXXZ @ 0x000BEFF0
 void sub_FB4F0()
 {
     RwInt32 var_4;
@@ -332,6 +356,7 @@ void sub_FB530()
 }
 
 // match: ?sub_FB570@@YAXXZ @ 0x000FB570
+// sp-match: ?sub_FB570@@YAXXZ @ 0x000BF020
 void sub_FB570()
 {
     RwInt32 var_4;
@@ -343,6 +368,7 @@ void sub_FB570()
 }
 
 // match: ??0type_4C09B0@@QAE@XZ @ 0x000FB5B0
+// sp-match: ??0type_4C09B0@@QAE@XZ @ 0x000BEF10
 type_4C09B0::type_4C09B0()
 {
     unk_00 = 0;
@@ -355,12 +381,14 @@ type_4C09B0::type_4C09B0()
 }
 
 // match: ??1type_4C09B0@@QAE@XZ @ 0x000FB640
+// sp-match: ??1type_4C09B0@@QAE@XZ @ 0x000BEF40
 type_4C09B0::~type_4C09B0()
 {
     unk_00 = 0;
 }
 
 // match: ?sub_FB660@type_4C09B0@@QAE_NXZ @ 0x000FB660
+// sp-match: ?sub_FB660@type_4C09B0@@QAE_NXZ @ 0x000BEF50
 bool type_4C09B0::sub_FB660()
 {
     unk_04.unk_00 = 0;
@@ -370,6 +398,7 @@ bool type_4C09B0::sub_FB660()
 }
 
 // match: ?sub_FB690@type_4C09B0@@QAE_NXZ @ 0x000FB690
+// sp-match: ?sub_FB690@type_4C09B0@@QAE_NXZ @ 0x000BEF60
 bool type_4C09B0::sub_FB690()
 {
     unk_04.unk_00 = 0;
@@ -379,6 +408,7 @@ bool type_4C09B0::sub_FB690()
 }
 
 // match: ?sub_FB6C0@@YAPAUtype_4C09B0@@H@Z @ 0x000FB6C0
+// sp-match: ?sub_FB6C0@@YAPAUtype_4C09B0@@H@Z @ 0x000BEF70
 type_4C09B0 *sub_FB6C0(RwInt32 arg_0)
 {
     if (arg_0 < 0 || arg_0 >= 0x6E)
@@ -389,6 +419,7 @@ type_4C09B0 *sub_FB6C0(RwInt32 arg_0)
 }
 
 // match: ??0type_FB6E0@@QAE@XZ @ 0x000FB6E0
+// sp-match: ??0type_FB6E0@@QAE@XZ @ 0x000BEF90
 type_FB6E0::type_FB6E0()
 {
     unk_04 = 0;
@@ -397,12 +428,14 @@ type_FB6E0::type_FB6E0()
 }
 
 // match: ?sub_FB710@type_FB6E0@@QAEHXZ @ 0x000FB710
+// sp-match: ?sub_FB710@type_FB6E0@@QAEHXZ @ 0x0005BA70
 RwInt32 type_FB6E0::sub_FB710()
 {
     return unk_08;
 }
 
 // match: ?sub_FB730@type_FB6E0@@QAEXHH@Z @ 0x000FB730
+// sp-match: ?sub_FB730@type_FB6E0@@QAEXHH@Z @ 0x000BEFB0
 void type_FB6E0::sub_FB730(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_08 = arg_0;
@@ -411,6 +444,7 @@ void type_FB6E0::sub_FB730(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_FB760@type_FB6E0@@QAEHXZ @ 0x000FB760
+// sp-match: ?sub_FB760@type_FB6E0@@QAEHXZ @ 0x000BEFD0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_FB6E0::sub_FB760()
 {
@@ -436,9 +470,11 @@ void type_3D94B8::vf_054(RwInt32 arg_0)
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ??1type_FB6E0@@QAE@XZ (folded into 0x1E41C0)
+#ifndef CODFH_SP // single player keeps the calls to the empty destructor (SP 0xBECB0, 0xBEBF0): defined elsewhere there
 type_FB6E0::~type_FB6E0()
 {
 }
+#endif
 
 // ??2type_3D94B8@@SAPAXIPAX@Z (folded into 0x6CCF0)
 void *type_3D94B8::operator new(RwUInt32 arg_0, void *arg_4)
@@ -463,9 +499,11 @@ bool type_4C09B0::sub_2015D0()
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ??3type_3D94B8@@SAXPAX@Z (folded into 0x19A750)
+#ifndef CODFH_SP // single player keeps the call to the empty operator delete (SP 0xBEC90 calls SP nullsub_1): defined elsewhere there
 void type_3D94B8::operator delete(void * arg_0)
 {
 }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
@@ -474,3 +512,4 @@ void type_3D94B8::operator delete(void * arg_0)
 void type_3D94B8::operator delete(void * arg_0, void * arg_4)
 {
 }
+#endif

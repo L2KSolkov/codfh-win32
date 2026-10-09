@@ -118,6 +118,7 @@ extern "C" void port_cli_frame(void)
         set_4F28F0_unk_183(port_config.playerName);
         plog("player name: %s", port_config.playerName);
     }
+#ifndef CODFH_SP
     if (!cli_pending || !dword_4FD974 || !dword_4FD970)
         return;
     cli_pending = 0;
@@ -150,4 +151,11 @@ extern "C" void port_cli_frame(void)
     startServer(false);
     dword_42D28C = 3;
     sub_1FC310()->sub_1FBE20();
+#else
+    if (cli_pending)
+    {
+        plog("command line: -map is only available in the multiplayer port");
+        cli_pending = 0;
+    }
+#endif
 }

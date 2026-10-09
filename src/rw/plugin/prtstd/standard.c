@@ -93,6 +93,7 @@ static const char rcsid[] = "@@@@(#)$Id: //RenderWare/RW36Active/rwsdk/plugin/pr
 // match: __real@2f800000 @ 0x00419F20
 
 // match: _RpPrtStdParticleStdUpdateCB @ 0x002EFC50
+// sp-match: _RpPrtStdParticleStdUpdateCB @ 0x0020A700
 
 RpPrtStdParticleBatch *
 RpPrtStdParticleStdUpdateCB(RpPrtStdEmitter *emt,
@@ -698,6 +699,7 @@ RpPrtStdParticleStdUpdateCB(RpPrtStdEmitter *emt,
  */
 
 // match: _RpPrtStdEmitterStdEmitCB @ 0x002F0860
+// sp-match: _RpPrtStdEmitterStdEmitCB @ 0x0020B310
 RpPrtStdEmitter *
 RpPrtStdEmitterStdEmitCB(RpAtomic * atomic __RWUNUSED__,
                               RpPrtStdEmitter *emt,
@@ -1386,6 +1388,7 @@ RpPrtStdEmitterStdEmitCB(RpAtomic * atomic __RWUNUSED__,
  * \see RpPrtStdParticleStdUpdateCB
  */
 // match: _RpPrtStdEmitterStdCreateCB @ 0x002F1980
+// sp-match: _RpPrtStdEmitterStdCreateCB @ 0x0020C430
 RpPrtStdEmitter *
 RpPrtStdEmitterStdCreateCB(RpAtomic * atomic __RWUNUSED__,
                                 RpPrtStdEmitter *emt,
@@ -1475,6 +1478,7 @@ RpPrtStdEmitterStdCreateCB(RpAtomic * atomic __RWUNUSED__,
  * \see RpPrtStdParticleStdUpdateCB
  */
 // match: _RpPrtStdEmitterStdDestroyCB @ 0x002F1A40
+// sp-match: _RpPrtStdEmitterStdDestroyCB @ 0x0020C4F0
 RpPrtStdEmitter *
 RpPrtStdEmitterStdDestroyCB(RpAtomic * atomic __RWUNUSED__,
                                 RpPrtStdEmitter *emt,
@@ -1531,6 +1535,7 @@ RpPrtStdEmitterStdDestroyCB(RpAtomic * atomic __RWUNUSED__,
  * \see RpPrtStdParticleStdUpdateCB
  */
 // match: _RpPrtStdEmitterStdCloneCB @ 0x002F1A80
+// sp-match: _RpPrtStdEmitterStdCloneCB @ 0x0020C530
 RpPrtStdEmitter *
 RpPrtStdEmitterStdCloneCB(RpAtomic * atomic __RWUNUSED__,
                                 RpPrtStdEmitter *emt,
@@ -1679,6 +1684,7 @@ RpPrtStdEmitterStdCloneCB(RpAtomic * atomic __RWUNUSED__,
  * \see RpPrtStdPClassStdCreate
  */
 // match: _RpPrtStdEmitterStdBeginUpdateCB @ 0x002F1C30
+// sp-match: _RpPrtStdEmitterStdBeginUpdateCB @ 0x0020C6E0
 RpPrtStdEmitter *
 RpPrtStdEmitterStdBeginUpdateCB(RpAtomic *atomic,
                                   RpPrtStdEmitter *emt, void *data)
@@ -1760,6 +1766,7 @@ RpPrtStdEmitterStdBeginUpdateCB(RpAtomic *atomic,
  * \see RpPrtStdPClassStdCreate
  */
 // match: _RpPrtStdEmitterStdEndUpdateCB @ 0x002F1D00
+// sp-match: _RpPrtStdEmitterStdEndUpdateCB @ 0x0020C7B0
 RpPrtStdEmitter *
 RpPrtStdEmitterStdEndUpdateCB(RpAtomic * atomic __RWUNUSED__,
                                    RpPrtStdEmitter *emt,
@@ -1827,6 +1834,7 @@ RpPrtStdEmitterStdEndUpdateCB(RpAtomic * atomic __RWUNUSED__,
  * \see RpPrtStdPClassStdCreate
  */
 // match: _RpPrtStdEmitterStdRenderCB @ 0x002F1D60
+// sp-match: _RpPrtStdEmitterStdRenderCB @ 0x0020C810
 RpPrtStdEmitter *
 RpPrtStdEmitterStdRenderCB(RpAtomic * atomic __RWUNUSED__,
                                 RpPrtStdEmitter *emt,
@@ -2313,6 +2321,7 @@ RpPrtStdEClassStdCreate( RwInt32 dataFlag )
  * \see RpPrtStdEmitterStdStreamWriteCB
  */
 // match: _RpPrtStdEmitterStdStreamReadCB @ 0x002F1DA0
+// sp-match: _RpPrtStdEmitterStdStreamReadCB @ 0x0020C850
 RpPrtStdEmitter *
 RpPrtStdEmitterStdStreamReadCB(RpAtomic * atomic __RWUNUSED__,
                                     RpPrtStdEmitter *emt, void *data)
@@ -2540,6 +2549,7 @@ RpPrtStdEmitterStdStreamReadCB(RpAtomic * atomic __RWUNUSED__,
  * \see RpPrtStdEmitterStdStreamWriteCB
  */
 // match: _RpPrtStdEmitterStdStreamWriteCB @ 0x002F2100
+// sp-match: _RpPrtStdEmitterStdStreamWriteCB @ 0x0020CBB0
 RpPrtStdEmitter *
 RpPrtStdEmitterStdStreamWriteCB(RpAtomic * atomic __RWUNUSED__,
                                      RpPrtStdEmitter *emt, void *data)
@@ -2755,6 +2765,7 @@ RpPrtStdEmitterStdStreamWriteCB(RpAtomic * atomic __RWUNUSED__,
  * \see RpPrtStdEmitterStdStreamWriteCB
  */
 // match: _RpPrtStdEmitterStdStreamGetSizeCB @ 0x002F2450
+// sp-match: _RpPrtStdEmitterStdStreamGetSizeCB @ 0x0020CF00
 RpPrtStdEmitter *
 RpPrtStdEmitterStdStreamGetSizeCB(RpAtomic * atomic __RWUNUSED__,
                                        RpPrtStdEmitter *emt,
@@ -2919,6 +2930,7 @@ RpPrtStdEmitterStdStreamGetSizeCB(RpAtomic * atomic __RWUNUSED__,
  * \see RpPrtStdSetEClassSetupCallBack
  */
 // match: _RpPrtStdEClassStdSetupCB @ 0x002F2530
+// sp-match: _RpPrtStdEClassStdSetupCB @ 0x0020CFE0
 RpPrtStdEmitterClass *
 RpPrtStdEClassStdSetupCB(RpPrtStdEmitterClass *eClass)
 {
@@ -2967,6 +2979,7 @@ RpPrtStdEClassStdSetupCB(RpPrtStdEmitterClass *eClass)
  * \see RpPrtStdSetPClassSetupCallBack
  */
 // match: _RpPrtStdPClassStdSetupCB @ 0x002F25D0
+// sp-match: _RpPrtStdPClassStdSetupCB @ 0x0020D080
 RpPrtStdParticleClass *
 RpPrtStdPClassStdSetupCB(RpPrtStdParticleClass *pClass)
 {

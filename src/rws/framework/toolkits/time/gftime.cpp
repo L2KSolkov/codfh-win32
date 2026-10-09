@@ -8,6 +8,7 @@
 #include "rws/gftime.h"
 
 // match: ?GetTime@Time@RWS@@YAIXZ @ 0x00132B30
+// sp-match: ?GetTime@Time@RWS@@YAIXZ @ 0x000E3460
 RwUInt32 RWS::Time::GetTime()
       {
          RwUInt32 result = (RwUInt32) GetTickCount();

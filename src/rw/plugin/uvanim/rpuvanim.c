@@ -215,6 +215,7 @@ UVAnimSize(const void *object,
 // match: __rpUVAnimParamInterpolatorInfo @ 0x0042D370
 
 // match: _UVAnimOpen @ 0x0022B5D0
+// sp-match: _UVAnimOpen @ 0x001302C0
 
 static void        *
 UVAnimOpen(void *instance,
@@ -248,6 +249,7 @@ UVAnimOpen(void *instance,
 }
 
 // match: _UVAnimClose @ 0x0022B640
+// sp-match: _UVAnimClose @ 0x00130330
 static void        *
 UVAnimClose(void *instance,
            RwInt32 offset __RWUNUSED__,
@@ -287,6 +289,7 @@ UVAnimClose(void *instance,
  */
 
 // match: _RpUVAnimPluginAttach @ 0x0022C220
+// sp-match: _RpUVAnimPluginAttach @ 0x00130F00
 RwBool
 RpUVAnimPluginAttach(void)
 {
@@ -357,6 +360,7 @@ RpUVAnimSetFreeListCreateParams(RwInt32 blockSize,
 /*----------------------------------------------------------------------*/
 
 // match: _UVAnimConstructor @ 0x0022B680
+// sp-match: _UVAnimConstructor @ 0x00130370
 static void        *
 UVAnimConstructor(void *object,
                  RwInt32 offset __RWUNUSED__,
@@ -374,6 +378,7 @@ UVAnimConstructor(void *object,
 }
 
 // match: _UVAnimDestructor @ 0x0022BD20
+// sp-match: _UVAnimDestructor @ 0x00130A00
 static void        *
 UVAnimDestructor(void *object,
                 RwInt32 offset __RWUNUSED__,
@@ -413,6 +418,7 @@ UVAnimDestructor(void *object,
 }
 
 // match: _UVAnimCopy @ 0x0022BDA0
+// sp-match: _UVAnimCopy @ 0x00130A80
 static void        *
 UVAnimCopy(void *dstObject,
           const void * srcObject,
@@ -450,6 +456,7 @@ UVAnimCopy(void *dstObject,
 }
 
 // match: __rpUVAnimCreateConsistantMatrices @ 0x0022B6B0
+// sp-match: __rpUVAnimCreateConsistantMatrices @ 0x001303A0
 static RpUVAnimMaterialExtension *
 _rpUVAnimCreateConsistantMatrices(RpUVAnimMaterialExtension *matExt)
 {
@@ -525,6 +532,7 @@ _rpUVAnimCreateConsistantMatrices(RpUVAnimMaterialExtension *matExt)
  */
 
 // match: _UVAnimWrite @ 0x0022BE40
+// sp-match: _UVAnimWrite @ 0x00130B20
 static RwStream    *
 UVAnimWrite(RwStream * stream,
            RwInt32 binaryLength __RWUNUSED__,
@@ -590,6 +598,7 @@ UVAnimWrite(RwStream * stream,
 
 /* Make a name-placeholder animation */
 // match: _CreateDummyAnim @ 0x0022BF50
+// sp-match: _CreateDummyAnim @ 0x00130C30
 static RpUVAnim *
 CreateDummyAnim(const RwChar *name)
 {
@@ -636,6 +645,7 @@ CreateDummyAnim(const RwChar *name)
  */
 
 // match: __rwStreamReadSingleUVAnim @ 0x0022C040
+// sp-match: __rwStreamReadSingleUVAnim @ 0x00130D20
 static RwStream *
 _rwStreamReadSingleUVAnim(RwStream * stream, RpUVAnim **anim)
 {
@@ -703,6 +713,7 @@ _rwStreamReadSingleUVAnim(RwStream * stream, RpUVAnim **anim)
  */
 
 // match: _UVAnimRead @ 0x0022C0B0
+// sp-match: _UVAnimRead @ 0x00130D90
 static RwStream    *
 UVAnimRead(RwStream * stream,
           RwInt32 binaryLength __RWUNUSED__,
@@ -780,6 +791,7 @@ UVAnimRead(RwStream * stream,
  */
 
 // match: _UVAnimSize @ 0x0022C190
+// sp-match: _UVAnimSize @ 0x00130E70
 static              RwInt32
 UVAnimSize(const void *object,
           RwInt32 offsetInObject __RWUNUSED__,
@@ -817,6 +829,7 @@ UVAnimSize(const void *object,
 }
 
 // match: __rpUVAnimCustomDataStreamRead @ 0x0022B730
+// sp-match: __rpUVAnimCustomDataStreamRead @ 0x00130420
 _rpUVAnimCustomData *
 _rpUVAnimCustomDataStreamRead(RwStream *stream)
 {
@@ -852,6 +865,7 @@ _rpUVAnimCustomDataStreamRead(RwStream *stream)
 }
 
 // match: __rpUVAnimCustomDataStreamWrite @ 0x0022B790
+// sp-match: __rpUVAnimCustomDataStreamWrite @ 0x00130480
 const _rpUVAnimCustomData *
 _rpUVAnimCustomDataStreamWrite(const _rpUVAnimCustomData *customData,
                                RwStream *stream)
@@ -875,6 +889,7 @@ _rpUVAnimCustomDataStreamWrite(const _rpUVAnimCustomData *customData,
 }
 
 // match: __rpUVAnimCustomDataStreamGetSize @ 0x0022B7D0
+// sp-match: __rpUVAnimCustomDataStreamGetSize @ 0x001C7810
 RwUInt32
 _rpUVAnimCustomDataStreamGetSize(const _rpUVAnimCustomData *customData __RWUNUSED__)
 {
@@ -895,6 +910,7 @@ _rpUVAnimCustomDataStreamGetSize(const _rpUVAnimCustomData *customData __RWUNUSE
 /*----------------------------------------------------------------------*/
 
 // match: __rpUVAnimInit @ 0x0022B7E0
+// sp-match: __rpUVAnimInit @ 0x001304C0
 static RpUVAnim *
 _rpUVAnimInit(RpUVAnim *anim, const RwChar *name, RwUInt32 numNodes, RwUInt32 *nodeToUVChannelMap)
 {
@@ -985,6 +1001,7 @@ _rpUVAnimDestruct(RpUVAnim *anim)
  * \see RtAnimInterpolatorDestroy
  */
 // match: _RpUVAnimCreate @ 0x0022B840
+// sp-match: _RpUVAnimCreate @ 0x00130520
 RpUVAnim *
 RpUVAnimCreate(const RwChar *name, RwUInt32 numNodes, RwUInt32 numFrames,
                RwReal duration, RwUInt32 *nodeIndexToUVChannelMap,
@@ -1044,6 +1061,7 @@ RpUVAnimCreate(const RwChar *name, RwUInt32 numNodes, RwUInt32 numFrames,
  *
  */
 // match: _RpUVAnimDestroy @ 0x0022B890
+// sp-match: _RpUVAnimDestroy @ 0x00130570
 RwBool
 RpUVAnimDestroy(RpUVAnim *anim)
 {
@@ -1073,6 +1091,7 @@ RpUVAnimDestroy(RpUVAnim *anim)
  *
  */
 // match: _RpUVAnimAddRef @ 0x0022B8C0
+// sp-match: _RpUVAnimAddRef @ 0x001305A0
 RpUVAnim *
 RpUVAnimAddRef(RpUVAnim *anim)
 {
@@ -1109,6 +1128,7 @@ RpUVAnimAddRef(RpUVAnim *anim)
  * \see RtMaterialUVAnimSubAnimTime
  */
 // match: _RpMaterialUVAnimApplyUpdate @ 0x0022B8D0
+// sp-match: _RpMaterialUVAnimApplyUpdate @ 0x001305B0
 RpMaterial *
 RpMaterialUVAnimApplyUpdate(RpMaterial *material)
 {
@@ -1222,6 +1242,7 @@ RpMaterialUVAnimApplyUpdate(RpMaterial *material)
  *
  */
 // match: _RpUVAnimGetName @ 0x0022BBE0
+// sp-match: _RpUVAnimGetName @ 0x001308C0
 const RwChar *
 RpUVAnimGetName(const RpUVAnim *anim)
 {
@@ -1249,6 +1270,7 @@ RpUVAnimGetName(const RpUVAnim *anim)
  *
  */
 // match: _RpMaterialSetUVAnim @ 0x0022BBF0
+// sp-match: _RpMaterialSetUVAnim @ 0x001308D0
 RpMaterial *
 RpMaterialSetUVAnim(RpMaterial *material, RpUVAnim *anim, RwUInt32 slot)
 {
@@ -1364,6 +1386,7 @@ RpMaterialUVAnimSetInterpolator(RpMaterial *material,
  *
  */
 // match: _RpMaterialUVAnimSetCurrentTime @ 0x0022BC70
+// sp-match: _RpMaterialUVAnimSetCurrentTime @ 0x00130950
 RpMaterial *
 RpMaterialUVAnimSetCurrentTime(RpMaterial *material, RwReal time)
 {
@@ -1401,6 +1424,7 @@ RpMaterialUVAnimSetCurrentTime(RpMaterial *material, RwReal time)
  *
  */
 // match: _RpMaterialUVAnimAddAnimTime @ 0x0022BCB0
+// sp-match: _RpMaterialUVAnimAddAnimTime @ 0x00130990
 extern RpMaterial *
 RpMaterialUVAnimAddAnimTime(RpMaterial *material, RwReal deltaTime)
 {
@@ -1473,6 +1497,7 @@ RpMaterialUVAnimSubAnimTime(RpMaterial *material, RwReal deltaTime)
  *
  */
 // match: _RpMaterialUVAnimExists @ 0x0022BCF0
+// sp-match: _RpMaterialUVAnimExists @ 0x001309D0
 RwBool
 RpMaterialUVAnimExists(const RpMaterial *material)
 {

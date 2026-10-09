@@ -24,12 +24,14 @@
 #include "types/cXboxLive.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E0EAC
 extern const RwReal flt_3E0EAC = 16.666666f;
 // 0x003E0EB0
 extern const RwReal flt_3E0EB0 = 0.01f;
 // 0x003E0EB4
 extern const RwReal flt_3E0EB4 = 0.01f;
+#endif
 
 // match: ?flt_3E0EAC@@3MB @ 0x003E0EAC
 // match: ?flt_3E0EB0@@3MB @ 0x003E0EB0

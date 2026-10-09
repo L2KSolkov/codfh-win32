@@ -2,6 +2,9 @@
 // "GameLoop Init ..." messages). The original file name is not in the
 // image, so it is named for its start address.
 
+#ifdef CODFH_SP
+#include "game/xboxlive.h"      // first, for the XDK's headers: dword_4F3130 (sub_D6EB0's relaunch)
+#endif
 #include <stdio.h>
 
 #include "rw/ostypes.h"
@@ -30,6 +33,21 @@
 #include "types/type_DC400.h"
 #include <string.h>
 #include "rw/baraster.h"
+#ifdef CODFH_SP
+#include "game/savestate.h"     // type_4F45F8
+#include "game/levels.h"        // sub_19BE30
+#include "game/movie.h"         // sub_19BAC0
+#include "game/profiles.h"      // sub_1A2650
+#include "game/platform.h"      // Width, Height, ZDepth
+#include "types/type_3DD948.h"  // sub_D7C20's vehicle mode
+#include "rws/camerahelper.h"
+#endif
+
+#ifdef CODFH_SP
+// Single player's debug print is an empty inline: its format text is gone, but
+// its arguments are still evaluated.
+static inline void sp_debug_print(const RwChar *, ...) {}
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D7334
@@ -44,10 +62,12 @@ extern const RwChar iMsgSparkRestartSystemBegin_name[] = "iMsgSparkRestartSystem
 extern const RwChar iMsgSparkRestartSystemEnd_name[] = "iMsgSparkRestartSystemEnd";
 // 0x003D739C
 extern const RwChar iMsgSparkRestartStartGame_name[] = "iMsgSparkRestartStartGame";
+#ifndef CODFH_SP // single player has neither 0.01f: "Game Restart END" follows the message names (SP 0x2E3614)
 // 0x003D73B8
 extern const RwReal flt_3D73B8 = 0.01f;
 // 0x003D73BC
 extern const RwReal flt_3D73BC = 0.01f;
+#endif
 // 0x004B86F8
 RwUInt32 dword_4B86F8;
 // 0x004B86FC
@@ -139,6 +159,9 @@ type_4F2B68 unk_4F2B68;
 
 // Globals with constructors defined here (their initializers and exit
 // functions at the end of .text).
+#ifdef CODFH_SP // single player's .data opens with it, before the statically initialized unk_4B8744 (SP 0x321508)
+RwInt32 dword_42926C = 1;
+#endif
 type_D9CF0 unk_4B8744;
 // An event id no code uses.
 RWS::CEventId iMsgSparkStartSystem;
@@ -220,6 +243,11 @@ type_3DF8D8_04 unk_4B8798[6];
 // match: _$E9 @ 0x0030E400
 // match: _$E11 @ 0x0030B270
 // match: ?sub_D6640@@YAHXZ @ 0x000D6640
+// sp-match: _$E5 @ 0x0021D540
+// sp-match: _$E8 @ 0x0021D560
+// sp-match: _$E6 @ 0x0021E810
+// sp-match: _$E9 @ 0x0021E820
+// sp-match: ?sub_D6640@@YAHXZ @ 0x000A2B80
 
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_D6640()
@@ -227,20 +255,34 @@ RwInt32 sub_D6640()
     RwInt32 var_8;
     RwInt32 l4;
 
+#ifndef CODFH_SP
     sub_19A750(" ");
     sub_19A750(" ");
     sub_19A750("******************************************");
+#endif
+#ifdef CODFH_SP
+    sp_debug_print("", RWS::Time::GetTime());
+#else
     sub_19A750("GameLoop Init BEGIN....at %d", RWS::Time::GetTime());
+#endif
+#ifndef CODFH_SP
     sub_19A750("******************************************");
+#endif
+#ifndef CODFH_SP // single player has no call here (SP 0xA2B85 goes on to the purge)
     sub_1A2D80();
+#endif
     l4 = RwFreeListPurgeAllFreeLists();
+#ifndef CODFH_SP
     sub_19A750("GameLoopInit: Memory freed on RwFreeList purge - %d", l4);
+#endif
     dword_4B8718 = 0;
     sub_19A750();
     var_8 = 1;
     if (sub_31DB0())
     {
+#ifndef CODFH_SP
         sub_19A750("GameLoop Init RWStudio begin....");
+#endif
         RWS::MainLoop::Open(Width, Height, ZDepth);
         RWS::CEventHandler::RegisterMsg(iMsgSparkStartSystem, iMsgSparkStartSystem_name, 0);
         RWS::CEventHandler::RegisterMsg(dword_4B8750, iMsgSparkStartGame_name, 0);
@@ -248,8 +290,10 @@ RwInt32 sub_D6640()
         RWS::CEventHandler::RegisterMsg(dword_4B67C0, iMsgSparkRestartSystemEnd_name, 0);
         RWS::CEventHandler::RegisterMsg(dword_4B67B0, iMsgSparkRestartStartGame_name, 0);
         l4 = RwFreeListPurgeAllFreeLists();
+#ifndef CODFH_SP
         sub_19A750("GameLoopInit RWStudio: Memory freed on RwFreeList purge - %d", l4);
         sub_19A750("GameLoop Init RWStudio end....");
+#endif
         var_8 = sub_D6820(0);
         var_8 = sub_19CF10();
         if (var_8 && sub_D8B90())
@@ -263,23 +307,28 @@ RwInt32 sub_D6640()
     {
         var_8 = 0;
     }
+#ifndef CODFH_SP
     sub_19A750("******************************************");
     sub_19A750("GameLoop Init END....");
     sub_19A750("******************************************");
     sub_19A750(" ");
     sub_19A750(" ");
+#endif
     dword_4B88B0 = 0;
     return var_8;
 }
 
 // match: ?sub_D6820@@YAHH@Z @ 0x000D6820
+// sp-match: ?sub_D6820@@YAHH@Z @ 0x000A2380
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_D6820(RwInt32 arg_0)
 {
     RwInt32 var_8;
     RwInt32 l4;
 
+#ifndef CODFH_SP
     sub_19A750("GameLoopInitModules begin....");
+#endif
     RwFreeListPurgeAllFreeLists();
     l4 = 1;
     var_8 = 0;
@@ -362,19 +411,26 @@ RwInt32 sub_D6820(RwInt32 arg_0)
     dword_4B8734 = 0;
     RwFreeListPurgeAllFreeLists();
     unk_4E73A8.sub_183130();
+#ifndef CODFH_SP
     sub_19A750("GameLoop Init Modules end....");
+#endif
     return l4;
 }
 
 // match: ?sub_D6A50@@YAXXZ @ 0x000D6A50
+// sp-match: ?sub_D6A50@@YAXXZ @ 0x000A2540
 void sub_D6A50()
 {
+#ifndef CODFH_SP
     sub_19A750(" ");
     sub_19A750(" ");
     sub_19A750("**************************************");
     sub_19A750("Game Restart BEGIN...");
     sub_19A750("**************************************");
+#endif
+#ifndef CODFH_SP // single player has no call here (SP 0xA2540 starts with the count)
     sub_1A2D50();
+#endif
     dword_4B8720++;
     dword_4B8734 = 2;
     sub_125E00();
@@ -396,13 +452,17 @@ void sub_D6A50()
     sub_31B10();
     sub_3EC80();
     sub_3CC80();
+#ifndef CODFH_SP
     sub_19A750("Restart: AI class restarts");
+#endif
     sub_3C220();
     sub_407C0();
     sub_35020();
     sub_19A750();
     sub_32EB0();
+#ifndef CODFH_SP
     sub_19A750("Restart: Alfa class restarts");
+#endif
     sub_733A0();
     sub_429E0();
     sub_6B490();
@@ -410,60 +470,112 @@ void sub_D6A50()
     sub_19A750();
     sub_19A750();
     sub_67340();
+#ifndef CODFH_SP
     sub_19A750("Restart: CAnimObjectMgr::RestartClass()");
+#endif
     sub_78790();
+#ifndef CODFH_SP
     sub_19A750("Restart: ProjectileGeneratorManager::RestartClass()");
+#endif
     sub_1222A0();
+#ifndef CODFH_SP
     sub_19A750("Restart: CProjectileMgr::RestartClass()");
+#endif
     sub_15F240();
+#ifndef CODFH_SP
     sub_19A750("Restart: StreamClumpManager::Restart()");
+#endif
     sub_16F1C0();
     sub_16FD10();
+#ifndef CODFH_SP
     sub_19A750("Restart: LevelInfo::RestartClass()");
+#endif
     sub_19A750();
+#ifndef CODFH_SP
     sub_19A750("Restart: StartingSections::RestartClass()");
+#endif
     sub_19A750();
+#ifndef CODFH_SP
     sub_19A750("Restart: PlayerTrigger::RestartClass()");
+#endif
     sub_19A750();
+#ifndef CODFH_SP
     sub_19A750("Restart: SectionInfo::RestartClass()");
+#endif
     sub_19A750();
+#ifndef CODFH_SP
     sub_19A750("Restart: CPlayerWeapon::RestartPlayerWeaponDefs()");
+#endif
     sub_19A750();
+#ifndef CODFH_SP
     sub_19A750("Restart: CNPCWeapon::RestartClass()");
+#endif
     sub_19A750();
+#ifndef CODFH_SP
     sub_19A750("Restart: TriggeredParticleManager::RestartClass()");
+#endif
     sub_F4850();
+#ifndef CODFH_SP
     sub_19A750("Restart: DecalManager::Restart()");
+#endif
     sub_EFF70();
+#ifndef CODFH_SP
     sub_19A750("Restart: CloneManager::Restart()");
+#endif
     sub_19A750();
+#ifndef CODFH_SP
     sub_19A750("Restart: ParticleManager::Restart()");
+#endif
     sub_F29F0();
+#ifndef CODFH_SP
     sub_19A750("Restart: TriggerManager::Restart()");
+#endif
     sub_19A750();
+#ifndef CODFH_SP
     sub_19A750("Restart: PathNodeManager::Restart()");
+#endif
     sub_F8010();
+#ifndef CODFH_SP
     sub_19A750("Restart: SplineManager::Restart()");
+#endif
     sub_19A750();
+#ifndef CODFH_SP
     sub_19A750("Restart: shellManager.Restart()");
+#endif
     dword_4B8EF0.sub_E99A0();
     sub_186950();
+#ifndef CODFH_SP
     sub_19A750("Restart: Audio::RestartClass()");
+#endif
     sub_83510();
     sub_D9450();
+#ifndef CODFH_SP
     sub_19A750("Restart: GodAssetManager::RestartClass()");
+#endif
     sub_198570();
+#ifndef CODFH_SP
     sub_19A750("Restart: CAnimDatabase::Restart()");
+#endif
     sub_19A750();
+#ifndef CODFH_SP
     sub_19A750("Restart: TextureManager::RestartClass()");
+#endif
     sub_19A750();
+#ifndef CODFH_SP
     sub_19A750("Restart: LevelManager::Restart()");
+#endif
     sub_172210();
+#ifndef CODFH_SP
     sub_19A750("Restart: SerializeManager::Restart()");
+#endif
     unk_4F2B68.pDtor();
+#ifndef CODFH_SP
     sub_19A750("Restart: CProfiler::RestartProfiler()");
+#endif
     sub_16D630();
+#ifndef CODFH_SP
     sub_19A750("Restart: Tick::Restart()");
+#endif
     sub_D9610();
     RwFreeListPurgeAllFreeLists();
     sub_D8660();
@@ -474,73 +586,138 @@ void sub_D6A50()
     if (sub_12F080(2))
     {
         sub_12F060(2);
+#ifndef CODFH_SP
         sub_19A750("***ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!***");
         sub_19A750("MEMORY LEAK detected during shutdown! Show this to a");
         sub_19A750("programmer immediately (especially the last one that");
         sub_19A750("checked in) and tell him that restart/reset is broken.");
         sub_19A750("***ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!***");
+#endif
     }
     sub_83C90();
-    sub_19A750("Game Restart END");
+    sub_19A750("Game Restart END"); // single player keeps this print (SP 0xA2715)
     dword_4B8714 = 1;
+#ifndef CODFH_SP
     sub_19A750("**************************************");
     sub_19A750("Game Restart END...");
     sub_19A750("**************************************");
     sub_19A750(" ");
     sub_19A750(" ");
+#endif
+#ifndef CODFH_SP // single player has no call here (SP 0xA271F goes on to sub_124EE0)
     sub_1A2D60();
+#endif
     sub_124EE0(2.5f, 0);
 }
 
 // match: ?sub_D6EB0@@YAXXZ @ 0x000D6EB0
+// sp-match: ?sub_D6EB0@@YAXXZ @ 0x000A2C60
 void sub_D6EB0()
 {
+#ifndef CODFH_SP
     sub_19A750(" ");
     sub_19A750(" ");
     sub_19A750("******************************************");
     sub_19A750("GameLoop Shutdown BEGIN....");
     sub_19A750("******************************************");
+#endif
+#ifndef CODFH_SP // single player has no call here (SP 0xA2C7A starts with sub_19D060)
     sub_1A2D40();
+#endif
     sub_19D060();
     unk_4B9308.sub_EEF90(0, 1);
     sub_D7040(0);
+#ifndef CODFH_SP
     sub_19A750("GameLoop Shutdown RWStudio begin....");
+#endif
     RWS::CEventHandler::UnRegisterMsg(iMsgSparkStartSystem);
     RWS::CEventHandler::UnRegisterMsg(dword_4B8750);
     RWS::CEventHandler::UnRegisterMsg(dword_4B67B8);
     RWS::CEventHandler::UnRegisterMsg(dword_4B67C0);
     RWS::CEventHandler::UnRegisterMsg(dword_4B67B0);
     RWS::MainLoop::Close();
+#ifndef CODFH_SP
     sub_19A750("GameLoop Shutdown RWStudio end....");
+#endif
     sub_19A750();
     sub_172A80();
     RwFreeListPurgeAllFreeLists();
     dword_4B86F8 &= ~1;
+#ifdef CODFH_SP
+    // Single player then starts the multiplayer image unless the launch data
+    // asked it to keep its defaults, handing it the profile, the level, the
+    // pad, the Live state and logon (SP 0xA2CE3-0xA2DD8).
+    if (!dword_4F45F8->unk_20)
+    {
+        LAUNCH_DATA var_C00;
+        type_4F45F8 *var_8 = (type_4F45F8 *)&var_C00;
+        RwInt32 var_C04 = dword_4F28F0->unk_44;
+        RwCamera *l4;
+
+        memset(var_8, 0, 0x6A0);
+        var_8->unk_10 = 1;
+        var_8->unk_14 = var_C04;
+        var_8->unk_18 = dword_4B877C;
+        if (dword_4B877C)
+        {
+            *(RwInt32 *)var_8->unk_1C = sub_19B050();
+        }
+        var_8->unk_24 = get_dword_4B9E50();
+        *(RwInt32 *)&var_8->unk_04[8] = dword_4F3130.unk_764;
+        if (dword_4F3130.sub_19C500() && !dword_4F3130.unk_24
+            && XOnlineSaveLogonState((PXONLINE_LOGON_STATE)var_8->unk_48A) == 0)
+        {
+            var_8->unk_40 = 1;
+        }
+        else
+        {
+            var_8->unk_40 = 0;
+        }
+        sub_1A2650(var_8);
+        var_8->unk_394 = dword_4F5A30;
+        sub_19BE30((type_19BE30 *)var_8);
+        l4 = RWS::CameraHelper::CreateMainRasterCamera(Width, Height, ZDepth);
+        sub_19BAC0(l4);
+        sub_EA560(l4);
+        RWS::CameraHelper::Destroy(l4);
+        D3DDevice_PersistDisplay();
+        XLaunchNewImage("d:\\default.xbe", (PLAUNCH_DATA)&var_C00);
+    }
+#endif
+#ifndef CODFH_SP
     sub_19A750("******************************************");
     sub_19A750("GameLoop Shutdown END....");
     sub_19A750("******************************************");
     sub_19A750(" ");
     sub_19A750(" ");
+#endif
     if (sub_12F080(1))
     {
         sub_12F060(1);
+#ifndef CODFH_SP
         sub_19A750("***ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!***");
         sub_19A750("MEMORY LEAK detected during shutdown! Show this to a");
         sub_19A750("programmer immediately (especially the last one that");
         sub_19A750("checked in) and tell him that restart/reset! is broken.");
         sub_19A750("***ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!***");
+#endif
     }
 }
 
 // match: ?sub_D7040@@YAXH@Z @ 0x000D7040
+// sp-match: ?sub_D7040@@YAXH@Z @ 0x000A2740
 void sub_D7040(RwInt32 arg_0)
 {
+#ifndef CODFH_SP
     sub_19A750("GameLoopShutdownModules begin....");
+#endif
     // Three shutdowns that expand to nothing (see unused_slot).
     unused_slot();
     unused_slot();
     unused_slot();
+#ifndef CODFH_SP // single player has none of these (SP 0xA2740)
     unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 0);
+#endif
     dword_4B8700 = 0;
     dword_4B8704 = 0;
     dword_4B8708 = 0;
@@ -558,7 +735,9 @@ void sub_D7040(RwInt32 arg_0)
     sub_17E310();
     sub_19A750();
     sub_E8830();
+#ifndef CODFH_SP
     unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 0);
+#endif
     RWS::CEventHandler::DeleteEventHandlers(RWS::iMsgDeleteEventHandler);
     RWS::CAttributeHandler::PurgeAll();
     RWS::CResourceManager::PurgeAll();
@@ -569,7 +748,9 @@ void sub_D7040(RwInt32 arg_0)
     sub_31B50();
     sub_3ECA0();
     sub_3CCE0();
+#ifndef CODFH_SP
     unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 0);
+#endif
     sub_3C270();
     sub_40840();
     sub_35080();
@@ -582,7 +763,9 @@ void sub_D7040(RwInt32 arg_0)
     sub_72890();
     sub_67E00();
     sub_673A0();
+#ifndef CODFH_SP
     unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 0);
+#endif
     sub_787F0();
     sub_1222D0();
     sub_15F280();
@@ -599,33 +782,75 @@ void sub_D7040(RwInt32 arg_0)
     sub_144A70();
     sub_143D40();
     sub_F8120();
+#ifndef CODFH_SP
     unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 0);
+#endif
     dword_4B8EF0.sub_E99E0();
     sub_1868E0();
     sub_835E0();
     sub_16F1D0();
+#ifndef CODFH_SP
     unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 0);
+#endif
     sub_16FD60();
+#ifndef CODFH_SP
     unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 0);
+#endif
     sub_198580();
+#ifndef CODFH_SP
     unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 0);
+#endif
     sub_773A0();
+#ifndef CODFH_SP
     unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 0);
+#endif
+#ifdef CODFH_SP
+    // single player expands sub_D73C0 here (SP 0xA288D)
+    if (dword_4E5E40.unk_08)
+    {
+        delete dword_4E5E40.unk_08;
+    }
+    dword_4E5E40.unk_08 = 0;
+    dword_4E5E40.unk_00[0] = 0;
+    dword_4E5E40.unk_00[1] = 0;
+#else
     sub_D73C0();
+#endif
     sub_F2630();
     sub_172230();
     unk_4E5CC8.sub_144330();
     sub_1446C0();
     sub_16D6A0();
     sub_19A750();
+#ifdef CODFH_SP
+    // single player expands type_8F300::sub_D7350 here (SP 0xA28D4)
+    if (dword_4B2550.unk_08)
+    {
+        delete dword_4B2550.unk_08;
+    }
+    if (dword_4B2550.unk_04)
+    {
+        delete dword_4B2550.unk_04;
+    }
+    dword_4B2550.unk_08 = 0;
+    dword_4B2550.unk_00 = 0;
+    dword_4B2550.unk_04 = 0;
+#else
     dword_4B2550.sub_D7350();
+#endif
+#ifndef CODFH_SP
     unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 0);
+#endif
     sub_E8830();
     unk_4F2B68.pDtor();
     RwFreeListPurgeAllFreeLists();
     unk_4E73A8.sub_1833D0();
+#ifndef CODFH_SP
     unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 0);
+#endif
+#ifndef CODFH_SP
     sub_19A750("GameLoop Shutdown modules end....");
+#endif
 }
 
 // match: ?sub_D7350@type_8F300@@QAEXXZ @ 0x000D7350
@@ -644,6 +869,8 @@ void type_8F300::sub_D7350()
     unk_04 = 0;
 }
 
+#ifndef CODFH_SP
+// The out-of-line body is MP-only; SP expands it at its sole call (0xA288D).
 // match: ?sub_D73C0@@YAXXZ @ 0x000D73C0
 void sub_D73C0()
 {
@@ -655,8 +882,10 @@ void sub_D73C0()
     dword_4E5E40.unk_00[0] = 0;
     dword_4E5E40.unk_00[1] = 0;
 }
+#endif
 
 // match: ?sub_D7410@@YAXXZ @ 0x000D7410
+// sp-match: ?sub_D7410@@YAXXZ @ 0x000A32B0
 void sub_D7410()
 {
     while ((dword_4B86F8 & 1) && !(dword_4B86F8 & 4))
@@ -679,6 +908,9 @@ void sub_D7410()
         }
         if (((dword_4B86F8 >> 5) & 1) && is_4F26D0_clear() && is_4B86FC_clear() && always_true())
         {
+#ifdef CODFH_SP
+            sub_D9490(1, 0); // single player shows the loading screen first (SP 0xA3352)
+#endif
             sub_D8E30();
         }
         if (sub_19D020())
@@ -695,6 +927,7 @@ void sub_D7410()
 }
 
 // match: ?sub_D7570@@YAHXZ @ 0x000D7570
+// sp-match: ?sub_D7570@@YAHXZ @ 0x000A2930
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_D7570()
 {
@@ -712,7 +945,9 @@ RwInt32 sub_D7570()
             RWS::SendMsg(iMsgSparkStartSystem);
             dword_4B8EF0.sub_E9C20();
             dword_4B8EF0.sub_E9FB0(10);
+#ifndef CODFH_SP // single player has no call here (SP 0xA298B goes on to the store)
             sub_1FF250()->sub_200630();
+#endif
             dword_4B8704 = 1;
             return 0;
         }
@@ -758,9 +993,15 @@ RwInt32 sub_D7570()
             }
             if (l4)
             {
+#ifdef CODFH_SP
+                // single player clears the flag first and has no sub_1A2D70 call (SP 0xA2A75)
+                dword_4B870C = 0;
+                unk_4E5CD8.unk_00 = 1;
+#else
                 unk_4E5CD8.unk_00 = 1;
                 dword_4B870C = 0;
                 sub_1A2D70();
+#endif
             }
             return 0;
         }
@@ -771,11 +1012,17 @@ RwInt32 sub_D7570()
         }
         else
         {
+#ifdef CODFH_SP
+            // single player also waits on bits 4 and 5 (SP 0xA2AB3: & 0x3A)
+            return !((RwUInt8)dword_4B86F8 & 0x3A);
+#else
             if (((dword_4B86F8 >> 3) & 1) || ((dword_4B86F8 >> 1) & 1))
             {
                 return 0;
             }
             return 1;
+#endif
+
         }
     }
     else if (sub_198650() > 30.0f)
@@ -793,6 +1040,7 @@ RwInt32 sub_D7570()
 }
 
 // match: ?sub_D7880@@YAXXZ @ 0x000D7880
+// sp-match: ?sub_D7880@@YAXXZ @ 0x000A2FD0
 void sub_D7880()
 {
     RwInt32 var_4;
@@ -813,7 +1061,9 @@ void sub_D7880()
     }
     if (sub_D7570() && deltaTime > 0.0f)
     {
+#ifndef CODFH_SP // single player has no call here (SP 0xA304F goes on to the profiler)
         sub_1A2A80(deltaTime);
+#endif
         sub_16D7F0(0x1C);
         dword_4B8EF0.sub_E9AD0(deltaTime);
         sub_16D850(0x1C);
@@ -905,6 +1155,7 @@ void sub_D7C10(bool arg_0)
 // match: ?sub_D7C20@@YAXXZ @ 0x000D7C20
 // match: __ehhandler$?sub_D7C20@@YAXXZ-0xE @ 0x00300CD0
 // match: __ehhandler$?sub_D7C20@@YAXXZ @ 0x00300CDE
+// sp-match: ?sub_D7C20@@YAXXZ @ 0x000A2E10
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D7C20()
 {
@@ -915,12 +1166,85 @@ void sub_D7C20()
 
     if ((dword_4B86F8 >> 4) & 1)
     {
-        flt_4B8984 += deltaTime * flt_3D7360 / 1000.0f;
+        flt_4B8984 += (deltaTime * flt_3D7360) / 1000.0f;
     }
     else
     {
         flt_4B8984 = 0.0f;
     }
+#ifdef CODFH_SP
+    // Single player's pause: not while the Live front end is up (unless at
+    // step 7) or once asked to quit (dword_4B8738), nor while the player's
+    // vehicle is in mode 1; the pause button (or a dropped pad: dword_42926C)
+    // toggles it, the front end's step 7 forces it, and leaving it closes the
+    // in-game menu (SP 0xA2E43-0xA2FC8).
+    if (dword_4F3130.sp_sub_12AAD0() && dword_4F3130.unk_38 != 7)
+    {
+        return;
+    }
+    if (dword_4B8738)
+    {
+        return;
+    }
+    type_10F710 *sp_l18 = (type_10F710 *)sub_1745A0(0);
+    if (sp_l18)
+    {
+        type_3DD948 *sp_v = (type_3DD948 *)sp_l18->unk_2110.sub_D4910();
+
+        if (sp_v && sp_v->unk_414 == 1)
+        {
+            return;
+        }
+    }
+    RwReal sp_v14 = unk_4B9308.sub_EE9A0(0, 0xB);
+    RwInt32 sp_bit = (dword_4B86F8 >> 4) & 1;
+    RwInt32 sp_held = dword_4EBCD8;
+    if (!sp_bit && !dword_42926C)
+    {
+        sp_v14 = 1.0f;
+    }
+    if (!((dword_4B86F8 >> 4) & 1) && dword_4F3130.unk_38 == 7)
+    {
+        dword_4B8738 = 1;
+    }
+    else if (sp_v14 == 0.0f && (!sp_held || !sp_bit))
+    {
+        return;
+    }
+    dword_4EBCD8 = 0;
+    ((type_4B86F8 *)&dword_4B86F8)->unk_00_4 = !((type_4B86F8 *)&dword_4B86F8)->unk_00_4;
+    if ((dword_4B86F8 >> 4) & 1)
+    {
+        sub_D7EA0();
+    }
+    else
+    {
+        sub_D7EE0();
+    }
+    if (dword_4B9190)
+    {
+        if ((dword_4B86F8 >> 4) & 1)
+        {
+            dword_4B9190->sub_E0DD0();
+        }
+        else
+        {
+            dword_4B9190->sub_E0E00();
+        }
+    }
+    if (!((dword_4B86F8 >> 4) & 1))
+    {
+        dword_4B86F8 |= 0x10;
+        sub_187040();
+        dword_4B86F8 &= ~0x10;
+        if (sp_l18 && sp_l18->unk_1A48[sp_l18->unk_1AE4] && dword_4B9190
+            && sp_l18->unk_1A48[sp_l18->unk_1AE4]->unk_458 != 0x20 && !sp_l18->unk_1B28 && !sp_l18->unk_1B04)
+        {
+            dword_4B9190->sub_DEB80(0);
+        }
+    }
+    sub_1745A0(0);
+#else
     if ((dword_4B86F8 >> 4) & 1)
     {
         static RwReal s_4B8768 = unk_4B9308.sub_EE9A0(0, 3);
@@ -985,9 +1309,11 @@ void sub_D7C20()
         sub_1745A0(0);
         sub_D7C10(byte_4B8764);
     }
+#endif
 }
 
 // match: ?sub_D7EA0@@YAXXZ @ 0x000D7EA0
+// sp-match: ?sub_D7EA0@@YAXXZ @ 0x000A2B10
 void sub_D7EA0()
 {
     dword_4B8728 = RWS::Time::GetTime();
@@ -1000,6 +1326,7 @@ void sub_D7EA0()
 }
 
 // match: ?sub_D7EE0@@YAXXZ @ 0x000D7EE0
+// sp-match: ?sub_D7EE0@@YAXXZ @ 0x000A2B40
 void sub_D7EE0()
 {
     dword_4B8724 += RWS::Time::GetTime() - dword_4B8728;
@@ -1050,6 +1377,10 @@ void sub_D7EE0()
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ?pDtor@type_4F2B68@@QAEXXZ (folded into 0x1E41C0)
+// Single player keeps the call to it (SP 0xA24CF in sub_D6820): its empty body here
+// would let /O2 drop that call, so SP only declares it.
+#ifndef CODFH_SP
 void type_4F2B68::pDtor()
 {
 }
+#endif

@@ -6,11 +6,38 @@
 #include "game/padlib.h"
 #include "game/data.h"
 #include "game/waitscreen.h"
+#ifdef CODFH_SP
+#include "game/levels.h"
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003E0614
 extern const RwReal flt_3E0614 = 16.666666f;
 // 0x0042C5D8
+#ifdef CODFH_SP // single player's table has 20 entries, without multiplayer's 8, 9 and 18-21 (SP 0x3294C8-0x329607)
+type_42C5D8 dword_42C5D8[20] = {
+    { 0, 0, 1, -1 },
+    { 1, 0, 2, -1 },
+    { 2, 0, 4, -1 },
+    { 3, 0, 8, -1 },
+    { 4, 0, 16, -1 },
+    { 5, 0, 32, -1 },
+    { 6, 0, 64, -1 },
+    { 7, 0, 128, -1 },
+    { 8, 1, -1, 0 },
+    { 9, 1, -1, 1 },
+    { 10, 1, -1, 2 },
+    { 11, 1, -1, 3 },
+    { 12, 1, -1, 4 },
+    { 13, 1, -1, 5 },
+    { 14, 1, -1, 6 },
+    { 15, 1, -1, 7 },
+    { 16, 2, -1, -1 },
+    { 17, 3, -1, -1 },
+    { 18, 4, -1, -1 },
+    { 19, 5, -1, -1 },
+};
+#else
 type_42C5D8 dword_42C5D8[26] = {
     { 0, 0, 1, -1 },
     { 1, 0, 2, -1 },
@@ -39,6 +66,7 @@ type_42C5D8 dword_42C5D8[26] = {
     { 24, 4, -1, -1 },
     { 25, 5, -1, -1 },
 };
+#endif
 // 0x0042C778
 RwReal flt_42C778 = 0.0001f;
 // 0x0042C77C
@@ -67,6 +95,7 @@ RwInt32 dword_4F48A8;
 // match: ?flt_42C77C@@3MA @ 0x0042C77C
 
 // match: ?sub_19D920@@YAHPAUtype_4F4638@@@Z @ 0x0019D920
+// sp-match: ?sub_19D920@@YAHPAUtype_4F4638@@@Z @ 0x0012CF10
 
 // Keeps the last state and reads the new one: whether the controller is in.
 RwInt32 sub_19D920(type_4F4638 *arg_0)
@@ -82,6 +111,7 @@ RwInt32 sub_19D920(type_4F4638 *arg_0)
 }
 
 // match: ?sub_19D990@@YAXXZ @ 0x0019D990
+// sp-match: ?sub_19D990@@YAXXZ @ 0x0012D5F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Takes the controllers taken out and put in (clearing the manager's
 // removed flag when the player's comes back).
@@ -114,6 +144,7 @@ void sub_19D990()
 }
 
 // match: ?sub_19DA80@@YAMF@Z @ 0x0019DA80
+// sp-match: ?sub_19DA80@@YAMF@Z @ 0x0012CF70
 // A stick's horizontal axis from -1 to 1 (0 inside the dead zone, 1 or -1
 // past 0.95).
 RwReal sub_19DA80(RwInt16 arg_0)
@@ -131,6 +162,7 @@ RwReal sub_19DA80(RwInt16 arg_0)
 }
 
 // match: ?sub_19DB10@@YAMF@Z @ 0x0019DB10
+// sp-match: ?sub_19DB10@@YAMF@Z @ 0x0012D000
 // The same for a vertical axis.
 RwReal sub_19DB10(RwInt16 arg_0)
 {
@@ -147,6 +179,7 @@ RwReal sub_19DB10(RwInt16 arg_0)
 }
 
 // match: ?sub_19DBA0@@YAMPAUtype_4F4638@@HHH@Z @ 0x0019DBA0
+// sp-match: ?sub_19DBA0@@YAMPAUtype_4F4638@@HHH@Z @ 0x0012D090
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The input arg_4 on the controller (arg_C: negated): arg_8 0 its value on
 // being pressed, 1 while held, 2 its last value on being let go.
@@ -221,11 +254,13 @@ RwReal sub_19DBA0(type_4F4638 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_
             bp_4 = var_10;
         else
             bp_4 = 0;
+        break;
     }
     return bp_4;
 }
 
 // match: ?sub_19DE30@@YAXPAUtype_4F4638@@PAUtype_4B9308_pad@@@Z @ 0x0019DE30
+// sp-match: ?sub_19DE30@@YAXPAUtype_4F4638@@PAUtype_4B9308_pad@@@Z @ 0x0012D2A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Reads the controller's bindings into the pad's buttons: each one's value
 // and whether it is held.
@@ -261,6 +296,7 @@ void sub_19DE30(type_4F4638 *arg_0, type_4B9308_pad *arg_4)
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Sets the library up: the bindings' tables, and each controller that is in.
 // match: ?sub_19DF40@@YAXXZ @ 0x0019DF40
+// sp-match: ?sub_19DF40@@YAXXZ @ 0x0012D690
 void sub_19DF40()
 {
     RwUInt32 var_C;
@@ -291,6 +327,7 @@ void sub_19DF40()
 }
 
 // match: ?sub_19DFE0@@YAHPAUtype_4B9308@@M@Z @ 0x0019DFE0
+// sp-match: ?sub_19DFE0@@YAHPAUtype_4B9308@@M@Z @ 0x0012D750
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Reads every controller into the manager's pads, then rumbles them: 0
 // while the one pad that counts is out (flagging it) or none is in.
@@ -329,6 +366,7 @@ RwInt32 sub_19DFE0(type_4B9308 *arg_0, RwReal arg_4)
 }
 
 // match: ?sub_19E0D0@@YAXPAUtype_4B9308@@M@Z @ 0x0019E0D0
+// sp-match: ?sub_19E0D0@@YAXPAUtype_4B9308@@M@Z @ 0x0012D710
 void sub_19E0D0(type_4B9308 *arg_0, RwReal arg_4)
 {
     RwInt32 var_4;
@@ -336,6 +374,38 @@ void sub_19E0D0(type_4B9308 *arg_0, RwReal arg_4)
     for (var_4 = 0; var_4 < 4; var_4++)
         sub_19E250(&dword_4F4638[var_4], &arg_0->unk_00[var_4], arg_4);
 }
+
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_12D360@@YAHPAUtype_42B740@@HH@Z @ 0x0012D360
+// Adds the button arg_4 to the binding arg_0 (up to five; arg_8: it becomes
+// the only one); whether it is there (single player's binding changes,
+// SP 0xB6C9A, 0x81D9D).
+RwInt32 sp_sub_12D360(type_42B740 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
+{
+    RwInt32 var_8;
+    RwInt32 l4;
+
+    if (arg_8)
+    {
+        arg_0->unk_04 = 1;
+        arg_0->unk_08[0] = arg_4;
+    }
+    else
+    {
+        l4 = arg_0->unk_04;
+        if (l4 >= 5)
+            return 0;
+        for (var_8 = 0; var_8 < arg_0->unk_04; var_8++)
+        {
+            if (arg_0->unk_08[var_8] == arg_4)
+                return 1;
+        }
+        arg_0->unk_08[l4] = arg_4;
+        arg_0->unk_04++;
+    }
+    return 1;
+}
+#endif
 
 // match: ?sub_19E120@@YAXXZ @ 0x0019E120
 void sub_19E120()
@@ -352,6 +422,7 @@ void sub_19E120()
 }
 
 // match: ?sub_19E180@@YAXH@Z @ 0x0019E180
+// sp-match: ?sub_19E180@@YAXH@Z @ 0x0012D3C0
 // Opens controller arg_0, with the control set's bindings.
 void sub_19E180(RwInt32 arg_0)
 {
@@ -361,6 +432,7 @@ void sub_19E180(RwInt32 arg_0)
 }
 
 // match: ?sub_19E200@@YAHHHPAUtype_4B9308@@@Z @ 0x0019E200
+// sp-match: ?sub_19E200@@YAHHHPAUtype_4B9308@@@Z @ 0x0012D410
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The first action bound to the input arg_0 on controller arg_4, or -1.
 RwInt32 sub_19E200(RwInt32 arg_0, RwInt32 arg_4, type_4B9308 *arg_8)
@@ -380,6 +452,7 @@ RwInt32 sub_19E200(RwInt32 arg_0, RwInt32 arg_4, type_4B9308 *arg_8)
 }
 
 // match: ?sub_19E250@@YAXPAUtype_4F4638@@PAUtype_4B9308_pad@@M@Z @ 0x0019E250
+// sp-match: ?sub_19E250@@YAXPAUtype_4F4638@@PAUtype_4B9308_pad@@M@Z @ 0x0012D450
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Rumbles the controller as the pad asks (its strength scaled up, the
 // right motor full or off), or runs the rumble's time down by half of
@@ -433,6 +506,7 @@ void sub_19E250(type_4F4638 *arg_0, type_4B9308_pad *arg_4, RwReal arg_8)
 }
 
 // match: ?sub_19E3E0@@YAHXZ @ 0x0019E3E0
+// sp-match: ?sub_19E3E0@@YAHXZ @ 0x0012D560
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // How many controllers are in.
 RwInt32 sub_19E3E0()
@@ -450,6 +524,7 @@ RwInt32 sub_19E3E0()
 }
 
 // match: ?sub_19E430@@YAHHHPAUtype_4B9308@@@Z @ 0x0019E430
+// sp-match: ?sub_19E430@@YAHHHPAUtype_4B9308@@@Z @ 0x0012D5A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The input the action arg_0 is bound to on controller arg_4 (the first
 // control set without bindings), or -1.

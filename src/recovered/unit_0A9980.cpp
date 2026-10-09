@@ -80,11 +80,13 @@ RWS_REGISTERCLASS(PlayerTrigger);
 // match: ?MakeNew@PlayerTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A9980
 // match: __ehhandler$?MakeNew@PlayerTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x003000F0
 // match: __ehhandler$?MakeNew@PlayerTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x003000FF
+// sp-match: ?MakeNew@PlayerTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00086460
 RWS_DEFINE_MAKENEW(PlayerTrigger)
 
 // match: ??0PlayerTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A9A00
 // match: __ehhandler$??0PlayerTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x16 @ 0x00300110
 // match: __ehhandler$??0PlayerTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300126
+// sp-match: ??0PlayerTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00083EE0
 PlayerTrigger::PlayerTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     RwInt32 var_10;
@@ -130,7 +132,11 @@ PlayerTrigger::PlayerTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
     unk_1C4 = 1.0f;
     unk_1C8 = 1.0f;
     unk_1D4 = 7;
+#ifdef CODFH_SP // through a reference (SP 0x83EE0: the 1.0f stores then follow it)
+    { RwReal &r = unk_1D8; r = 0.75f; }
+#else
     unk_1D8 = 0.75f;
+#endif
     unk_1E0 = 0.6f;
     unk_1DC = 0.5f;
     unk_1EC = 2.0f;
@@ -184,7 +190,11 @@ PlayerTrigger::PlayerTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
     unk_37C = 12.0f;
     unk_380 = 0;
     unk_430 = 0;
+#ifdef CODFH_SP // through a reference (SP 0x83EE0: stored after the 12.0f stores)
+    { RwReal &r = unk_434; r = 0; }
+#else
     unk_434 = 0;
+#endif
     unk_428 = 0;
     unk_42C = 0;
     unk_420 = 0;
@@ -219,12 +229,15 @@ PlayerTrigger::PlayerTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 }
 
 // match: ?vf_01C@PlayerTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x000AA2B0
+// sp-match: ?vf_01C@PlayerTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x000843E0
 
 // match: ??_GPlayerTrigger@@UAEPAXI@Z @ 0x000AA2D0
+// sp-match: ??_GPlayerTrigger@@UAEPAXI@Z @ 0x000849B0
 
 // match: ??1PlayerTrigger@@UAE@XZ @ 0x000AA2F0
 // match: __ehhandler$??1PlayerTrigger@@UAE@XZ-0x16 @ 0x00300130
 // match: __ehhandler$??1PlayerTrigger@@UAE@XZ @ 0x00300146
+// sp-match: ??1PlayerTrigger@@UAE@XZ @ 0x000843F0
 PlayerTrigger::~PlayerTrigger()
 {
     type_3D3548 *var_10 = unk_46C.sub_D4910();
@@ -240,12 +253,14 @@ PlayerTrigger::~PlayerTrigger()
 }
 
 // match: ?sub_AA3F0@@YAXXZ @ 0x000AA3F0
+// sp-match: ?sub_AA3F0@@YAXXZ @ 0x000844B0
 void sub_AA3F0()
 {
     dword_4B67E4 = 0;
 }
 
 // match: ?HandleAttributes@PlayerTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000AA400
+// sp-match: ?HandleAttributes@PlayerTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000849C0
 void PlayerTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     RwInt32 slot_C;
@@ -274,7 +289,11 @@ void PlayerTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
         switch (ebp_1C->GetCommandId())
         {
         case 2:
+#ifdef CODFH_SP // through a reference (SP 0x849C0: register allocation of the weapon-restore stores)
+            { RwInt32 &r = unk_C0; r = ebp_1C->GetAs_RwInt32(); }
+#else
             unk_C0 = ebp_1C->GetAs_RwInt32();
+#endif
             if (d20)
             {
                 sub_1745C0(d20, d20->unk_3D4);
@@ -398,13 +417,22 @@ void PlayerTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
             RwReal stk_2C;
 
             b14->GetCommandData(q48);
+#ifdef CODFH_SP // shape: two multiplies (SP 0x84E25)
+            q48 = q48 * 0.5f;
+            q48 = q48 * 0.017453292f;
+#else
             q48 = q48 * 0.5f * 0.017453292f;
+#endif
             unk_F0 = tan_ref(q48);
             ebp_50 = ((RwCamera *)dword_4E5C74)->frameBuffer->width;
             o4C = ((RwCamera *)dword_4E5C74)->frameBuffer->height;
             RwEngineGetVideoModeInfo(&v44, RwEngineGetCurrentVideoMode());
             if (v44.flags & 4)
+#ifdef CODFH_SP // through a reference (SP 0x849C0)
+                { RwInt32 &r = o4C; r *= 2; }
+#else
                 o4C *= 2;
+#endif
             unk_F8 = ((RwReal)cos(stk_2C = o4C * q48 / ebp_50));
             q48 = q48 * 0.8f;
             unk_F4 = cos_ref(q48);
@@ -464,6 +492,32 @@ void PlayerTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
                 unk_108[0] = -1;
                 unk_13C = -1;
                 lv_54 = 0x1D;
+#ifdef CODFH_SP // single player keeps the checkpoint's attributes (unk_254) when the saved
+                // level is an earlier one of this level's chapter and this level carries them
+                // over: a table of the 40 levels' {level, carries over, chapter} (SP 0x84FB3)
+                type_4F28F0 *save = dword_4F28F0;
+
+                if (save->unk_58 && !dword_4B8720 && save->unk_5C.sub_D9180(true))
+                {
+                    sp_level_chapter levels[40] = {
+                        {0, 0, 0}, {1, 0, 1}, {2, 1, 1}, {3, 1, 1}, {4, 0, 2},
+                        {5, 1, 2}, {6, 1, 2}, {7, 0, 3}, {8, 1, 3}, {9, 1, 3},
+                        {10, 0, 4}, {11, 0, 5}, {12, 0, 5}, {13, 1, 5}, {14, 0, 6},
+                        {15, 1, 6}, {16, 1, 6}, {17, 0, 7}, {18, 1, 7}, {19, 1, 7},
+                        {20, 0, 8}, {21, 0, 9}, {22, 0, 10}, {23, 0, 11}, {24, 0, 12},
+                        {25, 1, 12}, {26, 1, 12}, {27, 0, 13}, {28, 1, 13}, {29, 1, 13},
+                        {30, 0, 14}, {31, 1, 14}, {32, 1, 14}, {33, 0, 15}, {34, 1, 15},
+                        {35, 1, 15}, {36, 0, 16}, {37, 1, 16}, {38, 1, 16}, {39, 0, 0},
+                    };
+
+                    RwInt32 saved = save->unk_5C.unk_58;
+
+                    if (saved > 0 && saved < sub_19B050() &&
+                        levels[saved].chapter == levels[sub_19B050()].chapter &&
+                        levels[sub_19B050()].carries)
+                        unk_254 = 1;
+                }
+#endif
                 if (unk_254)
                 {
                     RwUInt32 frm_9C;
@@ -480,7 +534,9 @@ void PlayerTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
                     RwInt32 frm_70;
                     RwInt32 q6C;
 
+#ifndef CODFH_SP // the debug print is compiled out of single player
                     sub_19A750("NOTE: !!! PlayerTrigger: using player attribs from previous level or from memCard !!!\n");
+#endif
                     memset(unk_258, -1, 8);
                     memset(unk_264, -1, 0x9C);
                     unk_260 = -1;
@@ -566,8 +622,16 @@ void PlayerTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
                             if (unk_260 == unk_108[local_94])
                                 break;
                         }
+#ifdef CODFH_SP // single player also marks that weapon as held (SP 0x85616)
+                        if (local_94 == 2)
+                        {
+                            lv_54 = unk_260;
+                            unk_114[lv_54] = 1;
+                        }
+#else
                         if (local_94 == 2)
                             lv_54 = unk_260;
+#endif
                     }
                     q6C = *bp_4++;
                     if (q6C)
@@ -657,6 +721,9 @@ void PlayerTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
                     lv_54 = *bp_4++;
                     if (lv_54 == 999)
                         lv_54 = 0x1D;
+#ifdef CODFH_SP // single player marks the weapon lv_54 as held (SP 0x85766)
+                    unk_114[lv_54] = 1;
+#endif
                     locA0 = *bp_4++;
                     if (locA0)
                     {
@@ -680,6 +747,14 @@ void PlayerTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
                     slot_58->unk_0C = 1;
                     if (unk_114[slot_C])
                         slot_58->unk_0C = 0;
+#ifdef CODFH_SP // single player gives the weapon lv_54 the third place (SP 0x857D3)
+                    if (slot_C == lv_54)
+                    {
+                        sub_ACDB0(slot_C, 2);
+                        slot_58->unk_18 = 2;
+                    }
+                    else
+#endif
                     for (RwInt32 var_C0 = 0; var_C0 < 2; var_C0++)
                     {
                         if (unk_108[var_C0] != -1 && unk_108[var_C0] == slot_C)
@@ -968,12 +1043,14 @@ void PlayerTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
             break;
         case 98:
             b14->GetCommandData(unk_37C);
+            break;
         }
         ++b14;
     }
 }
 
 // match: ?sub_AC900@PlayerTrigger@@QAEXXZ @ 0x000AC900
+// sp-match: ?sub_AC900@PlayerTrigger@@QAEXXZ @ 0x000844C0
 void PlayerTrigger::sub_AC900()
 {
     RwInt32 lv_10;
@@ -993,7 +1070,10 @@ void PlayerTrigger::sub_AC900()
         else
             unk_384[bp_4] = -1;
     }
+#ifndef CODFH_SP
+    // Single player compiles the debug print out (SP 0x844C0).
     sub_19A750("Restoring Original Weapons, Unloading current banks -=]MF[=-\n");
+#endif
     sub_16FD10();
     for (bp_8 = 0; bp_8 < 2; bp_8++)
     {
@@ -1008,9 +1088,21 @@ void PlayerTrigger::sub_AC900()
         }
     }
     unk_13C = unk_108[0];
+#ifdef CODFH_SP
+    // Single player also restores the third weapon it started with, into bank 2 (SP 0x84565).
+    if (unk_260 != -1)
+    {
+        unk_114[unk_260] = 1;
+        slot_C = sub_119B70(unk_260);
+        lv_10 = slot_C->unk_24;
+        dword_4E54E8[2] = lv_10;
+        sub_16F2C0(2, slot_C->unk_24);
+    }
+#endif
 }
 
 // match: ?sub_ACA70@PlayerTrigger@@QAEXXZ @ 0x000ACA70
+// sp-match: ?sub_ACA70@PlayerTrigger@@QAEXXZ @ 0x000845A0
 void PlayerTrigger::sub_ACA70()
 {
     switch (dword_4F28F0->get_unk_18_direct())
@@ -1041,7 +1133,14 @@ void PlayerTrigger::sub_ACA70()
     }
 }
 
+#ifdef CODFH_SP
+// Single player only (SP 0xC85E0, no MP twin): builds the player (a 0x2260-byte
+// type_10F710) for the trigger arg_0.
+type_10F710 *sp_sub_C85E0(PlayerTrigger *arg_0);
+#endif
+
 // match: ?HandleEvents@PlayerTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000ACC60
+// sp-match: ?HandleEvents@PlayerTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000862C0
 void PlayerTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
     Trigger::HandleEvents(pMsg);
@@ -1052,11 +1151,28 @@ void PlayerTrigger::HandleEvents(RWS::CMsg &pMsg)
     }
     else if (pMsg.Id.p_msgrec == iMsgSparkStartSystem.p_msgrec)
     {
+#ifdef CODFH_SP
+        // Single player builds its player here (SP 0x862FE).
+        type_10F710 *player = sp_sub_C85E0(this);
+
+        if (player)
+        {
+            unk_46C.sub_D48D0(player);
+            sub_1745C0(player, player->unk_3D4);
+            sub_ACF10(player);
+            sub_174580(player, unk_C0);
+        }
+#endif
         UnLinkMsg(iMsgSparkStartSystem);
     }
     else if (pMsg.Id.p_msgrec == dword_4B8750.p_msgrec)
     {
         sub_ACE00();
+#ifdef CODFH_SP
+        // Single player also readies the player's weapons here (SP 0x86364).
+        ((type_10F710 *)unk_46C.sub_D4910())->sub_FF210();
+        sub_ACEA0();
+#endif
         unk_468 = 1;
         UnLinkMsg(dword_4B8750);
     }
@@ -1080,9 +1196,25 @@ void PlayerTrigger::HandleEvents(RWS::CMsg &pMsg)
         if (var_8)
             delete var_8;
     }
+#ifdef CODFH_SP
+    // Single player builds its player again at the restart's end (SP 0x8640F).
+    else if (pMsg.Id.p_msgrec == dword_4B67C0.p_msgrec)
+    {
+        type_10F710 *player = sp_sub_C85E0(this);
+
+        if (player)
+        {
+            unk_46C.sub_D48D0(player);
+            sub_1745C0(player, player->unk_3D4);
+            sub_174580(player, unk_C0);
+            sub_ACF10(player);
+        }
+    }
+#endif
 }
 
 // match: ?sub_ACDB0@PlayerTrigger@@QAEXHH@Z @ 0x000ACDB0
+// sp-match: ?sub_ACDB0@PlayerTrigger@@QAEXHH@Z @ 0x000846E0
 void PlayerTrigger::sub_ACDB0(RwInt32 arg_0, RwInt32 arg_4)
 {
     type_4C19C0 *bp_8;
@@ -1096,6 +1228,7 @@ void PlayerTrigger::sub_ACDB0(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_ACE00@PlayerTrigger@@QAEXXZ @ 0x000ACE00
+// sp-match: ?sub_ACE00@PlayerTrigger@@QAEXXZ @ 0x00084720
 void PlayerTrigger::sub_ACE00()
 {
     RwInt32 lv_10;
@@ -1109,13 +1242,17 @@ void PlayerTrigger::sub_ACE00()
         bp_8 = (type_1917A0 *)sub_198800((type_3DF8D8_04 *)slot_C);
         lv_10 = bp_8->unk_44;
         slot_C->unk_24 = lv_10;
+#ifndef CODFH_SP
+        // Single player compiles the debug prints out (SP 0x84720).
         sub_19A750("Assigning weapon %d's def to wbank_%02d.bin", bp_4, slot_C->unk_24);
         if (unk_114[bp_4])
             sub_19A750("Flagging weapon %d's def to initialize geometry on game start", bp_4);
+#endif
     }
 }
 
 // match: ?sub_ACEA0@PlayerTrigger@@QAEXXZ @ 0x000ACEA0
+// sp-match: ?sub_ACEA0@PlayerTrigger@@QAEXXZ @ 0x00084750
 void PlayerTrigger::sub_ACEA0()
 {
     type_3D3548 *var_4 = unk_46C.sub_D4910();
@@ -1138,6 +1275,7 @@ void PlayerTrigger::sub_ACEA0()
 }
 
 // match: ?sub_ACF10@PlayerTrigger@@QAEXPAUtype_10F710@@@Z @ 0x000ACF10
+// sp-match: ?sub_ACF10@PlayerTrigger@@QAEXPAUtype_10F710@@@Z @ 0x00084790
 void PlayerTrigger::sub_ACF10(type_10F710 *arg_0)
 {
     if (arg_0)
@@ -1160,6 +1298,7 @@ void PlayerTrigger::sub_ACF10(type_10F710 *arg_0)
 }
 
 // match: ?sub_AD030@PlayerTrigger@@QAEXXZ @ 0x000AD030
+// sp-match: ?sub_AD030@PlayerTrigger@@QAEXXZ @ 0x00084850
 void PlayerTrigger::sub_AD030()
 {
     if (dword_4B67E4)
@@ -1180,3 +1319,4 @@ void PlayerTrigger::sub_AD030()
 }
 
 // match: ??_EPlayerTrigger@@WBI@AEPAXI@Z @ 0x000AD1A0
+// sp-match: ??_EPlayerTrigger@@WBI@AEPAXI@Z @ 0x000849A0

@@ -65,6 +65,7 @@ static const RwChar nullString[] = RWSTRING("");
 // match: _nullString @ 0x00416E02
 
 // match: _StrICmp @ 0x002B4F00
+// sp-match: _StrICmp @ 0x001D0320
 
 static int
 StrICmp(const RwChar * s1, const RwChar * s2)
@@ -114,6 +115,7 @@ StrICmp(const RwChar * s1, const RwChar * s2)
 }
 
 // match: _StrUpr @ 0x002B4F50
+// sp-match: _StrUpr @ 0x001D0370
 static RwChar  *
 StrUpr(RwChar * s)
 {
@@ -140,6 +142,7 @@ StrUpr(RwChar * s)
 }
 
 // match: _StrLwr @ 0x002B4F80
+// sp-match: _StrLwr @ 0x001D03A0
 static RwChar  *
 StrLwr(RwChar * s)
 {
@@ -166,6 +169,7 @@ StrLwr(RwChar * s)
 }
 
 // match: _StrChr @ 0x002B4FB0
+// sp-match: _StrChr @ 0x001D03D0
 static RwChar *
 StrChr(const RwChar *s, int c)
 {
@@ -200,6 +204,7 @@ StrChr(const RwChar *s, int c)
 }
 
 // match: _StrRChr @ 0x002B4FD0
+// sp-match: _StrRChr @ 0x001D03F0
 static RwChar  *
 StrRChr(const RwChar * s, int c)
 {
@@ -243,6 +248,7 @@ StrRChr(const RwChar * s, int c)
  */
 
 // match: __rwStringOpen @ 0x002B4FF0
+// sp-match: __rwStringOpen @ 0x001D0410
 RwBool
 _rwStringOpen(void)
 {
@@ -336,6 +342,7 @@ _rwStringDestroy(RwChar * string)
  */
 
 // match: __rwStringStreamGetSize @ 0x002B50A0
+// sp-match: __rwStringStreamGetSize @ 0x001D04C0
 RwUInt32
 _rwStringStreamGetSize(const RwChar * string)
 {
@@ -360,6 +367,7 @@ _rwStringStreamGetSize(const RwChar * string)
  On exit    :
  */
 // match: __rwStringStreamWrite @ 0x002B50C0
+// sp-match: __rwStringStreamWrite @ 0x001D04E0
 const RwChar       *
 _rwStringStreamWrite(const RwChar * string, RwStream * stream)
 {
@@ -410,6 +418,7 @@ _rwStringStreamWrite(const RwChar * string, RwStream * stream)
  */
 
 // match: _StringStreamRead @ 0x002B5130
+// sp-match: _StringStreamRead @ 0x001D0550
 static RwChar      *
 StringStreamRead(RwChar *nativeString, RwStream * stream, RwUInt32 length)
 {
@@ -484,6 +493,7 @@ StringStreamRead(RwChar *nativeString, RwStream * stream, RwUInt32 length)
  */
 
 // match: _UnicodeStringStreamRead @ 0x002B51F0
+// sp-match: _UnicodeStringStreamRead @ 0x001D0610
 static RwChar      *
 UnicodeStringStreamRead(RwChar *nativeString, RwStream * stream, RwUInt32 length)
 {
@@ -558,6 +568,7 @@ UnicodeStringStreamRead(RwChar *nativeString, RwStream * stream, RwUInt32 length
  */
 
 // match: __rwStringStreamFindAndRead @ 0x002B52D0
+// sp-match: __rwStringStreamFindAndRead @ 0x001D06F0
 RwChar             *
 _rwStringStreamFindAndRead(RwChar *string, RwStream * stream)
 {

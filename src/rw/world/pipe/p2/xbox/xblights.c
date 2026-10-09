@@ -30,6 +30,7 @@ static RwInt32 numActiveLights = 0;
 // match: ?newLight@?1??_rxXBLightLocalEnable@@9@9 @ 0x00436C50
 
 // match: __rwXBLightsGlobalEnable @ 0x002DF190
+// sp-match: __rwXBLightsGlobalEnable @ 0x001F9C50
 
 RwBool
 _rwXBLightsGlobalEnable(RwUInt32 *numLights, RwUInt32 flags, RwBool hasNormals)
@@ -149,6 +150,7 @@ _rwXBLightsGlobalEnable(RwUInt32 *numLights, RwUInt32 flags, RwBool hasNormals)
 }
 
 // match: __rxXBLightLocalEnable @ 0x002DF410
+// sp-match: __rxXBLightLocalEnable @ 0x001F9ED0
 RwBool
 _rxXBLightLocalEnable(RpLight *light, RwUInt32 *numLights)
 {
@@ -225,6 +227,7 @@ _rxXBLightLocalEnable(RpLight *light, RwUInt32 *numLights)
 }
 
 // match: _RwXboxLightsEnable @ 0x002DF5A0
+// sp-match: _RwXboxLightsEnable @ 0x001FA060
 void
 RwXboxLightsEnable(RwInt32 numLights, RwBool enable)
 {

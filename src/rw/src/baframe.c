@@ -149,6 +149,7 @@ RwFrameSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc )
 // match: __rwFrameFreeListPreallocBlocks @ 0x00435360
 
 // match: __rwFrameOpen @ 0x002A3E70
+// sp-match: __rwFrameOpen @ 0x001BF2A0
 
 void *
 _rwFrameOpen(void *instance, RwInt32 offset, RwInt32 __RWUNUSED__ size)
@@ -189,6 +190,7 @@ _rwFrameOpen(void *instance, RwInt32 offset, RwInt32 __RWUNUSED__ size)
  */
 
 // match: __rwFrameClose @ 0x002A3ED0
+// sp-match: __rwFrameClose @ 0x001BF300
 void *
 _rwFrameClose(void *instance,
               RwInt32 __RWUNUSED__ offset,
@@ -227,6 +229,7 @@ _rwFrameClose(void *instance,
  */
 
 // match: _rwSetHierarchyRoot @ 0x002A3F10
+// sp-match: _rwSetHierarchyRoot @ 0x001BF340
 static void
 rwSetHierarchyRoot(RwFrame *frame, RwFrame *root)
 {
@@ -259,6 +262,7 @@ rwSetHierarchyRoot(RwFrame *frame, RwFrame *root)
  */
 
 // match: _rwFrameCloneRecurse @ 0x002A4410
+// sp-match: _rwFrameCloneRecurse @ 0x001BF840
 static RwFrame *
 rwFrameCloneRecurse(RwFrame *oldFrame, RwFrame *newRoot)
 {
@@ -357,6 +361,7 @@ rwFrameCloneRecurse(RwFrame *oldFrame, RwFrame *newRoot)
  */
 
 // match: __rwFrameCloneAndLinkClones @ 0x002A4510
+// sp-match: __rwFrameCloneAndLinkClones @ 0x001BF940
 RwFrame *
 _rwFrameCloneAndLinkClones(RwFrame *root)
 {
@@ -386,6 +391,7 @@ _rwFrameCloneAndLinkClones(RwFrame *root)
 }
 
 // match: __rwFramePurgeClone @ 0x002A3F50
+// sp-match: __rwFramePurgeClone @ 0x001BF380
 RwFrame *
 _rwFramePurgeClone(RwFrame *root)
 {
@@ -495,6 +501,7 @@ RwFrameGetParent(const RwFrame *frame)
  * \see RwFrameRegisterPlugin
  */
 // match: _RwFrameDirty @ 0x002A3F80
+// sp-match: _RwFrameDirty @ 0x001BF3B0
 RwBool
 RwFrameDirty(const RwFrame *frame)
 {
@@ -529,6 +536,7 @@ RwFrameDirty(const RwFrame *frame)
 
 /* codfh-match: not static in 3.6 (callers push its argument) */
 // match: _rwFrameInternalInit @ 0x002A3FA0
+// sp-match: _rwFrameInternalInit @ 0x001BF3D0
 void
 rwFrameInternalInit(RwFrame *frame)
 {
@@ -594,6 +602,7 @@ rwFrameInternalInit(RwFrame *frame)
  *
  */
 // match: _RwFrameCreate @ 0x002A4080
+// sp-match: _RwFrameCreate @ 0x001BF4B0
 RwFrame *
 RwFrameCreate(void)
 {
@@ -671,6 +680,7 @@ _rwFrameInit(RwFrame *frame)
  */
 /* codfh-match: not static in 3.6 (callers push its argument) */
 // match: __rwFrameInternalDeInit @ 0x002A4540
+// sp-match: __rwFrameInternalDeInit @ 0x001BF970
 void
 _rwFrameInternalDeInit(RwFrame *frame)
 {
@@ -732,6 +742,7 @@ _rwFrameInternalDeInit(RwFrame *frame)
  *
  */
 // match: _RwFrameDestroy @ 0x002A45B0
+// sp-match: _RwFrameDestroy @ 0x001BF9E0
 RwBool
 RwFrameDestroy(RwFrame *frame)
 {
@@ -835,6 +846,7 @@ rwFrameDestroyRecurseDestroyLeaf(RwFrame *frame)
  */
 
 // match: _rwFrameDestroyRecurse @ 0x002A40B0
+// sp-match: _rwFrameDestroyRecurse @ 0x001BF4E0
 static void
 rwFrameDestroyRecurse(RwFrame * frame)
 {
@@ -903,6 +915,7 @@ rwFrameDestroyRecurse(RwFrame * frame)
  *
  */
 // match: _RwFrameDestroyHierarchy @ 0x002A4120
+// sp-match: _RwFrameDestroyHierarchy @ 0x001BF550
 RwBool
 RwFrameDestroyHierarchy(RwFrame *frame)
 {
@@ -951,6 +964,7 @@ RwFrameDestroyHierarchy(RwFrame *frame)
  *
  */
 // match: _RwFrameUpdateObjects @ 0x002A4140
+// sp-match: _RwFrameUpdateObjects @ 0x001BF570
 RwFrame *
 RwFrameUpdateObjects(RwFrame *frame)
 {
@@ -1049,6 +1063,7 @@ RwFrameGetMatrix(RwFrame *frame)
  *
  */
 // match: _RwFrameGetLTM @ 0x002A41A0
+// sp-match: _RwFrameGetLTM @ 0x001BF5D0
 RwMatrix *
 RwFrameGetLTM(RwFrame *frame)
 {
@@ -1092,6 +1107,7 @@ RwFrameGetLTM(RwFrame *frame)
  *
  */
 // match: _RwFrameGetRoot @ 0x002A41C0
+// sp-match: _RwFrameGetRoot @ 0x001BF5F0
 RwFrame *
 RwFrameGetRoot(const RwFrame *frame)
 {
@@ -1172,6 +1188,7 @@ rwFrameIsAParentOf(RwFrame * frame, RwFrame * child)
  *
  */
 // match: _RwFrameAddChildNoUpdate @ 0x002A45E0
+// sp-match: _RwFrameAddChildNoUpdate @ 0x001BFA10
 RwFrame *
 RwFrameAddChildNoUpdate(RwFrame *parent, RwFrame *child)
 {
@@ -1230,6 +1247,7 @@ RwFrameAddChildNoUpdate(RwFrame *parent, RwFrame *child)
  *
  */
 // match: _RwFrameAddChild @ 0x002A4630
+// sp-match: _RwFrameAddChild @ 0x001BFA60
 RwFrame *
 RwFrameAddChild(RwFrame *parent, RwFrame *child)
 {
@@ -1294,6 +1312,7 @@ RwFrameAddChild(RwFrame *parent, RwFrame *child)
  *
  */
 // match: _RwFrameRemoveChild @ 0x002A41D0
+// sp-match: _RwFrameRemoveChild @ 0x001BF600
 RwFrame *
 RwFrameRemoveChild(RwFrame *child)
 {
@@ -1372,6 +1391,7 @@ RwFrameRemoveChild(RwFrame *child)
  *
  */
 // match: _RwFrameForAllChildren @ 0x002A4240
+// sp-match: _RwFrameForAllChildren @ 0x001BF670
 RwFrame *
 RwFrameForAllChildren(RwFrame *frame, RwFrameCallBack callBack, void *data)
 {
@@ -1485,6 +1505,7 @@ RwFrameSetRemoveCallback(RwFrameCallBack RemoveCallback, void* pData)
  *
  */
 // match: _RwFrameTranslate @ 0x002A4280
+// sp-match: _RwFrameTranslate @ 0x001BF6B0
 RwFrame *
 RwFrameTranslate(RwFrame *frame,
                  const RwV3d *translation,
@@ -1576,6 +1597,7 @@ RwFrameScale(RwFrame *frame, const RwV3d *scale, RwOpCombineType combineOp)
  *
  */
 // match: _RwFrameTransform @ 0x002A42B0
+// sp-match: _RwFrameTransform @ 0x001BF6E0
 RwFrame *
 RwFrameTransform(RwFrame *frame,
                  const RwMatrix *transform,
@@ -1626,6 +1648,7 @@ RwFrameTransform(RwFrame *frame,
  *
  */
 // match: _RwFrameRotate @ 0x002A42E0
+// sp-match: _RwFrameRotate @ 0x001BF710
 RwFrame *
 RwFrameRotate(RwFrame *frame, const RwV3d *axis,
               RwReal angle, RwOpCombineType combineOp)
@@ -1667,6 +1690,7 @@ RwFrameRotate(RwFrame *frame, const RwV3d *axis,
  *
  */
 // match: _RwFrameSetIdentity @ 0x002A4310
+// sp-match: _RwFrameSetIdentity @ 0x001BF740
 RwFrame *
 RwFrameSetIdentity(RwFrame *frame)
 {
@@ -1711,6 +1735,7 @@ RwFrameSetIdentity(RwFrame *frame)
  *
  */
 // match: _RwFrameOrthoNormalize @ 0x002A4380
+// sp-match: _RwFrameOrthoNormalize @ 0x001BF7B0
 RwFrame *
 RwFrameOrthoNormalize(RwFrame *frame)
 {
@@ -1757,6 +1782,7 @@ RwFrameOrthoNormalize(RwFrame *frame)
  *
  */
 // match: _RwFrameForAllObjects @ 0x002A43A0
+// sp-match: _RwFrameForAllObjects @ 0x001BF7D0
 RwFrame *
 RwFrameForAllObjects(RwFrame *frame, RwObjectCallBack callBack, void *data)
 {
@@ -1844,6 +1870,7 @@ _rwFrameSetStaticPluginsSize(RwInt32 size)
  * \see RwFrameValidatePlugins
  */
 // match: _RwFrameRegisterPlugin @ 0x002A43E0
+// sp-match: _RwFrameRegisterPlugin @ 0x001BF810
 RwInt32
 RwFrameRegisterPlugin(RwInt32 size,
                       RwUInt32 pluginID,

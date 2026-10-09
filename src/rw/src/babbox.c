@@ -91,6 +91,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/src/babbox.
 // match: _rcsid @ 0x00416B64
 
 // match: _RwBBoxCalculate @ 0x002B30B0
+// sp-match: _RwBBoxCalculate @ 0x001CE4D0
 RwBBox *
 RwBBoxCalculate(RwBBox *boundBox, const RwV3d *verts, RwInt32 numVerts)
 {
@@ -164,6 +165,7 @@ RwBBoxCalculate(RwBBox *boundBox, const RwV3d *verts, RwInt32 numVerts)
  */
 
 // match: _RwBBoxInitialize @ 0x002B3160
+// sp-match: _RwBBoxInitialize @ 0x001CE580
 RwBBox *
 RwBBoxInitialize(RwBBox *boundBox, const RwV3d *vertex)
 {
@@ -197,6 +199,7 @@ RwBBoxInitialize(RwBBox *boundBox, const RwV3d *vertex)
  */
 
 // match: _RwBBoxAddPoint @ 0x002B31A0
+// sp-match: _RwBBoxAddPoint @ 0x001CE5C0
 RwBBox *
 RwBBoxAddPoint(RwBBox *boundBox, const RwV3d *vertex)
 {

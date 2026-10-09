@@ -29,9 +29,11 @@ RWS_REGISTERCLASS(SimpleMechanicTrigger);
 // match: ?MakeNew@SimpleMechanicTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000B7330
 // match: __ehhandler$?MakeNew@SimpleMechanicTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x003002D0
 // match: __ehhandler$?MakeNew@SimpleMechanicTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x003002DF
+// sp-match: ?MakeNew@SimpleMechanicTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0008CAF0
 RWS_DEFINE_MAKENEW(SimpleMechanicTrigger)
 
 // match: ??0SimpleMechanicTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000B73B0
+// sp-match: ??0SimpleMechanicTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0008C660
 SimpleMechanicTrigger::SimpleMechanicTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_C0.unk_00 = 0;
@@ -50,16 +52,21 @@ SimpleMechanicTrigger::SimpleMechanicTrigger(const RWS::CAttributePacket &attr) 
 }
 
 // match: ?vf_008@SimpleMechanicTrigger@@UAEHXZ @ 0x000B7520
+// sp-match: ?vf_008@SimpleMechanicTrigger@@UAEHXZ @ 0x0008C720
 
 // match: ?vf_01C@SimpleMechanicTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x000B7530
+// sp-match: ?vf_01C@SimpleMechanicTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x000977B0
 
 // match: ??_GSimpleMechanicTrigger@@UAEPAXI@Z @ 0x000B7550
+// sp-match: ??_GSimpleMechanicTrigger@@UAEPAXI@Z @ 0x0008CAE0
 
 // match: ??1SimpleMechanicTrigger@@UAE@XZ @ 0x000B7570
+// sp-match: ??1SimpleMechanicTrigger@@UAE@XZ @ 0x0008C730
 // (Defined in the class, in SimpleMechanicTrigger.h.)
 
 // Commands 3 and 4 first (the kind of names unk_E0 picks), then the rest.
 // match: ?HandleAttributes@SimpleMechanicTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000B75A0
+// sp-match: ?HandleAttributes@SimpleMechanicTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0008C750
 void SimpleMechanicTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -172,6 +179,7 @@ void SimpleMechanicTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_020@SimpleMechanicTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000B7A40
+// sp-match: ?vf_020@SimpleMechanicTrigger@@UAEPAUtype_3D3548@@XZ @ 0x0008CAA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_3D3548 *SimpleMechanicTrigger::vf_020()
 {
@@ -191,6 +199,7 @@ type_3D3548 *SimpleMechanicTrigger::vf_020()
 }
 
 // match: ??_ESimpleMechanicTrigger@@WBI@AEPAXI@Z @ 0x000B7A90
+// sp-match: ??_ESimpleMechanicTrigger@@WBI@AEPAXI@Z @ 0x0008CAD0
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

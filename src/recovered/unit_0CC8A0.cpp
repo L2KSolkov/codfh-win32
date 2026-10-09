@@ -39,6 +39,9 @@
 #include "types/animobjpool.h"
 #include "rws/csystemcommands.h"
 #include "game/gameloop.h"
+#ifdef CODFH_SP
+#include "types/type_3DD948.h"
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D6F44
@@ -53,10 +56,12 @@ extern const RwV3d stru_3D6F58 = { 0.0f, 1.0f, 0.0f };
 extern const RwV3d stru_3D6F64 = { 0.0f, 0.0f, 1.0f };
 // 0x003D6F70
 extern const RwReal flt_3D6F70 = 16.666666f;
+#ifndef CODFH_SP // single player has neither unreferenced 0.01f: 5.0f follows the second 16.666666f (SP 0x2E338C)
 // 0x003D6F74
 extern const RwReal flt_3D6F74 = 0.01f;
 // 0x003D6F78
 extern const RwReal flt_3D6F78 = 0.01f;
+#endif
 // 0x003D6F7C
 extern const RwReal flt_3D6F7C = 5.0f;
 // 0x00429238
@@ -137,8 +142,13 @@ RwInt32 dword_4B69F8;
 // match: ?flt_429250@@3MA @ 0x00429250
 
 // match: ?sub_CC8A0@@YAPAXH@Z @ 0x000CC8A0
+// sp-match: ?sub_CC8A0@@YAPAXH@Z @ 0x0009B430
 
+#ifdef CODFH_SP // shape: external linkage; SP 0x9B430 reads its argument from the stack
+void *sub_CC8A0(RwInt32 arg_0)
+#else
 static void *sub_CC8A0(RwInt32 arg_0)
+#endif
 {
     type_429238 *var_4;
 
@@ -157,6 +167,7 @@ static void *sub_CC8A0(RwInt32 arg_0)
 // The ground's height under arg_0: a line test from 150 above it to 4000
 // below; its own height when nothing is hit.
 // match: ?sub_CC8E0@@YAMPAURwV3d@@@Z @ 0x000CC8E0
+// sp-match: ?sub_CC8E0@@YAMPAURwV3d@@@Z @ 0x0009B460
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwReal sub_CC8E0(RwV3d *arg_0)
 {
@@ -178,6 +189,7 @@ RwReal sub_CC8E0(RwV3d *arg_0)
 // match: ??0type_3D3548@@QAE@XZ @ 0x000CC960
 // match: __ehhandler$??0type_3D3548@@QAE@XZ-0x7A @ 0x00300BE0
 // match: __ehhandler$??0type_3D3548@@QAE@XZ @ 0x00300C5A
+// sp-match: ??0type_3D3548@@QAE@XZ @ 0x000A08E0
 type_3D3548::type_3D3548()
 {
     dword_4B69F8++;
@@ -186,6 +198,7 @@ type_3D3548::type_3D3548()
 }
 
 // match: ?vf_22C@type_3D3548@@UAEHXZ @ 0x000CCB70
+// sp-match: ?vf_22C@type_3D3548@@UAEHXZ @ 0x0009FA50
 RwInt32 type_3D3548::vf_22C()
 {
     unk_384 = 0;
@@ -203,6 +216,7 @@ RwInt32 type_3D3548::vf_22C()
     return 1;
 }
 
+#ifndef CODFH_SP // single player defines it in the class (include/types/type_8E670.h)
 // match: ?sub_CCC60@type_8E670@@QAEXXZ @ 0x000CCC60
 void type_8E670::sub_CCC60()
 {
@@ -216,8 +230,10 @@ void type_8E670::sub_CCC60()
     unk_10 = 0;
     unk_20 = 0;
 }
+#endif
 
 // match: ?sub_CCCD0@type_3D3548@@QAEXPAUtype_712B0@@@Z @ 0x000CCCD0
+// sp-match: ?sub_CCCD0@type_3D3548@@QAEXPAUtype_712B0@@@Z @ 0x0009B4F0
 void type_3D3548::sub_CCCD0(type_712B0 *arg_0)
 {
     unk_344.sub_144940(arg_0);
@@ -232,6 +248,7 @@ void type_3D3548::sub_CCCD0(type_712B0 *arg_0)
 }
 
 // match: ?vf_230@type_3D3548@@UAEXXZ @ 0x000CCD30
+// sp-match: ?vf_230@type_3D3548@@UAEXXZ @ 0x0009B540
 void type_3D3548::vf_230()
 {
     unk_38C = 0;
@@ -249,6 +266,7 @@ void type_3D3548::vf_230()
 
 // Resets its state (vf_22C, once registered).
 // match: ?sub_CCDF0@type_3D3548@@QAEXXZ @ 0x000CCDF0
+// sp-match: ?sub_CCDF0@type_3D3548@@QAEXXZ @ 0x0009E5A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::sub_CCDF0()
 {
@@ -355,12 +373,14 @@ void type_3D3548::sub_CCDF0()
 }
 
 // match: ?sub_CD530@type_3D3548@@QAEXH@Z @ 0x000CD530
+// sp-match: ?sub_CD530@type_3D3548@@QAEXH@Z @ 0x0009B5A0
 void type_3D3548::sub_CD530(RwInt32 arg_0)
 {
     unk_384 = arg_0;
 }
 
 // match: ?sub_CD550@type_3D3548@@QAEPAURwV3d@@XZ @ 0x000CD550
+// sp-match: ?sub_CD550@type_3D3548@@QAEPAURwV3d@@XZ @ 0x0009B5B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwV3d *type_3D3548::sub_CD550()
 {
@@ -382,6 +402,7 @@ RwV3d *type_3D3548::sub_CD550()
 }
 
 // match: ?sub_CD5A0@type_3D3548@@QAEPAURwV3d@@XZ @ 0x000CD5A0
+// sp-match: ?sub_CD5A0@type_3D3548@@QAEPAURwV3d@@XZ @ 0x0009B5E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwV3d *type_3D3548::sub_CD5A0()
 {
@@ -405,6 +426,7 @@ RwV3d *type_3D3548::sub_CD5A0()
 // Moves its frame to arg_0 (and its primary animation's two matrices by
 // as much).
 // match: ?vf_0C0@type_3D3548@@UAEXPAURwV3d@@@Z @ 0x000CD5F0
+// sp-match: ?vf_0C0@type_3D3548@@UAEXPAURwV3d@@@Z @ 0x0009B610
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::vf_0C0(RwV3d *arg_0)
 {
@@ -439,6 +461,7 @@ void type_3D3548::vf_0C0(RwV3d *arg_0)
 
 // Its frame's position (its modelling matrix's).
 // match: ?vf_0C4@type_3D3548@@UAEPAMXZ @ 0x000CD740
+// sp-match: ?vf_0C4@type_3D3548@@UAEPAMXZ @ 0x0009B700
 RwReal *type_3D3548::vf_0C4()
 {
     RwFrame *var_4;
@@ -449,6 +472,7 @@ RwReal *type_3D3548::vf_0C4()
 
 // Its frame's world position.
 // match: ?vf_0CC@type_3D3548@@UAEPAURwV3d@@XZ @ 0x000CD760
+// sp-match: ?vf_0CC@type_3D3548@@UAEPAURwV3d@@XZ @ 0x0009B710
 RwV3d *type_3D3548::vf_0CC()
 {
     RwFrame *var_4;
@@ -458,6 +482,7 @@ RwV3d *type_3D3548::vf_0CC()
 }
 
 // match: ?vf_0D4@type_3D3548@@UAEXPAURtQuat@@@Z @ 0x000CD790
+// sp-match: ?vf_0D4@type_3D3548@@UAEXPAURtQuat@@@Z @ 0x0009B730
 // Turns the entity where it stands to the rotation *arg_0.
 void type_3D3548::vf_0D4(RtQuat *arg_0)
 {
@@ -475,6 +500,7 @@ void type_3D3548::vf_0D4(RtQuat *arg_0)
 }
 
 // match: ?vf_0D0@type_3D3548@@UAEXPAURwV3d@@@Z @ 0x000CD9D0
+// sp-match: ?vf_0D0@type_3D3548@@UAEXPAURwV3d@@@Z @ 0x0009B8A0
 // Turns the entity where it stands to face the point *arg_0 (none when it
 // is there already).
 void type_3D3548::vf_0D0(RwV3d *arg_0)
@@ -497,6 +523,7 @@ void type_3D3548::vf_0D0(RwV3d *arg_0)
 }
 
 // match: ?vf_0D8@type_3D3548@@UAEXPAURwV3d@@@Z @ 0x000CDAC0
+// sp-match: ?vf_0D8@type_3D3548@@UAEXPAURwV3d@@@Z @ 0x0009B940
 // Turns the entity where it stands to face along *arg_0 (none for a zero
 // vector).
 void type_3D3548::vf_0D8(RwV3d *arg_0)
@@ -519,6 +546,7 @@ void type_3D3548::vf_0D8(RwV3d *arg_0)
 }
 
 // match: ?sub_CDB90@type_3D3548@@QAEPAURwV3d@@XZ @ 0x000CDB90
+// sp-match: ?sub_CDB90@type_3D3548@@QAEPAURwV3d@@XZ @ 0x0009B9C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwV3d *type_3D3548::sub_CDB90()
 {
@@ -540,6 +568,7 @@ RwV3d *type_3D3548::sub_CDB90()
 }
 
 // match: ?sub_CDBE0@type_3D3548@@QAEPAURwV3d@@XZ @ 0x000CDBE0
+// sp-match: ?sub_CDBE0@type_3D3548@@QAEPAURwV3d@@XZ @ 0x0009B9F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwV3d *type_3D3548::sub_CDBE0()
 {
@@ -561,6 +590,7 @@ RwV3d *type_3D3548::sub_CDBE0()
 }
 
 // match: ?sub_CDC30@type_3D3548@@QAEHXZ @ 0x000CDC30
+// sp-match: ?sub_CDC30@type_3D3548@@QAEHXZ @ 0x0009BA10
 RwInt32 type_3D3548::sub_CDC30()
 {
     RwInt32 var_4;
@@ -577,6 +607,7 @@ RwInt32 type_3D3548::sub_CDC30()
 // one or when the animation cannot be found or played; 1 at once while
 // unk_88_12 is set and arg_18 is not.
 // match: ?vf_208@type_3D3548@@UAEHHHHMMMH@Z @ 0x000CDC70
+// sp-match: ?vf_208@type_3D3548@@UAEHHHHMMMH@Z @ 0x0009BA30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3D3548::vf_208(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwReal arg_C,
                             RwReal arg_10, RwReal arg_14, RwInt32 arg_18)
@@ -632,6 +663,7 @@ RwInt32 type_3D3548::vf_208(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwReal 
 }
 
 // match: ?vf_21C@type_3D3548@@UAEXM@Z @ 0x000CDDD0
+// sp-match: ?vf_21C@type_3D3548@@UAEXM@Z @ 0x0009BB60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::vf_21C(RwReal arg_0)
 {
@@ -649,8 +681,28 @@ void type_3D3548::vf_21C(RwReal arg_0)
     {
         var_11 = 0;
     }
+#ifdef CODFH_SP // SP 0x9BB60: a blending character (unk_824 & 3) steps by arg_0, at most 4
+    type_3DAFC8 *lv_p = vf_008();
+    if (lv_p && (lv_p->unk_824 & 3))
+    {
+        if (arg_0 > 4.0f)
+        {
+            arg_0 = 4.0f;
+        }
+        lv_10 = arg_0;
+    }
+    else
+    {
+        lv_10 = flt_429288;
+    }
+    // shape: SP 0x9BB60 captures the flag while calculating the step.
+    bool step_flag;
+    lv_10 = (step_flag = var_11, lv_10 * flt_3D6F70 * 0.001f);
+    unk_284->sub_7A580(lv_10, &var_C, step_flag);
+#else // MP 0xCDDD0 uses its fixed time step.
     lv_10 = flt_429288 * flt_3D6F70 * 0.001f;
     unk_284->sub_7A580(lv_10, &var_C, var_11);
+#endif
     if (unk_28C)
     {
         unk_28C->sub_7A580(lv_10, 0, var_11);
@@ -679,6 +731,7 @@ void type_3D3548::vf_21C(RwReal arg_0)
 }
 
 // match: ?sub_CDF40@type_3D3548@@QAEXM@Z @ 0x000CDF40
+// sp-match: ?sub_CDF40@type_3D3548@@QAEXM@Z @ 0x0009BCD0
 void type_3D3548::sub_CDF40(RwReal arg_0)
 {
     if (!unk_284)
@@ -702,6 +755,7 @@ RwInt32 sub_EC2D0(RpClump *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C, R
 // match: ?sub_CDFA0@@YAHPAUtype_F2FF0@@@Z @ 0x000CDFA0
 // match: __ehhandler$?sub_CDFA0@@YAHPAUtype_F2FF0@@@Z-0x8 @ 0x00300C70
 // match: __ehhandler$?sub_CDFA0@@YAHPAUtype_F2FF0@@@Z @ 0x00300C78
+// sp-match: ?sub_CDFA0@@YAHPAUtype_F2FF0@@@Z @ 0x0009BD10
 RwInt32 sub_CDFA0(type_F2FF0 *arg_0)
 {
     RwInt32 var_14 = 1;
@@ -726,6 +780,7 @@ RwInt32 sub_CDFA0(type_F2FF0 *arg_0)
 
 // Collision on or off: environment and entity collision both.
 // match: ?vf_170@type_3D3548@@UAEXHHHH@Z @ 0x000CE070
+// sp-match: ?vf_170@type_3D3548@@UAEXHHHH@Z @ 0x0009FB10
 // Its animation's events (arg_0, with the event's data arg_4), once it has
 // an animation: the end of an animation (1: the performance player's end,
 // clearing unk_88_12), a sound (1100, by the surface's or its own tag),
@@ -775,7 +830,9 @@ void type_3D3548::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
                             "GameEntity Animation Event: WARNING! Entity on non-tagged surface calling index "
                             "alias 0x%x, 0x%x! Using 0 for Index Alias purposes",
                             var_C.unk_00, var_C.unk_04);
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x9FB10 keeps the sprintf)
                     sub_19A750(var_120);
+#endif
                 }
                 unk_294 = 0;
             }
@@ -912,7 +969,6 @@ void type_3D3548::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
         type_3D32F8 *var_2C4;
         RwV3d var_2D4;
         RwReal var_2D8;
-        RwInt32 var_2DC;
 
         var_2B4 = 1.0e37f;
         var_2B8 = 0;
@@ -939,6 +995,8 @@ void type_3D3548::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
         }
         if (var_2B8 && var_2B4 < 90000.0f)
         {
+            RwInt32 var_2DC;
+
             var_2DC = 0;
             sub_6B5F0("PlayAction", (type_67620 *)(var_2B8->vf_098()), 0, 0, &var_2DC, 1, true, false);
         }
@@ -953,7 +1011,6 @@ void type_3D3548::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
         type_3D32F8 *var_2F0;
         RwV3d var_300;
         RwReal var_304;
-        RwInt32 var_308;
 
         var_2E0 = 1.0e37f;
         var_2E4 = 0;
@@ -980,6 +1037,8 @@ void type_3D3548::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
         }
         if (var_2E4 && var_2E0 < 90000.0f)
         {
+            RwInt32 var_308;
+
             var_308 = 0;
             sub_6B5F0("PlayAction", (type_67620 *)(var_2E4->vf_098()), 0, 0, &var_308, 1, true, false);
         }
@@ -1002,6 +1061,30 @@ void type_3D3548::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
         break;
     }
     case 2200:
+#ifdef CODFH_SP // SP 0x9FB10: the prop is the object registered under the event's key (kind 0x2E), handed to vf_1FC
+    {
+        type_10F710_1A48_ev *var_318;
+        type_3DF8D8_04 var_31C;
+        type_3DF8D8 *var_314;
+
+        var_318 = (type_10F710_1A48_ev *)arg_4;
+        var_31C.unk_00 = var_318->unk_00;
+        var_31C.unk_04 = var_318->unk_04;
+        var_314 = sub_198800(&var_31C);
+        if (var_314 && var_314->vf_008() == 0x2E)
+        {
+            vf_1FC(((type_3DF8D8_BD900 *)var_314)->unk_24.sub_D4910(), var_318->unk_0C);
+            unk_364[var_318->unk_0C] = var_318->unk_08;
+        }
+        else
+        {
+            RwChar var_120[0x100];
+
+            sprintf(var_120, "Prop 0x%x, 0x%x is missing from level. -jcj\n", var_318->unk_00, var_318->unk_04);
+        }
+        break;
+    }
+#else
     {
         type_3D3548 *var_314;
         type_10F710_1A48_ev *var_318;
@@ -1015,6 +1098,7 @@ void type_3D3548::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
         }
         break;
     }
+#endif
     case 2201:
     {
         type_CE070_prop *var_31C;
@@ -1064,6 +1148,7 @@ void type_3D3548::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
 }
 
 // match: ?vf_190@type_3D3548@@UAEXH@Z @ 0x000CEEB0
+// sp-match: ?vf_190@type_3D3548@@UAEXH@Z @ 0x0009BD70
 void type_3D3548::vf_190(RwInt32 arg_0)
 {
     vf_1A0(arg_0);
@@ -1072,6 +1157,7 @@ void type_3D3548::vf_190(RwInt32 arg_0)
 
 // Gravity on or off; off, its vertical motion stops.
 // match: ?vf_18C@type_3D3548@@UAEXH@Z @ 0x000CEEF0
+// sp-match: ?vf_18C@type_3D3548@@UAEXH@Z @ 0x0009BDA0
 void type_3D3548::vf_18C(RwInt32 arg_0)
 {
     unk_28_3 = arg_0;
@@ -1086,6 +1172,7 @@ void type_3D3548::vf_18C(RwInt32 arg_0)
 
 // Environment collision on or off; turned on, it starts from where it is.
 // match: ?vf_1A0@type_3D3548@@UAEXH@Z @ 0x000CEF60
+// sp-match: ?vf_1A0@type_3D3548@@UAEXH@Z @ 0x0009BDE0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::vf_1A0(RwInt32 arg_0)
 {
@@ -1104,12 +1191,14 @@ void type_3D3548::vf_1A0(RwInt32 arg_0)
 }
 
 // match: ?vf_1A8@type_3D3548@@UAEXH@Z @ 0x000CF000
+// sp-match: ?vf_1A8@type_3D3548@@UAEXH@Z @ 0x0009BE50
 void type_3D3548::vf_1A8(RwInt32 arg_0)
 {
     unk_28_2 = arg_0;
 }
 
 // match: ?vf_1A4@type_3D3548@@UAEXH@Z @ 0x000CF030
+// sp-match: ?vf_1A4@type_3D3548@@UAEXH@Z @ 0x0009BE70
 void type_3D3548::vf_1A4(RwInt32 arg_0)
 {
     unk_28_21 = arg_0;
@@ -1118,6 +1207,7 @@ void type_3D3548::vf_1A4(RwInt32 arg_0)
 // Advances the material arg_0's UV animation (RpGeometryForAllMaterials'
 // callback).
 // match: ?sub_CF060@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x000CF060
+// sp-match: ?sub_CF060@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x0009BE90
 RpMaterial *sub_CF060(RpMaterial *arg_0, void *arg_4)
 {
     if (RpMatFXMaterialGetEffects(arg_0) == rpMATFXEFFECTUVTRANSFORM)
@@ -1131,6 +1221,7 @@ RpMaterial *sub_CF060(RpMaterial *arg_0, void *arg_4)
 // Advances the UV animations of the atomic arg_0's materials
 // (RpClumpForAllAtomics' callback; vf_03C, binary for now, passes it).
 // match: ?sub_CF0B0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000CF0B0
+// sp-match: ?sub_CF0B0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0009BED0
 RpAtomic *sub_CF0B0(RpAtomic *arg_0, void *arg_4)
 {
     RpGeometry *var_4;
@@ -1144,6 +1235,7 @@ RpAtomic *sub_CF0B0(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?vf_03C@type_3D3548@@UAEXM@Z @ 0x000CF0E0
+// sp-match: ?vf_03C@type_3D3548@@UAEXM@Z @ 0x0009E8A0
 // The per-frame update: its performance and animations (while animated), its
 // sound's position, fading and throbbing, its atomics' state (sub_CF0B0),
 // the physics callback, the two props at their tags and its trigger's
@@ -1207,6 +1299,7 @@ void type_3D3548::vf_03C(RwReal arg_0)
 }
 
 // match: ?vf_040@type_3D3548@@UAEXM@Z @ 0x000CF2D0
+// sp-match: ?vf_040@type_3D3548@@UAEXM@Z @ 0x0009BEF0
 void type_3D3548::vf_040(RwReal arg_0)
 {
     RwInt32 var_4;
@@ -1224,11 +1317,10 @@ void type_3D3548::vf_040(RwReal arg_0)
 }
 
 // match: ?vf_048@type_3D3548@@UAEXM@Z @ 0x000CF390
+// sp-match: ?vf_048@type_3D3548@@UAEXM@Z @ 0x0009BF60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::vf_048(RwReal arg_0)
 {
-    RwV3d v34;
-    RwV3d local_28;
     RwV3d *var_1C;
     RwReal var_18;
     RwV3d var14;
@@ -1240,6 +1332,8 @@ void type_3D3548::vf_048(RwReal arg_0)
         l4 = sub_1745A0(0);
         if (l4 && l4 != this)
         {
+            RwV3d v34;
+            RwV3d local_28;
             var_1C = (RwV3d *)l4->vf_0C4();
             RwV3dAddMacro(&var14, (RwV3d *)vf_0C4(), &unk_3C_v);
             RwV3dSubMacro(&v34, var_1C, &var14);
@@ -1258,6 +1352,7 @@ void type_3D3548::vf_048(RwReal arg_0)
 }
 
 // match: ?vf_044@type_3D3548@@UAEXM@Z @ 0x000CF520
+// sp-match: ?vf_044@type_3D3548@@UAEXM@Z @ 0x0009E9F0
 // Moves and collides it for the time step arg_0 (at most 4 for a soldier):
 // unless it has not moved or turned (then the last search's results stand),
 // searches the world around its frame (sub_985B0 for a soldier, else
@@ -1288,17 +1383,12 @@ void type_3D3548::vf_044(RwReal arg_0)
     AIData *lv_94;
     RwReal lv_cc;
     RwReal lv_d0;
-    RwInt32 lv_d8[2];
     RwMatrix *lv_dc;
-    RwV3d lv_e8;
-    RwV3d lv_f4;
     RwV3d lv_100;
-    RwV3d lv_10c;
     RwV3d *lv_110;
     RwV3d *lv_114;
     RwV3d *lv_118;
     RwV3d *lv_11c;
-    RwV3d lv_128;
 
     lv_5 = false;
     lv_c = unk_338.unk_08;
@@ -1347,6 +1437,44 @@ void type_3D3548::vf_044(RwReal arg_0)
             || ((RwReal)fabs((RwReal)(unk_70 - lv_64.z))) > 0.01f || ((RwReal)fabs((RwReal)unk_F0)) > 0.01f
             || ((RwReal)fabs((RwReal)unk_F4)) > 0.01f || ((RwReal)fabs((RwReal)unk_F8)) > 0.01f || unk_88_2 || lv_8c
             || unk_28_7 || unk_28_25) {
+#ifdef CODFH_SP
+            // Single player first pushes a soldier back out of a wall it moved
+            // into: a line test from its last position to the new one, 80 up,
+            // and on a hit the frame is moved to 10 short of the hit point
+            // (SP 0x9EC75-0x9EDF2).
+            if (lv_54 && !unk_88_2) {
+                RwV3d from;
+                RwV3d to;
+                RwV3d hit;
+
+                from = unk_68_v;
+                from.y += 80.0f;
+                to = lv_64;
+                to.y += 80.0f;
+                if (sub_FCAE0(&from, &to, &hit, 0, sub_9A800(this), 1, 0)) {
+                    RwV3d back;
+                    RwReal len;
+
+                    RwV3dSubMacro(&back, &from, &hit);
+                    len = RwV3dLength(&back);
+                    if (len != 0.0f) {
+                        RwV3d dest;
+                        RwV3d move;
+                        // A double keeps the factor on the stack past the
+                        // third product (SP 0x9ED73).
+                        RwDouble scale = 10.0f / len;
+
+                        RwV3dScaleMacro(&back, &back, scale);
+                        RwV3dAddMacro(&dest, &back, &hit);
+                        RwV3dSubMacro(&move, &dest, &to);
+                        RwV3dAddMacro(&lv_10->pos, &lv_10->pos, &move);
+                        lv_58 += move.y;
+                        lv_64 = lv_10->pos;
+                        RwFrameUpdateObjects(lv_c);
+                    }
+                }
+            }
+#endif
             if (lv_54)
                 sub_985B0(this, lv_c, &unk_3C_v, unk_50_r, &lv_74, &lv_70, &lv_cc, &lv_78, &lv_7c, &lv_80, &lv_84, lv_90,
                           !unk_88_2);
@@ -1371,7 +1499,7 @@ void type_3D3548::vf_044(RwReal arg_0)
         if (lv_54) {
             if (unk_88_2) {
             } else {
-                lv_d0 = arg_0 * 0.5f * 0.25f;
+                lv_d0 = (arg_0 * 0.5f) * 0.25f;
                 if (lv_d0 > 1.0f)
                     lv_d0 = 1.0f;
                 lv_10->pos.y = (lv_10->pos.y - lv_58) * lv_d0 + lv_58;
@@ -1386,6 +1514,8 @@ void type_3D3548::vf_044(RwReal arg_0)
         }
         unk_88_2 = 0;
         if (unk_28_15 && (lv_7c || lv_80)) {
+            RwInt32 lv_d8[2];
+
             lv_d8[0] = lv_7c;
             lv_d8[1] = lv_80;
             sub_6B5F0("CollisionNotification", (type_67620 *)(vf_098()), 0, 0, lv_d8, 2, true, false);
@@ -1400,6 +1530,9 @@ void type_3D3548::vf_044(RwReal arg_0)
             unk_28_23 = 0;
         }
         if (unk_28_12) {
+            RwV3d lv_e8;
+            RwV3d lv_f4;
+
             lv_dc = RwFrameGetLTM(lv_c);
             lv_e8 = lv_dc->pos;
             lv_e8.y += 50.0f;
@@ -1414,6 +1547,8 @@ void type_3D3548::vf_044(RwReal arg_0)
         lv_100 = RwFrameGetLTM(lv_c)->pos;
         if (!lv_74 && !lv_78) {
             if (unk_28_8) {
+                RwV3d lv_10c;
+
                 if (unk_14C == 0) {
                     lv_10c.x = lv_64.x - lv_100.x;
                     lv_10c.y = lv_64.y - lv_100.y;
@@ -1447,6 +1582,8 @@ void type_3D3548::vf_044(RwReal arg_0)
             } else {
                 unk_28_7 = 1;
                 if (unk_28_3) {
+                    RwV3d lv_128;
+
                     lv_128.x = 0.0f;
                     lv_128.y = 0.0f;
                     lv_128.z = 0.0f;
@@ -1485,6 +1622,7 @@ void type_3D3548::vf_044(RwReal arg_0)
 }
 
 // match: ?sub_D01B0@type_3D3548@@QAEXMPAURwV3d@@0@Z @ 0x000D01B0
+// sp-match: ?sub_D01B0@type_3D3548@@QAEXMPAURwV3d@@0@Z @ 0x0009C0C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::sub_D01B0(RwReal arg_0, RwV3d *arg_4, RwV3d *arg_8)
 {
@@ -1533,17 +1671,23 @@ void type_3D3548::sub_D01B0(RwReal arg_0, RwV3d *arg_4, RwV3d *arg_8)
 // origin's height (else 10^6 down or up) and its vertical velocity within
 // 10^6.
 // match: ?vf_04C@type_3D3548@@UAEXM@Z @ 0x000D0390
+// sp-match: ?vf_04C@type_3D3548@@UAEXM@Z @ 0x0009C240
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::vf_04C(RwReal arg_0)
 {
     RwV3d var_1C;
+#ifndef CODFH_SP
     RwV3d local_10;
+#endif
     RwV3d *var_4;
 
     sub_CDF40(arg_0);
     var_4 = RwMatrixGetPos(RwFrameGetMatrix(get_unk_340()));
     if (var_4->y < -10000000.0f || var_4->y > 10000000.0f)
     {
+#ifdef CODFH_SP // shape: block-scoped
+        RwV3d local_10;
+#endif
         local_10.x = var_4->x;
         local_10.y = var_4->y < -1000000.0f ? -1000000.0f : 1000000.0f;
         local_10.z = var_4->z;
@@ -1560,12 +1704,14 @@ void type_3D3548::vf_04C(RwReal arg_0)
 
 // Its trigger volume (sub_144C80 fills unk_248 and unk_24C for it).
 // match: ?vf_050@type_3D3548@@UAEXM@Z @ 0x000D04A0
+// sp-match: ?vf_050@type_3D3548@@UAEXM@Z @ 0x0009C320
 void type_3D3548::vf_050(RwReal arg_0)
 {
     sub_144C80(this, &unk_248, 0x20);
 }
 
 // match: ?sub_D04D0@type_3D3548@@QAEXPAURwV3d@@@Z @ 0x000D04D0
+// sp-match: ?sub_D04D0@type_3D3548@@QAEXPAURwV3d@@@Z @ 0x0009C340
 void type_3D3548::sub_D04D0(RwV3d *arg_0)
 {
     unk_28_4 = 1;
@@ -1573,6 +1719,7 @@ void type_3D3548::sub_D04D0(RwV3d *arg_0)
 }
 
 // match: ?vf_20C@type_3D3548@@UAEXPAUtype_D05C0@@MPAURwV3d@@1@Z @ 0x000D0510
+// sp-match: ?vf_20C@type_3D3548@@UAEXPAUtype_D05C0@@MPAURwV3d@@1@Z @ 0x0009C370
 void type_3D3548::vf_20C(type_D05C0 *arg_0, RwReal arg_4, RwV3d *arg_8, RwV3d *arg_C)
 {
     if (!unk_130)
@@ -1587,6 +1734,7 @@ void type_3D3548::vf_20C(type_D05C0 *arg_0, RwReal arg_4, RwV3d *arg_8, RwV3d *a
 }
 
 // match: ?vf_210@type_3D3548@@UAEXPAUtype_D05C0@@@Z @ 0x000D05C0
+// sp-match: ?vf_210@type_3D3548@@UAEXPAUtype_D05C0@@@Z @ 0x0009C3D0
 // Raises the step arg_0's point by its height along the entity's up (bits
 // 3 and 5 set, 7 clear); straight up while the entity stands upright.
 void type_3D3548::vf_210(type_D05C0 *arg_0)
@@ -1636,35 +1784,26 @@ extern const RwV3d stru_3D6F64;
 // primary animation's two matrices turned with it, the first moved back
 // while its height is out of range); then the step's one-step parts cleared.
 // match: ?vf_214@type_3D3548@@UAEXPAUtype_D05C0@@PAURwFrame@@M@Z @ 0x000D0760
+// sp-match: ?vf_214@type_3D3548@@UAEXPAUtype_D05C0@@PAURwFrame@@M@Z @ 0x0009C500
 void type_3D3548::vf_214(type_D05C0 *arg_0, RwFrame *arg_4, RwReal arg_8)
 {
     RwInt32 var_8;
-    RwReal var_C;
-    RwV3d var_18;
-    RwV3d var_24;
-    RwV3d var_30;
-    RwV3d var_3C;
-    RwV3d var_48;
-    RwV3d var_54;
-    RwReal var_58;
-    RwV3d var_64;
     RwV3d var_70;
     RwReal var_74;
-    RwMatrix *var_78;
-    RwMatrix *var_7C;
-    RwV3d var_88;
-    RwInt32 var_8C;
-    RwMatrix var_D0;
-    RwMatrix var_110;
-    RwMatrix var_150;
-    RwV3d var_15C;
-    RwV3d var_168;
 
     if (arg_4)
     {
         var_8 = 0;
         if (arg_0->unk_70)
         {
+            RwReal var_C;
+            RwV3d var_18;
+            RwV3d var_24;
+            RwV3d var_30;
+            RwV3d var_3C;
+            RwV3d var_48;
+            RwV3d var_54;
+
             var_C = arg_8;
             arg_0->unk_0C.x = arg_0->unk_00.x;
             arg_0->unk_0C.y = arg_0->unk_00.y;
@@ -1674,6 +1813,21 @@ void type_3D3548::vf_214(type_D05C0 *arg_0, RwFrame *arg_4, RwReal arg_8)
             var_24 = arg_0->unk_18;
             RwV3dIncrementScaledMacro(&var_24, &arg_0->unk_0C, arg_8);
             var_30 = var_24;
+#ifdef CODFH_SP
+            // shape: the velocity on the left of each limit test (SP 0x9C5A3: fld v; fcomp [limit])
+            if (var_24.x > arg_0->unk_64.x)
+                var_24.x = (RwReal)(RwDouble)arg_0->unk_64.x;
+            else if (var_24.x < -arg_0->unk_64.x)
+                var_24.x = -arg_0->unk_64.x;
+            if (var_24.y > arg_0->unk_64.y)
+                var_24.y = (RwReal)(RwDouble)arg_0->unk_64.y;
+            else if (var_24.y < -arg_0->unk_64.y)
+                var_24.y = -arg_0->unk_64.y;
+            if (var_24.z > arg_0->unk_64.z)
+                var_24.z = (RwReal)(RwDouble)arg_0->unk_64.z;
+            else if (var_24.z < -arg_0->unk_64.z)
+                var_24.z = -arg_0->unk_64.z;
+#else
             if (arg_0->unk_64.x < var_24.x)
                 var_24.x = (RwReal)(RwDouble)arg_0->unk_64.x;
             else if (-arg_0->unk_64.x > var_24.x)
@@ -1686,15 +1840,19 @@ void type_3D3548::vf_214(type_D05C0 *arg_0, RwFrame *arg_4, RwReal arg_8)
                 var_24.z = (RwReal)(RwDouble)arg_0->unk_64.z;
             else if (-arg_0->unk_64.z > var_24.z)
                 var_24.z = -arg_0->unk_64.z;
+#endif
             var_3C.x = var_24.x - arg_0->unk_18.x;
             var_3C.y = var_24.y - arg_0->unk_18.y;
             var_3C.z = var_24.z - arg_0->unk_18.z;
-            var_48.x = 0.5f * var_3C.x * arg_8 + arg_8 * arg_0->unk_18.x;
-            var_48.y = 0.5f * var_3C.y * arg_8 + arg_8 * arg_0->unk_18.y;
-            var_48.z = 0.5f * var_3C.z * arg_8 + arg_8 * arg_0->unk_18.z;
+            var_48.x = 0.5f * var_3C.x * arg_8 + (arg_8 * arg_0->unk_18.x);
+            var_48.y = 0.5f * var_3C.y * arg_8 + (arg_8 * arg_0->unk_18.y);
+            var_48.z = 0.5f * var_3C.z * arg_8 + (arg_8 * arg_0->unk_18.z);
             var_54 = var_48;
             if (RwV3dDotProductMacro(&var_54, &var_54) > 0.0001f)
             {
+                RwReal var_58;
+                RwV3d var_64;
+
                 RwV3dNormalize(&var_54, &var_54);
                 var_58 = arg_8 * arg_0->unk_48;
                 var_64.x = var_54.x * var_58 * arg_0->unk_58.x;
@@ -1766,6 +1924,14 @@ void type_3D3548::vf_214(type_D05C0 *arg_0, RwFrame *arg_4, RwReal arg_8)
         arg_0->unk_B8 = var_70;
         if (RwV3dDotProductMacro(&var_70, &var_70) != 0.0f)
         {
+            RwMatrix *var_78;
+            RwMatrix *var_7C;
+            RwV3d var_88;
+            RwInt32 var_8C;
+            RwMatrix var_D0;
+            RwMatrix var_110;
+            RwMatrix var_150;
+
             var_8 = 1;
             var_78 = 0;
             var_7C = 0;
@@ -1823,6 +1989,9 @@ void type_3D3548::vf_214(type_D05C0 *arg_0, RwFrame *arg_4, RwReal arg_8)
             }
             if (var_8C && var_78)
             {
+                RwV3d var_15C;
+                RwV3d var_168;
+
                 var_15C = var_88;
                 while (1)
                 {
@@ -1873,6 +2042,7 @@ void type_3D3548::vf_214(type_D05C0 *arg_0, RwFrame *arg_4, RwReal arg_8)
 // Its head matrix into arg_0: its frame's, raised by half its height (the
 // identity without a frame).
 // match: ?vf_104@type_3D3548@@UAEXPAURwMatrixTag@@@Z @ 0x000D14C0
+// sp-match: ?vf_104@type_3D3548@@UAEXPAURwMatrixTag@@@Z @ 0x0009CF40
 void type_3D3548::vf_104(RwMatrix *arg_0)
 {
     RwFrame *var_4;
@@ -1895,6 +2065,7 @@ void type_3D3548::vf_104(RwMatrix *arg_0)
 // Its eye point into arg_0: its position raised by half its height (the
 // origin without a frame).
 // match: ?vf_108@type_3D3548@@UAEXPAURwV3d@@@Z @ 0x000D15C0
+// sp-match: ?vf_108@type_3D3548@@UAEXPAURwV3d@@@Z @ 0x0009CFC0
 void type_3D3548::vf_108(RwV3d *arg_0)
 {
     RwFrame *var_4;
@@ -1919,6 +2090,7 @@ void type_3D3548::vf_108(RwV3d *arg_0)
 // The line arg_4 against its ellipsoid (its radius and height, scaled by
 // arg_C, around its raised position), the distance into *arg_8.
 // match: ?vf_080@type_3D3548@@UAEHHPAURpIntersection@@PAMM@Z @ 0x000D1640
+// sp-match: ?vf_080@type_3D3548@@UAEHHPAURpIntersection@@PAMM@Z @ 0x0009D020
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3D3548::vf_080(RwInt32 arg_0, RpIntersection *arg_4, RwReal *arg_8, RwReal arg_C)
 {
@@ -1940,6 +2112,7 @@ RwInt32 type_3D3548::vf_080(RwInt32 arg_0, RpIntersection *arg_4, RwReal *arg_8,
 }
 
 // match: ?vf_084@type_3D3548@@UAEHCPAURpIntersection@@PAMPAURwV3d@@@Z @ 0x000D16F0
+// sp-match: ?vf_084@type_3D3548@@UAEHCPAURpIntersection@@PAMPAURwV3d@@@Z @ 0x000A04E0
 // Mode 3: the line of arg_4 against its clump's atomics (the nearest hit
 // within 10000 into *arg_8, its normal into *arg_C). Otherwise the sphere
 // search arg_4 (a type_D1990) against them: *arg_8 gets the nearest hit's
@@ -1949,7 +2122,9 @@ RwInt32 type_3D3548::vf_084(RwInt8 arg_0, RpIntersection *arg_4, RwReal *arg_8, 
 {
     RwInt32 var_8;
     RwReal var_C;
+#ifndef CODFH_SP
     type_D18C0 var_18;
+#endif
     type_D1990 *var_24;
     RwReal var_84;
 
@@ -1958,6 +2133,9 @@ RwInt32 type_3D3548::vf_084(RwInt8 arg_0, RpIntersection *arg_4, RwReal *arg_8, 
     {
         *arg_8 = 10000.0f;
         var_C = 10000.0f;
+#ifdef CODFH_SP // shape: the line search's argument in its block
+        type_D18C0 var_18;
+#endif
         var_18.unk_00 = (RwV3d *)arg_4;
         var_18.unk_04 = arg_8;
         var_18.unk_08 = arg_C;
@@ -2007,6 +2185,7 @@ RwInt32 type_3D3548::vf_084(RwInt8 arg_0, RpIntersection *arg_4, RwReal *arg_8, 
 // The line of the search arg_4 against the atomic arg_0's triangles,
 // keeping the nearest hit (RpClumpForAllAtomics' callback).
 // match: ?Collision_AccumulateNearestAtomicLineIntersection@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000D18C0
+// sp-match: ?Collision_AccumulateNearestAtomicLineIntersection@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0009F340
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *Collision_AccumulateNearestAtomicLineIntersection(RpAtomic *arg_0, void *arg_4)
 {
@@ -2026,6 +2205,7 @@ RpAtomic *Collision_AccumulateNearestAtomicLineIntersection(RpAtomic *arg_0, voi
 }
 
 // match: ?Collision_RecordNearestCollisionTriangleHit@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAU1@MPAX@Z @ 0x000D1930
+// sp-match: ?Collision_RecordNearestCollisionTriangleHit@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAU1@MPAX@Z @ 0x0009D0C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpCollisionTriangle *Collision_RecordNearestCollisionTriangleHit(RpIntersection *arg_0,
                                                                  RpCollisionTriangle *arg_4,
@@ -2048,6 +2228,7 @@ RpCollisionTriangle *Collision_RecordNearestCollisionTriangleHit(RpIntersection 
 }
 
 // match: ?sub_D1990@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000D1990
+// sp-match: ?sub_D1990@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0009D100
 // vf_084's sphere search over one atomic: its entity and matrices (the frame
 // matrix, orthonormalised and inverted) and the sphere's centre go into the
 // triangle search, which runs on its triangles (sub_93700).
@@ -2087,6 +2268,7 @@ RpAtomic *sub_D1990(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?Collision_DispatchAtomicIntersectionsBySelectorFlag@type_3D3548@@UAEXPAURpAtomic@@PAURpIntersection@@PAUtype_93700@@@Z @ 0x000D1B10
+// sp-match: ?Collision_DispatchAtomicIntersectionsBySelectorFlag@type_3D3548@@UAEXPAURpAtomic@@PAURpIntersection@@PAUtype_93700@@@Z @ 0x0009D240
 void type_3D3548::Collision_DispatchAtomicIntersectionsBySelectorFlag(RpAtomic *arg_0,
                                                                        RpIntersection *arg_4,
                                                                        type_93700 *arg_8)
@@ -2109,6 +2291,7 @@ void type_3D3548::Collision_DispatchAtomicIntersectionsBySelectorFlag(RpAtomic *
 }
 
 // match: ?RenderWare_ReturnObjectUnchanged@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000D1B90
+// sp-match: ?RenderWare_ReturnObjectUnchanged@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000BF090
 RpAtomic *RenderWare_ReturnObjectUnchanged(RpAtomic *arg_0, void *arg_4)
 {
     return arg_0;
@@ -2117,6 +2300,7 @@ RpAtomic *RenderWare_ReturnObjectUnchanged(RpAtomic *arg_0, void *arg_4)
 // The atomic arg_4's bounding sphere onto the atomic arg_0, its radius
 // grown by 1 and scaled by flt_429250.
 // match: ?Clump_CopyExpandedBoundingSphere@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000D1BA0
+// sp-match: ?Clump_CopyExpandedBoundingSphere@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0009D2A0
 RpAtomic *Clump_CopyExpandedBoundingSphere(RpAtomic *arg_0, void *arg_4)
 {
     RpAtomic *var_4;
@@ -2128,6 +2312,7 @@ RpAtomic *Clump_CopyExpandedBoundingSphere(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?vf_224@type_3D3548@@UAE_NPAUtype_3DF8D8@@HPAH@Z @ 0x000D1BF0
+// sp-match: ?vf_224@type_3D3548@@UAE_NPAUtype_3DF8D8@@HPAH@Z @ 0x000A0A10
 // Takes its model from the object arg_0 (kind 3): clones the model (and,
 // unless arg_4, the second model: its animated parts), keeps its frame's
 // matrix (or its trigger's), sets its clumps (unk_25C, unk_268), a
@@ -2300,6 +2485,7 @@ bool type_3D3548::vf_224(type_3DF8D8 *arg_0, RwInt32 arg_4, RwInt32 *arg_8)
 }
 
 // match: ?Frame_DetachWhenOwnerDiffers@@YAPAURwFrame@@PAU1@PAX@Z @ 0x000D2300
+// sp-match: ?Frame_DetachWhenOwnerDiffers@@YAPAURwFrame@@PAU1@PAX@Z @ 0x0009D2E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwFrame *Frame_DetachWhenOwnerDiffers(RwFrame *arg_0, void *arg_4)
 {
@@ -2319,6 +2505,7 @@ RwFrame *Frame_DetachWhenOwnerDiffers(RwFrame *arg_0, void *arg_4)
 }
 
 // match: ?Frame_DetachAtomicChildrenWhenOwnerDiffers@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000D2370
+// sp-match: ?Frame_DetachAtomicChildrenWhenOwnerDiffers@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0009D320
 RpAtomic *Frame_DetachAtomicChildrenWhenOwnerDiffers(RpAtomic *arg_0, void *arg_4)
 {
     RwFrame *var_4;
@@ -2332,6 +2519,7 @@ RpAtomic *Frame_DetachAtomicChildrenWhenOwnerDiffers(RpAtomic *arg_0, void *arg_
 }
 
 // match: ?vf_228@type_3D3548@@UAE_NXZ @ 0x000D23A0
+// sp-match: ?vf_228@type_3D3548@@UAE_NXZ @ 0x0009D350
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 bool type_3D3548::vf_228()
 {
@@ -2371,6 +2559,7 @@ bool type_3D3548::vf_228()
 }
 
 // match: ?Clump_ResolvePrimaryAtomic@type_3D3548@@QAEPAURpAtomic@@XZ @ 0x000D24B0
+// sp-match: ?Clump_ResolvePrimaryAtomic@type_3D3548@@QAEPAURpAtomic@@XZ @ 0x0009D400
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *type_3D3548::Clump_ResolvePrimaryAtomic()
 {
@@ -2391,6 +2580,7 @@ RpAtomic *type_3D3548::Clump_ResolvePrimaryAtomic()
 }
 
 // match: ?Animation_GetMatrixArray@type_3D3548@@UAEPAURwMatrixTag@@XZ @ 0x000D2500
+// sp-match: ?Animation_GetMatrixArray@type_3D3548@@UAEPAURwMatrixTag@@XZ @ 0x0009D420
 RwMatrix *type_3D3548::Animation_GetMatrixArray()
 {
     RpHAnimHierarchy *var_4;
@@ -2402,6 +2592,7 @@ RwMatrix *type_3D3548::Animation_GetMatrixArray()
 // match: ?vf_1D0@type_3D3548@@UAEXXZ @ 0x000D2530
 // match: __ehhandler$?vf_1D0@type_3D3548@@UAEXXZ-0x8 @ 0x00300C90
 // match: __ehhandler$?vf_1D0@type_3D3548@@UAEXXZ @ 0x00300C98
+// sp-match: ?vf_1D0@type_3D3548@@UAEXXZ @ 0x0009F3B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::vf_1D0()
 {
@@ -2433,7 +2624,7 @@ void type_3D3548::vf_1D0()
                 type_3CE1FC l54(stk_58);
                 while (!l54.at_end())
                 {
-                    type_F8350 *var_60 = unk_4C00E8.unk_2C[l54.unk_0C];
+                    type_F8350 *var_60 = unk_4C00E8.unk_2C[l54.get_unk_0C()];
                     RwV3dSub(&var28, &var_60->unk_10, local_30);
                     if (var28.y > -75.0f && var28.y < 150.0f)
                     {
@@ -2451,6 +2642,7 @@ void type_3D3548::vf_1D0()
 }
 
 // match: ?sub_D2740@type_3D3548@@QAEXXZ @ 0x000D2740
+// sp-match: ?sub_D2740@type_3D3548@@QAEXXZ @ 0x0009D440
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::sub_D2740()
 {
@@ -2481,6 +2673,7 @@ void type_3D3548::sub_D2740()
 }
 
 // match: ?vf_054@type_3D3548@@UAEXH@Z @ 0x000D2820
+// sp-match: ?vf_054@type_3D3548@@UAEXH@Z @ 0x0009F540
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::vf_054(RwInt32 arg_0)
 {
@@ -2497,7 +2690,7 @@ void type_3D3548::vf_054(RwInt32 arg_0)
         var_8.alpha = 255;
         if (unk_28_14)
         {
-            var_8.alpha = (RwUInt8)(unk_2A0 / 30.0f * 255.0f);
+            var_8.alpha = (RwUInt8)(255.0f * (unk_2A0 / 30.0f));
             dword_4B697C = 0;
             dword_4B69E0 = 0;
             unk_330 = 0;
@@ -2516,6 +2709,7 @@ void type_3D3548::vf_054(RwInt32 arg_0)
 }
 
 // match: ?sub_D2920@type_3D3548@@QAEPAURpClump@@PAU2@H@Z @ 0x000D2920
+// sp-match: ?sub_D2920@type_3D3548@@QAEPAURpClump@@PAU2@H@Z @ 0x0009D4C0
 RpClump *type_3D3548::sub_D2920(RpClump *arg_0, RwInt32 arg_4)
 {
     if (dword_4B69EC)
@@ -2527,6 +2721,7 @@ RpClump *type_3D3548::sub_D2920(RpClump *arg_0, RwInt32 arg_4)
 }
 
 // match: ?vf_1FC@type_3D3548@@UAEXPAU1@H@Z @ 0x000D2950
+// sp-match: ?vf_1FC@type_3D3548@@UAEXPAU1@H@Z @ 0x0009D4F0
 void type_3D3548::vf_1FC(type_3D3548 *arg_0, RwInt32 arg_4)
 {
     type_3D3548 *var_4;
@@ -2547,6 +2742,7 @@ void type_3D3548::vf_1FC(type_3D3548 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_D29C0@type_3D3548@@QAEXH@Z @ 0x000D29C0
+// sp-match: ?sub_D29C0@type_3D3548@@QAEXH@Z @ 0x0009F600
 void type_3D3548::sub_D29C0(RwInt32 arg_0)
 {
     unk_28_9 = arg_0;
@@ -2557,23 +2753,31 @@ void type_3D3548::sub_D29C0(RwInt32 arg_0)
 }
 
 // match: ?sub_D2A40@type_3D3548@@QAEXPAU1@@Z @ 0x000D2A40
+// sp-match: ?sub_D2A40@type_3D3548@@QAEXPAU1@@Z @ 0x0009D550
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::sub_D2A40(type_3D3548 *arg_0)
 {
+#ifndef CODFH_SP
     RwInt32 var_8;
+#endif
     type_3D3548 *l4;
 
     for (l4 = arg_0; l4; l4 = l4->unk_10)
     {
         if (l4->vf_120() && l4->vf_120()->get_unk_1374() == this)
         {
+#ifdef CODFH_SP // shape: the flag local to the block
+            RwInt32 var_8 = 0;
+#else
             var_8 = 0;
+#endif
             sub_6B5F0("TargetDestroyed", (type_67620 *)(l4->vf_098()), 0, 0, &var_8, 1, true, false);
         }
     }
 }
 
 // match: ?sub_D2AD0@type_3D3548@@QAEXPAU1@H@Z @ 0x000D2AD0
+// sp-match: ?sub_D2AD0@type_3D3548@@QAEXPAU1@H@Z @ 0x0009D5D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::sub_D2AD0(type_3D3548 *arg_0, RwInt32 arg_4)
 {
@@ -2593,6 +2797,7 @@ void type_3D3548::sub_D2AD0(type_3D3548 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_D2B70@@YAPAURpAtomic@@PAU1@@Z @ 0x000D2B70
+// sp-match: ?sub_D2B70@@YAPAURpAtomic@@PAU1@@Z @ 0x0009D650
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *sub_D2B70(RpAtomic *arg_0)
 {
@@ -2631,6 +2836,7 @@ RpAtomic *sub_D2B70(RpAtomic *arg_0)
 }
 
 // match: ?vf_070@type_3D3548@@UAEHPAUtype_758F0@@HPAH@Z @ 0x000D2C20
+// sp-match: ?vf_070@type_3D3548@@UAEHPAUtype_758F0@@HPAH@Z @ 0x000A0620
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3D3548::vf_070(type_758F0 *arg_0, RwInt32 arg_4, RwInt32 *arg_8)
 {
@@ -2704,6 +2910,7 @@ RwInt32 type_3D3548::vf_070(type_758F0 *arg_0, RwInt32 arg_4, RwInt32 *arg_8)
 }
 
 // match: ?sub_D2EB0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000D2EB0
+// sp-match: ?sub_D2EB0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0009D6B0
 RpAtomic *sub_D2EB0(RpAtomic *arg_0, void *arg_4)
 {
     dword_4B6978 = RpAtomicGetBoundingSphere(arg_0);
@@ -2711,17 +2918,28 @@ RpAtomic *sub_D2EB0(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_D2EF0@type_3D3548@@QAEPBURwSphere@@XZ @ 0x000D2EF0
+// sp-match: ?sub_D2EF0@type_3D3548@@QAEPBURwSphere@@XZ @ 0x0009D6E0
 const RwSphere *type_3D3548::sub_D2EF0()
 {
+#ifdef CODFH_SP // shape: the clump read before the store
+    RpClump *lv_c = get_unk_264();
+    dword_4B6978 = 0;
+    if (lv_c)
+    {
+        RpClumpForAllAtomics(lv_c, sub_D2EB0, 0);
+    }
+#else
     dword_4B6978 = 0;
     if (get_unk_264())
     {
         RpClumpForAllAtomics(get_unk_264(), sub_D2EB0, 0);
     }
+#endif
     return dword_4B6978;
 }
 
 // match: ?vf_110@type_3D3548@@UAEXPAURwV3d@@PAU1@H@Z @ 0x000D2F40
+// sp-match: ?vf_110@type_3D3548@@UAEXPAURwV3d@@PAU1@H@Z @ 0x0009D710
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::vf_110(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
 {
@@ -2749,6 +2967,7 @@ void type_3D3548::vf_110(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_D2FC0@type_3D3548@@QAEHPAURwV3d@@0PAU1@PAMHHHHHHH@Z @ 0x000D2FC0
+// sp-match: ?sub_D2FC0@type_3D3548@@QAEHPAURwV3d@@0PAU1@PAMHHHHHHH@Z @ 0x0009F660
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3D3548::sub_D2FC0(RwV3d *arg_0, RwV3d *arg_4, type_3D3548 *arg_8, RwReal *arg_C,
                                RwInt32 arg_10, RwInt32 arg_14, RwInt32 arg_18, RwInt32 arg_1C,
@@ -2822,6 +3041,7 @@ RwInt32 type_3D3548::sub_D2FC0(RwV3d *arg_0, RwV3d *arg_4, type_3D3548 *arg_8, R
 }
 
 // match: ?sub_D31B0@@YAPAURpAtomic@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x000D31B0
+// sp-match: ?sub_D31B0@@YAPAURpAtomic@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x0009D770
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *sub_D31B0(RpIntersection *arg_0, RpWorldSector *arg_4, RpAtomic *arg_8, RwReal arg_C,
                     void *arg_10)
@@ -2938,6 +3158,7 @@ RpAtomic *sub_D31B0(RpIntersection *arg_0, RpWorldSector *arg_4, RpAtomic *arg_8
 }
 
 // match: ?vf_000@type_3D3548@@UAEHPAX@Z @ 0x000D34B0
+// sp-match: ?vf_000@type_3D3548@@UAEHPAX@Z @ 0x0009D990
 // Whether it is in view: sets unk_28_13 and returns 1. The test of its
 // bounding sphere (its atomic's, or 500 around its position) against the
 // main camera's six frustum planes, as the player's vf_064 makes it, follows
@@ -2952,6 +3173,16 @@ RwInt32 type_3D3548::vf_000(void *arg_0)
     RwCamera *bp_8;
     RwFrustumPlane *bp_4;
 
+#ifdef CODFH_SP // SP 0x9D990: the test runs, against arg_0, unless something keeps the entity in view
+    if (dword_4B69F0 || !sub_1745A0(dword_429EB0) ||
+        ((type_3DD948 *)((type_10F710 *)sub_1745A0(dword_429EB0))->unk_2110.sub_D4910())->unk_414 ||
+        unk_2C == 0x100000 /* not an address: entity kind bits */ || vf_010() || vf_014() || vf_018() || vf_02C() || vf_030() || vf_01C() ||
+        (vf_008() && vf_008()->unk_618.sub_D4910()) || unk_35C[0].sub_D4910() || unk_35C[1].sub_D4910()) {
+        unk_28_13 = 1;
+        return 1;
+    }
+    bp_8 = (RwCamera *)arg_0;
+#else
     if (dword_4B69F0) {
         unk_28_13 = 1;
         return 1;
@@ -2959,6 +3190,7 @@ RwInt32 type_3D3548::vf_000(void *arg_0)
     unk_28_13 = 1;
     return 1;
     bp_8 = (RwCamera *)dword_4E5C74;
+#endif
     bp_4 = bp_8->frustumPlanes;
     frm_24 = this;
     local_c = frm_24->unk_250.unk_08;
@@ -2979,6 +3211,7 @@ RwInt32 type_3D3548::vf_000(void *arg_0)
 }
 
 // match: ?vf_124@type_3D3548@@UAEXM@Z @ 0x000D3580
+// sp-match: ?vf_124@type_3D3548@@UAEXM@Z @ 0x0009DB70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::vf_124(RwReal arg_0)
 {
@@ -3010,6 +3243,7 @@ void type_3D3548::vf_124(RwReal arg_0)
 }
 
 // match: ?vf_128@type_3D3548@@UAEMXZ @ 0x000D3640
+// sp-match: ?vf_128@type_3D3548@@UAEMXZ @ 0x0009DBD0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwReal type_3D3548::vf_128()
 {
@@ -3042,6 +3276,7 @@ RwReal type_3D3548::vf_128()
 }
 
 // match: ?sub_D3700@type_3D3548@@QAEXP6AXPAU1@@ZHH@Z @ 0x000D3700
+// sp-match: ?sub_D3700@type_3D3548@@QAEXP6AXPAU1@@ZHH@Z @ 0x0009DC40
 void type_3D3548::sub_D3700(void (*arg_0)(type_3D3548 *), RwInt32 arg_4, RwInt32 arg_8)
 {
     unk_37C = arg_0;
@@ -3050,6 +3285,7 @@ void type_3D3548::sub_D3700(void (*arg_0)(type_3D3548 *), RwInt32 arg_4, RwInt32
 }
 
 // match: ?sub_D3740@@YAPAURwFrame@@PAU1@PAX@Z @ 0x000D3740
+// sp-match: ?sub_D3740@@YAPAURwFrame@@PAU1@PAX@Z @ 0x000A0860
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwFrame *sub_D3740(RwFrame *arg_0, void *arg_4)
 {
@@ -3087,6 +3323,7 @@ RwFrame *sub_D3740(RwFrame *arg_0, void *arg_4)
 }
 
 // match: ?sub_D37D0@@YAPAURwFrame@@PAU1@PAX@Z @ 0x000D37D0
+// sp-match: ?sub_D37D0@@YAPAURwFrame@@PAU1@PAX@Z @ 0x0009F7F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwFrame *sub_D37D0(RwFrame *arg_0, void *arg_4)
 {
@@ -3105,12 +3342,14 @@ RwFrame *sub_D37D0(RwFrame *arg_0, void *arg_4)
 }
 
 // match: ?vf_1E8@type_3D3548@@UAEXH@Z @ 0x000D3820
+// sp-match: ?vf_1E8@type_3D3548@@UAEXH@Z @ 0x0009DC80
 void type_3D3548::vf_1E8(RwInt32 arg_0)
 {
     unk_28_14 = arg_0;
 }
 
 // match: ?vf_1EC@type_3D3548@@UAEXM@Z @ 0x000D3850
+// sp-match: ?vf_1EC@type_3D3548@@UAEXM@Z @ 0x0009DCA0
 void type_3D3548::vf_1EC(RwReal arg_0)
 {
     if (unk_88_11)
@@ -3134,6 +3373,7 @@ void type_3D3548::vf_1EC(RwReal arg_0)
 }
 
 // match: ?sub_D3910@type_3D3548@@QAEXMH@Z @ 0x000D3910
+// sp-match: ?sub_D3910@type_3D3548@@QAEXMH@Z @ 0x0009DD20
 void type_3D3548::sub_D3910(RwReal arg_0, RwInt32 arg_4)
 {
     unk_2A4 = arg_0 > 0.2f ? arg_0 : 0.2f;
@@ -3151,6 +3391,7 @@ void type_3D3548::sub_D3910(RwReal arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_D39F0@type_3D3548@@QAEXH@Z @ 0x000D39F0
+// sp-match: ?sub_D39F0@type_3D3548@@QAEXH@Z @ 0x0009DDB0
 void type_3D3548::sub_D39F0(RwInt32 arg_0)
 {
     unk_2AC_i = arg_0;
@@ -3158,6 +3399,7 @@ void type_3D3548::sub_D39F0(RwInt32 arg_0)
 }
 
 // match: ?sub_D3A20@type_3D3548@@QAEXM@Z @ 0x000D3A20
+// sp-match: ?sub_D3A20@type_3D3548@@QAEXM@Z @ 0x0009DDD0
 void type_3D3548::sub_D3A20(RwReal arg_0)
 {
     unk_2A4 -= arg_0;
@@ -3177,6 +3419,7 @@ void type_3D3548::sub_D3A20(RwReal arg_0)
 }
 
 // match: ?sub_D3AD0@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x000D3AD0
+// sp-match: ?sub_D3AD0@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x0009DE40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpMaterial *sub_D3AD0(RpMaterial *arg_0, void *arg_4)
 {
@@ -3192,6 +3435,7 @@ RpMaterial *sub_D3AD0(RpMaterial *arg_0, void *arg_4)
 }
 
 // match: ?sub_D3B30@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000D3B30
+// sp-match: ?sub_D3B30@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0009DE70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *sub_D3B30(RpAtomic *arg_0, void *arg_4)
 {
@@ -3208,6 +3452,7 @@ RpAtomic *sub_D3B30(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_D3BA0@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x000D3BA0
+// sp-match: ?sub_D3BA0@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x0009DEB0
 RpMaterial *sub_D3BA0(RpMaterial *arg_0, void *arg_4)
 {
     RwRGBA *var_4;
@@ -3219,6 +3464,7 @@ RpMaterial *sub_D3BA0(RpMaterial *arg_0, void *arg_4)
 }
 
 // match: ?sub_D3BE0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000D3BE0
+// sp-match: ?sub_D3BE0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0009DED0
 RpAtomic *sub_D3BE0(RpAtomic *arg_0, void *arg_4)
 {
     RpGeometry *var_4;
@@ -3230,6 +3476,7 @@ RpAtomic *sub_D3BE0(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_D3C30@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x000D3C30
+// sp-match: ?sub_D3C30@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x0009DF10
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpMaterial *sub_D3C30(RpMaterial *arg_0, void *arg_4)
 {
@@ -3251,6 +3498,7 @@ RpMaterial *sub_D3C30(RpMaterial *arg_0, void *arg_4)
 }
 
 // match: ?sub_D3D10@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000D3D10
+// sp-match: ?sub_D3D10@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0009DF80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *sub_D3D10(RpAtomic *arg_0, void *arg_4)
 {
@@ -3283,6 +3531,7 @@ RpAtomic *sub_D3D10(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_D3E10@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x000D3E10
+// sp-match: ?sub_D3E10@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x0009E040
 RpMaterial *sub_D3E10(RpMaterial *arg_0, void *arg_4)
 {
     RwRGBA *var_4;
@@ -3297,6 +3546,7 @@ RpMaterial *sub_D3E10(RpMaterial *arg_0, void *arg_4)
 }
 
 // match: ?sub_D3EB0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000D3EB0
+// sp-match: ?sub_D3EB0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0009E0B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *sub_D3EB0(RpAtomic *arg_0, void *arg_4)
 {
@@ -3330,17 +3580,21 @@ RpAtomic *sub_D3EB0(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_D3FB0@type_3D3548@@QAEXPBDPAXPAUtype_3DF8D8_04@@@Z @ 0x000D3FB0
+// sp-match: ?sub_D3FB0@type_3D3548@@QAEXPBDPAXPAUtype_3DF8D8_04@@@Z @ 0x000FEB20
 void type_3D3548::sub_D3FB0(const RwChar *arg_0, void *arg_4, type_3DF8D8_04 *arg_8)
 {
+#ifndef CODFH_SP // MP only: single player compiles the debug print out (the text is not in default.xbe)
     if (arg_4)
     {
         return;
     }
     sub_19A750("***ERROR: Unable to create %s object because clump mesh %x,%x was not loaded or streamed!",
                arg_0, arg_8->unk_00, arg_8->unk_04);
+#endif
 }
 
 // match: ?sub_D3FF0@type_3D3548@@QAEXPAU1@@Z @ 0x000D3FF0
+// sp-match: ?sub_D3FF0@type_3D3548@@QAEXPAU1@@Z @ 0x0009E1A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::sub_D3FF0(type_3D3548 *arg_0)
 {
@@ -3387,12 +3641,14 @@ void type_3D3548::sub_D3FF0(type_3D3548 *arg_0)
 }
 
 // match: ?sub_D4170@type_3D3548@@QAEXPAU1@@Z @ 0x000D4170
+// sp-match: ?sub_D4170@type_3D3548@@QAEXPAU1@@Z @ 0x0009E2E0
 void type_3D3548::sub_D4170(type_3D3548 *arg_0)
 {
     unk_38C--;
 }
 
 // match: ?sub_D41A0@type_3D3548@@QAEXXZ @ 0x000D41A0
+// sp-match: ?sub_D41A0@type_3D3548@@QAEXXZ @ 0x0009E2F0
 void type_3D3548::sub_D41A0()
 {
     RwV3d var_C;
@@ -3416,18 +3672,21 @@ void type_3D3548::sub_D41A0()
 }
 
 // match: ?sub_D4290@type_3D3548@@QAEPAURwV3d@@XZ @ 0x000D4290
+// sp-match: ?sub_D4290@type_3D3548@@QAEPAURwV3d@@XZ @ 0x0009E3C0
 RwV3d *type_3D3548::sub_D4290()
 {
     return &unk_39C.v;
 }
 
 // match: ?sub_D42B0@type_3D3548@@QAEPAURwV3d@@XZ @ 0x000D42B0
+// sp-match: ?sub_D42B0@type_3D3548@@QAEPAURwV3d@@XZ @ 0x0009E3D0
 RwV3d *type_3D3548::sub_D42B0()
 {
     return &unk_390.v;
 }
 
 // match: ?sub_D42D0@type_3D3548@@QAEXXZ @ 0x000D42D0
+// sp-match: ?sub_D42D0@type_3D3548@@QAEXXZ @ 0x0009F830
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D3548::sub_D42D0()
 {
@@ -3501,6 +3760,7 @@ void type_3D3548::sub_D42D0()
 }
 
 // match: ?sub_D45F0@@YAPAURpAtomic@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x000D45F0
+// sp-match: ?sub_D45F0@@YAPAURpAtomic@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x0009E3E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *sub_D45F0(RpIntersection *arg_0, RpWorldSector *arg_4, RpAtomic *arg_8, RwReal arg_C,
                     void *arg_10)
@@ -4009,12 +4269,14 @@ void type_3D3548::vf_220(struct type_3D3548 *arg_0, RwInt32 arg_4)
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
+#ifndef CODFH_SP // MP folded into 0x1C06A0; single player's type_3D3548 has no vf_05C
 // ?vf_05C@type_3D3548@@UAEXXZ (folded into 0x1C06A0)
 void type_3D3548::vf_05C()
 {
         unk_35C[0].sub_D48D0(0);
         unk_364[0] = -1;
     }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

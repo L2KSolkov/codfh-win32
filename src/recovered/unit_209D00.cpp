@@ -11,12 +11,14 @@
 #include "game/startup.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E8C54
 extern const RwReal flt_3E8C54 = 0.01f;
 // 0x003E8C58
 extern const RwReal flt_3E8C58 = 0.01f;
 // 0x003E8C5C
 extern const RwReal flt_3E8C5C = 16.666666f;
+#endif
 // End of its data definitions.
 
 

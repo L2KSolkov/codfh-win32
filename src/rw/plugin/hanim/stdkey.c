@@ -131,6 +131,7 @@ MACRO_STOP
 // match: __real@2f2ec9d3 @ 0x00419994
 
 // match: _RpHAnimKeyFrameApply @ 0x002E6650
+// sp-match: _RpHAnimKeyFrameApply @ 0x002010F0
 
 void
 RpHAnimKeyFrameApply(void *pMatrix, void *pVoidIFrame)
@@ -161,6 +162,7 @@ RpHAnimKeyFrameApply(void *pMatrix, void *pVoidIFrame)
  * \return None
  */
 // match: _RpHAnimKeyFrameInterpolate @ 0x002E67C0
+// sp-match: _RpHAnimKeyFrameInterpolate @ 0x00201260
 void
 RpHAnimKeyFrameInterpolate(void * pVoidOut, void * pVoidIn1,
                            void * pVoidIn2, RwReal time,
@@ -273,6 +275,7 @@ RpHAnimKeyFrameInterpolate(void * pVoidOut, void * pVoidIn1,
  * \return None
  */
 // match: _RpHAnimKeyFrameBlend @ 0x002E6D20
+// sp-match: _RpHAnimKeyFrameBlend @ 0x002017C0
 void
 RpHAnimKeyFrameBlend(void * pVoidOut,
                      void * pVoidIn1,
@@ -356,6 +359,7 @@ RpHAnimKeyFrameBlend(void * pVoidOut,
  *
  */
 // match: _RpHAnimKeyFrameStreamRead @ 0x002E7270
+// sp-match: _RpHAnimKeyFrameStreamRead @ 0x00201D10
 RtAnimAnimation *
 RpHAnimKeyFrameStreamRead(RwStream * stream, RtAnimAnimation *pAnimation)
 {
@@ -569,6 +573,7 @@ RpHAnimConvertKeyFrameRate(RtAnimAnimation * pAnimation, const RwInt32 rate)
  *
  */
 // match: _RpHAnimKeyFrameStreamWrite @ 0x002E72F0
+// sp-match: _RpHAnimKeyFrameStreamWrite @ 0x00201D90
 RwBool
 RpHAnimKeyFrameStreamWrite(const RtAnimAnimation * pAnimation,
                               RwStream * stream)
@@ -618,6 +623,7 @@ RpHAnimKeyFrameStreamWrite(const RtAnimAnimation * pAnimation,
  *
  */
 // match: _RpHAnimKeyFrameStreamGetSize @ 0x002E7370
+// sp-match: _RpHAnimKeyFrameStreamGetSize @ 0x00201E10
 RwInt32
 RpHAnimKeyFrameStreamGetSize(const RtAnimAnimation *animation)
 {
@@ -645,6 +651,7 @@ RpHAnimKeyFrameStreamGetSize(const RtAnimAnimation *animation)
  *
  */
 // match: _RpHAnimKeyFrameMulRecip @ 0x002E7380
+// sp-match: _RpHAnimKeyFrameMulRecip @ 0x00201E20
 void
 RpHAnimKeyFrameMulRecip(void *pVoidFrame, void *pVoidStart)
 {
@@ -681,6 +688,7 @@ RpHAnimKeyFrameMulRecip(void *pVoidFrame, void *pVoidStart)
  *
  */
 // match: _RpHAnimKeyFrameAdd @ 0x002E7550
+// sp-match: _RpHAnimKeyFrameAdd @ 0x00201FF0
 void
 RpHAnimKeyFrameAdd(void * pVoidOut, void * pVoidIn1,
                       void * pVoidIn2)

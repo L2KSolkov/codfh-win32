@@ -33,6 +33,7 @@ RwInt32 dword_4E6718[0x202];
 type_4E6F20 unk_4E6F20;
 
 // match: ?sub_176B30@@YAMXZ @ 0x00176B30
+// sp-match: ?sub_176B30@@YAMXZ @ 0x00111960
 // The clock: the frame count in seconds (at 60 a second).
 RwReal sub_176B30()
 {
@@ -42,12 +43,14 @@ RwReal sub_176B30()
 }
 
 // match: ??0type_4E6F20@@QAE@XZ @ 0x00176B60
+// sp-match: ??0type_4E6F20@@QAE@XZ @ 0x00111980
 type_4E6F20::type_4E6F20()
 {
     unk_00 = sub_176B30;
 }
 
 // match: ?sub_176B80@type_4E6F20@@QAEMM@Z @ 0x00176B80
+// sp-match: ?sub_176B80@type_4E6F20@@QAEMM@Z @ 0x00111AE0
 // The noise at arg_0: Perlin's noise1, his declarations and macros
 // (setup, s_curve, lerp) as written out; the locals' slots match his
 // declaration order.
@@ -71,12 +74,14 @@ RwReal type_4E6F20::sub_176B80(RwReal arg_0)
 }
 
 // match: ?sub_176C40@type_4E6F20@@QAEMXZ @ 0x00176C40
+// sp-match: ?sub_176C40@type_4E6F20@@QAEMXZ @ 0x00111990
 RwReal type_4E6F20::sub_176C40()
 {
     return unk_00();
 }
 
 // match: ?sub_176C50@type_4E6F20@@QAEXXZ @ 0x00176C50
+// sp-match: ?sub_176C50@type_4E6F20@@QAEXXZ @ 0x001119A0
 // Sets the noise up once: the permutation shuffled, random gradients, each
 // table repeated past its end.
 void type_4E6F20::sub_176C50()
@@ -108,6 +113,7 @@ void type_4E6F20::sub_176C50()
 }
 
 // match: ?sub_176D70@type_176040@@QAEMXZ @ 0x00176D70
+// sp-match: ?sub_176D70@type_176040@@QAEMXZ @ 0x00111B60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its value now: its octaves of the noise along the clock by its speed
 // from its seed (reseeded when out of range), each half the last, by its

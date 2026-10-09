@@ -182,6 +182,7 @@ _rt2dSceneResourcePoolInit(Rt2dObject *scene, _rt2dSceneResourcePool *pool)
 }
 
 static RwBool
+// sp-match: __rt2dSceneResourcePoolDestruct @ 0x0016CC60
 _rt2dSceneResourcePoolDestruct(_rt2dSceneResourcePool *pool)
 {
     RWFUNCTION(RWSTRING("_rt2dSceneResourcePoolDestruct"));
@@ -222,6 +223,7 @@ _rt2dSceneResourcePoolStreamGetSize(_rt2dSceneResourcePool *pool)
 }
 
 static _rt2dSceneResourcePool *
+// sp-match: __rt2dSceneResourcePoolStreamReadTo @ 0x0016CCA0
 _rt2dSceneResourcePoolStreamReadTo(_rt2dSceneResourcePool *pool, RwStream *stream)
 {
     RwUInt32    i;
@@ -351,6 +353,7 @@ Rt2dSceneCreate(void)
 }
 
 Rt2dObject *
+// sp-match: __rt2dSceneInit @ 0x0016CD60
 _rt2dSceneInit(Rt2dObject *object, RwInt32 objectCount)
 {
     RWFUNCTION(RWSTRING("_rt2dSceneInit"));
@@ -378,6 +381,7 @@ _rt2dSceneInit(Rt2dObject *object, RwInt32 objectCount)
 // match: _rcsid @ 0x003EE38C
 
 // match: __rt2dSceneDestruct @ 0x00256C10
+// sp-match: __rt2dSceneDestruct @ 0x0016CDD0
 RwBool
 _rt2dSceneDestruct(Rt2dObject *object)
 {
@@ -429,6 +433,7 @@ _rt2dSceneDestruct(Rt2dObject *object)
  * \see Rt2dSceneAddChild
  */
 // match: _Rt2dSceneDestroy @ 0x00256CB0
+// sp-match: _Rt2dSceneDestroy @ 0x0016CE70
 RwBool
 Rt2dSceneDestroy(Rt2dObject *object)
 {
@@ -552,6 +557,7 @@ Rt2dSceneLock(Rt2dObject *object)
 }
 
 static Rt2dObject *
+// sp-match: _rt2dSceneDepthSort @ 0x0016CEA0
 rt2dSceneDepthSort(Rt2dObject *object)
 {
     _rt2dDepthOfObject *first, *finish, *i, *j, temp;
@@ -615,6 +621,7 @@ rt2dSceneDepthSort(Rt2dObject *object)
  * \see Rt2dObjectSetVisible
  */
 Rt2dObject *
+// sp-match: _Rt2dSceneUnlock @ 0x0016CF30
 Rt2dSceneUnlock(Rt2dObject *object)
 {
     Rt2dObject **first, **finish, **current;
@@ -889,6 +896,7 @@ Rt2dSceneGetNewChildObjectString(Rt2dObject *object, const RwChar *text, const R
  * \see Rt2dSceneForAllChildren
  */
 extern RwInt32
+// sp-match: _Rt2dSceneGetChildCount @ 0x0016D040
 Rt2dSceneGetChildCount(Rt2dObject* scene)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dSceneGetChildCount"));
@@ -912,6 +920,7 @@ Rt2dSceneGetChildCount(Rt2dObject* scene)
  * \see Rt2dSceneForAllChildren
  */
 Rt2dObject *
+// sp-match: _Rt2dSceneGetChildByIndex @ 0x0016D050
 Rt2dSceneGetChildByIndex(Rt2dObject *scene, RwInt32 index)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dSceneGetChildByIndex"));
@@ -941,6 +950,7 @@ Rt2dSceneGetChildByIndex(Rt2dObject *scene, RwInt32 index)
  * \see Rt2dSceneUpdateLTM
  */
 Rt2dObject *
+// sp-match: _Rt2dSceneRender @ 0x0016D530
 Rt2dSceneRender(Rt2dObject *object)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dSceneRender"));
@@ -950,6 +960,7 @@ Rt2dSceneRender(Rt2dObject *object)
 
 
 Rt2dObject *
+// sp-match: __rt2dSceneRenderChild @ 0x0016D080
 _rt2dSceneRenderChild(Rt2dObject *object, const RwRGBAReal *colorMult, const RwRGBAReal *colorOffs)
 {
     RwBool DirtyScene = FALSE;
@@ -1028,6 +1039,7 @@ _rt2dSceneRenderChild(Rt2dObject *object, const RwRGBAReal *colorMult, const RwR
  * \see Rt2dSceneGetChildByIndex
  */
 Rt2dObject *
+// sp-match: _Rt2dSceneForAllChildren @ 0x0016D220
 Rt2dSceneForAllChildren(Rt2dObject *scene, Rt2dObjectCallBack callback, void *pData )
 {
     Rt2dObject *first, *finish, *current;
@@ -1276,6 +1288,7 @@ Rt2dSceneStreamGetSize(Rt2dObject *scene)
 }
 
 static Rt2dObject *
+// sp-match: __rt2dSceneStreamReadToChildCallback @ 0x0016D270
 _rt2dSceneStreamReadToChildCallback(Rt2dObject *object, Rt2dObject *parent __RWUNUSED__, void *data)
 {
     StreamAndPool *sp=(StreamAndPool *)(data);
@@ -1291,6 +1304,7 @@ _rt2dSceneStreamReadToChildCallback(Rt2dObject *object, Rt2dObject *parent __RWU
 }
 
 Rt2dObject *
+// sp-match: __rt2dSceneStreamReadTo @ 0x0016D2A0
 _rt2dSceneStreamReadTo(Rt2dObject *scene, RwStream *stream, _rt2dSceneResourcePool *pool)
 {
     RwInt32 childCount = 0;
@@ -1394,6 +1408,7 @@ _rt2dSceneStreamReadTo(Rt2dObject *scene, RwStream *stream, _rt2dSceneResourcePo
  * \see Rt2dSceneStreamGetSize
  */
 Rt2dObject *
+// sp-match: _Rt2dSceneStreamRead @ 0x0016D3A0
 Rt2dSceneStreamRead(RwStream *stream)
 {
     Rt2dObject *scene = (Rt2dObject *) _rt2dObjectCreate();
@@ -1436,6 +1451,7 @@ Rt2dSceneStreamRead(RwStream *stream)
  * \see Rt2dObjectSetDepth
  */
 Rt2dObject *
+// sp-match: _Rt2dSceneSetDepthDirty @ 0x0016D400
 Rt2dSceneSetDepthDirty(Rt2dObject *scene)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dSceneSetDepthDirty"));
@@ -1462,6 +1478,7 @@ Rt2dSceneSetDepthDirty(Rt2dObject *scene)
  * \see Rt2dShapeRender
  */
 Rt2dObject *
+// sp-match: _Rt2dSceneUpdateLTM @ 0x0016D410
 Rt2dSceneUpdateLTM(Rt2dObject *scene)
 {
     _rt2dDepthOfObject *first, *finish, *i;

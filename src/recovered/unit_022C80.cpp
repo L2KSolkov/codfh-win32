@@ -106,6 +106,7 @@ extern const RwV3d stru_3CDE0C;
 // match: __real@3e4ccccd @ 0x003CE008
 // match: __real@47742400 @ 0x003CE00C
 // match: __real@3e99999a @ 0x003CE010
+// sp-match: ?sub_22C80@AIData@@QAEXPAUtype_F8350@@PAURwV3d@@1@Z @ 0x0001CF30
 void AIData::sub_22C80(type_F8350 *arg_0, RwV3d *arg_4, RwV3d *arg_8)
 {
     RwMatrix var_50;
@@ -121,6 +122,7 @@ void AIData::sub_22C80(type_F8350 *arg_0, RwV3d *arg_4, RwV3d *arg_8)
     *arg_8 = arg_0->unk_10;
 }
 // match: sub_22EF0 @ 0x00022EF0
+// sp-match: sub_22EF0 @ 0x0001FDC0
 RwInt32 AIData::sub_22EF0(RwInt32 arg_0)
 {
     unk_DD4 = arg_0;
@@ -130,6 +132,7 @@ RwInt32 AIData::sub_22EF0(RwInt32 arg_0)
     return 1;
 }
 // match: sub_22F30 @ 0x00022F30
+// sp-match: sub_22F30 @ 0x0001F160
 void AIData::sub_22F30(RwInt32 arg_0)
 {
     unk_136C = arg_0;
@@ -137,6 +140,7 @@ void AIData::sub_22F30(RwInt32 arg_0)
         sub_23D90(&unk_1324);
 }
 // match: sub_22F70 @ 0x00022F70
+// sp-match: sub_22F70 @ 0x0001D0F0
 void AIData::sub_22F70()
 {
     type_3D3548 *var_4;
@@ -155,6 +159,7 @@ void AIData::sub_22F70()
     unk_F54 = 0;
 }
 // match: sub_23050 @ 0x00023050
+// sp-match: sub_23050 @ 0x0001D170
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_14D180 *AIData::sub_23050(type_154C0_12F4 *arg_0)
 {
@@ -180,6 +185,7 @@ type_14D180 *AIData::sub_23050(type_154C0_12F4 *arg_0)
     return var_4;
 }
 // match: sub_23100 @ 0x00023100
+// sp-match: sub_23100 @ 0x0001D1F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_14D180 *AIData::sub_23100(type_154C0_12F4 *arg_0)
 {
@@ -207,6 +213,7 @@ type_14D180 *AIData::sub_23100(type_154C0_12F4 *arg_0)
     return var_4;
 }
 // match: sub_231B0 @ 0x000231B0
+// sp-match: sub_231B0 @ 0x0001F180
 void AIData::sub_231B0()
 {
     sub_23100(&unk_12F4);
@@ -216,6 +223,7 @@ void AIData::sub_231B0()
     sub_23D90(&unk_133C);
 }
 // match: sub_23230 @ 0x00023230
+// sp-match: sub_23230 @ 0x0001FDF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void AIData::sub_23230()
 {
@@ -238,6 +246,7 @@ void AIData::sub_23230()
     }
 }
 // match: sub_232F0 @ 0x000232F0
+// sp-match: sub_232F0 @ 0x0001D260
 type_3D3548 *AIData::sub_232F0()
 {
     type_3D3548 *var_4;
@@ -246,6 +255,7 @@ type_3D3548 *AIData::sub_232F0()
     return var_4;
 }
 // match: sub_23320 @ 0x00023320
+// sp-match: sub_23320 @ 0x00020EB0
 void AIData::sub_23320()
 {
     if (unk_F54 != 0 && ((unk_F54->unk_00 >> 2) & 1) == 0 && sub_25DD0(unk_F54, 0) != 0) {
@@ -255,6 +265,7 @@ void AIData::sub_23320()
     }
 }
 // match: sub_233B0 @ 0x000233B0
+// sp-match: sub_233B0 @ 0x00020F10
 RwInt32 AIData::sub_233B0()
 {
     RwInt32 var_4;
@@ -283,11 +294,13 @@ RwInt32 AIData::sub_233B0()
     return var_4;
 }
 // match: sub_23530 @ 0x00023530
+// sp-match: sub_23530 @ 0x0001D270
 void AIData::sub_23530(type_F8350 *arg_0)
 {
     unk_F54 = arg_0;
 }
 // match: sub_23550 @ 0x00023550
+// sp-match: sub_23550 @ 0x0001F1D0
 void AIData::sub_23550(RwInt32 arg_0)
 {
     if (arg_0 == 0)
@@ -296,6 +309,7 @@ void AIData::sub_23550(RwInt32 arg_0)
         sub_23D90(&unk_1324);
 }
 // match: sub_235A0 @ 0x000235A0
+// sp-match: sub_235A0 @ 0x0001D280
 void AIData::sub_235A0()
 {
     type_3D3548 *var_4;
@@ -313,6 +327,7 @@ void AIData::sub_235A0()
     unk_F64 = 0;
 }
 // match: sub_23670 @ 0x00023670
+// sp-match: sub_23670 @ 0x0001D300
 void AIData::sub_23670()
 {
     type_3D3548 *var_4;
@@ -326,6 +341,7 @@ void AIData::sub_23670()
     }
 }
 // match: sub_236F0 @ 0x000236F0
+// sp-match: sub_236F0 @ 0x0001D350
 void AIData::sub_236F0(type_F8350 *arg_0)
 {
     type_3D3548 *var_4;
@@ -338,11 +354,13 @@ void AIData::sub_236F0(type_F8350 *arg_0)
     }
 }
 // match: sub_23760 @ 0x00023760
+// sp-match: sub_23760 @ 0x0001F200
 void AIData::sub_23760()
 {
     sub_23DF0(&unk_133C, &unk_1324);
 }
 // match: sub_23790 @ 0x00023790
+// sp-match: sub_23790 @ 0x0001D390
 void AIData::sub_23790()
 {
     if (unk_F60 != 0) {
@@ -361,6 +379,7 @@ void AIData::sub_23790()
     unk_528 = 0;
 }
 // match: sub_23860 @ 0x00023860
+// sp-match: sub_23860 @ 0x0001F220
 void AIData::sub_23860()
 {
     sub_23100(&unk_12F4);
@@ -368,12 +387,14 @@ void AIData::sub_23860()
     sub_23D90(&unk_12F4);
 }
 // match: sub_238B0 @ 0x000238B0
+// sp-match: sub_238B0 @ 0x0001D410
 void AIData::sub_238B0()
 {
     if (unk_F5C != 0)
         sub_F7BA0(this, unk_F5C, false);
 }
 // match: sub_238E0 @ 0x000238E0
+// sp-match: sub_238E0 @ 0x0001D430
 RwBool AIData::sub_238E0(type_3D3548 *arg_0)
 {
     RwBool var_4;
@@ -384,6 +405,7 @@ RwBool AIData::sub_238E0(type_3D3548 *arg_0)
     return var_4;
 }
 // match: sub_23930 @ 0x00023930
+// sp-match: sub_23930 @ 0x0001D460
 RwBool AIData::sub_23930()
 {
     RwBool var_4;
@@ -394,6 +416,7 @@ RwBool AIData::sub_23930()
     return var_4;
 }
 // match: sub_23980 @ 0x00023980
+// sp-match: sub_23980 @ 0x0001D490
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_14D180 *AIData::sub_23980()
 {
@@ -413,6 +436,7 @@ type_14D180 *AIData::sub_23980()
     return var_4;
 }
 // match: sub_23A10 @ 0x00023A10
+// sp-match: sub_23A10 @ 0x0001D4E0
 RwInt32 AIData::sub_23A10(type_F8350 *arg_0)
 {
     if (arg_0->unk_04 == 7 || arg_0->unk_04 == 8 || arg_0->unk_04 == 0xE)
@@ -433,6 +457,7 @@ RwInt32 AIData::sub_23A10(type_F8350 *arg_0)
     return 1;
 }
 // match: sub_23B60 @ 0x00023B60
+// sp-match: sub_23B60 @ 0x0001FE60
 type_F8350 *AIData::sub_23B60()
 {
     type_F8350 *var_4;
@@ -447,6 +472,7 @@ type_F8350 *AIData::sub_23B60()
     return var_4;
 }
 // match: sub_23BE0 @ 0x00023BE0
+// sp-match: sub_23BE0 @ 0x0001F250
 type_154C0_12F4 *AIData::sub_23BE0()
 {
     type_154C0_12F4 *var_4;
@@ -457,6 +483,7 @@ type_154C0_12F4 *AIData::sub_23BE0()
     return var_4;
 }
 // match: sub_23C30 @ 0x00023C30
+// sp-match: sub_23C30 @ 0x0001D590
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_23C30(RwV3d *arg_0)
 {
@@ -474,6 +501,7 @@ RwInt32 AIData::sub_23C30(RwV3d *arg_0)
     return 1;
 }
 // match: sub_23CD0 @ 0x00023CD0
+// sp-match: sub_23CD0 @ 0x0001F280
 RwInt32 AIData::sub_23CD0(RwInt32 arg_0, RwInt32 arg_4)
 {
     RwInt32 var_4;
@@ -493,6 +521,7 @@ RwInt32 AIData::sub_23CD0(RwInt32 arg_0, RwInt32 arg_4)
     return 1;
 }
 // match: sub_23D90 @ 0x00023D90
+// sp-match: sub_23D90 @ 0x0001D610
 void AIData::sub_23D90(type_154C0_12F4 *arg_0)
 {
     RwV3d *var_4;
@@ -506,6 +535,7 @@ void AIData::sub_23D90(type_154C0_12F4 *arg_0)
     var_4->z = 0.0f;
 }
 // match: sub_23DF0 @ 0x00023DF0
+// sp-match: sub_23DF0 @ 0x0001D640
 void AIData::sub_23DF0(type_154C0_12F4 *arg_0, type_154C0_12F4 *arg_4)
 {
     arg_0->unk_04 = arg_4->unk_04;
@@ -514,6 +544,7 @@ void AIData::sub_23DF0(type_154C0_12F4 *arg_0, type_154C0_12F4 *arg_4)
     arg_0->unk_0C = arg_4->unk_0C;
 }
 // match: sub_23E50 @ 0x00023E50
+// sp-match: sub_23E50 @ 0x0001D680
 RwInt32 AIData::sub_23E50(type_154C0_12F4 *arg_0, type_154C0_12F4 *arg_4)
 {
     if (arg_0->unk_00 == arg_4->unk_00 && arg_0->unk_04 == arg_4->unk_04
@@ -522,6 +553,7 @@ RwInt32 AIData::sub_23E50(type_154C0_12F4 *arg_0, type_154C0_12F4 *arg_4)
     return 0;
 }
 // match: sub_23EA0 @ 0x00023EA0
+// sp-match: sub_23EA0 @ 0x0001D6C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_23EA0(type_154C0_12F4 *arg_0, type_154C0_12F4 *arg_4)
 {
@@ -545,6 +577,7 @@ RwInt32 AIData::sub_23EA0(type_154C0_12F4 *arg_0, type_154C0_12F4 *arg_4)
 extern RwReal flt_4C0198;
 extern const RwReal flt_3D9488;
 // match: ?sub_23F60@AIData@@QAEXH@Z @ 0x00023F60
+// sp-match: ?sub_23F60@AIData@@QAEXH@Z @ 0x0001D740
 void AIData::sub_23F60(RwInt32 arg_0)
 {
     switch (arg_0)
@@ -625,6 +658,7 @@ void AIData::sub_23F60(RwInt32 arg_0)
     }
 }
 // match: ?sub_242B0@AIData@@QAEHHHMPAM@Z @ 0x000242B0
+// sp-match: ?sub_242B0@AIData@@QAEHHHMPAM@Z @ 0x0001D930
 RwInt32 AIData::sub_242B0(RwInt32 arg_0, RwInt32 arg_4, RwReal arg_8, RwReal *arg_C)
 {
     RwV3d lv_10;
@@ -679,6 +713,7 @@ RwInt32 AIData::sub_242B0(RwInt32 arg_0, RwInt32 arg_4, RwReal arg_8, RwReal *ar
     return lv_18;
 }
 // match: sub_244E0 @ 0x000244E0
+// sp-match: sub_244E0 @ 0x0001FEB0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_244E0(type_F8350 **arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C)
 {
@@ -836,6 +871,7 @@ RwInt32 AIData::sub_244E0(type_F8350 **arg_0, RwInt32 arg_4, RwInt32 arg_8, RwIn
 // match: sub_24BA0 @ 0x00024BA0
 // match: __ehhandler$?sub_24BA0@AIData@@QAEHHHHPAH@Z-8 @ 0x002FF520
 // match: __ehhandler$?sub_24BA0@AIData@@QAEHHHHPAH@Z @ 0x002FF528
+// sp-match: sub_24BA0 @ 0x0001F320
 // symbol: ??1type_154C0_12F4@@QAE@XZ = 0x001E41C0
 RwInt32 AIData::sub_24BA0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 *arg_C)
 {
@@ -929,6 +965,7 @@ RwInt32 AIData::sub_24BA0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 *
     return fp_1C;
 }
 // match: sub_24F30 @ 0x00024F30
+// sp-match: sub_24F30 @ 0x0001DAB0
 RwInt32 AIData::sub_24F30(RwV3d *arg_0, type_3D3548 **arg_4, RwReal *arg_8, RwV3d *arg_C,
                           RwInt32 *arg_10)
 {
@@ -968,6 +1005,7 @@ RwInt32 AIData::sub_24F30(RwV3d *arg_0, type_3D3548 **arg_4, RwReal *arg_8, RwV3
     return 1;
 }
 // match: sub_250D0 @ 0x000250D0
+// sp-match: sub_250D0 @ 0x0001DC10
 void AIData::sub_250D0(RwMatrix *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwV3d *arg_C, RwInt32 arg_10)
 {
     RwV3d var_C;
@@ -981,6 +1019,7 @@ void AIData::sub_250D0(RwMatrix *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwV3d *arg_C
     sub_140CE0(arg_0, arg_4, &var_C);
 }
 // match: ?sub_25180@AIData@@QAEHPAPAUtype_F8350@@HHH@Z @ 0x00025180
+// sp-match: ?sub_25180@AIData@@QAEHPAPAUtype_F8350@@HHH@Z @ 0x000208B0
 RwInt32 AIData::sub_25180(type_F8350 **arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C)
 {
     RwInt32 lv_8;
@@ -1133,6 +1172,7 @@ RwInt32 AIData::sub_25180(type_F8350 **arg_0, RwInt32 arg_4, RwInt32 arg_8, RwIn
     return lv_8;
 }
 // match: sub_25890 @ 0x00025890
+// sp-match: sub_25890 @ 0x0001DCB0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_25890(type_F8350 *arg_0)
 {
@@ -1164,6 +1204,7 @@ RwInt32 AIData::sub_25890(type_F8350 *arg_0)
     return 0;
 }
 // match: ?sub_25A50@AIData@@QAEHXZ @ 0x00025A50
+// sp-match: ?sub_25A50@AIData@@QAEHXZ @ 0x0001F5C0
 RwInt32 AIData::sub_25A50()
 {
     RwInt32 lv_8 = 0;
@@ -1190,6 +1231,7 @@ RwInt32 AIData::sub_25A50()
     return lv_8;
 }
 // match: sub_25B60 @ 0x00025B60
+// sp-match: sub_25B60 @ 0x0001DE20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_25B60(type_F8350 *arg_0, RwMatrix *arg_4, RwInt32 arg_8, RwInt32 arg_C)
 {
@@ -1238,6 +1280,7 @@ RwInt32 AIData::sub_25B60(type_F8350 *arg_0, RwMatrix *arg_4, RwInt32 arg_8, RwI
     return 0;
 }
 // match: ?sub_25DD0@AIData@@QAEHPAUtype_F8350@@PAH@Z @ 0x00025DD0
+// sp-match: ?sub_25DD0@AIData@@QAEHPAUtype_F8350@@PAH@Z @ 0x00020DF0
 RwInt32 AIData::sub_25DD0(type_F8350 *arg_0, RwInt32 *arg_4)
 {
     type_3D3548 *lv_8 = 0;
@@ -1260,6 +1303,7 @@ RwInt32 AIData::sub_25DD0(type_F8350 *arg_0, RwInt32 *arg_4)
     return 0;
 }
 // match: sub_25EB0 @ 0x00025EB0
+// sp-match: sub_25EB0 @ 0x0001DF90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_25EB0(type_F8350 *arg_0, RwMatrix *arg_4, RwV3d *arg_8, RwV3d *arg_C)
 {
@@ -1308,6 +1352,7 @@ inline RwInt32 and_sides(RwInt32 arg_0, RwInt32 arg_4)
     return arg_0 & arg_4;
 }
 // match: sub_26000 @ 0x00026000
+// sp-match: sub_26000 @ 0x00020390
 // The kind is read into a local of each block that tests it.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_26000(type_F8350 *arg_0, RwMatrix *arg_4, RwV3d *arg_8, RwInt32 arg_C,
@@ -1345,7 +1390,11 @@ RwInt32 AIData::sub_26000(type_F8350 *arg_0, RwMatrix *arg_4, RwV3d *arg_8, RwIn
                 && (sub_238E0(0) == 0 || unk_F60 != arg_0)) {
             RwV3dSub(&ebp_50, v44->sub_CD550(), &arg_0->unk_10);
             ebp_50.y -= v44->unk_48;
+#ifdef CODFH_SP // shape: the height on the left of the lower bound (fxch, fcompp at SP 0x2049B)
+            if (ebp_50.y <= flt_4275E4 && ebp_50.y >= -flt_4275E8) {
+#else
             if (ebp_50.y <= flt_4275E4 && -flt_4275E8 <= ebp_50.y) {
+#endif
                 ebp_50.y = 0.0f;
                 if (RwV3dDotProduct(&ebp_50, &ebp_50) < flt_4275E8) {
                     if (arg_18 != 0)
@@ -1364,7 +1413,11 @@ RwInt32 AIData::sub_26000(type_F8350 *arg_0, RwMatrix *arg_4, RwV3d *arg_8, RwIn
         return 0;
     RwV3dSub(&stk_40, arg_8, &arg_0->unk_10);
     bp_4 = RwV3dDotProduct(&stk_40, &stk_40);
+#ifdef CODFH_SP // shape: the distance on the left (fxch, fcompp at SP 0x2055C)
+    if (bp_4 > arg_10 * arg_10)
+#else
     if (arg_10 * arg_10 < bp_4)
+#endif
         return 0;
     RwV3dSub(&stk_2C, &arg_0->unk_10, &arg_4->pos);
     stk_2C.y = 0.0f;
@@ -1386,6 +1439,42 @@ RwInt32 AIData::sub_26000(type_F8350 *arg_0, RwMatrix *arg_4, RwV3d *arg_8, RwIn
             return sub_25EB0(arg_0, arg_4, &ebp_14, &stk_2C);
         if ((arg_14 == 1 || arg_14 == 2) && bp_8 <= flt_3CDE1C)
             return sub_25EB0(arg_0, arg_4, &ebp_14, &stk_2C);
+#ifdef CODFH_SP // shape: the bounds tested with the value on the left and the dot products
+                // spelled out, at's from y and right's from x (SP 0x20674-0x2081A)
+    } else if (arg_14 == 3) {
+        if (bp_8 >= flt_3CDE18) {
+            var_20 = (RwReal)(arg_4->at.y * ebp_14.y) + arg_4->at.x * ebp_14.x + arg_4->at.z * ebp_14.z;
+            if (var_20 > 0.0f)
+                return 1;
+            RwInt32 kind = arg_0->unk_04;
+
+            if (kind == 0x0E && var_20 < flt_3CDE20 && var_20 > -flt_3CDE20)
+                return 1;
+        } else if (bp_8 < flt_3CDE18 && bp_8 > -flt_3CDE18) {
+            RwReal var_8C = RwV3dDotProduct(&arg_4->right, &stk_2C);
+
+            if (var_8C >= flt_3CDE24) {
+                var_20 = (RwReal)(arg_4->right.x * ebp_14.x) + arg_4->right.y * ebp_14.y + arg_4->right.z * ebp_14.z;
+                if (var_20 > 0.0f)
+                    return 1;
+            } else if (var_8C <= -flt_3CDE24) {
+                var_20 = (RwReal)(arg_4->right.x * ebp_14.x) + arg_4->right.y * ebp_14.y + arg_4->right.z * ebp_14.z;
+                if (var_20 < 0.0f)
+                    return 1;
+            }
+        } else if (bp_8 <= -flt_3CDE18) {
+            var_20 = (RwReal)(arg_4->at.y * ebp_14.y) + arg_4->at.x * ebp_14.x + arg_4->at.z * ebp_14.z;
+            if (var_20 < 0.0f)
+                return 1;
+            RwInt32 kind = arg_0->unk_04;
+
+            if (kind == 0x0E && var_20 < flt_3CDE20 && var_20 > -flt_3CDE20)
+                return 1;
+        }
+    } else if (arg_14 == 4) {
+        if (bp_4 < flt_3CDE28 * flt_3CDE28)
+            return 0;
+#else
     } else if (arg_14 == 3) {
         if (bp_8 >= flt_3CDE18) {
             var_20 = RwV3dDotProduct(&arg_4->at, &ebp_14);
@@ -1419,11 +1508,13 @@ RwInt32 AIData::sub_26000(type_F8350 *arg_0, RwMatrix *arg_4, RwV3d *arg_8, RwIn
     } else if (arg_14 == 4) {
         if (flt_3CDE28 * flt_3CDE28 > bp_4)
             return 0;
+#endif
         return 1;
     }
     return 0;
 }
 // match: ?sub_266A0@AIData@@QAEXPAUtype_F8350@@@Z @ 0x000266A0
+// sp-match: ?sub_266A0@AIData@@QAEXPAUtype_F8350@@@Z @ 0x0001E070
 void AIData::sub_266A0(type_F8350 *arg_0)
 {
     RwMatrix var_50;
@@ -1452,11 +1543,13 @@ void AIData::sub_266A0(type_F8350 *arg_0)
     zero_v3d(&unk_568->unk_CC);
 }
 // match: sub_26A30 @ 0x00026A30
+// sp-match: sub_26A30 @ 0x0001E2B0
 void AIData::sub_26A30()
 {
     unk_528 = 1;
 }
 // match: sub_26A50 @ 0x00026A50
+// sp-match: sub_26A50 @ 0x0001E2C0
 void AIData::sub_26A50()
 {
     type_F8350 *var_4;
@@ -1467,6 +1560,7 @@ void AIData::sub_26A50()
 }
 extern const RwReal flt_3CDE30;
 // match: sub_26A80 @ 0x00026A80
+// sp-match: sub_26A80 @ 0x0001F680
 // Whether the node arg_0 suits the attack on arg_4 (arg_8 set: without the
 // path check); *arg_C is set when the player stands on the node.
 RwInt32 AIData::sub_26A80(type_F8350 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwInt32 *arg_C)
@@ -1478,7 +1572,9 @@ RwInt32 AIData::sub_26A80(type_F8350 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, 
     RwV3d bp_F8;
     RwV3d lv_EC;
     RwV3d xE0;
+#ifndef CODFH_SP
     RwV3d lD4;
+#endif
     RwReal stk_C8;
     RwReal lcl_C4;
     RwV3d *pC0;
@@ -1503,7 +1599,9 @@ RwInt32 AIData::sub_26A80(type_F8350 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, 
     RwV3d r34;
     type_3D3548 *q28;
     RwV3d *frm_24;
+#ifndef CODFH_SP
     RwV3d t20;
+#endif
     RwReal ebp_14;
     type_154C0_80 *lv_10;
     RwReal slot_C;
@@ -1517,6 +1615,9 @@ RwInt32 AIData::sub_26A80(type_F8350 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, 
     bp_8 = 0;
     bp_4 = unk_568->sub_CD550();
     if (arg_4 != 0) {
+#ifdef CODFH_SP // shape: t20 local to this branch, sharing a slot with lD4 (frame 0x5C, SP 0x1F680)
+        RwV3d t20;
+#endif
         lv_10 = sub_16ED0(arg_4, 0);
         if (lv_10 != 0 && lv_10->unk_0C < 500.0f)
             return 0;
@@ -1531,7 +1632,13 @@ RwInt32 AIData::sub_26A80(type_F8350 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, 
                 && (sub_238E0(0) == 0 || unk_F60 != arg_0)) {
             RwV3dSub(&var_64, q28->sub_CD550(), &arg_0->unk_10);
             var_64.y -= q28->unk_48;
-            if (var_64.y <= flt_4275E4 && -flt_4275E8 <= var_64.y) {
+            if (var_64.y <= flt_4275E4
+#ifdef CODFH_SP // shape: the lower bound tested with the height first (fxch, fcompp at SP 0x1F7BE)
+                && var_64.y >= -flt_4275E8
+#else
+                && -flt_4275E8 <= var_64.y
+#endif
+            ) {
                 var_64.y = 0.0f;
                 if (RwV3dDotProduct(&var_64, &var_64) < flt_4275E8) {
                     if (arg_C != 0)
@@ -1600,6 +1707,9 @@ RwInt32 AIData::sub_26A80(type_F8350 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, 
             }
         }
     } else {
+#ifdef CODFH_SP // shape: lD4 local to this branch (frame 0x5C, SP 0x1F680)
+        RwV3d lD4;
+#endif
         if (sub_23C30(&xE0) == 0)
             return 0;
         frm_120 = 2.0f / (arg_0->unk_1C.real * arg_0->unk_1C.real
@@ -1621,6 +1731,7 @@ RwInt32 AIData::sub_26A80(type_F8350 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, 
     return bp_8;
 }
 // match: sub_27370 @ 0x00027370
+// sp-match: sub_27370 @ 0x0001FC70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_27370(type_3D3548 *arg_0)
 {
@@ -1660,6 +1771,7 @@ RwInt32 AIData::sub_27370(type_3D3548 *arg_0)
     return (var_4 = RwV3dDotProduct(&lcl_34, &bp_14)) >= lv_8;
 }
 // match: sub_27500 @ 0x00027500
+// sp-match: sub_27500 @ 0x0001E2E0
 RwReal sub_27500(type_F8350 *arg_0)
 {
     type_3DC9B0 *var_4;
@@ -1673,6 +1785,7 @@ RwReal sub_27500(type_F8350 *arg_0)
     return 0.8f;
 }
 // match: sub_27550 @ 0x00027550
+// sp-match: sub_27550 @ 0x0001E310
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_27550(type_F8350 *arg_0, RwV3d *arg_4, RwV3d *arg_8)
 {
@@ -1758,6 +1871,7 @@ RwInt32 AIData::sub_27550(type_F8350 *arg_0, RwV3d *arg_4, RwV3d *arg_8)
 }
 extern const RwReal flt_3CDE2C;
 // match: sub_279B0 @ 0x000279B0
+// sp-match: sub_279B0 @ 0x0001E600
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_14D180 *AIData::sub_279B0(type_154C0_12F4 *arg_0, type_3D3548 *arg_4, type_14D180 *arg_8)
 {
@@ -1821,6 +1935,7 @@ type_14D180 *AIData::sub_279B0(type_154C0_12F4 *arg_0, type_3D3548 *arg_4, type_
     return bp_8;
 }
 // match: sub_27CC0 @ 0x00027CC0
+// sp-match: sub_27CC0 @ 0x0001E800
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_27CC0(type_F8350 **arg_0)
 {
@@ -1856,6 +1971,7 @@ RwInt32 AIData::sub_27CC0(type_F8350 **arg_0)
     return v8;
 }
 // match: sub_27E30 @ 0x00027E30
+// sp-match: sub_27E30 @ 0x0001E910
 RwInt32 AIData::sub_27E30()
 {
     if (sub_27CC0(0) != 0) {
@@ -1868,6 +1984,7 @@ RwInt32 AIData::sub_27E30()
     return 0;
 }
 // match: sub_27EB0 @ 0x00027EB0
+// sp-match: sub_27EB0 @ 0x0001E970
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwV3d *AIData::sub_27EB0(RwV3d *arg_0, RwV3d *arg_4)
 {
@@ -1922,16 +2039,22 @@ RwV3d *AIData::sub_27EB0(RwV3d *arg_0, RwV3d *arg_4)
             }
         }
     }
+#ifdef CODFH_SP
+    // shape: one conditional return expression (SP 0x1E970)
+    return lv_8 ? &lv_8->unk_10 : (l10 ? &l10->unk_10 : 0);
+#else
     if (lv_8 != 0)
         return &lv_8->unk_10;
     if (l10 != 0)
         return &l10->unk_10;
     return 0;
+#endif
 }
 // Whether the cover node arg_4 faces the point arg_0 (a RwV3d's address):
 // the dot of its cover orientation's at row with the direction from the
 // node to the point is over 0.2.
 // match: ?sub_28200@AIData@@QAEHHPAUtype_F8350@@@Z @ 0x00028200
+// sp-match: ?sub_28200@AIData@@QAEHHPAUtype_F8350@@@Z @ 0x0001EBD0
 RwInt32 AIData::sub_28200(RwInt32 arg_0, type_F8350 *arg_4)
 {
     RwV3d var_10;
@@ -1948,6 +2071,7 @@ RwInt32 AIData::sub_28200(RwInt32 arg_0, type_F8350 *arg_4)
     return 0;
 }
 // match: sub_28470 @ 0x00028470
+// sp-match: sub_28470 @ 0x0001ECD0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_28470(RwV3d *arg_0)
 {
@@ -1992,6 +2116,7 @@ RwInt32 AIData::sub_28470(RwV3d *arg_0)
     return 0;
 }
 // match: sub_28640 @ 0x00028640
+// sp-match: sub_28640 @ 0x0001EE40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_28640(RwInt32 arg_0)
 {
@@ -2027,6 +2152,7 @@ RwInt32 AIData::sub_28640(RwInt32 arg_0)
     return 0;
 }
 // match: sub_28780 @ 0x00028780
+// sp-match: sub_28780 @ 0x0001EF50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_28780()
 {
@@ -2055,6 +2181,7 @@ RwInt32 AIData::sub_28780()
     return 1;
 }
 // match: sub_28840 @ 0x00028840
+// sp-match: sub_28840 @ 0x0001FD90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwBool AIData::sub_28840(type_3D3548 *arg_0)
 {
@@ -2068,6 +2195,7 @@ RwBool AIData::sub_28840(type_3D3548 *arg_0)
     return var_4;
 }
 // match: sub_28890 @ 0x00028890
+// sp-match: sub_28890 @ 0x0001EFC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 AIData::sub_28890(type_3D3548 *arg_0, type_154C0_12F4 *arg_4)
 {

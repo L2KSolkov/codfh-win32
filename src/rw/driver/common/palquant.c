@@ -188,6 +188,7 @@ LeafAddPixel(_rwPalQuantLeafNode *leaf, RwRGBA *color, RwReal weight)
 // match: _QuantDepth @ 0x00435710
 
 // match: _LeafCalcStats @ 0x002B53B0
+// sp-match: _LeafCalcStats @ 0x001D07D0
 
 static void
 LeafCalcStats(_rwPalQuantLeafNode *leaf, RwRGBA *origin)
@@ -222,6 +223,7 @@ LeafCalcStats(_rwPalQuantLeafNode *leaf, RwRGBA *origin)
 
 /*************************************************************************/
 // match: _StatsAdd @ 0x002B54B0
+// sp-match: _StatsAdd @ 0x001D08D0
 static void
 StatsAdd(_rwPalQuantLeafNode *combined, 
          _rwPalQuantLeafNode *set1, 
@@ -307,6 +309,7 @@ StatsSub(_rwPalQuantLeafNode *remainder,
  * This is used instead of 255.0f to prevent rounding errors.
  */
 // match: _RepresentativeColor @ 0x002B55F0
+// sp-match: _RepresentativeColor @ 0x001D0A10
 static void
 RepresentativeColor(RwRGBA *rgb, _rwPalQuantLeafNode *node)
 {
@@ -371,6 +374,7 @@ InitBranch(_rwPalQuantBranchNode * Branch)
 
 /*************************************************************************/
 // match: _GetOctAdr @ 0x002B56B0
+// sp-match: _GetOctAdr @ 0x001D0AD0
 static OctantMap
 GetOctAdr(RwRGBA * c)
 {
@@ -385,6 +389,7 @@ GetOctAdr(RwRGBA * c)
 
 /*************************************************************************/
 // match: _AllocateToLeaf @ 0x002B5710
+// sp-match: _AllocateToLeaf @ 0x001D0B30
 static _rwPalQuantOctNode     *
 AllocateToLeaf(RwPalQuant * pq, _rwPalQuantOctNode * root, OctantMap Octs, int depth)
 {
@@ -486,6 +491,7 @@ RwPalQuantGetMaxDepth(void)
  * \see RwPalQuantMatchImage
  */
 // match: _RwPalQuantAddImage @ 0x002B57C0
+// sp-match: _RwPalQuantAddImage @ 0x001D0BE0
 void
 RwPalQuantAddImage(RwPalQuant * pq, RwImage * img, RwReal weight)
 {
@@ -582,6 +588,7 @@ RwPalQuantAddImage(RwPalQuant * pq, RwImage * img, RwReal weight)
 
 /*************************************************************************/
 // match: _assignindex @ 0x002B5BC0
+// sp-match: _assignindex @ 0x001D0FE0
 static void
 assignindex(_rwPalQuantOctNode *root, RwInt32 *origin, int depth, _rwPalQuantRGBABox *region, RwInt32 palIndex)
 {
@@ -667,6 +674,7 @@ AssignPalIndex(_rwPalQuantOctNode * root, _rwPalQuantRGBABox * cube, RwInt32 pal
 
 /*************************************************************************/
 // match: _addvolume @ 0x002B5D20
+// sp-match: _addvolume @ 0x001D1140
 static void
 addvolume(_rwPalQuantOctNode *root, RwInt32 *origin, RwInt32 depth, _rwPalQuantRGBABox *region, _rwPalQuantLeafNode *volume)
 {
@@ -771,6 +779,7 @@ BoxStats(_rwPalQuantLeafNode *Vol, _rwPalQuantOctNode *root, _rwPalQuantRGBABox 
 /* We want to minimize the sum of the variances of two subboxes.
  */
 // match: _FindBestCut @ 0x002B5F00
+// sp-match: _FindBestCut @ 0x001D1320
 static RwReal
 FindBestCut(_rwPalQuantOctNode *root, _rwPalQuantRGBABox *cube, RwInt32 chn, RwInt32 *cuts, _rwPalQuantLeafNode *whole)
 {
@@ -877,6 +886,7 @@ FindBestCut(_rwPalQuantOctNode *root, _rwPalQuantRGBABox *cube, RwInt32 chn, RwI
 
 /*************************************************************************/
 // match: _nCut @ 0x002B6160
+// sp-match: _nCut @ 0x001D1580
 static RwBool
 nCut(_rwPalQuantOctNode *root, _rwPalQuantLeafNode *whole, _rwPalQuantRGBABox *set1, _rwPalQuantRGBABox *set2)
 {
@@ -917,6 +927,7 @@ nCut(_rwPalQuantOctNode *root, _rwPalQuantLeafNode *whole, _rwPalQuantRGBABox *s
 /*************************************************************************/
 
 // match: _CalcNodeWeights @ 0x002B6240
+// sp-match: _CalcNodeWeights @ 0x001D1660
 static _rwPalQuantLeafNode    *
 CalcNodeWeights(_rwPalQuantOctNode *root, RwRGBA *origin, RwInt32 depth)
 {
@@ -964,6 +975,7 @@ CalcNodeWeights(_rwPalQuantOctNode *root, RwRGBA *origin, RwInt32 depth)
 
 /*************************************************************************/
 // match: _CountLeafs @ 0x002B6460
+// sp-match: _CountLeafs @ 0x001D1880
 static int
 CountLeafs(_rwPalQuantOctNode *root, RwInt32 depth)
 {
@@ -1019,6 +1031,7 @@ CountNodes(_rwPalQuantOctNode *root, RwInt32 depth)
 
 /*************************************************************************/
 // match: _ExtractNodes @ 0x002B64B0
+// sp-match: _ExtractNodes @ 0x001D18D0
 static int
 ExtractNodes(_rwPalQuantOctNode *root, RwRGBA *palette, RwInt32 nodeIndex, RwInt32 depth)
 {
@@ -1050,6 +1063,7 @@ ExtractNodes(_rwPalQuantOctNode *root, RwRGBA *palette, RwInt32 nodeIndex, RwInt
 
 /*************************************************************************/
 // match: _GetIndex @ 0x002B6520
+// sp-match: _GetIndex @ 0x001D1940
 static              RwUInt8
 GetIndex(_rwPalQuantOctNode *root, OctantMap Octs, RwInt32 depth)
 {
@@ -1087,6 +1101,7 @@ GetIndex(_rwPalQuantOctNode *root, OctantMap Octs, RwInt32 depth)
  *
  */
 // match: _RwPalQuantResolvePalette @ 0x002B6560
+// sp-match: _RwPalQuantResolvePalette @ 0x001D1980
 RwInt32
 RwPalQuantResolvePalette(RwRGBA *palette, RwInt32 maxcols, RwPalQuant *pq)
 {
@@ -1208,6 +1223,7 @@ RwPalQuantResolvePalette(RwRGBA *palette, RwInt32 maxcols, RwPalQuant *pq)
  *
  */
 // match: _RwPalQuantMatchImage @ 0x002B6A20
+// sp-match: _RwPalQuantMatchImage @ 0x001D1E40
 void
 RwPalQuantMatchImage(RwUInt8 *dstpixels, RwInt32 dststride, RwInt32 dstdepth,
                      RwBool dstPacked, RwPalQuant *pq, RwImage *img)
@@ -1392,6 +1408,7 @@ RwPalQuantMatchImage(RwUInt8 *dstpixels, RwInt32 dststride, RwInt32 dstdepth,
  *
  */
 // match: _RwPalQuantInit @ 0x002B6EA0
+// sp-match: _RwPalQuantInit @ 0x001D22C0
 RwBool
 RwPalQuantInit(RwPalQuant *pq)
 {
@@ -1424,6 +1441,7 @@ RwPalQuantInit(RwPalQuant *pq)
 
 /*************************************************************************/
 // match: _DeleteOctTree @ 0x002B6F80
+// sp-match: _DeleteOctTree @ 0x001D23A0
 static void
 DeleteOctTree(RwPalQuant *pq, _rwPalQuantOctNode *root, int depth)
 {
@@ -1460,6 +1478,7 @@ DeleteOctTree(RwPalQuant *pq, _rwPalQuantOctNode *root, int depth)
  *
  */
 // match: _RwPalQuantTerm @ 0x002B6FD0
+// sp-match: _RwPalQuantTerm @ 0x001D23F0
 void
 RwPalQuantTerm(RwPalQuant *pq)
 {

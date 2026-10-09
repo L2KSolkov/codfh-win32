@@ -17,6 +17,9 @@
 #include "types/type_F2FF0.h"
 #include "game/data.h"
 #include "game/astarpathfinder.h"
+#ifdef CODFH_SP
+#include "game/gameloop.h"    // sub_19B050 (the level)
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D932C
@@ -55,6 +58,15 @@ type_4BFED0 dword_4BFE28;
 // match: _$E11 @ 0x0030B6C0
 // match: _$E12 @ 0x0030E580
 // match: ?sub_F47F0@@YAXXZ @ 0x000F47F0
+// sp-match: ?sub_F47F0@@YAXXZ @ 0x000BA820
+// sp-match: _$E2 @ 0x0021D6D0
+// sp-match: _$E5 @ 0x0021D6F0
+// sp-match: _$E8 @ 0x0021D710
+// sp-match: _$E11 @ 0x0021D740
+// sp-match: _$E3 @ 0x0021E8D0
+// sp-match: _$E6 @ 0x0021E8E0
+// sp-match: _$E9 @ 0x0021E8F0
+// sp-match: _$E12 @ 0x0021E910
 
 void sub_F47F0()
 {
@@ -65,12 +77,14 @@ void sub_F47F0()
 }
 
 // match: ?sub_F4850@@YAXXZ @ 0x000F4850
+// sp-match: ?sub_F4850@@YAXXZ @ 0x000BAF90
 void sub_F4850()
 {
     sub_F5E30();
 }
 
 // match: ?sub_F4860@@YAXXZ @ 0x000F4860
+// sp-match: ?sub_F4860@@YAXXZ @ 0x000BAFA0
 void sub_F4860()
 {
     sub_F5E30();
@@ -92,6 +106,7 @@ void sub_F4860()
 // match: ?sub_F4890@@YAXM@Z @ 0x000F4890
 // match: __ehhandler$?sub_F4890@@YAXM@Z-0x16 @ 0x003010D0
 // match: __ehhandler$?sub_F4890@@YAXM@Z @ 0x003010E6
+// sp-match: ?sub_F4890@@YAXM@Z @ 0x000BAFC0
 void sub_F4890(RwReal arg_0)
 {
     type_F5740 *v_14;
@@ -192,8 +207,8 @@ void sub_F4890(RwReal arg_0)
                         {
                             type_F4890_50 v_124;
 
-                            v_124.unk_00 = 0;
-                            v_124.unk_04 = v_54->unk_3C;
+                            v_124.unk_00_r = 0.0f;
+                            v_124.unk_04_r = v_54->unk_3C_f;
                             v_124.unk_08 = v_54->unk_40;
                             v_124.unk_0C = v_54->unk_44;
                             v_124.unk_10 = v_54->unk_48;
@@ -320,8 +335,8 @@ void sub_F4890(RwReal arg_0)
             {
                 type_F4890_50 v_264;
 
-                v_264.unk_00 = 0;
-                v_264.unk_04 = v_18->unk_3C;
+                v_264.unk_00_r = 0.0f;
+                v_264.unk_04_r = v_18->unk_3C_f;
                 v_264.unk_08 = v_18->unk_40;
                 v_264.unk_0C = v_18->unk_44;
                 v_264.unk_10 = v_18->unk_48;
@@ -358,6 +373,7 @@ void sub_F4890(RwReal arg_0)
 }
 
 // match: ?sub_F5370@@YAXPAUtype_F5740@@PAURwMatrixTag@@_N@Z @ 0x000F5370
+// sp-match: ?sub_F5370@@YAXPAUtype_F5740@@PAURwMatrixTag@@_N@Z @ 0x000BA870
 void sub_F5370(type_F5740 *arg_0, RwMatrix *arg_4, bool arg_8)
 {
     Trigger *var_4 = arg_0->unk_54.unk_08;
@@ -393,6 +409,7 @@ void sub_F5370(type_F5740 *arg_0, RwMatrix *arg_4, bool arg_8)
 }
 
 // match: ?sub_F54E0@@YAXPAUtype_F5740@@PAURwMatrixTag@@@Z @ 0x000F54E0
+// sp-match: ?sub_F54E0@@YAXPAUtype_F5740@@PAURwMatrixTag@@@Z @ 0x000BA950
 void sub_F54E0(type_F5740 *arg_0, RwMatrix *arg_4)
 {
     RwV3d var_C;
@@ -431,6 +448,7 @@ void sub_F54E0(type_F5740 *arg_0, RwMatrix *arg_4)
 }
 
 // match: ?sub_F5740@@YAPAUtype_F5740@@PAVParticleTrigger@@HPAUParticleTrigger_entry@@@Z @ 0x000F5740
+// sp-match: ?sub_F5740@@YAPAUtype_F5740@@PAVParticleTrigger@@HPAUParticleTrigger_entry@@@Z @ 0x000BB7F0
 type_F5740 *sub_F5740(ParticleTrigger *arg_0, RwInt32 arg_4, ParticleTrigger_entry *arg_8)
 {
     type_F5740 *var_4 = sub_F5920(arg_0, arg_4, arg_8);
@@ -451,6 +469,7 @@ type_F5740 *sub_F5740(ParticleTrigger *arg_0, RwInt32 arg_4, ParticleTrigger_ent
 }
 
 // match: ?sub_F57C0@@YAXM@Z @ 0x000F57C0
+// sp-match: ?sub_F57C0@@YAXM@Z @ 0x000BAB20
 void sub_F57C0(RwReal arg_0)
 {
     type_F58B0 *var_4 = dword_4BFDCC;
@@ -463,6 +482,7 @@ void sub_F57C0(RwReal arg_0)
 }
 
 // match: ?sub_F57F0@@YAPAUtype_F58B0@@XZ @ 0x000F57F0
+// sp-match: ?sub_F57F0@@YAPAUtype_F58B0@@XZ @ 0x000BAB50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_F58B0 *sub_F57F0()
 {
@@ -502,6 +522,7 @@ type_F58B0 *sub_F57F0()
 }
 
 // match: ?sub_F58B0@@YAPAUtype_F58B0@@PAUtype_F5740@@M@Z @ 0x000F58B0
+// sp-match: ?sub_F58B0@@YAPAUtype_F58B0@@PAUtype_F5740@@M@Z @ 0x000BABC0
 type_F58B0 *sub_F58B0(type_F5740 *arg_0, RwReal arg_4)
 {
     type_F58B0 *var_4 = (type_F58B0 *)dword_4BFDF4.sub_16C5A0(0);
@@ -522,6 +543,7 @@ type_F58B0 *sub_F58B0(type_F5740 *arg_0, RwReal arg_4)
 }
 
 // match: ?sub_F5920@@YAPAUtype_F5740@@PAVParticleTrigger@@HPAUParticleTrigger_entry@@@Z @ 0x000F5920
+// sp-match: ?sub_F5920@@YAPAUtype_F5740@@PAVParticleTrigger@@HPAUParticleTrigger_entry@@@Z @ 0x000BAC00
 type_F5740 *sub_F5920(ParticleTrigger *arg_0, RwInt32 arg_4, ParticleTrigger_entry *arg_8)
 {
     type_F5740 *var_4 = (type_F5740 *)dword_4BFDD4.sub_16C5A0(0);
@@ -539,6 +561,15 @@ type_F5740 *sub_F5920(ParticleTrigger *arg_0, RwInt32 arg_4, ParticleTrigger_ent
         var_4->unk_04 = arg_4;
         var_4->unk_1C = arg_8->unk_02;
         var_4->unk_1E = arg_8->unk_24_w;
+#ifdef CODFH_SP // single player fills them on level 7 (SP 0xBAC00 calls sub_19B050), as reals
+        if (sub_19B050() == 7)
+        {
+            var_4->unk_44 = arg_8->unk_30;
+            var_4->unk_40 = var_4->unk_44;
+            var_4->unk_4C_f = arg_8->unk_34_f;
+            var_4->unk_48_f = var_4->unk_4C_f;
+        }
+#else
         // Never taken: the fields it fills are unused.
         if (FALSE)
         {
@@ -547,6 +578,7 @@ type_F5740 *sub_F5920(ParticleTrigger *arg_0, RwInt32 arg_4, ParticleTrigger_ent
             var_4->unk_4C = arg_8->unk_34;
             var_4->unk_48 = var_4->unk_4C;
         }
+#endif
         var_4->unk_54.init();
         var_4->unk_54.sub_144940(arg_0);
         var_4->unk_28.init();
@@ -574,6 +606,7 @@ type_F5740 *sub_F5920(ParticleTrigger *arg_0, RwInt32 arg_4, ParticleTrigger_ent
 }
 
 // match: ?sub_F5BC0@@YAPAUtype_F5740@@PAU1@PAVParticleTrigger@@HPAUParticleTrigger_entry@@@Z @ 0x000F5BC0
+// sp-match: ?sub_F5BC0@@YAPAUtype_F5740@@PAU1@PAVParticleTrigger@@HPAUParticleTrigger_entry@@@Z @ 0x000BAD90
 type_F5740 *sub_F5BC0(type_F5740 *arg_0, ParticleTrigger *arg_4, RwInt32 arg_8, ParticleTrigger_entry *arg_C)
 {
     type_F5740 *var_4 = sub_F5920(arg_4, arg_8, arg_C);
@@ -594,7 +627,9 @@ type_F5740 *sub_F5BC0(type_F5740 *arg_0, ParticleTrigger *arg_4, RwInt32 arg_8, 
         }
         else
         {
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xBAD90)
             sub_19A750("Warning..adding child triggered particle to null parent.\n");
+#endif
             var_4->unk_B0 = 0;
         }
     }
@@ -602,6 +637,7 @@ type_F5740 *sub_F5BC0(type_F5740 *arg_0, ParticleTrigger *arg_4, RwInt32 arg_8, 
 }
 
 // match: ?sub_F5C70@@YAXPAUtype_F5740@@@Z @ 0x000F5C70
+// sp-match: ?sub_F5C70@@YAXPAUtype_F5740@@@Z @ 0x000BAE00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_F5C70(type_F5740 *arg_0)
 {
@@ -672,6 +708,7 @@ void sub_F5C70(type_F5740 *arg_0)
 }
 
 // match: ?sub_F5E30@@YAXXZ @ 0x000F5E30
+// sp-match: ?sub_F5E30@@YAXXZ @ 0x000BAF10
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_F5E30()
 {

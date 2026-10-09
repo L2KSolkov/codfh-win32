@@ -308,6 +308,7 @@ MACRO_STOP
 // match: __real@3f11eb85 @ 0x00417504
 
 // match: _WorldForAllSectorsIntsecLine @ 0x002BDAF0
+// sp-match: _WorldForAllSectorsIntsecLine @ 0x001D8F00
 
 static void
 WorldForAllSectorsIntsecLine(RpWorld *world,
@@ -339,6 +340,7 @@ WorldForAllSectorsIntsecLine(RpWorld *world,
  */
 
 // match: _WorldForAllSectorsIntsecBBox @ 0x002BDDB0
+// sp-match: _WorldForAllSectorsIntsecBBox @ 0x001D91C0
 static void
 WorldForAllSectorsIntsecBBox(RpWorld *world,
                              RwBBox *bbox,
@@ -370,6 +372,7 @@ WorldForAllSectorsIntsecBBox(RpWorld *world,
  */
 
 // match: _WorldForAllSectorsIntsecSphere @ 0x002BDE70
+// sp-match: _WorldForAllSectorsIntsecSphere @ 0x001D9280
 static void
 WorldForAllSectorsIntsecSphere(RpWorld *world,
                                const RwSphere *sphere,
@@ -422,6 +425,7 @@ WorldForAllSectorsIntsecSphere(RpWorld *world,
 
 
 // match: _WorldForAllAtomicsIntsecLine @ 0x002BE080
+// sp-match: _WorldForAllAtomicsIntsecLine @ 0x001D9490
 static void
 WorldForAllAtomicsIntsecLine(RpWorld *world,
                              RpIntersection *is,
@@ -503,6 +507,7 @@ WorldForAllAtomicsIntsecLine(RpWorld *world,
  */
 
 // match: _WorldForAllAtomicsIntsecBBox @ 0x002BE520
+// sp-match: _WorldForAllAtomicsIntsecBBox @ 0x001D9930
 static void
 WorldForAllAtomicsIntsecBBox(RpWorld *world,
                              RpIntersection *is,
@@ -575,6 +580,7 @@ WorldForAllAtomicsIntsecBBox(RpWorld *world,
  */
 
 // match: _WorldForAllAtomicsIntsecSphere @ 0x002BE710
+// sp-match: _WorldForAllAtomicsIntsecSphere @ 0x001D9B20
 static void
 WorldForAllAtomicsIntsecSphere(RpWorld *world,
                                const RwSphere *sphere,
@@ -679,6 +685,7 @@ WorldForAllAtomicsIntsecSphere(RpWorld *world,
 
 
 // match: _WorldForAllTriIntsecLine @ 0x002BEA30
+// sp-match: _WorldForAllTriIntsecLine @ 0x001D9E40
 static void
 WorldForAllTriIntsecLine(RpWorld *world,
                          RpIntersection *is,
@@ -752,6 +759,7 @@ WorldForAllTriIntsecLine(RpWorld *world,
  */
 
 // match: _WorldForAllTriIntsecBBox @ 0x002BF420
+// sp-match: _WorldForAllTriIntsecBBox @ 0x001DA830
 static void
 WorldForAllTriIntsecBBox(RpWorld *world,
                          RpIntersection *is,
@@ -827,6 +835,7 @@ WorldForAllTriIntsecBBox(RpWorld *world,
 
 
 // match: _WorldForAllTriIntsecSphere @ 0x002BFA40
+// sp-match: _WorldForAllTriIntsecSphere @ 0x001DAE50
 static void
 WorldForAllTriIntsecSphere(RpWorld *world,
                            const RwSphere *sphere,
@@ -944,6 +953,7 @@ WorldForAllTriIntsecSphere(RpWorld *world,
 
 
 // match: _SimpleGeomForAllTriIntsecLine @ 0x002C02F0
+// sp-match: _SimpleGeomForAllTriIntsecLine @ 0x001DB700
 static void
 SimpleGeomForAllTriIntsecLine(RpGeometry *geometry,
                               RwLine *line,
@@ -1041,6 +1051,7 @@ SimpleGeomForAllTriIntsecBBox(RpGeometry *geometry,
  */
 
 // match: _SimpleGeomForAllTriIntsecSphere @ 0x002C06F0
+// sp-match: _SimpleGeomForAllTriIntsecSphere @ 0x001DBB00
 static void
 SimpleGeomForAllTriIntsecSphere(RpGeometry *geometry,
                                 const RwSphere *sphere,
@@ -1103,6 +1114,7 @@ SimpleGeomForAllTriIntsecSphere(RpGeometry *geometry,
 
 
 // match: _GeometryForAllTriIntsecLine @ 0x002C07F0
+// sp-match: _GeometryForAllTriIntsecLine @ 0x001DBC00
 static void
 GeometryForAllTriIntsecLine(RpGeometry *geometry,
                             RwLine *line,
@@ -1261,6 +1273,7 @@ GeometryForAllTriIntsecBBox(RpGeometry *geometry,
  */
 
 // match: _GeometryForAllTriIntsecSphere @ 0x002C1100
+// sp-match: _GeometryForAllTriIntsecSphere @ 0x001DC510
 static void
 GeometryForAllTriIntsecSphere(RpGeometry *geometry,
                               const RwSphere *sphere,
@@ -1378,6 +1391,7 @@ GeometryForAllTriIntsecSphere(RpGeometry *geometry,
 
 
 // match: _MorphGeomForAllTriIntsecLine @ 0x002C1880
+// sp-match: _MorphGeomForAllTriIntsecLine @ 0x001DCC90
 static void
 MorphGeomForAllTriIntsecLine(RpGeometry     *geom,
                              RpInterpolator *interp,
@@ -1436,6 +1450,7 @@ MorphGeomForAllTriIntsecLine(RpGeometry     *geom,
  */
 
 // match: _MorphGeomForAllTriIntsecSphere @ 0x002C1EC0
+// sp-match: _MorphGeomForAllTriIntsecSphere @ 0x001DD2D0
 static void
 MorphGeomForAllTriIntsecSphere(RpGeometry     *geom,
                                RpInterpolator *interp,
@@ -1504,6 +1519,7 @@ MorphGeomForAllTriIntsecSphere(RpGeometry     *geom,
 
 
 // match: _AtomicForAllTriIntsecLine @ 0x002C21D0
+// sp-match: _AtomicForAllTriIntsecLine @ 0x001DD5E0
 static void
 AtomicForAllTriIntsecLine(RpAtomic *atomic,
                           RpIntersection *is,
@@ -1544,6 +1560,7 @@ AtomicForAllTriIntsecLine(RpAtomic *atomic,
  */
 
 // match: _AtomicForAllTriIntsecSphere @ 0x002C2240
+// sp-match: _AtomicForAllTriIntsecSphere @ 0x001DD650
 static void
 AtomicForAllTriIntsecSphere(RpAtomic *atomic,
                             const RwSphere  *sphere,
@@ -1632,6 +1649,7 @@ AtomicForAllTriIntsecSphere(RpAtomic *atomic,
  * \see \ref rpcollisoverview
  */
 // match: _RpWorldForAllWorldSectorIntersections @ 0x002C2320
+// sp-match: _RpWorldForAllWorldSectorIntersections @ 0x001DD730
 RpWorld *
 RpWorldForAllWorldSectorIntersections(
     RpWorld *world,
@@ -1758,6 +1776,7 @@ RpWorldForAllWorldSectorIntersections(
  * \see \ref rpcollisoverview
  */
 // match: _RpCollisionWorldForAllIntersections @ 0x002C2460
+// sp-match: _RpCollisionWorldForAllIntersections @ 0x001DD870
 RpWorld *
 RpCollisionWorldForAllIntersections(
     RpWorld *world,
@@ -1855,6 +1874,7 @@ RpCollisionWorldForAllIntersections(
  * \see \ref rpcollisoverview
  */
 // match: _RpWorldForAllAtomicIntersections @ 0x002C2540
+// sp-match: _RpWorldForAllAtomicIntersections @ 0x001DD950
 RpWorld *
 RpWorldForAllAtomicIntersections(RpWorld *world,
                                  RpIntersection *intersection,
@@ -2092,6 +2112,7 @@ RpCollisionGeometryForAllIntersections(
  * \see \ref rpcollisoverview
  */
 // match: _RpAtomicForAllIntersections @ 0x002C2670
+// sp-match: _RpAtomicForAllIntersections @ 0x001DDA80
 RpAtomic *
 RpAtomicForAllIntersections(RpAtomic * atomic,
                             RpIntersection * intersection,

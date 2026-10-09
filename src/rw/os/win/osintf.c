@@ -39,6 +39,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/os/xbox/osi
 // match: _rcsid @ 0x004170FC
 
 // match: __rwpathisabsolute @ 0x002B9810
+// sp-match: __rwpathisabsolute @ 0x001D4C20
 int
 _rwpathisabsolute(const RwChar *path)
 {

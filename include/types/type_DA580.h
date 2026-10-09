@@ -55,9 +55,11 @@ struct type_DA580
     RwRaster *sub_DBA80(const RwChar *arg_0);
 };
 
+#ifndef CODFH_SP // static in single player (unit_0DA580)
 // Draws the raster arg_0 at arg_4, arg_8 wide and arg_C high, with the brush
 // arg_10.
 void sub_DC0D0(RwRaster *arg_0, RwV2d *arg_4, RwReal arg_8, RwReal arg_C, Rt2dBrush *arg_10);
+#endif
 // Widens the string arg_0 into arg_4.
 void sub_DA860(const RwChar *arg_0, RwUInt16 *arg_4);
 // Reads the texture dictionary at the path arg_0 (0 when it will not).

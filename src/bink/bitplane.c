@@ -57,6 +57,7 @@ void readlossy(S8 *coeffs,VARBITS *vb,S32 limit);
 // match: _patterns @ 0x003F0FC8
 
 // match: _ReadBPLossless@8 @ 0x0034CEC0
+// sp-match: _ReadBPLossless@8 @ 0x0025CEC0
 void __stdcall ReadBPLossless(S16 *out,VARBITS *vb)
 {
   /* The coefficient workspace also holds the current bit result. Keeping
@@ -268,6 +269,7 @@ const U8 patterns[16][64] =
 };
 
 // match: _ReadBPLossyWithMotion@20 @ 0x0034DCB0
+// sp-match: _ReadBPLossyWithMotion@20 @ 0x0025DCB0
 void __stdcall ReadBPLossyWithMotion(U8 *out, U32 pitch, VARBITS *vb,S32 limit,U8 *motion)
 {
   S8 coeffs[64];

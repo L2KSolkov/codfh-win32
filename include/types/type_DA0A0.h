@@ -62,8 +62,33 @@ struct type_D90B0
     RwInt32 unk_58;
 
     // Clears the state, and its weapons.
+#ifdef CODFH_SP // inline in single player: SP 0xA49F0 and 0x12EFE0 expand both
+    void sub_D9120()
+    {
+        RwUInt32 var_4;
+
+        unk_00 = 0;
+        unk_04 = 0;
+        for (var_4 = 0; var_4 < 2; var_4++)
+        {
+            unk_10[var_4] = 0;
+            unk_08[var_4] = -1;
+        }
+    }
+    void sub_D90B0()
+    {
+        RwInt32 var_4;              // never used; the image's frame keeps its slot
+
+        sub_D9120();
+        unk_18.clear();
+        unk_54 = 1.0f;
+        unk_50 = 100;
+        unk_58 = 0;
+    }
+#else
     void sub_D90B0();
     void sub_D9120();
+#endif
     // Whether the state, and its weapons, are in range (arg_0: stricter,
     // as the save wants it).
     bool sub_D9180(bool arg_0);
@@ -91,7 +116,28 @@ struct type_DA150
     RwUInt8 unk_40[0x2];
     RwUInt8 unk_42[0x2];
 
+#ifdef CODFH_SP // inline in single player: SP 0x12EFE0 expands it (0xA4980 its copy)
+    void sub_DA150()
+    {
+        unk_00 = 1;
+        unk_04 = 1;
+        unk_08 = 0;
+        unk_0C = 1;
+        unk_0D = 0;
+        unk_0E = 1;
+        unk_0F = 1;
+        unk_10 = 1;
+        unk_11 = 1;
+        unk_14 = 1;
+        unk_18 = 0;
+        unk_1C = 0;
+        memset(unk_20, 0, 0x20);
+        strcpy(unk_20, "Player");
+        memset(unk_40, 0, 2);
+    }
+#else
     void sub_DA150();
+#endif
 };
 typedef RwChar type_DA150_size_check[sizeof(type_DA150) == 0x44 ? 1 : -1];
 
@@ -128,8 +174,27 @@ struct type_DA0A0
     type_DA0A0_64 unk_64;
 
     // Clears the record (sub_DA0F0 the header, for a record of arg_0 bytes).
+#ifdef CODFH_SP // inline in single player: SP 0xA4B10 and 0x12EFE0 expand both
+    void sub_DA0F0(RwInt32 arg_0)
+    {
+        unk_00 = 0x434F4431;
+        unk_04 = 0x101;
+        arg_0 = arg_0;
+        unk_0C = 1;
+        unk_0E = 1;
+        memset(unk_10, 0, 0xC);
+        unk_1C = 0;
+    }
+    void sub_DA0A0()
+    {
+        sub_DA0F0(0xC8);
+        unk_20.sub_DA150();
+        unk_64.clear();
+    }
+#else
     void sub_DA0A0();
     void sub_DA0F0(RwInt32 arg_0);
+#endif
     // Its checksum.
     // Whether it is blank ("KNLB"): an inline with no address and so no
     // database name, named for what it tests. Evidence: the checksum
@@ -182,6 +247,10 @@ struct type_D9CF0
     // Saves into slot arg_0; 0.
     RwInt32 sub_D9E50(RwInt32 arg_0);
     RwInt32 sub_DA200();
+#ifdef CODFH_SP
+    // Loads slot arg_0's save into the save state; 0 (SP 0xA4CA0).
+    RwInt32 sp_sub_A4CA0(RwInt32 arg_0);
+#endif
     RwInt32 sub_DA220();
     // Whether a save fits: the space it needs (sub_DA280) against the free
     // space and the card's own (sub_DA220).

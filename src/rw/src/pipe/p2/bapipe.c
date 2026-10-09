@@ -118,6 +118,7 @@ _rwSeatIdentifier(RwChar * RootPathName __RWWIN32GNUCUNUSED__,
 // match: _rcsid @ 0x00416D30
 
 // match: __rwRenderPipelineOpen @ 0x002B4E30
+// sp-match: __rwRenderPipelineOpen @ 0x001D0250
 void               *
 _rwRenderPipelineOpen( void *instance,
                        RwInt32 offset,
@@ -167,6 +168,7 @@ _rwRenderPipelineOpen( void *instance,
 /**********************************************************************/
 
 // match: __rwRenderPipelineClose @ 0x002B4E50
+// sp-match: __rwRenderPipelineClose @ 0x001D0270
 void               *
 _rwRenderPipelineClose( void *instance,
                         RwInt32 offset __RWUNUSED__,

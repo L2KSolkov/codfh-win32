@@ -50,6 +50,7 @@
 #include "types/VehicleTrigger.h"
 #include "types/GimpVehicleTrigger.h"
 
+#if !defined(CODFH_SP) || CODFH_SP_PART != 2 // SP 0xF5D80 is compiled with unit_155470.
 // An int's absolute value: an inline with no address and so no database
 // name. Evidence: vf_2D4 applies it to a comparison's result (a misplaced
 // parenthesis in the original), which it first stores as the argument,
@@ -75,8 +76,10 @@ extern const RwReal flt_3DBC58 = 16.666666f;
 extern const RwV3d stru_3DBC5C = { 1.0f, 0.0f, 0.0f };
 // 0x003DBC68
 extern const RwV3d stru_3DBC68 = { 0.0f, 1.0f, 0.0f };
+#ifndef CODFH_SP // MP only: single player's constants end with stru_3DBC68 (a literal follows, SP 0x2E7308)
 // 0x003DBC74
 extern const RwReal flt_3DBC74 = 0.0f;
+#endif
 
 // match: ?flt_3DBC58@@3MB @ 0x003DBC58
 // match: ?stru_3DBC5C@@3URwV3d@@B @ 0x003DBC5C
@@ -154,6 +157,46 @@ extern const RwReal flt_3DBC74 = 0.0f;
 // match: ??_C@_09CDFKMKLC@TankAlert?$AA@ @ 0x003DC034
 // match: __real@c0400000 @ 0x003DC040
 // match: __real@42840000 @ 0x003DC044
+// sp-match: ??0type_3DBC78@@QAE@PAUtype_712B0@@@Z @ 0x000FF4D0
+// sp-match: ?vf_094@type_3DBC78@@UAEXI@Z @ 0x000FE970
+// sp-match: ?vf_238@type_3DBC78@@UAEMXZ @ 0x000FE980
+// sp-match: ?vf_23C@type_3DBC78@@UAEXM@Z @ 0x000FE990
+// sp-match: ?vf_240@type_3DBC78@@UAEHXZ @ 0x000FE9A0
+// sp-match: ?vf_244@type_3DBC78@@UAEXH@Z @ 0x000FE9B0
+// sp-match: ?vf_248@type_3DBC78@@UAEHXZ @ 0x000FE9C0
+// sp-match: ?vf_174@type_3DBC78@@UAEHXZ @ 0x000FE9D0
+// sp-match: ?vf_178@type_3DBC78@@UAEXH@Z @ 0x000FE9E0
+// sp-match: ?vf_180@type_3DBC78@@UAEXH@Z @ 0x000FE9F0
+// sp-match: ?vf_0DC@type_3DBC78@@UAEHXZ @ 0x000FEA20
+// sp-match: ?vf_17C@type_3DBC78@@UAEMXZ @ 0x000FEA30
+// sp-match: ?vf_24C@type_3DBC78@@UAEHXZ @ 0x000FEA40
+// sp-match: ?vf_250@type_3DBC78@@UAEMXZ @ 0x000FEA50
+// sp-match: ?vf_164@type_3DBC78@@UAEMXZ @ 0x000FEA60
+// sp-match: ?vf_168@type_3DBC78@@UAEMXZ @ 0x000FEA70
+// sp-match: ?vf_254@type_3DBC78@@UAEMXZ @ 0x000FEA80
+// sp-match: ?vf_258@type_3DBC78@@UAEMXZ @ 0x000FEA90
+// sp-match: ?vf_25C@type_3DBC78@@UAEHXZ @ 0x000FEAA0
+// sp-match: ?vf_260@type_3DBC78@@UAEPAEXZ @ 0x000FEAB0
+// sp-match: ?vf_0E0@type_3DBC78@@UAEPAEXZ @ 0x000FEAC0
+// sp-match: ?vf_09C@type_3DBC78@@UAEHXZ @ 0x000FEAD0
+// sp-match: ?vf_0A0@type_3DBC78@@UAEXI@Z @ 0x000FEAE0
+// sp-match: ?vf_120@type_3DBC78@@UAEPAUAIData@@XZ @ 0x000FEAF0
+// sp-match: ?vf_118@type_3DBC78@@UAEPAUtype_3D3548@@XZ @ 0x000FEB00
+// sp-match: ?vf_11C@type_3DBC78@@UAEXPAUtype_3D3548@@@Z @ 0x000FEB10
+// sp-match: ?vf_27C@type_3DBC78@@UAEXH@Z @ 0x000FEB30
+// sp-match: ?vf_284@type_3DBC78@@UAEMXZ @ 0x000FEB40
+// sp-match: ?vf_288@type_3DBC78@@UAEXH@Z @ 0x000FEB50
+// sp-match: ?vf_290@type_3DBC78@@UAEXH@Z @ 0x000FEB60
+// sp-match: ?vf_2AC@type_3DBC78@@UAEHH@Z @ 0x000FEB80
+// sp-match: ?vf_2C4@type_3DBC78@@UAEPAUtype_3DC9B0@@XZ @ 0x000FEBA0
+// sp-match: ?vf_1DC@type_3DBC78@@UAEHXZ @ 0x000FEBB0
+// sp-match: ?vf_1E0@type_3DBC78@@UAEMXZ @ 0x000FEBC0
+// sp-match: ?vf_2E8@type_3DBC78@@UAEMXZ @ 0x000FEBE0
+// sp-match: ?vf_2EC@type_3DBC78@@UAEMXZ @ 0x000FEBF0
+// sp-match: ??1type_3DBC78@@UAE@XZ @ 0x000FE8B0
+// sp-match: ??0type_14D000@@QAE@XZ @ 0x000FABA0
+// sp-match: ??_Gtype_3DBC78@@UAEPAXI@Z @ 0x000FEC10
+// sp-match: ?vf_2A8@type_3DBC78@@UAEHHPAURwV3d@@H@Z @ 0x000FEB70
 
 // Not in the image: a stand-in for the dropped code that first built the vehicle here
 // (the link kept the factory, sub_14C820, from unit_155470's object, where the image
@@ -164,10 +207,15 @@ void dropped_14C930(type_712B0 *arg_0, type_3DBC78 *arg_4)
     arg_4->type_3DBC78::type_3DBC78(arg_0);
 }
 // match: ??0type_14D180@@QAE@XZ @ 0x0014D180
+// sp-match: ??0type_14D180@@QAE@XZ @ 0x000F5D50
 type_14D180::type_14D180()
 {
 }
+#endif
+
+#if !defined(CODFH_SP) || CODFH_SP_PART != 1 // SP 0xF5D80; MP 0x14D1B0 stays here.
 // match: ?sub_14D1B0@@YAXPAURwMatrixTag@@MMMM@Z @ 0x0014D1B0
+// sp-match: ?sub_14D1B0@@YAXPAURwMatrixTag@@MMMM@Z @ 0x000F5D80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_14D1B0(RwMatrix *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C, RwReal arg_10)
 {
@@ -201,7 +249,11 @@ void sub_14D1B0(RwMatrix *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C, RwRea
     arg_0->at.y = ebp_14 - var_20;
     arg_0->at.z = var_C * arg_C * arg_C + lv_10;
 }
+#endif
+
+#if !defined(CODFH_SP) || CODFH_SP_PART != 2 // SP: the remaining vehicle functions.
 // match: ?sub_14D2C0@type_3DBC78@@QAEHPAUtype_712B0@@@Z @ 0x0014D2C0
+// sp-match: ?sub_14D2C0@type_3DBC78@@QAEHPAUtype_712B0@@@Z @ 0x000FAC10
 // The vehicle's set-up from its trigger arg_0 (its constructor's body): its
 // spline object's handle, the base's (sub_CCCD0), its AI settings, its kind
 // flags by its model's data, its model (vf_2F8), animation and bodies, its
@@ -246,14 +298,18 @@ RwInt32 type_3DBC78::sub_14D2C0(type_712B0 *arg_0)
     RwReal var_120;
     RwInt32 var_128;
     const RwChar *var_12C;
+#ifndef CODFH_SP
     RwMatrix var_1C0;
+#endif
     type_712B0 *var_1C4;
     type_3D3548 *var_1C8;
     RwUInt32 var_1F8[12];
     RwBBox var_210;
     type_14D180 *var_214;
     type_EC1F0 *var_21C;
+#ifndef CODFH_SP
     RwMatrix var_260;
+#endif
     RwReal var_26C;
     RwReal var_278;
     type_3DF8D8 *var_28C;
@@ -578,6 +634,9 @@ RwInt32 type_3DBC78::sub_14D2C0(type_712B0 *arg_0)
     }
     if (var_C->unk_1AC)
     {
+#ifdef CODFH_SP // shape: SP 0xFAC10's matrices are the blocks' (they share a slot)
+        RwMatrix var_1C0;
+#endif
         RwMatrixSetIdentityMacro(&var_1C0);
         var_1C4 = (type_712B0 *)unk_344.unk_08;
         var_1C8 = sub_166D40(var_C->unk_1B0, var_C->unk_1B8, &var_1C0, 0, var_1C4, 1, var_C->unk_1C8, var_C->unk_1CC,
@@ -627,6 +686,9 @@ RwInt32 type_3DBC78::sub_14D2C0(type_712B0 *arg_0)
         default:
             if (var_21C)
             {
+#ifdef CODFH_SP
+                RwMatrix var_260;
+#endif
                 var_214->unk_00 |= 1;
                 var_214->unk_00 |= 2;
                 var_214->unk_0C = (type_14D180_0C *)var_21C;
@@ -672,6 +734,7 @@ RwInt32 type_3DBC78::sub_14D2C0(type_712B0 *arg_0)
     return 1;
 }
 // match: ?vf_230@type_3DBC78@@UAEXXZ @ 0x0014ED60
+// sp-match: ?vf_230@type_3DBC78@@UAEXXZ @ 0x000F5E70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Takes it down (once it is up, unk_2858): its AI, its objects and the AI's
 // registrations, the player riding it (kinds 2 and 3), its animation, the
@@ -720,11 +783,18 @@ void type_3DBC78::vf_230()
         }
         unk_2858 = 0;
         vf_228();
+#ifdef CODFH_SP // shape: SP 0xF5E70 releases it through an inline
+        if (unk_280)
+        {
+            release_anim(unk_280);
+        }
+#else
         if (unk_280)
         {
             sub_78870(unk_280);
             unk_280 = 0;
         }
+#endif
         bp_8 = get_unk_34C();
         if (bp_8->unk_E0.unk_00)
         {
@@ -744,6 +814,7 @@ void type_3DBC78::vf_230()
         sub_D5A60(bp_4, 0);
 }
 // match: ?vf_220@type_3DBC78@@UAEXPAUtype_3D3548@@H@Z @ 0x0014EFA0
+// sp-match: ?vf_220@type_3DBC78@@UAEXPAUtype_3D3548@@H@Z @ 0x000F5FF0
 // Hands arg_0 to the player (its unk_2174) when the player is its
 // passenger.
 void type_3DBC78::vf_220(type_3D3548 *arg_0, RwInt32 arg_4)
@@ -755,6 +826,7 @@ void type_3DBC78::vf_220(type_3D3548 *arg_0, RwInt32 arg_4)
         ((type_10F710 *)var_4)->unk_2174.sub_D48D0(arg_0);
 }
 // match: ?vf_064@type_3DBC78@@UAEHPAUtype_75600@@@Z @ 0x0014EFF0
+// sp-match: ?vf_064@type_3DBC78@@UAEHPAUtype_75600@@@Z @ 0x000F6030
 // A bullet's hit: a player's mounted weapon of kind 2 does a fifth (and
 // counts as kind 4); kinds 3, 4 and 6 hurt it when it may be hurt, scaled
 // by where the hit lands (its top, a side, the front or the rear); its
@@ -793,6 +865,32 @@ RwInt32 type_3DBC78::vf_064(type_75600 *arg_0)
             zero_v3d(&var_80.pos);
             sub_1414C0(&var_8C, arg_0->unk_20, &var_80);
             var_90 = RwV3dDotProduct(&var_8C, &var_80.up);
+#ifdef CODFH_SP // SP 0xF6030 has no debug prints (their strings are absent); the scaling stays
+            if (var_90 > 0.985f)
+            {
+                var_1C *= var_24->unk_198;
+            }
+            else
+            {
+                var_90 = RwV3dDotProduct(&var_8C, &var_80.at);
+                if (var_90 > 0.0f)
+                {
+                    var_90 = RwV3dDotProduct(&var_8C, &var_80.right);
+                    if ((RwReal)fabs((RwDouble)var_90) > 0.25f)
+                        var_1C *= var_24->unk_190;
+                    else
+                        var_1C *= var_24->unk_18C;
+                }
+                else
+                {
+                    var_90 = RwV3dDotProduct(&var_8C, &var_80.right);
+                    if ((RwReal)fabs((RwDouble)var_90) > 0.25f)
+                        var_1C *= var_24->unk_190;
+                    else
+                        var_1C *= var_24->unk_194;
+                }
+            }
+#else
             if (var_90 > 0.985f)
             {
                 sub_19A750("top damage! %3.2f\n", var_1C *= var_24->unk_198);
@@ -817,6 +915,7 @@ RwInt32 type_3DBC78::vf_064(type_75600 *arg_0)
                         sub_19A750("rear damage! %3.2f\n", var_1C *= var_24->unk_194);
                 }
             }
+#endif
             if (unk_262C > 0)
             {
                 unk_262C -= (RwInt32)var_1C;
@@ -847,6 +946,7 @@ RwInt32 type_3DBC78::vf_064(type_75600 *arg_0)
     return 0;
 }
 // match: ?vf_068@type_3DBC78@@UAEHPAUtype_758F0@@@Z @ 0x0014F600
+// sp-match: ?vf_068@type_3DBC78@@UAEHPAUtype_758F0@@@Z @ 0x000F63A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // An explosion that reaches it (and may hurt it; not its own): a player's
 // light weapons do little; within its radius and 300 it is pushed away and
@@ -855,9 +955,13 @@ RwInt32 type_3DBC78::vf_064(type_75600 *arg_0)
 // the player driving it. 1 when it is out of reach.
 RwInt32 type_3DBC78::vf_068(type_758F0 *arg_0)
 {
+#ifndef CODFH_SP
     RwV3d var_50;
+#endif
     RwMatrix *local_44;
+#ifndef CODFH_SP
     type_758F0_14 var_40;
+#endif
     RwV3d stk_2C;
     RwV3d *var_20;
     RwV3d *l1C;
@@ -917,14 +1021,34 @@ RwInt32 type_3DBC78::vf_068(type_758F0 *arg_0)
                 unk_2624 = 0;
         }
         local_44 = &unk_450.unk_170;
+#ifdef CODFH_SP // shape: SP 0xF63A0; MP 0x14F600 below.
+        // The position copy and script payload have disjoint lifetimes and share
+        // their stack storage. Promoting each difference preserves the image's
+        // x87 scheduling without making the position alias the payload.
+        RwV3d var_50;
+        {
+            RwV3d sp_pos;
+            sp_pos = *RwMatrixGetPos(local_44);
+            var_50.x = (RwDouble)(sp_pos.x - l1C->x);
+            var_50.y = (RwDouble)(sp_pos.y - l1C->y);
+            var_50.z = (RwDouble)(sp_pos.z - l1C->z);
+        }
+        {
+            type_758F0_14 var_40;
+            *(RwV3d *)&var_40 = *l1C;
+#else
         var_50 = *RwMatrixGetPos(local_44);
         RwV3dSubMacro(&var_50, &var_50, l1C);
         var_40.unk_00 = l1C->x;
         var_40.unk_04 = l1C->y;
         var_40.unk_08 = l1C->z;
+#endif
         var_40.unk_0C = arg_0->unk_14;
         var_40.unk_10 = RwV3dDotProductMacro(&local_44->at, &var_50) <= 0 ? 1 : 0;
         sub_6B5F0("HitByExplosion", (type_67620 *)(vf_098()), 0, 0, (RwInt32 *)(&var_40), 5, 1, 0);
+#ifdef CODFH_SP
+        }
+#endif
         sub_D2AD0(arg_0->unk_04.sub_D4910(), arg_0->unk_08);
         if (bp_4 && !bp_4->unk_4D0 && dword_4B9190)
             dword_4B9190->sub_DFB40(0, RwMatrixGetPos(arg_0->unk_0C));
@@ -932,11 +1056,13 @@ RwInt32 type_3DBC78::vf_068(type_758F0 *arg_0)
     return 0;
 }
 // match: ?vf_060@type_3DBC78@@UAEHPAUtype_3D3548@@@Z @ 0x0014FA40
+// sp-match: ?vf_060@type_3DBC78@@UAEHPAUtype_3D3548@@@Z @ 0x00060FB0
 RwInt32 type_3DBC78::vf_060(type_3D3548 *arg_0)
 {
     return vf_06C(arg_0);
 }
 // match: ?vf_06C@type_3DBC78@@UAEHPAUtype_3D3548@@@Z @ 0x0014FA60
+// sp-match: ?vf_06C@type_3DBC78@@UAEHPAUtype_3D3548@@@Z @ 0x000F6690
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A collision with the entity arg_0: tells the vehicle's script
 // ("CollisionByEntityNotification", and "CollisionByPlayerNotification"
@@ -966,6 +1092,7 @@ RwInt32 type_3DBC78::vf_06C(type_3D3548 *arg_0)
     return 0;
 }
 // match: ?vf_0FC@type_3DBC78@@UAEMXZ @ 0x0014FB90
+// sp-match: ?vf_0FC@type_3DBC78@@UAEMXZ @ 0x000F6770
 RwReal type_3DBC78::vf_0FC()
 {
     if (unk_1158)
@@ -973,6 +1100,7 @@ RwReal type_3DBC78::vf_0FC()
     return unk_1150;
 }
 // match: ?vf_100@type_3DBC78@@UAEMXZ @ 0x0014FBC0
+// sp-match: ?vf_100@type_3DBC78@@UAEMXZ @ 0x000F6790
 RwReal type_3DBC78::vf_100()
 {
     if (unk_1158)
@@ -980,6 +1108,7 @@ RwReal type_3DBC78::vf_100()
     return unk_1154;
 }
 // match: ?vf_104@type_3DBC78@@UAEXPAURwMatrixTag@@@Z @ 0x0014FBF0
+// sp-match: ?vf_104@type_3DBC78@@UAEXPAURwMatrixTag@@@Z @ 0x000F67B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its eye's matrix into *arg_0: bone 2 of its animation when it has one,
 // else its clump's frame raised by 150.
@@ -1016,6 +1145,7 @@ void type_3DBC78::vf_104(RwMatrix *arg_0)
     }
 }
 // match: ?vf_108@type_3DBC78@@UAEXPAURwV3d@@@Z @ 0x0014FCE0
+// sp-match: ?vf_108@type_3DBC78@@UAEXPAURwV3d@@@Z @ 0x000F6850
 // Its eye's position (vf_104's matrix).
 void type_3DBC78::vf_108(RwV3d *arg_0)
 {
@@ -1025,6 +1155,7 @@ void type_3DBC78::vf_108(RwV3d *arg_0)
     *arg_0 = var_50.pos;
 }
 // match: ?vf_110@type_3DBC78@@UAEXPAURwV3d@@PAUtype_3D3548@@H@Z @ 0x0014FD30
+// sp-match: ?vf_110@type_3DBC78@@UAEXPAURwV3d@@PAUtype_3D3548@@H@Z @ 0x000F6890
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The point others aim at: bone 100 of its animation when it has one, else
 // its position; raised by half its height.
@@ -1049,6 +1180,7 @@ void type_3DBC78::vf_110(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
     }
 }
 // match: ?vf_10C@type_3DBC78@@UAEMXZ @ 0x0014FE00
+// sp-match: ?vf_10C@type_3DBC78@@UAEMXZ @ 0x000F6930
 RwReal type_3DBC78::vf_10C()
 {
     if (unk_11A0.unk_520)
@@ -1056,16 +1188,19 @@ RwReal type_3DBC78::vf_10C()
     return unk_115C * unk_1164;
 }
 // match: ?vf_114@type_3DBC78@@UAEMXZ @ 0x0014FE40
+// sp-match: ?vf_114@type_3DBC78@@UAEMXZ @ 0x000F6950
 RwReal type_3DBC78::vf_114()
 {
     return unk_1160 * unk_1168;
 }
 // match: ?vf_0C8@type_3DBC78@@UAEPAURwV3d@@XZ @ 0x0014FE60
+// sp-match: ?vf_0C8@type_3DBC78@@UAEPAURwV3d@@XZ @ 0x000F6960
 RwV3d *type_3DBC78::vf_0C8()
 {
     return &unk_450.unk_124;
 }
 // match: ?vf_16C@type_3DBC78@@UAEHHH@Z @ 0x0014FE80
+// sp-match: ?vf_16C@type_3DBC78@@UAEHHH@Z @ 0x000F6970
 // Sets AI parameter arg_0 to arg_4, a float's bits as the script passes
 // them; 7 is refused.
 RwInt32 type_3DBC78::vf_16C(RwInt32 arg_0, RwInt32 arg_4)
@@ -1104,12 +1239,14 @@ RwInt32 type_3DBC78::vf_16C(RwInt32 arg_0, RwInt32 arg_4)
     return var_4;
 }
 // match: ?sub_14FFA0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0014FFA0
+// sp-match: ?sub_14FFA0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000F6A40
 RpAtomic *sub_14FFA0(RpAtomic *arg_0, void *arg_4)
 {
     arg_0->boundingSphere.radius = flt_429DA0 * arg_0->boundingSphere.radius;
     return arg_0;
 }
 // match: ?vf_2F8@type_3DBC78@@UAEXPAUtype_3DF8D8@@PAX@Z @ 0x0014FFC0
+// sp-match: ?vf_2F8@type_3DBC78@@UAEXPAUtype_3DF8D8@@PAX@Z @ 0x000FFA00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Takes the model arg_0 when its trigger is a vehicle's (kind 7): the
 // model must be of kind 3 ("VehicleEntity" warns otherwise). Its clump's
@@ -1159,6 +1296,7 @@ void type_3DBC78::vf_2F8(type_3DF8D8 *arg_0, void *arg_4)
     }
 }
 // match: ?sub_1501A0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x001501A0
+// sp-match: ?sub_1501A0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000FF860
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A clump callback: the atomic's materials searched for the tracks
 // (sub_150200); an atomic with one gets its material effects.
@@ -1179,6 +1317,7 @@ RpAtomic *sub_1501A0(RpAtomic *arg_0, void *arg_4)
     return arg_0;
 }
 // match: ?sub_150200@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x00150200
+// sp-match: ?sub_150200@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x000FEC80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A material callback: a "vtrack" texture (any case) is a track's, the
 // left one when "l" follows; it is noted and, unless it has one, given the
@@ -1226,6 +1365,7 @@ RpMaterial *sub_150200(RpMaterial *arg_0, void *arg_4)
     return arg_0;
 }
 // match: ?sub_150350@@YAXPAUtype_7C8D0@@PAUtype_80300@@H_N@Z @ 0x00150350
+// sp-match: ?sub_150350@@YAXPAUtype_7C8D0@@PAUtype_80300@@H_N@Z @ 0x000FBAE0
 // Its animation's procedural track (vf_038 starts it; arg_8 is the
 // vehicle). At its start it builds its pose key once: every node's
 // rotation relative to its frame, the root (unk_D9C) translated, then
@@ -1241,15 +1381,21 @@ void sub_150350(type_7C8D0 *arg_0, type_80300 *arg_4, RwInt32 arg_8, bool arg_C)
     RtQuat *var_2C;
     type_7CBD0_hdr *var_30;
     type_7CBD0_t *var_34;
+#ifndef CODFH_SP
     RwMatrix var_80;
+#endif
     RwInt32 var_84;
+#ifndef CODFH_SP
     RwMatrix var_D0;
+#endif
     RwInt32 var_D4;
     RtQuat *var_D8;
     RpHAnimHierarchy *var_E4;
     RtQuat *var_E8;
     RtQuat *var_EC;
+#ifndef CODFH_SP
     RwMatrix var_140;
+#endif
     RwV3d var_14C;
     RwV3d var_158;
     RwReal var_160;
@@ -1258,6 +1404,10 @@ void sub_150350(type_7C8D0 *arg_0, type_80300 *arg_4, RwInt32 arg_8, bool arg_C)
     var_8 = (type_7CBD0 *)arg_4->unk_144;
     if (arg_C && !var_4->unk_DB8)
     {
+#ifdef CODFH_SP // shape: SP 0xFBAE0's matrices are the blocks' (var_140 shares var_80's slot)
+        RwMatrix var_80;
+        RwMatrix var_D0;
+#endif
         var_10 = var_4->get_unk_340();
         var_18 = var_4->get_unk_284()->unk_18;
         var_1C = RpHAnimHierarchyGetMatrixArray(var_18);
@@ -1304,6 +1454,9 @@ void sub_150350(type_7C8D0 *arg_0, type_80300 *arg_4, RwInt32 arg_8, bool arg_C)
     }
     else
     {
+#ifdef CODFH_SP
+        RwMatrix var_140;
+#endif
         var_140 = *RwFrameGetMatrix(var_4->unk_B30.get_unk_08());
         var_4->sub_153890((type_153890 *)var_8, var_4->unk_B2C, &var_140, 1);
         var_14C.x = 1.0f;
@@ -1312,7 +1465,7 @@ void sub_150350(type_7C8D0 *arg_0, type_80300 *arg_4, RwInt32 arg_8, bool arg_C)
         var_158.x = 0.0f;
         var_158.y = 1.0f;
         var_158.z = 0.0f;
-        var_4->unk_DA8 += var_4->unk_DA0 * 57.295784f;
+        var_4->unk_DA8 += (var_4->unk_DA0 * 57.295784f);
         var_4->unk_DAC += var_4->unk_DA4 * 57.295784f;
         for (var_84 = 0; var_84 < var_4->unk_B3C; var_84++)
         {
@@ -1321,7 +1474,11 @@ void sub_150350(type_7C8D0 *arg_0, type_80300 *arg_4, RwInt32 arg_8, bool arg_C)
             else
                 var_4->sub_17FC00(var_8, var_4->unk_B40[var_84], 0, &var_14C, var_4->unk_DAC, 1);
         }
+#ifdef CODFH_SP // shape: SP 0xFBAE0 compares the constant first
+        var_160 = (1.0f < var_4->unk_450.unk_248 ? 1.0f : (RwReal)(RwDouble)var_4->unk_450.unk_248) * 45.0f;
+#else
         var_160 = (var_4->unk_450.unk_248 > 1.0f ? 1.0f : (RwReal)(RwDouble)var_4->unk_450.unk_248) * 45.0f;
+#endif
         for (var_84 = 0; var_84 < var_4->unk_CD0; var_84++)
             var_4->sub_17FC00(var_8, var_4->unk_CD4[var_84], 0, &var_158, var_160, 1);
         for (var_84 = 0; var_84 < var_4->unk_CD0; var_84++)
@@ -1336,6 +1493,7 @@ void sub_150350(type_7C8D0 *arg_0, type_80300 *arg_4, RwInt32 arg_8, bool arg_C)
     }
 }
 // match: ?vf_038@type_3DBC78@@UAEXM@Z @ 0x00150A70
+// sp-match: ?vf_038@type_3DBC78@@UAEXM@Z @ 0x000FBF60
 // Its animation's procedural track (sub_150350) started once, then its AI
 // steps by arg_0.
 void type_3DBC78::vf_038(RwReal arg_0)
@@ -1344,17 +1502,23 @@ void type_3DBC78::vf_038(RwReal arg_0)
     {
         get_unk_284()->sub_794C0(0);
         unk_DB4 = get_unk_284()->sub_79930(sub_150350, 1.0f, 1.0f);
+#ifdef CODFH_SP // SP expands type_78AC0::sub_6DF40 here (SP 0xFBF60: % 4 ring)
+        get_unk_284()->clear_last_unk_08_30();
+#else
         ((type_78AC0 *)get_unk_284())->sub_6DF40();
+#endif
         unused_slot();
     }
     unk_11A0.sub_17190(arg_0);
 }
 // match: ?sub_150B00@@YAXXZ @ 0x00150B00
+// sp-match: ?sub_150B00@@YAXXZ @ 0x000D1B90
 void sub_150B00()
 {
     dword_4B86F8 |= 8;
 }
 // match: ?vf_03C@type_3DBC78@@UAEXM@Z @ 0x00150B20
+// sp-match: ?vf_03C@type_3DBC78@@UAEXM@Z @ 0x000FBFE0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The step arg_0: its guns, its seats (kinds 2 and 3); when it is destroyed
 // with the player driving (who is not already leaving) the screen fades and
@@ -1396,6 +1560,7 @@ void type_3DBC78::vf_03C(RwReal arg_0)
     type_3D3548::vf_03C(arg_0);
 }
 // match: ?vf_040@type_3DBC78@@UAEXM@Z @ 0x00150C90
+// sp-match: ?vf_040@type_3DBC78@@UAEXM@Z @ 0x000F6A60
 void type_3DBC78::vf_040(RwReal arg_0)
 {
     RwMatrix var_60;
@@ -1405,16 +1570,25 @@ void type_3DBC78::vf_040(RwReal arg_0)
     RtQuat var_100;
     RwReal var_104;
     RwReal var_108;
+#ifndef CODFH_SP
     RwV3d var_118;
     RwV3d var_124;
     RwV3d var_130;
+#endif
     type_712B0_3DBC78 *var_138;
+#ifndef CODFH_SP
     RwV3d var_14C;
     RwV3d var_158;
     RwV3d var_164;
+#endif
 
     if (!get_unk_284()->sub_76E00(unk_DB4))
     {
+#ifdef CODFH_SP // shape: SP 0xF6A60's vectors are the branches' (they share slots)
+        RwV3d var_118;
+        RwV3d var_124;
+        RwV3d var_130;
+#endif
         unk_B28 = 0;
         type_3D3548::vf_20C((type_D05C0 *)&unk_C0, arg_0, &unk_10C, &unk_134);
         if (get_unk_340())
@@ -1434,7 +1608,12 @@ void type_3DBC78::vf_040(RwReal arg_0)
         unk_450.unk_130.x = 0.0f;
         var_104 = var_100.real;
         var_108 = RwV3dLength((RwV3d *)&var_100.imag);
+#ifdef CODFH_SP // shape: single player stores the factor first and multiplies the angle into it (SP 0xF6A60)
+        unk_450.unk_130.y = 2.0f;
+        unk_450.unk_130.y *= (RwReal)atan2(var_108, var_104);
+#else
         unk_450.unk_130.y = 2.0f * (RwReal)atan2(var_108, var_104);
+#endif
         unk_450.unk_124 = var_F0.pos;
         unk_450.unk_148 = var_F0.pos;
         vf_234();
@@ -1449,6 +1628,11 @@ void type_3DBC78::vf_040(RwReal arg_0)
     }
     else
     {
+#ifdef CODFH_SP
+        RwV3d var_14C;
+        RwV3d var_158;
+        RwV3d var_164;
+#endif
         if (!unk_B28 && unk_450.unk_108 < 3 && unk_450.unk_104)
         {
             unk_450.sub_149F80(1);
@@ -1477,6 +1661,7 @@ void type_3DBC78::vf_040(RwReal arg_0)
     }
 }
 // match: ?vf_2FC@type_3DBC78@@UAEXM@Z @ 0x00151270
+// sp-match: ?vf_2FC@type_3DBC78@@UAEXM@Z @ 0x000F6E10
 void type_3DBC78::vf_2FC(RwReal arg_0)
 {
     type_712B0 *var_4;
@@ -1485,6 +1670,7 @@ void type_3DBC78::vf_2FC(RwReal arg_0)
     ((type_712B0_3DBC78 *)var_4)->unk_118 = ((type_712B0_3DBC78 *)var_4)->unk_104;
 }
 // match: ?vf_264@type_3DBC78@@UAEXHPAURwV3d@@0@Z @ 0x001512C0
+// sp-match: ?vf_264@type_3DBC78@@UAEXHPAURwV3d@@0@Z @ 0x000F6E40
 // Starts a push of arg_0 steps: the force arg_4 (a quarter of it) at
 // arg_8, fading by its strength a step.
 void type_3DBC78::vf_264(RwInt32 arg_0, RwV3d *arg_4, RwV3d *arg_8)
@@ -1499,6 +1685,7 @@ void type_3DBC78::vf_264(RwInt32 arg_0, RwV3d *arg_4, RwV3d *arg_8)
     unk_1120 = RwV3dLength((RwV3d *)arg_4);
 }
 // match: ?vf_268@type_3DBC78@@UAEXPAUtype_10F710@@@Z @ 0x001513C0
+// sp-match: ?vf_268@type_3DBC78@@UAEXPAUtype_10F710@@@Z @ 0x000F6F00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The player arg_0 gets in: its frame goes under the vehicle's at the
 // seat, it is the passenger, and the getting-in sound plays.
@@ -1519,6 +1706,7 @@ void type_3DBC78::vf_268(type_10F710 *arg_0)
     dword_4D5164 = 0;
 }
 // match: ?vf_270@type_3DBC78@@UAEXXZ @ 0x00151490
+// sp-match: ?vf_270@type_3DBC78@@UAEXXZ @ 0x000FC0D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The player gets out: its view restored, it leaves the vehicle, the
 // getting-out sound plays and the HUD resets.
@@ -1541,6 +1729,7 @@ void type_3DBC78::vf_270()
         dword_4B9190->sub_E0CC0();
 }
 // match: ?sub_151550@@YAXXZ @ 0x00151550
+// sp-match: ?sub_151550@@YAXXZ @ 0x000F6F80
 void sub_151550()
 {
     type_10F710 *var_4;
@@ -1555,6 +1744,7 @@ void sub_151550()
     }
 }
 // match: ?vf_26C@type_3DBC78@@UAEXPAUtype_10F710@@@Z @ 0x001515B0
+// sp-match: ?vf_26C@type_3DBC78@@UAEXPAUtype_10F710@@@Z @ 0x000F6FC0
 // The player arg_0 takes its mounted weapon (unk_1190): the HUD shows it.
 void type_3DBC78::vf_26C(type_10F710 *arg_0)
 {
@@ -1573,6 +1763,7 @@ void type_3DBC78::vf_26C(type_10F710 *arg_0)
     }
 }
 // match: ?vf_274@type_3DBC78@@UAEXXZ @ 0x00151630
+// sp-match: ?vf_274@type_3DBC78@@UAEXXZ @ 0x000F7020
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The player leaves its mounted weapon.
 void type_3DBC78::vf_274()
@@ -1596,6 +1787,7 @@ void type_3DBC78::vf_274()
     }
 }
 // match: ?vf_2C8@type_3DBC78@@UAEXPAUtype_10F710@@HHHH@Z @ 0x001516C0
+// sp-match: ?vf_2C8@type_3DBC78@@UAEXPAUtype_10F710@@HHHH@Z @ 0x000F7080
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The player arg_0 rides as a passenger at (arg_8, arg_C, arg_10) from the
 // tag arg_4 of its clump (or from its frame): its frame goes under the
@@ -1628,6 +1820,7 @@ void type_3DBC78::vf_2C8(type_10F710 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt
     unk_1C0.sub_8A980(&unk_3D4.unk_30, this, 4, arg_0->sub_CD550(), 0, 0);
 }
 // match: ?vf_2CC@type_3DBC78@@UAEXXZ @ 0x001517F0
+// sp-match: ?vf_2CC@type_3DBC78@@UAEXXZ @ 0x000FC160
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The passenger gets out.
 void type_3DBC78::vf_2CC()
@@ -1653,6 +1846,7 @@ void type_3DBC78::vf_2CC()
         dword_4B9190->sub_E0CC0();
 }
 // match: ?vf_0C0@type_3DBC78@@UAEXPAURwV3d@@@Z @ 0x001518E0
+// sp-match: ?vf_0C0@type_3DBC78@@UAEXPAURwV3d@@@Z @ 0x000F7160
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Moves it to arg_0: its first body's position, and its animation's two
 // matrices by as much.
@@ -1682,6 +1876,7 @@ void type_3DBC78::vf_0C0(RwV3d *arg_0)
     RwFrameUpdateObjects(get_unk_340());
 }
 // match: ?vf_0D4@type_3DBC78@@UAEXPAURtQuat@@@Z @ 0x001519E0
+// sp-match: ?vf_0D4@type_3DBC78@@UAEXPAURtQuat@@@Z @ 0x000F7200
 // Turns it to the orientation arg_0, keeping its position.
 void type_3DBC78::vf_0D4(RtQuat *arg_0)
 {
@@ -1694,6 +1889,7 @@ void type_3DBC78::vf_0D4(RtQuat *arg_0)
     RwFrameUpdateObjects(get_unk_340());
 }
 // match: ?vf_0D0@type_3DBC78@@UAEXPAURwV3d@@@Z @ 0x00151C20
+// sp-match: ?vf_0D0@type_3DBC78@@UAEXPAURwV3d@@@Z @ 0x000F7360
 // Turns it to face the point arg_0.
 void type_3DBC78::vf_0D0(RwV3d *arg_0)
 {
@@ -1707,6 +1903,7 @@ void type_3DBC78::vf_0D0(RwV3d *arg_0)
     RwFrameUpdateObjects(get_unk_340());
 }
 // match: ?vf_0D8@type_3DBC78@@UAEXPAURwV3d@@@Z @ 0x00151CF0
+// sp-match: ?vf_0D8@type_3DBC78@@UAEXPAURwV3d@@@Z @ 0x000F73F0
 // Turns it to face along arg_0 (unless it is nearly zero).
 void type_3DBC78::vf_0D8(RwV3d *arg_0)
 {
@@ -1724,6 +1921,7 @@ void type_3DBC78::vf_0D8(RwV3d *arg_0)
     }
 }
 // match: ?vf_278@type_3DBC78@@UAEXH@Z @ 0x00151DC0
+// sp-match: ?vf_278@type_3DBC78@@UAEXH@Z @ 0x000FC220
 // Starts (arg_0) or stops its engine: physics on or off, and its start and
 // running sounds (from the player when the player drives) or its stop.
 void type_3DBC78::vf_278(RwInt32 arg_0)
@@ -1759,6 +1957,7 @@ void type_3DBC78::vf_278(RwInt32 arg_0)
     }
 }
 // match: ?vf_280@type_3DBC78@@UAEXM@Z @ 0x00151F80
+// sp-match: ?vf_280@type_3DBC78@@UAEXM@Z @ 0x000F7480
 // Steers by arg_0, within its limit; nothing while its engine is off or it
 // may not move.
 void type_3DBC78::vf_280(RwReal arg_0)
@@ -1775,12 +1974,14 @@ void type_3DBC78::vf_280(RwReal arg_0)
     unk_450.unk_270 = arg_0;
 }
 // match: ?vf_28C@type_3DBC78@@UAEXM@Z @ 0x00152040
+// sp-match: ?vf_28C@type_3DBC78@@UAEXM@Z @ 0x000F74F0
 void type_3DBC78::vf_28C(RwReal arg_0)
 {
     if (unk_DC4)
         unk_450.unk_248 = arg_0;
 }
 // match: ?vf_29C@type_3DBC78@@UAEXM@Z @ 0x00152070
+// sp-match: ?vf_29C@type_3DBC78@@UAEXM@Z @ 0x000FC370
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Turns unk_B24 by arg_0, at most a unit a call.
 void type_3DBC78::vf_29C(RwReal arg_0)
@@ -1796,6 +1997,7 @@ void type_3DBC78::vf_29C(RwReal arg_0)
     }
 }
 // match: ?vf_2A0@type_3DBC78@@UAEXHH@Z @ 0x001520D0
+// sp-match: ?vf_2A0@type_3DBC78@@UAEXHH@Z @ 0x000F7510
 // Sets (arg_4) or clears flag arg_0 of unk_1100.
 void type_3DBC78::vf_2A0(RwInt32 arg_0, RwInt32 arg_4)
 {
@@ -1804,7 +2006,11 @@ void type_3DBC78::vf_2A0(RwInt32 arg_0, RwInt32 arg_4)
     else
         unk_1100 &= ~(1 << arg_0);
 }
+#endif
+
+#if !defined(CODFH_SP) || CODFH_SP_PART != 1 // SP 0xFC3C0 shares sub_14D1B0 with the tank.
 // match: ?vf_04C@type_3DBC78@@UAEXM@Z @ 0x00152120
+// sp-match: ?vf_04C@type_3DBC78@@UAEXM@Z @ 0x000FC3C0
 void type_3DBC78::vf_04C(RwReal arg_0)
 {
     RwV3d var_10;
@@ -1816,9 +2022,13 @@ void type_3DBC78::vf_04C(RwReal arg_0)
     RwMatrix *var_4C;
     RwMatrix *var_54;
     RwInt32 var_58;
+#ifndef CODFH_SP
     RwMatrix var_A0;
+#endif
     type_EC1F0 *var_A8;
+#ifndef CODFH_SP
     RwMatrix var_F0;
+#endif
     RwV3d var_FC;
     type_3DC048 *var_100;
     type_3D3548 *var_104;
@@ -1828,18 +2038,22 @@ void type_3DBC78::vf_04C(RwReal arg_0)
     RpHAnimHierarchy *var_128;
     RwMatrix *var_12C;
     RwMatrix *var_130;
+#ifndef CODFH_SP
     RwMatrix var_170;
     RwMatrix var_1B0;
+#endif
     RwFrame *var_1B4;
     RwMatrix *var_1B8;
+#ifndef CODFH_SP
     RwMatrix var_200;
+#endif
     RwMatrix *var_204;
 
     type_3D3548::vf_04C(arg_0);
     vf_2B8();
     sub_154440(&var_1C, &var_10);
     RwV3dScale(&var_28, &var_1C, unk_4C + 300.0f);
-    RwV3dScale(&unk_117C, &var_1C, 60.0f / arg_0 * flt_429DD4);
+    RwV3dScale(&unk_117C, &var_1C, (60.0f / arg_0 * flt_429DD4));
     RwV3dAdd(&unk_117C, &unk_117C, &var_28);
     RwV3dAdd(&unk_117C, &unk_117C, sub_CD550());
     sub_154EA0();
@@ -1849,6 +2063,10 @@ void type_3DBC78::vf_04C(RwReal arg_0)
     var_38 = unk_1190.sub_D4910();
     if (var_38)
     {
+#ifdef CODFH_SP // shape: SP 0xFC3C0's matrices are the blocks' (they share slots)
+        RwMatrix var_A0;
+        RwMatrix var_F0;
+#endif
         var_40 = (type_712B0_3DBC78 *)get_unk_34C();
         var_48 = var_38->get_unk_340();
         var_4C = RwFrameGetMatrix(var_48);
@@ -1882,6 +2100,11 @@ void type_3DBC78::vf_04C(RwReal arg_0)
     var_114 = var_108->get_unk_340();
     if (var_108->unk_4D0 == 1)
     {
+#ifdef CODFH_SP
+        RwMatrix var_170;
+        RwMatrix var_1B0;
+        RwMatrix var_200;
+#endif
         var_120.x = dword_4D5168;
         var_120.y = dword_429DBC;
         var_120.z = dword_429DC0;
@@ -1911,7 +2134,11 @@ void type_3DBC78::vf_04C(RwReal arg_0)
         var_108->sub_100680();
     }
 }
+#endif
+
+#if !defined(CODFH_SP) || CODFH_SP_PART != 2 // SP: the remaining vehicle functions.
 // match: ?vf_234@type_3DBC78@@UAEXXZ @ 0x00152830
+// sp-match: ?vf_234@type_3DBC78@@UAEXXZ @ 0x000F7550
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its tracks' speeds for their UV animations: its move along the ground
 // (backwards when it moves against its facing), less or more its spin for
@@ -1951,6 +2178,7 @@ void type_3DBC78::vf_234()
         vf_2B4(&unk_B18, unk_DA0);
 }
 // match: ?vf_2B4@type_3DBC78@@UAEXPAUtype_3DBC78_B10@@M@Z @ 0x00152A20
+// sp-match: ?vf_2B4@type_3DBC78@@UAEXPAUtype_3DBC78_B10@@M@Z @ 0x000F76A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Advances the track arg_0's UV time by the distance arg_4 (three
 // quarters of it, wrapped into a unit, backwards for a negative distance).
@@ -1975,6 +2203,7 @@ void type_3DBC78::vf_2B4(type_3DBC78_B10 *arg_0, RwReal arg_4)
 // match: ?vf_1D0@type_3DBC78@@UAEXXZ @ 0x00152AD0
 // match: __ehhandler$?vf_1D0@type_3DBC78@@UAEXXZ-0x8 @ 0x00301BF0
 // match: __ehhandler$?vf_1D0@type_3DBC78@@UAEXXZ @ 0x00301BF8
+// sp-match: ?vf_1D0@type_3DBC78@@UAEXXZ @ 0x000FC800
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // As the base's (type_3D3548::vf_1D0), from its position (sub_CD550) and
 // for longer: the path nodes it covers are marked for 120.
@@ -2008,7 +2237,7 @@ void type_3DBC78::vf_1D0()
                 type_3CE1FC l58(stk_5C);
                 while (!l58.at_end())
                 {
-                    type_F8350 *var_64 = unk_4C00E8.unk_2C[l58.unk_0C];
+                    type_F8350 *var_64 = unk_4C00E8.unk_2C[l58.get_unk_0C()];
                     RwV3dSub(&stk_2C, &var_64->unk_10, var_34);
                     if (stk_2C.y > -75.0f && stk_2C.y < 150.0f)
                     {
@@ -2023,6 +2252,7 @@ void type_3DBC78::vf_1D0()
     }
 }
 // match: ?vf_054@type_3DBC78@@UAEXH@Z @ 0x00152CE0
+// sp-match: ?vf_054@type_3DBC78@@UAEXH@Z @ 0x000F7720
 // Its tracks' UV animations applied, then the entity drawn (the base's).
 void type_3DBC78::vf_054(RwInt32 arg_0)
 {
@@ -2041,6 +2271,7 @@ void type_3DBC78::vf_054(RwInt32 arg_0)
     sub_19A750(0);
 }
 // match: ?vf_170@type_3DBC78@@UAEXHHHH@Z @ 0x00152D90
+// sp-match: ?vf_170@type_3DBC78@@UAEXHHHH@Z @ 0x000F77A0
 // An animation event arg_0 for its animation: kind 1 hands arg_8 to its
 // sound object (dropping its procedural track when the animation's
 // records did not change); others are the base's.
@@ -2066,11 +2297,13 @@ void type_3DBC78::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
     }
 }
 // match: ?vf_0EC@type_3DBC78@@UAEXHH@Z @ 0x00152E60
+// sp-match: ?vf_0EC@type_3DBC78@@UAEXHH@Z @ 0x000F7830
 void type_3DBC78::vf_0EC(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_112C[arg_0] = (RwInt16)arg_4;
 }
 // match: ?vf_2BC@type_3DBC78@@UAEXXZ @ 0x00152E80
+// sp-match: ?vf_2BC@type_3DBC78@@UAEXXZ @ 0x000F7850
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DBC78::vf_2BC()
 {
@@ -2145,6 +2378,7 @@ void type_3DBC78::vf_2BC()
     }
 }
 // match: ?vf_2B8@type_3DBC78@@UAEXXZ @ 0x00153270
+// sp-match: ?vf_2B8@type_3DBC78@@UAEXXZ @ 0x000F7A90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DBC78::vf_2B8()
 {
@@ -2230,6 +2464,7 @@ void type_3DBC78::vf_2B8()
     }
 }
 // match: ?sub_153890@type_3DBC78@@QAEXPAUtype_153890@@HPAURwMatrixTag@@H@Z @ 0x00153890
+// sp-match: ?sub_153890@type_3DBC78@@QAEXPAUtype_153890@@HPAURwMatrixTag@@H@Z @ 0x000F7EC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DBC78::sub_153890(type_153890 *arg_0, RwInt32 arg_4, RwMatrix *arg_8, RwInt32 arg_C)
 {
@@ -2265,6 +2500,7 @@ void type_3DBC78::sub_153890(type_153890 *arg_0, RwInt32 arg_4, RwMatrix *arg_8,
     }
 }
 // match: ?sub_153B30@type_3DBC78@@QAEXXZ @ 0x00153B30
+// sp-match: ?sub_153B30@type_3DBC78@@QAEXXZ @ 0x000F8040
 void type_3DBC78::sub_153B30()
 {
     if (unk_1148)
@@ -2279,6 +2515,7 @@ void type_3DBC78::sub_153B30()
     }
 }
 // match: ?vf_2C0@type_3DBC78@@UAEPAURwMatrixTag@@XZ @ 0x00153BA0
+// sp-match: ?vf_2C0@type_3DBC78@@UAEPAURwMatrixTag@@XZ @ 0x000F8090
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its turret's matrix: bone 160 of its animation when it has one, else its
 // clump's frame raised by its height.
@@ -2308,6 +2545,7 @@ RwMatrix *type_3DBC78::vf_2C0()
     return bp_4;
 }
 // match: ?sub_153C40@type_3DBC78@@QAEXPAUtype_153C40@@HHHPAURwV3d@@@Z @ 0x00153C40
+// sp-match: ?sub_153C40@type_3DBC78@@QAEXPAUtype_153C40@@HHHPAURwV3d@@@Z @ 0x000F80F0
 void type_3DBC78::sub_153C40(type_153C40 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C, RwV3d *arg_10)
 {
     arg_0->unk_00 = arg_4;
@@ -2317,6 +2555,7 @@ void type_3DBC78::sub_153C40(type_153C40 *arg_0, RwInt32 arg_4, RwInt32 arg_8, R
     arg_0->unk_08 = *arg_10;
 }
 // match: ?sub_153CB0@type_3DBC78@@QAE_NXZ @ 0x00153CB0
+// sp-match: ?sub_153CB0@type_3DBC78@@QAE_NXZ @ 0x000F8150
 bool type_3DBC78::sub_153CB0()
 {
     if (sub_16D900(get_unk_264(), "destroyed"))
@@ -2328,6 +2567,7 @@ bool type_3DBC78::sub_153CB0()
     return false;
 }
 // match: ?vf_2D4@type_3DBC78@@UAE_NPAUtype_3D3548@@PAURwV3d@@PAM@Z @ 0x00153D20
+// sp-match: ?vf_2D4@type_3DBC78@@UAE_NPAUtype_3D3548@@PAURwV3d@@PAM@Z @ 0x000F81A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Whether it threatens the entity arg_0 ("IsThreatenedByTank"): within the
 // range *arg_8 (else the distance to the point it watches), within its
@@ -2387,6 +2627,7 @@ bool type_3DBC78::vf_2D4(type_3D3548 *arg_0, RwV3d *arg_4, RwReal *arg_8)
     return false;
 }
 // match: ?vf_2D8@type_3DBC78@@UAE_NMPAUtype_3D3548@@HPAURwV3d@@PAM@Z @ 0x00153FE0
+// sp-match: ?vf_2D8@type_3DBC78@@UAE_NMPAUtype_3D3548@@HPAURwV3d@@PAM@Z @ 0x000FC9B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 bool type_3DBC78::vf_2D8(RwReal arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwV3d *arg_C, RwReal *arg_10)
 {
@@ -2397,14 +2638,18 @@ bool type_3DBC78::vf_2D8(RwReal arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwV3d 
     RwReal stk_6C;
     RwReal q68;
     RwV3d var_64;
+#ifndef CODFH_SP
     RwV3d stk_58;
+#endif
     RwMatrix *l4C;
     RwReal var_48;
     RwReal loc44;
     RwReal var_40;
     AIData *l3C;
     RwReal local_38;
+#ifndef CODFH_SP
     RwV3d local_34;
+#endif
     RwV3d var28;
     RwReal l1C;
     RwV3d m_18;
@@ -2416,7 +2661,15 @@ bool type_3DBC78::vf_2D8(RwReal arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwV3d 
     if (arg_C)
         var28 = *arg_C;
     else
+#ifdef CODFH_SP // shape: SP 0xFC9DE: the position is the block's (stk_58 shares its slot)
+    {
+        RwV3d local_34;
+
         sub_154440(&local_34, &var28);
+    }
+#else
+        sub_154440(&local_34, &var28);
+#endif
     bp_8 = arg_4->sub_CD550();
     if (arg_10)
     {
@@ -2436,6 +2689,9 @@ bool type_3DBC78::vf_2D8(RwReal arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwV3d 
         }
         else
         {
+#ifdef CODFH_SP // shape: SP 0xFCA67: stk_58 is the block's (its y difference is dropped)
+            RwV3d stk_58;
+#endif
             l4C = RwFrameGetLTM(arg_4->get_unk_340());
             RwV3dSub(&stk_58, var_C, bp_8);
             stk_58.y = 0.0f;
@@ -2501,6 +2757,7 @@ bool type_3DBC78::vf_2D8(RwReal arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwV3d 
     return false;
 }
 // match: ?sub_154440@type_3DBC78@@QAEXPAURwV3d@@0@Z @ 0x00154440
+// sp-match: ?sub_154440@type_3DBC78@@QAEXPAURwV3d@@0@Z @ 0x000F83F0
 void type_3DBC78::sub_154440(RwV3d *arg_0, RwV3d *arg_4)
 {
     RwV3d var_10;
@@ -2536,6 +2793,7 @@ void type_3DBC78::sub_154440(RwV3d *arg_0, RwV3d *arg_4)
     *arg_4 = var_28;
 }
 // match: ?vf_2D0@type_3DBC78@@UAEXMPAURwV3d@@@Z @ 0x001546C0
+// sp-match: ?vf_2D0@type_3DBC78@@UAEXMPAURwV3d@@@Z @ 0x000F85E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DBC78::vf_2D0(RwReal arg_0, RwV3d *arg_4)
 {
@@ -2675,6 +2933,7 @@ void type_3DBC78::vf_2D0(RwReal arg_0, RwV3d *arg_4)
     }
 }
 // match: ?sub_154E30@type_3DBC78@@QAEXH@Z @ 0x00154E30
+// sp-match: ?sub_154E30@type_3DBC78@@QAEXH@Z @ 0x000F8B30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DBC78::sub_154E30(RwInt32 arg_0)
 {
@@ -2691,6 +2950,7 @@ void type_3DBC78::sub_154E30(RwInt32 arg_0)
     }
 }
 // match: ?sub_154EA0@type_3DBC78@@QAEXXZ @ 0x00154EA0
+// sp-match: ?sub_154EA0@type_3DBC78@@QAEXXZ @ 0x000F8C00
 // Places its enabled cover points on its model (the node's matrix, from
 // the skin's bones or the node frames, times the point's offset) and marks
 // each clear when no wall stands between it and the vehicle (66 up); the
@@ -2799,6 +3059,7 @@ void type_3DBC78::sub_154EA0()
     }
 }
 // match: ?sub_155340@type_3DBC78@@QAEPAUtype_14D180@@PAUtype_154C0_12F4@@@Z @ 0x00155340
+// sp-match: ?sub_155340@type_3DBC78@@QAEPAUtype_14D180@@PAUtype_154C0_12F4@@@Z @ 0x000F8F50
 type_14D180 *type_3DBC78::sub_155340(type_154C0_12F4 *arg_0)
 {
     type_14D180 *var_4;
@@ -2809,6 +3070,7 @@ type_14D180 *type_3DBC78::sub_155340(type_154C0_12F4 *arg_0)
     return var_4;
 }
 // match: ?vf_2F4@type_3DBC78@@UAEXHPAURwMatrixTag@@@Z @ 0x00155380
+// sp-match: ?vf_2F4@type_3DBC78@@UAEXHPAURwMatrixTag@@@Z @ 0x000F8F90
 void type_3DBC78::vf_2F4(RwInt32 arg_0, RwMatrix *arg_4)
 {
     RpClump *var_4;
@@ -2820,6 +3082,7 @@ void type_3DBC78::vf_2F4(RwInt32 arg_0, RwMatrix *arg_4)
         sub_EC2D0(var_4, (RwInt32)arg_4, unk_DFC.unk_00[arg_0].unk_38, 0, 0);
 }
 // match: ?sub_1553E0@type_3DBC78@@QAEPAUtype_14D180@@PAU2@PAURwMatrixTag@@@Z @ 0x001553E0
+// sp-match: ?sub_1553E0@type_3DBC78@@QAEPAUtype_14D180@@PAU2@PAURwMatrixTag@@@Z @ 0x000F8FD0
 type_14D180 *type_3DBC78::sub_1553E0(type_14D180 *arg_0, RwMatrix *arg_4)
 {
     RpClump *var_4;
@@ -2832,12 +3095,15 @@ type_14D180 *type_3DBC78::sub_1553E0(type_14D180 *arg_0, RwMatrix *arg_4)
     return arg_0;
 }
 // match: ?vf_098@type_3DBC78@@UAEPAUtype_3D2E7C@@XZ @ 0x00155430
+// sp-match: ?vf_098@type_3DBC78@@UAEPAUtype_3D2E7C@@XZ @ 0x000F9000
 type_3D2E7C *type_3DBC78::vf_098()
 {
     return (type_3D2E7C *)sub_67620(unk_1124);
 }
 // match: ?vf_090@type_3DBC78@@UAEPAUtype_6D380@@XZ @ 0x00155450
+// sp-match: ?vf_090@type_3DBC78@@UAEPAUtype_6D380@@XZ @ 0x000F9010
 type_6D380 *type_3DBC78::vf_090()
 {
     return (type_6D380 *)sub_67620(unk_1128);
 }
+#endif

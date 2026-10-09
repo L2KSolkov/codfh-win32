@@ -670,7 +670,40 @@ struct type_5FC30
 };
 
 void sub_44350(type_44350 *arg_0, void *arg_4);
+#ifdef CODFH_SP // an inline in single player: expanded in the script commands (SP 0x58CD0),
+                // kept out of line where VC declines (SP 0x32F30)
+type_3DF8D8 *sub_198800(type_3DF8D8_04 *arg_0);   // (game/functions.h)
+inline void sub_44220(bool arg_0)
+{
+    type_67620 *stk_18;
+    type_3DF8D8 *l14;
+    RwInt32 var_10;
+    RwUInt8 *ebp_C;
+    type_712B0 *v8;
+    type_3D2E7C *var_4;
+
+    if (arg_0 == 0 && dword_449328 != 0) {
+        stk_18 = dword_449328;
+        var_4 = stk_18->vf_024();
+        if (var_4 != 0) {
+            v8 = var_4->sub_712B0();
+            if (v8 != 0) {
+                var_10 = 0;
+                ebp_C = 0;
+                if (v8->unk_28.unk_00 != 0 || v8->unk_28.unk_04 != 0) {
+                    l14 = sub_198800(&v8->unk_28);
+                    if (l14 != 0)
+                        var_10 = l14->unk_14;
+                }
+                if (v8->unk_60 != 0)
+                    ebp_C = v8->unk_60;
+            }
+        }
+    }
+}
+#else
 void sub_44220(bool arg_0);
+#endif
 
 // Argument n (from 1) of the call ctx as a T lvalue: the commands load 16-bit
 // arguments with a word move and floats with fld (the same accessor, typed).

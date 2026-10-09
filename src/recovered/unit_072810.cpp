@@ -89,6 +89,14 @@ alfahash dword_449A70;
 // match: _$E9 @ 0x0030DE20
 // match: _$E11 @ 0x00309B90
 // match: _$E12 @ 0x0030DE30
+// sp-match: _$E12 @ 0x0021E260
+// sp-match: _$E2 @ 0x0021C5C0
+// sp-match: _$E5 @ 0x0021C5E0
+// sp-match: _$E8 @ 0x0021C600
+// sp-match: _$E11 @ 0x0021C620
+// sp-match: _$E3 @ 0x0021E230
+// sp-match: _$E6 @ 0x0021E240
+// sp-match: _$E9 @ 0x0021E250
 
 RwUInt32 sub_72A50(void *arg_0);
 bool sub_72A70(void *arg_0, void *arg_4);
@@ -99,6 +107,7 @@ bool sub_72B00(void *arg_0, void *arg_4);
 type_67620_74 *sub_72AC0(RwInt32 arg_0);
 
 // match: ?sub_72810@@YAXXZ @ 0x00072810
+// sp-match: ?sub_72810@@YAXXZ @ 0x0005F710
 // Sets the tables up.
 void sub_72810()
 {
@@ -109,6 +118,7 @@ void sub_72810()
 }
 
 // match: ?sub_72890@@YAXXZ @ 0x00072890
+// sp-match: ?sub_72890@@YAXXZ @ 0x0005F5F0
 void sub_72890()
 {
     dword_449AD8.sub_67780();
@@ -118,6 +128,7 @@ void sub_72890()
 }
 
 // match: ?sub_728C0@@YAXPAUtype_72900@@@Z @ 0x000728C0
+// sp-match: ?sub_728C0@@YAXPAUtype_72900@@@Z @ 0x0005F780
 // Adds arg_0 unless its id is present, and resolves its imports.
 void sub_728C0(type_72900 *arg_0)
 {
@@ -128,6 +139,7 @@ void sub_728C0(type_72900 *arg_0)
 }
 
 // match: ?sub_72900@@YAHH@Z @ 0x00072900
+// sp-match: ?sub_72900@@YAHH@Z @ 0x0005F620
 RwInt32 sub_72900(RwInt32 arg_0)
 {
     type_72900 var_1C;
@@ -137,6 +149,7 @@ RwInt32 sub_72900(RwInt32 arg_0)
 }
 
 // match: ?sub_72920@@YAXPAUtype_72990@@@Z @ 0x00072920
+// sp-match: ?sub_72920@@YAXPAUtype_72990@@@Z @ 0x0005F7C0
 void sub_72920(type_72990 *arg_0)
 {
     if (sub_72990(arg_0->unk_04) == 0) {
@@ -146,6 +159,7 @@ void sub_72920(type_72990 *arg_0)
 }
 
 // match: ?sub_72960@@YAXPAUtype_72990@@@Z @ 0x00072960
+// sp-match: ?sub_72960@@YAXPAUtype_72990@@@Z @ 0x0005F800
 void sub_72960(type_72990 *arg_0)
 {
     if (sub_72990(arg_0->unk_04) != 0)
@@ -153,6 +167,7 @@ void sub_72960(type_72990 *arg_0)
 }
 
 // match: ?sub_72990@@YAPAUtype_72990@@H@Z @ 0x00072990
+// sp-match: ?sub_72990@@YAPAUtype_72990@@H@Z @ 0x0005F660
 type_72990 *sub_72990(RwInt32 arg_0)
 {
     type_72990 var_20;
@@ -162,6 +177,7 @@ type_72990 *sub_72990(RwInt32 arg_0)
 }
 
 // match: ?sub_729C0@@YA_NPAX0@Z @ 0x000729C0
+// sp-match: ?sub_729C0@@YA_NPAX0@Z @ 0x0005F640
 bool sub_729C0(void *arg_0, void *arg_4)
 {
     type_72990 *local_8;
@@ -173,6 +189,7 @@ bool sub_729C0(void *arg_0, void *arg_4)
 }
 
 // match: ?sub_729F0@@YAXPAUtype_72A30@@@Z @ 0x000729F0
+// sp-match: ?sub_729F0@@YAXPAUtype_72A30@@@Z @ 0x0005F830
 void sub_729F0(type_72A30 *arg_0)
 {
     if (sub_72A30(arg_0->unk_04) == 0) {
@@ -182,6 +199,7 @@ void sub_729F0(type_72A30 *arg_0)
 }
 
 // match: ?sub_72A30@@YAPAUtype_67620_74@@H@Z @ 0x00072A30
+// sp-match: ?sub_72A30@@YAPAUtype_67620_74@@H@Z @ 0x0005F690
 type_67620_74 *sub_72A30(RwInt32 arg_0)
 {
     type_72A30 var_14;
@@ -191,6 +209,7 @@ type_67620_74 *sub_72A30(RwInt32 arg_0)
 }
 
 // match: ?sub_72A50@@YAIPAX@Z @ 0x00072A50
+// sp-match: ?sub_72A50@@YAIPAX@Z @ 0x0005F6B0
 RwUInt32 sub_72A50(void *arg_0)
 {
     type_72A30 *var_4;
@@ -211,12 +230,14 @@ bool sub_72A70(void *arg_0, void *arg_4)
 }
 
 // match: ?sub_72AA0@@YAXPAUtype_67620_74@@@Z @ 0x00072AA0
+// sp-match: ?sub_72AA0@@YAXPAUtype_67620_74@@@Z @ 0x0005F6C0
 void sub_72AA0(type_67620_74 *arg_0)
 {
     dword_449A70.sub_67850(arg_0);
 }
 
 // match: ?sub_72AC0@@YAPAUtype_67620_74@@H@Z @ 0x00072AC0
+// sp-match: ?sub_72AC0@@YAPAUtype_67620_74@@H@Z @ 0x0005F6D0
 type_67620_74 *sub_72AC0(RwInt32 arg_0)
 {
     type_67620_74 var_14;
@@ -226,6 +247,7 @@ type_67620_74 *sub_72AC0(RwInt32 arg_0)
 }
 
 // match: ?sub_72AE0@@YAIPAX@Z @ 0x00072AE0
+// sp-match: ?sub_72AE0@@YAIPAX@Z @ 0x000BCDE0
 RwUInt32 sub_72AE0(void *arg_0)
 {
     type_67620_74 *var_4;
@@ -235,6 +257,7 @@ RwUInt32 sub_72AE0(void *arg_0)
 }
 
 // match: ?sub_72B00@@YA_NPAX0@Z @ 0x00072B00
+// sp-match: ?sub_72B00@@YA_NPAX0@Z @ 0x0005F6F0
 bool sub_72B00(void *arg_0, void *arg_4)
 {
     type_67620_74 *local_8;
@@ -246,16 +269,25 @@ bool sub_72B00(void *arg_0, void *arg_4)
 }
 
 // match: ?sub_72B30@@YAHPAD@Z @ 0x00072B30
+// sp-match: ?sub_72B30@@YAHPAD@Z @ 0x00088220
 RwInt32 sub_72B30(RwChar *arg_0)
 {
     RwChar *var_4;
 
     var_4 = arg_0;
+#ifdef CODFH_SP
+    // The image's callers keep the call (SP 0x5F890, 0x5FCC0): an
+    // if on the result, whose body is compiled out, makes it non-pure.
+    if (strcmp(var_4, off_428A4C) != 0) {
+    }
+#else
     strcmp(var_4, off_428A4C);
+#endif
     return 4;
 }
 
 // match: ?sub_72B60@@YAXPAX0@Z @ 0x00072B60
+// sp-match: ?sub_72B60@@YAXPAX0@Z @ 0x0005F870
 void sub_72B60(void *arg_0, void *arg_4)
 {
     if (*(RwInt32 *)arg_0 != 0)
@@ -263,6 +295,7 @@ void sub_72B60(void *arg_0, void *arg_4)
 }
 
 // match: ?sub_72B80@@YAXPAD@Z @ 0x00072B80
+// sp-match: ?sub_72B80@@YAXPAD@Z @ 0x0005F890
 void sub_72B80(RwChar *arg_0)
 {
     sub_72B30(arg_0);
@@ -270,6 +303,7 @@ void sub_72B80(RwChar *arg_0)
 }
 
 // match: ?sub_72BA0@@YAPAXPAD@Z @ 0x00072BA0
+// sp-match: ?sub_72BA0@@YAPAXPAD@Z @ 0x0005FCC0
 // Relocates the loaded file arg_0 by its kind; returns its contents.
 void *sub_72BA0(RwChar *arg_0)
 {
@@ -285,7 +319,11 @@ void *sub_72BA0(RwChar *arg_0)
     case 2:
         return sub_72D00(arg_0, 1);
     case 3:
+#ifdef CODFH_SP // kind 3's own copy of sub_72D00, folded by the linker (SP 0x5FCF8)
+        return sp_sub_72D00_kind3(arg_0, 1);
+#else
         return sub_72D00(arg_0, 1);
+#endif
     case 4:
         return sub_72F00(arg_0, 1);
     }
@@ -293,6 +331,7 @@ void *sub_72BA0(RwChar *arg_0)
 }
 
 // match: ?sub_72C40@@YAPAUtype_67620_74@@PAD_N@Z @ 0x00072C40
+// sp-match: ?sub_72C40@@YAPAUtype_67620_74@@PAD_N@Z @ 0x0005F8B0
 type_67620_74 *sub_72C40(RwChar *arg_0, bool arg_4)
 {
     type_72BA0 *varC;
@@ -316,6 +355,7 @@ type_67620_74 *sub_72C40(RwChar *arg_0, bool arg_4)
 }
 
 // match: ?sub_72D00@@YAPAUtype_72990@@PAD_N@Z @ 0x00072D00
+// sp-match: ?sub_72D00@@YAPAUtype_72990@@PAD_N@Z @ 0x0005F920
 type_72990 *sub_72D00(RwChar *arg_0, bool arg_4)
 {
     type_72BA0 *local_C;
@@ -359,7 +399,55 @@ type_72990 *sub_72D00(RwChar *arg_0, bool arg_4)
     return var_4;
 }
 
+#ifdef CODFH_SP
+// ?sp_sub_72D00_kind3@@YAPAUtype_72990@@PAD_N@Z (single player only): sub_72D00's body again,
+// for sub_72BA0's kind 3; /OPT:ICF folded the two (SP 0x5F920).
+type_72990 *sp_sub_72D00_kind3(RwChar *arg_0, bool arg_4)
+{
+    type_72BA0 *local_C;
+    type_72990 *var_4;
+    RwInt32 loc8;
+    bool local_D;
+    RwInt32 l14;
+
+    if (arg_4) {
+        local_C = (type_72BA0 *)arg_0;
+        var_4 = (type_72990 *)(arg_0 + 4);
+        if (local_C->unk_02 != 0)
+            return var_4;
+        local_C->unk_02 = 1;
+    } else
+        var_4 = (type_72990 *)arg_0;
+    sub_72B60(var_4, var_4);
+    sub_72B60(&var_4->unk_08, var_4);
+    sub_72B60(&var_4->unk_18, var_4);
+    sub_72B60(&var_4->unk_14, var_4);
+    for (loc8 = 0; loc8 < var_4->unk_0C; loc8++) {
+        sub_72B60(&var_4->unk_08[loc8].unk_04, var_4->unk_08);
+        sub_72B60(&var_4->unk_08[loc8].unk_08, var_4->unk_08);
+        sub_72B60(&var_4->unk_08[loc8].unk_0C, var_4->unk_08);
+        if (var_4->unk_18 != 0)
+            sub_72B60(&((RwInt32 *)var_4->unk_18)[loc8], (void *)var_4->unk_18);
+    }
+    for (loc8 = 0; loc8 < var_4->unk_0C; loc8++) {
+        if ((RwInt32)var_4->unk_08[loc8].unk_00 != -1) {
+            local_D = false;
+            for (l14 = 0; l14 < var_4->unk_0C; l14++) {
+                if ((RwInt32)var_4->unk_08[loc8].unk_00 == var_4->unk_08[l14].unk_10) {
+                    var_4->unk_08[loc8].unk_00 = &var_4->unk_08[l14];
+                    local_D = true;
+                    break;
+                }
+            }
+        } else
+            var_4->unk_08[loc8].unk_00 = 0;
+    }
+    return var_4;
+}
+#endif
+
 // match: ?sub_72F00@@YAPAUtype_72A30@@PAD_N@Z @ 0x00072F00
+// sp-match: ?sub_72F00@@YAPAUtype_72A30@@PAD_N@Z @ 0x0005FA50
 type_72A30 *sub_72F00(RwChar *arg_0, bool arg_4)
 {
     type_72BA0 *local_8;
@@ -380,6 +468,7 @@ type_72A30 *sub_72F00(RwChar *arg_0, bool arg_4)
 }
 
 // match: ?CompareFunction@@YAHPBX0@Z @ 0x00072F80
+// sp-match: ?CompareFunction@@YAHPBX0@Z @ 0x0005FAA0
 // CompareFunction (the database's name).
 RwInt32 CompareFunction(const void *arg_0, const void *arg_4)
 {
@@ -396,6 +485,7 @@ RwInt32 CompareFunction(const void *arg_0, const void *arg_4)
 }
 
 // match: ?sub_72FC0@@YAXHPAUtype_72FC0@@@Z @ 0x00072FC0
+// sp-match: ?sub_72FC0@@YAXHPAUtype_72FC0@@@Z @ 0x0005FDA0
 // Resolves the arg_0 imports at arg_4 by their kinds.
 void sub_72FC0(RwInt32 arg_0, type_72FC0 *arg_4)
 {
@@ -417,6 +507,7 @@ void sub_72FC0(RwInt32 arg_0, type_72FC0 *arg_4)
 }
 
 // match: ?sub_73050@@YAXPAUtype_72FC0@@@Z @ 0x00073050
+// sp-match: ?sub_73050@@YAXPAUtype_72FC0@@@Z @ 0x0005FAC0
 void sub_73050(type_72FC0 *arg_0)
 {
     type_73050 var_8 = {0, 0};
@@ -427,6 +518,7 @@ void sub_73050(type_72FC0 *arg_0)
 }
 
 // match: ?sub_73090@@YAXPAUtype_72FC0@@@Z @ 0x00073090
+// sp-match: ?sub_73090@@YAXPAUtype_72FC0@@@Z @ 0x0005FAF0
 void sub_73090(type_72FC0 *arg_0)
 {
     type_73050 var_8 = {0, 0};
@@ -437,6 +529,7 @@ void sub_73090(type_72FC0 *arg_0)
 }
 
 // match: ?sub_730D0@@YAXPAUtype_72FC0@@@Z @ 0x000730D0
+// sp-match: ?sub_730D0@@YAXPAUtype_72FC0@@@Z @ 0x0005FD30
 void sub_730D0(type_72FC0 *arg_0)
 {
     type_73050 var_8 = {0, 0};
@@ -456,6 +549,7 @@ void sub_730D0(type_72FC0 *arg_0)
 }
 
 // match: ?sub_73160@@YAXPAUtype_73050@@PBD@Z @ 0x00073160
+// sp-match: ?sub_73160@@YAXPAUtype_73050@@PBD@Z @ 0x0005FB20
 // Registers the global arg_0 by the type name String1.
 void sub_73160(type_73050 *arg_0, const RwChar *String1)
 {

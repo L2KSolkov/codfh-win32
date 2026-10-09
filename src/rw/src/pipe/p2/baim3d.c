@@ -210,6 +210,7 @@ rwImmediGlobals    *_rwIm3DGlobals = (rwImmediGlobals *)NULL;
 // match: _rcsid @ 0x00416918
 
 // match: _RwIm3DTransform @ 0x002B0D90
+// sp-match: _RwIm3DTransform @ 0x001CC1B0
 void               *
 RwIm3DTransform(RwIm3DVertex * pVerts,
                 RwUInt32 numVerts, RwMatrix * ltm, RwUInt32 flags)
@@ -304,6 +305,7 @@ RwIm3DTransform(RwIm3DVertex * pVerts,
  */
 
 // match: _RwIm3DEnd @ 0x002B0E30
+// sp-match: _RwIm3DEnd @ 0x001CC250
 RwBool
 RwIm3DEnd(void)
 {
@@ -356,6 +358,7 @@ RwIm3DEnd(void)
  *
  */
 // match: _RwIm3DRenderIndexedPrimitive @ 0x002B0E60
+// sp-match: _RwIm3DRenderIndexedPrimitive @ 0x001CC280
 RwBool
 RwIm3DRenderIndexedPrimitive(RwPrimitiveType primType,
                              RwImVertexIndex * indices,
@@ -513,6 +516,7 @@ RwIm3DRenderIndexedPrimitive(RwPrimitiveType primType,
  */
 
 // match: _RwIm3DRenderPrimitive @ 0x002B0F80
+// sp-match: _RwIm3DRenderPrimitive @ 0x001CC3A0
 RwBool
 RwIm3DRenderPrimitive(RwPrimitiveType primType)
 {
@@ -1002,6 +1006,7 @@ RwIm3DGetRenderPipeline(RwPrimitiveType primType)
  */
 
 // match: _RwIm3DSetTransformPipeline @ 0x002B1090
+// sp-match: _RwIm3DSetTransformPipeline @ 0x001CC4B0
 RxPipeline         *
 RwIm3DSetTransformPipeline(RxPipeline * pipeline)
 {
@@ -1057,6 +1062,7 @@ RwIm3DSetTransformPipeline(RxPipeline * pipeline)
  *
  */
 // match: _RwIm3DSetRenderPipeline @ 0x002B10D0
+// sp-match: _RwIm3DSetRenderPipeline @ 0x001CC4F0
 RxPipeline         *
 RwIm3DSetRenderPipeline(RxPipeline * pipeline, RwPrimitiveType primType)
 {
@@ -1242,6 +1248,7 @@ _rwIm3DGetPool(void)
  _rwIm3DClose
  */
 // match: __rwIm3DClose @ 0x002B12B0
+// sp-match: __rwIm3DClose @ 0x001CC6D0
 void               *
 _rwIm3DClose(void *instance, RwInt32 __RWUNUSED__ offset,
              RwInt32 __RWUNUSED__ size)
@@ -1269,6 +1276,7 @@ _rwIm3DClose(void *instance, RwInt32 __RWUNUSED__ offset,
  _rwIm3DOpen
  */
 // match: __rwIm3DOpen @ 0x002B12F0
+// sp-match: __rwIm3DOpen @ 0x001CC710
 void               *
 _rwIm3DOpen(void *instance, RwInt32 offset, RwInt32 size)
 {

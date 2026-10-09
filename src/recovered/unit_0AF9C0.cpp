@@ -28,9 +28,11 @@ RWS_REGISTERCLASS(SceneTrigger);
 // match: ?MakeNew@SceneTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000AF9C0
 // match: __ehhandler$?MakeNew@SceneTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300190
 // match: __ehhandler$?MakeNew@SceneTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030019F
+// sp-match: ?MakeNew@SceneTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00087D70
 RWS_DEFINE_MAKENEW(SceneTrigger)
 
 // match: ??0SceneTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000AFA40
+// sp-match: ??0SceneTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00087C50
 SceneTrigger::SceneTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     RwInt32 var_4;
@@ -43,11 +45,14 @@ SceneTrigger::SceneTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 }
 
 // match: ??_GSceneTrigger@@UAEPAXI@Z @ 0x000AFAB0
+// sp-match: ??_GSceneTrigger@@UAEPAXI@Z @ 0x00087D60
 
 // match: ??1SceneTrigger@@UAE@XZ @ 0x000AFAD0
+// sp-match: ??1SceneTrigger@@UAE@XZ @ 0x00087C90
 // (Defined in the class, in SceneTrigger.h.)
 
 // match: ?HandleAttributes@SceneTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000AFB00
+// sp-match: ?HandleAttributes@SceneTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00087CB0
 void SceneTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -68,3 +73,4 @@ void SceneTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_ESceneTrigger@@WBI@AEPAXI@Z @ 0x000AFBB0
+// sp-match: ??_ESceneTrigger@@WBI@AEPAXI@Z @ 0x00087D50

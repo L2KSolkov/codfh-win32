@@ -16,13 +16,20 @@
 #include "game/gameloop.h"
 #include "types/type_DA580.h"
 
+#ifdef CODFH_SP
+// Static in single player: sub_DBB80 passes arg_4 in eax (SP 0xA7063).
+static void sub_DC0D0(RwRaster *arg_0, RwV2d *arg_4, RwReal arg_8, RwReal arg_C, Rt2dBrush *arg_10);
+#endif
+
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D7FA8
 extern const RwReal flt_3D7FA8 = 16.666666f;
+#ifndef CODFH_SP // MP only: single player keeps one unreferenced 16.666666f, just before the unit's first string (SP 0x2E39A8)
 // 0x003D7FAC
 extern const RwReal flt_3D7FAC = 16.666666f;
 // 0x003D7FB0
 extern const RwReal flt_3D7FB0 = 16.666666f;
+#endif
 // 0x004292C8
 RwReal flt_4292C8 = 1.0f;
 // 0x004292D0
@@ -41,7 +48,11 @@ type_4292D0 unk_4292D0[20] = {
     { 23, "$ms$" },
     { 24, "$mc$" },
     { 11, "$pa$" },
-    { 40, "$he$" },
+#ifdef CODFH_SP
+    { 36, "$he$" }, // SP @ 0x00321620
+#else
+    { 40, "$he$" }, // MP @ 0x00429378
+#endif
     { 18, "$rc$" },
     { 1001, "$ud$" },
     { 1002, "$lr$" },
@@ -83,6 +94,7 @@ RwInt32 dword_4B8968;
 // match: ?unk_4292D0@@3PAUtype_4292D0@@A @ 0x004292D0
 
 // match: ??0type_DA580@@QAE@XZ @ 0x000DA580
+// sp-match: ??0type_DA580@@QAE@XZ @ 0x000A6340
 
 type_DA580::type_DA580()
 {
@@ -95,6 +107,7 @@ type_DA580::type_DA580()
 }
 
 // match: ??1type_DA580@@QAE@XZ @ 0x000DA5E0
+// sp-match: ??1type_DA580@@QAE@XZ @ 0x000A6390
 type_DA580::~type_DA580()
 {
     if (unk_00)
@@ -124,6 +137,7 @@ type_DA580::~type_DA580()
 // match: ?sub_DA680@type_DA580@@SAPAU1@PBD@Z @ 0x000DA680
 // match: __ehhandler$?sub_DA680@type_DA580@@SAPAU1@PBD@Z-0xB @ 0x00300CF0
 // match: __ehhandler$?sub_DA680@type_DA580@@SAPAU1@PBD@Z @ 0x00300CFB
+// sp-match: ?sub_DA680@type_DA580@@SAPAU1@PBD@Z @ 0x000A6B40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_DA580 *type_DA580::sub_DA680(const RwChar *arg_0)
 {
@@ -160,13 +174,30 @@ type_DA580 *type_DA580::sub_DA680(const RwChar *arg_0)
     return var_14;
 }
 
+#ifdef CODFH_SP
+// Single player's front end swaps the pad textures (dword_4B895C) for the
+// dictionary at arg_0, the pad shell's (SP 0xA6BF0, called by sp_sub_A59D0).
+// sp-match: ?sp_sub_A6BF0@@YAXPBD@Z @ 0x000A6BF0
+void sp_sub_A6BF0(const RwChar *arg_0)
+{
+    if (dword_4B895C)
+    {
+        RwTexDictionaryDestroy(dword_4B895C);
+        dword_4B895C = 0;
+    }
+    dword_4B895C = sub_DC000(arg_0);
+}
+#endif
+
 // match: ?sub_DA790@type_DA580@@QAEMXZ @ 0x000DA790
+// sp-match: ?sub_DA790@type_DA580@@QAEMXZ @ 0x000A6400
 RwReal type_DA580::sub_DA790()
 {
     return Rt2dFontGetHeight(unk_00);
 }
 
 // match: ?sub_DA7B0@type_DA580@@QAEMPBDM@Z @ 0x000DA7B0
+// sp-match: ?sub_DA7B0@type_DA580@@QAEMPBDM@Z @ 0x000A6410
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwReal type_DA580::sub_DA7B0(const RwChar *arg_0, RwReal arg_4)
 {
@@ -192,6 +223,7 @@ RwReal type_DA580::sub_DA7B0(const RwChar *arg_0, RwReal arg_4)
 }
 
 // match: ?sub_DA860@@YAXPBDPAG@Z @ 0x000DA860
+// sp-match: ?sub_DA860@@YAXPBDPAG@Z @ 0x000A62B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_DA860(const RwChar *arg_0, RwUInt16 *arg_4)
 {
@@ -206,7 +238,28 @@ void sub_DA860(const RwChar *arg_0, RwUInt16 *arg_4)
     arg_4[l4] = 0;
 }
 
+#ifdef CODFH_SP
+// Single player only (SP 0xA6310): narrows the wide string arg_0 into arg_4
+// (the low byte of each character); sub_DB620 calls it where multiplayer
+// expands the inline FONT_NARROW.
+// sp-match: ?sp_sub_A6310@@YAXPBDPAD@Z @ 0x000A6310
+void sp_sub_A6310(const RwChar *arg_0, RwChar *arg_4)
+{
+    const RwUInt16 *p = (const RwUInt16 *)arg_0;
+    RwChar *q = arg_4;
+
+    while (*p)
+    {
+        *q = (RwChar)*p;
+        q++;
+        p++;
+    }
+    *q = 0;
+}
+#endif
+
 // match: ?sub_DA8C0@type_DA580@@QAEMPBDPAURt2dBBox@@M@Z @ 0x000DA8C0
+// sp-match: ?sub_DA8C0@type_DA580@@QAEMPBDPAURt2dBBox@@M@Z @ 0x000A6C20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwReal type_DA580::sub_DA8C0(const RwChar *arg_0, Rt2dBBox *arg_4, RwReal arg_8)
 {
@@ -254,6 +307,7 @@ RwReal type_DA580::sub_DA8C0(const RwChar *arg_0, Rt2dBBox *arg_4, RwReal arg_8)
 }
 
 // match: ?sub_DAB00@type_DA580@@QAEXPBDPAURwV2d@@PAURwRGBA@@MPAURt2dFont@@@Z @ 0x000DAB00
+// sp-match: ?sub_DAB00@type_DA580@@QAEXPBDPAURwV2d@@PAURwRGBA@@MPAURt2dFont@@@Z @ 0x000A7320
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DA580::sub_DAB00(const RwChar *arg_0, RwV2d *arg_4, RwRGBA *arg_8, RwReal arg_C, Rt2dFont *arg_10)
 {
@@ -298,6 +352,7 @@ void type_DA580::sub_DAB00(const RwChar *arg_0, RwV2d *arg_4, RwRGBA *arg_8, RwR
 }
 
 // match: ?sub_DAC60@type_DA580@@QAEXPBDPAURt2dBBox@@MHPAURwRGBA@@M@Z @ 0x000DAC60
+// sp-match: ?sub_DAC60@type_DA580@@QAEXPBDPAURt2dBBox@@MHPAURwRGBA@@M@Z @ 0x000A7420
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DA580::sub_DAC60(const RwChar *arg_0, Rt2dBBox *arg_4, RwReal arg_8, RwInt32 arg_C,
                            RwRGBA *arg_10, RwReal arg_14)
@@ -386,6 +441,7 @@ void type_DA580::sub_DAC60(const RwChar *arg_0, Rt2dBBox *arg_4, RwReal arg_8, R
 }
 
 // match: ?sub_DB180@type_DA580@@QAEIPBDMM@Z @ 0x000DB180
+// sp-match: ?sub_DB180@type_DA580@@QAEIPBDMM@Z @ 0x000A6D30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwUInt32 type_DA580::sub_DB180(const RwChar *arg_0, RwReal arg_4, RwReal arg_8)
 {
@@ -442,6 +498,7 @@ RwUInt32 type_DA580::sub_DB180(const RwChar *arg_0, RwReal arg_4, RwReal arg_8)
 }
 
 // match: ?sub_DB3E0@type_DA580@@QAEPBDPBDMPAM@Z @ 0x000DB3E0
+// sp-match: ?sub_DB3E0@type_DA580@@QAEPBDPBDMPAM@Z @ 0x000A64B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 const RwChar *type_DA580::sub_DB3E0(const RwChar *arg_0, RwReal arg_4, RwReal *arg_8)
 {
@@ -507,13 +564,18 @@ const RwChar *type_DA580::sub_DB3E0(const RwChar *arg_0, RwReal arg_4, RwReal *a
 }
 
 // match: ?sub_DB620@type_DA580@@QAEXPBDMPAURwV2d@@@Z @ 0x000DB620
+// sp-match: ?sub_DB620@type_DA580@@QAEXPBDMPAURwV2d@@@Z @ 0x000A70F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DA580::sub_DB620(const RwChar *arg_0, RwReal arg_4, RwV2d *arg_8)
 {
     RwUInt32 local_74;
     RwUInt16 *var_70;
     RwUInt32 l6C;
+#ifdef CODFH_SP // shape: single player's buffer is 0x44 bytes (SP 0xA70F0 frame 0x5C)
+    RwChar local_68[0x44];
+#else
     RwChar local_68[0x48];
+#endif
     RwChar *bp_18;
     bool var_11;
     RwChar *lv_10;
@@ -568,7 +630,11 @@ void type_DA580::sub_DB620(const RwChar *arg_0, RwReal arg_4, RwV2d *arg_8)
             dword_4B8930[dword_4B8968] = l6C;
             if (var_11)
             {
+#ifdef CODFH_SP // single player calls its out-of-line narrowing (SP 0xA724C calls SP 0xA6310)
+                sp_sub_A6310(byte_4B8940[dword_4B8968], local_68);
+#else
                 FONT_NARROW(local_68, byte_4B8940[dword_4B8968]);
+#endif
             }
             else
             {
@@ -599,6 +665,7 @@ void type_DA580::sub_DB620(const RwChar *arg_0, RwReal arg_4, RwV2d *arg_8)
 }
 
 // match: ?sub_DBA10@type_DA580@@QAEXPBD@Z @ 0x000DBA10
+// sp-match: ?sub_DBA10@type_DA580@@QAEXPBD@Z @ 0x000A6600
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DA580::sub_DBA10(const RwChar *arg_0)
 {
@@ -614,6 +681,7 @@ void type_DA580::sub_DBA10(const RwChar *arg_0)
 }
 
 // match: ?sub_DBA80@type_DA580@@QAEPAURwRaster@@PBD@Z @ 0x000DBA80
+// sp-match: ?sub_DBA80@type_DA580@@QAEPAURwRaster@@PBD@Z @ 0x000A6670
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwRaster *type_DA580::sub_DBA80(const RwChar *arg_0)
 {
@@ -641,6 +709,10 @@ RwRaster *type_DA580::sub_DBA80(const RwChar *arg_0)
     }
     if (p54 < 1000)
     {
+#ifdef CODFH_SP // single player swaps picture 12 for 0x26 on level 7 (SP 0xA6670)
+        if (sub_19B050() == 7 && p54 == 12)
+            p54 = 0x26;
+#endif
         bp_8 = unk_4B9308.sub_EE7F0(p54, 0);
         sprintf(var_50, "%.4d", bp_8);
     }
@@ -658,6 +730,7 @@ RwRaster *type_DA580::sub_DBA80(const RwChar *arg_0)
 }
 
 // match: ?sub_DBB80@type_DA580@@QAE_NPADPBD1PAURwV2d@@M@Z @ 0x000DBB80
+// sp-match: ?sub_DBB80@type_DA580@@QAE_NPADPBD1PAURwV2d@@M@Z @ 0x000A6E30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 bool type_DA580::sub_DBB80(RwChar *arg_0, const RwChar *arg_4, const RwChar *arg_8, RwV2d *arg_C, RwReal arg_10)
 {
@@ -726,14 +799,21 @@ bool type_DA580::sub_DBB80(RwChar *arg_0, const RwChar *arg_4, const RwChar *arg
     bp_8 = bp_4 * lv_10 * l1C.y;
     bp_8 *= flt_4292C8;
     bp_4 *= flt_4292C8;
+#ifdef CODFH_SP // shape: the -1 products kept as multiplies (fmul -1.0, SP 0xA6FD9 and 0xA7010)
+    local_B8.x = ((RwReal)(lv_108.x * -1.0f) + arg_C->x + local_AC + var_C / 2.0f) / local_110.x;
+    // Height is read unsigned here (fild of a zero-extended qword).
+    local_B8.y = (RwReal)(RwUInt32)Height - ((RwReal)(lv_108.y * -1.0f) + arg_C->y + arg_10 / 4.0f) / l1C.y;
+#else
     local_B8.x = (-1.0f * lv_108.x + arg_C->x + local_AC + var_C / 2.0f) / local_110.x;
     // Height is read unsigned here (fild of a zero-extended qword).
     local_B8.y = (RwReal)(RwUInt32)Height - (-1.0f * lv_108.y + arg_C->y + arg_10 / 4.0f) / l1C.y;
+#endif
     sub_DC0D0(local_B0, &local_B8, bp_8, bp_4, brush);
     return true;
 }
 
 // match: ?sub_DC000@@YAPAURwTexDictionary@@PBD@Z @ 0x000DC000
+// sp-match: ?sub_DC000@@YAPAURwTexDictionary@@PBD@Z @ 0x000A6790
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwTexDictionary *sub_DC000(const RwChar *arg_0)
 {
@@ -760,6 +840,7 @@ RwTexDictionary *sub_DC000(const RwChar *arg_0)
 }
 
 // match: ?sub_DC0D0@@YAXPAURwRaster@@PAURwV2d@@MMPAURt2dBrush@@@Z @ 0x000DC0D0
+// sp-match: ?sub_DC0D0@@YAXPAURwRaster@@PAURwV2d@@MMPAURt2dBrush@@@Z @ 0x000A6840
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_DC0D0(RwRaster *arg_0, RwV2d *arg_4, RwReal arg_8, RwReal arg_C, Rt2dBrush *arg_10)
 {
@@ -778,13 +859,22 @@ void sub_DC0D0(RwRaster *arg_0, RwV2d *arg_4, RwReal arg_8, RwReal arg_C, Rt2dBr
     void *m_18;
     void *ebp_14;
     void *lv_10;
+#ifdef CODFH_SP // shape: the point is copied into a three-float vector (frame 0xA4, SP 0xA6840)
+    RwV3d pos;
+#else
     RwReal var_C;
     RwReal bp_8;
+#endif
     RwInt32 bp_4;
 
     z34 = RwCameraGetCurrentCamera();
+#ifdef CODFH_SP
+    pos.x = arg_4->x;
+    pos.y = arg_4->y;
+#else
     var_C = arg_4->x;
     bp_8 = arg_4->y;
+#endif
     bp_4 = 0;
     for (var_B4 = 0; var_B4 < 4; var_B4++)
     {
@@ -794,6 +884,16 @@ void sub_DC0D0(RwRaster *arg_0, RwV2d *arg_4, RwReal arg_8, RwReal arg_C, Rt2dBr
     }
     m_40 = arg_8 / 2.0f;
     v3C = arg_C / 2.0f;
+#ifdef CODFH_SP
+    RwIm2DVertexSetScreenX(&vB0[0], pos.x - m_40);
+    RwIm2DVertexSetScreenY(&vB0[0], pos.y + v3C);
+    RwIm2DVertexSetScreenX(&vB0[1], pos.x - m_40);
+    RwIm2DVertexSetScreenY(&vB0[1], pos.y - v3C);
+    RwIm2DVertexSetScreenX(&vB0[2], pos.x + m_40);
+    RwIm2DVertexSetScreenY(&vB0[2], pos.y + v3C);
+    RwIm2DVertexSetScreenX(&vB0[3], pos.x + m_40);
+    RwIm2DVertexSetScreenY(&vB0[3], pos.y - v3C);
+#else
     RwIm2DVertexSetScreenX(&vB0[0], var_C - m_40);
     RwIm2DVertexSetScreenY(&vB0[0], bp_8 + v3C);
     RwIm2DVertexSetScreenX(&vB0[1], var_C - m_40);
@@ -802,6 +902,7 @@ void sub_DC0D0(RwRaster *arg_0, RwV2d *arg_4, RwReal arg_8, RwReal arg_C, Rt2dBr
     RwIm2DVertexSetScreenY(&vB0[2], bp_8 + v3C);
     RwIm2DVertexSetScreenX(&vB0[3], var_C + m_40);
     RwIm2DVertexSetScreenY(&vB0[3], bp_8 - v3C);
+#endif
     RwIm2DVertexSetU(&vB0[0], 0.0f, 1.0f);
     RwIm2DVertexSetV(&vB0[0], 1.0f, 1.0f);
     RwIm2DVertexSetU(&vB0[1], 0.0f, 1.0f);

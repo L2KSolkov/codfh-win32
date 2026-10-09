@@ -18,6 +18,7 @@ BINK4444 SEGMENT PARA PUBLIC 'CODE'
 segstart:
 
 ; // match: _YUV_16a4_4x2_even_MMX@4 @ 0x00352810
+; // sp-match: _YUV_16a4_4x2_even_MMX@4 @ 0x00262810
 _YUV_16a4_4x2_even_MMX@4 PROC PUBLIC
         push ebx
         push ebp
@@ -166,6 +167,7 @@ L0160:
 _YUV_16a4_4x2_even_MMX@4 ENDP
 
 ; // match: _YUV_16a4_4x2_odd_MMX@4 @ 0x00352A70
+; // sp-match: _YUV_16a4_4x2_odd_MMX@4 @ 0x00262A70
 _YUV_16a4_4x2_odd_MMX@4 PROC PUBLIC
         push ebx
         push ebp

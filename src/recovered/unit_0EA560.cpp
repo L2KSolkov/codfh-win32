@@ -28,6 +28,7 @@ extern const RwReal flt_3D8E50 = 16.666666f;
 // match: ??_C@_0O@KKFOMDPE@ldbanner_xbox?$AA@ @ 0x003D8E54
 // match: ??_C@_0CG@DBNGCFCJ@shell?2fend?2INSTANCE?2xbox?2LDBANNE@ @ 0x003D8E64
 // match: ?off_429458@?1??sub_EA560@@YAXPAURwCamera@@@Z@4PAPBDA @ 0x00429458
+// sp-match: ?sub_EA560@@YAXPAURwCamera@@@Z @ 0x000B3840
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_EA560(RwCamera *arg_0)
 {
@@ -79,6 +80,7 @@ void sub_EA560(RwCamera *arg_0)
     RwTexDictionaryDestroy(bp_4);
 }
 // match: ?sub_EA640@@YAXPAURwRaster@@EPAURwCamera@@MMMM@Z @ 0x000EA640
+// sp-match: ?sub_EA640@@YAXPAURwRaster@@EPAURwCamera@@MMMM@Z @ 0x000B34B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_EA640(RwRaster *arg_0, RwUInt8 arg_4, RwCamera *arg_8, RwReal arg_C, RwReal arg_10, RwReal arg_14,
                RwReal arg_18)
@@ -166,7 +168,18 @@ void sub_EA640(RwRaster *arg_0, RwUInt8 arg_4, RwCamera *arg_8, RwReal arg_C, Rw
     RwRenderStateSet(rwRENDERSTATESRCBLEND, var_2C);
     RwRenderStateSet(rwRENDERSTATEDESTBLEND, m_18);
 }
+#ifdef CODFH_SP
+// Single player's own copy of the path helper (SP 0xB37B0, sprintf of "%s"),
+// static here, so sub_EA9C0 passes it the buffer in ecx and the name in eax.
+// sp-match: ?sp_sub_B37B0@@YAXPADPBD@Z @ 0x000B37B0
+static void sp_sub_B37B0(RwChar *arg_0, const RwChar *arg_4)
+{
+    sprintf(arg_0, "%s", arg_4);
+}
+#endif
+
 // match: ?sub_EA9C0@@YAPAURwTexDictionary@@PBD@Z @ 0x000EA9C0
+// sp-match: ?sub_EA9C0@@YAPAURwTexDictionary@@PBD@Z @ 0x000B37C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwTexDictionary *sub_EA9C0(const RwChar *arg_0)
 {
@@ -176,7 +189,11 @@ RwTexDictionary *sub_EA9C0(const RwChar *arg_0)
 
     var8 = 0;
     l4 = 0;
+#ifdef CODFH_SP // single player calls its own static copy (SP 0xB37CF)
+    sp_sub_B37B0(var_210, arg_0);
+#else
     sub_D7F20(var_210, arg_0);
+#endif
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_210);
     if (l4)
     {

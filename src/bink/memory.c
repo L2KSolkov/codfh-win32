@@ -13,6 +13,7 @@ void *malloc(size_t size);
 void free(void *ptr);
 
 // match: _radmalloc@4 @ 0x00258C90
+// sp-match: _radmalloc@4 @ 0x00174B00
 RADEXPFUNC void PTR4 *RADEXPLINK radmalloc(U32 numbytes)
 {
   U8 *p;
@@ -50,6 +51,7 @@ RADEXPFUNC void PTR4 *RADEXPLINK radmalloc(U32 numbytes)
 }
 
 // match: _radfree@4 @ 0x00258D00
+// sp-match: _radfree@4 @ 0x00174B70
 RADEXPFUNC void RADEXPLINK radfree(void PTR4 *ptr)
 {
   if (ptr)

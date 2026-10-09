@@ -39,12 +39,14 @@
 #include <math.h>
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003D5934
 extern const RwReal flt_3D5934 = 0.01f;
 // 0x003D5938
 extern const RwReal flt_3D5938 = 0.01f;
 // 0x003D593C
 extern const RwReal flt_3D593C = 16.666666f;
+#endif
 
 // match: ?flt_3D5934@@3MB @ 0x003D5934
 // match: ?flt_3D5938@@3MB @ 0x003D5938
@@ -75,11 +77,13 @@ RWS_REGISTERCLASS(AnimatedBGTrigger);
 // match: ?MakeNew@AnimatedBGTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0009F130
 // match: __ehhandler$?MakeNew@AnimatedBGTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFBD0
 // match: __ehhandler$?MakeNew@AnimatedBGTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFBDF
+// sp-match: ?MakeNew@AnimatedBGTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007D650
 RWS_DEFINE_MAKENEW(AnimatedBGTrigger)
 
 // match: ??0AnimatedBGTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0009F1B0
 // match: __ehhandler$??0AnimatedBGTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x16 @ 0x002FFBF0
 // match: __ehhandler$??0AnimatedBGTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x002FFC06
+// sp-match: ??0AnimatedBGTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007CCD0
 AnimatedBGTrigger::AnimatedBGTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     RwInt32 var_10;
@@ -121,20 +125,27 @@ AnimatedBGTrigger::AnimatedBGTrigger(const RWS::CAttributePacket &attr) : Trigge
 }
 
 // match: ?vf_008@AnimatedBGTrigger@@UAEHXZ @ 0x0009F4C0
+// sp-match: ?vf_008@AnimatedBGTrigger@@UAEHXZ @ 0x00209A70
 
 // match: ?vf_01C@AnimatedBGTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x0009F4D0
+// sp-match: ?vf_01C@AnimatedBGTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x00092870
 
 // match: ?vf_030@AnimatedBGTrigger@@UAEIXZ @ 0x0009F4F0
+// sp-match: ?vf_030@AnimatedBGTrigger@@UAEIXZ @ 0x0007CE50
 
 // match: ?vf_034@AnimatedBGTrigger@@UAEIXZ @ 0x0009F510
+// sp-match: ?vf_034@AnimatedBGTrigger@@UAEIXZ @ 0x0007CE60
 
 // match: ?vf_038@AnimatedBGTrigger@@UAEIXZ @ 0x0009F530
+// sp-match: ?vf_038@AnimatedBGTrigger@@UAEIXZ @ 0x0007CE70
 
 // match: ??_GAnimatedBGTrigger@@UAEPAXI@Z @ 0x0009F550
+// sp-match: ??_GAnimatedBGTrigger@@UAEPAXI@Z @ 0x0007CF60
 
 // match: ??1AnimatedBGTrigger@@UAE@XZ @ 0x0009F570
 // match: __ehhandler$??1AnimatedBGTrigger@@UAE@XZ-0x16 @ 0x002FFC10
 // match: __ehhandler$??1AnimatedBGTrigger@@UAE@XZ @ 0x002FFC26
+// sp-match: ??1AnimatedBGTrigger@@UAE@XZ @ 0x0007CE80
 AnimatedBGTrigger::~AnimatedBGTrigger()
 {
     if (unk_178 != 0)
@@ -148,6 +159,7 @@ AnimatedBGTrigger::~AnimatedBGTrigger()
 // settings, the ranges 35 and 36 (halved unless -1), its block (40) and its
 // registration as a multiplayer flag (41, 42).
 // match: ?HandleAttributes@AnimatedBGTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0009F5F0
+// sp-match: ?HandleAttributes@AnimatedBGTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007CF70
 void AnimatedBGTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -395,6 +407,7 @@ void AnimatedBGTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
             sub_BD490(attrIt->GetAs_RwChar_ptr(), &unk_178);
             break;
         }
+#ifndef CODFH_SP // single player has no commands 41 and 42 (SP 0x7CFDB jump table ends at 40)
         case 41:
         {
             RwInt32 var_40;
@@ -417,12 +430,14 @@ void AnimatedBGTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
             }
             break;
         }
+#endif
         }
         ++attrIt;
     }
 }
 
 // match: ?vf_020@AnimatedBGTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000A0220
+// sp-match: ?vf_020@AnimatedBGTrigger@@UAEPAUtype_3D3548@@XZ @ 0x0007CEF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_3D3548 *AnimatedBGTrigger::vf_020()
 {
@@ -445,6 +460,7 @@ type_3D3548 *AnimatedBGTrigger::vf_020()
 }
 
 // match: ?vf_018@AnimatedBGTrigger@@UAEHXZ @ 0x000A0280
+// sp-match: ?vf_018@AnimatedBGTrigger@@UAEHXZ @ 0x0007CF30
 RwInt32 AnimatedBGTrigger::vf_018()
 {
     switch (unk_11C)
@@ -458,6 +474,7 @@ RwInt32 AnimatedBGTrigger::vf_018()
 }
 
 // match: ??_EAnimatedBGTrigger@@WBI@AEPAXI@Z @ 0x000A02C0
+// sp-match: ??_EAnimatedBGTrigger@@WBI@AEPAXI@Z @ 0x0007CF50
 // (The this-adjusting thunk for the second vtable's deleting destructor.)
 
 // Members /OPT:ICF folded into shared trivial bodies (config/aliases.txt): defined here for

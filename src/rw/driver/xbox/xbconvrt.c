@@ -33,6 +33,7 @@ typedef void (*XbPixUnconvertFn)(RwRGBA *pixOut, RwUInt32 pixIn);
 // match: ??_C@_0DD@MEIOGGLH@Conversion?5to?5compressed?5rasters@ @ 0x00416FA0
 
 // match: __rwXbFindMSB @ 0x002B7750
+// sp-match: __rwXbFindMSB @ 0x001D2B70
 
 RwInt32
 _rwXbFindMSB(RwInt32 num)
@@ -49,6 +50,7 @@ _rwXbFindMSB(RwInt32 num)
 }
 
 // match: _rwXbConvR8G8B8A8ToR5G5B5 @ 0x002B7770
+// sp-match: _rwXbConvR8G8B8A8ToR5G5B5 @ 0x001D2B90
 static RwUInt32
 rwXbConvR8G8B8A8ToR5G5B5(RwRGBA *pixIn)
 {
@@ -63,6 +65,7 @@ rwXbConvR8G8B8A8ToR5G5B5(RwRGBA *pixIn)
 }
 
 // match: _XbConvR8G8B8A8ToR5G6B5 @ 0x002B77A0
+// sp-match: _XbConvR8G8B8A8ToR5G6B5 @ 0x001D2BC0
 static RwUInt32
 XbConvR8G8B8A8ToR5G6B5(RwRGBA *pixIn)
 {
@@ -76,6 +79,7 @@ XbConvR8G8B8A8ToR5G6B5(RwRGBA *pixIn)
 }
 
 // match: _XbConvR8G8B8A8ToA1R5G5B5 @ 0x002B77D0
+// sp-match: _XbConvR8G8B8A8ToA1R5G5B5 @ 0x001D2BF0
 static RwUInt32
 XbConvR8G8B8A8ToA1R5G5B5(RwRGBA *pixIn)
 {
@@ -90,6 +94,7 @@ XbConvR8G8B8A8ToA1R5G5B5(RwRGBA *pixIn)
 }
 
 // match: _XbConvR8G8B8A8ToA4R4G4B4 @ 0x002B7810
+// sp-match: _XbConvR8G8B8A8ToA4R4G4B4 @ 0x001D2C30
 static RwUInt32
 XbConvR8G8B8A8ToA4R4G4B4(RwRGBA *pixIn)
 {
@@ -104,6 +109,7 @@ XbConvR8G8B8A8ToA4R4G4B4(RwRGBA *pixIn)
 }
 
 // match: _XbConvR8G8B8A8ToX8R8G8B8 @ 0x002B7850
+// sp-match: _XbConvR8G8B8A8ToX8R8G8B8 @ 0x001D2C70
 static RwUInt32
 XbConvR8G8B8A8ToX8R8G8B8(RwRGBA *pixIn)
 {
@@ -118,6 +124,7 @@ XbConvR8G8B8A8ToX8R8G8B8(RwRGBA *pixIn)
 }
 
 // match: _XbConvR8G8B8A8ToA8R8G8B8 @ 0x002B7870
+// sp-match: _XbConvR8G8B8A8ToA8R8G8B8 @ 0x001D2C90
 static RwUInt32
 XbConvR8G8B8A8ToA8R8G8B8(RwRGBA *pixIn)
 {
@@ -133,6 +140,7 @@ XbConvR8G8B8A8ToA8R8G8B8(RwRGBA *pixIn)
 
 /* 3.6: no alpha scaling (3.7.2's scales the luminance by the alpha). */
 // match: _XbConvR8G8B8A8ToL8 @ 0x002B7890
+// sp-match: _XbConvR8G8B8A8ToL8 @ 0x001D2CB0
 static RwUInt32
 XbConvR8G8B8A8ToL8(RwRGBA *pixIn)
 {
@@ -146,6 +154,7 @@ XbConvR8G8B8A8ToL8(RwRGBA *pixIn)
 }
 
 // match: __rwXbRGBToPixel @ 0x002B78C0
+// sp-match: __rwXbRGBToPixel @ 0x001D2CE0
 RwBool
 _rwXbRGBToPixel(void *pixelOut, void *colIn, RwInt32 format)
 {
@@ -205,6 +214,7 @@ _rwXbRGBToPixel(void *pixelOut, void *colIn, RwInt32 format)
 }
 
 // match: _XbConvR5G5B5ToR8G8B8A8 @ 0x002B7A80
+// sp-match: _XbConvR5G5B5ToR8G8B8A8 @ 0x001D2EA0
 static void
 XbConvR5G5B5ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
 {
@@ -224,6 +234,7 @@ XbConvR5G5B5ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
  On exit  : A RwUInt32 representing the packed pixel value.
  */
 // match: _XbConvR5G6B5ToR8G8B8A8 @ 0x002B7AB0
+// sp-match: _XbConvR5G6B5ToR8G8B8A8 @ 0x001D2ED0
 static void
 XbConvR5G6B5ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
 {
@@ -243,6 +254,7 @@ XbConvR5G6B5ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
  On exit  : A RwUInt32 representing the packed pixel value.
  */
 // match: _XbConvA1R5G5B5ToR8G8B8A8 @ 0x002B7AE0
+// sp-match: _XbConvA1R5G5B5ToR8G8B8A8 @ 0x001D2F00
 static void
 XbConvA1R5G5B5ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
 {
@@ -270,6 +282,7 @@ XbConvA1R5G5B5ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
  On exit  : A RwUInt32 representing the packed pixel value.
  */
 // match: _XbConvA4R4G4B4ToR8G8B8A8 @ 0x002B7B20
+// sp-match: _XbConvA4R4G4B4ToR8G8B8A8 @ 0x001D2F40
 static void
 XbConvA4R4G4B4ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
 {
@@ -291,6 +304,7 @@ XbConvA4R4G4B4ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
  On exit  : A RwUInt32 representing the packed pixel value.
  */
 // match: _XbConvX8R8G8B8ToR8G8B8A8 @ 0x002B7B50
+// sp-match: _XbConvX8R8G8B8ToR8G8B8A8 @ 0x001D2F70
 static void
 XbConvX8R8G8B8ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
 {
@@ -310,6 +324,7 @@ XbConvX8R8G8B8ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
  On exit  : A RwUInt32 representing the packed pixel value.
  */
 // match: _XbConvA8R8G8B8ToR8G8B8A8 @ 0x002B7B70
+// sp-match: _XbConvA8R8G8B8ToR8G8B8A8 @ 0x001D2F90
 static void
 XbConvA8R8G8B8ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
 {
@@ -330,6 +345,7 @@ XbConvA8R8G8B8ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
  On exit  : A RwUInt32 representing the packed pixel value.
  */
 // match: _XbConvL8ToR8G8B8A8 @ 0x002B7BA0
+// sp-match: _XbConvL8ToR8G8B8A8 @ 0x001D2FC0
 static void
 XbConvL8ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
 {
@@ -354,6 +370,7 @@ XbConvL8ToR8G8B8A8(RwRGBA *pixOut, RwUInt32 pixIn)
  On exit    : TRUE on success
  */
 // match: __rwXbPixelToRGB @ 0x002B7BC0
+// sp-match: __rwXbPixelToRGB @ 0x001D2FE0
 RwBool
 _rwXbPixelToRGB(void *rgbOut, void *pixel, RwInt32 format)
 {
@@ -428,6 +445,7 @@ _rwXbPixelToRGB(void *rgbOut, void *pixel, RwInt32 format)
  On exit  :
  */
 // match: _XbSelectUnconvertFn @ 0x002B7D50
+// sp-match: _XbSelectUnconvertFn @ 0x001D3170
 static XbPixUnconvertFn
 XbSelectUnconvertFn(RwRasterFormat format)
 {
@@ -477,6 +495,7 @@ XbSelectUnconvertFn(RwRasterFormat format)
  XbImage32GetFromRaster
  */
 // match: _XbImage32GetFromRaster @ 0x002B7E10
+// sp-match: _XbImage32GetFromRaster @ 0x001D3230
 static void
 XbImage32GetFromRaster(RwImage *image, RwRaster *raster)
 {
@@ -593,6 +612,7 @@ XbImage32GetFromRaster(RwImage *image, RwRaster *raster)
  rwXbImage8GetFromRaster
  */
 // match: _rwXbImage8GetFromRaster @ 0x002B8060
+// sp-match: _rwXbImage8GetFromRaster @ 0x001D3480
 static void
 rwXbImage8GetFromRaster(RwImage *image, RwRaster *raster)
 {
@@ -654,6 +674,7 @@ rwXbImage8GetFromRaster(RwImage *image, RwRaster *raster)
 }
 
 // match: __rwXbImageGetFromRaster @ 0x002B82A0
+// sp-match: __rwXbImageGetFromRaster @ 0x001D36C0
 RwBool
 _rwXbImageGetFromRaster(void *imageIn, void *rasterIn, RwInt32 unused3)
 {
@@ -720,6 +741,7 @@ _rwXbImageGetFromRaster(void *imageIn, void *rasterIn, RwInt32 unused3)
  XbSelectConvertFn
  */
 // match: _XbSelectConvertFn @ 0x002B83A0
+// sp-match: _XbSelectConvertFn @ 0x001D37C0
 static XbPixConvertFn
 XbSelectConvertFn(RwRasterFormat format)
 {
@@ -764,6 +786,7 @@ XbSelectConvertFn(RwRasterFormat format)
 }
 
 // match: __rwXboxPalettizeImage @ 0x002B8450
+// sp-match: __rwXboxPalettizeImage @ 0x001D3870
 RwImage *
 _rwXboxPalettizeImage(RwImage *srcImage, RwInt32 depth)
 {
@@ -804,6 +827,7 @@ _rwXboxPalettizeImage(RwImage *srcImage, RwInt32 depth)
  XbRasterLum8SetFromImage
  */
 // match: _XbRasterLum8SetFromImage @ 0x002B8500
+// sp-match: _XbRasterLum8SetFromImage @ 0x001D3920
 static void
 XbRasterLum8SetFromImage(RwRaster *raster, RwImage *image)
 {
@@ -828,6 +852,7 @@ XbRasterLum8SetFromImage(RwRaster *raster, RwImage *image)
  XbRasterPalletizedSetFromImage
  */
 // match: _XbRasterPalletizedSetFromImage @ 0x002B8550
+// sp-match: _XbRasterPalletizedSetFromImage @ 0x001D3970
 static void
 XbRasterPalletizedSetFromImage(RwRaster *raster, RwImage *image)
 {
@@ -885,6 +910,7 @@ XbRasterPalletizedSetFromImage(RwRaster *raster, RwImage *image)
  XbRaster16SetFromImage
  */
 // match: _XbRaster16SetFromImage @ 0x002B8650
+// sp-match: _XbRaster16SetFromImage @ 0x001D3A70
 static void
 XbRaster16SetFromImage(RwRaster *raster, RwImage *image)
 {
@@ -932,6 +958,7 @@ XbRaster16SetFromImage(RwRaster *raster, RwImage *image)
  XbRaster24_32SetFromImage
  */
 // match: _XbRaster24_32SetFromImage @ 0x002B8750
+// sp-match: _XbRaster24_32SetFromImage @ 0x001D3B70
 static void
 XbRaster24_32SetFromImage(RwRaster *raster, RwImage *image)
 {
@@ -975,6 +1002,7 @@ XbRaster24_32SetFromImage(RwRaster *raster, RwImage *image)
 }
 
 // match: __rwXbRasterSetFromImage @ 0x002B8850
+// sp-match: __rwXbRasterSetFromImage @ 0x001D3C70
 RwBool
 _rwXbRasterSetFromImage(void *rasterIn, void *imageIn, RwInt32 unused3)
 {
@@ -1060,6 +1088,7 @@ _rwXbRasterSetFromImage(void *rasterIn, void *imageIn, RwInt32 unused3)
 /* The raster format an image converts to: palettised or not, with alpha if
    any pixel is not opaque. */
 // match: _XbImageFindFormat @ 0x002B89D0
+// sp-match: _XbImageFindFormat @ 0x001D3DF0
 static RwUInt32
 XbImageFindFormat(RwImage *image)
 {
@@ -1155,6 +1184,7 @@ XbImageFindFormat(RwImage *image)
 }
 
 // match: __rwXbImageFindRasterFormat @ 0x002B8AC0
+// sp-match: __rwXbImageFindRasterFormat @ 0x001D3EE0
 RwBool
 _rwXbImageFindRasterFormat(void *rasterIn, void *imageIn, RwInt32 flags)
 {

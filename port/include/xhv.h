@@ -24,9 +24,11 @@ typedef PVOID XHV_PROCESSING_MODE;
 extern "C" const XHV_PROCESSING_MODE _xhv_loopback_mode;
 extern "C" const XHV_PROCESSING_MODE _xhv_voicechat_mode;
 extern "C" const XHV_PROCESSING_MODE _xhv_voicemail_mode;
+extern "C" const XHV_PROCESSING_MODE _xhv_inactive_mode;
 #define XHV_LOOPBACK_MODE _xhv_loopback_mode
 #define XHV_VOICECHAT_MODE _xhv_voicechat_mode
 #define XHV_VOICEMAIL_MODE _xhv_voicemail_mode
+#define XHV_INACTIVE_MODE _xhv_inactive_mode
 
 typedef enum _XHV_VOICE_COMMUNICATOR_STATUS
 {
@@ -104,6 +106,7 @@ struct XHVEngine
     BOOL WINAPI IsTalking(XUID xuidRemoteTalker);
     HRESULT WINAPI SetPlaybackPriority(XUID xuidRemoteTalker, DWORD dwLocalPort,
                                        XHV_PLAYBACK_PRIORITY playbackPriority);
+    HRESULT WINAPI SetMaxPlaybackStreamsCount(DWORD dwMaxPlaybackStreams);
 };
 typedef XHVEngine *PXHVENGINE;
 

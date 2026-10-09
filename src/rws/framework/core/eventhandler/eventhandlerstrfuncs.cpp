@@ -16,6 +16,7 @@
 // match: ?SendTestEvent@?A0x95c57325@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x0012EBE0
 // match: __ehhandler$?SendTestEvent@?A0x95c57325@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z-0x8 @ 0x003016D0
 // match: __ehhandler$?SendTestEvent@?A0x95c57325@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x003016D8
+// sp-match: ?SendTestEvent@?A0x95c57325@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000E0B50
 
 namespace RWS
 {
@@ -41,6 +42,7 @@ namespace RWS
 }
 
 // match: ?RegisterStreamChunkHandlers@CEventHandler@RWS@@SAXXZ @ 0x0012ECB0
+// sp-match: ?RegisterStreamChunkHandlers@CEventHandler@RWS@@SAXXZ @ 0x000E0C10
 void RWS::CEventHandler::RegisterStreamChunkHandlers(void)
    {
       CStreamHandler::RegisterChunkHandler(MAKECHUNKID (rwVENDORID_CRITERIONRM,
@@ -48,6 +50,7 @@ void RWS::CEventHandler::RegisterStreamChunkHandlers(void)
    }
 
 // match: ?UnRegisterStreamChunkHandlers@CEventHandler@RWS@@SAXXZ @ 0x0012ECD0
+// sp-match: ?UnRegisterStreamChunkHandlers@CEventHandler@RWS@@SAXXZ @ 0x000E0C30
 void RWS::CEventHandler::UnRegisterStreamChunkHandlers(void)
    {
       CStreamHandler::UnRegisterChunkHandler(MAKECHUNKID (rwVENDORID_CRITERIONRM, strfunc_SendTestEvent));

@@ -15,6 +15,7 @@ extern void *realloc(void *mem, RwUInt32 size);
 extern void *memset(void *dst, RwInt32 value, RwUInt32 size);
 
 // match: _sub_242170 @ 0x00242170
+// sp-match: _sub_242170 @ 0x00159050
 void *
 sub_242170(RwUInt32 size, RwUInt32 hint)
 {
@@ -22,6 +23,7 @@ sub_242170(RwUInt32 size, RwUInt32 hint)
 }
 
 // match: _sub_242180 @ 0x00242180
+// sp-match: _sub_242180 @ 0x00159060
 void *
 sub_242180(RwUInt32 size, RwUInt32 hint)
 {
@@ -40,6 +42,7 @@ sub_242180(RwUInt32 size, RwUInt32 hint)
 }
 
 // match: _sub_2421B0 @ 0x002421B0
+// sp-match: _sub_2421B0 @ 0x00159090
 void
 sub_2421B0(void *mem)
 {
@@ -47,6 +50,7 @@ sub_2421B0(void *mem)
 }
 
 // match: _sub_2421C0 @ 0x002421C0
+// sp-match: _sub_2421C0 @ 0x001590A0
 void *
 sub_2421C0(RwUInt32 count, RwUInt32 size, RwUInt32 hint)
 {
@@ -54,6 +58,7 @@ sub_2421C0(RwUInt32 count, RwUInt32 size, RwUInt32 hint)
 }
 
 // match: _sub_2421D0 @ 0x002421D0
+// sp-match: _sub_2421D0 @ 0x001590B0
 void *
 sub_2421D0(RwUInt32 size, RwUInt32 hint)
 {
@@ -61,6 +66,7 @@ sub_2421D0(RwUInt32 size, RwUInt32 hint)
 }
 
 // match: _sub_2421E0 @ 0x002421E0
+// sp-match: _sub_2421E0 @ 0x001590C0
 void *
 sub_2421E0(void *mem, RwUInt32 size, RwUInt32 hint)
 {
@@ -68,6 +74,7 @@ sub_2421E0(void *mem, RwUInt32 size, RwUInt32 hint)
 }
 
 // match: __fnxCalloc @ 0x00242200
+// sp-match: __fnxCalloc @ 0x001590E0
 void *
 _fnxCalloc(RwUInt32 count, RwUInt32 size, RwUInt32 hint)
 {
@@ -83,6 +90,7 @@ _fnxCalloc(RwUInt32 count, RwUInt32 size, RwUInt32 hint)
 }
 
 // match: _sub_242240 @ 0x00242240
+// sp-match: _sub_242240 @ 0x00159120
 RwBool
 sub_242240(void **funcs)
 {
@@ -105,6 +113,7 @@ sub_242240(void **funcs)
 }
 
 // match: _sub_2422A0 @ 0x002422A0
+// sp-match: _sub_2422A0 @ 0x00159180
 void
 sub_2422A0(void *mem)
 {

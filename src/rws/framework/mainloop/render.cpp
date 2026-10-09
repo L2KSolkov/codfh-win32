@@ -48,6 +48,12 @@ extern const RwChar iMsgPreShowRaster_name[] = "iMsgPreShowRaster";
 // match: _$E14 @ 0x0030E7E0
 // match: _$E16 @ 0x0030BB20
 // match: _$E17 @ 0x0030E7F0
+// sp-match: _$E1 @ 0x0021DA80
+// sp-match: _$E4 @ 0x0021DAA0
+// sp-match: _$E13 @ 0x0021DB00
+// sp-match: _$E2 @ 0x0021EB70
+// sp-match: _$E5 @ 0x0021EB80
+// sp-match: _$E14 @ 0x0021EBB0
 
 namespace RWS
 {
@@ -79,18 +85,23 @@ namespace RWS
 }
 
 // match: ?GetCamera@Render@MainLoop@RWS@@YAPAURwCamera@@XZ @ 0x001323B0
+// sp-match: ?GetCamera@Render@MainLoop@RWS@@YAPAURwCamera@@XZ @ 0x000E2E20
 RwCamera *RWS::MainLoop::Render::GetCamera(void) {return g_pCamera;}
 
 // match: ?sub_1323C0@Render@MainLoop@RWS@@YAPAURwCamera@@XZ @ 0x001323C0
+// sp-match: ?sub_1323C0@Render@MainLoop@RWS@@YAPAURwCamera@@XZ @ 0x000E2E30
 RwCamera *RWS::MainLoop::Render::sub_1323C0(void) {return g_pCamera_0;}
 
 // match: ?SetCamera@Render@MainLoop@RWS@@YAXQAURwCamera@@@Z @ 0x001323D0
+// sp-match: ?SetCamera@Render@MainLoop@RWS@@YAXQAURwCamera@@@Z @ 0x000E2E40
 void RWS::MainLoop::Render::SetCamera(RwCamera * const pCamera) {g_pCamera = pCamera;}
 
 // match: ?sub_1323E0@Render@MainLoop@RWS@@YAXQAURwCamera@@@Z @ 0x001323E0
+// sp-match: ?sub_1323E0@Render@MainLoop@RWS@@YAXQAURwCamera@@@Z @ 0x000E2E50
 void RWS::MainLoop::Render::sub_1323E0(RwCamera * const pCamera) {g_pCamera_0 = pCamera;}
 
 // match: ?Open@Render@MainLoop@RWS@@YAXXZ @ 0x001323F0
+// sp-match: ?Open@Render@MainLoop@RWS@@YAXXZ @ 0x000E2E60
 void RWS::MainLoop::Render::Open(void)
          {
             CEventHandler::RegisterMsg(iMsgDoRender, iMsgDoRender_name, "RwCamera*");
@@ -99,6 +110,7 @@ void RWS::MainLoop::Render::Open(void)
          }
 
 // match: ?Close@Render@MainLoop@RWS@@YAXXZ @ 0x00132440
+// sp-match: ?Close@Render@MainLoop@RWS@@YAXXZ @ 0x000E2EA0
 void RWS::MainLoop::Render::Close(void)
          {
             CEventHandler::UnRegisterMsg(iMsgDoRender);
@@ -107,12 +119,14 @@ void RWS::MainLoop::Render::Close(void)
          }
 
 // match: ?SetEnabled@Render@MainLoop@RWS@@YAXH@Z @ 0x00132470
+// sp-match: ?SetEnabled@Render@MainLoop@RWS@@YAXH@Z @ 0x000E2ED0
 void RWS::MainLoop::Render::SetEnabled(RwBool bEnabled)
          {
             gbEnabled = bEnabled;
          }
 
 // match: ?Poll@Render@MainLoop@RWS@@YAXXZ @ 0x00132480
+// sp-match: ?Poll@Render@MainLoop@RWS@@YAXXZ @ 0x000E2EE0
 void RWS::MainLoop::Render::Poll(void)
          {
             if (!gbEnabled) return;

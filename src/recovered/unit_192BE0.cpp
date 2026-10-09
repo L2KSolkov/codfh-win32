@@ -126,6 +126,7 @@ const RwChar *dword_42B690 = "XBX_";
 
 
 // match: ?vf_00C@type_44E8D8_248@@UAEHPAUtype_8A980@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x00192BE0
+// sp-match: ?vf_00C@type_44E8D8_248@@UAEHPAUtype_8A980@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x001238E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Plays it on its player: its file named from the language's folder and the
 // sound table; a replay of the track now playing is left alone (or its
@@ -174,6 +175,7 @@ RwInt32 type_44E8D8_248::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 a
     return -1;
 }
 // match: ??0type_3DFC34@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00192E60
+// sp-match: ??0type_3DFC34@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00126230
 type_3DFC34::type_3DFC34(const type_3DF8D8_04 &arg_0)
     : type_3DFB6C(arg_0)
 {
@@ -189,6 +191,7 @@ type_3DFC34::type_3DFC34(const type_3DF8D8_04 &arg_0)
     unk_28 = 0;
 }
 // match: ?vf_014@type_3DFC34@@UAEXPAUtype_825E0@@H@Z @ 0x00192F30
+// sp-match: ?vf_014@type_3DFC34@@UAEXPAUtype_825E0@@H@Z @ 0x00123A60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Adds it to the bank arg_0 as its record arg_4 (unless that bank has it
 // already): into a free slot, at 0.6 of its volume while a bank request
@@ -231,6 +234,7 @@ void type_3DFC34::vf_014(type_825E0 *arg_0, RwInt32 arg_4)
             unk_04.unk_04);
 }
 // match: ?vf_004@type_3DFC34@@UAEXXZ @ 0x00193140
+// sp-match: ?vf_004@type_3DFC34@@UAEXXZ @ 0x00123B60
 void type_3DFC34::vf_004()
 {
     if (unk_28)
@@ -238,6 +242,7 @@ void type_3DFC34::vf_004()
     unk_28 = 0;
 }
 // match: ?vf_00C@type_3DFC34@@UAEHPAUtype_8A980@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x00193170
+// sp-match: ?vf_00C@type_3DFC34@@UAEHPAUtype_8A980@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x00123B80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Plays it through the emitter arg_0 (its name shown as a subtitle), then
 // lets the entity arg_4's listeners hear it; the voice, or 0.
@@ -270,6 +275,7 @@ RwInt32 type_3DFC34::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8
     return l4;
 }
 // match: ??0type_3DFCA0@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001932D0
+// sp-match: ??0type_3DFCA0@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00126280
 type_3DFCA0::type_3DFCA0(const type_3DF8D8_04 &arg_0)
     : type_3DFB6C(arg_0)
 {
@@ -279,6 +285,7 @@ type_3DFCA0::type_3DFCA0(const type_3DF8D8_04 &arg_0)
     unk_1C = 0;
 }
 // match: ?vf_00C@type_3DFCA0@@UAEHPAUtype_8A980@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x00193330
+// sp-match: ?vf_00C@type_3DFCA0@@UAEHPAUtype_8A980@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x00123CA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Plays one of its loaded sounds, picked at random by weight.
 RwInt32 type_3DFCA0::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwV3d *arg_C,
@@ -313,13 +320,16 @@ RwInt32 type_3DFCA0::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8
                     return var_800[v804]->vf_00C(arg_0, arg_4, arg_8, arg_C, arg_10, arg_14);
             }
         }
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x123CA0)
         sub_19A750("Didn't play anything from a random even though at least one of it's sounds was actually loaded. What the hell?? That's not right! -RB\n");
+#endif
     }
     else if (dword_44E870)
         sprintf(var_898, "0x%X, 0x%X", unk_04.unk_00, unk_04.unk_04);
     return 0;
 }
 // match: ?vf_000@type_3DFCA0@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00193530
+// sp-match: ?vf_000@type_3DFCA0@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00127520
 // Registers its list (kind 0x20), which sub_193E20 hands it.
 RwInt32 type_3DFCA0::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -332,6 +342,7 @@ RwInt32 type_3DFCA0::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?vf_004@type_3DFCA0@@UAEXXZ @ 0x001935C0
+// sp-match: ?vf_004@type_3DFCA0@@UAEXXZ @ 0x00123E10
 // Frees its weights, keys and references.
 void type_3DFCA0::vf_004()
 {
@@ -352,6 +363,7 @@ void type_3DFCA0::vf_004()
     }
 }
 // match: ??0type_3DFD40@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00193640
+// sp-match: ??0type_3DFD40@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001262C0
 type_3DFD40::type_3DFD40(const type_3DF8D8_04 &arg_0)
     : type_3DFB6C(arg_0)
 {
@@ -361,11 +373,13 @@ type_3DFD40::type_3DFD40(const type_3DF8D8_04 &arg_0)
     unk_1C = 0;
 }
 // match: ?vf_008@type_3DFD40@@UAEHXZ @ 0x001936A0
+// sp-match: ?vf_008@type_3DFD40@@UAEHXZ @ 0x001262F0
 RwInt32 type_3DFD40::vf_008()
 {
     return 0x1C;
 }
 // match: ?vf_00C@type_3DFD40@@UAEHPAUtype_8A980@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x001936B0
+// sp-match: ?vf_00C@type_3DFD40@@UAEHPAUtype_8A980@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x00123E60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Plays the sequence through the emitter arg_0 at arg_C: nothing while a
 // slot of dword_4B1CA0 is starting this one; else a free slot, or one with
@@ -438,8 +452,10 @@ RwInt32 type_3DFD40::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8
         if (var_C == -1)
         {
             var_C = 0;
+#ifndef CODFH_SP // single player compiles the debug prints out (SP 0x123E60)
             sub_19A750("******^&^&^^ WARNING: Did not find a sequence alias slot that has no subtitle to remove!\n");
             sub_19A750("******^&^&^^ WARNING: Subtitles might not display\n");
+#endif
         }
         delete dword_4B1CA0[var_C].unk_04;
         dword_4B1CA0[var_C].unk_04 = 0;
@@ -456,6 +472,7 @@ RwInt32 type_3DFD40::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8
     return 0;
 }
 // match: ?vf_000@type_3DFD40@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00193980
+// sp-match: ?vf_000@type_3DFD40@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00127580
 // Registers its list (kind 0x21), which sub_1940E0 hands it.
 RwInt32 type_3DFD40::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -468,6 +485,7 @@ RwInt32 type_3DFD40::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?sub_193A00@type_3DFCA0@@QAEXPAURwStream@@H@Z @ 0x00193A00
+// sp-match: ?sub_193A00@type_3DFCA0@@QAEXPAURwStream@@H@Z @ 0x00124010
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DFCA0::sub_193A00(RwStream *arg_0, RwInt32 arg_4)
 {
@@ -485,6 +503,7 @@ void type_3DFCA0::sub_193A00(RwStream *arg_0, RwInt32 arg_4)
     }
 }
 // match: ??0type_3DFDE4@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00193AB0
+// sp-match: ??0type_3DFDE4@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00126300
 type_3DFDE4::type_3DFDE4(const type_3DF8D8_04 &arg_0)
     : type_3DFB6C(arg_0)
 {
@@ -494,17 +513,20 @@ type_3DFDE4::type_3DFDE4(const type_3DF8D8_04 &arg_0)
     unk_1C = 0;
 }
 // match: ?vf_008@type_3DFDE4@@UAEHXZ @ 0x00193B10
+// sp-match: ?vf_008@type_3DFDE4@@UAEHXZ @ 0x00126330
 RwInt32 type_3DFDE4::vf_008()
 {
     return 0x1D;
 }
 // match: ?vf_00C@type_3DFDE4@@UAEHPAUtype_8A980@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x00193B20
+// sp-match: ?vf_00C@type_3DFDE4@@UAEHPAUtype_8A980@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x001240A0
 RwInt32 type_3DFDE4::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwV3d *arg_C,
                             RwInt32 arg_10, RwInt32 arg_14)
 {
     return 0;
 }
 // match: ?vf_014@type_3DFDE4@@UAEHPAUtype_8A980@@HPAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x00193B30
+// sp-match: ?vf_014@type_3DFDE4@@UAEHPAUtype_8A980@@HPAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x001240B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Plays its loaded sound of index arg_4; with none, a warning sound at the
 // player when the debug switch is set.
@@ -545,6 +567,7 @@ RwInt32 type_3DFDE4::vf_014(type_8A980 *arg_0, RwInt32 arg_4, type_3D3548 *arg_8
     return 0;
 }
 // match: ?vf_000@type_3DFDE4@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00193D20
+// sp-match: ?vf_000@type_3DFDE4@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001275D0
 // Registers its list (kind 0x22), which sub_193FB0 hands it.
 RwInt32 type_3DFDE4::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -557,6 +580,7 @@ RwInt32 type_3DFDE4::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ??0type_3DFDFC@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00193DB0
+// sp-match: ??0type_3DFDFC@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00124230
 type_3DFDFC::type_3DFDFC(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
@@ -564,6 +588,7 @@ type_3DFDFC::type_3DFDFC(const type_3DF8D8_04 &arg_0)
     unk_14 = 0;
 }
 // match: ?vf_004@type_3DFDFC@@UAEXXZ @ 0x00193DF0
+// sp-match: ?vf_004@type_3DFDFC@@UAEXXZ @ 0x00124E50
 void type_3DFDFC::vf_004()
 {
     if (unk_14)
@@ -573,6 +598,7 @@ void type_3DFDFC::vf_004()
     }
 }
 // match: ?sub_193E20@@YAHPAUtype_3DFDFC@@PAUtype_3DFCA0@@PAX@Z @ 0x00193E20
+// sp-match: ?sub_193E20@@YAHPAUtype_3DFDFC@@PAUtype_3DFCA0@@PAX@Z @ 0x001272A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_193E20(type_3DFDFC *arg_0, type_3DFCA0 *arg_4, void *arg_8)
 {
@@ -595,6 +621,7 @@ RwInt32 sub_193E20(type_3DFDFC *arg_0, type_3DFCA0 *arg_4, void *arg_8)
     return 0;
 }
 // match: ?vf_000@type_3DFDFC@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00193F00
+// sp-match: ?vf_000@type_3DFDFC@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001242A0
 // Reads its references.
 RwInt32 type_3DFDFC::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -607,6 +634,7 @@ RwInt32 type_3DFDFC::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ??0type_3DFE08@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00193F60
+// sp-match: ??0type_3DFE08@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00124260
 type_3DFE08::type_3DFE08(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
@@ -614,11 +642,13 @@ type_3DFE08::type_3DFE08(const type_3DF8D8_04 &arg_0)
     unk_14 = 0;
 }
 // match: ?vf_008@type_3DFE08@@UAEHXZ @ 0x00193FA0
+// sp-match: ?vf_008@type_3DFE08@@UAEHXZ @ 0x00124290
 RwInt32 type_3DFE08::vf_008()
 {
     return 0x22;
 }
 // match: ?sub_193FB0@@YAHPAUtype_3DFDFC@@PAUtype_3DFDE4@@PAX@Z @ 0x00193FB0
+// sp-match: ?sub_193FB0@@YAHPAUtype_3DFDFC@@PAUtype_3DFDE4@@PAX@Z @ 0x00127340
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The index sound's list callback (as sub_193E20, kind 0x25).
 RwInt32 sub_193FB0(type_3DFDFC *arg_0, type_3DFDE4 *arg_4, void *arg_8)
@@ -642,6 +672,7 @@ RwInt32 sub_193FB0(type_3DFDFC *arg_0, type_3DFDE4 *arg_4, void *arg_8)
     return 0;
 }
 // match: ??0type_3DFE14@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00194090
+// sp-match: ??0type_3DFE14@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001242F0
 type_3DFE14::type_3DFE14(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
@@ -649,11 +680,13 @@ type_3DFE14::type_3DFE14(const type_3DF8D8_04 &arg_0)
     unk_14 = 0;
 }
 // match: ?vf_008@type_3DFE14@@UAEHXZ @ 0x001940D0
+// sp-match: ?vf_008@type_3DFE14@@UAEHXZ @ 0x00124320
 RwInt32 type_3DFE14::vf_008()
 {
     return 0x21;
 }
 // match: ?sub_1940E0@@YAHPAUtype_3DFDFC@@PAUtype_3DFD40@@PAX@Z @ 0x001940E0
+// sp-match: ?sub_1940E0@@YAHPAUtype_3DFDFC@@PAUtype_3DFD40@@PAX@Z @ 0x001273D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The sequence sound's list callback (as sub_193E20, kind 0x24).
 RwInt32 sub_1940E0(type_3DFDFC *arg_0, type_3DFD40 *arg_4, void *arg_8)
@@ -677,6 +710,7 @@ RwInt32 sub_1940E0(type_3DFDFC *arg_0, type_3DFD40 *arg_4, void *arg_8)
     return 0;
 }
 // match: ?vf_000@type_3DFE14@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001941C0
+// sp-match: ?vf_000@type_3DFE14@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00124330
 RwInt32 type_3DFE14::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
     RwUInt32 var_4;
@@ -688,26 +722,31 @@ RwInt32 type_3DFE14::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ??0type_3DFE20@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00194220
+// sp-match: ??0type_3DFE20@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00124380
 type_3DFE20::type_3DFE20(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
 }
 // match: ?vf_008@type_3DFE20@@UAEHXZ @ 0x00194290
+// sp-match: ?vf_008@type_3DFE20@@UAEHXZ @ 0x001243B0
 RwInt32 type_3DFE20::vf_008()
 {
     return 0x23;
 }
 // match: ??0type_3DFE2C@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001942A0
+// sp-match: ??0type_3DFE2C@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001243C0
 type_3DFE2C::type_3DFE2C(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
 }
 // match: ?vf_008@type_3DFE2C@@UAEHXZ @ 0x00194310
+// sp-match: ?vf_008@type_3DFE2C@@UAEHXZ @ 0x001243F0
 RwInt32 type_3DFE2C::vf_008()
 {
     return 0x24;
 }
 // match: ?sub_194320@@YAHPAUtype_3DFE20@@PAUtype_3DF8D8_04@@PAH@Z @ 0x00194320
+// sp-match: ?sub_194320@@YAHPAUtype_3DFE20@@PAUtype_3DF8D8_04@@PAH@Z @ 0x00126340
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A sound reference's callback: registers its sound (kind 0x26, its key
 // into *arg_4 through sub_194510) and its weight (a variable into *arg_8).
@@ -738,28 +777,33 @@ RwInt32 sub_194320(type_3DFE20 *arg_0, type_3DF8D8_04 *arg_4, RwInt32 *arg_8)
     return 0;
 }
 // match: ?vf_000@type_3DFE2C@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001943F0
+// sp-match: ?vf_000@type_3DFE2C@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00124400
 RwInt32 type_3DFE2C::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
     RwStreamRead(arg_0, unk_10, arg_4->unk_04 - 0x1C);
     return 1;
 }
 // match: ??0type_3DFE38@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00194420
+// sp-match: ??0type_3DFE38@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00124430
 type_3DFE38::type_3DFE38(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
 }
 // match: ?vf_000@type_3DFE20@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00194490
+// sp-match: ?vf_000@type_3DFE20@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001223A0
 RwInt32 type_3DFE20::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
     RwStreamRead(arg_0, unk_10, arg_4->unk_08 - 0x1C);
     return 1;
 }
 // match: ??0type_3DFE44@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001944C0
+// sp-match: ??0type_3DFE44@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00124470
 type_3DFE44::type_3DFE44(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
 }
 // match: ?sub_194510@@YAHPAUtype_3DFE44@@HPAUtype_3DF8D8_04@@@Z @ 0x00194510
+// sp-match: ?sub_194510@@YAHPAUtype_3DFE44@@HPAUtype_3DF8D8_04@@@Z @ 0x001244B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A sound reference's key into *arg_8.
 RwInt32 sub_194510(type_3DFE44 *arg_0, RwInt32 arg_4, type_3DF8D8_04 *arg_8)
@@ -774,6 +818,7 @@ RwInt32 sub_194510(type_3DFE44 *arg_0, RwInt32 arg_4, type_3DF8D8_04 *arg_8)
     return 0;
 }
 // match: ??0type_3DFE50@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00194550
+// sp-match: ??0type_3DFE50@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001263A0
 type_3DFE50::type_3DFE50(const type_3DF8D8_04 &arg_0)
     : type_3DFB6C(arg_0)
 {
@@ -782,11 +827,13 @@ type_3DFE50::type_3DFE50(const type_3DF8D8_04 &arg_0)
     unk_18 = 0;
 }
 // match: ?vf_008@type_3DFE50@@UAEHXZ @ 0x001945A0
+// sp-match: ?vf_008@type_3DFE50@@UAEHXZ @ 0x001263D0
 RwInt32 type_3DFE50::vf_008()
 {
     return 0x1E;
 }
 // match: ?vf_00C@type_3DFE50@@UAEHPAUtype_8A980@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x001945B0
+// sp-match: ?vf_00C@type_3DFE50@@UAEHPAUtype_8A980@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x001244D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Plays one of its loaded sounds, picked at random.
 RwInt32 type_3DFE50::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwV3d *arg_C,
@@ -826,6 +873,7 @@ RwInt32 type_3DFE50::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8
     return 0;
 }
 // match: ?vf_000@type_3DFE50@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00194760
+// sp-match: ?vf_000@type_3DFE50@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001263F0
 // Registers its list (kind 0x1F), which sub_194900 hands it.
 RwInt32 type_3DFE50::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -838,6 +886,7 @@ RwInt32 type_3DFE50::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?sub_1947F0@type_3DFE50@@QAEXPAURwStream@@H@Z @ 0x001947F0
+// sp-match: ?sub_1947F0@type_3DFE50@@QAEXPAURwStream@@H@Z @ 0x00124610
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DFE50::sub_1947F0(RwStream *arg_0, RwInt32 arg_4)
 {
@@ -851,6 +900,7 @@ void type_3DFE50::sub_1947F0(RwStream *arg_0, RwInt32 arg_4)
         RwStreamRead(arg_0, &unk_10[var_8], 8);
 }
 // match: ?vf_004@type_3DFE50@@UAEXXZ @ 0x00194870
+// sp-match: ?vf_004@type_3DFE50@@UAEXXZ @ 0x00124680
 void type_3DFE50::vf_004()
 {
     if (unk_10)
@@ -865,17 +915,20 @@ void type_3DFE50::vf_004()
     }
 }
 // match: ??0type_3DFE64@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001948C0
+// sp-match: ??0type_3DFE64@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001246C0
 type_3DFE64::type_3DFE64(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
     unk_14 = 0;
 }
 // match: ?vf_008@type_3DFE64@@UAEHXZ @ 0x001948F0
+// sp-match: ?vf_008@type_3DFE64@@UAEHXZ @ 0x001246E0
 RwInt32 type_3DFE64::vf_008()
 {
     return 0x1F;
 }
 // match: ?sub_194900@@YAHPAUtype_3DFE64@@PAUtype_3DFE50@@PAX@Z @ 0x00194900
+// sp-match: ?sub_194900@@YAHPAUtype_3DFE64@@PAUtype_3DFE50@@PAX@Z @ 0x001246F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The uniform random sound's list callback: its references registered
 // (kind 0x26) with sub_194510 filling their keys.
@@ -900,6 +953,7 @@ RwInt32 sub_194900(type_3DFE64 *arg_0, type_3DFE50 *arg_4, void *arg_8)
 // match: ??0type_3DFE70@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001949C0
 // match: __ehhandler$??0type_3DFE70@@QAE@ABUtype_3DF8D8_04@@@Z-0x8 @ 0x00302340
 // match: __ehhandler$??0type_3DFE70@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00302348
+// sp-match: ??0type_3DFE70@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00124770
 type_3DFE70::type_3DFE70(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
@@ -907,6 +961,7 @@ type_3DFE70::type_3DFE70(const type_3DF8D8_04 &arg_0)
     memset(unk_10, 0, 0x9C);
 }
 // match: ?vf_004@type_3DFE70@@UAEXXZ @ 0x00194A40
+// sp-match: ?vf_004@type_3DFE70@@UAEXXZ @ 0x001247F0
 void type_3DFE70::vf_004()
 {
     if (unk_10)
@@ -920,7 +975,27 @@ void type_3DFE70::vf_004()
         unk_10 = 0;
     }
 }
+#ifdef CODFH_SP
+// shape: sp_sub_18F8B0_twin (folded into sub_18F8B0, SP 0x1223D0): sub_18F8B0's body again, the
+// callback of vf_000's last six dword references. Single player's compiler shares the
+// `push 0; push sub_1223D0` tail among those six cases only (vf_000, SP 0x126450), which it does when
+// they name another symbol than the first eight; the linker folds the two bodies.
+RwInt32 sp_sub_18F8B0_twin(type_3DF8D8 *arg_0, RwInt32 arg_4, void *arg_8)
+{
+    RwInt32 var_8;
+    RwInt32 *l4;
+
+    l4 = (RwInt32 *)arg_8;
+    var_8 = arg_0->unk_10;
+    *l4 = var_8;
+    return 0;
+}
+#define sub_18F8B0_late sp_sub_18F8B0_twin
+#else
+#define sub_18F8B0_late sub_18F8B0
+#endif
 // match: ?vf_000@type_3DFE70@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00194AB0
+// sp-match: ?vf_000@type_3DFE70@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00126450
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Fills its block from its 31 references.
 RwInt32 type_3DFE70::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
@@ -1033,19 +1108,19 @@ RwInt32 type_3DFE70::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
                        (RwInt32)&unk_10->unk_78, 0);
             break;
         case 9:
-            sub_198900((type_3DF8D8_04 *)&var_178[var_180].unk_04, 1, (void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0, 0,
+            sub_198900((type_3DF8D8_04 *)&var_178[var_180].unk_04, 1, (void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0_late, 0,
                        (RwInt32)&unk_10->unk_7C, 0);
             break;
         case 10:
-            sub_198900((type_3DF8D8_04 *)&var_178[var_180].unk_04, 1, (void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0, 0,
+            sub_198900((type_3DF8D8_04 *)&var_178[var_180].unk_04, 1, (void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0_late, 0,
                        (RwInt32)&unk_10->unk_80, 0);
             break;
         case 18:
-            sub_198900((type_3DF8D8_04 *)&var_178[var_180].unk_04, 1, (void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0, 0,
+            sub_198900((type_3DF8D8_04 *)&var_178[var_180].unk_04, 1, (void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0_late, 0,
                        (RwInt32)&unk_10->unk_84, 0);
             break;
         case 27:
-            sub_198900((type_3DF8D8_04 *)&var_178[var_180].unk_04, 1, (void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0, 0,
+            sub_198900((type_3DF8D8_04 *)&var_178[var_180].unk_04, 1, (void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0_late, 0,
                        (RwInt32)&unk_10->unk_88, 0);
             break;
         case 21:
@@ -1054,7 +1129,7 @@ RwInt32 type_3DFE70::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
             local_17C->sub_1904B0((void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0, 0, (RwInt32)&unk_10->unk_8C);
             break;
         case 4:
-            sub_198900((type_3DF8D8_04 *)&var_178[var_180].unk_04, 1, (void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0, 0,
+            sub_198900((type_3DF8D8_04 *)&var_178[var_180].unk_04, 1, (void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0_late, 0,
                        (RwInt32)&unk_10->unk_90, 0);
             break;
         case 5:
@@ -1062,7 +1137,7 @@ RwInt32 type_3DFE70::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
                        (RwInt32)this, (RwInt32)&unk_10->unk_98, 0);
             break;
         case 16:
-            sub_198900((type_3DF8D8_04 *)&var_178[var_180].unk_04, 1, (void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0, 0,
+            sub_198900((type_3DF8D8_04 *)&var_178[var_180].unk_04, 1, (void (*)(RwInt32, RwInt32, RwInt32))sub_18F8B0_late, 0,
                        (RwInt32)&unk_10->unk_94, 0);
             break;
         }
@@ -1070,22 +1145,26 @@ RwInt32 type_3DFE70::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?sub_1954D0@type_3DFE7C@@QAEPAUtype_3DF8D8@@XZ @ 0x001954D0
+// sp-match: ?sub_1954D0@type_3DFE7C@@QAEPAUtype_3DF8D8@@XZ @ 0x00124830
 type_3DF8D8 *type_3DFE7C::sub_1954D0()
 {
     return (type_3DF8D8 *)sub_198710((type_3DF8D8_04 *)((type_825E0_id *)&unk_10->unk_04));
 }
 // match: ??0type_3DFE7C@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001954F0
+// sp-match: ??0type_3DFE7C@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00124840
 type_3DFE7C::type_3DFE7C(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
     unk_10 = (type_3DFE7C_10 *)RWSMalloc(0x78, 0x34257); // not an address: a memory hint
 }
 // match: ?vf_008@type_3DFE7C@@UAEHXZ @ 0x00195560
+// sp-match: ?vf_008@type_3DFE7C@@UAEHXZ @ 0x001248A0
 RwInt32 type_3DFE7C::vf_008()
 {
     return 0x28;
 }
 // match: ?vf_000@type_3DFE7C@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00195570
+// sp-match: ?vf_000@type_3DFE7C@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001248B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its fifteen references: each names a sound list (kind 0x26) whose key
 // goes into its slot of the block (sub_194510).
@@ -1166,12 +1245,14 @@ RwInt32 type_3DFE7C::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ??0type_3DFE88@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00195A20
+// sp-match: ??0type_3DFE88@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00124A30
 type_3DFE88::type_3DFE88(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
     unk_10 = 0;
 }
 // match: ?vf_000@type_3DFE88@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00195A50
+// sp-match: ?vf_000@type_3DFE88@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00124A50
 RwInt32 type_3DFE88::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
     unk_10 = new type_4B9304;
@@ -1181,6 +1262,7 @@ RwInt32 type_3DFE88::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?vf_004@type_3DFE88@@UAEXXZ @ 0x00195B00
+// sp-match: ?vf_004@type_3DFE88@@UAEXXZ @ 0x00126920
 void type_3DFE88::vf_004()
 {
     if (unk_10)
@@ -1191,6 +1273,7 @@ void type_3DFE88::vf_004()
     dword_4B9304 = 0;
 }
 // match: ?sub_195B70@@YAHPAUtype_3DFE94@@HPAX@Z @ 0x00195B70
+// sp-match: ?sub_195B70@@YAHPAUtype_3DFE94@@HPAX@Z @ 0x00124AD0
 // A string variable's callback: the string copied to arg_8.
 RwInt32 sub_195B70(type_3DFE94 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -1202,6 +1285,7 @@ RwInt32 sub_195B70(type_3DFE94 *arg_0, RwInt32 arg_4, void *arg_8)
     return 0;
 }
 // match: ?sub_195BA0@@YAHPAUtype_3DFE94@@HPAX@Z @ 0x00195BA0
+// sp-match: ?sub_195BA0@@YAHPAUtype_3DFE94@@HPAX@Z @ 0x00124AF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A string variable's callback: a copy of the string (0 for an empty one)
 // into *arg_8.
@@ -1224,6 +1308,7 @@ RwInt32 sub_195BA0(type_3DFE94 *arg_0, RwInt32 arg_4, void *arg_8)
     return 0;
 }
 // match: ?sub_195C10@@YAHPAUtype_3DFE94@@HPAX@Z @ 0x00195C10
+// sp-match: ?sub_195C10@@YAHPAUtype_3DFE94@@HPAX@Z @ 0x00124B50
 // A string variable's callback: the FNV hash of the upper-cased string into
 // *arg_8 (CWeaponBehavior's names).
 RwInt32 sub_195C10(type_3DFE94 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -1236,6 +1321,7 @@ RwInt32 sub_195C10(type_3DFE94 *arg_0, RwInt32 arg_4, void *arg_8)
     return 0;
 }
 // match: ?vf_000@type_3DFE94@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00195C50
+// sp-match: ?vf_000@type_3DFE94@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00124B80
 RwInt32 type_3DFE94::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
     RwInt32 var_4;
@@ -1251,27 +1337,32 @@ RwInt32 type_3DFE94::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ??0type_3DFE94@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00195CD0
+// sp-match: ??0type_3DFE94@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00124BD0
 type_3DFE94::type_3DFE94(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
     unk_10 = 0;
 }
 // match: ?vf_008@type_3DFE94@@UAEHXZ @ 0x00195D00
+// sp-match: ?vf_008@type_3DFE94@@UAEHXZ @ 0x00124BF0
 RwInt32 type_3DFE94::vf_008()
 {
     return 2;
 }
 // match: ??0type_3DFEA4@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00195D10
+// sp-match: ??0type_3DFEA4@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00124C10
 type_3DFEA4::type_3DFEA4(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
 }
 // match: ?vf_008@type_3DFEA4@@UAEHXZ @ 0x00195D60
+// sp-match: ?vf_008@type_3DFEA4@@UAEHXZ @ 0x00124C40
 RwInt32 type_3DFEA4::vf_008()
 {
     return 0x2B;
 }
 // match: ?vf_000@type_3DFEA4@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00195D70
+// sp-match: ?vf_000@type_3DFEA4@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00126950
 // Keeps its model object's reference (registering it, kind 3) and a
 // variable whose value names a pickup (sub_195EB0).
 RwInt32 type_3DFEA4::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
@@ -1297,6 +1388,7 @@ RwInt32 type_3DFEA4::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?sub_195EB0@@YAHPAUtype_3DF8D8@@HPAUtype_3DF8D8_04@@@Z @ 0x00195EB0
+// sp-match: ?sub_195EB0@@YAHPAUtype_3DF8D8@@HPAUtype_3DF8D8_04@@@Z @ 0x00124C50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The pickup settings the variable's value names take the key arg_8.
 RwInt32 sub_195EB0(type_3DF8D8 *arg_0, RwInt32 arg_4, type_3DF8D8_04 *arg_8)
@@ -1313,16 +1405,19 @@ RwInt32 sub_195EB0(type_3DF8D8 *arg_0, RwInt32 arg_4, type_3DF8D8_04 *arg_8)
     return 0;
 }
 // match: ??0type_3DFEB0_obj@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00195F00
+// sp-match: ??0type_3DFEB0_obj@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00127460
 type_3DFEB0_obj::type_3DFEB0_obj(const type_3DF8D8_04 &arg_0)
     : type_3DFEEC_obj(arg_0)
 {
 }
 // match: ?vf_008@type_3DFEB0_obj@@UAEHXZ @ 0x00195F30
+// sp-match: ?vf_008@type_3DFEB0_obj@@UAEHXZ @ 0x00127480
 RwInt32 type_3DFEB0_obj::vf_008()
 {
     return 0x2E;
 }
 // match: ?vf_000@type_3DFEB0_obj@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00195F40
+// sp-match: ?vf_000@type_3DFEB0_obj@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00127490
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Registers the kind-0x2C objects among its references (sub_196020 names
 // it after the first).
@@ -1345,6 +1440,7 @@ RwInt32 type_3DFEB0_obj::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?sub_196020@@YAHPAUtype_3DFEEC_obj@@HPAUtype_3DFEB0_obj@@@Z @ 0x00196020
+// sp-match: ?sub_196020@@YAHPAUtype_3DFEEC_obj@@HPAUtype_3DFEB0_obj@@@Z @ 0x001269F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_196020(type_3DFEEC_obj *arg_0, RwInt32 arg_4, type_3DFEB0_obj *arg_8)
 {
@@ -1359,11 +1455,13 @@ RwInt32 sub_196020(type_3DFEEC_obj *arg_0, RwInt32 arg_4, type_3DFEB0_obj *arg_8
     return 0;
 }
 // match: ?vf_004@type_3DFEB0_obj@@UAEXXZ @ 0x00196070
+// sp-match: ?vf_004@type_3DFEB0_obj@@UAEXXZ @ 0x00126A20
 void type_3DFEB0_obj::vf_004()
 {
     type_3DFEEC_obj::vf_004();
 }
 // match: ??0type_3DFEC4_obj@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00196090
+// sp-match: ??0type_3DFEC4_obj@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00126A30
 type_3DFEC4_obj::type_3DFEC4_obj(const type_3DF8D8_04 &arg_0)
     : type_3DFED8_obj(arg_0)
 {
@@ -1371,21 +1469,25 @@ type_3DFEC4_obj::type_3DFEC4_obj(const type_3DF8D8_04 &arg_0)
     RwMatrixSetIdentity(unk_10);
 }
 // match: ?vf_008@type_3DFEC4_obj@@UAEHXZ @ 0x00196190
+// sp-match: ?vf_008@type_3DFEC4_obj@@UAEHXZ @ 0x00126AB0
 RwInt32 type_3DFEC4_obj::vf_008()
 {
     return 0x2D;
 }
 // match: ?vf_00C@type_3DFEC4_obj@@UAEPAURwV3d@@XZ @ 0x001961A0
+// sp-match: ?vf_00C@type_3DFEC4_obj@@UAEPAURwV3d@@XZ @ 0x00126AC0
 RwV3d *type_3DFEC4_obj::vf_00C()
 {
     return &unk_10->pos;
 }
 // match: ?vf_010@type_3DFEC4_obj@@UAEPAURwV3d@@XZ @ 0x001961C0
+// sp-match: ?vf_010@type_3DFEC4_obj@@UAEPAURwV3d@@XZ @ 0x00126AD0
 RwV3d *type_3DFEC4_obj::vf_010()
 {
     return &unk_10->at;
 }
 // match: ?vf_000@type_3DFEC4_obj@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001961E0
+// sp-match: ?vf_000@type_3DFEC4_obj@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00124C90
 RwInt32 type_3DFEC4_obj::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
     RwReal var_40[16];
@@ -1406,6 +1508,7 @@ RwInt32 type_3DFEC4_obj::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?vf_004@type_3DFEC4_obj@@UAEXXZ @ 0x001962A0
+// sp-match: ?vf_004@type_3DFEC4_obj@@UAEXXZ @ 0x00124D40
 void type_3DFEC4_obj::vf_004()
 {
     if (unk_10)
@@ -1415,6 +1518,7 @@ void type_3DFEC4_obj::vf_004()
     }
 }
 // match: ??0type_3DFEEC_obj@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001962D0
+// sp-match: ??0type_3DFEEC_obj@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00126AE0
 type_3DFEEC_obj::type_3DFEEC_obj(const type_3DF8D8_04 &arg_0)
     : type_3DFED8_obj(arg_0)
 {
@@ -1426,11 +1530,13 @@ type_3DFEEC_obj::type_3DFEEC_obj(const type_3DF8D8_04 &arg_0)
     unk_30 = 0;
 }
 // match: ?vf_008@type_3DFEEC_obj@@UAEHXZ @ 0x00196370
+// sp-match: ?vf_008@type_3DFEEC_obj@@UAEHXZ @ 0x00126B20
 RwInt32 type_3DFEEC_obj::vf_008()
 {
     return 0x2C;
 }
 // match: ?vf_000@type_3DFEEC_obj@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00196380
+// sp-match: ?vf_000@type_3DFEEC_obj@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00124D60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Keeps its reference.
 RwInt32 type_3DFEEC_obj::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
@@ -1455,6 +1561,7 @@ RwInt32 type_3DFEEC_obj::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?sub_196480@@YAHPAUtype_3DFE94@@HPAX@Z @ 0x00196480
+// sp-match: ?sub_196480@@YAHPAUtype_3DFE94@@HPAX@Z @ 0x00124DC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A string variable's callback: a copy of the string, cut to 31 characters,
 // into *arg_8 (0 for an empty one).
@@ -1488,6 +1595,7 @@ RwInt32 sub_196480(type_3DFE94 *arg_0, RwInt32 arg_4, void *arg_8)
     return 0;
 }
 // match: ?vf_00C@type_3DFEEC_obj@@UAEPAURwV3d@@XZ @ 0x00196530
+// sp-match: ?vf_00C@type_3DFEEC_obj@@UAEPAURwV3d@@XZ @ 0x00124E70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its point: its entity's position, its trigger's, or its path node's.
 RwV3d *type_3DFEEC_obj::vf_00C()
@@ -1518,6 +1626,7 @@ RwV3d *type_3DFEEC_obj::vf_00C()
     return bp_4;
 }
 // match: ?vf_010@type_3DFEEC_obj@@UAEPAURwV3d@@XZ @ 0x001965D0
+// sp-match: ?vf_010@type_3DFEEC_obj@@UAEPAURwV3d@@XZ @ 0x00124EC0
 // Its direction: its entity's frame's (the world matrix's at), its
 // trigger's, or its path node's orientation's at (kept at +0x28).
 RwV3d *type_3DFEEC_obj::vf_010()
@@ -1560,16 +1669,19 @@ RwV3d *type_3DFEEC_obj::vf_010()
     return var_8;
 }
 // match: ??0type_3DFF00@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001968C0
+// sp-match: ??0type_3DFF00@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00124FF0
 type_3DFF00::type_3DFF00(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
 }
 // match: ?vf_008@type_3DFF00@@UAEHXZ @ 0x00196940
+// sp-match: ?vf_008@type_3DFF00@@UAEHXZ @ 0x00125020
 RwInt32 type_3DFF00::vf_008()
 {
     return 0x2F;
 }
 // match: ?vf_000@type_3DFF00@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00196950
+// sp-match: ?vf_000@type_3DFF00@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00126B30
 RwInt32 type_3DFF00::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
     type_3DF8D8_ref var_48[6];
@@ -1611,6 +1723,7 @@ RwInt32 type_3DFF00::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?sub_196B70@@YAHPAUtype_3DF8D8@@HPAUtype_3DFF00@@@Z @ 0x00196B70
+// sp-match: ?sub_196B70@@YAHPAUtype_3DF8D8@@HPAUtype_3DFF00@@@Z @ 0x00125030
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The mounted weapon settings the variable's value names take the record's
 // two model keys, with the record as their animation.
@@ -1633,16 +1746,19 @@ RwInt32 sub_196B70(type_3DF8D8 *arg_0, RwInt32 arg_4, type_3DFF00 *arg_8)
     return 0;
 }
 // match: ??0type_3DFF0C@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00196C00
+// sp-match: ??0type_3DFF0C@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00125090
 type_3DFF0C::type_3DFF0C(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
 }
 // match: ?vf_008@type_3DFF0C@@UAEHXZ @ 0x00196C30
+// sp-match: ?vf_008@type_3DFF0C@@UAEHXZ @ 0x001250B0
 RwInt32 type_3DFF0C::vf_008()
 {
     return 0x31;
 }
 // match: ?vf_000@type_3DFF0C@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00196C40
+// sp-match: ?vf_000@type_3DFF0C@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001250C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3DFF0C::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -1661,6 +1777,7 @@ RwInt32 type_3DFF0C::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ??0type_3DFF18@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00196CD0
+// sp-match: ??0type_3DFF18@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00125130
 type_3DFF18::type_3DFF18(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
@@ -1669,11 +1786,13 @@ type_3DFF18::type_3DFF18(const type_3DF8D8_04 &arg_0)
     unk_18 = 0;
 }
 // match: ?vf_008@type_3DFF18@@UAEHXZ @ 0x00196D20
+// sp-match: ?vf_008@type_3DFF18@@UAEHXZ @ 0x00125160
 RwInt32 type_3DFF18::vf_008()
 {
     return 0x32;
 }
 // match: ?vf_000@type_3DFF18@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00196D30
+// sp-match: ?vf_000@type_3DFF18@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00126C40
 // Its fifteen references, one per language: it keeps the string of the one
 // for the game's language (sub_197520) and only registers the others.
 RwInt32 type_3DFF18::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
@@ -1796,6 +1915,7 @@ RwInt32 type_3DFF18::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?sub_1974B0@type_3DFF18@@QAEXXZ @ 0x001974B0
+// sp-match: ?sub_1974B0@type_3DFF18@@QAEXXZ @ 0x00125170
 // Cuts the string at its '}' (unk_18 the rest) and then its '{' (unk_14).
 void type_3DFF18::sub_1974B0()
 {
@@ -1817,6 +1937,7 @@ void type_3DFF18::sub_1974B0()
     }
 }
 // match: ?sub_197520@@YAHPAUtype_3DFE94@@PAUtype_3DFF18@@PAX@Z @ 0x00197520
+// sp-match: ?sub_197520@@YAHPAUtype_3DFE94@@PAUtype_3DFF18@@PAX@Z @ 0x001251B0
 // The localised string's callback: a copy of the string variable's value
 // into its unk_10, then cut.
 RwInt32 sub_197520(type_3DFE94 *arg_0, type_3DFF18 *arg_4, void *arg_8)
@@ -1826,6 +1947,7 @@ RwInt32 sub_197520(type_3DFE94 *arg_0, type_3DFF18 *arg_4, void *arg_8)
     return 0;
 }
 // match: ?sub_197550@type_3DF8D8@@QAEPBDPADH@Z @ 0x00197550
+// sp-match: ?sub_197550@type_3DF8D8@@QAEPBDPADH@Z @ 0x001251E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 const RwChar *type_3DF8D8::sub_197550(RwChar *arg_0, RwInt32 arg_4)
 {
@@ -1850,7 +1972,55 @@ const RwChar *type_3DF8D8::sub_197550(RwChar *arg_0, RwInt32 arg_4)
     }
     return arg_0;
 }
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_1252B0@type_3DF8D8@@QAEPBDPADH@Z @ 0x001252B0
+// Single player's copy of sub_197550 for the text at +0x14 (no "NULL - REPLACE ME":
+// a null text or buffer returns the text; SP 0x1252B0).
+const RwChar *type_3DF8D8::sp_sub_1252B0(RwChar *arg_0, RwInt32 arg_4)
+{
+    RwChar var_C[4];
+    RwChar *bp_8;
+    RwChar *bp_4;
+
+    if (!unk_14 || !arg_0)
+        return (const RwChar *)unk_14;
+    strcpy(arg_0, (const RwChar *)unk_14);
+    bp_8 = strstr(arg_0, "#");
+    if (bp_8)
+    {
+        bp_4 = strstr((RwChar *)unk_14, "#") + 1;
+        sprintf(var_C, "%d", arg_4);
+        memcpy(bp_8, var_C, strlen(var_C));
+        sprintf(bp_8 + strlen(var_C), "%s", bp_4);
+    }
+    return arg_0;
+}
+#endif
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_125370@type_3DF8D8@@QAEPBDPADH@Z @ 0x00125370
+// Single player's copy of sub_197550 for the text at +0x18 (SP 0x125370).
+const RwChar *type_3DF8D8::sp_sub_125370(RwChar *arg_0, RwInt32 arg_4)
+{
+    RwChar var_C[4];
+    RwChar *bp_8;
+    RwChar *bp_4;
+
+    if (!unk_18 || !arg_0)
+        return (const RwChar *)unk_18;
+    strcpy(arg_0, (const RwChar *)unk_18);
+    bp_8 = strstr(arg_0, "#");
+    if (bp_8)
+    {
+        bp_4 = strstr((RwChar *)unk_18, "#") + 1;
+        sprintf(var_C, "%d", arg_4);
+        memcpy(bp_8, var_C, strlen(var_C));
+        sprintf(bp_8 + strlen(var_C), "%s", bp_4);
+    }
+    return arg_0;
+}
+#endif
 // match: ?vf_004@type_3DFF18@@UAEXXZ @ 0x00197630
+// sp-match: ?vf_004@type_3DFF18@@UAEXXZ @ 0x00125430
 void type_3DFF18::vf_004()
 {
     if (unk_10)
@@ -1860,6 +2030,7 @@ void type_3DFF18::vf_004()
     }
 }
 // match: ??0type_3DFF3C@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00197660
+// sp-match: ??0type_3DFF3C@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00125450
 type_3DFF3C::type_3DFF3C(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
@@ -1868,11 +2039,13 @@ type_3DFF3C::type_3DFF3C(const type_3DF8D8_04 &arg_0)
     unk_18 = 0;
 }
 // match: ?vf_008@type_3DFF3C@@UAEHXZ @ 0x001976B0
+// sp-match: ?vf_008@type_3DFF3C@@UAEHXZ @ 0x00125480
 RwInt32 type_3DFF3C::vf_008()
 {
     return 0x33;
 }
 // match: ?vf_000@type_3DFF3C@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001976C0
+// sp-match: ?vf_000@type_3DFF3C@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00126E80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3DFF3C::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -1893,6 +2066,7 @@ RwInt32 type_3DFF3C::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?sub_197760@@YAHPAUtype_3DF8D8@@PAUtype_3DFF3C@@H@Z @ 0x00197760
+// sp-match: ?sub_197760@@YAHPAUtype_3DF8D8@@PAUtype_3DFF3C@@H@Z @ 0x00125490
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Each index sound's callback: once the last is in, the table (every entry
 // -1) goes into dword_4E5E40 and the surface materials are asked for.
@@ -1930,16 +2104,19 @@ RwInt32 sub_197760(type_3DF8D8 *arg_0, type_3DFF3C *arg_4, RwInt32 arg_8)
     return 0;
 }
 // match: ??0type_3DFF5C@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00197880
+// sp-match: ??0type_3DFF5C@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00125530
 type_3DFF5C::type_3DFF5C(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
 }
 // match: ?vf_008@type_3DFF5C@@UAEHXZ @ 0x001978B0
+// sp-match: ?vf_008@type_3DFF5C@@UAEHXZ @ 0x00125550
 RwInt32 type_3DFF5C::vf_008()
 {
     return 0x34;
 }
 // match: ?vf_000@type_3DFF5C@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001978C0
+// sp-match: ?vf_000@type_3DFF5C@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00125560
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3DFF5C::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -1958,16 +2135,19 @@ RwInt32 type_3DFF5C::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ??0type_3DFF68@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00197950
+// sp-match: ??0type_3DFF68@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001255D0
 type_3DFF68::type_3DFF68(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
 }
 // match: ?vf_008@type_3DFF68@@UAEHXZ @ 0x00197980
+// sp-match: ?vf_008@type_3DFF68@@UAEHXZ @ 0x001255F0
 RwInt32 type_3DFF68::vf_008()
 {
     return 0x35;
 }
 // match: ?vf_000@type_3DFF68@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00197990
+// sp-match: ?vf_000@type_3DFF68@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00125600
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3DFF68::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -1986,6 +2166,7 @@ RwInt32 type_3DFF68::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ??0type_3DFF74@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00197A20
+// sp-match: ??0type_3DFF74@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00125670
 type_3DFF74::type_3DFF74(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
@@ -1996,11 +2177,13 @@ type_3DFF74::type_3DFF74(const type_3DF8D8_04 &arg_0)
     unk_1C = -1;
 }
 // match: ?vf_008@type_3DFF74@@UAEHXZ @ 0x00197A80
+// sp-match: ?vf_008@type_3DFF74@@UAEHXZ @ 0x001256A0
 RwInt32 type_3DFF74::vf_008()
 {
     return 0x36;
 }
 // match: ?vf_000@type_3DFF74@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00197A90
+// sp-match: ?vf_000@type_3DFF74@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00126F00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3DFF74::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -2039,6 +2222,7 @@ RwInt32 type_3DFF74::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?sub_197C80@@YAHPAUtype_3DF8E4@@PAUtype_3DFF74@@PAH@Z @ 0x00197C80
+// sp-match: ?sub_197C80@@YAHPAUtype_3DF8E4@@PAUtype_3DFF74@@PAH@Z @ 0x001256B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Each variable's callback: its value into the field arg_8 (the fourth's
 // truncated from a real), then the entry into the table.
@@ -2075,6 +2259,7 @@ RwInt32 sub_197C80(type_3DF8E4 *arg_0, type_3DFF74 *arg_4, RwInt32 *arg_8)
     return 0;
 }
 // match: ??0type_3DFF80@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00197D40
+// sp-match: ??0type_3DFF80@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00125720
 type_3DFF80::type_3DFF80(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
@@ -2082,11 +2267,13 @@ type_3DFF80::type_3DFF80(const type_3DF8D8_04 &arg_0)
     unk_14 = 0;
 }
 // match: ?vf_008@type_3DFF80@@UAEHXZ @ 0x00197D80
+// sp-match: ?vf_008@type_3DFF80@@UAEHXZ @ 0x00125750
 RwInt32 type_3DFF80::vf_008()
 {
     return 0x37;
 }
 // match: ?vf_000@type_3DFF80@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00197D90
+// sp-match: ?vf_000@type_3DFF80@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00125760
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3DFF80::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -2109,17 +2296,20 @@ RwInt32 type_3DFF80::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ??0type_3DFF8C@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00197ED0
+// sp-match: ??0type_3DFF8C@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00125820
 type_3DFF8C::type_3DFF8C(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
     unk_10 = 0;
 }
 // match: ?vf_008@type_3DFF8C@@UAEHXZ @ 0x00197F00
+// sp-match: ?vf_008@type_3DFF8C@@UAEHXZ @ 0x00125840
 RwInt32 type_3DFF8C::vf_008()
 {
     return 0x38;
 }
 // match: ?vf_000@type_3DFF8C@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00197F10
+// sp-match: ?vf_000@type_3DFF8C@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00127030
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3DFF8C::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -2149,6 +2339,7 @@ RwInt32 type_3DFF8C::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?sub_198070@@YAHPAUtype_3DF8D8_base@@PAUtype_3DFF8C@@H@Z @ 0x00198070
+// sp-match: ?sub_198070@@YAHPAUtype_3DF8D8_base@@PAUtype_3DFF8C@@H@Z @ 0x00125850
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The kind-0x39 object's callback: its key into the entry.
 RwInt32 sub_198070(type_3DF8D8_base *arg_0, type_3DFF8C *arg_4, RwInt32 arg_8)
@@ -2162,6 +2353,7 @@ RwInt32 sub_198070(type_3DF8D8_base *arg_0, type_3DFF8C *arg_4, RwInt32 arg_8)
     return 1;
 }
 // match: ??0type_3DFF98@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001980A0
+// sp-match: ??0type_3DFF98@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00125870
 type_3DFF98::type_3DFF98(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
@@ -2169,11 +2361,13 @@ type_3DFF98::type_3DFF98(const type_3DF8D8_04 &arg_0)
     unk_14 = 0;
 }
 // match: ?vf_008@type_3DFF98@@UAEHXZ @ 0x001980E0
+// sp-match: ?vf_008@type_3DFF98@@UAEHXZ @ 0x001258A0
 RwInt32 type_3DFF98::vf_008()
 {
     return 0x39;
 }
 // match: ?vf_000@type_3DFF98@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001980F0
+// sp-match: ?vf_000@type_3DFF98@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001258B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3DFF98::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
@@ -2198,23 +2392,27 @@ RwInt32 type_3DFF98::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?vf_004@type_3DFF98@@UAEXXZ @ 0x001981E0
+// sp-match: ?vf_004@type_3DFF98@@UAEXXZ @ 0x00125960
 void type_3DFF98::vf_004()
 {
     if (unk_14)
         delete[] unk_14;
 }
 // match: ??0type_3DFFA4@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00198210
+// sp-match: ??0type_3DFFA4@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x00125970
 type_3DFFA4::type_3DFFA4(const type_3DF8D8_04 &arg_0)
     : type_3DF8D8_base(arg_0)
 {
     unk_10 = 0;
 }
 // match: ?vf_008@type_3DFFA4@@UAEHXZ @ 0x00198240
+// sp-match: ?vf_008@type_3DFFA4@@UAEHXZ @ 0x00125990
 RwInt32 type_3DFFA4::vf_008()
 {
     return 0x3B;
 }
 // match: ?vf_000@type_3DFFA4@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00198250
+// sp-match: ?vf_000@type_3DFFA4@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x001259A0
 RwInt32 type_3DFFA4::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 {
     RwInt32 l4;
@@ -2240,6 +2438,7 @@ RwInt32 type_3DFFA4::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     return 1;
 }
 // match: ?vf_004@type_3DFFA4@@UAEXXZ @ 0x00198360
+// sp-match: ?vf_004@type_3DFFA4@@UAEXXZ @ 0x00125A40
 void type_3DFFA4::vf_004()
 {
     if (unk_10)

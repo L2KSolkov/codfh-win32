@@ -10,6 +10,24 @@
 static RwUInt8 unk_506B48[0x24];    /* copied UUIDs */
 static RwUInt32 dword_506B6C;
 
+#ifdef CODFH_SP // this file's data: a word of 1 and the UUID format strings no kept code reads (SP 0x32AC40, after unit_23CC10's unk_42E548)
+/* Multiplayer's copy is the tail of unit_23FAD0's unk_42E798 (0x42E870). */
+void *unk_42E870[11] =
+{
+    (void *)0x1,
+    (void *)0x382E3825,
+    (void *)0x34252D78,
+    (void *)0x2D78342E,
+    (void *)0x342E3425,
+    (void *)0x32252D78,
+    (void *)0x2578322E,
+    (void *)0x78322E32,
+    (void *)0x2D,
+    (void *)0x322E3225,
+    (void *)0x78,
+};
+#endif
+
 extern void sub_241FD0(RwUInt8 **cursor, const void *src, RwInt32 size);
 extern void sub_2421B0(void *data);
 extern void sub_2437A0(void *freeList, void *item);
@@ -20,6 +38,7 @@ extern RwInt32 memcmp(const void *a, const void *b, RwUInt32 size);
 extern void *memcpy(void *dst, const void *src, RwUInt32 size);
 
 // match: _RwaUUIDCompare @ 0x00240980
+// sp-match: _RwaUUIDCompare @ 0x00154AC0
 RwInt32
 RwaUUIDCompare(const RwaUUID *uuid1, const RwaUUID *uuid2)
 {
@@ -32,6 +51,7 @@ RwaUUIDCompare(const RwaUUID *uuid1, const RwaUUID *uuid2)
 }
 
 // match: _sub_2409B0 @ 0x002409B0
+// sp-match: _sub_2409B0 @ 0x00154AF0
 void
 sub_2409B0(RwaUUID *uuid)
 {
@@ -48,6 +68,7 @@ sub_2409B0(RwaUUID *uuid)
 }
 
 // match: _sub_240A30 @ 0x00240A30
+// sp-match: _sub_240A30 @ 0x00154B70
 void
 sub_240A30(RwaV3d *vector)
 {
@@ -63,6 +84,7 @@ sub_240A30(RwaV3d *vector)
 }
 
 // match: _sub_240A90 @ 0x00240A90
+// sp-match: _sub_240A90 @ 0x00154BD0
 RwBool
 sub_240A90(void)
 {
@@ -77,6 +99,7 @@ sub_240A90(void)
 }
 
 // match: _sub_240AC0 @ 0x00240AC0
+// sp-match: _sub_240AC0 @ 0x00154C00
 void
 sub_240AC0(void)
 {
@@ -85,6 +108,7 @@ sub_240AC0(void)
 }
 
 // match: _sub_240AE0 @ 0x00240AE0
+// sp-match: _sub_240AE0 @ 0x00154C20
 RwaUniqueID *
 sub_240AE0(RwaUniqueID *uniqueID)
 {
@@ -98,6 +122,7 @@ sub_240AE0(RwaUniqueID *uniqueID)
 }
 
 // match: _sub_240B10 @ 0x00240B10
+// sp-match: _sub_240B10 @ 0x00154C50
 RwaUniqueID *
 sub_240B10(RwaUniqueID *uniqueID)
 {
@@ -111,6 +136,7 @@ sub_240B10(RwaUniqueID *uniqueID)
 }
 
 // match: _sub_240B40 @ 0x00240B40
+// sp-match: _sub_240B40 @ 0x00154C80
 void
 sub_240B40(RwaUniqueID *uniqueID)
 {
@@ -120,6 +146,7 @@ sub_240B40(RwaUniqueID *uniqueID)
 }
 
 // match: _sub_240B50 @ 0x00240B50
+// sp-match: _sub_240B50 @ 0x00154C90
 const RwaUUID *
 sub_240B50(const RwaUUID *uuid, RwaUUID *copy, RwBool swap)
 {
@@ -144,6 +171,7 @@ sub_240B50(const RwaUUID *uuid, RwaUUID *copy, RwBool swap)
      (RwChar)((_c) & 0xDF) : (_c))
 
 // match: _sub_240B90 @ 0x00240B90
+// sp-match: _sub_240B90 @ 0x00154CD0
 RwInt32
 sub_240B90(const RwChar *string1, const RwChar *string2, RwUInt32 count)
 {
@@ -166,6 +194,7 @@ sub_240B90(const RwChar *string1, const RwChar *string2, RwUInt32 count)
 }
 
 // match: _sub_240BF0 @ 0x00240BF0
+// sp-match: _sub_240BF0 @ 0x00154D30
 RwaUniqueID *
 sub_240BF0(RwaUniqueID *uniqueID, const RwChar *name)
 {
@@ -177,6 +206,7 @@ sub_240BF0(RwaUniqueID *uniqueID, const RwChar *name)
 }
 
 // match: _sub_240C10 @ 0x00240C10
+// sp-match: _sub_240C10 @ 0x00154D50
 RwaUniqueID *
 sub_240C10(RwaUniqueID *uniqueID, const RwaUUID *uuid)
 {
@@ -188,6 +218,7 @@ sub_240C10(RwaUniqueID *uniqueID, const RwaUUID *uuid)
 }
 
 // match: _sub_240C30 @ 0x00240C30
+// sp-match: _sub_240C30 @ 0x00154D70
 RwaUniqueID *
 sub_240C30(RwaUniqueID *uniqueID)
 {

@@ -15,6 +15,8 @@
 
 // match: _$E1 @ 0x0030BB60
 // match: _$E2 @ 0x0030E810
+// sp-match: _$E2 @ 0x0021EBE0
+// sp-match: _$E1 @ 0x0021DB60
 
 namespace RWS
 {
@@ -25,18 +27,21 @@ namespace RWS
 }
 
 // match: ?Open@ClumpHelper@RWS@@YAXXZ @ 0x00132F60
+// sp-match: ?Open@ClumpHelper@RWS@@YAXXZ @ 0x000E3750
 void RWS::ClumpHelper::Open()
       {
          CEventHandler::RegisterMsg ( iMsgPreRpClumpDestroy, "iMsgPreRpClumpDestroy", "RwFrame*");
       }
 
 // match: ?Close@ClumpHelper@RWS@@YAXXZ @ 0x00132F80
+// sp-match: ?Close@ClumpHelper@RWS@@YAXXZ @ 0x000E3770
 void RWS::ClumpHelper::Close()
       {
          CEventHandler::UnRegisterMsg ( iMsgPreRpClumpDestroy );
       }
 
 // match: ?SetIsVisibleCallback@ClumpHelper@RWS@@YAPAURpAtomic@@PAU3@PAX@Z @ 0x00132FA0
+// sp-match: ?SetIsVisibleCallback@ClumpHelper@RWS@@YAPAURpAtomic@@PAU3@PAX@Z @ 0x000E3780
 RpAtomic* RWS::ClumpHelper::SetIsVisibleCallback(RpAtomic* pAtomic, void* pData)
       {
          AtomicHelper::SetIsVisible(*pAtomic, 0 != pData);
@@ -45,12 +50,14 @@ RpAtomic* RWS::ClumpHelper::SetIsVisibleCallback(RpAtomic* pAtomic, void* pData)
       }
 
 // match: ?SetIsVisible@ClumpHelper@RWS@@YAXAAURpClump@@_N@Z @ 0x00132FC0
+// sp-match: ?SetIsVisible@ClumpHelper@RWS@@YAXAAURpClump@@_N@Z @ 0x000E37A0
 void RWS::ClumpHelper::SetIsVisible( RpClump& clump, bool isVisible )
       {
          RpClumpForAllAtomics(&clump, SetIsVisibleCallback, isVisible ? reinterpret_cast<void*>(1) : 0);
       }
 
 // match: ?SetCanCollideCallback@ClumpHelper@RWS@@YAPAURpAtomic@@PAU3@PAX@Z @ 0x00132FF0
+// sp-match: ?SetCanCollideCallback@ClumpHelper@RWS@@YAPAURpAtomic@@PAU3@PAX@Z @ 0x000E37C0
 RpAtomic* RWS::ClumpHelper::SetCanCollideCallback(RpAtomic* pAtomic, void* pData)
       {
          AtomicHelper::SetCanCollide(*pAtomic, 0 != pData);
@@ -59,6 +66,7 @@ RpAtomic* RWS::ClumpHelper::SetCanCollideCallback(RpAtomic* pAtomic, void* pData
       }
 
 // match: ?SetCanCollide@ClumpHelper@RWS@@YAXAAURpClump@@_N@Z @ 0x00133010
+// sp-match: ?SetCanCollide@ClumpHelper@RWS@@YAXAAURpClump@@_N@Z @ 0x000E37E0
 void RWS::ClumpHelper::SetCanCollide(RpClump& clump, bool canCollide)
       {
          RpClumpForAllAtomics(&clump, SetCanCollideCallback, canCollide ? reinterpret_cast<void*>(1) : 0);

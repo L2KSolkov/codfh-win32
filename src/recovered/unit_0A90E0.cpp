@@ -30,22 +30,27 @@ RWS_REGISTERCLASS(CPickupSelector);
 // match: ?MakeNew@CPickupSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A90E0
 // match: __ehhandler$?MakeNew@CPickupSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300070
 // match: __ehhandler$?MakeNew@CPickupSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030007F
+// sp-match: ?MakeNew@CPickupSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00083960
 RWS_DEFINE_MAKENEW(CPickupSelector)
 
 // match: ??0CPickupSelector@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A9160
+// sp-match: ??0CPickupSelector@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000837D0
 CPickupSelector::CPickupSelector(const RWS::CAttributePacket &attr)
 {
 }
 
 // match: ??_GCPickupSelector@@UAEPAXI@Z @ 0x000A91F0
+// sp-match: ??_GCPickupSelector@@UAEPAXI@Z @ 0x000838D0
 
 // match: ??1CPickupSelector@@UAE@XZ @ 0x000A9210
 // match: __ehhandler$??1CPickupSelector@@UAE@XZ-0x8 @ 0x00300090
 // match: __ehhandler$??1CPickupSelector@@UAE@XZ @ 0x00300098
+// sp-match: ??1CPickupSelector@@UAE@XZ @ 0x00083810
 // (Defined in the class, in CPickupSelector.h.)
 
 // Command 0: the pickups' names.
 // match: ?HandleAttributes@CPickupSelector@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A9290
+// sp-match: ?HandleAttributes@CPickupSelector@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000838E0
 void CPickupSelector::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     RWS::CAttributeHandler::HandleAttributes(attr);
@@ -63,6 +68,7 @@ void CPickupSelector::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?sub_A9310@CPickupSelector@@QAEXPBI@Z @ 0x000A9310
+// sp-match: ?sub_A9310@CPickupSelector@@QAEXPBI@Z @ 0x00083870
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void CPickupSelector::sub_A9310(const RwUInt32 *arg_0)
 {
@@ -86,6 +92,7 @@ void CPickupSelector::sub_A9310(const RwUInt32 *arg_0)
 }
 
 // match: ??_ECPickupSelector@@WBI@AEPAXI@Z @ 0x000A93A0
+// sp-match: ??_ECPickupSelector@@WBI@AEPAXI@Z @ 0x000838C0
 
 // Members /OPT:ICF folded into shared trivial bodies (config/aliases.txt): defined here for
 // the authentic link (PLAN M7); the placement link takes the shared bodies.

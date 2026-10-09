@@ -36,10 +36,18 @@ public:
 typedef RwChar LevelInfo_size_check[sizeof(LevelInfo) == 0x20 ? 1 : -1];
 
 // The level's settings, LevelInfo's commands 0 to 4.
+#ifdef CODFH_SP // reals in single player: SP 0x966E0 clears them with immediate stores
+extern RwReal dword_4B686C;
+extern RwReal dword_4B6870;
+extern RwReal dword_4B6874;
+extern RwReal dword_4B6878;
+extern RwReal dword_4B687C;
+#else
 extern RwInt32 dword_4B686C;
 extern RwInt32 dword_4B6870;
 extern RwInt32 dword_4B6874;
 extern RwInt32 dword_4B6878;
 extern RwInt32 dword_4B687C;
+#endif
 
 #endif

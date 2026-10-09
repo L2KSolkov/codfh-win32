@@ -72,6 +72,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/src/basync.
 // match: _rcsid @ 0x00416BA0
 
 // match: _FrameSyncHierarchyRecurse @ 0x002B3210
+// sp-match: _FrameSyncHierarchyRecurse @ 0x001CE630
 static void
 FrameSyncHierarchyRecurse(RwFrame *frame, RwInt32 flags)
 {
@@ -139,6 +140,7 @@ FrameSyncHierarchyRecurse(RwFrame *frame, RwInt32 flags)
  */
 
 // match: _FrameSyncHierarchyRecurseNoLTM @ 0x002B3290
+// sp-match: _FrameSyncHierarchyRecurseNoLTM @ 0x001CE6B0
 static void
 FrameSyncHierarchyRecurseNoLTM(RwFrame *frame)
 {
@@ -196,6 +198,7 @@ FrameSyncHierarchyRecurseNoLTM(RwFrame *frame)
  */
 
 // match: _FrameSyncHierarchy @ 0x002B32F0
+// sp-match: _FrameSyncHierarchy @ 0x001CE710
 static void
 FrameSyncHierarchy(RwFrame *frame)
 {
@@ -282,6 +285,7 @@ FrameSyncHierarchy(RwFrame *frame)
  */
 
 // match: __rwFrameSyncDirty @ 0x002B33A0
+// sp-match: __rwFrameSyncDirty @ 0x001CE7C0
 RwBool
 _rwFrameSyncDirty(void)
 {
@@ -322,6 +326,7 @@ _rwFrameSyncDirty(void)
  */
 
 // match: _FrameSyncHierarchyLTMRecurse @ 0x002B33F0
+// sp-match: _FrameSyncHierarchyLTMRecurse @ 0x001CE810
 static void
 FrameSyncHierarchyLTMRecurse(RwFrame * frame, RwInt32 flags)
 {
@@ -371,6 +376,7 @@ FrameSyncHierarchyLTMRecurse(RwFrame * frame, RwInt32 flags)
  */
 
 // match: __rwFrameSyncHierarchyLTM @ 0x002B3450
+// sp-match: __rwFrameSyncHierarchyLTM @ 0x001CE870
 void
 _rwFrameSyncHierarchyLTM(RwFrame * frame)
 {

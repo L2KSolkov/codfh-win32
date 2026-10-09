@@ -83,6 +83,7 @@ RwV3d *dword_429100[3] = { &dword_4B678C[0], &dword_4B678C[1], &dword_4B678C[2] 
 // match: __real@42960000 @ 0x003D51A8
 // match: __real@41800000 @ 0x003D51AC
 // match: __real@47435000 @ 0x003D51B0
+// sp-match: ?sub_929A0@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x000769F0
 // sub_948A0's collision world triangle callback: keeps the surface, skips
 // a skipped material, gathers the triangle for an entity that asks
 // (unk_28_12), finds the triangle's nearest point to the sphere (sub_8F960)
@@ -201,7 +202,13 @@ RpCollisionTriangle *sub_929A0(RpIntersection *arg_0, RpWorldSector *arg_4, RpCo
         arg_0->t.sphere.center = stk_EC->pos;
         if (bp_4->unk_6C)
         {
+#ifdef CODFH_SP // shape: the offset added component by component (center loaded first for x, SP 0x76CF7)
+            arg_0->t.sphere.center.x += bp_4->unk_6C->x;
+            arg_0->t.sphere.center.y += bp_4->unk_6C->y;
+            arg_0->t.sphere.center.z += bp_4->unk_6C->z;
+#else
             RwV3dAddMacro(&arg_0->t.sphere.center, &arg_0->t.sphere.center, bp_4->unk_6C);
+#endif
         }
     }
     stk_F0 = &RwFrameGetLTM(bp_4->unk_14)->pos;
@@ -235,6 +242,7 @@ RpCollisionTriangle *sub_929A0(RpIntersection *arg_0, RpWorldSector *arg_4, RpCo
 // reproduce both, where plain float ones compare with fcomp and move with
 // mov.
 // match: ?sub_92FB0@@YAHPAURwV3d@@00@Z @ 0x00092FB0
+// sp-match: ?sub_92FB0@@YAHPAURwV3d@@00@Z @ 0x00074370
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_92FB0(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8)
 {
@@ -242,10 +250,18 @@ RwInt32 sub_92FB0(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8)
     RwReal bp_8;
     RwReal bp_4;
 
+#ifdef CODFH_SP
+    // shape: plain float compares (fcomp memory operands at SP 0x74370)
+    var_C = arg_0->y > arg_4->y ? (arg_0->y > arg_8->y ? arg_0->y : arg_8->y)
+                                : (arg_4->y > arg_8->y ? arg_4->y : arg_8->y);
+    bp_4 = arg_0->y < arg_4->y ? (arg_0->y < arg_8->y ? arg_0->y : arg_8->y)
+                               : (arg_4->y < arg_8->y ? arg_4->y : arg_8->y);
+#else
     var_C = (RwDouble)arg_0->y > (RwDouble)arg_4->y ? ((RwDouble)arg_0->y > (RwDouble)arg_8->y ? (RwReal)(RwDouble)arg_0->y : (RwReal)(RwDouble)arg_8->y)
                                 : ((RwDouble)arg_4->y > (RwDouble)arg_8->y ? (RwReal)(RwDouble)arg_4->y : (RwReal)(RwDouble)arg_8->y);
     bp_4 = (RwDouble)arg_0->y < (RwDouble)arg_4->y ? ((RwDouble)arg_0->y < (RwDouble)arg_8->y ? (RwReal)(RwDouble)arg_0->y : (RwReal)(RwDouble)arg_8->y)
                                 : ((RwDouble)arg_4->y < (RwDouble)arg_8->y ? (RwReal)(RwDouble)arg_4->y : (RwReal)(RwDouble)arg_8->y);
+#endif
     bp_8 = fabs(var_C - bp_4);
     if (bp_8 < 50.0f)
     {
@@ -254,6 +270,7 @@ RwInt32 sub_92FB0(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8)
     return 1;
 }
 // match: ?sub_930F0@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x000930F0
+// sp-match: ?sub_930F0@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x00076DF0
 // sub_929A0 with the height test only for a triangle inside the contact
 // ellipsoid (sub_950C0's collision world callback).
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -366,7 +383,13 @@ RpCollisionTriangle *sub_930F0(RpIntersection *arg_0, RpWorldSector *arg_4, RpCo
         arg_0->t.sphere.center = stk_EC->pos;
         if (bp_4->unk_6C)
         {
+#ifdef CODFH_SP // shape: the offset added component by component (center loaded first for x, SP 0x770FF)
+            arg_0->t.sphere.center.x += bp_4->unk_6C->x;
+            arg_0->t.sphere.center.y += bp_4->unk_6C->y;
+            arg_0->t.sphere.center.z += bp_4->unk_6C->z;
+#else
             RwV3dAddMacro(&arg_0->t.sphere.center, &arg_0->t.sphere.center, bp_4->unk_6C);
+#endif
         }
     }
     if (bp_4->unk_7C && slot_58 < 0.3f && slot_58 > -0.3f && !frm_24)
@@ -398,6 +421,7 @@ RpCollisionTriangle *sub_930F0(RpIntersection *arg_0, RpWorldSector *arg_4, RpCo
     return arg_8;
 }
 // match: ?sub_93700@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAU1@MPAX@Z @ 0x00093700
+// sp-match: ?sub_93700@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAU1@MPAX@Z @ 0x000772D0
 // sub_929A0 for an atomic's own triangles (the query arg_C, a type_93DF0):
 // the triangle is taken into the world by the atomic's matrix (unk_18,
 // into dword_4B6768) first, and with unk_90 set it is only gathered
@@ -569,6 +593,7 @@ RpCollisionTriangle *sub_93700(RpIntersection *arg_0, RpCollisionTriangle *arg_4
     return arg_4;
 }
 // match: ?sub_93DF0@@YAXPAPAURwV3d@@PAU1@PAUtype_93DF0@@PAURpIntersection@@@Z @ 0x00093DF0
+// sp-match: ?sub_93DF0@@YAXPAPAURwV3d@@PAU1@PAUtype_93DF0@@PAURpIntersection@@@Z @ 0x00077200
 void sub_93DF0(RwV3d **arg_0, RwV3d *arg_4, type_93DF0 *arg_8, RpIntersection *arg_C)
 {
     RwInt32 var_4;
@@ -589,6 +614,7 @@ void sub_93DF0(RwV3d **arg_0, RwV3d *arg_4, type_93DF0 *arg_8, RpIntersection *a
     dword_4B6760++;
 }
 // match: ?sub_93F00@@YAPAURpWorldSector@@PAURpIntersection@@PAU1@PAX@Z @ 0x00093F00
+// sp-match: ?sub_93F00@@YAPAURpWorldSector@@PAURpIntersection@@PAU1@PAX@Z @ 0x00074410
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpWorldSector *sub_93F00(RpIntersection *arg_0, RpWorldSector *arg_4, void *arg_8)
 {
@@ -632,9 +658,11 @@ RpWorldSector *sub_93F00(RpIntersection *arg_0, RpWorldSector *arg_4, void *arg_
     return arg_4;
 }
 // match: ?sub_94060@@YAXPAUtype_3D3548@@@Z @ 0x00094060
+// sp-match: ?sub_94060@@YAXPAUtype_3D3548@@@Z @ 0x000744E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_94060(type_3D3548 *arg_0)
 {
+#ifndef CODFH_SP
     type_4E5D30 *bp_84;
     RwInt32 var80;
     type_93F00 local_7C;
@@ -658,9 +686,31 @@ void sub_94060(type_3D3548 *arg_0)
     RwV3d ebp_14;
     RwReal bp_8;
     type_94060_atomic *bp_4;
+#endif
 
     if (!dword_4B6764)
     {
+#ifdef CODFH_SP
+        RwReal y54;
+        RwReal stk_50;
+        RwReal local_4C;
+        RwReal m_48;
+        RwInt32 var44;
+        type_8F3E0 *m_40;
+        RwInt32 p3C;
+        RwInt32 var_38;
+        RwInt32 l34;
+        type_94060_tie *var30;
+        type_8F8C0 *ebp_2C;
+        type_94060_link *lcl_28;
+        RwReal frm_24;
+        type_94060_link *var_20;
+        type_8F3E0 *l1C;
+        type_94060_link *m_18;
+        RwV3d ebp_14;
+        RwReal bp_8;
+        type_94060_atomic *bp_4;
+#endif
         bp_4 = (type_94060_atomic *)arg_0->Clump_ResolvePrimaryAtomic();
         if (bp_4)
         {
@@ -668,11 +718,20 @@ void sub_94060(type_3D3548 *arg_0)
             if (bp_8 != 0.0f)
             {
                 ebp_14 = *arg_0->sub_CD550();
+#ifdef CODFH_SP
+                // shape: height adjusted after the search setup (SP 0x744E0 loads the list head first)
+                frm_24 = 1e37f;
+                l1C = 0;
+                m_18 = bp_4->unk_64.unk_00;
+                var_20 = &bp_4->unk_64;
+                ebp_14.y += 8.0f;
+#else
                 ebp_14.y += 8.0f;
                 frm_24 = 1e37f;
                 l1C = 0;
                 m_18 = bp_4->unk_64.unk_00;
                 var_20 = &bp_4->unk_64;
+#endif
                 while (m_18 != var_20)
                 {
                     var30 = (type_94060_tie *)((RwUInt8 *)m_18 - 0xC);
@@ -717,6 +776,13 @@ void sub_94060(type_3D3548 *arg_0)
     }
     else
     {
+#ifdef CODFH_SP
+        // shape: block-scoped locals share the frame with the other branch's (SP 0x744E0)
+        type_4E5D30 *bp_84;
+        RwInt32 var80;
+        type_93F00 local_7C;
+        RpIntersection var_70;
+#endif
         var_70.type = rpINTERSECTSPHERE;
         var_70.t.sphere.center = *arg_0->sub_CD550();
         var_70.t.sphere.center.y += 8.0f;
@@ -751,6 +817,7 @@ void sub_94060(type_3D3548 *arg_0)
     }
 }
 // match: ?sub_943E0@@YAPAURpAtomic@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x000943E0
+// sp-match: ?sub_943E0@@YAPAURpAtomic@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x00077810
 // sub_946B0 without its second collision test, for sub_948A0's sphere
 // search: once a hit is reported, an entity of contact kind (unk_2C & 0x30,
 // not skipped by bit 9) near enough is also sorted into the search's contact
@@ -832,6 +899,7 @@ RpAtomic *sub_943E0(RpIntersection *arg_0, RpWorldSector *arg_4, RpAtomic *arg_8
     return arg_8;
 }
 // match: ?sub_946B0@@YAPAURpAtomic@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x000946B0
+// sp-match: ?sub_946B0@@YAPAURpAtomic@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x00074730
 // The atomic callback of a moving entity's collision search (arg_10, a
 // type_93DF0): unless it is the mover itself or neither collides with the
 // other, the atomic's triangles are tested in the frame of its matrix
@@ -899,7 +967,12 @@ RpAtomic *sub_946B0(RpIntersection *arg_0, RpWorldSector *arg_4, RpAtomic *arg_8
     }
     return arg_8;
 }
+#ifdef CODFH_SP
+// Whether arg_0 is an ancestor of arg_4 (single player only, SP 0x10B070).
+bool sp_sub_10B070(RwFrame *arg_0, RwFrame *arg_4);
+#endif
 // match: ?sub_948A0@@YAXPAUtype_3D3548@@PAURwFrame@@PAURwV3d@@MPAH2PAM3333PAUtype_3DAFC8_1DDC@@@Z @ 0x000948A0
+// sp-match: ?sub_948A0@@YAXPAUtype_3D3548@@PAURwFrame@@PAURwV3d@@MPAH2PAM3333PAUtype_3DAFC8_1DDC@@@Z @ 0x00077990
 // Moves the entity arg_0's frame arg_4 out of the collision worlds: a
 // sphere at the frame's position plus arg_8, of the largest of the radii
 // arg_14, searched against their atomics (sub_943E0) and, for an entity
@@ -1051,6 +1124,50 @@ void sub_948A0(type_3D3548 *arg_0, RwFrame *arg_4, RwV3d *arg_8, RwReal arg_C, R
         local_E0.unk_7C->unk_48 = t20.t.sphere.center;
     }
     q28 = 1;
+#ifdef CODFH_SP
+    // Single player rides what it stands on (SP 0x77990): the frame is made a
+    // child of the atomic's frame, keeping its world matrix, and is detached
+    // when there is none; either way the ground probe below is skipped.
+    if (local_E0.unk_58)
+    {
+        RwFrame *parent = RpAtomicGetFrame(local_E0.unk_58);
+
+        if (RwFrameGetParent(arg_4) != parent && !sp_sub_10B070(arg_4, parent))
+        {
+            RwMatrix *inverse = RwMatrixCreate();
+
+            if (RwFrameGetParent(arg_4))
+            {
+                RwMatrixCopy(RwFrameGetMatrix(arg_4), RwFrameGetLTM(arg_4));
+                RwFrameRemoveChild(arg_4);
+            }
+            inverse->flags = 1;
+            RwMatrixInvert(inverse, RwFrameGetLTM(parent));
+            RwFrameTransform(arg_4, inverse, rwCOMBINEPOSTCONCAT);
+            RwFrameAddChild(parent, arg_4);
+            RwMatrixDestroy(inverse);
+            var118 = &RwFrameGetLTM(arg_4)->pos;
+            *arg_18 = var118->y;
+            *arg_1C = 1;
+            q28 = 0;
+        }
+    }
+    else
+    {
+        if (RwFrameGetParent(arg_4))
+        {
+            RwMatrixCopy(RwFrameGetMatrix(arg_4), RwFrameGetLTM(arg_4));
+            RwFrameRemoveChild(arg_4);
+        }
+        if (*local_E0.unk_50)
+        {
+            var118 = &RwFrameGetLTM(arg_4)->pos;
+            *arg_18 = var118->y;
+            *arg_1C = 1;
+            q28 = 0;
+        }
+    }
+#endif
     if (q28)
     {
         var118 = &RwFrameGetLTM(arg_4)->pos;
@@ -1095,7 +1212,9 @@ void sub_948A0(type_3D3548 *arg_0, RwFrame *arg_4, RwV3d *arg_8, RwReal arg_C, R
     }
     arg_0->unk_5C = t20.t.sphere.center;
 }
+#ifndef CODFH_SP // single player defines it in the class (include/types/type_92430.h)
 // match: ??0type_93DF0@@QAE@XZ @ 0x00095030
+// sp-match: ??0type_93DF0@@QAE@XZ @ 0x00074330
 type_93DF0::type_93DF0()
 {
     unk_7C = 0;
@@ -1109,7 +1228,9 @@ type_93DF0::type_93DF0()
     unk_AC = 0;
     unk_B0 = 0;
 }
+#endif
 // match: ?sub_950C0@@YAXPAUtype_3D3548@@PAURwFrame@@PAURwV3d@@MPAH2PAM333PAUtype_3DAFC8_1DDC@@@Z @ 0x000950C0
+// sp-match: ?sub_950C0@@YAXPAUtype_3D3548@@PAURwFrame@@PAURwV3d@@MPAH2PAM333PAUtype_3DAFC8_1DDC@@@Z @ 0x00078020
 // sub_948A0 for an entity that can stand on others: the sphere is at least
 // 150 across, the callbacks are sub_946B0 and sub_930F0, and there is no
 // third hit flag. When the search found an atomic to stand on (unk_58),
@@ -1352,6 +1473,7 @@ void sub_950C0(type_3D3548 *arg_0, RwFrame *arg_4, RwV3d *arg_8, RwReal arg_C, R
     arg_0->unk_5C = t20.t.sphere.center;
 }
 // match: ?sub_959E0@@YAHPAURwV3d@@M00000@Z @ 0x000959E0
+// sp-match: ?sub_959E0@@YAHPAURwV3d@@M00000@Z @ 0x00074850
 // Drops four points (arg_0 and three around it) along y onto the triangle
 // arg_8, arg_C, arg_10 of normal arg_14 (not near vertical), within arg_4:
 // the highest hit inside the triangle goes into arg_18->y. 1 on a hit.
@@ -1359,13 +1481,13 @@ void sub_950C0(type_3D3548 *arg_0, RwFrame *arg_4, RwV3d *arg_8, RwReal arg_C, R
 RwInt32 sub_959E0(RwV3d *arg_0, RwReal arg_4, RwV3d *arg_8, RwV3d *arg_C, RwV3d *arg_10, RwV3d *arg_14,
                   RwV3d *arg_18)
 {
-    RwReal fp_C;
     RwV3d l48;
     RwInt32 lv_4C;
     RwReal var_50;
-    RwReal var_54;
     RwReal var_58;
     RwV3d stk_64;
+    RwReal fp_C;
+    RwReal var_54;
 
     if (arg_14->y < flt_4290EC && -flt_4290EC < arg_14->y)
     {
@@ -1402,7 +1524,7 @@ RwInt32 sub_959E0(RwV3d *arg_0, RwReal arg_4, RwV3d *arg_8, RwV3d *arg_C, RwV3d 
         {
             continue;
         }
-        if ((arg_10->z - arg_C->z) * (l48.x - arg_C->x) - (arg_10->x - arg_C->x) * (l48.z - arg_C->z) <= 0.0f)
+        if (((arg_10->z - arg_C->z) * (l48.x - arg_C->x)) - ((arg_10->x - arg_C->x) * (l48.z - arg_C->z)) <= 0.0f)
         {
             continue;
         }
@@ -1417,6 +1539,7 @@ RwInt32 sub_959E0(RwV3d *arg_0, RwReal arg_4, RwV3d *arg_8, RwV3d *arg_C, RwV3d 
     return l4;
 }
 // match: ?sub_95C70@@YAHPAURwV3d@@0M00@Z @ 0x00095C70
+// sp-match: ?sub_95C70@@YAHPAURwV3d@@0M00@Z @ 0x00074A80
 // Whether the sphere at arg_4 of radius arg_8 touches the triangle arg_C
 // (three points) of normal arg_10, with the triangle's nearest point to the
 // sphere's centre into *arg_0: the centre dropped onto the plane when it is
@@ -1595,6 +1718,7 @@ RwInt32 sub_95C70(RwV3d *arg_0, RwV3d *arg_4, RwReal arg_8, RwV3d *arg_C, RwV3d 
     return 0;
 }
 // match: ?sub_96680@@YAXPAUtype_93DF0@@PAURpIntersection@@MPAMM@Z @ 0x00096680
+// sp-match: ?sub_96680@@YAXPAUtype_93DF0@@PAURpIntersection@@MPAMM@Z @ 0x000751E0
 // Flushes the gathered triangles for a ground search (sub_96EF0, and
 // sub_93DF0 when 350 are gathered): the highest drop of the sphere onto
 // each goes to *arg_C (sub_959E0), and two spheres of radius arg_8, one at
@@ -1755,6 +1879,7 @@ void sub_96680(type_93DF0 *arg_0, RpIntersection *arg_4, RwReal arg_8, RwReal *a
     }
 }
 // match: ?sub_96E30@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x00096E30
+// sp-match: ?sub_96E30@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x000785B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpCollisionTriangle *sub_96E30(RpIntersection *arg_0, RpWorldSector *arg_4, RpCollisionTriangle *arg_8,
                                RwReal arg_C, void *arg_10)
@@ -1779,12 +1904,27 @@ RpCollisionTriangle *sub_96E30(RpIntersection *arg_0, RpWorldSector *arg_4, RpCo
     return arg_8;
 }
 // match: ?sub_991F0@@YAHPAUtype_99130@@PAURpWorldSector@@PAURpCollisionTriangle@@@Z @ 0x000991F0
+// sp-match: ?sub_991F0@@YAHPAUtype_99130@@PAURpWorldSector@@PAURpCollisionTriangle@@@Z @ 0x00075990
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 inline RwInt32 sub_991F0(type_99130 *arg_0, RpWorldSector *arg_4, RpCollisionTriangle *arg_8)
 {
     void *l4;
     type_FC000 *var_8;
 
+#ifdef CODFH_SP
+    // shape: one shared return -1 (SP 0x75990 jumps to it from the null test)
+    if (arg_4)
+    {
+        l4 = ((type_96E30 *)arg_0->unk_20)->unk_10[((type_92540 *)arg_4)->unk_80 +
+                                                    ((type_92540 *)arg_4)->unk_04[arg_8->index].unk_06];
+        var_8 = sub_FC000(l4);
+        if ((var_8->unk_04 & 0xFFFF) != 0xFFFF)
+        {
+            return var_8->unk_04 & 0xFFFF;
+        }
+    }
+    return -1;
+#else
     if (!arg_4)
     {
         return -1;
@@ -1793,8 +1933,10 @@ inline RwInt32 sub_991F0(type_99130 *arg_0, RpWorldSector *arg_4, RpCollisionTri
                                                 ((type_92540 *)arg_4)->unk_04[arg_8->index].unk_06];
     var_8 = sub_FC000(l4);
     return (var_8->unk_04 & 0xFFFF) == 0xFFFF ? -1 : var_8->unk_04 & 0xFFFF;
+#endif
 }
 // match: ?sub_96EF0@@YAXPAUtype_3D3548@@PAURwFrame@@PAURwV3d@@MPAH2PAM333MMH@Z @ 0x00096EF0
+// sp-match: ?sub_96EF0@@YAXPAUtype_3D3548@@PAURwFrame@@PAURwV3d@@MPAH2PAM333MMH@Z @ 0x00078620
 // The ground search of a walking entity: a sphere from arg_C below the
 // frame to the top of the radii arg_14 (arg_2C above), searched against
 // the collision worlds' atomics (sub_943E0) and triangles (sub_96E30, then
@@ -1956,6 +2098,7 @@ void sub_96EF0(type_3D3548 *arg_0, RwFrame *arg_4, RwV3d *arg_8, RwReal arg_C, R
     arg_0->unk_5C = stk_2C.t.sphere.center;
 }
 // match: ?sub_974A0@@YAXPAUtype_93DF0@@PAURwV3d@@M@Z @ 0x000974A0
+// sp-match: ?sub_974A0@@YAXPAUtype_93DF0@@PAURwV3d@@M@Z @ 0x000757A0
 // Pushes the sphere at arg_4 of radius arg_8 out of each gathered triangle
 // (dword_4B25C0, normals dword_4B56F8) it overlaps from the front, moving
 // arg_4 and the search's frame (unk_14) by the sum and marking a hit.
@@ -2019,6 +2162,7 @@ void sub_974A0(type_93DF0 *arg_0, RwV3d *arg_4, RwReal arg_8)
     }
 }
 // match: ?sub_97790@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAU1@MPAX@Z @ 0x00097790
+// sp-match: ?sub_97790@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAU1@MPAX@Z @ 0x00078AA0
 // sub_93700 for a soldier's query: an atomic's triangle (taken into the
 // world into dword_4B678C) touched by the sphere pushes the frame out by
 // the query's radius (unk_4C) and, when it faces up enough (flt_4290E8)
@@ -2139,9 +2283,16 @@ RpCollisionTriangle *sub_97790(RpIntersection *arg_0, RpCollisionTriangle *arg_4
                             var_16C = RwV3dDotProductMacro(&var_12C, &var_164) * var_140;
                             if (var_16C > var_144 && var_16C < var_148)
                             {
+#ifdef CODFH_SP
+                                // shape: the rise computed once (SP 0x78AA0)
+                                var_170 = var_114.y * var_16C + var_FC.y - var_3C->y;
+                                var_58.y += var_170;
+                                arg_0->t.sphere.center.y += var_170;
+#else
                                 var_170 = var_114.y * var_16C + var_FC.y;
                                 var_58.y += var_170 - var_3C->y;
                                 arg_0->t.sphere.center.y += var_170 - var_3C->y;
+#endif
                                 var_4C++;
                                 var_4->unk_54 = var_4->unk_08;
                                 var_4->unk_64 = 1;
@@ -2231,6 +2382,7 @@ RpCollisionTriangle *sub_97790(RpIntersection *arg_0, RpCollisionTriangle *arg_4
     return arg_4;
 }
 // match: ?sub_98200@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x00098200
+// sp-match: ?sub_98200@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x00079250
 // sub_948A0's world triangle callback: keeps the surface, skips the
 // triangle for a skipped material, and with a contact record set (unk_7C)
 // sorts a touched, steep enough triangle high enough above the frame into
@@ -2299,10 +2451,20 @@ RpCollisionTriangle *sub_98200(RpIntersection *arg_0, RpWorldSector *arg_4, RpCo
                 if (lv_64 > flt_4290D0)
                 {
                     fp_68 = 0;
+#ifdef CODFH_SP
+                    // shape: the scaled squares in one vector (SP 0x79250 keeps all three on the FPU)
+                    RwV3d scaled;
+
+                    scaled.x = lcl_60.x * lcl_60.x * ebp_14->unk_7C->unk_0C.x;
+                    scaled.y = lcl_60.y * lcl_60.y * ebp_14->unk_7C->unk_0C.y;
+                    scaled.z = lcl_60.z * lcl_60.z * ebp_14->unk_7C->unk_0C.z;
+                    fp_6C = scaled.x + scaled.y + scaled.z;
+#else
                     v7C = lcl_60.x * lcl_60.x * ebp_14->unk_7C->unk_0C.x;
                     var78 = lcl_60.y * lcl_60.y * ebp_14->unk_7C->unk_0C.y;
                     lv_74 = lcl_60.z * lcl_60.z * ebp_14->unk_7C->unk_0C.z;
                     fp_6C = v7C + var78 + lv_74;
+#endif
                     if (fp_6C < 1.0f && sub_92FB0(arg_8->vertices[0], arg_8->vertices[1], arg_8->vertices[2]))
                     {
                         fp_68 = 1;
@@ -2344,6 +2506,7 @@ RpCollisionTriangle *sub_98200(RpIntersection *arg_0, RpWorldSector *arg_4, RpCo
     return arg_8;
 }
 // match: ?sub_985B0@@YAXPAUtype_3D3548@@PAURwFrame@@PAURwV3d@@MPAH2PAM3333PAUtype_3DAFC8_1DDC@@H@Z @ 0x000985B0
+// sp-match: ?sub_985B0@@YAXPAUtype_3D3548@@PAURwFrame@@PAURwV3d@@MPAH2PAM3333PAUtype_3DAFC8_1DDC@@H@Z @ 0x00079510
 // The soldier's collision search: sub_948A0's sphere (at least 150 across
 // with contact records, which also get the wider radii flt_4290D8; else the
 // side radius), with the triangles gathered (sub_98200) and pushed out of
@@ -2625,6 +2788,7 @@ void sub_985B0(type_3D3548 *arg_0, RwFrame *arg_4, RwV3d *arg_8, RwReal arg_C, R
     arg_0->unk_294 = local_E0.unk_78;
 }
 // match: ?sub_99130@@YAXMPAURpIntersection@@PAUtype_99130@@PAURpWorldSector@@PAURpCollisionTriangle@@@Z @ 0x00099130
+// sp-match: ?sub_99130@@YAXMPAURpIntersection@@PAUtype_99130@@PAURpWorldSector@@PAURpCollisionTriangle@@@Z @ 0x000759E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_99130(RwReal arg_0, RpIntersection *arg_4, type_99130 *arg_8, RpWorldSector *arg_C,
                RpCollisionTriangle *arg_10)
@@ -2654,6 +2818,7 @@ void sub_99130(RwReal arg_0, RpIntersection *arg_4, type_99130 *arg_8, RpWorldSe
     }
 }
 // match: ?sub_99280@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x00099280
+// sp-match: ?sub_99280@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x00075A80
 RpCollisionTriangle *sub_99280(RpIntersection *arg_0, RpWorldSector *arg_4, RpCollisionTriangle *arg_8,
                                RwReal arg_C, void *arg_10)
 {
@@ -2664,6 +2829,7 @@ RpCollisionTriangle *sub_99280(RpIntersection *arg_0, RpWorldSector *arg_4, RpCo
     return arg_8;
 }
 // match: ?sub_992B0@@YAXHPAURwV3d@@PAUtype_3DAFC8_1DDC@@0PAUtype_30B90_48@@@Z @ 0x000992B0
+// sp-match: ?sub_992B0@@YAXHPAURwV3d@@PAUtype_3DAFC8_1DDC@@0PAUtype_30B90_48@@@Z @ 0x00075AB0
 // Sorts the wall triangle arg_10 (at least 40 wide or 400 high) touched at
 // arg_4 into the contact records of arg_8 by its direction from the sphere
 // centre arg_C (ahead, right, left, behind against the facing unk_30 and
@@ -2693,15 +2859,30 @@ void sub_992B0(RwInt32 arg_0, RwV3d *arg_4, type_3DAFC8_1DDC *arg_8, RwV3d *arg_
     RwReal bp_8;
     RwReal bp_4;
 
+#ifdef CODFH_SP
+    // shape: plain float compares (fcomp memory operands at SP 0x75AB0)
+    lv_30 = arg_10->unk_1C->x > arg_10->unk_20->x ? (arg_10->unk_1C->x > arg_10->unk_24->x ? arg_10->unk_1C->x : arg_10->unk_24->x)
+              : (arg_10->unk_20->x > arg_10->unk_24->x ? arg_10->unk_20->x : arg_10->unk_24->x);
+    frm_24 = arg_10->unk_1C->x < arg_10->unk_20->x ? (arg_10->unk_1C->x < arg_10->unk_24->x ? arg_10->unk_1C->x : arg_10->unk_24->x)
+              : (arg_10->unk_20->x < arg_10->unk_24->x ? arg_10->unk_20->x : arg_10->unk_24->x);
+#else
     lv_30 = (RwDouble)arg_10->unk_1C->x > (RwDouble)arg_10->unk_20->x ? ((RwDouble)arg_10->unk_1C->x > (RwDouble)arg_10->unk_24->x ? (RwReal)(RwDouble)arg_10->unk_1C->x : (RwReal)(RwDouble)arg_10->unk_24->x)
               : ((RwDouble)arg_10->unk_20->x > (RwDouble)arg_10->unk_24->x ? (RwReal)(RwDouble)arg_10->unk_20->x : (RwReal)(RwDouble)arg_10->unk_24->x);
     frm_24 = (RwDouble)arg_10->unk_1C->x < (RwDouble)arg_10->unk_20->x ? ((RwDouble)arg_10->unk_1C->x < (RwDouble)arg_10->unk_24->x ? (RwReal)(RwDouble)arg_10->unk_1C->x : (RwReal)(RwDouble)arg_10->unk_24->x)
               : ((RwDouble)arg_10->unk_20->x < (RwDouble)arg_10->unk_24->x ? (RwReal)(RwDouble)arg_10->unk_20->x : (RwReal)(RwDouble)arg_10->unk_24->x);
+#endif
     fp_2C = fabs(lv_30 - frm_24);
+#ifdef CODFH_SP
+    slot_C = arg_10->unk_1C->z > arg_10->unk_20->z ? (arg_10->unk_1C->z > arg_10->unk_24->z ? arg_10->unk_1C->z : arg_10->unk_24->z)
+              : (arg_10->unk_20->z > arg_10->unk_24->z ? arg_10->unk_20->z : arg_10->unk_24->z);
+    loc50 = arg_10->unk_1C->z < arg_10->unk_20->z ? (arg_10->unk_1C->z < arg_10->unk_24->z ? arg_10->unk_1C->z : arg_10->unk_24->z)
+              : (arg_10->unk_20->z < arg_10->unk_24->z ? arg_10->unk_20->z : arg_10->unk_24->z);
+#else
     slot_C = (RwDouble)arg_10->unk_1C->z > (RwDouble)arg_10->unk_20->z ? ((RwDouble)arg_10->unk_1C->z > (RwDouble)arg_10->unk_24->z ? (RwReal)(RwDouble)arg_10->unk_1C->z : (RwReal)(RwDouble)arg_10->unk_24->z)
               : ((RwDouble)arg_10->unk_20->z > (RwDouble)arg_10->unk_24->z ? (RwReal)(RwDouble)arg_10->unk_20->z : (RwReal)(RwDouble)arg_10->unk_24->z);
     loc50 = (RwDouble)arg_10->unk_1C->z < (RwDouble)arg_10->unk_20->z ? ((RwDouble)arg_10->unk_1C->z < (RwDouble)arg_10->unk_24->z ? (RwReal)(RwDouble)arg_10->unk_1C->z : (RwReal)(RwDouble)arg_10->unk_24->z)
               : ((RwDouble)arg_10->unk_20->z < (RwDouble)arg_10->unk_24->z ? (RwReal)(RwDouble)arg_10->unk_20->z : (RwReal)(RwDouble)arg_10->unk_24->z);
+#endif
     m_18 = fabs(slot_C - loc50);
     if (fp_2C > m_18)
     {
@@ -2711,11 +2892,18 @@ void sub_992B0(RwInt32 arg_0, RwV3d *arg_4, type_3DAFC8_1DDC *arg_8, RwV3d *arg_
     {
         ebp_14 = m_18;
     }
+#ifdef CODFH_SP
+    x4C = arg_10->unk_1C->y > arg_10->unk_20->y ? (arg_10->unk_1C->y > arg_10->unk_24->y ? arg_10->unk_1C->y : arg_10->unk_24->y)
+              : (arg_10->unk_20->y > arg_10->unk_24->y ? arg_10->unk_20->y : arg_10->unk_24->y);
+    lv_10 = arg_10->unk_1C->y < arg_10->unk_20->y ? (arg_10->unk_1C->y < arg_10->unk_24->y ? arg_10->unk_1C->y : arg_10->unk_24->y)
+              : (arg_10->unk_20->y < arg_10->unk_24->y ? arg_10->unk_20->y : arg_10->unk_24->y);
+#else
     x4C = (RwDouble)arg_10->unk_1C->y > (RwDouble)arg_10->unk_20->y ? ((RwDouble)arg_10->unk_1C->y > (RwDouble)arg_10->unk_24->y ? (RwReal)(RwDouble)arg_10->unk_1C->y : (RwReal)(RwDouble)arg_10->unk_24->y)
               : ((RwDouble)arg_10->unk_20->y > (RwDouble)arg_10->unk_24->y ? (RwReal)(RwDouble)arg_10->unk_20->y : (RwReal)(RwDouble)arg_10->unk_24->y);
     lv_10 = (RwDouble)arg_10->unk_1C->y < (RwDouble)arg_10->unk_20->y ? ((RwDouble)arg_10->unk_1C->y < (RwDouble)arg_10->unk_24->y ? (RwReal)(RwDouble)arg_10->unk_1C->y : (RwReal)(RwDouble)arg_10->unk_24->y)
               : ((RwDouble)arg_10->unk_20->y < (RwDouble)arg_10->unk_24->y ? (RwReal)(RwDouble)arg_10->unk_20->y : (RwReal)(RwDouble)arg_10->unk_24->y);
-    q28 = fabs(x4C - lv_10);
+#endif
+    q28 = fabs((x4C - lv_10));
     if (ebp_14 < flt_4290E0 && q28 < 400.0f)
     {
         return;
@@ -2799,7 +2987,12 @@ void sub_992B0(RwInt32 arg_0, RwV3d *arg_4, type_3DAFC8_1DDC *arg_8, RwV3d *arg_
             }
         }
     }
+#ifdef CODFH_SP
+    // shape: compared value first (SP 0x75AB0)
+    else if (bp_8 < dword_4290C0 && bp_8 > -dword_4290C4)
+#else
     else if (bp_8 < dword_4290C0 && -dword_4290C4 < bp_8)
+#endif
     {
         l54 = RwV3dDotProductMacro(&arg_8->unk_3C, &w48);
         if (l54 >= dword_4290C8)
@@ -2866,7 +3059,12 @@ void sub_992B0(RwInt32 arg_0, RwV3d *arg_4, type_3DAFC8_1DDC *arg_8, RwV3d *arg_
                 }
             }
         }
+#ifdef CODFH_SP
+        // shape: compared value first (SP 0x75AB0)
+        else if (l54 <= -dword_4290C8)
+#else
         else if (-dword_4290C8 >= l54)
+#endif
         {
             switch (arg_0)
             {
@@ -2934,7 +3132,12 @@ void sub_992B0(RwInt32 arg_0, RwV3d *arg_4, type_3DAFC8_1DDC *arg_8, RwV3d *arg_
             }
         }
     }
+#ifdef CODFH_SP
+    // shape: compared value first (SP 0x75AB0)
+    else if (bp_8 <= -dword_4290C0)
+#else
     else if (-dword_4290C0 >= bp_8)
+#endif
     {
         switch (arg_0)
         {
@@ -2996,6 +3199,7 @@ void sub_992B0(RwInt32 arg_0, RwV3d *arg_4, type_3DAFC8_1DDC *arg_8, RwV3d *arg_
     }
 }
 // match: ?sub_9A2D0@@YAXPAUtype_3D3548@@PAURwV3d@@1PAUtype_3DAFC8_1DDC@@@Z @ 0x0009A2D0
+// sp-match: ?sub_9A2D0@@YAXPAUtype_3D3548@@PAURwV3d@@1PAUtype_3DAFC8_1DDC@@@Z @ 0x00076550
 // Sorts the contact of arg_0 between the points arg_4 and arg_8 by its
 // direction on the ground (against arg_C's facing unk_30 and right unk_3C)
 // and keeps it in the matching record of arg_C (ahead, right, left,
@@ -3025,7 +3229,12 @@ void sub_9A2D0(type_3D3548 *arg_0, RwV3d *arg_4, RwV3d *arg_8, type_3DAFC8_1DDC 
             *(type_3D3548_384 *)&arg_C->unk_2D4[0].unk_20 = arg_0->get_unk_384_h();
         }
     }
+#ifdef CODFH_SP
+    // shape: compared value first (SP 0x76550)
+    else if (var_4 < dword_4290C0 && var_4 > -dword_4290C4)
+#else
     else if (var_4 < dword_4290C0 && -dword_4290C4 < var_4)
+#endif
     {
         l24 = RwV3dDotProduct(&arg_C->unk_3C, &local_20);
         if (l24 >= dword_4290C8)
@@ -3039,7 +3248,12 @@ void sub_9A2D0(type_3D3548 *arg_0, RwV3d *arg_4, RwV3d *arg_8, type_3DAFC8_1DDC 
                 *(type_3D3548_384 *)&arg_C->unk_2D4[2].unk_20 = arg_0->get_unk_384_h();
             }
         }
+#ifdef CODFH_SP
+        // shape: compared value first (SP 0x76550)
+        else if (l24 <= -dword_4290C8)
+#else
         else if (-dword_4290C8 >= l24)
+#endif
         {
             // Measured against the right record's distance, as the image does.
             if (loc8 < arg_C->unk_2D4[2].unk_04)
@@ -3052,7 +3266,12 @@ void sub_9A2D0(type_3D3548 *arg_0, RwV3d *arg_4, RwV3d *arg_8, type_3DAFC8_1DDC 
             }
         }
     }
+#ifdef CODFH_SP
+    // shape: compared value first (SP 0x76550)
+    else if (var_4 <= -dword_4290C0)
+#else
     else if (-dword_4290C0 >= var_4)
+#endif
     {
         if (loc8 < arg_C->unk_2D4[2].unk_04)
         {
@@ -3065,6 +3284,7 @@ void sub_9A2D0(type_3D3548 *arg_0, RwV3d *arg_4, RwV3d *arg_8, type_3DAFC8_1DDC 
     }
 }
 // match: ?sub_9A5F0@@YAHPAURwV3d@@0PAURpIntersection@@PAM@Z @ 0x0009A5F0
+// sp-match: ?sub_9A5F0@@YAHPAURwV3d@@0PAURpIntersection@@PAM@Z @ 0x00076800
 // Intersects the line arg_8 with the ellipsoid at arg_0 whose inverse
 // squared radii are arg_4: the nearest crossing in [0, 1] into *arg_C.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -3127,6 +3347,7 @@ RwInt32 sub_9A5F0(RwV3d *arg_0, RwV3d *arg_4, RpIntersection *arg_8, RwReal *arg
     return 0;
 }
 // match: ?sub_9A800@@YAIPAUtype_3D3548@@@Z @ 0x0009A800
+// sp-match: ?sub_9A800@@YAIPAUtype_3D3548@@@Z @ 0x000769C0
 RwUInt32 sub_9A800(type_3D3548 *arg_0)
 {
     if (arg_0->unk_2C_4)
@@ -3148,6 +3369,7 @@ RwUInt32 sub_9A800(type_3D3548 *arg_0)
     return 0;
 }
 // match: ?sub_9A860@@YAPAURpAtomic@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x0009A860
+// sp-match: ?sub_9A860@@YAPAURpAtomic@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x00079D10
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *sub_9A860(RpIntersection *arg_0, RpWorldSector *arg_4, RpAtomic *arg_8, RwReal arg_C,
                     void *arg_10)
@@ -3189,6 +3411,7 @@ RpAtomic *sub_9A860(RpIntersection *arg_0, RpWorldSector *arg_4, RpAtomic *arg_8
     return arg_8;
 }
 // match: ?sub_9A960@@YAXPAUtype_4AE70@@@Z @ 0x0009A960
+// sp-match: ?sub_9A960@@YAXPAUtype_4AE70@@@Z @ 0x00079DA0
 // Sets off the blast arg_0: a sphere at its matrix's position plus its
 // offset, of its largest radius, handed with a search context (the blast as
 // its explosion, its inverse squared radii, a new search id) to every
@@ -3249,6 +3472,7 @@ void sub_9A960(type_4AE70 *arg_0)
     }
 }
 // match: ?sub_9ABE0@@YAHPAURwV3d@@PAURwMatrixTag@@MMM@Z @ 0x0009ABE0
+// sp-match: ?sub_9ABE0@@YAHPAURwV3d@@PAURwMatrixTag@@MMM@Z @ 0x00079F70
 // Whether the point arg_0 lies inside the box at the matrix arg_4 with the
 // half-extents arg_8, arg_C and arg_10 (strictly).
 RwInt32 sub_9ABE0(RwV3d *arg_0, RwMatrix *arg_4, RwReal arg_8, RwReal arg_C, RwReal arg_10)
@@ -3268,6 +3492,7 @@ RwInt32 sub_9ABE0(RwV3d *arg_0, RwMatrix *arg_4, RwReal arg_8, RwReal arg_C, RwR
 }
 // Whether arg_0 is less than arg_8 from arg_4.
 // match: ?sub_9ACE0@@YAHPAURwV3d@@0M@Z @ 0x0009ACE0
+// sp-match: ?sub_9ACE0@@YAHPAURwV3d@@0M@Z @ 0x0007A080
 RwInt32 sub_9ACE0(RwV3d *arg_0, RwV3d *arg_4, RwReal arg_8)
 {
     RwReal var_4;

@@ -46,6 +46,31 @@ extern "C" HRESULT WINAPI UIXCreateLiveEngine(LPCSTR, DWORD, ILiveEngine **ppEng
     return S_OK;
 }
 
+extern "C" HRESULT WINAPI UIXCreateUIPlugin(ITitleFontRenderer *, ITitleUIPlugin **ppPlugin)
+{
+    *ppPlugin = NULL;
+    return E_NOTIMPL;
+}
+
+extern "C" HRESULT WINAPI XOnlineGetUsers(PXONLINE_USER pUsers, DWORD *pdwUsers)
+{
+    if (pUsers)
+        memset(pUsers, 0, sizeof(XONLINE_USER) * XONLINE_MAX_STORED_ONLINE_USERS);
+    if (pdwUsers)
+        *pdwUsers = 0;
+    return S_OK;
+}
+
+extern "C" BOOL WINAPI XOnlineIsUserVoiceAllowed(DWORD)
+{
+    return FALSE;
+}
+
+extern "C" DWORD WINAPI XGetDeviceEnumerationStatus(void)
+{
+    return 0;
+}
+
 ULONG WINAPI LiveEngine::AddRef() { return 1; }
 ULONG WINAPI LiveEngine::Release() { return 0; }
 HRESULT WINAPI LiveEngine::SetUIPlugin(ITitleUIPlugin *) { return S_OK; }
@@ -133,6 +158,7 @@ HRESULT WINAPI PluginSupport::GetWordLength(LPCWSTR pString, DWORD *pWordLength)
 extern "C" const XHV_PROCESSING_MODE _xhv_loopback_mode = (XHV_PROCESSING_MODE)"loopback";
 extern "C" const XHV_PROCESSING_MODE _xhv_voicechat_mode = (XHV_PROCESSING_MODE)"voicechat";
 extern "C" const XHV_PROCESSING_MODE _xhv_voicemail_mode = (XHV_PROCESSING_MODE)"voicemail";
+extern "C" const XHV_PROCESSING_MODE _xhv_inactive_mode = (XHV_PROCESSING_MODE)"inactive";
 
 static char voice_engine_storage[16];
 
@@ -154,6 +180,7 @@ HRESULT WINAPI XHVEngine::UnregisterRemoteTalker(XUID) { return S_OK; }
 HRESULT WINAPI XHVEngine::SubmitIncomingVoicePacket(XUID, VOID *, DWORD) { return S_OK; }
 BOOL WINAPI XHVEngine::IsTalking(XUID) { return FALSE; }
 HRESULT WINAPI XHVEngine::SetPlaybackPriority(XUID, DWORD, XHV_PLAYBACK_PRIORITY) { return S_OK; }
+HRESULT WINAPI XHVEngine::SetMaxPlaybackStreamsCount(DWORD) { return S_OK; }
 
 /*
  * The system font: an 8x16 cell scaled to the set height.
@@ -170,6 +197,11 @@ extern "C" HRESULT __stdcall XFONT_OpenDefaultFont(XFONT **ppFont)
 {
     *ppFont = (XFONT *)&default_font;
     return S_OK;
+}
+
+extern "C" HRESULT __stdcall XFONT_OpenTrueTypeFont(LPCWSTR, DWORD, XFONT **ppFont)
+{
+    return XFONT_OpenDefaultFont(ppFont);
 }
 
 extern "C" void __stdcall XFONT_Release(XFONT *)

@@ -32,11 +32,13 @@ RWS_REGISTERCLASS(CPickupBehavior);
 // match: ?MakeNew@CPickupBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C5D70
 // match: __ehhandler$?MakeNew@CPickupBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300760
 // match: __ehhandler$?MakeNew@CPickupBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030076F
+// sp-match: ?MakeNew@CPickupBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00096AB0
 RWS_DEFINE_MAKENEW(CPickupBehavior)
 
 // match: ??0CPickupBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C5DF0
 // match: __ehhandler$??0CPickupBehavior@@QAE@ABVCAttributePacket@RWS@@@Z-0x13 @ 0x00300780
 // match: __ehhandler$??0CPickupBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300793
+// sp-match: ??0CPickupBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00096850
 CPickupBehavior::CPickupBehavior(const RWS::CAttributePacket &attr)
 {
     unk_24 = 0;
@@ -44,10 +46,12 @@ CPickupBehavior::CPickupBehavior(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_GCPickupBehavior@@UAEPAXI@Z @ 0x000C5ED0
+// sp-match: ??_GCPickupBehavior@@UAEPAXI@Z @ 0x00096980
 
 // match: ??1CPickupBehavior@@UAE@XZ @ 0x000C5EF0
 // match: __ehhandler$??1CPickupBehavior@@UAE@XZ-0x2F @ 0x003007A0
 // match: __ehhandler$??1CPickupBehavior@@UAE@XZ @ 0x003007CF
+// sp-match: ??1CPickupBehavior@@UAE@XZ @ 0x000968D0
 CPickupBehavior::~CPickupBehavior()
 {
     UnLinkMsg(dword_4B8750);
@@ -55,6 +59,7 @@ CPickupBehavior::~CPickupBehavior()
 
 // Command 0 picks the settings; commands 1 to 3 fill them.
 // match: ?HandleAttributes@CPickupBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C5F80
+// sp-match: ?HandleAttributes@CPickupBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00096990
 void CPickupBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     type_4C09B0 *var_C;
@@ -105,3 +110,4 @@ void CPickupBehavior::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ??_ECPickupBehavior@@WBI@AEPAXI@Z @ 0x000C60D0
+// sp-match: ??_ECPickupBehavior@@WBI@AEPAXI@Z @ 0x00096970

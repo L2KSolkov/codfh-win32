@@ -1,4 +1,4 @@
-"""portbuild.py [--only GLOB]... [--link] [--jobs N]: the Win32 port's build (docs/WIN32_PORT.md): every source
+"""portbuild.py [--sp] [--only GLOB]... [--link] [--jobs N]: the Win32 port's build (docs/WIN32_PORT.md): every source
 under src/ (bar the Xbox-only trees src/xbe and src/xdk) compiled for Win32 x86
 with MSVC 14.51 and Windows SDK 10.0.26100, against the port's bridge headers (port/include, ahead
 of everything; they stand in for the XDK's xtl.h, d3d8.h, dsound.h and the rest, which are not on
@@ -7,9 +7,9 @@ matching rule, as the matching build reads it); the Xbox/VC7.1-only switches are
 port's own are added: CODFH_WIN32 and CODFH_PLAIN, x87 code (/arch:IA32, as the game sets the FPU
 itself), VC7.1-era language rules (/permissive, /Zc:forScope-, /Zc:wchar_t-...).
 
-Objects go to build/port/obj; build/port/compile.log has every unit's compiler output and
-build/port/errors.md a summary: units that fail, error codes by count, and the headers and
-identifiers the errors name most. Linking comes with W0's entry point.
+Objects go to build/port/obj, or build/port_sp/obj with --sp; the selected output directory's
+compile.log has every unit's compiler output and errors.md summarizes failed units, error codes,
+and the headers and identifiers the errors name most. Linking comes with W0's entry point.
 
 Bink (W6) is the Xbox library as the tree has it: its C, and its image transcriptions (.asm,
 assembled with ml.exe: the code is 32-bit x86 with symbolic relocations, so it runs as is).
@@ -25,7 +25,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
-OUT = os.path.join(ROOT, 'build', 'port')
+SINGLE_PLAYER = '--sp' in sys.argv[1:]
+OUT = os.path.join(ROOT, 'build', 'port_sp' if SINGLE_PLAYER else 'port')
 OBJ = os.path.join(OUT, 'obj')
 
 VS = os.environ.get('CODFH_VS', r'C:\Program Files\Microsoft Visual Studio\18\Enterprise')
@@ -64,8 +65,45 @@ PORT_FLAGS = [
 DROP = re.compile(r'^/(compiler:.*|G[5-7B]|Gs\d*|QIfist|arch:.*|O[12bdgistxy].*|GF-?|Gy-?|GS-?|'
                   r'EH.*|GR-?|MT.*|MD.*|W\d|Zi|nologo|c)$')
 
-SKIP_DIRS = ('src/xbe/', 'src/xdk/')
+SKIP_DIRS = ('src/xbe/', 'src/xdk/', 'src/sp/xbe/')
 ASM_DIRS = ('src/bink/',)
+
+
+def single_player_sources(srcs):
+    """Use SP's unit selection and wrappers without compiling shared units twice."""
+    rules = []
+    cfg = os.path.join(ROOT, 'config', 'sp', 'units.txt')
+    for line in open(cfg, encoding='utf-8'):
+        line = line.strip()
+        if not line or line.startswith('#'):
+            continue
+        op, pattern = line[0], line[1:].strip()
+        if op not in ('+', '-'):
+            raise SystemExit('invalid SP unit rule: %s' % line)
+        rules.append((op, pattern))
+
+    wrapped = set()
+    include_cpp = re.compile(r'^\s*#\s*include\s+"([^"]+\.(?:cpp|c))"')
+    for wrapper in srcs:
+        if not wrapper.startswith('src/sp/units/'):
+            continue
+        for line in open(wrapper, encoding='latin-1'):
+            match = include_cpp.match(line)
+            if match:
+                path = os.path.normpath(os.path.join(os.path.dirname(wrapper), match.group(1)))
+                wrapped.add(path.replace(os.sep, '/'))
+
+    selected = []
+    for src in srcs:
+        if src in wrapped or src.startswith('src/sp/units/sp_data'):
+            continue
+        include = True
+        for op, pattern in rules:
+            if fnmatch.fnmatch(src, pattern):
+                include = op == '+'
+        if include:
+            selected.append(src)
+    return selected
 
 
 def load_rules():
@@ -102,7 +140,13 @@ def compile_unit(job):
         # (ml's errors read "error A2xxx"; reported as the compiler's for the summary)
         return src, r.returncode, out.replace(': error A', ': error C')
     lang = '/TC' if src.endswith('.c') else '/TP'
-    cmd = ([CL] + PORT_FLAGS + flags + [lang, '/Iport/include', '/Iinclude']
+    include_dirs = ['/Iport/include', '/Iinclude']
+    if SINGLE_PLAYER and src.startswith('src/sp/units/'):
+        # These wrappers include the Xbox RWA output source, whose headers live one level
+        # above its src/rwa/xbox directory.
+        if src.endswith(('sp_unit_24DF20_1.c', 'sp_unit_24DF20_2.c')):
+            include_dirs.append('/Isrc/rwa')
+    cmd = ([CL] + PORT_FLAGS + (['/DCODFH_SP'] if SINGLE_PLAYER else []) + flags + [lang] + include_dirs
            + ['/Fo' + obj, '/Fd' + os.path.join(OBJ, 'port.pdb'), src])
     env = dict(os.environ)
     env['INCLUDE'] = ';'.join(SYSTEM_INCLUDES)
@@ -114,7 +158,10 @@ def compile_unit(job):
 
 
 def main():
+    global SINGLE_PLAYER
     args = sys.argv[1:]
+    SINGLE_PLAYER = '--sp' in args
+    args = [arg for arg in args if arg != '--sp']
     only = [args[i + 1] for i, a in enumerate(args) if a == '--only']
     jobs_n = int(args[args.index('--jobs') + 1]) if '--jobs' in args else (os.cpu_count() or 4)
     if not os.path.exists(CL):
@@ -127,6 +174,8 @@ def main():
                    glob.glob('port/src/**/*.c', recursive=True) + glob.glob('port/src/**/*.cpp', recursive=True))
     srcs += sorted(s.replace(os.sep, '/') for d in ASM_DIRS for s in glob.glob(d + '*.asm'))
     srcs = [s for s in srcs if not s.startswith(SKIP_DIRS)]
+    if SINGLE_PLAYER:
+        srcs = single_player_sources(srcs)
     # (an .asm beside a .c of the same name gets its own object)
     def obj_of(s):
         base = os.path.splitext(s)[0] + ('_asm' if s.endswith('.asm') and not s.endswith('_asm.asm') else '')
@@ -177,8 +226,9 @@ def main():
     md += ['', '## Failing units by error count', '', '| unit | errors |', '|---|---|']
     md += ['| %s | %d |' % (s, per_unit[s]) for s in sorted(failed, key=lambda s: -per_unit[s])]
     open(os.path.join(OUT, 'errors.md'), 'w', encoding='utf-8').write('\n'.join(md) + '\n')
-    print('%d units: %d compile, %d fail (build/port/errors.md, build/port/compile.log)' % (
-        len(results), len(results) - len(failed), len(failed)))
+    out_label = os.path.relpath(OUT, ROOT).replace(os.sep, '/')
+    print('%d units: %d compile, %d fail (%s/errors.md, %s/compile.log)' % (
+        len(results), len(results) - len(failed), len(failed), out_label, out_label))
     # (--link: link after a partial compile, with the other units' objects as they are)
     if not failed and (not only or '--link' in args):
         link(every)
@@ -219,8 +269,9 @@ def link(objs):
                                                                     if len(unresolved[s]) > 6 else ''))
            for s in sorted(unresolved)]
     open(os.path.join(OUT, 'link.md'), 'w', encoding='utf-8').write('\n'.join(md) + '\n')
-    print('link exit %d: %d unresolved symbols, %d other errors (build/port/link.md)' % (
-        r.returncode, len(unresolved), len(others)))
+    out_label = os.path.relpath(OUT, ROOT).replace(os.sep, '/')
+    print('link exit %d: %d unresolved symbols, %d other errors (%s/link.md)' % (
+        r.returncode, len(unresolved), len(others), out_label))
 
 
 if __name__ == '__main__':

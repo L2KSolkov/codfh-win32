@@ -126,6 +126,7 @@ MACRO_STOP
 // match: _rcsid @ 0x0041A6E0
 
 // match: __rpMTEffectSystemInit @ 0x002F75F0
+// sp-match: __rpMTEffectSystemInit @ 0x00211D80
 RwBool
 _rpMTEffectSystemInit()
 {
@@ -140,6 +141,7 @@ _rpMTEffectSystemInit()
 /******************************************************************************
  */
 // match: __rpMTEffectRegisterPlatform @ 0x002F7610
+// sp-match: __rpMTEffectRegisterPlatform @ 0x00211DA0
 RwBool
 _rpMTEffectRegisterPlatform(RwPlatformID  platformID,
                             rpMTEffectStreamReadCallBack      streamRead,
@@ -168,6 +170,7 @@ _rpMTEffectRegisterPlatform(RwPlatformID  platformID,
 /******************************************************************************
  */
 // match: __rpMTEffectOpen @ 0x002F7A90
+// sp-match: __rpMTEffectOpen @ 0x00212220
 RwBool
 _rpMTEffectOpen()
 {
@@ -210,6 +213,7 @@ _rpMTEffectOpen()
 /******************************************************************************
  */
 // match: __rpMTEffectClose @ 0x002F7B60
+// sp-match: __rpMTEffectClose @ 0x002122F0
 RwBool
 _rpMTEffectClose()
 {
@@ -259,6 +263,7 @@ _rpMTEffectClose()
 /******************************************************************************
  */
 // match: __rpMTEffectInit @ 0x002F7BE0
+// sp-match: __rpMTEffectInit @ 0x00212370
 RpMTEffect *
 _rpMTEffectInit(RpMTEffect *effect, RwPlatformID platformID)
 {
@@ -579,6 +584,7 @@ RpMTEffectDictStreamRead(RwStream *stream)
  * \see RpMTEffectDictAddEffect
  */
 // match: _RpMTEffectDictCreate @ 0x002F7650
+// sp-match: _RpMTEffectDictCreate @ 0x00211DE0
 RpMTEffectDict *
 RpMTEffectDictCreate(void)
 {
@@ -621,6 +627,7 @@ RpMTEffectDictCreate(void)
  * \see RpMTEffectDictCreate
  */
 // match: _RpMTEffectDictDestroy @ 0x002F77E0
+// sp-match: _RpMTEffectDictDestroy @ 0x00211F70
 void
 RpMTEffectDictDestroy(RpMTEffectDict *dict)
 {
@@ -763,6 +770,7 @@ RpMTEffectDictForAllEffects(const RpMTEffectDict *dict,
  * \see RpMTEffectDictCreate
  */
 // match: _RpMTEffectDictAddEffect @ 0x002F7880
+// sp-match: _RpMTEffectDictAddEffect @ 0x00212010
 RpMTEffectDict *
 RpMTEffectDictAddEffect(RpMTEffectDict *dict, RpMTEffect *effect)
 {
@@ -802,6 +810,7 @@ RpMTEffectDictAddEffect(RpMTEffectDict *dict, RpMTEffect *effect)
  * \see RpMTEffectDictAddEffect
  */
 // match: _RpMTEffectDictRemoveEffect @ 0x002F76E0
+// sp-match: _RpMTEffectDictRemoveEffect @ 0x00211E70
 RpMTEffect *
 RpMTEffectDictRemoveEffect(RpMTEffect *effect)
 {
@@ -832,6 +841,7 @@ RpMTEffectDictRemoveEffect(RpMTEffect *effect)
  * \see RpMTEffectSetName
  */
 // match: _RpMTEffectDictFindNamedEffect @ 0x002F7710
+// sp-match: _RpMTEffectDictFindNamedEffect @ 0x00211EA0
 RpMTEffect *
 RpMTEffectDictFindNamedEffect(const RpMTEffectDict *dict,
                               const RwChar *name)
@@ -916,6 +926,7 @@ RpMTEffectDictGetCurrent(void)
  * \see RpMTEffectDestroy
  */
 // match: _RpMTEffectCreateDummy @ 0x002F7C30
+// sp-match: _RpMTEffectCreateDummy @ 0x002123C0
 RpMTEffect *
 RpMTEffectCreateDummy(void)
 {
@@ -950,6 +961,7 @@ RpMTEffectCreateDummy(void)
  * \see RpMTEffectCreateDummy
  */
 // match: _RpMTEffectDestroy @ 0x002F7750
+// sp-match: _RpMTEffectDestroy @ 0x00211EE0
 void
 RpMTEffectDestroy(RpMTEffect *effect)
 {
@@ -1104,6 +1116,7 @@ RpMTEffectStreamWrite(const RpMTEffect *effect, RwStream *stream)
  * \see RwStreamFindChunk
  */
 // match: _RpMTEffectStreamRead @ 0x002F78D0
+// sp-match: _RpMTEffectStreamRead @ 0x00212060
 RpMTEffect *
 RpMTEffectStreamRead(RwStream *stream)
 {
@@ -1169,6 +1182,7 @@ RpMTEffectStreamRead(RwStream *stream)
  * \see RpMTEffectSetName
  */
 // match: _RpMTEffectFind @ 0x002F7990
+// sp-match: _RpMTEffectFind @ 0x00212120
 RpMTEffect *
 RpMTEffectFind(RwChar *name)
 {
@@ -1294,6 +1308,7 @@ RpMTEffectWrite(const RpMTEffect *effect)
  * \see RpMTEffectGetName
  */
 // match: _RpMTEffectSetName @ 0x002F77B0
+// sp-match: _RpMTEffectSetName @ 0x00211F40
 RpMTEffect *
 RpMTEffectSetName(RpMTEffect *effect, RwChar *name)
 {
@@ -1337,6 +1352,7 @@ RpMTEffectGetName(RpMTEffect *effect)
  * \see RpMTEffectDestroy
  */
 // match: _RpMTEffectAddRef @ 0x002F77D0
+// sp-match: _RpMTEffectAddRef @ 0x00211F60
 RpMTEffect *
 RpMTEffectAddRef(RpMTEffect *effect)
 {

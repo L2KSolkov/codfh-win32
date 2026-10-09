@@ -47,6 +47,7 @@ U32 unk_52F770[4] = { 0 };
 // match: _unk_52F770 @ 0x0052F770
 
 // match: ?set_rate_volume_and_pan@@YGXPAUSNDCHANNEL@@@Z @ 0x00345540
+// sp-match: ?set_rate_volume_and_pan@@YGXPAUSNDCHANNEL@@@Z @ 0x00255540
 
 static void __stdcall set_rate_volume_and_pan(SNDCHANNEL *ch)
 {
@@ -129,6 +130,7 @@ static void DS_unlock(SNDCHANNEL *ch)
 }
 
 // match: ?DS_clear@@YAXPAUSNDCHANNEL@@KK@Z @ 0x00345680
+// sp-match: ?DS_clear@@YAXPAUSNDCHANNEL@@KK@Z @ 0x00255680
 static void DS_clear(SNDCHANNEL *ch, U32 start, U32 len)
 {
   U32 fill;
@@ -154,6 +156,7 @@ static void DS_stop_secondary(SNDCHANNEL *ch)
 }
 
 // match: ?GoodGetCurrentPosition@@YAXPAUIDirectSoundBuffer@@PAK1@Z @ 0x00345730
+// sp-match: ?GoodGetCurrentPosition@@YAXPAUIDirectSoundBuffer@@PAK1@Z @ 0x00255730
 static void GoodGetCurrentPosition(IDirectSoundBuffer *buf, U32 *play, U32 *write)
 {
   U32 p0, w0, p1, w1;
@@ -171,6 +174,7 @@ static void GoodGetCurrentPosition(IDirectSoundBuffer *buf, U32 *play, U32 *writ
 }
 
 // match: ?Ready@@YGJPAUBINKSND@@@Z @ 0x003457A0
+// sp-match: ?Ready@@YGJPAUBINKSND@@@Z @ 0x002557A0
 static S32 __stdcall Ready(BINKSND *bs)
 {
   U32 play;
@@ -245,6 +249,7 @@ static S32 __stdcall Ready(BINKSND *bs)
 }
 
 // match: ?Lock@@YGJPAUBINKSND@@PAPAEPAK@Z @ 0x00345950
+// sp-match: ?Lock@@YGJPAUBINKSND@@PAPAEPAK@Z @ 0x00255950
 static S32 __stdcall Lock(BINKSND *bs, U8 **addr, U32 *len)
 {
   DS_lock(CH(bs), CH(bs)->writepos, CH(bs)->avail);
@@ -256,6 +261,7 @@ static S32 __stdcall Lock(BINKSND *bs, U8 **addr, U32 *len)
 }
 
 // match: ?start_streaming@@YAXPAUSNDCHANNEL@@@Z @ 0x003459E0
+// sp-match: ?start_streaming@@YAXPAUSNDCHANNEL@@@Z @ 0x002559E0
 static void start_streaming(SNDCHANNEL *ch)
 {
   U32 play;
@@ -284,6 +290,7 @@ static void start_streaming(SNDCHANNEL *ch)
 }
 
 // match: ?Unlock@@YGJPAUBINKSND@@K@Z @ 0x00345A90
+// sp-match: ?Unlock@@YGJPAUBINKSND@@K@Z @ 0x00255A90
 static S32 __stdcall Unlock(BINKSND *bs, U32 filled)
 {
   CH(bs)->writepos += filled;
@@ -298,6 +305,7 @@ static S32 __stdcall Unlock(BINKSND *bs, U32 filled)
 }
 
 // match: ?Volume@@YGXPAUBINKSND@@J@Z @ 0x00345B20
+// sp-match: ?Volume@@YGXPAUBINKSND@@J@Z @ 0x00255B20
 static void __stdcall Volume(BINKSND *bs, S32 volume)
 {
   if (volume > 32767)
@@ -307,6 +315,7 @@ static void __stdcall Volume(BINKSND *bs, S32 volume)
 }
 
 // match: ?Pan@@YGXPAUBINKSND@@J@Z @ 0x00345B50
+// sp-match: ?Pan@@YGXPAUBINKSND@@J@Z @ 0x00255B50
 static void __stdcall Pan(BINKSND *bs, S32 pan)
 {
   if (pan > 65536)
@@ -316,6 +325,7 @@ static void __stdcall Pan(BINKSND *bs, S32 pan)
 }
 
 // match: ?MixBins@@YGXPAUBINKSND@@PAKK@Z @ 0x00345B80
+// sp-match: ?MixBins@@YGXPAUBINKSND@@PAKK@Z @ 0x00255B80
 static void __stdcall MixBins(BINKSND *bs, U32 *bins, U32 total)
 {
   if (total > 8)
@@ -326,6 +336,7 @@ static void __stdcall MixBins(BINKSND *bs, U32 *bins, U32 total)
 }
 
 // match: ?MixBinVolumes@@YGXPAUBINKSND@@PAKPAJK@Z @ 0x00345BC0
+// sp-match: ?MixBinVolumes@@YGXPAUBINKSND@@PAKPAJK@Z @ 0x00255BC0
 static void __stdcall MixBinVolumes(BINKSND *bs, U32 *bins, S32 *volumes, U32 total)
 {
   U32 i;
@@ -356,6 +367,7 @@ static void __stdcall MixBinVolumes(BINKSND *bs, U32 *bins, S32 *volumes, U32 to
 }
 
 // match: ?SetOnOff@@YGJPAUBINKSND@@J@Z @ 0x00345C70
+// sp-match: ?SetOnOff@@YGJPAUBINKSND@@J@Z @ 0x00255C70
 static S32 __stdcall SetOnOff(BINKSND *bs, S32 status)
 {
   if (status)
@@ -386,6 +398,7 @@ static S32 __stdcall SetOnOff(BINKSND *bs, S32 status)
 }
 
 // match: ?Pause@@YGJPAUBINKSND@@J@Z @ 0x00345D00
+// sp-match: ?Pause@@YGJPAUBINKSND@@J@Z @ 0x00255D00
 static S32 __stdcall Pause(BINKSND *bs, S32 status)
 {
   if (status)
@@ -403,6 +416,7 @@ static S32 __stdcall Pause(BINKSND *bs, S32 status)
 }
 
 // match: ?open_ds@@YAJXZ @ 0x00345D70
+// sp-match: ?open_ds@@YAJXZ @ 0x00255D70
 static S32 open_ds(void)
 {
   if (++opened_ds == 1)
@@ -438,6 +452,7 @@ static void close_ds(void)
 }
 
 // match: ?Close@@YGXPAUBINKSND@@@Z @ 0x00345DC0
+// sp-match: ?Close@@YGXPAUBINKSND@@@Z @ 0x00255DC0
 static void __stdcall Close(BINKSND *bs)
 {
   if (CH(bs)->dsbuf)
@@ -452,6 +467,7 @@ static void __stdcall Close(BINKSND *bs)
 }
 
 // match: ?Open@@YGJPAUBINKSND@@KJJKPAUBINK@@@Z @ 0x00345E40
+// sp-match: ?Open@@YGJPAUBINKSND@@KJJKPAUBINK@@@Z @ 0x00255E40
 static S32 __stdcall Open(BINKSND *bs, U32 freq, S32 bits, S32 chans, U32 flags, BINK *bink)
 {
   WAVEFORMATEX wf;
@@ -523,6 +539,7 @@ static S32 __stdcall Open(BINKSND *bs, U32 freq, S32 bits, S32 chans, U32 flags,
 }
 
 // match: _BinkOpenDirectSound@4 @ 0x003460D0
+// sp-match: _BinkOpenDirectSound@4 @ 0x002560D0
 RADEXPFUNC BINKSNDOPEN RADEXPLINK BinkOpenDirectSound(U32 param)
 {
   if (lpds == (IDirectSound *)-1)

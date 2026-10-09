@@ -44,7 +44,22 @@ struct type_8E670
 
     void sub_8E670(type_8F3E0 *arg_0);
     // Clears it, as its constructor does (type_3D3548's vf_22C).
+#ifdef CODFH_SP // single player expands it inline, its stores in this order (SP 0x9FA50)
+    void sub_CCC60()
+    {
+        unk_08 = 0;
+        unk_00 = 0;
+        unk_0C = 0.0f;
+        unk_04 = 0.0f;
+        unk_1C = 0.0f;
+        unk_18 = 0;
+        unk_14 = 0;
+        unk_10 = 0;
+        unk_20 = 0;
+    }
+#else
     void sub_CCC60();
+#endif
     void sub_8E750();
     void sub_8F140(RwInt32 arg_0, RwReal arg_4, RwV3d *arg_8, struct type_8BEC0 *arg_C,
                    RwV3d *arg_10, struct type_8BEC0 *arg_14);

@@ -53,12 +53,14 @@ void sub_31B90()
     sub_19A750("Somebody forgot to unregister in the CanShoot Scheduler!");
 }
 // match: sub_31BB0 @ 0x00031BB0
+// sp-match: sub_31BB0 @ 0x000270A0
 void sub_31BB0(RwReal arg_0)
 {
     flt_438D38.sub_72560(arg_0);
     flt_438D88.sub_72560(arg_0);
 }
 // match: sub_31BE0 @ 0x00031BE0
+// sp-match: sub_31BE0 @ 0x000274D0
 void sub_31BE0(type_3D2E7C *arg_0)
 {
     if (arg_0 != 0) {
@@ -67,12 +69,14 @@ void sub_31BE0(type_3D2E7C *arg_0)
     }
 }
 // match: sub_31C30 @ 0x00031C30
+// sp-match: sub_31C30 @ 0x000270C0
 void sub_31C30(type_3D2E7C *arg_0)
 {
     if (arg_0 != 0)
         flt_438D38.sub_72240(arg_0->sub_71340());
 }
 // match: sub_31C50 @ 0x00031C50
+// sp-match: sub_31C50 @ 0x000270E0
 RwInt32 sub_31C50(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 {
     type_3D3548 *local_24;
@@ -101,11 +105,13 @@ RwInt32 sub_31C50(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
     return 1;
 }
 // match: ?sub_31DB0@@YAHPAUtype_67620@@HMH@Z @ 0x00031DB0
+// sp-match: ?sub_31DB0@@YAHPAUtype_67620@@HMH@Z @ 0x002168E0
 RwInt32 sub_31DB0(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 {
     return 1;
 }
 // match: sub_31DC0 @ 0x00031DC0
+// sp-match: sub_31DC0 @ 0x00027210
 void sub_31DC0(type_3D2E7C *arg_0)
 {
     // The negation is an int before it is tested (neg; sbb; inc), as in an
@@ -114,12 +120,14 @@ void sub_31DC0(type_3D2E7C *arg_0)
         flt_438D88.sub_72050(arg_0->sub_71340(), 0, 0, 0);
 }
 // match: sub_31E00 @ 0x00031E00
+// sp-match: sub_31E00 @ 0x00027240
 void sub_31E00(type_3D2E7C *arg_0)
 {
     if (arg_0 != 0)
         flt_438D88.sub_72240(arg_0->sub_71340());
 }
 // match: sub_31E20 @ 0x00031E20
+// sp-match: sub_31E20 @ 0x00027260
 // The second scheduler's callback: finds up to three nodes of kind 11
 // within 1000 of the entity and records them in its AI (their points in
 // unk_04, their facings in unk_28, the kind-15 ones in the bits of unk_4C,

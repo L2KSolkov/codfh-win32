@@ -32,11 +32,13 @@ RWS_REGISTERCLASS(CPoolSizes);
 // match: ?MakeNew@CPoolSizes@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000CA2C0
 // match: __ehhandler$?MakeNew@CPoolSizes@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300980
 // match: __ehhandler$?MakeNew@CPoolSizes@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030098F
+// sp-match: ?MakeNew@CPoolSizes@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00099B20
 RWS_DEFINE_MAKENEW(CPoolSizes)
 
 // match: ??0CPoolSizes@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000CA340
 // match: __ehhandler$??0CPoolSizes@@QAE@ABVCAttributePacket@RWS@@@Z-0x13 @ 0x003009A0
 // match: __ehhandler$??0CPoolSizes@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x003009B3
+// sp-match: ??0CPoolSizes@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00099830
 CPoolSizes::CPoolSizes(const RWS::CAttributePacket &attr)
     : unk_20(25), unk_24(30), unk_28(30), unk_2C(5), unk_30(0), unk_34(1), unk_38(15), unk_3C(10),
       unk_40(30)
@@ -45,10 +47,12 @@ CPoolSizes::CPoolSizes(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_GCPoolSizes@@UAEPAXI@Z @ 0x000CA470
+// sp-match: ??_GCPoolSizes@@UAEPAXI@Z @ 0x00099B10
 
 // match: ??1CPoolSizes@@UAE@XZ @ 0x000CA490
 // match: __ehhandler$??1CPoolSizes@@UAE@XZ-0x2F @ 0x003009C0
 // match: __ehhandler$??1CPoolSizes@@UAE@XZ @ 0x003009EF
+// sp-match: ??1CPoolSizes@@UAE@XZ @ 0x000998E0
 CPoolSizes::~CPoolSizes()
 {
     UnLinkMsg(RWS::iMsgStartSystem);
@@ -56,6 +60,7 @@ CPoolSizes::~CPoolSizes()
 
 // Commands 9 and 10: the task pool's size and the call records per task.
 // match: ?HandleAttributes@CPoolSizes@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000CA520
+// sp-match: ?HandleAttributes@CPoolSizes@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00099950
 void CPoolSizes::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     RWS::CAttributeHandler::HandleAttributes(attr);
@@ -81,10 +86,18 @@ void CPoolSizes::HandleAttributes(const RWS::CAttributePacket &attr)
             break;
         case 7:
             unk_38 = attrIt->GetAs_RwInt32();
+#ifdef CODFH_SP
+            // Single player caps this count at 15, not 33 (SP 0x99987).
+            if (unk_38 > 0xF)
+            {
+                unk_38 = 0xF;
+            }
+#else
             if (unk_38 > 0x21)
             {
                 unk_38 = 0x21;
             }
+#endif
             break;
         case 8:
             unk_40 = attrIt->GetAs_RwInt32();
@@ -107,6 +120,7 @@ void CPoolSizes::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?HandleEvents@CPoolSizes@@UAEXAAVCMsg@RWS@@@Z @ 0x000CA740
+// sp-match: ?HandleEvents@CPoolSizes@@UAEXAAVCMsg@RWS@@@Z @ 0x00099AD0
 void CPoolSizes::HandleEvents(RWS::CMsg &pMsg)
 {
     if (pMsg.Id.p_msgrec == RWS::iMsgStartSystem.p_msgrec)
@@ -117,3 +131,4 @@ void CPoolSizes::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ??_ECPoolSizes@@WBI@AEPAXI@Z @ 0x000CA780
+// sp-match: ??_ECPoolSizes@@WBI@AEPAXI@Z @ 0x00099B00

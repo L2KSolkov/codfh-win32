@@ -126,6 +126,7 @@ RwModuleInfo  _rpMultiTextureModule = {0, 0};
 // match: _rcsid @ 0x0041A900
 
 // match: _MultiTextureOpen @ 0x002FC3B0
+// sp-match: _MultiTextureOpen @ 0x00216B50
 static void *
 MultiTextureOpen(void    *object        __RWUNUSED__,
                  RwInt32 offsetInObject __RWUNUSED__,
@@ -142,6 +143,7 @@ MultiTextureOpen(void    *object        __RWUNUSED__,
 
 
 // match: _MultiTextureClose @ 0x002FC3C0
+// sp-match: _MultiTextureClose @ 0x00216B60
 static void *
 MultiTextureClose(void    *object        __RWUNUSED__,
                   RwInt32 offsetInObject __RWUNUSED__,
@@ -160,6 +162,7 @@ MultiTextureClose(void    *object        __RWUNUSED__,
 /******************************************************************************
  */
 // match: _MultiTextureCreate @ 0x002FC3D0
+// sp-match: _MultiTextureCreate @ 0x00216B70
 static RpMultiTexture *
 MultiTextureCreate(rpMultiTextureRegEntry *regEntry, RwUInt32 numTextures)
 {
@@ -195,6 +198,7 @@ MultiTextureCreate(rpMultiTextureRegEntry *regEntry, RwUInt32 numTextures)
 /******************************************************************************
  */
 // match: _MultiTextureDestroy @ 0x002FC450
+// sp-match: _MultiTextureDestroy @ 0x00216BF0
 static void
 MultiTextureDestroy(RpMultiTexture *multiTexture)
 {
@@ -244,6 +248,7 @@ MultiTextureConstructor(void    *object,
 /******************************************************************************
  */
 // match: _MultiTextureDestructor @ 0x002FC4C0
+// sp-match: _MultiTextureDestructor @ 0x00216C50
 static void *
 MultiTextureDestructor(void    *object,
                        RwInt32  offset,
@@ -267,6 +272,7 @@ MultiTextureDestructor(void    *object,
 /******************************************************************************
  */
 // match: _MultiTextureCopy @ 0x002FC6D0
+// sp-match: _MultiTextureCopy @ 0x00216E60
 static void *
 MultiTextureCopy(void       *dstObject,
                  const void *srcObject,
@@ -314,6 +320,7 @@ MultiTextureCopy(void       *dstObject,
 /******************************************************************************
  */
 // match: _MultiTextureStreamGetSize @ 0x002FC4F0
+// sp-match: _MultiTextureStreamGetSize @ 0x00216C80
 static RwInt32
 MultiTextureStreamGetSize(const void *object,
                           RwInt32     offset,
@@ -358,6 +365,7 @@ MultiTextureStreamGetSize(const void *object,
 /******************************************************************************
  */
 // match: _MultiTextureStreamWrite @ 0x002FC550
+// sp-match: _MultiTextureStreamWrite @ 0x00216CE0
 static RwStream *
 MultiTextureStreamWrite(RwStream   *stream,
                         RwInt32     length    __RWUNUSED__,
@@ -426,6 +434,7 @@ MultiTextureStreamWrite(RwStream   *stream,
 /******************************************************************************
  */
 // match: _MultiTextureStreamRead @ 0x002FC7A0
+// sp-match: _MultiTextureStreamRead @ 0x00216F30
 static RwStream *
 MultiTextureStreamRead(RwStream *stream,
                        RwInt32   length    __RWUNUSED__,
@@ -540,6 +549,7 @@ MultiTextureStreamRead(RwStream *stream,
 /******************************************************************************
  */
 // match: __rpMultiTexturePluginAttach @ 0x002FC620
+// sp-match: __rpMultiTexturePluginAttach @ 0x00216DB0
 RwBool
 _rpMultiTexturePluginAttach()
 {
@@ -572,6 +582,7 @@ _rpMultiTexturePluginAttach()
 /******************************************************************************
  */
 // match: __rpMaterialRegisterMultiTexturePlugin @ 0x002FC8D0
+// sp-match: __rpMaterialRegisterMultiTexturePlugin @ 0x00217060
 RwBool
 _rpMaterialRegisterMultiTexturePlugin(RwPlatformID    platformID,
                             RwUInt32        pluginID,
@@ -669,6 +680,7 @@ RpMultiTextureGetNumTextures(const RpMultiTexture *multiTexture)
  * \see RpMTEffectCreateDummy
  */
 // match: _RpMultiTextureSetEffect @ 0x002FC670
+// sp-match: _RpMultiTextureSetEffect @ 0x00216E00
 RpMultiTexture *
 RpMultiTextureSetEffect(RpMultiTexture *multiTexture,
                         RpMTEffect     *effect)
@@ -932,6 +944,7 @@ RpMaterialDestroyMultiTexture(RpMaterial   *material,
  * \see RpMaterialCreateMultiTexture.
  */
 // match: _RpMaterialGetMultiTexture @ 0x002FC6A0
+// sp-match: _RpMaterialGetMultiTexture @ 0x00216E30
 RpMultiTexture *
 RpMaterialGetMultiTexture(const RpMaterial    *material,
                           RwPlatformID   platformID)

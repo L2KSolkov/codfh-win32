@@ -378,6 +378,11 @@ extern "C" HRESULT WINAPI D3DDevice_GetRenderTarget(D3DSurface **pp)
     return D3D_OK;
 }
 
+extern "C" D3DSurface *WINAPI D3DDevice_GetRenderTarget2(void)
+{
+    return render_target;
+}
+
 extern "C" HRESULT WINAPI D3DDevice_GetDepthStencilSurface(D3DSurface **pp)
 {
     *pp = depth_target;

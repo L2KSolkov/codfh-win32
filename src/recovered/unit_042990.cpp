@@ -36,6 +36,8 @@ type_16C2A0 dword_439910;
 
 // match: _$E1 @ 0x003098F0
 // match: _$E2 @ 0x0030DD00
+// sp-match: _$E2 @ 0x0021E130
+// sp-match: _$E1 @ 0x0021C370
 
 void sub_42A10();
 type_42AF0 *sub_42AB0();
@@ -51,6 +53,7 @@ void sub_6BDC0(type_42E00 *arg_0);
 void sub_6B890(RwUInt32 arg_0);
 
 // match: sub_42990 @ 0x00042990
+// sp-match: sub_42990 @ 0x000320B0
 void sub_42990()
 {
     dword_439910.sub_16C2C0(0x3E8, 0x10, "m_actionPool", 4, 0);
@@ -62,12 +65,14 @@ void sub_42990()
 }
 
 // match: sub_429E0 @ 0x000429E0
+// sp-match: sub_429E0 @ 0x00032440
 void sub_429E0()
 {
     sub_42A10();
 }
 
 // match: sub_429F0 @ 0x000429F0
+// sp-match: sub_429F0 @ 0x00032450
 void sub_429F0()
 {
     sub_42A10();
@@ -75,6 +80,7 @@ void sub_429F0()
 }
 
 // match: sub_42A10 @ 0x00042A10
+// sp-match: sub_42A10 @ 0x00032320
 // Drops every queued action (sub_42D70) and empties the queue.
 void sub_42A10()
 {
@@ -99,6 +105,7 @@ void sub_42A10()
 }
 
 // match: sub_42AB0 @ 0x00042AB0
+// sp-match: sub_42AB0 @ 0x000320F0
 type_42AF0 *sub_42AB0()
 {
     type_42AF0 *var_4;
@@ -108,12 +115,14 @@ type_42AF0 *sub_42AB0()
 }
 
 // match: sub_42AD0 @ 0x00042AD0
+// sp-match: sub_42AD0 @ 0x00032100
 void sub_42AD0(type_42AF0 *arg_0)
 {
     dword_439910.sub_16C710(arg_0);
 }
 
 // match: sub_42AF0 @ 0x00042AF0
+// sp-match: sub_42AF0 @ 0x00032110
 // Queues an action of kind arg_4 with the handle arg_8 from arg_0: while a
 // tick runs and arg_C is set, behind the running action (arg_10) or at the
 // tick's end; else at the head (arg_10) or the tail of the queue.
@@ -157,6 +166,7 @@ void sub_42AF0(type_3D2E7C *arg_0, RwInt32 arg_4, RwUInt32 arg_8, bool arg_C, bo
 }
 
 // match: sub_42C50 @ 0x00042C50
+// sp-match: sub_42C50 @ 0x00032390
 // The tick, arg_0 its time: sends "Tick" when dword_4B8710 is set, then runs
 // the actions queued before it (sub_42D40), freeing each.
 void sub_42C50(RwReal arg_0)
@@ -194,6 +204,7 @@ void sub_42C50(RwReal arg_0)
 }
 
 // match: sub_42D40 @ 0x00042D40
+// sp-match: sub_42D40 @ 0x00032230
 // Runs the action arg_0.
 void sub_42D40(type_42AF0 *arg_0)
 {
@@ -204,6 +215,7 @@ void sub_42D40(type_42AF0 *arg_0)
 }
 
 // match: sub_42D70 @ 0x00042D70
+// sp-match: sub_42D70 @ 0x00032250
 // Drops the action arg_0.
 void sub_42D70(type_42AF0 *arg_0)
 {
@@ -214,6 +226,7 @@ void sub_42D70(type_42AF0 *arg_0)
 }
 
 // match: sub_42DA0 @ 0x00042DA0
+// sp-match: sub_42DA0 @ 0x00032200
 void sub_42DA0(type_42AF0 *arg_0)
 {
     type_67620 *var_4;
@@ -226,15 +239,21 @@ void sub_42DA0(type_42AF0 *arg_0)
 }
 
 // match: sub_42DE0 @ 0x00042DE0
+// sp-match: sub_42DE0 @ 0x00032220
 void sub_42DE0(type_42AF0 *arg_0)
 {
     RwUInt32 var_4;
 
     var_4 = arg_0->unk_08;
+#ifdef CODFH_SP
+    // shape: retain the target's second field read before releasing the handle.
+    if (var_4 == arg_0->unk_08)
+#endif
     sub_6B890(var_4);
 }
 
 // match: sub_42E00 @ 0x00042E00
+// sp-match: sub_42E00 @ 0x00032270
 // Drops the kind-16 actions not yet run whose object is for arg_0 with the
 // id arg_4 (and has unk_12 clear).
 void sub_42E00(type_67620 *arg_0, RwInt32 arg_4)

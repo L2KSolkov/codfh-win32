@@ -43,9 +43,11 @@ RWS_REGISTERCLASS(ProjectileGeneratorTrigger);
 // match: ?MakeNew@ProjectileGeneratorTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000AD1B0
 // match: __ehhandler$?MakeNew@ProjectileGeneratorTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300150
 // match: __ehhandler$?MakeNew@ProjectileGeneratorTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030015F
+// sp-match: ?MakeNew@ProjectileGeneratorTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00087630
 RWS_DEFINE_MAKENEW(ProjectileGeneratorTrigger)
 
 // match: ??0ProjectileGeneratorTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000AD230
+// sp-match: ??0ProjectileGeneratorTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000864D0
 ProjectileGeneratorTrigger::ProjectileGeneratorTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_DC = 0;
@@ -118,11 +120,14 @@ ProjectileGeneratorTrigger::ProjectileGeneratorTrigger(const RWS::CAttributePack
 }
 
 // match: ??_GProjectileGeneratorTrigger@@UAEPAXI@Z @ 0x000AD6E0
+// sp-match: ??_GProjectileGeneratorTrigger@@UAEPAXI@Z @ 0x000867F0
 
 // match: ??1ProjectileGeneratorTrigger@@UAE@XZ @ 0x000AD700
+// sp-match: ??1ProjectileGeneratorTrigger@@UAE@XZ @ 0x00086720
 // (Defined in the class, in ProjectileGeneratorTrigger.h.)
 
 // match: ?HandleAttributes@ProjectileGeneratorTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000AD730
+// sp-match: ?HandleAttributes@ProjectileGeneratorTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00086800
 void ProjectileGeneratorTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -195,7 +200,11 @@ void ProjectileGeneratorTrigger::HandleAttributes(const RWS::CAttributePacket &a
             break;
         }
         case 12:
+#ifdef CODFH_SP // a real in single player (include/types/ProjectileGeneratorTrigger.h)
+            unk_F8 = attrIt->GetAs_RwReal();
+#else
             unk_F8 = attrIt->GetAs_RwInt32();
+#endif
             break;
         case 14:
             unk_FC = attrIt->GetAs_RwInt32();
@@ -515,34 +524,64 @@ void ProjectileGeneratorTrigger::HandleAttributes(const RWS::CAttributePacket &a
             unk_228.unk_04 = attrIt->GetAs_RwInt32();
             break;
         case 93:
+#ifdef CODFH_SP // a whole real in single player: SP 0x872E4 converts the attribute through RwUInt32
+            unk_228.unk_08_r = (RwReal)(RwUInt32)attrIt->GetAs_RwReal();
+#else
             unk_228.unk_08 = attrIt->GetAs_RwInt32();
+#endif
             break;
         case 94:
+#ifdef CODFH_SP // a whole real in single player: SP 0x87312 converts the attribute through RwUInt32
+            unk_228.unk_0C_r = (RwReal)(RwUInt32)attrIt->GetAs_RwReal();
+#else
             unk_228.unk_0C = attrIt->GetAs_RwInt32();
+#endif
             break;
         case 95:
+#ifdef CODFH_SP // a whole real in single player: SP 0x87340 converts the attribute through RwUInt32
+            unk_228.unk_10_r = (RwReal)(RwUInt32)attrIt->GetAs_RwReal();
+#else
             unk_228.unk_10 = attrIt->GetAs_RwInt32();
+#endif
             break;
         case 96:
+#ifdef CODFH_SP // a whole real in single player: SP 0x8736E converts the attribute through RwUInt32
+            unk_228.unk_14_r = (RwReal)(RwUInt32)attrIt->GetAs_RwReal();
+#else
             unk_228.unk_14 = attrIt->GetAs_RwInt32();
+#endif
             break;
         case 97:
+#ifdef CODFH_SP // a whole real in single player: SP 0x8739C converts the attribute through RwUInt32
+            unk_228.unk_18_r = (RwReal)(RwUInt32)attrIt->GetAs_RwReal();
+#else
             unk_228.unk_18 = attrIt->GetAs_RwInt32();
+#endif
             break;
         case 82:
             unk_118 = attrIt->GetAs_RwReal();
             break;
         case 83:
+#ifdef CODFH_SP // whole seconds in single player: SP 0x873E1 converts through RwUInt32
+            unk_11C = (RwReal)(RwUInt32)attrIt->GetAs_RwReal() * 60.0f;
+#else
             unk_11C = attrIt->GetAs_RwReal() * 60.0f;
+#endif
             break;
         case 7:
             unk_21C = attrIt->GetAs_RwInt32();
             break;
         case 8:
         {
+#ifdef CODFH_SP // negated in single player: SP 0x87426 multiplies by -60 and subtracts
+            RwInt32 var_74 = (RwInt32)(attrIt->GetAs_RwReal() * -60.0f);
+
+            unk_220 = (unk_220 & 0xFFFF0000) - var_74;
+#else
             RwInt32 var_74 = (RwInt32)(attrIt->GetAs_RwReal() * 60.0f);
 
             unk_220 = (unk_220 & 0xFFFF0000) + var_74;
+#endif
             break;
         }
         case 9:
@@ -558,6 +597,7 @@ void ProjectileGeneratorTrigger::HandleAttributes(const RWS::CAttributePacket &a
 }
 
 // match: ?sub_AF020@ProjectileGeneratorTrigger@@QAEXH@Z @ 0x000AF020
+// sp-match: ?sub_AF020@ProjectileGeneratorTrigger@@QAEXH@Z @ 0x00086740
 void ProjectileGeneratorTrigger::sub_AF020(RwInt32 arg_0)
 {
     switch (arg_0)
@@ -584,3 +624,4 @@ void ProjectileGeneratorTrigger::sub_AF020(RwInt32 arg_0)
 }
 
 // match: ??_EProjectileGeneratorTrigger@@WBI@AEPAXI@Z @ 0x000AF140
+// sp-match: ??_EProjectileGeneratorTrigger@@WBI@AEPAXI@Z @ 0x000867E0

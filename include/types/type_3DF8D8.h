@@ -157,6 +157,11 @@ struct type_3DF8D8 : type_3DF8D8_base
     // given a buffer arg_0, a copy with its first '#' replaced by the number
     // arg_4 ("SetCheckPointRegister" passes 0 and 0 for the string itself).
     const RwChar *sub_197550(RwChar *arg_0, RwInt32 arg_4);
+#ifdef CODFH_SP
+    // Single player's copies of sub_197550 reading +0x14 and +0x18 (SP 0x1252B0, 0x125370).
+    const RwChar *sp_sub_1252B0(RwChar *arg_0, RwInt32 arg_4);
+    const RwChar *sp_sub_125370(RwChar *arg_0, RwInt32 arg_4);
+#endif
     // The object its model names (VehicleTrigger's vf_020 requires one; a
     // FlakTrigger's must be of kind 3).
     type_3DF8D8 *sub_1954D0();

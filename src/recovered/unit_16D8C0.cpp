@@ -27,7 +27,28 @@
 // match: ??_C@_0DO@PNEMFKEB@Warning?3?5Texture?5cannot?5be?5delet@ @ 0x003DCF44
 // match: ??_C@_0FC@HJOJEHHB@Warning?3?5Texture?5dictionary?5has?5@ @ 0x003DCF88
 
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_10B070@@YA_NPAURwFrame@@0@Z @ 0x0010B070
+// Single player only (SP 0x10B070, called from sub_948A0's SP 0x77DEB): whether
+// arg_0 is one of arg_4's ancestors (stopping at a frame that is its own parent).
+bool sp_sub_10B070(RwFrame *arg_0, RwFrame *arg_4)
+{
+    RwFrame *parent;
+
+    for (parent = RwFrameGetParent(arg_4); parent; parent = RwFrameGetParent(parent))
+    {
+        if (arg_4 == parent)
+            break;
+        if (arg_0 == parent)
+            return true;
+        arg_4 = parent;
+    }
+    return false;
+}
+#endif
+
 // match: ?sub_16D8C0@@YA_NPAURpClump@@PBD_N@Z @ 0x0016D8C0
+// sp-match: ?sub_16D8C0@@YA_NPAURpClump@@PBD_N@Z @ 0x0010B860
 
 bool sub_16D8C0(RpClump *arg_0, const RwChar *arg_4, bool arg_8)
 {
@@ -43,6 +64,7 @@ bool sub_16D8C0(RpClump *arg_0, const RwChar *arg_4, bool arg_8)
 }
 
 // match: ?sub_16D900@@YAHPAURpClump@@PBD@Z @ 0x0016D900
+// sp-match: ?sub_16D900@@YAHPAURpClump@@PBD@Z @ 0x0010B8A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The atomic of the clump arg_0 named arg_4 (as its first word), or 0.
 RwInt32 sub_16D900(RpClump *arg_0, const RwChar *arg_4)
@@ -58,6 +80,7 @@ RwInt32 sub_16D900(RpClump *arg_0, const RwChar *arg_4)
 }
 
 // match: ?sub_16D940@@YAPAURwFrame@@PAU1@H@Z @ 0x0016D940
+// sp-match: ?sub_16D940@@YAPAURwFrame@@PAU1@H@Z @ 0x0010B8E0
 RwFrame *sub_16D940(RwFrame *arg_0, RwInt32 arg_4)
 {
     type_16DAB0 var_8;
@@ -69,6 +92,7 @@ RwFrame *sub_16D940(RwFrame *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_16D970@@YAPAURpHAnimHierarchy@@PAURpClump@@@Z @ 0x0016D970
+// sp-match: ?sub_16D970@@YAPAURpHAnimHierarchy@@PAURpClump@@@Z @ 0x0010B910
 RpHAnimHierarchy *sub_16D970(RpClump *arg_0)
 {
     RpHAnimHierarchy *var_4;
@@ -79,6 +103,7 @@ RpHAnimHierarchy *sub_16D970(RpClump *arg_0)
 }
 
 // match: ?sub_16D9A0@@YAXPAURpClump@@@Z @ 0x0016D9A0
+// sp-match: ?sub_16D9A0@@YAXPAURpClump@@@Z @ 0x0010BB30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The pruning to the kept ids (sub_16DB20) is compiled out (`if (0)`);
 // what runs detaches the hierarchy's frame, empties the clump frame's
@@ -130,6 +155,7 @@ void sub_16D9A0(RpClump *arg_0)
 }
 
 // match: ?sub_16DAB0@@YAPAURwFrame@@PAU1@PAX@Z @ 0x0016DAB0
+// sp-match: ?sub_16DAB0@@YAPAURwFrame@@PAU1@PAX@Z @ 0x0010B0A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwFrame *sub_16DAB0(RwFrame *arg_0, void *arg_4)
 {
@@ -196,6 +222,7 @@ RwFrame *sub_16DB20(RwFrame *arg_0, void *arg_4)
 }
 
 // match: ?sub_16DC20@@YAPAURwFrame@@PAU1@PAX@Z @ 0x0016DC20
+// sp-match: ?sub_16DC20@@YAPAURwFrame@@PAU1@PAX@Z @ 0x0010B940
 // Destroys arg_0 and the frames below it, moving their atomics to the
 // frame arg_4.
 RwFrame *sub_16DC20(RwFrame *arg_0, void *arg_4)
@@ -210,6 +237,7 @@ RwFrame *sub_16DC20(RwFrame *arg_0, void *arg_4)
 }
 
 // match: ?sub_16DC70@@YAPAURwObject@@PAU1@PAX@Z @ 0x0016DC70
+// sp-match: ?sub_16DC70@@YAPAURwObject@@PAU1@PAX@Z @ 0x0010B0F0
 RwObject *sub_16DC70(RwObject *arg_0, void *arg_4)
 {
     RwFrame *var_4;
@@ -220,6 +248,7 @@ RwObject *sub_16DC70(RwObject *arg_0, void *arg_4)
 }
 
 // match: ?Clump_FindFirstAtomic@@YAPAURpAtomic@@PAURpClump@@@Z @ 0x0016DCA0
+// sp-match: ?Clump_FindFirstAtomic@@YAPAURpAtomic@@PAURpClump@@@Z @ 0x0010B970
 RpAtomic *Clump_FindFirstAtomic(RpClump *arg_0)
 {
     RpAtomic *var_4;
@@ -230,6 +259,7 @@ RpAtomic *Clump_FindFirstAtomic(RpClump *arg_0)
 }
 
 // match: ?sub_16DCD0@@YAXPAURpClump@@PAURwSphere@@@Z @ 0x0016DCD0
+// sp-match: ?sub_16DCD0@@YAXPAURpClump@@PAURwSphere@@@Z @ 0x0010B9A0
 void sub_16DCD0(RpClump *arg_0, RwSphere *arg_4)
 {
     RpAtomic *var_4;
@@ -249,6 +279,7 @@ void sub_16DCD0(RpClump *arg_0, RwSphere *arg_4)
 }
 
 // match: ?sub_16DD80@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0016DD80
+// sp-match: ?sub_16DD80@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0010B110
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *sub_16DD80(RpAtomic *arg_0, void *arg_4)
 {
@@ -294,6 +325,7 @@ RpAtomic *sub_16DD80(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_16DFA0@@YAXPAURpClump@@PAURwV3d@@M@Z @ 0x0016DFA0
+// sp-match: ?sub_16DFA0@@YAXPAURpClump@@PAURwV3d@@M@Z @ 0x0010BA10
 void sub_16DFA0(RpClump *arg_0, RwV3d *arg_4, RwReal arg_8)
 {
     RwSphere var_10;
@@ -304,6 +336,7 @@ void sub_16DFA0(RpClump *arg_0, RwV3d *arg_4, RwReal arg_8)
 }
 
 // match: ?sub_16DFE0@@YAXPAURpClump@@H@Z @ 0x0016DFE0
+// sp-match: ?sub_16DFE0@@YAXPAURpClump@@H@Z @ 0x0010BA50
 void sub_16DFE0(RpClump *arg_0, RwInt32 arg_4)
 {
     sub_FBBE0(arg_0, arg_4);
@@ -311,6 +344,7 @@ void sub_16DFE0(RpClump *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_16E010@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0016E010
+// sp-match: ?sub_16E010@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0010B2B0
 RpAtomic *sub_16E010(RpAtomic *arg_0, void *arg_4)
 {
     RwInt32 var_4;
@@ -321,6 +355,7 @@ RpAtomic *sub_16E010(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_16E040@@YAXPAURpClump@@@Z @ 0x0016E040
+// sp-match: ?sub_16E040@@YAXPAURpClump@@@Z @ 0x0010B2D0
 void sub_16E040(RpClump *arg_0)
 {
     RwFrame *var_4;
@@ -334,6 +369,7 @@ void sub_16E040(RpClump *arg_0)
 }
 
 // match: ?sub_16E080@@YAXPAURpClump@@I@Z @ 0x0016E080
+// sp-match: ?sub_16E080@@YAXPAURpClump@@I@Z @ 0x0010BA80
 void sub_16E080(RpClump *arg_0, RwUInt32 arg_4)
 {
     type_16E250 var_8;
@@ -346,6 +382,7 @@ void sub_16E080(RpClump *arg_0, RwUInt32 arg_4)
 }
 
 // match: ?sub_16E0C0@@YAIPAURpClump@@@Z @ 0x0016E0C0
+// sp-match: ?sub_16E0C0@@YAIPAURpClump@@@Z @ 0x0010BAC0
 RwUInt32 sub_16E0C0(RpClump *arg_0)
 {
     type_16E250 var_8;
@@ -359,6 +396,7 @@ RwUInt32 sub_16E0C0(RpClump *arg_0)
 }
 
 // match: ?sub_16E100@@YAXPAURpClump@@0@Z @ 0x0016E100
+// sp-match: ?sub_16E100@@YAXPAURpClump@@0@Z @ 0x0010BBA0
 void sub_16E100(RpClump *arg_0, RpClump *arg_4)
 {
     RwFrame *var_4;
@@ -370,6 +408,7 @@ void sub_16E100(RpClump *arg_0, RpClump *arg_4)
 }
 
 // match: ?sub_16E140@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0016E140
+// sp-match: ?sub_16E140@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0010BB00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *sub_16E140(RpAtomic *arg_0, void *arg_4)
 {
@@ -389,6 +428,7 @@ RpAtomic *sub_16E140(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?GetHierarchyFrameRecurse@@YAPAURwFrame@@PAU1@PAX@Z @ 0x0016E1A0
+// sp-match: ?GetHierarchyFrameRecurse@@YAPAURwFrame@@PAU1@PAX@Z @ 0x0010B300
 // The database's name: finds the first frame below arg_0 with a
 // hierarchy, into *arg_4.
 RwFrame *GetHierarchyFrameRecurse(RwFrame *arg_0, void *arg_4)
@@ -407,6 +447,7 @@ RwFrame *GetHierarchyFrameRecurse(RwFrame *arg_0, void *arg_4)
 }
 
 // match: ?Clump_CaptureFirstAtomic@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0016E1F0
+// sp-match: ?Clump_CaptureFirstAtomic@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0010B340
 RpAtomic *Clump_CaptureFirstAtomic(RpAtomic *arg_0, void *arg_4)
 {
     RpAtomic **var_4;
@@ -430,6 +471,7 @@ RwTexture *Clump_CaptureFirstAtomic(RwTexture *arg_0, void *arg_4)
 }
 
 // match: ?sub_16E210@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0016E210
+// sp-match: ?sub_16E210@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0010B350
 RpAtomic *sub_16E210(RpAtomic *arg_0, void *arg_4)
 {
     RwSphere *var_4;
@@ -441,6 +483,7 @@ RpAtomic *sub_16E210(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_16E250@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0016E250
+// sp-match: ?sub_16E250@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0010B380
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Shows the atomic when its material's game data forces it (with that
 // data's mask) or its bit of the mask is set, else hides it.
@@ -485,6 +528,7 @@ RpAtomic *sub_16E250(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_16E370@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0016E370
+// sp-match: ?sub_16E370@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0010B420
 RpAtomic *sub_16E370(RpAtomic *arg_0, void *arg_4)
 {
     RwInt8 var_1;
@@ -499,6 +543,7 @@ RpAtomic *sub_16E370(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_16E3C0@@YAPAURpUserDataArray@@PAURpAtomic@@PBD@Z @ 0x0016E3C0
+// sp-match: ?sub_16E3C0@@YAPAURpUserDataArray@@PAURpAtomic@@PBD@Z @ 0x0010B450
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpUserDataArray *sub_16E3C0(RpAtomic *arg_0, const RwChar *arg_4)
 {
@@ -527,6 +572,7 @@ RpUserDataArray *sub_16E3C0(RpAtomic *arg_0, const RwChar *arg_4)
 }
 
 // match: ?sub_16E450@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0016E450
+// sp-match: ?sub_16E450@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0010B4C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *sub_16E450(RpAtomic *arg_0, void *arg_4)
 {
@@ -561,6 +607,7 @@ RpAtomic *sub_16E450(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_16E500@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0016E500
+// sp-match: ?sub_16E500@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0010B520
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpAtomic *sub_16E500(RpAtomic *arg_0, void *arg_4)
 {
@@ -577,6 +624,7 @@ RpAtomic *sub_16E500(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_16E540@@YAPAURpLight@@PAU1@PAX@Z @ 0x0016E540
+// sp-match: ?sub_16E540@@YAPAURpLight@@PAU1@PAX@Z @ 0x0010B550
 RpLight *sub_16E540(RpLight *arg_0, void *arg_4)
 {
     type_16E5C0 *var_4;
@@ -587,6 +635,7 @@ RpLight *sub_16E540(RpLight *arg_0, void *arg_4)
 }
 
 // match: ?sub_16E560@@YAPAURpClump@@PAU1@PAX@Z @ 0x0016E560
+// sp-match: ?sub_16E560@@YAPAURpClump@@PAU1@PAX@Z @ 0x0010B560
 RpClump *sub_16E560(RpClump *arg_0, void *arg_4)
 {
     type_16E5C0 *var_4;
@@ -597,6 +646,7 @@ RpClump *sub_16E560(RpClump *arg_0, void *arg_4)
 }
 
 // match: ?sub_16E580@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0016E580
+// sp-match: ?sub_16E580@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0009DC70
 RpAtomic *sub_16E580(RpAtomic *arg_0, void *arg_4)
 {
     type_16E5C0 *var_4;
@@ -607,6 +657,7 @@ RpAtomic *sub_16E580(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_16E5A0@@YAPAURpWorldSector@@PAU1@PAX@Z @ 0x0016E5A0
+// sp-match: ?sub_16E5A0@@YAPAURpWorldSector@@PAU1@PAX@Z @ 0x0010B570
 RpWorldSector *sub_16E5A0(RpWorldSector *arg_0, void *arg_4)
 {
     RpWorldSectorForAllAtomics(arg_0, sub_16E580, arg_4);
@@ -614,6 +665,7 @@ RpWorldSector *sub_16E5A0(RpWorldSector *arg_0, void *arg_4)
 }
 
 // match: ?sub_16E5C0@@YA_NPAURpWorld@@HH@Z @ 0x0016E5C0
+// sp-match: ?sub_16E5C0@@YA_NPAURpWorld@@HH@Z @ 0x0010B590
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Whether the world arg_0 is empty of atomics, clumps and lights (true
 // with no world); arg_4 and arg_8 are unused.
@@ -645,6 +697,7 @@ bool sub_16E5C0(RpWorld *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_16E6B0@@YAPAURwTexture@@PAU1@PAX@Z @ 0x0016E6B0
+// sp-match: ?sub_16E6B0@@YAPAURwTexture@@PAU1@PAX@Z @ 0x0010B690
 RwTexture *sub_16E6B0(RwTexture *arg_0, void *arg_4)
 {
     RwInt32 *var_4;
@@ -653,12 +706,16 @@ RwTexture *sub_16E6B0(RwTexture *arg_0, void *arg_4)
     {
         var_4 = (RwInt32 *)arg_4;
         (*var_4)++;
+#ifndef CODFH_SP
+        // single player compiles the debug prints out (SP 0x10B690)
         sub_19A750("Warning: Texture cannot be deleted! Texture has %d ref count!", arg_0->refCount);
+#endif
     }
     return arg_0;
 }
 
 // match: ?sub_16E6F0@@YA_NPAURwTexDictionary@@@Z @ 0x0016E6F0
+// sp-match: ?sub_16E6F0@@YA_NPAURwTexDictionary@@@Z @ 0x0010B6B0
 // Whether every texture of the dictionary arg_0 can be deleted (none has
 // another reference).
 bool sub_16E6F0(RwTexDictionary *arg_0)
@@ -669,13 +726,17 @@ bool sub_16E6F0(RwTexDictionary *arg_0)
     RwTexDictionaryForAllTextures(arg_0, sub_16E6B0, &var_4);
     if (var_4 > 0)
     {
+#ifndef CODFH_SP
+        // single player compiles the debug print out (SP 0x10B6B0)
         sub_19A750("Warning: Texture dictionary has %d textures that cannot be deleted! Refcount > 0!", var_4);
+#endif
         return false;
     }
     return true;
 }
 
 // match: ?sub_16E740@@YAXPAX0PAURwV3d@@@Z @ 0x0016E740
+// sp-match: ?sub_16E740@@YAXPAX0PAURwV3d@@@Z @ 0x0010B6E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The unit normal of the triangle arg_0 over the vertices arg_4 into
 // *arg_8.
@@ -698,6 +759,7 @@ void sub_16E740(void *arg_0, void *arg_4, RwV3d *arg_8)
 }
 
 // match: ?sub_16E860@@YAXPAURwV3d@@000@Z @ 0x0016E860
+// sp-match: ?sub_16E860@@YAXPAURwV3d@@000@Z @ 0x0010B7B0
 // The unit normal of the triangle arg_0, arg_4, arg_8 into *arg_C.
 void sub_16E860(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwV3d *arg_C)
 {
@@ -712,6 +774,7 @@ void sub_16E860(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwV3d *arg_C)
 }
 
 // match: ?sub_16E950@@YAXPADPBD@Z @ 0x0016E950
+// sp-match: ?sub_16E950@@YAXPADPBD@Z @ 0x0010BBD0
 void sub_16E950(RwChar *arg_0, const RwChar *arg_4)
 {
     RwInt32 var_4;

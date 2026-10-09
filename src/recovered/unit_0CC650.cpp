@@ -32,9 +32,11 @@ RWS_REGISTERCLASS(PASTrigger);
 // match: ?MakeNew@PASTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000CC650
 // match: __ehhandler$?MakeNew@PASTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300BC0
 // match: __ehhandler$?MakeNew@PASTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00300BCF
+// sp-match: ?MakeNew@PASTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0009B3C0
 RWS_DEFINE_MAKENEW(PASTrigger)
 
 // match: ??0PASTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000CC6D0
+// sp-match: ??0PASTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0009B290
 PASTrigger::PASTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_C0 = 0;
@@ -42,15 +44,19 @@ PASTrigger::PASTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 }
 
 // match: ?vf_008@PASTrigger@@UAEHXZ @ 0x000CC720
+// sp-match: ?vf_008@PASTrigger@@UAEHXZ @ 0x001244A0
 
 // match: ??_GPASTrigger@@UAEPAXI@Z @ 0x000CC730
+// sp-match: ??_GPASTrigger@@UAEPAXI@Z @ 0x0009B3B0
 
 // match: ??1PASTrigger@@UAE@XZ @ 0x000CC750
+// sp-match: ??1PASTrigger@@UAE@XZ @ 0x0009B2C0
 PASTrigger::~PASTrigger()
 {
 }
 
 // match: ?HandleAttributes@PASTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000CC780
+// sp-match: ?HandleAttributes@PASTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0009B2E0
 void PASTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -79,18 +85,21 @@ void PASTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?sub_CC850@PASTrigger@@QAEXH@Z @ 0x000CC850
+// sp-match: ?sub_CC850@PASTrigger@@QAEXH@Z @ 0x0009B380
 void PASTrigger::sub_CC850(RwInt32 arg_0)
 {
     unk_C0 = 1;
 }
 
 // match: ?sub_CC870@PASTrigger@@QAEXH@Z @ 0x000CC870
+// sp-match: ?sub_CC870@PASTrigger@@QAEXH@Z @ 0x0009B390
 void PASTrigger::sub_CC870(RwInt32 arg_0)
 {
     unk_C0 = 0;
 }
 
 // match: ??_EPASTrigger@@WBI@AEPAXI@Z @ 0x000CC890
+// sp-match: ??_EPASTrigger@@WBI@AEPAXI@Z @ 0x0009B3A0
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

@@ -8,6 +8,7 @@
 #include "game/gameloop.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003EA338
 extern const RwReal flt_3EA338 = 16.666666f;
 // 0x003EA33C
@@ -16,6 +17,7 @@ extern const RwReal flt_3EA33C = 0.01f;
 extern const RwReal flt_3EA340 = 0.01f;
 // 0x003EA344
 extern const RwReal flt_3EA344 = 0.0f;
+#endif
 // End of its data definitions.
 
 

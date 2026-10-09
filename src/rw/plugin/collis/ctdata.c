@@ -63,6 +63,7 @@ typedef struct
 // match: _rcsid @ 0x00417524
 
 // match: __rpCollTreeCreate @ 0x002C36C0
+// sp-match: __rpCollTreeCreate @ 0x001DEAD0
 RpCollTree *
 _rpCollTreeCreate(RwUInt16  numEntries,
                   RwUInt16  numSplits,
@@ -134,6 +135,7 @@ _rpCollTreeCreate(RwUInt16  numEntries,
 
 
 // match: __rpCollTreeDestroy @ 0x002C37C0
+// sp-match: __rpCollTreeDestroy @ 0x00166490
 void
 _rpCollTreeDestroy(RpCollTree *tree)
 {
@@ -163,6 +165,7 @@ _rpCollTreeDestroy(RpCollTree *tree)
  * does not include the rwID_COLLTREE chunk header.
  */
 // match: __rpCollTreeStreamGetSize @ 0x002C37D0
+// sp-match: __rpCollTreeStreamGetSize @ 0x001DEBD0
 RwUInt32
 _rpCollTreeStreamGetSize(const RpCollTree *tree)
 {
@@ -192,6 +195,7 @@ _rpCollTreeStreamGetSize(const RpCollTree *tree)
  * Serialise collision tree.
  */
 // match: __rpCollTreeStreamWrite @ 0x002C37F0
+// sp-match: __rpCollTreeStreamWrite @ 0x001DEBF0
 const RpCollTree *
 _rpCollTreeStreamWrite(const RpCollTree *tree, RwStream *stream)
 {
@@ -272,6 +276,7 @@ _rpCollTreeStreamWrite(const RpCollTree *tree, RwStream *stream)
 
 
 // match: __rpCollTreeStreamRead @ 0x002C3940
+// sp-match: __rpCollTreeStreamRead @ 0x001DED40
 RpCollTree *
 _rpCollTreeStreamRead(RwStream *stream)
 {
@@ -365,6 +370,7 @@ _rpCollTreeStreamRead(RwStream *stream)
  *
  */
 // match: __rpCollTreeStreamReadPre36001 @ 0x002C3A30
+// sp-match: __rpCollTreeStreamReadPre36001 @ 0x001DEE30
 RpCollTree *
 _rpCollTreeStreamReadPre36001(RwStream *stream,
                               RwUInt32  numEntries,

@@ -95,6 +95,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/src/baimras
 // match: _rcsid @ 0x00416C6C
 
 // match: _RwImageSetFromRaster @ 0x002B4860
+// sp-match: _RwImageSetFromRaster @ 0x001CFD50
 RwImage *
 RwImageSetFromRaster(RwImage *image, RwRaster *raster)
 {
@@ -148,6 +149,7 @@ RwImageSetFromRaster(RwImage *image, RwRaster *raster)
  *
  */
 // match: _RwRasterSetFromImage @ 0x002B4890
+// sp-match: _RwRasterSetFromImage @ 0x001CFD80
 RwRaster *
 RwRasterSetFromImage(RwRaster *raster, RwImage *image)
 {
@@ -196,6 +198,7 @@ RwRasterSetFromImage(RwRaster *raster, RwImage *image)
  *
  */
 // match: _RwImageFindRasterFormat @ 0x002B48C0
+// sp-match: _RwImageFindRasterFormat @ 0x001CFDB0
 RwImage *
 RwImageFindRasterFormat(RwImage *ipImage, RwInt32 nRasterType,
                         RwInt32 *npWidth, RwInt32 *npHeight,

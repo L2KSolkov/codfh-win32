@@ -25,6 +25,9 @@ type_16C2A0 dword_449B48;
 // match: _$E1 @ 0x00309BB0
 // match: _$E2 @ 0x0030DE40
 // match: ?sub_73360@@YAXXZ @ 0x00073360
+// sp-match: ?sub_73360@@YAXXZ @ 0x0005FDF0
+// sp-match: _$E1 @ 0x0021C640
+// sp-match: _$E2 @ 0x0021E270
 
 void sub_73360()
 {
@@ -34,12 +37,14 @@ void sub_73360()
 }
 
 // match: ?sub_733A0@@YAXXZ @ 0x000733A0
+// sp-match: ?sub_733A0@@YAXXZ @ 0x00060010
 void sub_733A0()
 {
     sub_73550();
 }
 
 // match: ?sub_733B0@@YAXXZ @ 0x000733B0
+// sp-match: ?sub_733B0@@YAXXZ @ 0x00060020
 void sub_733B0()
 {
     sub_73550();
@@ -48,6 +53,7 @@ void sub_733B0()
 }
 
 // match: ?sub_733D0@@YAHPAUtype_67620@@HHM@Z @ 0x000733D0
+// sp-match: ?sub_733D0@@YAHPAUtype_67620@@HHM@Z @ 0x00060040
 RwInt32 sub_733D0(type_67620 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwReal arg_C)
 {
     type_73360 *var_4;
@@ -69,6 +75,7 @@ RwInt32 sub_733D0(type_67620 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwReal arg_C)
 }
 
 // match: ?sub_73470@@YAXPAUtype_3D2C88@@@Z @ 0x00073470
+// sp-match: ?sub_73470@@YAXPAUtype_3D2C88@@@Z @ 0x0005FF60
 void sub_73470(type_3D2C88 *arg_0)
 {
     type_73360 *varC;
@@ -80,7 +87,12 @@ void sub_73470(type_3D2C88 *arg_0)
     local_8 = 0;
     while (varC != 0) {
         var_4 = varC->unk_14;
+#ifdef CODFH_SP
+        // shape: the record's handle read as a word (SP 0x5FF72)
+        if (varC->unk_00 == arg_0->get_unk_04_h())
+#else
         if (varC->unk_00 == arg_0->get_unk_04())
+#endif
             sub_73610(local_8, varC);
         else
             local_8 = varC;
@@ -89,6 +101,7 @@ void sub_73470(type_3D2C88 *arg_0)
 }
 
 // match: ?sub_734E0@@YAXPAUtype_67620@@H@Z @ 0x000734E0
+// sp-match: ?sub_734E0@@YAXPAUtype_67620@@H@Z @ 0x0005FFA0
 void sub_734E0(type_67620 *arg_0, RwInt32 arg_4)
 {
     type_73360 *varC;
@@ -100,7 +113,13 @@ void sub_734E0(type_67620 *arg_0, RwInt32 arg_4)
     local_8 = 0;
     while (varC != 0) {
         var_4 = varC->unk_14;
+#ifdef CODFH_SP
+        // shape: the object's handle read as a word (SP 0x5FFB7)
+        if (varC->unk_00 == arg_0->get_unk_04_h() && varC->unk_04 == arg_4)
+#else
         if (varC->unk_00 == arg_0->get_unk_04() && varC->unk_04 == arg_4)
+#endif
+
             sub_73610(local_8, varC);
         else
             local_8 = varC;
@@ -109,6 +128,7 @@ void sub_734E0(type_67620 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_73550@@YAXXZ @ 0x00073550
+// sp-match: ?sub_73550@@YAXXZ @ 0x0005FFE0
 void sub_73550()
 {
     type_73360 *local_8;
@@ -124,6 +144,7 @@ void sub_73550()
 }
 
 // match: ?sub_73590@@YAXPAUtype_73360@@@Z @ 0x00073590
+// sp-match: ?sub_73590@@YAXPAUtype_73360@@@Z @ 0x0005FE20
 void sub_73590(type_73360 *arg_0)
 {
     type_73360 *var_4;
@@ -147,6 +168,7 @@ void sub_73590(type_73360 *arg_0)
 }
 
 // match: ?sub_73610@@YAXPAUtype_73360@@0@Z @ 0x00073610
+// sp-match: ?sub_73610@@YAXPAUtype_73360@@0@Z @ 0x0005FE70
 void sub_73610(type_73360 *arg_0, type_73360 *arg_4)
 {
     if (arg_0 != 0)
@@ -158,6 +180,7 @@ void sub_73610(type_73360 *arg_0, type_73360 *arg_4)
 }
 
 // match: ?sub_73650@@YAXM@Z @ 0x00073650
+// sp-match: ?sub_73650@@YAXM@Z @ 0x0005FEC0
 // Runs the clock on by arg_0, posting the timers it passes.
 void sub_73650(RwReal arg_0)
 {
@@ -168,8 +191,14 @@ void sub_73650(RwReal arg_0)
     while (dword_449B44 != 0 && dword_449B44->unk_10 < dword_449B40) {
         var_4 = sub_67620(dword_449B44->unk_00);
         if (var_4 != 0 && var_4->vf_028() == dword_449B44->unk_0C) {
+#ifdef CODFH_SP
+            // shape: a block-scoped copy of the argument (SP 0x5FF29)
+            RwInt32 l8 = dword_449B44->unk_08;
+            sub_6B680(dword_449B44->unk_04, (type_67620 *)(var_4->vf_024()), 0, 0, &l8, 1, 1, 0);
+#else
             local_8 = dword_449B44->unk_08;
             sub_6B680(dword_449B44->unk_04, (type_67620 *)(var_4->vf_024()), 0, 0, &local_8, 1, 1, 0);
+#endif
         }
         sub_73610(0, dword_449B44);
     }

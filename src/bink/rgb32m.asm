@@ -25,6 +25,7 @@ BINK32M SEGMENT PARA PUBLIC 'CODE'
 segstart:
 
 ; // match: _YUV_32m_8x2_MMX@4 @ 0x00356140
+; // sp-match: _YUV_32m_8x2_MMX@4 @ 0x00266140
 _YUV_32m_8x2_MMX@4 PROC PUBLIC
         push ebx
         push ebp

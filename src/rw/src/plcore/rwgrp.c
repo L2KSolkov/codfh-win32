@@ -91,6 +91,7 @@ static RwFreeList _rwChunkGroupFList;
 // match: __rwChunkGroupFListPreallocBlocks @ 0x0043570C
 
 // match: __rwChunkGroupOpen @ 0x002B4E60
+// sp-match: __rwChunkGroupOpen @ 0x001D0280
 
 void  *
 _rwChunkGroupOpen(void *instance,
@@ -124,6 +125,7 @@ _rwChunkGroupOpen(void *instance,
  * Close this sub module.
  */
 // match: __rwChunkGroupClose @ 0x002B4EB0
+// sp-match: __rwChunkGroupClose @ 0x001D02D0
 void           *
 _rwChunkGroupClose(void *instance,
               RwInt32 __RWUNUSED__ offset,

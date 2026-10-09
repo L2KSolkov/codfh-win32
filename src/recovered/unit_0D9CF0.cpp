@@ -41,6 +41,7 @@ bool type_D9CF0::sub_D9CF0(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_D9D30@type_D9CF0@@QAEHXZ @ 0x000D9D30
+// sp-match: ?sub_D9D30@type_D9CF0@@QAEHXZ @ 0x000A4A50
 RwInt32 type_D9CF0::sub_D9D30()
 {
     RwInt32 var_4;
@@ -55,6 +56,7 @@ RwInt32 type_D9CF0::sub_D9D30()
 }
 
 // match: ?sub_D9D60@type_D9CF0@@QAE_NPAHPAY0M@D@Z @ 0x000D9D60
+// sp-match: ?sub_D9D60@type_D9CF0@@QAE_NPAHPAY0M@D@Z @ 0x000A4A60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 bool type_D9CF0::sub_D9D60(RwInt32 *arg_0, RwChar (*arg_4)[12])
 {
@@ -93,6 +95,7 @@ bool type_D9CF0::sub_D9D60(RwInt32 *arg_0, RwChar (*arg_4)[12])
 }
 
 // match: ?sub_D9E50@type_D9CF0@@QAEHH@Z @ 0x000D9E50
+// sp-match: ?sub_D9E50@type_D9CF0@@QAEHH@Z @ 0x000A4E50
 RwInt32 type_D9CF0::sub_D9E50(RwInt32 arg_0)
 {
     type_DA0A0 var_D0;
@@ -106,6 +109,7 @@ RwInt32 type_D9CF0::sub_D9E50(RwInt32 arg_0)
 }
 
 // match: ?sub_D9EC0@@YAXPAUtype_DA0A0@@@Z @ 0x000D9EC0
+// sp-match: ?sub_D9EC0@@YAXPAUtype_DA0A0@@@Z @ 0x000A4B10
 void sub_D9EC0(type_DA0A0 *arg_0)
 {
     type_DA0A0 *var_4;
@@ -146,6 +150,51 @@ void sub_D9EC0(type_DA0A0 *arg_0)
     arg_0->unk_1C = arg_0->sub_19ABA0();
 }
 
+#ifdef CODFH_SP
+#include "sp/sp_launch.h"
+void sp_sub_1291D0(RwInt32 arg_0);
+
+// Loads slot arg_0's save into the save state (the reverse of sub_D9EC0);
+// 0.
+// sp-match: ?sp_sub_A4CA0@type_D9CF0@@QAEHH@Z @ 0x000A4CA0
+RwInt32 type_D9CF0::sp_sub_A4CA0(RwInt32 arg_0)
+{
+    type_DA0A0 rec;
+
+    rec.unk_64.clear();
+    rec = dword_4F5DC0[arg_0].unk_08;
+    sub_1A26B0(arg_0);
+    dword_4F28F0->unk_B8 = rec;
+    dword_4F28F0->unk_54 = rec.unk_0E;
+    if (!((sp_type_3EC3B0 *)dword_4F45F8)->unk_18)
+    {
+        sub_19B000(rec.unk_0C);
+    }
+    else
+    {
+        sub_19B000(((sp_type_3EC3B0 *)dword_4F45F8)->unk_1C);
+    }
+    rec.unk_10[11] = 0;
+    strcpy(dword_4F28F0->unk_48, rec.unk_10);
+    dword_4F28F0->unk_14 = rec.unk_20.unk_00;
+    dword_4F28F0->unk_18 = rec.unk_20.unk_04;
+    dword_4F28F0->unk_1C = rec.unk_20.unk_08;
+    dword_4F28F0->unk_21 = rec.unk_20.unk_0C;
+    dword_4F28F0->unk_22 = rec.unk_20.unk_0D;
+    dword_4F28F0->unk_20 = rec.unk_20.unk_0E;
+    dword_4F28F0->unk_28 = rec.unk_20.unk_0F;
+    dword_4F28F0->unk_180 = rec.unk_20.unk_10;
+    dword_4F28F0->unk_181 = rec.unk_20.unk_11;
+    sp_sub_1291D0(rec.unk_20.unk_14);
+    strcpy(dword_4F28F0->unk_183, rec.unk_20.unk_20);
+    dword_4F28F0->unk_30 = rec.unk_20.unk_18;
+    dword_4F28F0->unk_2C = rec.unk_20.unk_1C;
+    dword_4F28F0->unk_5C = rec.unk_64.unk_00;
+    return 0;
+}
+#endif
+
+#ifndef CODFH_SP // single player has both inline (include/types/type_DA0A0.h)
 // match: ?sub_DA0A0@type_DA0A0@@QAEXXZ @ 0x000DA0A0
 void type_DA0A0::sub_DA0A0()
 {
@@ -170,7 +219,13 @@ void type_DA0A0::sub_DA0F0(RwInt32 arg_0)
     unk_1C = 0;
 }
 
+#endif
+
+#ifndef CODFH_SP // single player has it inline (include/types/type_DA0A0.h)
 // match: ?sub_DA150@type_DA150@@QAEXXZ @ 0x000DA150
+// sp-match: ?sub_DA150@type_DA150@@QAEXXZ @ 0x000A4980
+// (type_DA0A0_64::clear, an inline single player keeps out of line: sub_D9EC0 and SP 0x1290C3 call it)
+// sp-match: ?clear@type_DA0A0_64@@QAEXXZ @ 0x000A49F0
 void type_DA150::sub_DA150()
 {
     unk_00 = 1;
@@ -189,6 +244,7 @@ void type_DA150::sub_DA150()
     strcpy(unk_20, "Player");
     memset(unk_40, 0, 2);
 }
+#endif
 
 // match: ?sub_DA200@type_D9CF0@@QAEHXZ @ 0x000DA200
 RwInt32 type_D9CF0::sub_DA200()
@@ -200,12 +256,14 @@ RwInt32 type_D9CF0::sub_DA200()
 }
 
 // match: ?sub_DA220@type_D9CF0@@QAEHXZ @ 0x000DA220
+// sp-match: ?sub_DA220@type_D9CF0@@QAEHXZ @ 0x000A4E30
 RwInt32 type_D9CF0::sub_DA220()
 {
     return dword_4292B0;
 }
 
 // match: ?sub_DA230@type_D9CF0@@QAE_NXZ @ 0x000DA230
+// sp-match: ?sub_DA230@type_D9CF0@@QAE_NXZ @ 0x000A4EA0
 bool type_D9CF0::sub_DA230()
 {
     RwInt32 var_4;
@@ -219,6 +277,7 @@ bool type_D9CF0::sub_DA230()
 }
 
 // match: ?sub_DA280@type_D9CF0@@QAEHXZ @ 0x000DA280
+// sp-match: ?sub_DA280@type_D9CF0@@QAEHXZ @ 0x000A4E40
 RwInt32 type_D9CF0::sub_DA280()
 {
     return 0xC8;

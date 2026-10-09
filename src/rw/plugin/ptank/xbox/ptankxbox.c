@@ -76,6 +76,7 @@ SinCos(float angle, float *sine, float *cosine)
 // match: _defaultCB @ 0x00436E30
 
 // match: _rpPTankXboxRenderCallBack @ 0x002E9B20
+// sp-match: _rpPTankXboxRenderCallBack @ 0x002045D0
 
 static RwBool
 rpPTankXboxRenderCallBack(RpAtomic *atomic, RpPTankData *ptankGlobal, RwInt32 actPCount)
@@ -280,6 +281,7 @@ rpPTankXboxRenderCallBack(RpAtomic *atomic, RpPTankData *ptankGlobal, RwInt32 ac
 }
 
 // match: _rpPTankXboxInsUV2C @ 0x002EA1A0
+// sp-match: _rpPTankXboxInsUV2C @ 0x00204C50
 static void
 rpPTankXboxInsUV2C(RpPTankLockStruct *dstCluster, RwInt32 pCount, RpPTankData *ptankGlobal)
 {
@@ -313,6 +315,7 @@ rpPTankXboxInsUV2C(RpPTankLockStruct *dstCluster, RwInt32 pCount, RpPTankData *p
 }
 
 // match: _rpPTankXboxInsUV4C @ 0x002EA280
+// sp-match: _rpPTankXboxInsUV4C @ 0x00204D30
 static void
 rpPTankXboxInsUV4C(RpPTankLockStruct *dstCluster, RwInt32 pCount, RpPTankData *ptankGlobal)
 {
@@ -344,6 +347,7 @@ rpPTankXboxInsUV4C(RpPTankLockStruct *dstCluster, RwInt32 pCount, RpPTankData *p
 }
 
 // match: _rpPTankXboxInsNormals @ 0x002EA3C0
+// sp-match: _rpPTankXboxInsNormals @ 0x00204E70
 static void
 rpPTankXboxInsNormals(RpPTankLockStruct *dstCluster, RwInt32 pCount, RpPTankData *ptankGlobal)
 {
@@ -378,6 +382,7 @@ rpPTankXboxInsNormals(RpPTankLockStruct *dstCluster, RwInt32 pCount, RpPTankData
 }
 
 // match: _rpPTankXboxInsSetup @ 0x002EA480
+// sp-match: _rpPTankXboxInsSetup @ 0x00204F30
 static void
 rpPTankXboxInsSetup(RpPTANKInstanceSetupData *data,
                     RpAtomic *atomic,
@@ -552,6 +557,7 @@ rpPTankXboxInsSetup(RpPTANKInstanceSetupData *data,
 }
 
 // match: _rpPTankXboxCreate @ 0x002EA890
+// sp-match: _rpPTankXboxCreate @ 0x00205340
 static RwBool
 rpPTankXboxCreate(RpAtomic *atomic, RpPTankData *ptankGlobal,
                   RwInt32 maxPCount, RwUInt32 dataFlags, RwUInt32 platFlags)
@@ -637,6 +643,7 @@ rpPTankXboxCreate(RpAtomic *atomic, RpPTankData *ptankGlobal,
 }
 
 // match: _rpPTankXboxInstance @ 0x002EA9B0
+// sp-match: _rpPTankXboxInstance @ 0x00205460
 RpPTankCallBacks defaultCB =
 {
     NULL,

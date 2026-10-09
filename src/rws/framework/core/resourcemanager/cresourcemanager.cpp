@@ -19,6 +19,7 @@
 // match: __ehhandler$?Add@CResourceManager@RWS@@SAXPBDPBVRWSGUID@2@0PBXI@Z>1 @ 0x0041D950
 
 // match: ?LoadResource@?A0x7db30061@RWS@@YAPAXPBDPBVRWSGUID@2@0PADPAURwStream@@I@Z @ 0x0012F8C0
+// sp-match: ?LoadResource@?A0x7db30061@RWS@@YAPAXPBDPBVRWSGUID@2@0PADPAURwStream@@I@Z @ 0x000E1570
 
 namespace RWS
 {
@@ -56,6 +57,7 @@ namespace RWS
 }
 
 // match: ?FreeResource@?A0x7db30061@RWS@@YAHPBDPAX@Z @ 0x0012F940
+// sp-match: ?FreeResource@?A0x7db30061@RWS@@YAHPBDPAX@Z @ 0x000E1380
 namespace RWS
 {
    namespace
@@ -87,6 +89,7 @@ namespace RWS
 void operator delete(void *pMem, RwUInt32 type);
 
 // match: ??0CResource@RWS@@QAE@XZ @ 0x0012F980
+// sp-match: ??0CResource@RWS@@QAE@XZ @ 0x000E13B0
 RWS::CResource::CResource(void) :
       m_pNextResource(0),
       m_pPrevResource(0),
@@ -109,6 +112,7 @@ RWS::CResource::CResource(void) :
    }
 
 // match: ??1CResource@RWS@@QAE@XZ @ 0x0012FA30
+// sp-match: ??1CResource@RWS@@QAE@XZ @ 0x000E13F0
 RWS::CResource::~CResource(void)
    {
       m_pResData = 0;
@@ -145,6 +149,7 @@ RWS::CResource::~CResource(void)
 // match: ?Add@CResourceManager@RWS@@SAXPBDPBVRWSGUID@2@0PBXI@Z @ 0x0012FAC0
 // match: __ehhandler$?Add@CResourceManager@RWS@@SAXPBDPBVRWSGUID@2@0PBXI@Z-0xF @ 0x00301770
 // match: __ehhandler$?Add@CResourceManager@RWS@@SAXPBDPBVRWSGUID@2@0PBXI@Z @ 0x0030177F
+// sp-match: ?Add@CResourceManager@RWS@@SAXPBDPBVRWSGUID@2@0PBXI@Z @ 0x000E1440
 void RWS::CResourceManager::Add(const RwChar *_pResName,
                               const RWSGUID *_pResId,
                               const RwChar *_pResType,
@@ -161,6 +166,7 @@ void RWS::CResourceManager::Add(const RwChar *_pResName,
    }
 
 // match: ?Remove@CResourceManager@RWS@@SAPBXPBX@Z @ 0x0012FC80
+// sp-match: ?Remove@CResourceManager@RWS@@SAPBXPBX@Z @ 0x000E17B0
 const void *RWS::CResourceManager::Remove(const void *_pResData)
    {
       CResourceIterator Ittr;
@@ -186,6 +192,7 @@ const void *RWS::CResourceManager::Remove(const void *_pResData)
    }
 
 // match: ?FindById@CResourceManager@RWS@@SAPBXPBVRWSGUID@2@PAPBDPAI1@Z @ 0x0012FCF0
+// sp-match: ?FindById@CResourceManager@RWS@@SAPBXPBVRWSGUID@2@PAPBDPAI1@Z @ 0x000E14B0
 const void *RWS::CResourceManager::FindById(const RWSGUID *_pResId,
                                           RwChar const **_pResType,
                                           RwUInt32 *_uiResDataSize,
@@ -211,6 +218,7 @@ const void *RWS::CResourceManager::FindById(const RWSGUID *_pResId,
    }
 
 // match: ?PurgeItem@CResourceManager@RWS@@KA_NAAVCResourceIterator@2@@Z @ 0x0012FDE0
+// sp-match: ?PurgeItem@CResourceManager@RWS@@KA_NAAVCResourceIterator@2@@Z @ 0x000E16D0
 bool RWS::CResourceManager::PurgeItem(CResourceIterator &Ittr)
    {
       if (Ittr->GetLockRefCount() == 0)
@@ -227,6 +235,7 @@ bool RWS::CResourceManager::PurgeItem(CResourceIterator &Ittr)
    }
 
 // match: ?Purge@CResourceManager@RWS@@SA_NXZ @ 0x0012FEC0
+// sp-match: ?Purge@CResourceManager@RWS@@SA_NXZ @ 0x000E1720
 bool RWS::CResourceManager::Purge(void)
    {
       bool flag = true;
@@ -247,6 +256,7 @@ bool RWS::CResourceManager::Purge(void)
    }
 
 // match: ?PurgeAll@CResourceManager@RWS@@SA_NXZ @ 0x0012FF20
+// sp-match: ?PurgeAll@CResourceManager@RWS@@SA_NXZ @ 0x000E1760
 bool RWS::CResourceManager::PurgeAll(void)
    {
       bool flag = true;
@@ -269,6 +279,7 @@ bool RWS::CResourceManager::PurgeAll(void)
    }
 
 // match: ?Lock@CResourceManager@RWS@@SAXPBX@Z @ 0x0012FF90
+// sp-match: ?Lock@CResourceManager@RWS@@SAXPBX@Z @ 0x000E1520
 void RWS::CResourceManager::Lock(const void *ptr)
    {
       CResourceIterator Ittr;
@@ -287,6 +298,7 @@ void RWS::CResourceManager::Lock(const void *ptr)
    }
 
 // match: ?Load@CResourceManager@RWS@@SAPAXPBDPBVRWSGUID@2@000@Z @ 0x00130000
+// sp-match: ?Load@CResourceManager@RWS@@SAPAXPBDPBVRWSGUID@2@000@Z @ 0x000E15E0
 void *RWS::CResourceManager::Load(
       const RwChar *pStrName,
       const RWSGUID *pResId,
@@ -325,6 +337,7 @@ void *RWS::CResourceManager::Load(
    }
 
 // match: ?UpLoad@CResourceManager@RWS@@SAPAXPBDPBVRWSGUID@2@00PAURwStream@@I@Z @ 0x00130120
+// sp-match: ?UpLoad@CResourceManager@RWS@@SAPAXPBDPBVRWSGUID@2@00PAURwStream@@I@Z @ 0x000E16C0
 void *RWS::CResourceManager::UpLoad(
       const RwChar *pStrName,
       const RWSGUID *pResId,
@@ -339,12 +352,14 @@ void *RWS::CResourceManager::UpLoad(
    }
 
 // match: ?Open@CResourceManager@RWS@@SAXXZ @ 0x00130150
+// sp-match: ?Open@CResourceManager@RWS@@SAXXZ @ 0x000E1550
 void RWS::CResourceManager::Open(void)
    {
       CResourceHandler::OpenAll();
    }
 
 // match: ?Close@CResourceManager@RWS@@SAXXZ @ 0x00130160
+// sp-match: ?Close@CResourceManager@RWS@@SAXXZ @ 0x000E1560
 void RWS::CResourceManager::Close(void)
    {
       CResourceHandler::CloseAll();
@@ -355,3 +370,5 @@ void RWS::CResourceManager::Close(void)
 // match: ?SetType@CResource@RWS@@QAEXPBD@Z @ 0x0012FB80
 // match: ?SetName@CResource@RWS@@QAEXPBD@Z @ 0x0012FC00
 // match: ?Remove@CResourceIterator@RWS@@QAEXXZ @ 0x0012FE50
+// sp-match: ?SetType@CResource@RWS@@QAEXPBD@Z @ 0x000E12C0
+// sp-match: ?SetName@CResource@RWS@@QAEXPBD@Z @ 0x000E1320

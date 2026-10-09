@@ -19,6 +19,7 @@ extern const RwUInt8 unk_3ED964[];  /* the stream node interface */
 
 /* Sets up a node's shared state from its creation parameters. */
 // match: _sub_246FD0 @ 0x00246FD0
+// sp-match: _sub_246FD0 @ 0x0015AF20
 rwaDecoder *
 sub_246FD0(rwaDecoder *obj, rwaInstance *parent, rwaStreamNodeParams *params)
 {
@@ -51,6 +52,7 @@ sub_246FD0(rwaDecoder *obj, rwaInstance *parent, rwaStreamNodeParams *params)
 
 /* A node has been created: its status from its mode, then the callback. */
 // match: _RwaStreamNodeCreationComplete @ 0x00247050
+// sp-match: _RwaStreamNodeCreationComplete @ 0x0015AFA0
 void
 RwaStreamNodeCreationComplete(rwaDecoder *obj)
 {
@@ -82,6 +84,7 @@ RwaStreamNodeCreationComplete(rwaDecoder *obj)
 /* The node's status from its mode, unlinking it from its parent when it
  * plays. */
 // match: _sub_2470A0 @ 0x002470A0
+// sp-match: _sub_2470A0 @ 0x0015AFF0
 void
 sub_2470A0(rwaDecoder *obj)
 {
@@ -107,6 +110,7 @@ sub_2470A0(rwaDecoder *obj)
 }
 
 // match: _RwaStreamNodeGetParams @ 0x002470F0
+// sp-match: _RwaStreamNodeGetParams @ 0x0015B040
 rwaDecoder *
 RwaStreamNodeGetParams(rwaDecoder *obj, rwaStreamNodeParams *params)
 {
@@ -121,6 +125,7 @@ RwaStreamNodeGetParams(rwaDecoder *obj, rwaStreamNodeParams *params)
 }
 
 // match: _sub_247120 @ 0x00247120
+// sp-match: _sub_247120 @ 0x0015B070
 void
 sub_247120(rwaDecoder *obj, RwUInt32 unused)
 {
@@ -128,6 +133,7 @@ sub_247120(rwaDecoder *obj, RwUInt32 unused)
 }
 
 // match: _sub_247130 @ 0x00247130
+// sp-match: _sub_247130 @ 0x0015B080
 static RwUInt32
 sub_247130(void)
 {
@@ -136,6 +142,7 @@ sub_247130(void)
 
 /* The node's status (parameter 0). */
 // match: _sub_247140 @ 0x00247140
+// sp-match: _sub_247140 @ 0x0015B090
 rwaDecoder *
 sub_247140(rwaDecoder *obj, void *data, RwInt32 *status)
 {
@@ -146,6 +153,7 @@ sub_247140(rwaDecoder *obj, void *data, RwInt32 *status)
 /* Sets the node's play mode, and moves it to the front of its parent's
  * sub-objects. */
 // match: _sub_247160 @ 0x00247160
+// sp-match: _sub_247160 @ 0x0015B0B0
 rwaDecoder *
 sub_247160(rwaDecoder *obj, void *data, RwInt32 *mode)
 {
@@ -184,6 +192,7 @@ sub_247160(rwaDecoder *obj, void *data, RwInt32 *mode)
 
 /* The node's reader: its node, a reader returning nothing and the data. */
 // match: _sub_2471D0 @ 0x002471D0
+// sp-match: _sub_2471D0 @ 0x0015B120
 rwaDecoder *
 sub_2471D0(rwaDecoder *obj, void *data, rwaStreamConnect *connect)
 {
@@ -194,6 +203,7 @@ sub_2471D0(rwaDecoder *obj, void *data, rwaStreamConnect *connect)
 }
 
 // match: _sub_2471F0 @ 0x002471F0
+// sp-match: _sub_2471F0 @ 0x0015B140
 rwaDecoder *
 sub_2471F0(rwaDecoder *obj, void *data, rwaStreamConnect *connect)
 {
@@ -203,6 +213,7 @@ sub_2471F0(rwaDecoder *obj, void *data, rwaStreamConnect *connect)
 
 /* Calls a reader. */
 // match: _sub_247200 @ 0x00247200
+// sp-match: _sub_247200 @ 0x0015B150
 rwaQueueItem *
 sub_247200(rwaStreamReader *reader)
 {
@@ -211,6 +222,7 @@ sub_247200(rwaStreamReader *reader)
 }
 
 // match: _sub_247220 @ 0x00247220
+// sp-match: _sub_247220 @ 0x0015B170
 RwBool
 sub_247220(rwaDecoder *obj, rwaObjInterface *iface, RwInt32 type, void *value)
 {
@@ -221,6 +233,7 @@ sub_247220(rwaDecoder *obj, rwaObjInterface *iface, RwInt32 type, void *value)
 }
 
 // match: _sub_247250 @ 0x00247250
+// sp-match: _sub_247250 @ 0x0015B1A0
 void
 sub_247250(rwaDecoder *obj, rwaObjInterface *iface, RwInt32 type, void *value)
 {
@@ -228,6 +241,7 @@ sub_247250(rwaDecoder *obj, rwaObjInterface *iface, RwInt32 type, void *value)
 }
 
 // match: _sub_247260 @ 0x00247260
+// sp-match: _sub_247260 @ 0x0015B1B0
 RwBool
 sub_247260(rwaDecoder *obj, rwaObjInterface *iface, RwInt32 type, void *value)
 {
@@ -238,6 +252,7 @@ sub_247260(rwaDecoder *obj, rwaObjInterface *iface, RwInt32 type, void *value)
 }
 
 // match: _sub_247290 @ 0x00247290
+// sp-match: _sub_247290 @ 0x0015B1E0
 void
 sub_247290(rwaDecoder *obj, rwaObjInterface *iface, RwInt32 type, ...)
 {
@@ -245,6 +260,7 @@ sub_247290(rwaDecoder *obj, rwaObjInterface *iface, RwInt32 type, ...)
 }
 
 // match: _RwaObjIntGetParamUInt32 @ 0x002472B0
+// sp-match: _RwaObjIntGetParamUInt32 @ 0x0015B200
 RwUInt32
 RwaObjIntGetParamUInt32(rwaDecoder *obj, rwaObjInterface *iface, RwUInt32 type)
 {
@@ -254,6 +270,7 @@ RwaObjIntGetParamUInt32(rwaDecoder *obj, rwaObjInterface *iface, RwUInt32 type)
 
 /* Sets up a play queue over count items. */
 // match: _sub_2472E0 @ 0x002472E0
+// sp-match: _sub_2472E0 @ 0x0015B230
 rwaQueue *
 sub_2472E0(rwaQueue *queue, rwaQueueItem *items, RwUInt8 size)
 {
@@ -267,6 +284,7 @@ sub_2472E0(rwaQueue *queue, rwaQueueItem *items, RwUInt8 size)
 
 /* The next free item, its flag 8 cleared. */
 // match: _sub_247300 @ 0x00247300
+// sp-match: _sub_247300 @ 0x0015B250
 rwaQueueItem *
 sub_247300(rwaQueue *queue)
 {
@@ -291,6 +309,7 @@ sub_247300(rwaQueue *queue)
 
 /* Drops the first item. */
 // match: _sub_247340 @ 0x00247340
+// sp-match: _sub_247340 @ 0x0015B290
 void
 sub_247340(rwaQueue *queue)
 {
@@ -305,6 +324,7 @@ sub_247340(rwaQueue *queue)
 }
 
 // match: _sub_247360 @ 0x00247360
+// sp-match: _sub_247360 @ 0x0015B2B0
 RwInt32
 sub_247360(rwaDecoder *obj)
 {
@@ -317,6 +337,7 @@ sub_247360(rwaDecoder *obj)
 /* Connects source to node's input index: the source's output, then the
  * node's input. */
 // match: _sub_247380 @ 0x00247380
+// sp-match: _sub_247380 @ 0x0015B2D0
 void
 sub_247380(rwaDecoder *node, RwUInt32 index, rwaDecoder *source, RwUInt32 d)
 {
@@ -329,6 +350,7 @@ sub_247380(rwaDecoder *node, RwUInt32 index, rwaDecoder *source, RwUInt32 d)
 }
 
 // match: _sub_2473D0 @ 0x002473D0
+// sp-match: _sub_2473D0 @ 0x0015B320
 void *
 sub_2473D0(RwUInt32 size, RwUInt32 unused)
 {
@@ -336,6 +358,7 @@ sub_2473D0(RwUInt32 size, RwUInt32 unused)
 }
 
 // match: __rwaStreamSourceCreationParamsInit @ 0x002473E0
+// sp-match: __rwaStreamSourceCreationParamsInit @ 0x0015B330
 rwaStreamSourceParams *
 _rwaStreamSourceCreationParamsInit(rwaStreamSourceParams *params)
 {

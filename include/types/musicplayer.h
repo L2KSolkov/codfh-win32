@@ -187,8 +187,10 @@ extern RwInt32 dword_44D4D8;
 extern RwInt32 dword_44D4CC;
 extern RwInt32 dword_44E868;
 extern RwInt32 dword_44E5F0[];
+#ifndef CODFH_SP // file-static in single player (unit_0863C0)
 extern RwInt32 dword_428E74;
 extern RwInt32 dword_428E78;
+#endif
 extern RwChar byte_4B1F68[];
 extern RwInt32 dword_44E8A0;
 extern RwInt32 dword_44E898;

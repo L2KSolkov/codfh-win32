@@ -15,10 +15,16 @@
 #include <stdarg.h>
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifdef CODFH_SP
+// shape: COMDAT data, so the linker drops them with the unused debug text (default.xbe has neither)
+#define SP_DEBUGTEXT_DATA __declspec(selectany)
+#else
+#define SP_DEBUGTEXT_DATA
+#endif
 // 0x00429EA0
-RwRGBA foreGround = { 255, 255, 255, 128 };
+SP_DEBUGTEXT_DATA RwRGBA foreGround = { 255, 255, 255, 128 };
 // 0x00429EA4
-RwRGBA backGround = { 0, 0, 0, 128 };
+SP_DEBUGTEXT_DATA RwRGBA backGround = { 0, 0, 0, 128 };
 // 0x004E2290
 RwInt32 dword_4E2290;
 // 0x004E2294
@@ -260,6 +266,7 @@ RwInt32 sub_16BE20(RwIm2DVertex *arg_0, RwInt32 arg_4, const RwChar **arg_8, RwI
 }
 
 // match: ?sub_16C220@@YAXPBDZZ @ 0x0016C220
+// sp-match: ?sub_16C220@@YAXPBDZZ @ 0x0010A180
 // The debug printf: formats into a buffer and prints it with a newline.
 void sub_16C220(const RwChar *arg_0, ...)
 {

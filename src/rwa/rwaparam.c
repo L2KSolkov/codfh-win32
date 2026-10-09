@@ -214,6 +214,7 @@ RwUInt8 unk_506FAC[36];
 // match: _unk_42EFC0 @ 0x0042EFC0
 
 // match: _sub_2418E0 @ 0x002418E0
+// sp-match: _sub_2418E0 @ 0x00155A20
 
 void *
 sub_2418E0(RwUInt32 type)
@@ -233,6 +234,7 @@ sub_2418E0(RwUInt32 type)
 }
 
 // match: _sub_241920 @ 0x00241920
+// sp-match: _sub_241920 @ 0x00155A60
 void
 sub_241920(void *value, RwUInt32 type)
 {
@@ -251,6 +253,7 @@ sub_241920(void *value, RwUInt32 type)
 }
 
 // match: _sub_241960 @ 0x00241960
+// sp-match: _sub_241960 @ 0x00155AA0
 static void
 sub_241960(RwaParamType *paramType)
 {
@@ -261,6 +264,7 @@ sub_241960(RwaParamType *paramType)
 }
 
 // match: _sub_241980 @ 0x00241980
+// sp-match: _sub_241980 @ 0x00155AC0
 static void
 sub_241980(RwaParamType *paramType)
 {
@@ -279,6 +283,7 @@ sub_241980(RwaParamType *paramType)
 }
 
 // match: _sub_2419B0 @ 0x002419B0
+// sp-match: _sub_2419B0 @ 0x00155AF0
 void
 sub_2419B0(RwaParamType *paramType, RwBool recurse)
 {
@@ -299,6 +304,7 @@ sub_2419B0(RwaParamType *paramType, RwBool recurse)
 }
 
 // match: _sub_241A20 @ 0x00241A20
+// sp-match: _sub_241A20 @ 0x00155B60
 void
 sub_241A20(void)
 {
@@ -324,6 +330,7 @@ sub_241A20(void)
 }
 
 // match: __rwaParamTypeHandleRefreshType @ 0x00241AB0
+// sp-match: __rwaParamTypeHandleRefreshType @ 0x00155BF0
 RwaParamTypeHandle *
 _rwaParamTypeHandleRefreshType(RwaParamTypeHandle *handle)
 {
@@ -344,6 +351,7 @@ _rwaParamTypeHandleRefreshType(RwaParamTypeHandle *handle)
 }
 
 // match: _sub_241AE0 @ 0x00241AE0
+// sp-match: _sub_241AE0 @ 0x00155C20
 RwaParamType *
 sub_241AE0(RwUInt32 type, const void *rangeMin, const void *rangeMax, RwaParamType *paramType,
            RwUInt8 *rangeStorage)
@@ -421,6 +429,7 @@ sub_241AE0(RwUInt32 type, const void *rangeMin, const void *rangeMax, RwaParamTy
 }
 
 // match: _sub_241C10 @ 0x00241C10
+// sp-match: _sub_241C10 @ 0x00155D50
 RwaParamType *
 sub_241C10(RwUInt32 type, RwaParamType *parent, void *max, RwaParamType *paramType,
            RwUInt8 *rangeStorage)
@@ -447,6 +456,7 @@ sub_241C10(RwUInt32 type, RwaParamType *parent, void *max, RwaParamType *paramTy
 }
 
 // match: _RwaParamTypeCreatePointer @ 0x00241C80
+// sp-match: _RwaParamTypeCreatePointer @ 0x00155DC0
 RwaParamType *
 RwaParamTypeCreatePointer(RwaParamType *parent, RwaParamType *paramType, RwUInt8 *rangeStorage)
 {
@@ -470,6 +480,7 @@ RwaParamTypeCreatePointer(RwaParamType *parent, RwaParamType *paramType, RwUInt8
 }
 
 // match: _sub_241CD0 @ 0x00241CD0
+// sp-match: _sub_241CD0 @ 0x00155E10
 RwaParamType *
 sub_241CD0(void *rangeMin, void *rangeMax, RwaParamType *parent, RwaParamType *paramType,
            RwUInt8 *rangeStorage)
@@ -502,6 +513,7 @@ sub_241CD0(void *rangeMin, void *rangeMax, RwaParamType *parent, RwaParamType *p
 }
 
 // match: _sub_241D40 @ 0x00241D40
+// sp-match: _sub_241D40 @ 0x00155E80
 _rwaParamTypeDef *
 sub_241D40(_rwaParamTypeDef *defs, RwUInt32 count)
 {
@@ -559,6 +571,7 @@ sub_241D40(_rwaParamTypeDef *defs, RwUInt32 count)
 }
 
 // match: _sub_241E90 @ 0x00241E90
+// sp-match: _sub_241E90 @ 0x00155FD0
 RwBool
 sub_241E90(void)
 {
@@ -566,6 +579,7 @@ sub_241E90(void)
 }
 
 // match: _sub_241EB0 @ 0x00241EB0
+// sp-match: _sub_241EB0 @ 0x00155FF0
 RwBool
 sub_241EB0(void)
 {

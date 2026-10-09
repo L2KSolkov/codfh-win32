@@ -25,9 +25,17 @@ RwReal flt_427678 = 240.0f;
 // End of its data definitions.
 
 
+// shape: single player passes the scores' arguments in registers
+// (SP 0x30A33 eax/edi), the internal-linkage register convention.
+#ifdef CODFH_SP
+static RwInt32 sub_3FAC0(type_3D3548 *arg_0, type_3D3548 *arg_4);
+static RwInt32 sub_401B0(type_3DBC78 *arg_0, type_3D3548 *arg_4);
+static RwInt32 sub_403F0(type_3D3548 *arg_0, type_3D3548 *arg_4);
+#else
 RwInt32 sub_3FAC0(type_3D3548 *arg_0, type_3D3548 *arg_4);
 RwInt32 sub_401B0(type_3DBC78 *arg_0, type_3D3548 *arg_4);
 RwInt32 sub_403F0(type_3D3548 *arg_0, type_3D3548 *arg_4);
+#endif
 
 // Its data (PLAN M5): literals, constants and tables where the image has them.
 // match: ?flt_3CE888@@3MB @ 0x003CE888
@@ -38,6 +46,7 @@ RwInt32 sub_403F0(type_3D3548 *arg_0, type_3D3548 *arg_4);
 // match: ?flt_427678@@3MA @ 0x00427678
 
 // match: sub_3FA10 @ 0x0003FA10
+// sp-match: sub_3FA10 @ 0x000309F0
 
 RwInt32 AIData::sub_3FA10(type_3D3548 *arg_0)
 {
@@ -57,6 +66,7 @@ RwInt32 AIData::sub_3FA10(type_3D3548 *arg_0)
 }
 
 // match: sub_3FAC0 @ 0x0003FAC0
+// sp-match: sub_3FAC0 @ 0x00030070
 // The score for the target arg_4 of an entity with flag 0x20: 0 unless it
 // is among the nearest the entity's squad targets, then by what it is and
 // how near.
@@ -200,6 +210,7 @@ RwInt32 sub_3FAC0(type_3D3548 *arg_0, type_3D3548 *arg_4)
 }
 
 // match: sub_401B0 @ 0x000401B0
+// sp-match: sub_401B0 @ 0x00030600
 // The score for the target arg_0 of an entity with flag 0x40000.
 RwInt32 sub_401B0(type_3DBC78 *arg_0, type_3D3548 *arg_4)
 {
@@ -246,6 +257,7 @@ RwInt32 sub_401B0(type_3DBC78 *arg_0, type_3D3548 *arg_4)
 }
 
 // match: sub_403F0 @ 0x000403F0
+// sp-match: sub_403F0 @ 0x00030770
 // The score for the target arg_0 of an entity with flag 0x80.
 RwInt32 sub_403F0(type_3D3548 *arg_0, type_3D3548 *arg_4)
 {
@@ -266,6 +278,7 @@ RwInt32 sub_403F0(type_3D3548 *arg_0, type_3D3548 *arg_4)
 }
 
 // match: sub_404A0 @ 0x000404A0
+// sp-match: sub_404A0 @ 0x000307E0
 // The score of the target arg_0 for a soldier on a mounted weapon: 0 unless
 // the weapon's view holds it (while bit 9 of unk_49C is set); the current
 // target, held under 60, or the recent enemy under 120, gain most; seen and
@@ -335,10 +348,22 @@ RwInt32 AIData::sub_404A0(type_3D3548 *arg_0)
     else if (var18)
     {
         v10 += 10000 - var_1C;
+#ifdef CODFH_SP
+        // shape: SP 0x307E0 keeps the score in edi as well as its home slot.
+        // Bind the clamped value by reference, then store only when it rises.
+        // A direct assignment in the test spills the score for the whole function.
+        {
+            const RwInt32 &r = v10 < 2 ? 2 : v10;
+            if (r > v10)
+                v10 = r;
+        }
+#else
+        // MP 0x404A0.
         if (v10 < 2)
         {
             v10 = 2;
         }
+#endif
     }
     else
     {

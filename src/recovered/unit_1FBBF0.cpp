@@ -22,12 +22,14 @@ extern "C" void port_cli_frame(void);
 #endif
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E7E5C
 extern const RwReal flt_3E7E5C = 16.666666f;
 // 0x003E7E60
 extern const RwReal flt_3E7E60 = 0.01f;
 // 0x003E7E64
 extern const RwReal flt_3E7E64 = 0.01f;
+#endif
 // 0x005043B0
 InGameMenuManager *dword_5043B0;
 // 0x005043B4

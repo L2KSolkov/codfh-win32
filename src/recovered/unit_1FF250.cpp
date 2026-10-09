@@ -18,15 +18,19 @@
 #include "game/livebase.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E7FFC
 extern const RwReal flt_3E7FFC = 0.01f;
 // 0x003E8000
 extern const RwReal flt_3E8000 = 0.01f;
+#endif
 
 // match: ?flt_3E7FFC@@3MB @ 0x003E7FFC
 // match: ?flt_3E8000@@3MB @ 0x003E8000
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E8004
 extern const RwReal flt_3E8004 = 16.666666f;
+#endif
 // 0x005043BC
 type_1FF250 *dword_5043BC;
 // 0x005043C0

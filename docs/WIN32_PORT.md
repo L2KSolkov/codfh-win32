@@ -27,6 +27,13 @@ as the data root:
 
     CODFH_DATA=D:\CODFH_DUMP build/port/codfh.exe [-map <n|name>] [-gametype DM|TDM|CTF|SD|SUP]
 
+The SP-on-Win32 branch adds a separate selection and output directory: `python
+tools/portbuild.py --sp --link` builds the SP front end and campaign as `build/port_sp/codfh.exe`;
+`config/sp/units.txt` selects SP implementations and `src/sp/units` supplies the split wrappers.
+The Win32 Live UI and voice bridges still report offline/no-device. The SP build has been checked
+at 509 compiled units and a link with no unresolved symbols; this checkout has no game data, so
+runtime gameplay still needs a user-provided data root.
+
 | Workstream | State | Checked by |
 |---|---|---|
 | W0 build, entry point | Done | Every unit compiles and links; `codfh.log` beside the executable |

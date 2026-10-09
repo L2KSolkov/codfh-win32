@@ -19,7 +19,11 @@
 type_428BEC dword_428BEC[3] = {
     { 4, 128, 1 },
     { 8, 16, 2 },
+#ifdef CODFH_SP // single player's third bank is { 24, 16, 1 } (SP 0x320D1C)
+    { 24, 16, 1 },
+#else
     { 96, 34, 1 },
+#endif
 };
 // 0x00449B90
 RwChar byte_449B90[256];
@@ -32,7 +36,7 @@ RwUInt8 *dword_449C98;
 // 0x00449C9C
 RwInt32 dword_449C9C;
 // 0x00449CA0
-type_449CA0 dword_449CA0[0xB3];
+type_449CA0 dword_449CA0[dword_449CA0_count];
 // 0x0044A504
 RwInt32 dword_44A504;
 // End of its data definitions.
@@ -67,6 +71,9 @@ CAnimObjectPool byte_44A508[3];
 // match: _$E1 @ 0x00309BD0
 // match: _$E2 @ 0x0030DE50
 // match: ?sub_770C0@@YAXXZ @ 0x000770C0
+// sp-match: ?sub_770C0@@YAXXZ @ 0x00062180
+// sp-match: _$E1 @ 0x0021C660
+// sp-match: _$E2 @ 0x0021E280
 
 void sub_770C0()
 {
@@ -76,6 +83,7 @@ void sub_770C0()
 }
 
 // match: ?sub_770F0@@YAXIIPAI@Z @ 0x000770F0
+// sp-match: ?sub_770F0@@YAXIIPAI@Z @ 0x000621A0
 // Sets up arg_0 banks of arg_4 bytes each, or of the sizes arg_8 (at least
 // 0x800 counted, 300 given, each).
 void sub_770F0(RwUInt32 arg_0, RwUInt32 arg_4, RwUInt32 *arg_8)
@@ -86,18 +94,25 @@ void sub_770F0(RwUInt32 arg_0, RwUInt32 arg_4, RwUInt32 *arg_8)
     RwUInt32 var_10;
 
     var_4 = 0;
+#ifndef CODFH_SP
+    // single player compiles the debug prints out (SP 0x621A0)
     sub_19A750("*********************************************");
     sub_19A750("******ANIMATION HEAP SIZE ALLOCATION*********");
+#endif
     dword_449C90 = arg_0;
     var_4 = arg_0 * 0x44;
     dword_449C94 = (type_449C94 *)RwMalloc(var_4, 0x34251); // not an address: an allocation tag
+#ifndef CODFH_SP
     sub_19A750("Size Allocated for DataSet Entries: %d", var_4);
     sub_19A750("Number of anim banks: %d", arg_0);
+#endif
     var_4 = 0;
     for (v8 = 0; v8 < arg_0; v8++) {
         if (arg_8 != 0) {
             var_4 += arg_8[v8] < 0x800 ? 0x800 : arg_8[v8];
+#ifndef CODFH_SP
             sub_19A750("Anim bank %d size: %d", v8 + 1, arg_8[v8]);
+#endif
         }
         dword_449C94[v8].unk_00 = v8;
         dword_449C94[v8].unk_04 = 0;
@@ -111,11 +126,15 @@ void sub_770F0(RwUInt32 arg_0, RwUInt32 arg_4, RwUInt32 *arg_8)
     }
     if (var_4 == 0) {
         var_4 = arg_0 * arg_4;
+#ifndef CODFH_SP
         sub_19A750("Size per bank %d", arg_4);
+#endif
     }
     dword_449C98 = (RwUInt8 *)RwMalloc(var_4, 0x34251); // not an address: an allocation tag
     stk_C = dword_449C98;
+#ifndef CODFH_SP
     sub_19A750("***Total size allocated for all anim banks: %d", var_4);
+#endif
     for (v8 = 0; v8 < arg_0; v8++) {
         dword_449C94[v8].unk_18 = 0;
         dword_449C94[v8].unk_10 = (type_77D30 *)stk_C;
@@ -130,10 +149,13 @@ void sub_770F0(RwUInt32 arg_0, RwUInt32 arg_4, RwUInt32 *arg_8)
             stk_C += arg_4;
         }
     }
+#ifndef CODFH_SP
     sub_19A750("*********************************************");
+#endif
 }
 
 // match: ?sub_773A0@@YAXXZ @ 0x000773A0
+// sp-match: ?sub_773A0@@YAXXZ @ 0x00062690
 // Destroys the heap-built sets and frees the banks and their heap.
 void sub_773A0()
 {
@@ -157,6 +179,7 @@ void sub_773A0()
 }
 
 // match: ?sub_774F0@@YAHUtype_449C94_08@@H@Z @ 0x000774F0
+// sp-match: ?sub_774F0@@YAHUtype_449C94_08@@H@Z @ 0x000622D0
 // Whether bank arg_8 holds the loaded set arg_0, arg_4.
 RwInt32 sub_774F0(type_449C94_08 arg_0, RwInt32 arg_8)
 {
@@ -167,6 +190,7 @@ RwInt32 sub_774F0(type_449C94_08 arg_0, RwInt32 arg_8)
 }
 
 // match: ?sub_77540@@YAHPBDUtype_449C94_08@@IHH@Z @ 0x00077540
+// sp-match: ?sub_77540@@YAHPBDUtype_449C94_08@@IHH@Z @ 0x00062730
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Loads the set arg_4 named Source into bank arg_C from its
 // "ANIMGRPS\..." file.
@@ -207,6 +231,7 @@ RwInt32 sub_77540(const RwChar *Source, type_449C94_08 arg_4, RwUInt32 arg_C, Rw
 }
 
 // match: ?sub_776F0@@YAHPAURwStream@@PAUtype_776F0@@H@Z @ 0x000776F0
+// sp-match: ?sub_776F0@@YAHPAURwStream@@PAUtype_776F0@@H@Z @ 0x00062310
 RwInt32 sub_776F0(RwStream *arg_0, type_776F0 *arg_4, RwInt32 arg_8)
 {
     type_77D30 *var_4;
@@ -231,6 +256,7 @@ RwInt32 sub_776F0(RwStream *arg_0, type_776F0 *arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_777F0@@YAHPBDUtype_449C94_08@@HPAURwV3d@@@Z @ 0x000777F0
+// sp-match: ?sub_777F0@@YAHPBDUtype_449C94_08@@HPAURwV3d@@@Z @ 0x000623C0
 // Queues the load of the set arg_4, arg_8 (the file arg_0) into bank arg_C,
 // unloading what it holds; arg_10 is the trigger asking, or 0 for a script.
 RwInt32 sub_777F0(const RwChar *arg_0, type_449C94_08 arg_4, RwInt32 arg_C, RwV3d *arg_10)
@@ -240,8 +266,11 @@ RwInt32 sub_777F0(const RwChar *arg_0, type_449C94_08 arg_4, RwInt32 arg_C, RwV3
     bool l9;
 
     if (dword_449C94[arg_C].unk_08 == arg_4.unk_00 && dword_449C94[arg_C].unk_0C == arg_4.unk_04) {
+#ifndef CODFH_SP
+        // single player compiles the debug prints out (SP 0x623C0)
         sub_19A750("Requested Animation bank %x:%x is already loaded in slot %d. Ignoring load.\n",
                    arg_4.unk_00, arg_4.unk_04, arg_C);
+#endif
         return 0;
     }
     for (var_4 = 0; var_4 < dword_449C90; var_4++) {
@@ -251,7 +280,9 @@ RwInt32 sub_777F0(const RwChar *arg_0, type_449C94_08 arg_4, RwInt32 arg_C, RwV3
             sprintf(var_110,
                     "ERROR! Cannot load anim bank %x:%x into slot %d.  It is already loaded in %d!!\n",
                     arg_4.unk_00, arg_4.unk_04, arg_C + 1, var_4 + 1);
+#ifndef CODFH_SP
             sub_19A750(var_110);
+#endif
         }
     }
     l9 = false;
@@ -264,9 +295,11 @@ RwInt32 sub_777F0(const RwChar *arg_0, type_449C94_08 arg_4, RwInt32 arg_C, RwV3
         while (var_118 != 0) {
             var_114 = var_118->unk_24;
             if (sub_788C0(var_118->unk_00, 1)) {
+#ifndef CODFH_SP
                 sub_19A750("\n*\nERROR: Attempting to unload animation %s (in bank %d) while still "
                            "active.\n*\n",
                            var_118->unk_04, arg_C + 1);
+#endif
                 l9 = true;
             }
             var_118 = var_114;
@@ -284,19 +317,24 @@ RwInt32 sub_777F0(const RwChar *arg_0, type_449C94_08 arg_4, RwInt32 arg_C, RwV3
             sprintf(var_218, "ERROR: Can't unload a bank with active animations from SCRIPT");
     }
     if (dword_449C94[arg_C].unk_04 & 0x80000000) {
+#ifndef CODFH_SP
         sub_19A750("Unloading anim bank slot %d \n", arg_C);
+#endif
         dword_449C94[arg_C].unk_04 &= 0x7FFFFFFF;
         dword_449C94[arg_C].unk_18 = 0;
     }
     dword_449C94[arg_C].unk_08 = arg_4.unk_00;
     dword_449C94[arg_C].unk_0C = arg_4.unk_04;
     dword_449C94[arg_C].unk_1C = 0;
+#ifndef CODFH_SP
     sub_19A750("Adding load of Anim bank %s slot %d to AsyncQueue...\n", arg_0, arg_C);
+#endif
     sub_81EB0(2, arg_0, (RwInt32)&dword_449C94[arg_C]);
     return 1;
 }
 
 // match: ?sub_77AC0@@YAHPAUtype_77D30@@@Z @ 0x00077AC0
+// sp-match: ?sub_77AC0@@YAHPAUtype_77D30@@@Z @ 0x000625B0
 // Puts the set arg_0 (built elsewhere) into the first free bank.
 RwInt32 sub_77AC0(type_77D30 *arg_0)
 {
@@ -316,6 +354,7 @@ RwInt32 sub_77AC0(type_77D30 *arg_0)
 }
 
 // match: ?sub_77B70@@YAHHPAPAX0@Z @ 0x00077B70
+// sp-match: ?sub_77B70@@YAHHPAPAX0@Z @ 0x00062620
 // Finds the animation arg_0 in the loading banks (sub_77DC0).
 RwInt32 sub_77B70(RwInt32 arg_0, void **arg_4, void **arg_8)
 {
@@ -337,6 +376,7 @@ RwInt32 sub_77B70(RwInt32 arg_0, void **arg_4, void **arg_8)
 }
 
 // match: ??2type_77D30@@SAPAXIPAEI@Z @ 0x00077C10
+// sp-match: ??2type_77D30@@SAPAXIPAEI@Z @ 0x000628B0
 void *type_77D30::operator new(RwUInt32 arg_0, RwUInt8 *arg_4, RwUInt32 arg_8)
 {
     type_77D30 *var_4;
@@ -358,6 +398,7 @@ void *type_77D30::operator new(RwUInt32 arg_0, RwUInt8 *arg_4, RwUInt32 arg_8)
 }
 
 // match: ??0type_77D30@@QAE@XZ @ 0x00077CA0
+// sp-match: ??0type_77D30@@QAE@XZ @ 0x00062920
 type_77D30::type_77D30()
 {
     RwInt32 var_4;
@@ -375,6 +416,7 @@ type_77D30::type_77D30()
 }
 
 // match: ??1type_77D30@@QAE@XZ @ 0x00077D30
+// sp-match: ??1type_77D30@@QAE@XZ @ 0x00062980
 type_77D30::~type_77D30()
 {
     RwInt32 var_4;
@@ -396,6 +438,7 @@ type_77D30::~type_77D30()
 }
 
 // match: ?sub_77DC0@type_77D30@@QAE_NHPAPAX0@Z @ 0x00077DC0
+// sp-match: ?sub_77DC0@type_77D30@@QAE_NHPAPAX0@Z @ 0x000629E0
 bool type_77D30::sub_77DC0(RwInt32 arg_0, void **arg_4, void **arg_8)
 {
     type_77D30_28 *var_4;
@@ -426,6 +469,7 @@ bool type_77D30::sub_77DC0(RwInt32 arg_0, void **arg_4, void **arg_8)
 extern RwInt32 dword_449C9C;
 
 // match: ?sub_77E40@@YAPAUtype_77D30@@PAURwStream@@PAXI@Z @ 0x00077E40
+// sp-match: ?sub_77E40@@YAPAUtype_77D30@@PAURwStream@@PAXI@Z @ 0x00062B40
 // Reads a set ('ADST' chunk 0x42A1) from the stream arg_0 into the bank
 // memory arg_4 of arg_8 bytes (the heap when arg_4 is 0): two words for
 // unk_0C and unk_10 around the animations' count, then each animation
@@ -482,9 +526,16 @@ type_77D30 *sub_77E40(RwStream *arg_0, void *arg_4, RwUInt32 arg_8)
             ebp_1000[ebp_1008] = (type_7CBD0_hdr *)q1030->pFrames;
             sub_801C0(q1030, ebp_1000, ebp_1008);
             RwStreamReadInt32(arg_0, &fp_105c, 4);
+#ifdef CODFH_SP // shape: SP 0x62B40 retains the signed count across the bank-size test.
+            const RwInt32 &count = (RwInt16)fp_105c;
+            RwUInt32 has = ebp_1004->unk_24;
+            fp_105c = count;
+            if (has) {
+#else // MP 0x77E40
             l1034 = (RwInt16)fp_105c;
             fp_105c = l1034;
             if (ebp_1004->unk_24 != 0) {
+#endif
                 if (fp_105c != 0) {
                     l102c = (type_783F0 *)ebp_1004->sub_78370(sub_78670(fp_105c));
                     if (l102c == 0)
@@ -503,6 +554,7 @@ type_77D30 *sub_77E40(RwStream *arg_0, void *arg_4, RwUInt32 arg_8)
 }
 
 // match: ?sub_78260@type_77D30@@QAE_NPBDPAXPAE@Z @ 0x00078260
+// sp-match: ?sub_78260@type_77D30@@QAE_NPBDPAXPAE@Z @ 0x00062A60
 bool type_77D30::sub_78260(const RwChar *Source, void *arg_4, RwUInt8 *arg_8)
 {
     RwChar *var_4;
@@ -537,6 +589,7 @@ bool type_77D30::sub_78260(const RwChar *Source, void *arg_4, RwUInt8 *arg_8)
 }
 
 // match: ?sub_78370@type_77D30@@QAEPAXI@Z @ 0x00078370
+// sp-match: ?sub_78370@type_77D30@@QAEPAXI@Z @ 0x00062A20
 void *type_77D30::sub_78370(RwUInt32 arg_0)
 {
     RwUInt32 var_4;
@@ -548,13 +601,17 @@ void *type_77D30::sub_78370(RwUInt32 arg_0)
         unk_20 += var_4;
         unk_14 = unk_20 - &unk_00;
     } else {
+#ifndef CODFH_SP
+        // single player compiles the debug print out (SP 0x62A20)
         sub_19A750("Out of animation bank memory!");
+#endif
         local_8 = 0;
     }
     return local_8;
 }
 
 // match: ?sub_783F0@@YAPAUtype_783F0@@PAURwStream@@PAU1@I@Z @ 0x000783F0
+// sp-match: ?sub_783F0@@YAPAUtype_783F0@@PAURwStream@@PAU1@I@Z @ 0x00062DE0
 // Reads arg_8 events from the stream arg_0 into arg_4.
 type_783F0 *sub_783F0(RwStream *arg_0, type_783F0 *arg_4, RwUInt32 arg_8)
 {
@@ -580,6 +637,7 @@ type_783F0 *sub_783F0(RwStream *arg_0, type_783F0 *arg_4, RwUInt32 arg_8)
 }
 
 // match: ?sub_784D0@@YAPAUtype_783F0@@PAURwStream@@I@Z @ 0x000784D0
+// sp-match: ?sub_784D0@@YAPAUtype_783F0@@PAURwStream@@I@Z @ 0x00062E70
 type_783F0 *sub_784D0(RwStream *arg_0, RwUInt32 arg_4)
 {
     RwUInt32 var_4;
@@ -598,6 +656,7 @@ type_783F0 *sub_784D0(RwStream *arg_0, RwUInt32 arg_4)
 }
 
 // match: ?sub_78550@type_783F0@@QAEPAUtype_783F0_04@@MH@Z @ 0x00078550
+// sp-match: ?sub_78550@type_783F0@@QAEPAUtype_783F0_04@@MH@Z @ 0x00062EC0
 type_783F0_04 *type_783F0::sub_78550(RwReal arg_0, RwInt32 arg_4)
 {
     RwUInt32 var_4;
@@ -610,6 +669,7 @@ type_783F0_04 *type_783F0::sub_78550(RwReal arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_785C0@type_783F0@@QAEPAUtype_783F0_04@@PAU2@H@Z @ 0x000785C0
+// sp-match: ?sub_785C0@type_783F0@@QAEPAUtype_783F0_04@@PAU2@H@Z @ 0x00062F10
 type_783F0_04 *type_783F0::sub_785C0(type_783F0_04 *arg_0, RwInt32 arg_4)
 {
     RwUInt32 var_4;
@@ -634,6 +694,7 @@ type_783F0_04 *type_783F0::sub_785C0(type_783F0_04 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_78670@@YAIH@Z @ 0x00078670
+// sp-match: ?sub_78670@@YAIH@Z @ 0x00062F70
 // The size of an event list of arg_0 events.
 RwUInt32 sub_78670(RwInt32 arg_0)
 {
@@ -645,6 +706,7 @@ RwUInt32 sub_78670(RwInt32 arg_0)
 }
 
 // match: ?sub_786A0@@YAXXZ @ 0x000786A0
+// sp-match: ?sub_786A0@@YAXXZ @ 0x00063160
 // Sets the animation system up: its parts, the three player pools and the
 // players' handle table.
 void sub_786A0()
@@ -669,6 +731,7 @@ void sub_786A0()
 }
 
 // match: ?sub_78790@@YAXXZ @ 0x00078790
+// sp-match: ?sub_78790@@YAXXZ @ 0x00063210
 void sub_78790()
 {
     RwInt32 var_4;
@@ -682,6 +745,7 @@ void sub_78790()
 }
 
 // match: ?sub_787F0@@YAXXZ @ 0x000787F0
+// sp-match: ?sub_787F0@@YAXXZ @ 0x00063250
 void sub_787F0()
 {
     RwInt32 var_4;
@@ -693,6 +757,7 @@ void sub_787F0()
 }
 
 // match: ?sub_78830@@YAIH@Z @ 0x00078830
+// sp-match: ?sub_78830@@YAIH@Z @ 0x00063280
 RwUInt32 sub_78830(RwInt32 arg_0)
 {
     void *var_4;
@@ -704,6 +769,7 @@ RwUInt32 sub_78830(RwInt32 arg_0)
 }
 
 // match: ?sub_78870@@YAXH@Z @ 0x00078870
+// sp-match: ?sub_78870@@YAXH@Z @ 0x000632A0
 void sub_78870(RwInt32 arg_0)
 {
     type_788C0 *var_4;
@@ -716,6 +782,7 @@ void sub_78870(RwInt32 arg_0)
 }
 
 // match: ?sub_788C0@@YA_NH_N@Z @ 0x000788C0
+// sp-match: ?sub_788C0@@YA_NH_N@Z @ 0x000632E0
 // Whether a player plays the animation arg_0 (holding it on unload when
 // arg_4 is set).
 bool sub_788C0(RwInt32 arg_0, bool arg_4)
@@ -724,7 +791,7 @@ bool sub_788C0(RwInt32 arg_0, bool arg_4)
     RwInt32 v8;
     type_788C0 *varC;
 
-    for (v8 = 1; v8 < 0xB3; v8++) {
+    for (v8 = 1; v8 < dword_449CA0_count; v8++) {
         if (dword_449CA0[v8].unk_08 != 0) {
             varC = (type_788C0 *)sub_78AC0(dword_449CA0[v8].unk_04);
             if (varC != 0) {
@@ -742,6 +809,7 @@ bool sub_788C0(RwInt32 arg_0, bool arg_4)
 }
 
 // match: ?sub_789A0@@YAIPAXH@Z @ 0x000789A0
+// sp-match: ?sub_789A0@@YAIPAXH@Z @ 0x00062F90
 // Registers the player arg_0 of the pool arg_4 under a new handle.
 RwUInt32 sub_789A0(void *arg_0, RwInt32 arg_4)
 {
@@ -752,7 +820,7 @@ RwUInt32 sub_789A0(void *arg_0, RwInt32 arg_4)
     var_4 = 0;
     if (dword_428C0C == 0)
         dword_428C0C = 1;
-    for (varC = 1; varC < 0xB3; varC++) {
+    for (varC = 1; varC < dword_449CA0_count; varC++) {
         if (dword_449CA0[varC].unk_04 == 0 && dword_449CA0[varC].unk_08 == 0) {
             v8.unk_00 = (RwUInt16)varC;
             v8.unk_02 = (RwUInt16)dword_428C0C;
@@ -769,6 +837,7 @@ RwUInt32 sub_789A0(void *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_78A80@@YAXI@Z @ 0x00078A80
+// sp-match: ?sub_78A80@@YAXI@Z @ 0x00063020
 void sub_78A80(RwUInt32 arg_0)
 {
     dword_449CA0[(RwUInt16)arg_0].unk_04 = 0;
@@ -777,6 +846,7 @@ void sub_78A80(RwUInt32 arg_0)
 }
 
 // match: ?sub_78AC0@@YAPAUtype_78AC0@@H@Z @ 0x00078AC0
+// sp-match: ?sub_78AC0@@YAPAUtype_78AC0@@H@Z @ 0x00063040
 type_78AC0 *sub_78AC0(RwInt32 arg_0)
 {
     if (dword_449CA0[(RwUInt16)arg_0].unk_04 == (RwUInt32)arg_0)

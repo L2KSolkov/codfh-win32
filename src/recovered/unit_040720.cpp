@@ -84,6 +84,12 @@ type_16C2A0 dword_43988C;
 // match: _$E6 @ 0x0030DCE0
 // match: _$E8 @ 0x003098D0
 // match: _$E9 @ 0x0030DCF0
+// sp-match: _$E9 @ 0x0021E120
+// sp-match: _$E2 @ 0x0021C310
+// sp-match: _$E5 @ 0x0021C330
+// sp-match: _$E8 @ 0x0021C350
+// sp-match: _$E3 @ 0x0021E100
+// sp-match: _$E6 @ 0x0021E110
 
 RwInt32 sub_40F00(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C);
 RwInt32 sub_40FB0(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C);
@@ -116,6 +122,7 @@ void sub_425A0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_409A0 *arg_8);
 void sub_426E0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_409A0 *arg_8, RwInt32 arg_C);
 
 // match: sub_40720 @ 0x00040720
+// sp-match: sub_40720 @ 0x00031F80
 void sub_40720()
 {
     dword_43983C = 0.0f;
@@ -130,6 +137,7 @@ void sub_40720()
 }
 
 // match: sub_407C0 @ 0x000407C0
+// sp-match: sub_407C0 @ 0x000314F0
 void sub_407C0()
 {
     RwInt32 var_4;
@@ -149,6 +157,7 @@ void sub_407C0()
 }
 
 // match: sub_40840 @ 0x00040840
+// sp-match: sub_40840 @ 0x00031530
 void sub_40840()
 {
     RwInt32 var_4;
@@ -171,10 +180,13 @@ void sub_40840()
 // match: sub_408D0 @ 0x000408D0
 void sub_408D0()
 {
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x31530 drops the calls)
     sub_19A750("Somebody forgot to unregister in the Vision Scheduler!");
+#endif
 }
 
 // match: sub_408F0 @ 0x000408F0
+// sp-match: sub_408F0 @ 0x00030A70
 // The update, with the time step arg_0: runs dword_4398B0 until three looks
 // were made (dword_439834) or each entry ran once, then dword_439840 until
 // one was (dword_439830).
@@ -202,6 +214,7 @@ void sub_408F0(RwReal arg_0)
 }
 
 // match: sub_409A0 @ 0x000409A0
+// sp-match: sub_409A0 @ 0x00031580
 type_409A0 *sub_409A0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, type_3D2E7C *arg_C)
 {
     type_409A0 *var_4;
@@ -222,6 +235,7 @@ type_409A0 *sub_409A0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, type_3D2E7C *
 }
 
 // match: sub_40A60 @ 0x00040A60
+// sp-match: sub_40A60 @ 0x00031600
 // Registers arg_0 with both schedules, a registration each (sub_409A0).
 void sub_40A60(type_67620 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C,
                type_3D2E7C *arg_10)
@@ -235,6 +249,7 @@ void sub_40A60(type_67620 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C,
 }
 
 // match: sub_40AE0 @ 0x00040AE0
+// sp-match: sub_40AE0 @ 0x00030B10
 void sub_40AE0(type_67620 *arg_0)
 {
     if (arg_0 != 0) {
@@ -244,6 +259,7 @@ void sub_40AE0(type_67620 *arg_0)
 }
 
 // match: sub_40B10 @ 0x00040B10
+// sp-match: sub_40B10 @ 0x00032010
 // Has arg_0 look at arg_4 at once (AIData::sub_18BB0, on a new target):
 // a test-3 look through a registration on the stack.
 void sub_40B10(type_3D3548 *arg_0, type_3D3548 *arg_4)
@@ -273,6 +289,7 @@ void sub_40B10(type_3D3548 *arg_0, type_3D3548 *arg_4)
 }
 
 // match: sub_40BD0 @ 0x00040BD0
+// sp-match: sub_40BD0 @ 0x00030B40
 // Before a look for the registration arg_4: the time since its last look
 // (in 60ths of a second) into dword_43983C, and arg_0's squared view range
 // into its unk_08.
@@ -297,6 +314,7 @@ void sub_40BD0(type_3D3548 *arg_0, type_409A0 *arg_4)
 }
 
 // match: sub_40C60 @ 0x00040C60
+// sp-match: sub_40C60 @ 0x00031BF0
 // arg_0 looks at arg_4 for the registration arg_8: when it may (sub_41420)
 // and arg_4 is in range (sub_414F0), it sees it (sub_425A0) or not
 // (sub_426E0, told whether only the second test ran); a look put off adds
@@ -363,6 +381,7 @@ void sub_40C60(type_3D3548 *arg_0, type_3D3548 *arg_4, type_409A0 *arg_8)
 }
 
 // match: sub_40EA0 @ 0x00040EA0
+// sp-match: sub_40EA0 @ 0x00030BB0
 // After a look for the registration arg_4: counts its countdown down
 // (wrapping to dword_42767C), with arg_8 has arg_0's AI object update
 // (sub_213B0), and stamps the time.
@@ -382,6 +401,7 @@ void sub_40EA0(type_3D3548 *arg_0, type_409A0 *arg_4, RwInt32 arg_8)
 }
 
 // match: sub_40F00 @ 0x00040F00
+// sp-match: sub_40F00 @ 0x00031D80
 // dword_4398B0's first callback: the registration arg_4's entity looks at
 // its tracked entity.
 RwInt32 sub_40F00(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
@@ -407,6 +427,7 @@ RwInt32 sub_40F00(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 }
 
 // match: sub_40FB0 @ 0x00040FB0
+// sp-match: sub_40FB0 @ 0x00031E00
 // dword_439840's first callback: the registration arg_4's entity, when its
 // AI object has flag 5 of unk_49C, looks at every entity of the lists its
 // sides (unk_2C bits 0 and 1) watch.
@@ -463,17 +484,17 @@ RwInt32 sub_40FB0(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 }
 
 // match: sub_41200 @ 0x00041200
+// sp-match: sub_41200 @ 0x00030BF0
 // Whether arg_0 looks at arg_4 now: 0 when arg_4 sees further, or as far
 // with a lower rank (unk_244), storing whether arg_4 sees arg_0 in *arg_C.
 RwInt32 sub_41200(type_3D3548 *arg_0, type_3D3548 *arg_4, type_409A0 *arg_8, RwInt32 *arg_C)
 {
     RwReal varC;
     type_154C0_80 *local_8;
-    RwReal var_4;
 
     varC = arg_0->vf_10C();
-    var_4 = arg_4->vf_10C();
-    if (arg_8->unk_04 == 3)
+    RwReal var_4 = arg_4->vf_10C();
+    if (!(arg_8->unk_04 != 3))
         return 1;
     if (arg_4->vf_120() == 0 || arg_4->vf_00C() != 0)
         return 1;
@@ -486,14 +507,18 @@ RwInt32 sub_41200(type_3D3548 *arg_0, type_3D3548 *arg_4, type_409A0 *arg_8, RwI
     }
     if (varC > var_4)
         return 1;
-    if (arg_0->unk_244 > arg_4->unk_244) {
-        *arg_C = (local_8->unk_04 >> 1) & 1;
-        return 0;
+    else
+    {
+        if (!(arg_0->unk_244 <= arg_4->unk_244)) {
+            *arg_C = (local_8->unk_04 >> 1) & 1;
+            return 0;
+        }
+        return 1;
     }
-    return 1;
 }
 
 // match: sub_41300 @ 0x00041300
+// sp-match: sub_41300 @ 0x00030CA0
 // Whether arg_0 looks at arg_4 this time: always at its tracked entity or at
 // one it does not see; else every other time (the record's unk_08).
 RwInt32 sub_41300(type_3D3548 *arg_0, type_3D3548 *arg_4)
@@ -514,6 +539,7 @@ RwInt32 sub_41300(type_3D3548 *arg_0, type_3D3548 *arg_4)
 }
 
 // match: sub_41390 @ 0x00041390
+// sp-match: sub_41390 @ 0x00031670
 // The schedules' second callback: ends the registration arg_4.
 RwInt32 sub_41390(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 {
@@ -530,6 +556,7 @@ RwInt32 sub_41390(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 }
 
 // match: sub_413E0 @ 0x000413E0
+// sp-match: sub_413E0 @ 0x00030D00
 RwInt32 sub_413E0(type_3D3548 *arg_0, type_3D3548 *arg_4)
 {
     AIData *local_8;
@@ -543,6 +570,7 @@ RwInt32 sub_413E0(type_3D3548 *arg_0, type_3D3548 *arg_4)
 }
 
 // match: sub_41420 @ 0x00041420
+// sp-match: sub_41420 @ 0x00030D30
 // Whether the registration arg_8 lets arg_0 look at arg_4: test 2 for an
 // entity of another side, test 3 for the registration's own object.
 RwInt32 sub_41420(type_3D3548 *arg_0, type_3D3548 *arg_4, type_409A0 *arg_8)
@@ -558,13 +586,16 @@ RwInt32 sub_41420(type_3D3548 *arg_0, type_3D3548 *arg_4, type_409A0 *arg_8)
         return ((var_4 | 4) ^ (local_8 | 4)) != 0 && local_8 != 0 && local_8 != 4;
     case 3:
         varC = arg_4->vf_098();
-        return varC != 0 && varC->get_unk_04() == arg_8->unk_0C
+        // The handle through its struct's conversion: single player (SP 0x30D58)
+        // then reuses ecx for the serial.
+        return varC != 0 && varC->get_unk_04_h() == arg_8->unk_0C
             && varC->get_unk_24() == arg_8->unk_10;
     }
     return 1;
 }
 
 // match: sub_414F0 @ 0x000414F0
+// sp-match: sub_414F0 @ 0x00030DA0
 // Whether arg_4 is within the squared distance arg_8 of arg_0, storing the
 // squared distance in *arg_C; 0 when either has no frame.
 RwInt32 sub_414F0(type_3D3548 *arg_0, type_3D3548 *arg_4, RwReal arg_8, RwReal *arg_C)
@@ -585,6 +616,7 @@ RwInt32 sub_414F0(type_3D3548 *arg_0, type_3D3548 *arg_4, RwReal arg_8, RwReal *
 }
 
 // match: ?sub_415E0@@YAHPAUtype_3D3548@@0@Z @ 0x000415E0
+// sp-match: ?sub_415E0@@YAHPAUtype_3D3548@@0@Z @ 0x00030E30
 RwInt32 sub_415E0(type_3D3548 *arg_0, type_3D3548 *arg_4)
 {
     RwMatrix var_40;
@@ -608,9 +640,14 @@ RwInt32 sub_415E0(type_3D3548 *arg_0, type_3D3548 *arg_4)
     RwV3dSubMacro(&var_A4, &var_98, var_8C);
     RwV3dScaleMacro(&var_B0, var_88, RwV3dDotProductMacro(&var_A4, var_88));
     RwV3dScaleMacro(&var_BC, var_84, RwV3dDotProductMacro(&var_A4, var_84));
+#ifdef CODFH_SP // shape: the length test sums z first (SP 0x30F33 fst/fmul of z)
+    RwV3dAddMacro(&var_B0, &var_B0, &var_BC);
+    if (var_B0.z * var_B0.z + var_B0.x * var_B0.x + var_B0.y * var_B0.y == 0.0f)
+#else
     RwV3dAddMacro(&var_B0, &var_B0, &var_BC);
     // An empty first branch gives the image's jp-to-else test.
     if (RwV3dDotProductMacro(&var_B0, &var_B0) == 0.0f)
+#endif
     {
     }
     else
@@ -636,6 +673,7 @@ RwInt32 sub_415E0(type_3D3548 *arg_0, type_3D3548 *arg_4)
 }
 
 // match: sub_41AD0 @ 0x00041AD0
+// sp-match: sub_41AD0 @ 0x00031B70
 // Whether arg_0 sees arg_4 from its AI object's node (unk_F60, sub_41B20).
 RwInt32 sub_41AD0(type_3D3548 *arg_0, type_3D3548 *arg_4)
 {
@@ -648,6 +686,7 @@ RwInt32 sub_41AD0(type_3D3548 *arg_0, type_3D3548 *arg_4)
 }
 
 // match: sub_41B20 @ 0x00041B20
+// sp-match: sub_41B20 @ 0x000316A0
 // Whether arg_0 sees arg_4 from the node arg_8: the line from the node's
 // eye point (sub_F8FE0, through the node's orientation and position) to
 // arg_4's aim point (vf_110) is blocked by no collision world's line test
@@ -757,6 +796,7 @@ RwInt32 sub_41B20(type_3D3548 *arg_0, type_3D3548 *arg_4, type_F8350 *arg_8)
 }
 
 // match: sub_421C0 @ 0x000421C0
+// sp-match: sub_421C0 @ 0x00031BA0
 // Whether nothing blocks the line from arg_0's eye point to arg_4's point
 // for it (sub_42210).
 RwInt32 sub_421C0(type_3D3548 *arg_0, type_3D3548 *arg_4)
@@ -770,6 +810,7 @@ RwInt32 sub_421C0(type_3D3548 *arg_0, type_3D3548 *arg_4)
 }
 
 // match: sub_42210 @ 0x00042210
+// sp-match: sub_42210 @ 0x00031A80
 // Whether nothing blocks the line from arg_0 to arg_4: no line test hit in a
 // live collision world (sub_91F40), then no atomic other than the entities
 // arg_8's and arg_C's (sub_42350).
@@ -807,6 +848,7 @@ RwInt32 sub_42210(RwV3d *arg_0, RwV3d *arg_4, type_3D3548 *arg_8, type_3D3548 *a
 }
 
 // match: sub_42350 @ 0x00042350
+// sp-match: sub_42350 @ 0x00031090
 // sub_42210's atomic callback: an atomic blocks unless it belongs to either
 // entity, to one they are attached to (vf_1F8) or share with (vf_200,
 // vf_010), or to an entity without flag 2 of unk_28; its triangles decide
@@ -859,6 +901,7 @@ RpAtomic *sub_42350(RpIntersection *arg_0, RpWorldSector *arg_4, RpAtomic *arg_8
 }
 
 // match: sub_42580 @ 0x00042580
+// sp-match: sub_42580 @ 0x00031080
 // sub_42350's triangle callback: a hit.
 RpCollisionTriangle *sub_42580(RpIntersection *arg_0, RpCollisionTriangle *arg_4, RwReal arg_8,
                                void *arg_C)
@@ -871,6 +914,7 @@ RpCollisionTriangle *sub_42580(RpIntersection *arg_0, RpCollisionTriangle *arg_4
 }
 
 // match: sub_425A0 @ 0x000425A0
+// sp-match: sub_425A0 @ 0x00031210
 // arg_0 sees arg_4: tells it ("TargetSeen" the first time for its tracked
 // entity, "CanPotentiallySeeTarget"), and marks the record seen at arg_4's
 // position.
@@ -905,6 +949,7 @@ void sub_425A0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_409A0 *arg_8)
 }
 
 // match: sub_426E0 @ 0x000426E0
+// sp-match: sub_426E0 @ 0x00031310
 // arg_0 does not see arg_4 (arg_C: it could): tells it about its tracked
 // entity ("TargetLostLOS", "CanPotentiallySeeTarget",
 // "CannotPotentiallySeeTarget") and counts the time on the record.
@@ -942,6 +987,7 @@ void sub_426E0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_409A0 *arg_8, RwInt3
 }
 
 // match: sub_42870 @ 0x00042870
+// sp-match: sub_42870 @ 0x00031440
 // Gives the registration arg_0 the first free entry of dword_439618, with a
 // new serial.
 RwUInt32 sub_42870(type_409A0 *arg_0)
@@ -969,6 +1015,7 @@ RwUInt32 sub_42870(type_409A0 *arg_0)
 }
 
 // match: sub_42930 @ 0x00042930
+// sp-match: sub_42930 @ 0x000314B0
 // Frees the handle arg_0's entry.
 void sub_42930(type_365A0 arg_0)
 {
@@ -977,6 +1024,7 @@ void sub_42930(type_365A0 arg_0)
 }
 
 // match: sub_42960 @ 0x00042960
+// sp-match: sub_42960 @ 0x000314D0
 // The registration of the handle arg_0, 0 when it is stale.
 type_409A0 *sub_42960(type_365A0 arg_0)
 {

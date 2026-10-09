@@ -12,6 +12,7 @@
 // match: ??_C@_0IK@BHKMADDA@Some?5things?5are?5still?5registered@ @ 0x003D30E0
 
 // match: ??0alfasched@@QAE@XZ @ 0x00071EC0
+// sp-match: ??0alfasched@@QAE@XZ @ 0x0005F040
 
 alfasched::alfasched()
 {
@@ -22,11 +23,13 @@ alfasched::alfasched()
 }
 
 // match: ??1alfasched@@QAE@XZ @ 0x00071F00
+// sp-match: ??1alfasched@@QAE@XZ @ 0x0005F060
 alfasched::~alfasched()
 {
 }
 
 // match: ?sub_71F20@alfasched@@QAEXHHHHP6AHPAUtype_67620@@HMH@Z1@Z @ 0x00071F20
+// sp-match: ?sub_71F20@alfasched@@QAEXHHHHP6AHPAUtype_67620@@HMH@Z1@Z @ 0x0005F070
 void alfasched::sub_71F20(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C,
                           alfasched_callback arg_10, alfasched_test arg_14)
 {
@@ -42,6 +45,7 @@ void alfasched::sub_71F20(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 a
 }
 
 // match: ?sub_71FA0@alfasched@@QAEHXZ @ 0x00071FA0
+// sp-match: ?sub_71FA0@alfasched@@QAEHXZ @ 0x0005F5C0
 RwInt32 alfasched::sub_71FA0()
 {
     RwInt32 var_4;
@@ -51,6 +55,7 @@ RwInt32 alfasched::sub_71FA0()
 }
 
 // match: ?sub_71FC0@alfasched@@QAEHXZ @ 0x00071FC0
+// sp-match: ?sub_71FC0@alfasched@@QAEHXZ @ 0x0005F5D0
 RwInt32 alfasched::sub_71FC0()
 {
     RwInt32 var_4;
@@ -61,6 +66,7 @@ RwInt32 alfasched::sub_71FC0()
 }
 
 // match: ?sub_71FF0@alfasched@@QAEHXZ @ 0x00071FF0
+// sp-match: ?sub_71FF0@alfasched@@QAEHXZ @ 0x0005F590
 RwInt32 alfasched::sub_71FF0()
 {
     RwInt32 var_4;
@@ -69,8 +75,11 @@ RwInt32 alfasched::sub_71FF0()
 
     var_4 = 0;
     if (unk_00 != 0) {
+#ifndef CODFH_SP
+        // single player compiles the debug print out (SP 0x5F590)
         sub_19A750("Some things are still registered in the scheduler at restart/shutdown!  "
                    "But this might not be anybody's fault.  I'll clean it up for you\n");
+#endif
         varC = unk_00;
         while (varC != 0) {
             v8 = varC->unk_18;
@@ -82,6 +91,7 @@ RwInt32 alfasched::sub_71FF0()
 }
 
 // match: ?sub_72050@alfasched@@QAE?AUtype_72050@@PAUtype_67620@@HMH@Z @ 0x00072050
+// sp-match: ?sub_72050@alfasched@@QAE?AUtype_72050@@PAUtype_67620@@HMH@Z @ 0x0005F3C0
 type_72050 alfasched::sub_72050(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 {
     alfasched_entry *var_8;
@@ -110,6 +120,7 @@ type_72050 alfasched::sub_72050(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, 
 }
 
 // match: ?sub_72120@alfasched@@QAE?AUtype_72050@@PAUtype_67620@@HMH@Z @ 0x00072120
+// sp-match: ?sub_72120@alfasched@@QAE?AUtype_72050@@PAUtype_67620@@HMH@Z @ 0x0005F450
 type_72050 alfasched::sub_72120(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 {
     alfasched_entry *var_8;
@@ -152,6 +163,7 @@ type_72050 alfasched::sub_72120(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, 
 }
 
 // match: ?sub_72240@alfasched@@QAEXPAUtype_67620@@@Z @ 0x00072240
+// sp-match: ?sub_72240@alfasched@@QAEXPAUtype_67620@@@Z @ 0x0005F500
 void alfasched::sub_72240(type_67620 *arg_0)
 {
     alfasched_entry *stk_C;
@@ -174,6 +186,7 @@ void alfasched::sub_72240(type_67620 *arg_0)
 }
 
 // match: ?sub_722B0@alfasched@@QAEXI@Z @ 0x000722B0
+// sp-match: ?sub_722B0@alfasched@@QAEXI@Z @ 0x0005F570
 void alfasched::sub_722B0(RwUInt32 arg_0)
 {
     alfasched_entry *var_4;
@@ -183,6 +196,7 @@ void alfasched::sub_722B0(RwUInt32 arg_0)
 }
 
 // match: ?sub_722E0@alfasched@@QAEHPAUalfasched_entry@@@Z @ 0x000722E0
+// sp-match: ?sub_722E0@alfasched@@QAEHPAUalfasched_entry@@@Z @ 0x0005F0C0
 RwInt32 alfasched::sub_722E0(alfasched_entry *arg_0)
 {
     alfasched_entry *var_4;
@@ -195,18 +209,25 @@ RwInt32 alfasched::sub_722E0(alfasched_entry *arg_0)
 }
 
 // match: ?sub_72320@alfasched@@QAEPAUalfasched_entry@@PAUtype_67620@@@Z @ 0x00072320
+// sp-match: ?sub_72320@alfasched@@QAEPAUalfasched_entry@@PAUtype_67620@@@Z @ 0x0005F0F0
 alfasched_entry *alfasched::sub_72320(type_67620 *arg_0)
 {
     alfasched_entry *var_4;
 
     for (var_4 = unk_00; var_4 != 0; var_4 = var_4->unk_18) {
+#ifdef CODFH_SP
+        // shape: the argument's handle read through its struct getter (SP 0x5F0F0)
+        if (var_4->unk_04 == arg_0->get_unk_04_h() && var_4->unk_14 == arg_0->vf_028())
+#else
         if (var_4->unk_04 == arg_0->get_unk_04() && var_4->unk_14 == arg_0->vf_028())
+#endif
             return var_4;
     }
     return 0;
 }
 
 // match: ?sub_72380@alfasched@@QAEXPAUalfasched_entry@@@Z @ 0x00072380
+// sp-match: ?sub_72380@alfasched@@QAEXPAUalfasched_entry@@@Z @ 0x0005F130
 void alfasched::sub_72380(alfasched_entry *arg_0)
 {
     arg_0->unk_18 = 0;
@@ -225,6 +246,7 @@ void alfasched::sub_72380(alfasched_entry *arg_0)
 }
 
 // match: ?sub_72410@alfasched@@QAEXPAUalfasched_entry@@@Z @ 0x00072410
+// sp-match: ?sub_72410@alfasched@@QAEXPAUalfasched_entry@@@Z @ 0x0005F180
 void alfasched::sub_72410(alfasched_entry *arg_0)
 {
     if (unk_04 != 0) {
@@ -237,6 +259,7 @@ void alfasched::sub_72410(alfasched_entry *arg_0)
 }
 
 // match: ?sub_72450@alfasched@@QAEXPAUalfasched_entry@@@Z @ 0x00072450
+// sp-match: ?sub_72450@alfasched@@QAEXPAUalfasched_entry@@@Z @ 0x0005F540
 void alfasched::sub_72450(alfasched_entry *arg_0)
 {
     alfasched_entry *v8;
@@ -257,6 +280,7 @@ void alfasched::sub_72450(alfasched_entry *arg_0)
 }
 
 // match: ?sub_724B0@alfasched@@QAEXPAUalfasched_entry@@0@Z @ 0x000724B0
+// sp-match: ?sub_724B0@alfasched@@QAEXPAUalfasched_entry@@0@Z @ 0x0005F1A0
 void alfasched::sub_724B0(alfasched_entry *arg_0, alfasched_entry *arg_4)
 {
     if (unk_40 != 0)
@@ -274,6 +298,7 @@ void alfasched::sub_724B0(alfasched_entry *arg_0, alfasched_entry *arg_4)
 }
 
 // match: ?sub_72560@alfasched@@QAEXM@Z @ 0x00072560
+// sp-match: ?sub_72560@alfasched@@QAEXM@Z @ 0x0005F220
 void alfasched::sub_72560(RwReal arg_0)
 {
     alfasched_entry *var_10;
@@ -283,7 +308,12 @@ void alfasched::sub_72560(RwReal arg_0)
 
     unk_48 = 0;
     unk_44 = arg_0 + unk_44;
+#ifdef CODFH_SP
+    // shape: the clock tested from its own side (SP 0x5F220)
+    if (unk_44 < unk_30 || unk_00 == 0)
+#else
     if (unk_30 > unk_44 || unk_00 == 0)
+#endif
         return;
     var_10 = unk_00;
     v8 = 0;
@@ -319,6 +349,7 @@ void alfasched::sub_72560(RwReal arg_0)
 }
 
 // match: ?sub_726E0@alfasched@@QAEXP6AHPAUtype_67620@@HMH@Z@Z @ 0x000726E0
+// sp-match: ?sub_726E0@alfasched@@QAEXP6AHPAUtype_67620@@HMH@Z@Z @ 0x0005F310
 void alfasched::sub_726E0(alfasched_callback arg_0)
 {
     alfasched_entry *var_10;
@@ -353,6 +384,7 @@ void alfasched::sub_726E0(alfasched_callback arg_0)
 }
 
 // match: ?sub_727D0@alfasched@@QAEHXZ @ 0x000727D0
+// sp-match: ?sub_727D0@alfasched@@QAEHXZ @ 0x0005F3A0
 RwInt32 alfasched::sub_727D0()
 {
     RwInt32 var_4;

@@ -42,7 +42,24 @@ struct type_67260
         RwReal unk_4C_r;    // the generators copy their trigger's unk_194
     };
 
+#ifdef CODFH_SP // inline in single player: SP 0xD61B0, 0xD6100, 0xFE7F0 and 0x100430 expand it
+    type_67260()
+    {
+        unk_00 = 0;
+        unk_04 = 0;
+        memset(unk_08, 0, sizeof(unk_08));
+        unk_00 = 1;
+        unk_04 = 0;
+        unk_38 = 0;
+        unk_3C = 0;
+        unk_40 = 0;
+        unk_44 = 0;
+        unk_48 = 0;
+        unk_4C = 0;
+    }
+#else
     type_67260();
+#endif
 };
 typedef RwChar type_67260_size_check[sizeof(type_67260) == 0x50 ? 1 : -1];
 
@@ -64,7 +81,11 @@ struct type_10F710_1A48_29C
     type_10F710_1A48_29C()
     {
         unk_00 = 0;
+#ifdef CODFH_SP // single player clears it as a float (immediate stores, SP 0x10934E)
+        unk_04_r = 0.0f;
+#else
         unk_04 = 0;
+#endif
         memset(unk_08, 0, sizeof(unk_08));
     }
 };

@@ -45,6 +45,7 @@
 #include "game/parsedfile.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E138C
 extern const RwReal flt_3E138C = 16.666666f;
 // 0x003E1390
@@ -63,6 +64,7 @@ extern const RwReal flt_3E13A4 = 0.01f;
 extern const RwReal flt_3E13A8 = 0.01f;
 // 0x003E13AC
 extern const RwReal flt_3E13AC = 16.666666f;
+#endif
 // 0x003E13B0
 extern const RwReal flt_3E13B0 = 4000000.0f;
 // 0x004F62F8
@@ -1413,7 +1415,9 @@ void type_4F7EB8::sub_1AB440()
             sub_1AF7E0();
             unk_2A8 = 3;
             sub_124EE0(0.5f, 0);
+#ifndef CODFH_SP // MP only: single player's HUD has no unk_90
             set_hud_unk_90();
+#endif
             break;
         case 0:
             if (unk_1A8)
@@ -1486,7 +1490,9 @@ void type_4F7EB8::sub_1AB440()
                 unk_230 = -1;
                 sub_1AB200();
                 sub_124EE0(0.5f, 0);
+#ifndef CODFH_SP // MP only: single player's HUD has no unk_90
                 set_hud_unk_90();
+#endif
             }
             break;
         case 2:
@@ -1526,7 +1532,9 @@ void type_4F7EB8::sub_1AB440()
             }
             unk_2A8 = 1;
             sub_124EE0(0.5f, 0);
+#ifndef CODFH_SP // MP only: single player's HUD has no unk_90
             set_hud_unk_90();
+#endif
         }
         // A compiled-out check (docs/toolchain.md): the registers after it
         // are one load on.
@@ -1742,7 +1750,9 @@ void type_4F7EB8::sub_1ABE30()
                 get_unk_1A0()->sub_1DDE20(&var_98, get_unk_19C()->get_unk_B0()->sub_1A8050());
                 sub_1A8A70(&unk_4F7EB8, "Local player respawned\n");
                 unk_3D0.sub_1C28F0(sub_1AEC70(), unk_29C, 0);
+#ifndef CODFH_SP // MP only: single player's HUD has no unk_90
                 clear_hud_unk_90();
+#endif
                 unk_290 = 0;
                 unk_288 = 0;
             }

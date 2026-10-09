@@ -199,9 +199,11 @@ RwUInt8 byte_4CF7D0;
 // the image has these constants before the data's texts.)
 // 0x003DA7E8
 extern const RwReal flt_3DA7E8 = 16.666666f;
+#ifndef CODFH_SP // single player writes the literal: its folded 114.59275f (__real@42e52f7d) follows 16.666666f (SP 0x2E6674, read at SP 0xDAF35)
 // 0x003DA7EC
 // (a named constant: the image has it among the constants, before the table's texts)
 extern const RwReal flt_3DA7EC = 57.296375f;
+#endif
 // End of its data definitions.
 
 
@@ -233,13 +235,26 @@ RwTexture *sub_125490(RwTexture *arg_0, void *arg_4)
 }
 
 // match: ?sub_1254B0@@YAPAURwTexDictionary@@PAU1@PAX@Z @ 0x001254B0
+// sp-match: ?sub_1254B0@@YAPAURwTexDictionary@@PAU1@PAX@Z @ 0x000DAE60
 RwTexDictionary *sub_1254B0(RwTexDictionary *arg_0, void *arg_4)
 {
     RwTexDictionaryForAllTextures(arg_0, sub_125490, arg_4);
     return arg_0;
 }
 
+#ifdef CODFH_SP
+// Single player only (SP 0xDAE80): whether the level is not level 2; the
+// level draw tests it before the second level world (SP 0xDB058), where
+// multiplayer calls a function that always returns 1 (sub_31DB0).
+// sp-match: ?sp_sub_DAE80@@YAHXZ @ 0x000DAE80
+RwInt32 sp_sub_DAE80()
+{
+    return sub_19B050() != 2;
+}
+#endif
+
 // match: ?sub_1254D0@@YAXPAURwCamera@@@Z @ 0x001254D0
+// sp-match: ?sub_1254D0@@YAXPAURwCamera@@@Z @ 0x000DAF10
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws the level for the camera arg_0: the worlds (or a clear screen), the
 // level sections' worlds and the clones in two passes, and the world render
@@ -268,6 +283,20 @@ void sub_1254D0(RwCamera *arg_0)
         return;
     }
     bp_4 = sub_1745A0(0);
+#ifdef CODFH_SP
+    // shape: single player's field of view is a block local (it shares the
+    // dead camera argument's slot, SP 0xDAF46).
+    if (bp_4)
+    {
+        RwInt32 fov = (RwInt32)((RwReal)atan(((type_10F710 *)bp_4)->get_unk_534()) * 2.0f
+                                    * 57.296375f);
+        if (fov != dword_4CF7C4)
+        {
+            dword_4CF7C4 = fov;
+            RwTexDictionaryForAllTexDictionaries(sub_1254B0, &fov);
+        }
+    }
+#else
     if (bp_4)
     {
         l1C = (RwInt32)(m_18 = (RwReal)atan(((type_10F710 *)bp_4)->get_unk_534()) * 2.0f
@@ -278,6 +307,7 @@ void sub_1254D0(RwCamera *arg_0)
             RwTexDictionaryForAllTexDictionaries(sub_1254B0, &l1C);
         }
     }
+#endif
     if (world && !dword_4CF440)
     {
         sub_16D7F0(10);
@@ -288,6 +318,11 @@ void sub_1254D0(RwCamera *arg_0)
     }
     else
     {
+#ifdef CODFH_SP
+        // shape: a block local too (the same dead argument slot, SP 0xDAFB2).
+        RwRGBA var_20;
+
+#endif
         var_20.red = 0;
         var_20.green = 0;
         var_20.blue = 0;
@@ -305,7 +340,12 @@ void sub_1254D0(RwCamera *arg_0)
         sub_127700(arg_0, dword_4E5C88);
         sub_16D850(10);
     }
+#ifdef CODFH_SP
+    // Single player skips the second level world in level 2 (SP 0xDB058).
+    if (dword_4E5C84 && !dword_4CF440 && (frm_24 = sp_sub_DAE80()) != 0)
+#else
     if (dword_4E5C84 && !dword_4CF440 && (frm_24 = sub_31DB0()) != 0)
+#endif
     {
         sub_16D7F0(10);
         sub_127530(arg_0, dword_4E5C84);
@@ -400,6 +440,7 @@ void sub_1254D0(RwCamera *arg_0)
 }
 
 // match: ?sub_1259C0@@YAXPAURwCamera@@H@Z @ 0x001259C0
+// sp-match: ?sub_1259C0@@YAXPAURwCamera@@H@Z @ 0x000DAE90
 // Draws the clones of the pass arg_4 in the effects world's pass.
 void sub_1259C0(RwCamera *arg_0, RwInt32 arg_4)
 {
@@ -411,6 +452,7 @@ void sub_1259C0(RwCamera *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_125A10@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x00125A10
+// sp-match: ?sub_125A10@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x000DAEE0
 // Runs the UV animation of the material arg_0 by a frame (1/60 s).
 RpMaterial *sub_125A10(RpMaterial *arg_0, void *arg_4)
 {
@@ -423,6 +465,7 @@ RpMaterial *sub_125A10(RpMaterial *arg_0, void *arg_4)
 }
 
 // match: ?sub_125A50@@YAXXZ @ 0x00125A50
+// sp-match: ?sub_125A50@@YAXXZ @ 0x000DC6B0
 // Sets the render settings to their defaults.
 void sub_125A50()
 {
@@ -446,8 +489,12 @@ void sub_125A50()
     stru_4CF790.blue = 0;
     stru_4CF790.alpha = 0;
     dword_4CF5BC = 2;
+#ifdef CODFH_SP // shape: both set to 30.0f in one assignment (SP 0xDC74F/0xDC759: two immediate stores, no reload)
+    *(RwReal *)&dword_4CF468 = *(RwReal *)&dword_4CF540 = 30.0f;
+#else
     *(RwReal *)&dword_4CF540 = 30.0f;
     dword_4CF468 = dword_4CF540;
+#endif
     flt_4CF458 = farClip = 20000.0f;
     dword_4CF490 = 1;
     dword_4CF518 = 1;
@@ -494,6 +541,7 @@ void sub_125A50()
 }
 
 // match: ?sub_125E00@@YAXXZ @ 0x00125E00
+// sp-match: ?sub_125E00@@YAXXZ @ 0x000DD6B0
 // Clears the screen and frees the shadows' buffers, the motion blur off.
 void sub_125E00()
 {
@@ -508,6 +556,7 @@ void sub_125E00()
 }
 
 // match: ?sub_125E40@@YAXXZ @ 0x00125E40
+// sp-match: ?sub_125E40@@YAXXZ @ 0x000DCA50
 void sub_125E40()
 {
     RwCamera *var_4;
@@ -517,6 +566,7 @@ void sub_125E40()
 }
 
 // match: ?sub_125E60@@YAXPAURwCamera@@@Z @ 0x00125E60
+// sp-match: ?sub_125E60@@YAXPAURwCamera@@@Z @ 0x000DCA60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Clears both buffers of the camera arg_0 to black.
 void sub_125E60(RwCamera *arg_0)
@@ -540,6 +590,7 @@ void sub_125E60(RwCamera *arg_0)
 }
 
 // match: ?sub_125ED0@@YAXPAURwCamera@@H@Z @ 0x00125ED0
+// sp-match: ?sub_125ED0@@YAXPAURwCamera@@H@Z @ 0x000DCAC0
 // Shows both buffers of the camera arg_0 as they are.
 void sub_125ED0(RwCamera *arg_0, RwInt32 arg_4)
 {
@@ -556,6 +607,7 @@ void sub_125ED0(RwCamera *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_125F20@@YAXH@Z @ 0x00125F20
+// sp-match: ?sub_125F20@@YAXH@Z @ 0x000DCB00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws a frame: the level, the effects, RenderWare Studio's entities, the
 // player's view (its own field of view, lit apart), the fades, the motion
@@ -593,7 +645,9 @@ void sub_125F20(RwInt32 arg_0)
         return;
     }
     sub_16D7F0(9);
+#ifndef CODFH_SP
     sub_19A750((RwInt32)bp_8);
+#endif
     sub_16D850(9);
     SuspendThread((HANDLE)dword_44BAD4);
     sub_1254D0(bp_8);
@@ -667,7 +721,17 @@ void sub_125F20(RwInt32 arg_0)
     sub_128DB0();
     sub_187150(dword_4E5CBC);
     dword_4B8EF0.sub_E9B50();
+#ifdef CODFH_SP
+    // single player sets the 2D camera again when not paused for a capture
+    // (SP 0xDCDA0) and reads the pad without the input test (SP 0xDCDBC).
+    if (!arg_0)
+    {
+        sub_187150(dword_4E5CBC);
+    }
+    if (0.0f != unk_4B9308.sub_EE9A0(1, 0x11))
+#else
     if (0.0f != unk_4B9308.sub_EE8F0(1, 0x11))
+#endif
     {
         dword_429BCC = !dword_429BCC;
     }
@@ -689,6 +753,7 @@ void sub_125F20(RwInt32 arg_0)
     {
         sub_187150(dword_4E5CBC);
     }
+#ifndef CODFH_SP // single player has no second camera update (SP 0xDCE0E)
     RwCameraBeginUpdate(bp_8);
     bp_4 = RwCameraGetFrame(bp_8);
     lv_10 = &bp_4->modelling;
@@ -696,6 +761,7 @@ void sub_125F20(RwInt32 arg_0)
     RwFrameUpdateObjects(bp_4);
     sub_1A2D00();
     RwCameraEndUpdate(bp_8);
+#endif
     if (byte_4CF7D0)
     {
         sub_D8E80();
@@ -712,6 +778,7 @@ void sub_125F20(RwInt32 arg_0)
 }
 
 // match: ?sub_126750@@YAXPAURwCamera@@@Z @ 0x00126750
+// sp-match: ?sub_126750@@YAXPAURwCamera@@@Z @ 0x000DB250
 void sub_126750(RwCamera *arg_0)
 {
     if (arg_0)
@@ -721,6 +788,7 @@ void sub_126750(RwCamera *arg_0)
 }
 
 // match: ?sub_126770@@YAXXZ @ 0x00126770
+// sp-match: ?sub_126770@@YAXXZ @ 0x000DD6F0
 // Applies the prelit setting (dword_4CF50C) to the live sections' worlds.
 void sub_126770()
 {
@@ -736,6 +804,7 @@ void sub_126770()
 }
 
 // match: ?sub_1267D0@@YAXPAUtype_4E5D30@@H@Z @ 0x001267D0
+// sp-match: ?sub_1267D0@@YAXPAUtype_4E5D30@@H@Z @ 0x000DCE70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_1267D0(type_4E5D30 *arg_0, RwInt32 arg_4)
 {
@@ -758,6 +827,7 @@ void sub_1267D0(type_4E5D30 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_126850@@YAXPAURpWorld@@IH@Z @ 0x00126850
+// sp-match: ?sub_126850@@YAXPAURpWorld@@IH@Z @ 0x000DB270
 // Turns the world arg_0's prelit flag on or off (arg_8), where its flags
 // arg_4 allow it.
 void sub_126850(RpWorld *arg_0, RwUInt32 arg_4, RwInt32 arg_8)
@@ -791,6 +861,7 @@ void sub_126850(RpWorld *arg_0, RwUInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_1268D0@@YAXXZ @ 0x001268D0
+// sp-match: ?sub_1268D0@@YAXXZ @ 0x000DD720
 // Applies the lit setting (dword_4CF754) to the live sections' worlds.
 void sub_1268D0()
 {
@@ -806,6 +877,7 @@ void sub_1268D0()
 }
 
 // match: ?sub_126930@@YAXPAUtype_4E5D30@@H@Z @ 0x00126930
+// sp-match: ?sub_126930@@YAXPAUtype_4E5D30@@H@Z @ 0x000DCEB0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_126930(type_4E5D30 *arg_0, RwInt32 arg_4)
 {
@@ -828,6 +900,7 @@ void sub_126930(type_4E5D30 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_1269B0@@YAXPAURpWorld@@IH@Z @ 0x001269B0
+// sp-match: ?sub_1269B0@@YAXPAURpWorld@@IH@Z @ 0x000DB2C0
 // Turns the world arg_0's lit flag on or off (arg_8), where its flags
 // arg_4 allow it.
 void sub_1269B0(RpWorld *arg_0, RwUInt32 arg_4, RwInt32 arg_8)
@@ -861,6 +934,7 @@ void sub_1269B0(RpWorld *arg_0, RwUInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_126A30@@YAPAURwCamera@@PAU1@PAURpWorld@@EMH@Z @ 0x00126A30
+// sp-match: ?sub_126A30@@YAPAURwCamera@@PAU1@PAURpWorld@@EMH@Z @ 0x000DB310
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Begins a pass over the world arg_4 for the camera arg_0: the camera and
 // the extra lights in the world, the near clip arg_C (the setting's, at
@@ -960,6 +1034,7 @@ RwCamera *sub_126A30(RwCamera *arg_0, RpWorld *arg_4, RwUInt8 arg_8, RwReal arg_
 }
 
 // match: ?sub_126D00@@YAXPAURwCamera@@PAURpWorld@@@Z @ 0x00126D00
+// sp-match: ?sub_126D00@@YAXPAURwCamera@@PAURpWorld@@@Z @ 0x000DB540
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Ends a pass sub_126A30 began: its states back, the camera and the extra
 // lights out of the world, the near clip the setting's.
@@ -998,6 +1073,7 @@ void sub_126D00(RwCamera *arg_0, RpWorld *arg_4)
 }
 
 // match: ?sub_126E30@@YAPAURwCamera@@PAU1@PAURpWorld@@EM@Z @ 0x00126E30
+// sp-match: ?sub_126E30@@YAPAURwCamera@@PAU1@PAURpWorld@@EM@Z @ 0x000DB620
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Begins a lit pass over the world arg_4 (sub_126A30's, but for the
 // lights): the ambient light and the four view lights are put in the world
@@ -1120,6 +1196,7 @@ RwCamera *sub_126E30(RwCamera *arg_0, RpWorld *arg_4, RwUInt8 arg_8, RwReal arg_
 }
 
 // match: ?sub_127360@@YAXPAURwCamera@@PAURpWorld@@@Z @ 0x00127360
+// sp-match: ?sub_127360@@YAXPAURwCamera@@PAURpWorld@@@Z @ 0x000DB9F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Ends a lit pass: its states back, the camera out of the world, and the
 // lights out of it with the colours and frames they had.
@@ -1167,6 +1244,7 @@ void sub_127360(RwCamera *arg_0, RpWorld *arg_4)
 }
 
 // match: ?sub_127530@@YAPAURwCamera@@PAU1@PAURpWorld@@@Z @ 0x00127530
+// sp-match: ?sub_127530@@YAPAURwCamera@@PAU1@PAURpWorld@@@Z @ 0x000DBB50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Begins the sky pass over the world arg_4: the camera moved to its
 // position scaled by dword_4CF500 (the old kept), clipped from 5 to 1e6,
@@ -1216,6 +1294,7 @@ RwCamera *sub_127530(RwCamera *arg_0, RpWorld *arg_4)
 }
 
 // match: ?sub_127700@@YAXPAURwCamera@@PAURpWorld@@@Z @ 0x00127700
+// sp-match: ?sub_127700@@YAXPAURwCamera@@PAURpWorld@@@Z @ 0x000DBCB0
 // Ends the sky pass: its states and the camera's position back.
 void sub_127700(RwCamera *arg_0, RpWorld *arg_4)
 {
@@ -1238,6 +1317,7 @@ void sub_127700(RwCamera *arg_0, RpWorld *arg_4)
 }
 
 // match: ?sub_1277D0@@YAPAURwCamera@@PAU1@PAURpWorld@@E@Z @ 0x001277D0
+// sp-match: ?sub_1277D0@@YAPAURwCamera@@PAU1@PAURpWorld@@E@Z @ 0x000DBD60
 // Begins the effects pass over the world arg_4 (the clip planes the
 // settings' when arg_8 is set), without fog.
 RwCamera *sub_1277D0(RwCamera *arg_0, RpWorld *arg_4, RwUInt8 arg_8)
@@ -1275,6 +1355,7 @@ RwCamera *sub_1277D0(RwCamera *arg_0, RpWorld *arg_4, RwUInt8 arg_8)
 }
 
 // match: ?sub_127910@@YAXPAURwCamera@@PAURpWorld@@@Z @ 0x00127910
+// sp-match: ?sub_127910@@YAXPAURwCamera@@PAURpWorld@@@Z @ 0x000DBE60
 void sub_127910(RwCamera *arg_0, RpWorld *arg_4)
 {
     RwRenderStateSet(rwRENDERSTATESRCBLEND, (void *)dword_4CF464);

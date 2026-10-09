@@ -70,6 +70,7 @@ extern              sky_c;
 // match: _rcsid @ 0x00419E90
 
 // match: __rpPrtStdParticleBatchCtor @ 0x002EF020
+// sp-match: __rpPrtStdParticleBatchCtor @ 0x00209AD0
 RpPrtStdParticleBatch *
 _rpPrtStdParticleBatchCtor(RpPrtStdParticleBatch * prtBatch)
 {
@@ -106,6 +107,7 @@ _rpPrtStdParticleBatchCtor(RpPrtStdParticleBatch * prtBatch)
 }
 
 // match: __rpPrtStdParticleBatchDtor @ 0x002EF080
+// sp-match: __rpPrtStdParticleBatchDtor @ 0x00209B30
 RpPrtStdParticleBatch *
 _rpPrtStdParticleBatchDtor(RpPrtStdParticleBatch * prtBatch)
 {
@@ -263,6 +265,7 @@ RpPrtStdParticleBatchAddBatch(RpPrtStdParticleBatch * prtBatchHead,
  ************************************************************************/
 
 // match: __rpPrtStdEmitterCtor @ 0x002EF0E0
+// sp-match: __rpPrtStdEmitterCtor @ 0x00209B90
 RpPrtStdEmitter    *
 _rpPrtStdEmitterCtor(RpPrtStdEmitter * emt, void * data)
 {
@@ -316,6 +319,7 @@ _rpPrtStdEmitterCtor(RpPrtStdEmitter * emt, void * data)
 }
 
 // match: __rpPrtStdEmitterDtor @ 0x002EF9A0
+// sp-match: __rpPrtStdEmitterDtor @ 0x0020A450
 RpPrtStdEmitter    *
 _rpPrtStdEmitterDtor(RpPrtStdEmitter * emt)
 {
@@ -376,6 +380,7 @@ _rpPrtStdEmitterDtor(RpPrtStdEmitter * emt)
 }
 
 // match: __rpPrtStdEmitterCopy @ 0x002EF190
+// sp-match: __rpPrtStdEmitterCopy @ 0x00209C40
 RpPrtStdEmitter *
 _rpPrtStdEmitterCopy(RpPrtStdEmitter *dstEmt, RpPrtStdEmitter *emt)
 {
@@ -455,6 +460,7 @@ RpPrtStdEmitterCreate(RpPrtStdEmitterClass * eClass, void * data)
  * \see RpPrtStdEmitterCreate
  */
 // match: _RpPrtStdEmitterDestroy @ 0x002EFA50
+// sp-match: _RpPrtStdEmitterDestroy @ 0x0020A500
 RwBool
 RpPrtStdEmitterDestroy(RpPrtStdEmitter * emt)
 {
@@ -489,6 +495,7 @@ RpPrtStdEmitterDestroy(RpPrtStdEmitter * emt)
  * \see RpPrtStdEmitterDestroy
  */
 // match: _RpPrtStdEmitterClone @ 0x002EFA80
+// sp-match: _RpPrtStdEmitterClone @ 0x0020A530
 RpPrtStdEmitter *
 RpPrtStdEmitterClone(RpPrtStdEmitter * emt)
 {
@@ -535,6 +542,7 @@ RpPrtStdEmitterClone(RpPrtStdEmitter * emt)
  * \see RpPrtStdEmitterDestroy
  */
 // match: _RpPrtStdEmitterAddEmitter @ 0x002EF1F0
+// sp-match: _RpPrtStdEmitterAddEmitter @ 0x00209CA0
 RpPrtStdEmitter    *
 RpPrtStdEmitterAddEmitter(RpPrtStdEmitter * emtHead,
                           RpPrtStdEmitter * emt)
@@ -635,6 +643,7 @@ RpPrtStdEmitterForAllParticleBatch(RpPrtStdEmitter * emt,
  * \see RpPrtStdEmitterNewParticleBatch
  */
 // match: _RpPrtStdEmitterDestroyParticleBatch @ 0x002EF210
+// sp-match: _RpPrtStdEmitterDestroyParticleBatch @ 0x00209CC0
 RpPrtStdEmitter    *
 RpPrtStdEmitterDestroyParticleBatch(RpPrtStdEmitter * emt)
 {
@@ -721,6 +730,7 @@ RpPrtStdEmitterDestroyParticleBatch(RpPrtStdEmitter * emt)
  * \see RpPrtStdEmitterDestroyParticleBatch
  */
 // match: _RpPrtStdEmitterNewParticleBatch @ 0x002EF290
+// sp-match: _RpPrtStdEmitterNewParticleBatch @ 0x00209D40
 RpPrtStdParticleBatch *
 RpPrtStdEmitterNewParticleBatch(RpPrtStdEmitter * emt)
 {
@@ -1207,6 +1217,7 @@ _rpPrtStdEmitterUpdate(RpAtomic * atomic, RpPrtStdEmitter * emt,
 /************************************************************************/
 
 // match: __rpPrtStdEmitterRender @ 0x002EFB30
+// sp-match: __rpPrtStdEmitterRender @ 0x0020A5E0
 RpPrtStdEmitter    *
 _rpPrtStdEmitterRender(RpAtomic * atomic,
                        RpPrtStdEmitter * emt, void *data)
@@ -1301,6 +1312,7 @@ _rpPrtStdEmitterRender(RpAtomic * atomic,
  ************************************************************************/
 
 // match: __rpPrtStdEmitterStreamRead @ 0x002EF320
+// sp-match: __rpPrtStdEmitterStreamRead @ 0x00209DD0
 RpPrtStdEmitter    *
 _rpPrtStdEmitterStreamRead(RpAtomic * atomic, RwStream * stream)
 {
@@ -1489,6 +1501,7 @@ _rpPrtStdEmitterStreamRead(RpAtomic * atomic, RwStream * stream)
 }
 
 // match: __rpPrtStdEmitterStreamWrite @ 0x002EF5E0
+// sp-match: __rpPrtStdEmitterStreamWrite @ 0x0020A090
 RpPrtStdEmitter    *
 _rpPrtStdEmitterStreamWrite(RpAtomic * atomic,
                             RpPrtStdEmitter * emt, void *data)
@@ -1561,6 +1574,7 @@ _rpPrtStdEmitterStreamWrite(RpAtomic * atomic,
 }
 
 // match: __rpPrtStdEmitterStreamGetSize @ 0x002EF6D0
+// sp-match: __rpPrtStdEmitterStreamGetSize @ 0x0020A180
 RpPrtStdEmitter    *
 _rpPrtStdEmitterStreamGetSize(RpAtomic * atomic,
                               RpPrtStdEmitter * emt, void *data)
@@ -1634,6 +1648,7 @@ _rpPrtStdEmitterStreamGetSize(RpAtomic * atomic,
  ************************************************************************/
 
 // match: __rpPrtStdEmitterGetPropOffset @ 0x002EF790
+// sp-match: __rpPrtStdEmitterGetPropOffset @ 0x0020A240
 RpPrtStdEmitter    *
 _rpPrtStdEmitterGetPropOffset(RpPrtStdEmitter * emt)
 {

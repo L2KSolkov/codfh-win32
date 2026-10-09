@@ -265,6 +265,15 @@ struct type_439A48;
 RwInt32 sub_15F2C0(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, RwV3d *arg_C, RwInt32 arg_10,
                    type_439A48 *arg_14, RwInt32 arg_18);
 extern RwReal flt_4F2890[3];
+// The difficulty's multiplier of flt_4F2890 (1 outside 0 to 2): an inline
+// with no database name, named for what it returns. Evidence: single
+// player keeps a copy out of line (SP 0xF5D60, 0x1E bytes) where VC
+// declines to expand it (the eight spreads of type_3DC048::vf_2A8).
+extern RwInt32 dword_42B714;
+inline RwReal difficulty_4F2890()
+{
+    return dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f;
+}
 extern RwReal flt_429E2C;
 // sub_FCAE0: a line test from *arg_0 to *arg_4, its hit into *arg_8;
 // nonzero on a hit. Only the widths of the rest are known.

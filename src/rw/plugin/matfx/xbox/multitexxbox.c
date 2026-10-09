@@ -24,6 +24,7 @@ static const char rcsid[] = "@@@@(#)$Id: //RenderWare/RW36Active/rwsdk/plugin/ma
 // match: _rcsid @ 0x0041A8B0
 
 // match: _RpXboxMTEffectGetConfig @ 0x002FC160
+// sp-match: _RpXboxMTEffectGetConfig @ 0x00216900
 RpMatFXXboxMaterial *
 RpXboxMTEffectGetConfig(const RpMTEffect *effect)
 {
@@ -31,6 +32,7 @@ RpXboxMTEffectGetConfig(const RpMTEffect *effect)
 }
 
 // match: _RpXboxMTEffectCreate @ 0x002FC170
+// sp-match: _RpXboxMTEffectCreate @ 0x00216910
 RpMTEffect *
 RpXboxMTEffectCreate(RwUInt32 numStages)
 {
@@ -62,6 +64,7 @@ RpXboxMTEffectCreate(RwUInt32 numStages)
 }
 
 // match: _MatFXXboxMaterialStreamGetSize @ 0x002FC1F0
+// sp-match: _MatFXXboxMaterialStreamGetSize @ 0x00216990
 static RwInt32
 MatFXXboxMaterialStreamGetSize(const RpMTEffect *effect)
 {
@@ -79,6 +82,7 @@ MatFXXboxMaterialStreamGetSize(const RpMTEffect *effect)
 }
 
 // match: _MatFXXboxMaterialStreamWrite @ 0x002FC210
+// sp-match: _MatFXXboxMaterialStreamWrite @ 0x002169B0
 static const RpMTEffect *
 MatFXXboxMaterialStreamWrite(const RpMTEffect *effect, RwStream *stream)
 {
@@ -107,6 +111,7 @@ MatFXXboxMaterialStreamWrite(const RpMTEffect *effect, RwStream *stream)
 }
 
 // match: _MatFXXboxMaterialStreamRead @ 0x002FC2C0
+// sp-match: _MatFXXboxMaterialStreamRead @ 0x00216A60
 static RpMTEffect *
 MatFXXboxMaterialStreamRead(RwStream *stream,
                             RwPlatformID platformID __RWUNUSED__,
@@ -135,6 +140,7 @@ MatFXXboxMaterialStreamRead(RwStream *stream,
 }
 
 // match: __rpMatFXXboxMaterialDestroy @ 0x002FC340
+// sp-match: __rpMatFXXboxMaterialDestroy @ 0x00216AE0
 void
 _rpMatFXXboxMaterialDestroy(RpMTEffect *effect)
 {
@@ -149,6 +155,7 @@ _rpMatFXXboxMaterialDestroy(RpMTEffect *effect)
 }
 
 // match: __rpMultiTexturePlatformPluginsAttach @ 0x002FC370
+// sp-match: __rpMultiTexturePlatformPluginsAttach @ 0x00216B10
 RwBool
 _rpMultiTexturePlatformPluginsAttach(void)
 {

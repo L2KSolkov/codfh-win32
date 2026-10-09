@@ -16,12 +16,14 @@
 #include "game/fileio.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E3308
 extern const RwReal flt_3E3308 = 0.01f;
 // 0x003E330C
 extern const RwReal flt_3E330C = 16.666666f;
 // 0x003E3310
 extern const RwReal flt_3E3310 = 0.01f;
+#endif
 // 0x003E3314
 extern const RwReal flt_3E3314 = 120.0f;
 // 0x003E3318

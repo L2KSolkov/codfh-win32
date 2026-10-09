@@ -244,6 +244,7 @@ FontDecodeUTF8(RwInt32 *c, RwChar *utf, RwInt32 *stride)
 // match: __rt2dFontDictNodeFreeListPreallocBlocks @ 0x004310A0
 
 // match: _rt2dFontShowOutline @ 0x00253BB0
+// sp-match: _rt2dFontShowOutline @ 0x00168ED0
 
 static Rt2dFont    *
 rt2dFontShowOutline(Rt2dFont * font,
@@ -325,6 +326,7 @@ rt2dFontShowOutline(Rt2dFont * font,
 }
 
 // match: _rt2dFontShowBitmap @ 0x00255230
+// sp-match: _rt2dFontShowBitmap @ 0x0016A620
 static Rt2dFont    *
 rt2dFontShowBitmap(Rt2dFont * font,
                    const RwChar * string,
@@ -595,6 +597,7 @@ rt2dFontShowBitmap(Rt2dFont * font,
 }
 
 // match: _FontCompressIndex @ 0x00253D00
+// sp-match: _FontCompressIndex @ 0x00169020
 static Rt2dFont *
 FontCompressIndex( Rt2dFont * font )
 {
@@ -659,6 +662,7 @@ FontCompressIndex( Rt2dFont * font )
 }
 
 // match: _FontReadMetrics2d1 @ 0x00253DD0
+// sp-match: _FontReadMetrics2d1 @ 0x001690F0
 static Rt2dFont    *
 FontReadMetrics2d1(Rt2dFont * const font,
                    RwFileFunctions * fileFuncs,
@@ -868,6 +872,7 @@ FontReadMetrics2d1(Rt2dFont * const font,
 }
 
 // match: _FontReadMetrics2d2 @ 0x00254210
+// sp-match: _FontReadMetrics2d2 @ 0x00169530
 static Rt2dFont    *
 FontReadMetrics2d2(Rt2dFont * const font,
                    RwFileFunctions * fileFuncs,
@@ -1264,6 +1269,7 @@ FontReadMetrics2d2(Rt2dFont * const font,
 }
 
 // match: _FontReadMetrics2d3 @ 0x002549D0
+// sp-match: _FontReadMetrics2d3 @ 0x00169CF0
 static Rt2dFont    *
 FontReadMetrics2d3(Rt2dFont * const font,
                    RwFileFunctions * fileFuncs,
@@ -1439,6 +1445,7 @@ FontReadMetrics2d3(Rt2dFont * const font,
 /****************************************************************************/
 
 // match: _FontCreate2d @ 0x00255920
+// sp-match: _FontCreate2d @ 0x0016AD10
 static Rt2dFont    *
 FontCreate2d( void )
 {
@@ -2146,6 +2153,7 @@ WireRender2d(RwIm3DVertex * vertex, int vcount,
 
 /****************************************************************************/
 // match: __rt2dFontClose @ 0x002559D0
+// sp-match: __rt2dFontClose @ 0x0016ADC0
 void
 _rt2dFontClose(void)
 {
@@ -2210,6 +2218,7 @@ static RwFreeList _rt2dFontFreeList;
  *
  */
 // match: _Rt2dFontSetFreeListCreateParams @ 0x00254EF0
+// sp-match: _Rt2dFontSetFreeListCreateParams @ 0x0016A210
 void
 Rt2dFontSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc )
 {
@@ -2246,6 +2255,7 @@ static RwFreeList _rt2dFontDictNodeFreeList;
  *
  */
 // match: _Rt2dFontDictNodeSetFreeListCreateParams @ 0x00254F10
+// sp-match: _Rt2dFontDictNodeSetFreeListCreateParams @ 0x0016A230
 void
 Rt2dFontDictNodeSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc )
 {
@@ -2264,6 +2274,7 @@ Rt2dFontDictNodeSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToP
 
 /****************************************************************************/
 // match: __rt2dFontOpen @ 0x00255C10
+// sp-match: __rt2dFontOpen @ 0x0016B000
 RwBool
 _rt2dFontOpen(void)
 {
@@ -2352,6 +2363,7 @@ _rt2dFontOpen(void)
  * \see RwImageSetPath
  */
 // match: _Rt2dFontSetPath @ 0x00254F30
+// sp-match: _Rt2dFontSetPath @ 0x0016A250
 const RwChar       *
 Rt2dFontSetPath(const RwChar * path)
 {
@@ -2460,6 +2472,7 @@ Rt2dFontGetReadCallBack(void)
  * \see Rt2dFontSetIntergapSpacing
  */
 // match: _Rt2dFontGetHeight @ 0x00254FA0
+// sp-match: _Rt2dFontGetHeight @ 0x0016A2C0
 RwReal
 Rt2dFontGetHeight(Rt2dFont * font)
 {
@@ -2579,6 +2592,7 @@ _rt2dFontGetStringInfo(Rt2dFont * font, const RwChar * string,
  * \see Rt2dFontShow
  */
 // match: _Rt2dFontGetStringWidth @ 0x00254FD0
+// sp-match: _Rt2dFontGetStringWidth @ 0x0016A2F0
 RwReal
 Rt2dFontGetStringWidth(Rt2dFont * font, const RwChar * string,
                        RwReal height)
@@ -2865,6 +2879,7 @@ Rt2dFontFlow(Rt2dFont * font,
  * \see Rt2dClose
  */
 // match: _Rt2dFontDestroy @ 0x002550A0
+// sp-match: _Rt2dFontDestroy @ 0x0016A3C0
 RwBool
 Rt2dFontDestroy(Rt2dFont * font)
 {
@@ -2926,6 +2941,7 @@ Rt2dFontDestroy(Rt2dFont * font)
 
 
 // match: _AttemptToOpenFont @ 0x00255170
+// sp-match: _AttemptToOpenFont @ 0x0016A490
 static void *
 AttemptToOpenFont( const RwChar* filename, RwChar* temporaryName )
 {
@@ -2989,6 +3005,7 @@ FontDefaultRead
 /* this function is the default reader used by the global callback
  */
 // match: _FontDefaultRead @ 0x00255AA0
+// sp-match: _FontDefaultRead @ 0x0016AE90
 static Rt2dFont   *
 FontDefaultRead(const RwChar * name)
 {
@@ -3128,6 +3145,7 @@ FontDefaultRead(const RwChar * name)
  * \see RwImageSetPath
  */
 // match: _Rt2dFontRead @ 0x002551D0
+// sp-match: _Rt2dFontRead @ 0x0016A4F0
 Rt2dFont           *
 Rt2dFontRead(const RwChar * name)
 {
@@ -3183,6 +3201,7 @@ Rt2dFontRead(const RwChar * name)
  * \see Rt2dFontGetStringWidth
  */
 // match: _Rt2dFontShow @ 0x002551E0
+// sp-match: _Rt2dFontShow @ 0x0016A500
 Rt2dFont           *
 Rt2dFontShow(Rt2dFont * font,
              const RwChar * string,
@@ -3339,6 +3358,7 @@ _rt2dFontDictionaryFindFontNode(Rt2dFont *font,
 }
 
 static _rt2dFontDictionaryNode *
+// sp-match: __rt2dFontDictionaryAddNode @ 0x0016A530
 _rt2dFontDictionaryAddNode(Rt2dFont *font, const RwChar *fontName)
 {
     _rt2dFontDictionaryNode *node;
@@ -3422,6 +3442,7 @@ _rt2dFontDictionaryRemoveFont( Rt2dFont *font )
 }
 
 _rt2dFontDictionaryNode *
+// sp-match: __rt2dFontDictionaryLookup @ 0x0016A580
 _rt2dFontDictionaryLookup(const RwChar* fontName)
 {
     Rt2dFont *font= (Rt2dFont *) NULL;
@@ -3541,6 +3562,7 @@ Rt2dFontIsOutline(Rt2dFont * font)
  * \see Rt2dFontShow
  */
 // match: _Rt2dFontIsUnicode @ 0x00255210
+// sp-match: _Rt2dFontIsUnicode @ 0x0016A600
 RwBool
 Rt2dFontIsUnicode(Rt2dFont * font)
 {
@@ -3570,6 +3592,7 @@ Rt2dFontIsUnicode(Rt2dFont * font)
  * \see RwTexDictionaryDestroy
  */
 // match: _Rt2dFontTexDictionarySet @ 0x00255220
+// sp-match: _Rt2dFontTexDictionarySet @ 0x0016A610
 RwTexDictionary *
 Rt2dFontTexDictionarySet( RwTexDictionary * texDict )
 {

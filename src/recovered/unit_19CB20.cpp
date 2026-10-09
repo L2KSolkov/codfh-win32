@@ -97,6 +97,7 @@ extern const RwReal flt_3E0430 = 16.666666f;
 // match: ?off_42C5A4@@3PAPBDA @ 0x0042C5A4
 
 // match: ?sub_19CB20@type_4F39A8@@QAEXH@Z @ 0x0019CB20
+// sp-match: ?sub_19CB20@type_4F39A8@@QAEXH@Z @ 0x0012C240
 
 void type_4F39A8::sub_19CB20(RwInt32 arg_0)
 {
@@ -110,6 +111,7 @@ void type_4F39A8::sub_19CB20(RwInt32 arg_0)
 }
 
 // match: ?sub_19CB80@type_4F39A8@@QAEPAUBINK@@PBDPAH@Z @ 0x0019CB80
+// sp-match: ?sub_19CB80@type_4F39A8@@QAEPAUBINK@@PBDPAH@Z @ 0x0012C270
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens the movie d:\arg_0 with sound tracks 0 and 1 at half volume, and
 // keeps the screen's scale to it; 0 on failure.
@@ -138,6 +140,7 @@ HBINK type_4F39A8::sub_19CB80(const RwChar *arg_0, RwInt32 *arg_4)
 }
 
 // match: ?sub_19CD10@type_4F39A8@@QAEXPAUBINK@@PAX@Z @ 0x0019CD10
+// sp-match: ?sub_19CD10@type_4F39A8@@QAEXPAUBINK@@PAX@Z @ 0x0012C390
 // Closes the movie arg_0 (and its file arg_4) after the next vertical blank.
 void type_4F39A8::sub_19CD10(HBINK arg_0, void *arg_4)
 {

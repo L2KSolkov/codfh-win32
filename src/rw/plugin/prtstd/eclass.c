@@ -160,6 +160,7 @@ _rpPrtStdEClassAdd(RpPrtStdEmitterClass *eClassHead,
 // match: _rcsid @ 0x00419E00
 
 // match: _RpPrtStdEClassCreate @ 0x002EEA60
+// sp-match: _RpPrtStdEClassCreate @ 0x00209510
 RpPrtStdEmitterClass *
 RpPrtStdEClassCreate( void )
 {
@@ -198,6 +199,7 @@ RpPrtStdEClassCreate( void )
  * \see RpPrtStdPropTabCreate
  */
 // match: _RpPrtStdEClassDestroy @ 0x002EEAD0
+// sp-match: _RpPrtStdEClassDestroy @ 0x00209580
 RwBool
 RpPrtStdEClassDestroy(RpPrtStdEmitterClass *eClass)
 {
@@ -293,6 +295,7 @@ RpPrtStdEClassDestroy(RpPrtStdEmitterClass *eClass)
  * \see RpPrtStdPropTabCreate
  */
 // match: _RpPrtStdEClassSetCallBack @ 0x002EEB70
+// sp-match: _RpPrtStdEClassSetCallBack @ 0x00209620
 RpPrtStdEmitterClass *
 RpPrtStdEClassSetCallBack(RpPrtStdEmitterClass *eClass,
                                 RwInt32 numCallback,
@@ -479,6 +482,7 @@ RpPrtStdEClassGetPropTab(RpPrtStdEmitterClass *eClass, RpPrtStdPropertyTable **p
  * \see RpPrtStdEClassGetByPropTab
  */
 // match: _RpPrtStdEClassGet @ 0x002EEBE0
+// sp-match: _RpPrtStdEClassGet @ 0x002096D0
 RpPrtStdEmitterClass *
 RpPrtStdEClassGet(RwInt32 id)
 {
@@ -527,6 +531,7 @@ RpPrtStdEClassGet(RwInt32 id)
  * \see RpPrtStdEClassGet
  */
 // match: _RpPrtStdEClassGetByPropTab @ 0x002EEC10
+// sp-match: _RpPrtStdEClassGetByPropTab @ 0x00209700
 RpPrtStdEmitterClass *
 RpPrtStdEClassGetByPropTab(RpPrtStdPropertyTable *propTab)
 {
@@ -675,6 +680,7 @@ RpPrtStdEClassStreamWrite(RpPrtStdEmitterClass *eClass, RwStream *stream)
  * \see RpPrtStdPluginAttach
  */
 // match: _RpPrtStdEClassStreamRead @ 0x002EEC40
+// sp-match: _RpPrtStdEClassStreamRead @ 0x00209730
 RpPrtStdEmitterClass *
 RpPrtStdEClassStreamRead(RwStream *stream)
 {

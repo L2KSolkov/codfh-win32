@@ -75,6 +75,7 @@ RwModuleInfo resourcesModule;
 // match: _rcsid @ 0x004168D0
 
 // match: _ResourcesInit @ 0x002B0960
+// sp-match: _ResourcesInit @ 0x001CBD80
 static rwResources *
 ResourcesInit(rwResources * res, RwUInt32 size)
 {
@@ -130,6 +131,7 @@ ResourcesInit(rwResources * res, RwUInt32 size)
  */
 
 // match: __rwResourcesOpen @ 0x002B0A20
+// sp-match: __rwResourcesOpen @ 0x001CBE40
 void               *
 _rwResourcesOpen(void *instance, RwInt32 offset,
                  RwInt32 __RWUNUSED__ size)
@@ -168,6 +170,7 @@ _rwResourcesOpen(void *instance, RwInt32 offset,
  */
 
 // match: __rwResourcesClose @ 0x002B0D40
+// sp-match: __rwResourcesClose @ 0x001CC160
 void               *
 _rwResourcesClose(void *instance,
                   RwInt32 __RWUNUSED__ offset,
@@ -215,6 +218,7 @@ _rwResourcesClose(void *instance,
  *
  */
 // match: _RwResourcesFreeResEntry @ 0x002B0A50
+// sp-match: _RwResourcesFreeResEntry @ 0x001CBE70
 RwBool
 RwResourcesFreeResEntry(RwResEntry * entry)
 {
@@ -283,6 +287,7 @@ RwResourcesFreeResEntry(RwResEntry * entry)
  */
 
 // match: __rwResourcesPurge @ 0x002B0AB0
+// sp-match: __rwResourcesPurge @ 0x001CBED0
 void
 _rwResourcesPurge(void)
 {
@@ -367,6 +372,7 @@ _rwResourcesPurge(void)
  * \see RwResourcesUseResEntry
  */
 // match: _RwResourcesAllocateResEntry @ 0x002B0B10
+// sp-match: _RwResourcesAllocateResEntry @ 0x001CBF30
 RwResEntry *
 RwResourcesAllocateResEntry(void *owner,
                             RwResEntry **ownerRef,
@@ -781,6 +787,7 @@ RwResourcesGetArenaUsage(void)
  *
  */
 // match: _RwResourcesEmptyArena @ 0x002B0C80
+// sp-match: _RwResourcesEmptyArena @ 0x001CC0A0
 RwBool
 RwResourcesEmptyArena(void)
 {

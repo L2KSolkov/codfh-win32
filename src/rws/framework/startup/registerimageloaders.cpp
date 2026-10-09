@@ -17,6 +17,7 @@ namespace RWS
 }
 
 // match: ?DDSTextureRead@?A0x1f0d7d45@RWS@@YAPAURwTexture@@PBD0@Z @ 0x00132610
+// sp-match: ?DDSTextureRead@?A0x1f0d7d45@RWS@@YAPAURwTexture@@PBD0@Z @ 0x000E3050
 namespace RWS
 {
    namespace
@@ -36,6 +37,7 @@ namespace RWS
 }
 
 // match: ?HookDDSTextureRead@?A0x1f0d7d45@RWS@@YAXXZ @ 0x00132650
+// sp-match: ?HookDDSTextureRead@?A0x1f0d7d45@RWS@@YAXXZ @ 0x000E3080
 namespace RWS
 {
    namespace
@@ -52,6 +54,7 @@ namespace RWS
 // The database's j_?DDSTextureRead@?A0x6064568b@RWS@@... (a thunk name that
 // fits neither its arguments nor its body).
 // match: ?RegisterImageLoaders@StartUp@RWS@@YAHXZ @ 0x00132670
+// sp-match: ?RegisterImageLoaders@StartUp@RWS@@YAHXZ @ 0x000E30A0
 RwBool RWS::StartUp::RegisterImageLoaders(void)
       {
          bool flag = true;

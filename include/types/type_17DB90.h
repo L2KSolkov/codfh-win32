@@ -50,6 +50,13 @@ struct type_17DB90
     RwInt32 unk_CC;             // its particle system
 
     type_17DB90();
+    // Sets unk_54: an inline with no address, named for what it does. Evidence:
+    // "PZ_Manipulate" (sub_54B00, SP 0x42D10) stores through it when stopping a
+    // zone, where the plain store keeps a copy of the zone pointer.
+    void set_running(RwInt32 arg_0)
+    {
+        unk_54 = arg_0;
+    }
     // Built in its pool's memory (sub_17E3A0): an inline placement operator
     // new (no call in sub_17E3A0) and a placement operator delete, empty and
     // folded into sub_19A750, which its unwind funclet calls. Its deleting

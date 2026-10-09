@@ -29,6 +29,10 @@
 // match: _$E3 @ 0x0030E780
 // match: _$E5 @ 0x0030BA60
 // match: _$E6 @ 0x0030E790
+// sp-match: _$E6 @ 0x0021EB60
+// sp-match: _$E2 @ 0x0021DA40
+// sp-match: _$E5 @ 0x0021DA60
+// sp-match: _$E3 @ 0x0021EB50
 
 namespace RWS
 {
@@ -45,6 +49,7 @@ namespace RWS
 }
 
 // match: ?NewEntityCreatedCB@?A0x25f28fdd@MainLoop@RWS@@YAXXZ @ 0x00131E80
+// sp-match: ?NewEntityCreatedCB@?A0x25f28fdd@MainLoop@RWS@@YAXXZ @ 0x000E2A20
 namespace RWS
 {
    namespace MainLoop
@@ -68,6 +73,7 @@ namespace RWS
 }
 
 // match: ?StartSystem@MainLoop@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00131EE0
+// sp-match: ?StartSystem@MainLoop@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000E2A70
 void RWS::MainLoop::StartSystem (RwChunkHeaderInfo &rChunkHeader, RwStream *pStream)
          {
             SendMsg(iMsgStartSystem);
@@ -83,6 +89,7 @@ void RWS::MainLoop::StartSystem (RwChunkHeaderInfo &rChunkHeader, RwStream *pStr
          }
 
 // match: ?StopSystem@MainLoop@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00131F60
+// sp-match: ?StopSystem@MainLoop@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000E2AE0
 void RWS::MainLoop::StopSystem (RwChunkHeaderInfo &rChunkHeader, RwStream *pStream)
          {
             SendMsg(iMsgStopSystem);
@@ -94,6 +101,7 @@ void RWS::MainLoop::StopSystem (RwChunkHeaderInfo &rChunkHeader, RwStream *pStre
          }
 
 // match: ?Reset@?A0x25f28fdd@MainLoop@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00131FC0
+// sp-match: ?Reset@?A0x25f28fdd@MainLoop@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000E2B30
 namespace RWS
 {
    namespace MainLoop
@@ -119,6 +127,7 @@ namespace RWS
 }
 
 // match: ?Init@MainLoop@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00132000
+// sp-match: ?Init@MainLoop@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000E2B70
 void RWS::MainLoop::Init (RwChunkHeaderInfo &rChunkHeader, RwStream *pStream)
          {
             CAttributeHandler::PurgeAll();
@@ -131,6 +140,7 @@ void RWS::MainLoop::Init (RwChunkHeaderInfo &rChunkHeader, RwStream *pStream)
          }
 
 // match: ?RegisterStreamChunkHandlers@MainLoop@RWS@@YAXXZ @ 0x00132040
+// sp-match: ?RegisterStreamChunkHandlers@MainLoop@RWS@@YAXXZ @ 0x000E2BA0
 void RWS::MainLoop::RegisterStreamChunkHandlers(void)
       {
          CStreamHandler::RegisterChunkHandler(MAKECHUNKID (rwVENDORID_CRITERIONRM,
@@ -147,6 +157,7 @@ void RWS::MainLoop::RegisterStreamChunkHandlers(void)
       }
 
 // match: ?UnRegisterStreamChunkHandlers@MainLoop@RWS@@YAXXZ @ 0x00132090
+// sp-match: ?UnRegisterStreamChunkHandlers@MainLoop@RWS@@YAXXZ @ 0x000E2BE0
 void RWS::MainLoop::UnRegisterStreamChunkHandlers(void)
       {
          CStreamHandler::UnRegisterChunkHandler(MAKECHUNKID (rwVENDORID_CRITERIONRM, strfunc_StartSystem));
@@ -156,6 +167,7 @@ void RWS::MainLoop::UnRegisterStreamChunkHandlers(void)
       }
 
 // match: ?Open@MainLoop@RWS@@YAXHHH@Z @ 0x001320D0
+// sp-match: ?Open@MainLoop@RWS@@YAXHHH@Z @ 0x000E2C10
 void RWS::MainLoop::Open(RwInt32 ScreenWidth, RwInt32 ScreenHeight, RwInt32 ZBitDepth)
       {
          RwCamera *pCamera = CameraHelper::CreateMainRasterCamera( ScreenWidth, ScreenHeight, ZBitDepth);
@@ -209,6 +221,7 @@ void RWS::MainLoop::Open(RwInt32 ScreenWidth, RwInt32 ScreenHeight, RwInt32 ZBit
       }
 
 // match: ?Close@MainLoop@RWS@@YAXXZ @ 0x001321E0
+// sp-match: ?Close@MainLoop@RWS@@YAXXZ @ 0x000E2D60
 void RWS::MainLoop::Close(void)
       {
          CEventHandler::UnRegisterMsg(iMsgStopSystem);
@@ -255,9 +268,11 @@ void RWS::MainLoop::Close(void)
 // DestroyLinearMemoryManager (inline in rws/clinearmemorymanager.h), emitted
 // for Close.
 // match: ?DestroyLinearMemoryManager@CLinearMemoryManager@RWS@@SAXXZ @ 0x001322C0
+// sp-match: ?DestroyLinearMemoryManager@CLinearMemoryManager@RWS@@SAXXZ @ 0x000E2D10
 
 // The game's poll: the logic only (the main render draws itself).
 // match: ?Poll@MainLoop@RWS@@YAXXZ @ 0x001323A0
+// sp-match: ?Poll@MainLoop@RWS@@YAXXZ @ 0x000E2D00
 void RWS::MainLoop::Poll(void)
       {
          Logic::Poll();

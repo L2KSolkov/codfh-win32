@@ -161,6 +161,7 @@ MACRO_STOP
 // match: __real@3b800000 @ 0x004159F0
 
 // match: __splSetBspline @ 0x002E2720
+// sp-match: __splSetBspline @ 0x001FD1F0
 
 static              RwBool
 _splSetBspline(void)
@@ -310,6 +311,7 @@ _splSetBspline(void)
                         or NULL if failed
 ****************************************************************************/
 // match: __splBuildSeries @ 0x002E29E0
+// sp-match: __splBuildSeries @ 0x001FD4B0
 static RwInt32     *
 _splBuildSeries(RwInt32 nFirst, RwInt32 nSecond, RwInt32 nLength)
 {
@@ -348,6 +350,7 @@ _splBuildSeries(RwInt32 nFirst, RwInt32 nSecond, RwInt32 nLength)
  On exit  : RwReal*     the coefficient matrix
 ****************************************************************************/
 // match: __splBuildCoefficientMatrix @ 0x002E2A60
+// sp-match: __splBuildCoefficientMatrix @ 0x001FD530
 static RwReal      *
 _splBuildCoefficientMatrix(RwInt32 nDimension)
 {
@@ -447,6 +450,7 @@ _splBuildCoefficientMatrix(RwInt32 nDimension)
  On exit  : RwBool      TRUE if successful
 ****************************************************************************/
 // match: __splSetCoefficients @ 0x002E2D90
+// sp-match: __splSetCoefficients @ 0x001FD860
 static              RwBool
 _splSetCoefficients(void)
 {
@@ -485,6 +489,7 @@ _splSetCoefficients(void)
  On exit  : RpSpline*   spline struc, or NULL if unsuccessful
 ****************************************************************************/
 // match: __splCreateSpline @ 0x002E3370
+// sp-match: __splCreateSpline @ 0x001FDE40
 static RpSpline    *
 _splCreateSpline(RpSpline * splSpline, RwV3d * points)
 {
@@ -672,6 +677,7 @@ _splCreateSpline(RpSpline * splSpline, RwV3d * points)
  On exit  : engine instance on success
 ****************************************************************************/
 // match: _SplineClose @ 0x002E2DF0
+// sp-match: _SplineClose @ 0x001FD8C0
 static void        *
 SplineClose(void *instance,
             RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -711,6 +717,7 @@ SplineClose(void *instance,
  On exit  : engine instance on success
 ****************************************************************************/
 // match: _SplineOpen @ 0x002E2E40
+// sp-match: _SplineOpen @ 0x001FD910
 static void        *
 SplineOpen(void *instance,
            RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -786,6 +793,7 @@ SplineOpen(void *instance,
  */
 
 // match: _RpSplineStreamRead @ 0x002E4100
+// sp-match: _RpSplineStreamRead @ 0x001FEBD0
 RpSpline           *
 RpSplineStreamRead(RwStream * stream)
 {
@@ -974,6 +982,7 @@ RpSplineStreamGetSize(const RpSpline * spline)
  */
 
 // match: _RpSplineGetNumControlPoints @ 0x002E2EC0
+// sp-match: _RpSplineGetNumControlPoints @ 0x001FD990
 RwInt32
 RpSplineGetNumControlPoints(const RpSpline * spline)
 {
@@ -1163,6 +1172,7 @@ RpSplineSetControlPoint(RpSpline * spline, RwInt32 control,
  */
 
 // match: _RpSplineFindPosition @ 0x002E2F10
+// sp-match: _RpSplineFindPosition @ 0x001FD9E0
 RwV3d              *
 RpSplineFindPosition(RpSpline * spline, RwInt32 path, RwReal where,
                      RwV3d * pos, RwV3d * tangent)
@@ -1811,6 +1821,7 @@ RpSplineWrite(RpSpline *spline, const RwChar *name)
  */
 
 // match: _RpSplineDestroy @ 0x002E32F0
+// sp-match: _RpSplineDestroy @ 0x001FDDC0
 RwBool
 RpSplineDestroy(RpSpline * spline)
 {
@@ -1865,6 +1876,7 @@ RpSplineDestroy(RpSpline * spline)
  */
 
 // match: _RpSplineCreate @ 0x002E3F70
+// sp-match: _RpSplineCreate @ 0x001FEA40
 RpSpline           *
 RpSplineCreate(RwInt32 numCtrlPoints, RwInt32 type, RwV3d * ctrlPoints)
 {
@@ -1986,6 +1998,7 @@ RpSplineCreate(RwInt32 numCtrlPoints, RwInt32 type, RwV3d * ctrlPoints)
  */
 
 // match: _RpSplinePluginAttach @ 0x002E3340
+// sp-match: _RpSplinePluginAttach @ 0x001FDE10
 RwBool
 RpSplinePluginAttach(void)
 {

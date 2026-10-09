@@ -62,6 +62,23 @@ struct type_154C0_5BC
     RwInt32 unk_60;
     type_169D0 unk_64;
     RwInt16 unk_B0[0x64];
+#ifdef CODFH_SP
+    // Forced inline in single player: AIData::AIData (SP 0x1B710) expands
+    // all seven paths with their type_169D0's stores, past the size /Ob1
+    // inlines an implicit constructor at (16 member stores).
+    // revisit: __forceinline (owner: last resort; find the original spelling after the byte match)
+    __forceinline type_154C0_5BC()
+    {
+    }
+    // Moves the path on to the point arg_4, keeping the old one in unk_44: a
+    // member in single player, called out of line (SP 0x21070: this in ecx,
+    // ret 4; from AIData::sub_2B740, SP 0x26B80).
+    void set_unk_38(RwV3d *arg_4)
+    {
+        unk_44 = unk_38;
+        unk_38 = *arg_4;
+    }
+#endif
 };
 typedef RwChar type_154C0_5BC_size_check[sizeof(type_154C0_5BC) == 0x178 ? 1 : -1];
 

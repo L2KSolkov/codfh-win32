@@ -40,6 +40,7 @@ extern const RwReal flt_3DA744 = 16.666666f;
 // match: ??_C@_0BP@MINIHGIG@StopProjectileGeneratorForever?$AA@ @ 0x003DA75C
 
 // match: ?sub_122230@@YAXXZ @ 0x00122230
+// sp-match: ?sub_122230@@YAXXZ @ 0x000D8A20
 // Sets up the pool, sized for the larger kind, the list and the id table.
 void sub_122230()
 {
@@ -56,6 +57,7 @@ void sub_122230()
     dword_4CE8F0 = 0;
 }
 // match: ?sub_1222A0@@YAXXZ @ 0x001222A0
+// sp-match: ?sub_1222A0@@YAXXZ @ 0x000D8D00
 void sub_1222A0()
 {
     sub_122680();
@@ -63,12 +65,14 @@ void sub_1222A0()
     dword_4CE8F0 = 0;
 }
 // match: ?sub_1222D0@@YAXXZ @ 0x001222D0
+// sp-match: ?sub_1222D0@@YAXXZ @ 0x000D8D20
 void sub_1222D0()
 {
     sub_122680();
     dword_4CEA48.sub_16C4D0(1);
 }
 // match: ?sub_1222F0@@YAXM@Z @ 0x001222F0
+// sp-match: ?sub_1222F0@@YAXM@Z @ 0x000D8D40
 // Updates each generator whose parent, turret and barrel still stand; one
 // that lost them tells its script ("StopProjectileGeneratorForever"), or is
 // destroyed without one.
@@ -108,6 +112,7 @@ void sub_1222F0(RwReal arg_0)
     }
 }
 // match: ?sub_1223B0@@YAHPAUtype_712B0@@@Z @ 0x001223B0
+// sp-match: ?sub_1223B0@@YAHPAUtype_712B0@@@Z @ 0x000D8DD0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_1223B0(type_712B0 *arg_0)
 {
@@ -138,6 +143,7 @@ inline type_1227C0 *get_generator_list()
 // match: ?sub_122410@@YAHPAVProjectileGeneratorTrigger@@@Z @ 0x00122410
 // match: __ehhandler$?sub_122410@@YAHPAVProjectileGeneratorTrigger@@@Z-0x11 @ 0x00301560
 // match: __ehhandler$?sub_122410@@YAHPAVProjectileGeneratorTrigger@@@Z @ 0x00301571
+// sp-match: ?sub_122410@@YAHPAVProjectileGeneratorTrigger@@@Z @ 0x000D8B20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Creates a bullets' generator for the trigger arg_0 in the pool, links it
 // and gives it an id, which it returns.
@@ -157,6 +163,7 @@ RwInt32 sub_122410(ProjectileGeneratorTrigger *arg_0)
     return var_14->get_unk_104_h().unk_00;
 }
 // match: ?sub_1224F0@@YAHPAVProjectileGeneratorTrigger@@@Z @ 0x001224F0
+// sp-match: ?sub_1224F0@@YAHPAVProjectileGeneratorTrigger@@@Z @ 0x000D8BC0
 // Likewise a shells' generator (its unwinding is sub_122410's, identical,
 // folded by /OPT:ICF).
 RwInt32 sub_1224F0(ProjectileGeneratorTrigger *arg_0)
@@ -175,13 +182,16 @@ RwInt32 sub_1224F0(ProjectileGeneratorTrigger *arg_0)
     return var_14->get_unk_104_h().unk_00;
 }
 // match: ?sub_1225D0@@YAXPAUtype_1227C0@@@Z @ 0x001225D0
+// sp-match: ?sub_1225D0@@YAXPAUtype_1227C0@@@Z @ 0x000D8C60
 // Destroys the generator arg_0: unlinks it, frees its id, stops it and
 // returns it to the pool.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_1225D0(type_1227C0 *arg_0)
 {
     type_1227C0 *var_4;
+#ifndef CODFH_SP
     RwInt32 local_8;
+#endif
 
     for (var_4 = dword_4CE8F8; var_4; var_4 = var_4->unk_100)
     {
@@ -198,12 +208,18 @@ void sub_1225D0(type_1227C0 *arg_0)
     {
         dword_4CE8F8 = arg_0->get_unk_100();
     }
+#ifdef CODFH_SP
+    // shape: the id passed straight from the by-value record getter (SP 0xD8C60)
+    sub_122790(arg_0->get_unk_104_h().unk_00);
+#else
     local_8 = arg_0->unk_104;
     sub_122790(local_8);
+#endif
     arg_0->vf_008();
     dword_4CEA48.sub_16C710(arg_0);
 }
 // match: ?sub_122680@@YAXXZ @ 0x00122680
+// sp-match: ?sub_122680@@YAXXZ @ 0x000D8CC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_122680()
 {
@@ -221,6 +237,7 @@ void sub_122680()
     dword_4CE8F8 = 0;
 }
 // match: ?sub_1226D0@@YAHPAUtype_1227C0@@@Z @ 0x001226D0
+// sp-match: ?sub_1226D0@@YAHPAUtype_1227C0@@@Z @ 0x000D8A60
 // Gives arg_0 the first free entry of the id table (from 1) with the next
 // serial (from 1); its id, or garbage when the table is full.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -252,12 +269,14 @@ RwInt32 sub_1226D0(type_1227C0 *arg_0)
     return v8.unk_00;
 }
 // match: ?sub_122790@@YAXH@Z @ 0x00122790
+// sp-match: ?sub_122790@@YAXH@Z @ 0x000D8AE0
 void sub_122790(RwInt32 arg_0)
 {
     dword_4CE900[(RwUInt16)arg_0].unk_00 = 0;
     dword_4CE900[(RwUInt16)arg_0].unk_04 = 0;
 }
 // match: ?sub_1227C0@@YAPAUtype_1227C0@@H@Z @ 0x001227C0
+// sp-match: ?sub_1227C0@@YAPAUtype_1227C0@@H@Z @ 0x000D8B00
 // The generator with the id arg_0, or 0 when its entry holds another id.
 type_1227C0 *sub_1227C0(RwInt32 arg_0)
 {

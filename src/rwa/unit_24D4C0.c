@@ -14,6 +14,7 @@ extern void **sub_2416D0(void **semaphore, RwInt32 initial, RwInt32 maximum);
 #define rwaINFINITE 0xFFFFFFFF
 
 // match: _sub_24D4C0 @ 0x0024D4C0
+// sp-match: _sub_24D4C0 @ 0x00161610
 rwaReadCache *
 sub_24D4C0(rwaReadCache *cache, rwaReadRequest *requests, RwUInt16 size)
 {
@@ -27,6 +28,7 @@ sub_24D4C0(rwaReadCache *cache, rwaReadRequest *requests, RwUInt16 size)
 }
 
 // match: _sub_24D500 @ 0x0024D500
+// sp-match: _sub_24D500 @ 0x00161650
 void
 sub_24D500(rwaReadCache *cache)
 {
@@ -35,6 +37,7 @@ sub_24D500(rwaReadCache *cache)
 
 /* Queues a read (FALSE when the ring is full). */
 // match: _sub_24D510 @ 0x0024D510
+// sp-match: _sub_24D510 @ 0x00161660
 RwBool
 sub_24D510(rwaReadCache *cache, void *dest, RwUInt32 size, RwUInt32 offset, RwUInt32 e,
            RwInt32 kind)
@@ -72,6 +75,7 @@ sub_24D510(rwaReadCache *cache, void *dest, RwUInt32 size, RwUInt32 offset, RwUI
 
 /* Takes the next read off (FALSE when there is none). */
 // match: _sub_24D5B0 @ 0x0024D5B0
+// sp-match: _sub_24D5B0 @ 0x00161700
 RwBool
 sub_24D5B0(rwaReadCache *cache, rwaReadRequest *out)
 {
@@ -105,6 +109,7 @@ sub_24D5B0(rwaReadCache *cache, rwaReadRequest *out)
 
 /* Drops the queued reads. */
 // match: _sub_24D640 @ 0x0024D640
+// sp-match: _sub_24D640 @ 0x00161790
 void
 sub_24D640(rwaReadCache *cache)
 {

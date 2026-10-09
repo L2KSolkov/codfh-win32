@@ -89,6 +89,7 @@ _rpSkinGetMeshBoneRLE(RpSkin *skin)
 // match: _rcsid @ 0x00418EE8
 
 // match: __rpSkinSplitDataCreate @ 0x002D3EB0
+// sp-match: __rpSkinSplitDataCreate @ 0x001EE800
 RpSkin *
 _rpSkinSplitDataCreate(RpSkin *skin,
                            RwUInt32 boneLimit,
@@ -136,6 +137,7 @@ _rpSkinSplitDataCreate(RpSkin *skin,
  _rpSkinSplitDataDestroy
  */
 // match: __rpSkinSplitDataDestroy @ 0x002D3DA0
+// sp-match: __rpSkinSplitDataDestroy @ 0x001EE6F0
 RwBool
 _rpSkinSplitDataDestroy(RpSkin *skin)
 {
@@ -165,6 +167,7 @@ _rpSkinSplitDataDestroy(RpSkin *skin)
  _rpSkinSplitDataStreamWrite
  */
 // match: __rpSkinSplitDataStreamWrite @ 0x002D3DF0
+// sp-match: __rpSkinSplitDataStreamWrite @ 0x001EE740
 RwStream *
 _rpSkinSplitDataStreamWrite(RwStream *stream,
                                 const RpSkin *skin)
@@ -214,6 +217,7 @@ _rpSkinSplitDataStreamWrite(RwStream *stream,
  _rpSkinSplitDataStreamRead
  */
 // match: __rpSkinSplitDataStreamRead @ 0x002D3F70
+// sp-match: __rpSkinSplitDataStreamRead @ 0x001EE8C0
 RwStream *
 _rpSkinSplitDataStreamRead(RwStream *stream,
                                RpSkin *skin)
@@ -271,6 +275,7 @@ _rpSkinSplitDataStreamRead(RwStream *stream,
  _rpSkinSplitDataStreamGetSize
  */
 // match: __rpSkinSplitDataStreamGetSize @ 0x002D3E80
+// sp-match: __rpSkinSplitDataStreamGetSize @ 0x001EE7D0
 RwInt32
 _rpSkinSplitDataStreamGetSize(const RpSkin *skin)
 {

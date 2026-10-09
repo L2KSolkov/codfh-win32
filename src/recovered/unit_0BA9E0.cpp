@@ -28,22 +28,28 @@ RWS_REGISTERCLASS(StopSoundStreamTrigger);
 // match: ?MakeNew@StopSoundStreamTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000BA9E0
 // match: __ehhandler$?MakeNew@StopSoundStreamTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300450
 // match: __ehhandler$?MakeNew@StopSoundStreamTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030045F
+// sp-match: ?MakeNew@StopSoundStreamTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0008F070
 RWS_DEFINE_MAKENEW(StopSoundStreamTrigger)
 
 // match: ??0StopSoundStreamTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000BAA60
+// sp-match: ??0StopSoundStreamTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0008EDD0
 StopSoundStreamTrigger::StopSoundStreamTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
 }
 
 // match: ?vf_008@StopSoundStreamTrigger@@UAEHXZ @ 0x000BAA90
+// sp-match: ?vf_008@StopSoundStreamTrigger@@UAEHXZ @ 0x001232E0
 
 // match: ??_GStopSoundStreamTrigger@@UAEPAXI@Z @ 0x000BAAA0
+// sp-match: ??_GStopSoundStreamTrigger@@UAEPAXI@Z @ 0x0008F060
 
 // match: ??1StopSoundStreamTrigger@@UAE@XZ @ 0x000BAAC0
+// sp-match: ??1StopSoundStreamTrigger@@UAE@XZ @ 0x0008EDF0
 // (Defined in the class, in StopSoundStreamTrigger.h.)
 
 // Command 0: its player and the fade's length.
 // match: ?HandleAttributes@StopSoundStreamTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000BAAF0
+// sp-match: ?HandleAttributes@StopSoundStreamTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0008EE10
 void StopSoundStreamTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -70,6 +76,7 @@ void StopSoundStreamTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_030@StopSoundStreamTrigger@@UAEXXZ @ 0x000BABB0
+// sp-match: ?vf_030@StopSoundStreamTrigger@@UAEXXZ @ 0x0008EEB0
 void StopSoundStreamTrigger::vf_030()
 {
     RwInt32 var_4;
@@ -83,6 +90,7 @@ void StopSoundStreamTrigger::vf_030()
 }
 
 // match: ??_EStopSoundStreamTrigger@@WBI@AEPAXI@Z @ 0x000BAC40
+// sp-match: ??_EStopSoundStreamTrigger@@WBI@AEPAXI@Z @ 0x0008F050
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

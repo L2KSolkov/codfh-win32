@@ -42,12 +42,14 @@ RWS_REGISTERCLASS(LevelClumpBankParamTrigger);
 // match: ?MakeNew@LevelClumpBankParamTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C60E0
 // match: __ehhandler$?MakeNew@LevelClumpBankParamTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x003007E0
 // match: __ehhandler$?MakeNew@LevelClumpBankParamTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x003007EF
+// sp-match: ?MakeNew@LevelClumpBankParamTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00096DE0
 RWS_DEFINE_MAKENEW(LevelClumpBankParamTrigger)
 
 // Its handler serves the destructor too (folded by /OPT:ICF).
 // match: ??0LevelClumpBankParamTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C6160
 // match: __ehhandler$??0LevelClumpBankParamTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x8 @ 0x00300800
 // match: __ehhandler$??0LevelClumpBankParamTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300808
+// sp-match: ??0LevelClumpBankParamTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00096B10
 LevelClumpBankParamTrigger::LevelClumpBankParamTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     LinkMsg(iMsgSparkStartSystem, 0, 0x8000);
@@ -55,8 +57,10 @@ LevelClumpBankParamTrigger::LevelClumpBankParamTrigger(const RWS::CAttributePack
 }
 
 // match: ??_GLevelClumpBankParamTrigger@@UAEPAXI@Z @ 0x000C61F0
+// sp-match: ??_GLevelClumpBankParamTrigger@@UAEPAXI@Z @ 0x00096DD0
 
 // match: ??1LevelClumpBankParamTrigger@@UAE@XZ @ 0x000C6210
+// sp-match: ??1LevelClumpBankParamTrigger@@UAE@XZ @ 0x00096B90
 LevelClumpBankParamTrigger::~LevelClumpBankParamTrigger()
 {
     UnLinkMsg(iMsgSparkStartSystem);
@@ -66,6 +70,7 @@ LevelClumpBankParamTrigger::~LevelClumpBankParamTrigger()
 // Commands 1 and 2: the clump banks' memory and their clumps', in
 // kilobytes; command 0: the default clump bank (dword_429EA8).
 // match: ?HandleAttributes@LevelClumpBankParamTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C6290
+// sp-match: ?HandleAttributes@LevelClumpBankParamTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00096C00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void LevelClumpBankParamTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
@@ -88,7 +93,11 @@ void LevelClumpBankParamTrigger::HandleAttributes(const RWS::CAttributePacket &a
         }
         ++bp_8;
     }
+#ifdef CODFH_SP // shape: SP 0x96C86 multiplies (shl, then the and kept)
+    dword_4E51C0 = (bp_18 * 1024) & ~0x1F;
+#else
     dword_4E51C0 = (bp_18 << 10) & ~0x1F;
+#endif
     sub_16FF00(var_1C << 10);
     RWS::CAttributeCommandIterator ebp_10(attr, RWS_CLASSID_OF(LevelClumpBankParamTrigger));
     while (!ebp_10.IsFinished())
@@ -108,6 +117,7 @@ void LevelClumpBankParamTrigger::HandleAttributes(const RWS::CAttributePacket &a
 }
 
 // match: ?HandleEvents@LevelClumpBankParamTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000C63C0
+// sp-match: ?HandleEvents@LevelClumpBankParamTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x00096D20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void LevelClumpBankParamTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
@@ -138,3 +148,4 @@ void LevelClumpBankParamTrigger::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ??_ELevelClumpBankParamTrigger@@WBI@AEPAXI@Z @ 0x000C6490
+// sp-match: ??_ELevelClumpBankParamTrigger@@WBI@AEPAXI@Z @ 0x00096DC0

@@ -62,11 +62,13 @@ extern const RwReal flt_3D91C4 = 16.666666f;
 // match: ?MakeNew@ParticleEditor@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000F1320
 // match: __ehhandler$?MakeNew@ParticleEditor@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300F90
 // match: __ehhandler$?MakeNew@ParticleEditor@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00300F9F
+// sp-match: ?MakeNew@ParticleEditor@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000B8F50
 RWS_DEFINE_MAKENEW(ParticleEditor)
 
 // match: ??0ParticleEditor@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000F13A0
 // match: __ehhandler$??0ParticleEditor@@QAE@ABVCAttributePacket@RWS@@@Z-0x3D @ 0x00300FB0
 // match: __ehhandler$??0ParticleEditor@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300FED
+// sp-match: ??0ParticleEditor@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000B8820
 ParticleEditor::ParticleEditor(const RWS::CAttributePacket &attr)
 {
     unk_24 = RwMatrixCreate();
@@ -78,10 +80,12 @@ ParticleEditor::ParticleEditor(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_GParticleEditor@@UAEPAXI@Z @ 0x000F15B0
+// sp-match: ??_GParticleEditor@@UAEPAXI@Z @ 0x000B8940
 
 // match: ??1ParticleEditor@@UAE@XZ @ 0x000F15D0
 // match: __ehhandler$??1ParticleEditor@@UAE@XZ-0x59 @ 0x00301000
 // match: __ehhandler$??1ParticleEditor@@UAE@XZ @ 0x00301059
+// sp-match: ??1ParticleEditor@@UAE@XZ @ 0x000B8530
 ParticleEditor::~ParticleEditor()
 {
     if (unk_24)
@@ -98,6 +102,7 @@ ParticleEditor::~ParticleEditor()
 }
 
 // match: ?HandleEvents@ParticleEditor@@UAEXAAVCMsg@RWS@@@Z @ 0x000F1720
+// sp-match: ?HandleEvents@ParticleEditor@@UAEXAAVCMsg@RWS@@@Z @ 0x000B8630
 void ParticleEditor::HandleEvents(RWS::CMsg &pMsg)
 {
     RwChar var_24[32];
@@ -121,6 +126,7 @@ void ParticleEditor::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?HandleAttributes@ParticleEditor@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000F1860
+// sp-match: ?HandleAttributes@ParticleEditor@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000B8950
 void ParticleEditor::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     RWS::CAttributeHandler::HandleAttributes(attr);
@@ -295,6 +301,7 @@ void ParticleEditor::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?sub_F2360@ParticleEditor@@QAEXABVCAttributePacket@RWS@@@Z @ 0x000F2360
+// sp-match: ?sub_F2360@ParticleEditor@@QAEXABVCAttributePacket@RWS@@@Z @ 0x000BA6A0
 void ParticleEditor::sub_F2360(const RWS::CAttributePacket &attr)
 {
     RWS::CAttributeCommandIterator attrIt(attr, RWS::CSystemCommands::pCSystemCommandsClassID);
@@ -316,6 +323,7 @@ void ParticleEditor::sub_F2360(const RWS::CAttributePacket &attr)
 }
 
 // match: ?sub_F23F0@ParticleEditor@@QAEXPAUtype_F3130@@@Z @ 0x000F23F0
+// sp-match: ?sub_F23F0@ParticleEditor@@QAEXPAUtype_F3130@@@Z @ 0x000B8710
 void ParticleEditor::sub_F23F0(type_F3130 *arg_0)
 {
     arg_0->unk_00 = 6;
@@ -366,3 +374,4 @@ void ParticleEditor::sub_F23F0(type_F3130 *arg_0)
 }
 
 // match: ??_EParticleEditor@@WBI@AEPAXI@Z @ 0x000F25E0
+// sp-match: ??_EParticleEditor@@WBI@AEPAXI@Z @ 0x000B8810

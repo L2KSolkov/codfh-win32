@@ -34,13 +34,19 @@
 #include "rws/csystemcommands.h"
 #include "types/type_4B9E90.h"
 
+#ifdef CODFH_SP // static in single player: SP 0x102B90 takes its arguments in registers
+static void sub_164210(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8);
+#endif
+
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003DC928
 extern const RwReal flt_3DC928 = 16.666666f;
+#ifndef CODFH_SP // MP only: single player has neither unreferenced 0.01f: the unit's first string follows 16.666666f (SP 0x2E7F84)
 // 0x003DC92C
 extern const RwReal flt_3DC92C = 0.01f;
 // 0x003DC930
 extern const RwReal flt_3DC930 = 0.01f;
+#endif
 
 // match: ?flt_3DC928@@3MB @ 0x003DC928
 // match: ?flt_3DC92C@@3MB @ 0x003DC92C
@@ -52,6 +58,7 @@ extern const RwReal flt_3DC930 = 0.01f;
 
 
 // match: ?vf_000@type_3DC8B8@@UAEXHPAUtype_3D3548@@PAUtype_439A48@@PAUtype_429E54@@@Z @ 0x00161C50
+// sp-match: ?vf_000@type_3DC8B8@@UAEXHPAUtype_3D3548@@PAUtype_439A48@@PAUtype_429E54@@@Z @ 0x00102920
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A grenade starts as the base does (without colours), with a copy of its
 // settings' model and its owner's weapon in hand.
@@ -90,6 +97,7 @@ void type_3DC8B8::vf_000(RwInt32 arg_0, type_3D3548 *arg_4, type_439A48 *arg_8, 
         unk_A8[var_8].sub_D48D0(0);
 }
 // match: ?vf_004@type_3DC8B8@@UAEHXZ @ 0x00161E30
+// sp-match: ?vf_004@type_3DC8B8@@UAEHXZ @ 0x00102A40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Done: unless unk_128 is set, tells each entity in unk_438CA8 not in
 // unk_A8 "GrenadeExplodeCancel" (with where it was); then as the base, its
@@ -99,22 +107,37 @@ RwInt32 type_3DC8B8::vf_004()
     RwV3d var_24;
     RwInt32 bp_18;
     type_3D3548 *var_14;
+#ifdef CODFH_SP // the message carries the distance after the position (SP 0x102AD4 stores it there)
+    RwReal ebp_10[4];
+#else
     RwV3d ebp_10;
     RwReal l4;
+#endif
 
     if (!unk_128)
     {
+#ifdef CODFH_SP // the message carries the distance after the position (SP 0x102AD4 stores it there)
+        ebp_10[0] = unk_04.x;
+        ebp_10[1] = unk_04.y;
+        ebp_10[2] = unk_04.z;
+        ebp_10[3] = 0;
+#else
         ebp_10.x = unk_04.x;
         ebp_10.y = unk_04.y;
         ebp_10.z = unk_04.z;
         l4 = 0;
+#endif
         for (bp_18 = 0; bp_18 < 32; bp_18++)
         {
             var_14 = unk_438CA8[bp_18].sub_D4910();
             if (var_14 && !unk_A8[bp_18].sub_D4910())
             {
                 RwV3dSub(&var_24, var_14->sub_CD550(), &unk_04);
+#ifdef CODFH_SP // the message carries the distance after the position (SP 0x102AD4 stores it there)
+                ebp_10[3] = RwV3dLength((RwV3d *)&var_24);
+#else
                 l4 = RwV3dLength((RwV3d *)&var_24);
+#endif
                 sub_6B5F0("GrenadeExplodeCancel", (type_67620 *)(var_14->vf_098()), 0, 0, (RwInt32 *)(&ebp_10), 4, 1, 0);
             }
         }
@@ -125,6 +148,7 @@ RwInt32 type_3DC8B8::vf_004()
     return 1;
 }
 // match: ?vf_008@type_3DC8B8@@UAEXPAURwMatrixTag@@@Z @ 0x00161F70
+// sp-match: ?vf_008@type_3DC8B8@@UAEXPAURwMatrixTag@@@Z @ 0x00102B40
 // Its model placed at the matrix arg_0.
 void type_3DC8B8::vf_008(RwMatrix *arg_0)
 {
@@ -141,6 +165,7 @@ void type_3DC8B8::vf_008(RwMatrix *arg_0)
 #define ABS_(x) ((x) < 0.0f ? -(x) : (x))
 
 // match: ?vf_014@type_3DC8B8@@UAE_NM@Z @ 0x00161FC0
+// sp-match: ?vf_014@type_3DC8B8@@UAE_NM@Z @ 0x001041A0
 // Its step by arg_0. Unless it sticks to something (unk_12C), its model moves
 // by its velocity and gravity; the line (or, for a table-6 grenade at rest, a
 // sphere) there is tested against the worlds and their atomics. A hit sticks
@@ -177,8 +202,12 @@ bool type_3DC8B8::vf_014(RwReal arg_0)
         }
         else
         {
+#ifdef CODFH_SP // shape: the fall as one product, gravity first
+            RwReal var_94 = vf_020() * arg_0 * arg_0 * 0.5f;
+#else
             RwReal var_90 = 0.5f * arg_0 * arg_0;
             RwReal var_94 = vf_020() * var_90;
+#endif
 
             var_8C.y = var_8C.y + var_94;
         }
@@ -238,7 +267,11 @@ bool type_3DC8B8::vf_014(RwReal arg_0)
             {
                 var_128.type = rpINTERSECTSPHERE;
                 var_128.t.sphere.center = var_80.pos;
+#ifdef CODFH_SP // shape: the radius through the FPU (SP 0x1043AD fld/fstp)
+                var_128.t.sphere.radius = (RwReal)(dword_429E8C > dword_429E88 ? (RwDouble)dword_429E8C : (RwDouble)dword_429E88);
+#else
                 var_128.t.sphere.radius = dword_429E8C > dword_429E88 ? dword_429E8C : dword_429E88;
+#endif
                 var_100.sub_161470();
                 var_100.unk_14 = unk_24;
                 var_100.unk_18 = var_28;
@@ -273,6 +306,7 @@ bool type_3DC8B8::vf_014(RwReal arg_0)
                 if (var_100.unk_0C)
                 {
                     type_3D3548 *var_194 = sub_FB960(var_100.unk_0C);
+                    RwMatrix var_420;
 
                     if (var_194)
                     {
@@ -414,24 +448,25 @@ bool type_3DC8B8::vf_014(RwReal arg_0)
                             if (var_3A8)
                                 unk_1C -= var_8->unk_50;
                         }
-                        type_439A48 *var_3B0 = unk_3C;
-                        type_75600 var_3E0;
-                        RwMatrix var_420;
+                        {
+                            type_439A48 *var_3B0 = unk_3C;
+                            type_75600 var_3E0;
 
-                        var_3E0.unk_00_w = var_3B0->unk_00;
-                        var_3E0.unk_02_w = 0;
-                        var_3E0.unk_04 = (RwInt32)this;
-                        var_3E0.unk_14 = (RwInt32)&var_100.unk_20;
-                        var_3E0.unk_18 = (RwInt32)&var_100.unk_2C;
-                        var_3E0.unk_20 = &var_100.unk_38;
-                        var_3E0.unk_1C = (RwInt32)&var_420;
-                        var_3E0.unk_08 = unk_24;
-                        var_3E0.unk_0C = var_28;
-                        var_3E0.unk_10 = unk_34;
-                        var_3E0.unk_28 = 0;
-                        var_3E0.unk_2C = 0;
-                        var_3E0.unk_24 = var_100.unk_44;
-                        var_194->vf_064(&var_3E0);
+                            var_3E0.unk_00_w = var_3B0->unk_00;
+                            var_3E0.unk_02_w = 0;
+                            var_3E0.unk_04 = (RwInt32)this;
+                            var_3E0.unk_14 = (RwInt32)&var_100.unk_20;
+                            var_3E0.unk_18 = (RwInt32)&var_100.unk_2C;
+                            var_3E0.unk_20 = &var_100.unk_38;
+                            var_3E0.unk_1C = (RwInt32)&var_420;
+                            var_3E0.unk_08 = unk_24;
+                            var_3E0.unk_0C = var_28;
+                            var_3E0.unk_10 = unk_34;
+                            var_3E0.unk_28 = 0;
+                            var_3E0.unk_2C = 0;
+                            var_3E0.unk_24 = var_100.unk_44;
+                            var_194->vf_064(&var_3E0);
+                        }
                     }
                 }
                 if (!unk_12C)
@@ -568,13 +603,18 @@ bool type_3DC8B8::vf_014(RwReal arg_0)
                         var_4A0 = acos(0.99999f > ((var_4A0 = RwV3dDotProduct(&var_444, &var_80.at)) > -0.99999f
                                                        ? var_4A0 : -0.99999f)
                                            ? (var_4A0 > -0.99999f ? var_4A0 : -0.99999f) : 0.99999f) * 57.295776f;
-                        if (dword_429E78 * arg_0 >= var_4A0)
+                        if (var_4A0 <= dword_429E78 * arg_0)
                             var_4A0 = var_4A0 / arg_0;
                         else
                             var_4A0 = dword_429E78;
                         unk_7C.x = RwV3dDotProduct(&unk_7C, &var_80.right);
                         unk_7C.y = RwV3dDotProduct(&unk_7C, &var_80.up);
+#ifdef CODFH_SP // shape: SP 0x1056FB takes the x term first, with at.y read fresh
+                        unk_7C.z = *(volatile RwReal *)&var_80.at.x * *(volatile RwReal *)&unk_7C.x
+                                   + *(volatile RwReal *)&var_80.at.y * unk_7C.y + var_80.at.z * unk_7C.z;
+#else
                         unk_7C.z = RwV3dDotProduct(&unk_7C, &var_80.at);
+#endif
                     }
                     unk_88 = var_4A0;
                 }
@@ -682,9 +722,17 @@ bool type_3DC8B8::vf_014(RwReal arg_0)
     {
         unk_04 = var_8C;
         var_80.pos = var_8C;
+#ifdef CODFH_SP // shape: SP 0x105AE5 stores the step after testing whether rotation is enabled.
+        RwInt32 can_rotate;
+        RwReal var_544;
+        var_544 = (can_rotate = !unk_8C, arg_0 * unk_88);
+
+        if (can_rotate && var_544 != 0.0f && unk_70 != 6)
+#else // MP 0x161FC0 keeps the step assignment before the rotation test.
         RwReal var_544 = arg_0 * unk_88;
 
         if (!unk_8C && var_544 != 0.0f && unk_70 != 6)
+#endif
             RwMatrixRotate(&var_80, &unk_7C, var_544, rwCOMBINEPRECONCAT);
         RwFrameTransform(var_30, &var_80, rwCOMBINEREPLACE);
         if (var_C != arg_0 && dword_429E7C > dword_4E1B60)
@@ -705,10 +753,14 @@ bool type_3DC8B8::vf_014(RwReal arg_0)
     return false;
 }
 // match: ?sub_164210@@YAXPAURwV3d@@00@Z @ 0x00164210
+// sp-match: ?sub_164210@@YAXPAURwV3d@@00@Z @ 0x00102B90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The grenade's step (vf_014): a velocity from arg_0 and arg_4 under the
 // gravity dword_429E90, into *arg_8 (its y from arg_0; the local's y is
 // never set).
+#ifdef CODFH_SP // static: SP 0x102B90 takes its arguments in registers
+static
+#endif
 void sub_164210(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8)
 {
     RwReal var_14;
@@ -721,6 +773,7 @@ void sub_164210(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8)
     arg_8->y = arg_0->y;
 }
 // match: ?vf_04C@type_3DC8B8@@UAEXXZ @ 0x00164280
+// sp-match: ?vf_04C@type_3DC8B8@@UAEXXZ @ 0x00102BF0
 // Set off while held (unk_13C 1, its model on a frame and an entity in
 // unk_1A0): its model taken off the frame to where the frame is, and its
 // position from it.
@@ -750,6 +803,7 @@ void type_3DC8B8::vf_04C()
     }
 }
 // match: ?vf_038@type_3DC8B8@@UAEXPAURwMatrixTag@@@Z @ 0x00164350
+// sp-match: ?vf_038@type_3DC8B8@@UAEXPAURwMatrixTag@@@Z @ 0x00102C90
 void type_3DC8B8::vf_038(RwMatrix *arg_0)
 {
     sub_F2FF0(0x7F1EBD6D, arg_0, 0, 1, 0, 0); // not an address: a particle system's name hash
@@ -757,6 +811,7 @@ void type_3DC8B8::vf_038(RwMatrix *arg_0)
     sub_F2FF0(0xF9933423, arg_0, 0, 1, 0, 0); // not an address: a particle system's name hash
 }
 // match: ?vf_000@type_3DC798@@UAEXHPAUtype_3D3548@@PAUtype_439A48@@PAUtype_429E54@@@Z @ 0x001643B0
+// sp-match: ?vf_000@type_3DC798@@UAEXHPAUtype_3D3548@@PAUtype_439A48@@PAUtype_429E54@@@Z @ 0x00102CE0
 void type_3DC798::vf_000(RwInt32 arg_0, type_3D3548 *arg_4, type_439A48 *arg_8, type_429E54 *arg_C)
 {
     type_439A48 *var_4;
@@ -766,6 +821,7 @@ void type_3DC798::vf_000(RwInt32 arg_0, type_3D3548 *arg_4, type_439A48 *arg_8, 
     unk_70.sub_129620(RpClumpClone((RpClump *)var_4->unk_38));
 }
 // match: ?vf_004@type_3DC798@@UAEHXZ @ 0x00164400
+// sp-match: ?vf_004@type_3DC798@@UAEHXZ @ 0x00102D20
 RwInt32 type_3DC798::vf_004()
 {
     type_3DC7F8::vf_004();
@@ -774,6 +830,7 @@ RwInt32 type_3DC798::vf_004()
     return 1;
 }
 // match: ?vf_008@type_3DC798@@UAEXPAURwMatrixTag@@@Z @ 0x00164440
+// sp-match: ?vf_008@type_3DC798@@UAEXPAURwMatrixTag@@@Z @ 0x00102D40
 void type_3DC798::vf_008(RwMatrix *arg_0)
 {
     RwFrame *var_4;
@@ -783,6 +840,7 @@ void type_3DC798::vf_008(RwMatrix *arg_0)
     sub_173180(unk_70.get_unk_08());
 }
 // match: ?vf_02C@type_3DC798@@UAEXHPAURwMatrixTag@@PAUtype_3D3548@@H@Z @ 0x00164490
+// sp-match: ?vf_02C@type_3DC798@@UAEXHPAURwMatrixTag@@PAUtype_3D3548@@H@Z @ 0x00105BC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The surface arg_0's particles and decal (with arg_C), or with none its
 // own blast effects; its sound; and its blast when it has one (vf_040).
@@ -823,6 +881,7 @@ void type_3DC798::vf_02C(RwInt32 arg_0, RwMatrix *arg_4, type_3D3548 *arg_8, RwI
         sub_1614E0(arg_4, arg_8, unk_3C);
 }
 // match: ?vf_028@type_3DC798@@UAEXPAUtype_3D3548@@PAURwMatrixTag@@0@Z @ 0x001645B0
+// sp-match: ?vf_028@type_3DC798@@UAEXPAUtype_3D3548@@PAURwMatrixTag@@0@Z @ 0x00105C80
 void type_3DC798::vf_028(type_3D3548 *arg_0, RwMatrix *arg_4, type_3D3548 *arg_8)
 {
     RwInt32 var_4;
@@ -837,6 +896,7 @@ void type_3DC798::vf_028(type_3D3548 *arg_0, RwMatrix *arg_4, type_3D3548 *arg_8
     type_3DC798::vf_02C(var_4, arg_4, arg_8, 0);
 }
 // match: ?vf_014@type_3DC798@@UAE_NM@Z @ 0x00164620
+// sp-match: ?vf_014@type_3DC798@@UAE_NM@Z @ 0x00105CD0
 // Its step: its model moved by its velocity (and gravity, vf_020) unless the
 // line there meets the worlds or an atomic; a hit (unless on its owner's
 // own vehicle) makes an impact effect near the line's end, shakes and
@@ -860,8 +920,12 @@ bool type_3DC798::vf_014(RwReal arg_0)
     var_10 = RpClumpGetFrame(var_C);
     var_50 = *RwFrameGetMatrix(var_10);
     RwV3dScale(&var_5C, &unk_10, arg_0);
+#ifdef CODFH_SP // shape: the fall as one product, gravity first
+    var_64 = vf_020() * arg_0 * arg_0 * 0.5f;
+#else
     var_60 = 0.5f * arg_0 * arg_0;
     var_64 = vf_020() * var_60;
+#endif
     var_5C.y = var_5C.y + var_64;
     RwV3dAdd(&var_5C, &var_50.pos, &var_5C);
     var_C8.unk_00 = 1.0e37f;
@@ -920,7 +984,9 @@ bool type_3DC798::vf_014(RwReal arg_0)
         {
             RwInt32 var_15C = 1;
             RwV3d var_168;
+#ifndef CODFH_SP
             RwV3d var_174;
+#endif
             RwMatrix var_1C0;
 
             if (var_C8.unk_00 <= 1.0f)
@@ -930,6 +996,9 @@ bool type_3DC798::vf_014(RwReal arg_0)
             var_168.z = 0;
             if (var_14D && vf_03C())
             {
+#ifdef CODFH_SP // shape: block-scoped
+                RwV3d var_174;
+#endif
                 RwV3dNormalize(&var_174, &unk_10);
                 sub_140F00(&var_1C0, &var_5C, &unk_10);
             }
@@ -1005,6 +1074,7 @@ bool type_3DC798::vf_014(RwReal arg_0)
     return false;
 }
 // match: ?vf_038@type_3DC798@@UAEXPAURwMatrixTag@@@Z @ 0x00164EE0
+// sp-match: ?vf_038@type_3DC798@@UAEXPAURwMatrixTag@@@Z @ 0x00102D70
 void type_3DC798::vf_038(RwMatrix *arg_0)
 {
     sub_F2FF0(0xFC34701D, arg_0, 0, 1, 0, 1); // not an address: a particle system's name hash
@@ -1015,6 +1085,7 @@ void type_3DC798::vf_038(RwMatrix *arg_0)
     sub_F2FF0(0x7A855E3F, arg_0, 0, 1, 0, 1); // not an address: a particle system's name hash
 }
 // match: ?vf_000@type_3DC858@@UAEXHPAUtype_3D3548@@PAUtype_439A48@@PAUtype_429E54@@@Z @ 0x00164F90
+// sp-match: ?vf_000@type_3DC858@@UAEXHPAUtype_3D3548@@PAUtype_439A48@@PAUtype_429E54@@@Z @ 0x00102E00
 void type_3DC858::vf_000(RwInt32 arg_0, type_3D3548 *arg_4, type_439A48 *arg_8, type_429E54 *arg_C)
 {
     type_439A48 *var_4;
@@ -1025,6 +1096,7 @@ void type_3DC858::vf_000(RwInt32 arg_0, type_3D3548 *arg_4, type_439A48 *arg_8, 
     unk_70.sub_F2880(0);
 }
 // match: ?vf_004@type_3DC858@@UAEHXZ @ 0x00164FF0
+// sp-match: ?vf_004@type_3DC858@@UAEHXZ @ 0x00102E40
 RwInt32 type_3DC858::vf_004()
 {
     type_3DC7F8::vf_004();
@@ -1033,6 +1105,7 @@ RwInt32 type_3DC858::vf_004()
     return 1;
 }
 // match: ?vf_008@type_3DC858@@UAEXPAURwMatrixTag@@@Z @ 0x00165030
+// sp-match: ?vf_008@type_3DC858@@UAEXPAURwMatrixTag@@@Z @ 0x00102E70
 void type_3DC858::vf_008(RwMatrix *arg_0)
 {
     RwFrame *var_4;
@@ -1042,6 +1115,7 @@ void type_3DC858::vf_008(RwMatrix *arg_0)
     sub_173180(unk_7C.get_unk_08());
 }
 // match: ?vf_02C@type_3DC858@@UAEXHPAURwMatrixTag@@PAUtype_3D3548@@H@Z @ 0x00165080
+// sp-match: ?vf_02C@type_3DC858@@UAEXHPAURwMatrixTag@@PAUtype_3D3548@@H@Z @ 0x001062C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DC858::vf_02C(RwInt32 arg_0, RwMatrix *arg_4, type_3D3548 *arg_8, RwInt32 arg_C)
 {
@@ -1076,6 +1150,7 @@ void type_3DC858::vf_02C(RwInt32 arg_0, RwMatrix *arg_4, type_3D3548 *arg_8, RwI
     }
 }
 // match: ?vf_028@type_3DC858@@UAEXPAUtype_3D3548@@PAURwMatrixTag@@0@Z @ 0x00165180
+// sp-match: ?vf_028@type_3DC858@@UAEXPAUtype_3D3548@@PAURwMatrixTag@@0@Z @ 0x00106370
 void type_3DC858::vf_028(type_3D3548 *arg_0, RwMatrix *arg_4, type_3D3548 *arg_8)
 {
     RwInt32 var_4;
@@ -1086,6 +1161,7 @@ void type_3DC858::vf_028(type_3D3548 *arg_0, RwMatrix *arg_4, type_3D3548 *arg_8
     type_3DC858::vf_02C(var_4, arg_4, arg_8, 0);
 }
 // match: ?vf_014@type_3DC858@@UAE_NM@Z @ 0x001651D0
+// sp-match: ?vf_014@type_3DC858@@UAE_NM@Z @ 0x001063A0
 // Its step: as the model projectile's (without the vehicle and impact
 // checks), its particle system destroyed when it ends.
 bool type_3DC858::vf_014(RwReal arg_0)
@@ -1106,8 +1182,12 @@ bool type_3DC858::vf_014(RwReal arg_0)
     var_10 = RpClumpGetFrame(var_C);
     var_50 = *RwFrameGetMatrix(var_10);
     RwV3dScale(&var_5C, &unk_10, arg_0);
+#ifdef CODFH_SP // shape: the fall as one product, gravity first (SP 0x106429)
+    var_64 = vf_020() * arg_0 * arg_0 * 0.5f;
+#else
     var_60 = 0.5f * arg_0 * arg_0;
     var_64 = vf_020() * var_60;
+#endif
     var_5C.y = var_5C.y + var_64;
     RwV3dAdd(&var_5C, &var_50.pos, &var_5C);
     var_C8.unk_00 = 1.0e37f;
@@ -1154,7 +1234,9 @@ bool type_3DC858::vf_014(RwReal arg_0)
     if (var_C8.unk_00 <= 1.0f || var_14D && vf_03C())
     {
         RwV3d var_15C;
+#ifndef CODFH_SP
         RwV3d var_170;
+#endif
         RwMatrix var_1B0;
 
         var_15C.x = 0;
@@ -1167,6 +1249,9 @@ bool type_3DC858::vf_014(RwReal arg_0)
         }
         if (var_14D && vf_03C())
         {
+#ifdef CODFH_SP // shape: block-scoped (SP 0x1063A0 frame 0x154)
+            RwV3d var_170;
+#endif
             RwV3dNormalize(&var_170, &unk_10);
             sub_140F00(&var_1B0, &var_5C, &unk_10);
         }
@@ -1232,6 +1317,7 @@ bool type_3DC858::vf_014(RwReal arg_0)
     return false;
 }
 // match: ?vf_01C@type_3DC858@@UAEXM@Z @ 0x00165980
+// sp-match: ?vf_01C@type_3DC858@@UAEXM@Z @ 0x00102C70
 // Its fall by arg_0 (the settings' gravity unk_40 when unk_3C is set); the
 // model projectile's and the grenade's slot too (folded by /OPT:ICF).
 void type_3DC858::vf_01C(RwReal arg_0)
@@ -1243,6 +1329,7 @@ void type_3DC858::vf_01C(RwReal arg_0)
         unk_10.y = arg_0 * var_4->unk_40 + unk_10.y;
 }
 // match: ?vf_038@type_3DC858@@UAEXPAURwMatrixTag@@@Z @ 0x001659C0
+// sp-match: ?vf_038@type_3DC858@@UAEXPAURwMatrixTag@@@Z @ 0x00103070
 // Six effects at the matrix arg_0 (the kind-8 projectile's slot too).
 void type_3DC858::vf_038(RwMatrix *arg_0)
 {
@@ -1254,6 +1341,7 @@ void type_3DC858::vf_038(RwMatrix *arg_0)
     sub_F2FF0(0x7A855E3F, arg_0, 0, 1, 0, 0); // not an address: a particle system's name hash
 }
 // match: ?vf_000@type_3DC738@@UAEXHPAUtype_3D3548@@PAUtype_439A48@@PAUtype_429E54@@@Z @ 0x00165A70
+// sp-match: ?vf_000@type_3DC738@@UAEXHPAUtype_3D3548@@PAUtype_439A48@@PAUtype_429E54@@@Z @ 0x00102EA0
 void type_3DC738::vf_000(RwInt32 arg_0, type_3D3548 *arg_4, type_439A48 *arg_8, type_429E54 *arg_C)
 {
     type_439A48_84 *var_4;
@@ -1270,12 +1358,14 @@ void type_3DC738::vf_000(RwInt32 arg_0, type_3D3548 *arg_4, type_439A48 *arg_8, 
     unk_20 = var_4->unk_94 * 60.0f;
 }
 // match: ?vf_004@type_3DC738@@UAEHXZ @ 0x00165B20
+// sp-match: ?vf_004@type_3DC738@@UAEHXZ @ 0x00102F20
 RwInt32 type_3DC738::vf_004()
 {
     type_3DC7F8::vf_004();
     return 1;
 }
 // match: ?vf_01C@type_3DC738@@UAEXM@Z @ 0x00165B40
+// sp-match: ?vf_01C@type_3DC738@@UAEXM@Z @ 0x00102F30
 // Its fall by arg_0: after its delay (unk_80), its fall speed grows by
 // unk_7C up to the speed it has.
 void type_3DC738::vf_01C(RwReal arg_0)
@@ -1296,6 +1386,7 @@ void type_3DC738::vf_01C(RwReal arg_0)
     }
 }
 // match: ?vf_000@type_3DC6D8@@UAEXHPAUtype_3D3548@@PAUtype_439A48@@PAUtype_429E54@@@Z @ 0x00165BF0
+// sp-match: ?vf_000@type_3DC6D8@@UAEXHPAUtype_3D3548@@PAUtype_439A48@@PAUtype_429E54@@@Z @ 0x00102FA0
 void type_3DC6D8::vf_000(RwInt32 arg_0, type_3D3548 *arg_4, type_439A48 *arg_8, type_429E54 *arg_C)
 {
     type_439A48_84 *var_4;
@@ -1317,6 +1408,7 @@ void type_3DC6D8::vf_000(RwInt32 arg_0, type_3D3548 *arg_4, type_439A48 *arg_8, 
     unk_B8 = var_4->unk_A4;
 }
 // match: ?vf_02C@type_3DC6D8@@UAEXHPAURwMatrixTag@@PAUtype_3D3548@@H@Z @ 0x00165D10
+// sp-match: ?vf_02C@type_3DC6D8@@UAEXHPAURwMatrixTag@@PAUtype_3D3548@@H@Z @ 0x001068F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DC6D8::vf_02C(RwInt32 arg_0, RwMatrix *arg_4, type_3D3548 *arg_8, RwInt32 arg_C)
 {
@@ -1352,6 +1444,7 @@ void type_3DC6D8::vf_02C(RwInt32 arg_0, RwMatrix *arg_4, type_3D3548 *arg_8, RwI
         sub_1614E0(arg_4, arg_8, unk_3C);
 }
 // match: ?vf_028@type_3DC6D8@@UAEXPAUtype_3D3548@@PAURwMatrixTag@@0@Z @ 0x00165E10
+// sp-match: ?vf_028@type_3DC6D8@@UAEXPAUtype_3D3548@@PAURwMatrixTag@@0@Z @ 0x001069A0
 void type_3DC6D8::vf_028(type_3D3548 *arg_0, RwMatrix *arg_4, type_3D3548 *arg_8)
 {
     RwInt32 var_4;
@@ -1362,11 +1455,16 @@ void type_3DC6D8::vf_028(type_3D3548 *arg_0, RwMatrix *arg_4, type_3D3548 *arg_8
     type_3DC798::vf_02C(var_4, arg_4, arg_8, 0);
 }
 // match: ?vf_014@type_3DC6D8@@UAE_NM@Z @ 0x00165E60
+// sp-match: ?vf_014@type_3DC6D8@@UAE_NM@Z @ 0x001069D0
 // Its step: every fourth frame its model along its velocity; once its delay
 // is over, its sound (one of two by the player's distance from where it
 // heads); then as the model projectile.
 bool type_3DC6D8::vf_014(RwReal arg_0)
 {
+#ifdef CODFH_SP // shape: the rest are declared in their blocks
+    type_3D3548 *var_60;
+    type_439A48_84 *var_5C;
+#else
     RwReal var_78;
     RwV3d var_74;
     type_73050 var_68;
@@ -1375,9 +1473,15 @@ bool type_3DC6D8::vf_014(RwReal arg_0)
     RwFrame *var_58;
     RwMatrix var_50;
     RwV3d var_10;
+#endif
 
     if (!(dword_4B87D8 & 3))
     {
+#ifdef CODFH_SP // shape: block-scoped locals share the frame (SP 0x1069D6 sub esp,0x54)
+        RwFrame *var_58;
+        RwMatrix var_50;
+        RwV3d var_10;
+#endif
         RwV3dNormalize(&var_10, &unk_10);
         sub_140CE0(&var_50, &unk_04, &var_10);
         var_58 = RpClumpGetFrame(unk_70.get_unk_08());
@@ -1391,6 +1495,11 @@ bool type_3DC6D8::vf_014(RwReal arg_0)
         var_60 = sub_1745A0(0);
         if (var_60)
         {
+#ifdef CODFH_SP // shape: block-scoped locals share the frame (SP 0x1069D6 sub esp,0x54)
+            RwReal var_78;
+            RwV3d var_74;
+            type_73050 var_68;
+#endif
             var_68.unk_00 = 0;
             var_68.unk_04 = 0;
             RwV3dSub(&var_74, (RwV3d *)var_60->vf_0C4(), &unk_B8);
@@ -1412,6 +1521,7 @@ bool type_3DC6D8::vf_014(RwReal arg_0)
     return type_3DC798::vf_014(arg_0);
 }
 // match: ?vf_01C@type_3DC6D8@@UAEXM@Z @ 0x00166040
+// sp-match: ?vf_01C@type_3DC6D8@@UAEXM@Z @ 0x00103100
 // Its fall by arg_0: after its delay (unk_A0), with its speed growing by
 // unk_9C when unk_A4 is set.
 void type_3DC6D8::vf_01C(RwReal arg_0)
@@ -1422,6 +1532,7 @@ void type_3DC6D8::vf_01C(RwReal arg_0)
     unk_10.y = arg_0 * unk_98 + unk_10.y;
 }
 // match: ?sub_1660C0@@YAPAURpAtomic@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x001660C0
+// sp-match: ?sub_1660C0@@YAPAURpAtomic@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x001031A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The worlds' atomics' callback of a projectile's query arg_10 (a
 // type_161470): skipping atomics collision ignores, kind-0x38 entities, the
@@ -1645,6 +1756,7 @@ RpAtomic *sub_1660C0(RpIntersection *arg_0, RpWorldSector *arg_4, RpAtomic *arg_
     return arg_8;
 }
 // match: ?sub_166950@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAU1@MPAX@Z @ 0x00166950
+// sp-match: ?sub_166950@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAU1@MPAX@Z @ 0x00103170
 RpCollisionTriangle *sub_166950(RpIntersection *arg_0, RpCollisionTriangle *arg_4, RwReal arg_8,
                                 void *arg_C)
 {

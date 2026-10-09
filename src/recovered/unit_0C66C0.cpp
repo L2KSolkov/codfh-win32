@@ -40,12 +40,14 @@ RWS_REGISTERCLASS(LevelScriptTrigger);
 // match: ?MakeNew@LevelScriptTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C66C0
 // match: __ehhandler$?MakeNew@LevelScriptTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300840
 // match: __ehhandler$?MakeNew@LevelScriptTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030084F
+// sp-match: ?MakeNew@LevelScriptTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000972D0
 RWS_DEFINE_MAKENEW(LevelScriptTrigger)
 
 // Its handler serves the destructor too (folded by /OPT:ICF).
 // match: ??0LevelScriptTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C6740
 // match: __ehhandler$??0LevelScriptTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x8 @ 0x00300860
 // match: __ehhandler$??0LevelScriptTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300868
+// sp-match: ??0LevelScriptTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00096FF0
 LevelScriptTrigger::LevelScriptTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_C0 = 0;
@@ -56,8 +58,10 @@ LevelScriptTrigger::LevelScriptTrigger(const RWS::CAttributePacket &attr) : Trig
 }
 
 // match: ??_GLevelScriptTrigger@@UAEPAXI@Z @ 0x000C6800
+// sp-match: ??_GLevelScriptTrigger@@UAEPAXI@Z @ 0x000972C0
 
 // match: ??1LevelScriptTrigger@@UAE@XZ @ 0x000C6820
+// sp-match: ??1LevelScriptTrigger@@UAE@XZ @ 0x00097090
 LevelScriptTrigger::~LevelScriptTrigger()
 {
     if (unk_C0)
@@ -72,6 +76,7 @@ LevelScriptTrigger::~LevelScriptTrigger()
 // Registers a fixed name (a kind 0x31) first; command 0 is its script,
 // commands 1 and 2 more names to register.
 // match: ?HandleAttributes@LevelScriptTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C68C0
+// sp-match: ?HandleAttributes@LevelScriptTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00097130
 void LevelScriptTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -118,6 +123,7 @@ void LevelScriptTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?HandleEvents@LevelScriptTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000C6A30
+// sp-match: ?HandleEvents@LevelScriptTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x00097280
 void LevelScriptTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
     Trigger::HandleEvents(pMsg);
@@ -128,6 +134,7 @@ void LevelScriptTrigger::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ??_ELevelScriptTrigger@@WBI@AEPAXI@Z @ 0x000C6A70
+// sp-match: ??_ELevelScriptTrigger@@WBI@AEPAXI@Z @ 0x000972B0
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

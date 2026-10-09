@@ -31,6 +31,7 @@ extern RwBool XboxDmorphAtomicInstanceCallback(void *object,
 // match: _nodeXboxDmorphAtomicAllInOneCSL @ 0x00436E40
 
 // match: _XBoxDmorphAtomicAllInOneNode @ 0x002F3F40
+// sp-match: _XBoxDmorphAtomicAllInOneNode @ 0x0020E9F0
 static RwBool
 XBoxDmorphAtomicAllInOneNode(RxPipelineNode *self, const RxPipelineNodeParam *params)
 {
@@ -209,6 +210,7 @@ XBoxDmorphAtomicAllInOneNode(RxPipelineNode *self, const RxPipelineNodeParam *pa
 static RxPipeline *_rwDMorphPipelines[rpDMORPHTYPEGENERIC + 1];
 
 // match: _rxXBDmorphAtomicAllInOnePipelineInit @ 0x002F4200
+// sp-match: _rxXBDmorphAtomicAllInOnePipelineInit @ 0x0020ECB0
 RwBool
 rxXBDmorphAtomicAllInOnePipelineInit(RxPipelineNode *node)
 {
@@ -247,6 +249,7 @@ static RxNodeDefinition nodeXboxDmorphAtomicAllInOneCSL =
 };
 
 // match: __rpDMorphGeometryDtor @ 0x002F2830
+// sp-match: __rpDMorphGeometryDtor @ 0x0020D2E0
 void
 _rpDMorphGeometryDtor(rpDMorphGeometryData *geometryData)
 {
@@ -268,6 +271,7 @@ struct _BlockInfo
 };
 
 // match: _XboxDMorphAddBlock @ 0x002F2860
+// sp-match: _XboxDMorphAddBlock @ 0x0020D310
 static RwUInt32
 XboxDMorphAddBlock(RwUInt32 numBlocks, _BlockInfo *blocks,
                    RwUInt32 firstVertex, RwUInt32 numVertex)
@@ -318,6 +322,7 @@ XboxDMorphAddBlock(RwUInt32 numBlocks, _BlockInfo *blocks,
 }
 
 // match: _XboxDmorphAtomicInstanceCallback @ 0x002F28D0
+// sp-match: _XboxDmorphAtomicInstanceCallback @ 0x0020D380
 RwBool
 XboxDmorphAtomicInstanceCallback(void *object,
                                  RxXboxResEntryHeader *instancedHeader,
@@ -1290,6 +1295,7 @@ XboxDmorphAtomicInstanceCallback(void *object,
 }
 
 // match: __rpDMorphPipelinesCreate @ 0x002F4230
+// sp-match: __rpDMorphPipelinesCreate @ 0x0020ECE0
 RwBool
 _rpDMorphPipelinesCreate(RwUInt32 type __RWUNUSED__)
 {
@@ -1312,6 +1318,7 @@ _rpDMorphPipelinesCreate(RwUInt32 type __RWUNUSED__)
 }
 
 // match: __rpDMorphPipelinesDestroy @ 0x002F4290
+// sp-match: __rpDMorphPipelinesDestroy @ 0x0020ED40
 RwBool
 _rpDMorphPipelinesDestroy(void)
 {
@@ -1325,6 +1332,7 @@ _rpDMorphPipelinesDestroy(void)
 }
 
 // match: __rpDMorphPipelinesAttach @ 0x002F42C0
+// sp-match: __rpDMorphPipelinesAttach @ 0x0020ED70
 RpAtomic *
 _rpDMorphPipelinesAttach(RpAtomic *atomic, RpDMorphType type)
 {

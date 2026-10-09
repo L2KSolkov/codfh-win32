@@ -40,19 +40,24 @@ RWS_REGISTERCLASS(RenderTrigger);
 // match: ?MakeNew@RenderTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000AF150
 // match: __ehhandler$?MakeNew@RenderTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300170
 // match: __ehhandler$?MakeNew@RenderTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030017F
+// sp-match: ?MakeNew@RenderTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00087C20
 RWS_DEFINE_MAKENEW(RenderTrigger)
 
 // match: ??0RenderTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000AF1D0
+// sp-match: ??0RenderTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000876A0
 RenderTrigger::RenderTrigger(const RWS::CAttributePacket &attr)
 {
 }
 
 // match: ??_GRenderTrigger@@UAEPAXI@Z @ 0x000AF230
+// sp-match: ??_GRenderTrigger@@UAEPAXI@Z @ 0x00087770
 
 // match: ??1RenderTrigger@@UAE@XZ @ 0x000AF250
+// sp-match: ??1RenderTrigger@@UAE@XZ @ 0x000876C0
 // (Defined in the class, in RenderTrigger.h.)
 
 // match: ?sub_AF270@RenderTrigger@@QAEHH@Z @ 0x000AF270
+// sp-match: ?sub_AF270@RenderTrigger@@QAEHH@Z @ 0x000876D0
 RwInt32 RenderTrigger::sub_AF270(RwInt32 arg_0)
 {
     RwInt32 var_4;
@@ -97,6 +102,7 @@ RwInt32 RenderTrigger::sub_AF270(RwInt32 arg_0)
 }
 
 // match: ?HandleAttributes@RenderTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000AF330
+// sp-match: ?HandleAttributes@RenderTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00087780
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void RenderTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
@@ -235,8 +241,13 @@ void RenderTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
             }
             break;
         case 23:
+#ifdef CODFH_SP // shape: SP 0x87AB9 copies the field of view as a float (fld/fst/fstp)
+            *(RwReal *)&dword_4CF468 = *(const RwReal *)attrIt->GetAs_RwChar_ptr();
+            *(RwReal *)&dword_4CF540 = *(RwReal *)&dword_4CF468;
+#else
             dword_4CF468 = *(const RwInt32 *)attrIt->GetAs_RwChar_ptr();
             dword_4CF540 = dword_4CF468;
+#endif
             break;
         case 24:
             flt_4CF458 = *(const RwReal *)attrIt->GetAs_RwChar_ptr();

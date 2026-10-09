@@ -65,6 +65,12 @@ struct type_4BFED0
     RwUInt32 unk_A4;            // the search types it takes
 
     type_4BFED0();
+#ifdef CODFH_SP
+    // Single player's destructor is out of line: dword_4BFE28's exit
+    // function (SP 0x21E910) jumps to the folded empty body (SP 0x5A260).
+    // Only declared: the placement link binds it there.
+    ~type_4BFED0();
+#endif
     type_F6400 *sub_F6400();
     type_F6400 *sub_F6450(RwInt32 arg_0);
     void sub_F6510();

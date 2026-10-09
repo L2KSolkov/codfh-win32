@@ -28,6 +28,9 @@ type_4B9E90 dword_4B9E90[128];
 // match: ??0type_4B9E90@@QAE@XZ @ 0x000F06B0
 // match: __ehhandler$??0type_4B9E90@@QAE@XZ-0x16 @ 0x00300F50
 // match: __ehhandler$??0type_4B9E90@@QAE@XZ @ 0x00300F66
+// sp-match: ??0type_4B9E90@@QAE@XZ @ 0x000B8490
+// sp-match: _$E1 @ 0x0021D5E0
+// sp-match: _$E2 @ 0x0021E860
 
 type_4B9E90::type_4B9E90()
 {
@@ -35,18 +38,21 @@ type_4B9E90::type_4B9E90()
 }
 
 // match: ??1type_F2880@@QAE@XZ @ 0x000F0740
+// sp-match: ??1type_F2880@@QAE@XZ @ 0x000B8480
 // (Defined in the struct, in type_F2880.h; out of line for the constructor's
 // unwinding.)
 
 // match: ??1type_4B9E90@@QAE@XZ @ 0x000F0760
 // match: __ehhandler$??1type_4B9E90@@QAE@XZ-0x16 @ 0x00300F70
 // match: __ehhandler$??1type_4B9E90@@QAE@XZ @ 0x00300F86
+// sp-match: ??1type_4B9E90@@QAE@XZ @ 0x000B84E0
 type_4B9E90::~type_4B9E90()
 {
     sub_F07C0();
 }
 
 // match: ?sub_F07C0@type_4B9E90@@QAEXXZ @ 0x000F07C0
+// sp-match: ?sub_F07C0@type_4B9E90@@QAEXXZ @ 0x000B7D10
 void type_4B9E90::sub_F07C0()
 {
     unk_0C = 0;
@@ -66,6 +72,7 @@ void type_4B9E90::sub_F07C0()
 }
 
 // match: ?sub_F0880@type_4B9E90@@QAEXHHMH@Z @ 0x000F0880
+// sp-match: ?sub_F0880@type_4B9E90@@QAEXHHMH@Z @ 0x000B7D60
 void type_4B9E90::sub_F0880(RwInt32 arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 {
     sub_F07C0();
@@ -83,6 +90,7 @@ void type_4B9E90::sub_F0880(RwInt32 arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 
 }
 
 // match: ?sub_F0900@type_4B9E90@@QAEXXZ @ 0x000F0900
+// sp-match: ?sub_F0900@type_4B9E90@@QAEXXZ @ 0x000B7DC0
 void type_4B9E90::sub_F0900()
 {
     if (unk_44.get_unk_08() && get_unk_40())
@@ -94,6 +102,7 @@ void type_4B9E90::sub_F0900()
 }
 
 // match: ?sub_F0960@type_4B9E90@@QAEPAXXZ @ 0x000F0960
+// sp-match: ?sub_F0960@type_4B9E90@@QAEPAXXZ @ 0x000B7DF0
 void *type_4B9E90::sub_F0960()
 {
     void *var_4 = 0;
@@ -111,6 +120,7 @@ void *type_4B9E90::sub_F0960()
 }
 
 // match: ?sub_F09B0@type_4B9E90@@QAEXPAUtype_3D3548@@@Z @ 0x000F09B0
+// sp-match: ?sub_F09B0@type_4B9E90@@QAEXPAUtype_3D3548@@@Z @ 0x000B7E10
 void type_4B9E90::sub_F09B0(type_3D3548 *arg_0)
 {
     unk_24.sub_D48D0(0);
@@ -127,6 +137,7 @@ void type_4B9E90::sub_F09B0(type_3D3548 *arg_0)
 }
 
 // match: ?sub_F0A10@type_4B9E90@@QAEXPAUtype_3D3548@@HH@Z @ 0x000F0A10
+// sp-match: ?sub_F0A10@type_4B9E90@@QAEXPAUtype_3D3548@@HH@Z @ 0x000B7E50
 void type_4B9E90::sub_F0A10(type_3D3548 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     if (arg_4 >= 0 && arg_4 <= 99)
@@ -148,6 +159,7 @@ void type_4B9E90::sub_F0A10(type_3D3548 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_F0AA0@type_4B9E90@@QAEXM@Z @ 0x000F0AA0
+// sp-match: ?sub_F0AA0@type_4B9E90@@QAEXM@Z @ 0x000B7EA0
 void type_4B9E90::sub_F0AA0(RwReal arg_0)
 {
     if (arg_0 > 1.0f)
@@ -162,10 +174,10 @@ void type_4B9E90::sub_F0AA0(RwReal arg_0)
 }
 
 // match: ?sub_F0AF0@type_4B9E90@@QAEXXZ @ 0x000F0AF0
+// sp-match: ?sub_F0AF0@type_4B9E90@@QAEXXZ @ 0x000B7F00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_4B9E90::sub_F0AF0()
 {
-    RwV3d frm_24;
     type_4B9E90_28 *m_18;
     type_3D3548 *ebp_14;
     RpClump *lv_10;
@@ -203,7 +215,7 @@ void type_4B9E90::sub_F0AF0()
         m_18 = (type_4B9E90_28 *)sub_F0960();
         if (m_18 && m_18->get_unk_20() > 0.0f)
         {
-            frm_24 = m_18->unk_10;
+            RwV3d frm_24 = m_18->unk_10;
             RwV3dNormalize(&frm_24, &frm_24);
             sub_140CE0(bp_8, &m_18->unk_04, &frm_24);
         }
@@ -212,6 +224,7 @@ void type_4B9E90::sub_F0AF0()
 }
 
 // match: ?sub_F0C40@type_4B9E90@@QAEXMPAURwV3d@@@Z @ 0x000F0C40
+// sp-match: ?sub_F0C40@type_4B9E90@@QAEXMPAURwV3d@@@Z @ 0x000B7FD0
 // Counts down to the next emission; then, unless the emission chance
 // (unk_50) fails, emits at the target (a kind-1 entity's tag or frame, a
 // kind-2 object's position facing its direction, the kind-3 point unk_00),
@@ -227,9 +240,6 @@ void type_4B9E90::sub_F0C40(RwReal arg_0, RwV3d *arg_4)
     RwMatrix var_60;
     RwFrame *var_68;
     type_4B9E90_28 *var_6C;
-    RwV3d var_7C;
-    RwV3d var_88;
-    RwV3d var_94;
     RwReal var_98;
     RwV3d var_A4;
     RwV3d var_B0;
@@ -313,7 +323,7 @@ void type_4B9E90::sub_F0C40(RwReal arg_0, RwV3d *arg_4)
         var_6C = (type_4B9E90_28 *)sub_F0960();
         if (var_6C && var_6C->get_unk_20() > 0.0f)
         {
-            var_7C = var_6C->unk_10;
+            RwV3d var_7C = var_6C->unk_10;
             RwV3dNormalize(&var_7C, &var_7C);
             sub_140CE0(&var_60, &var_6C->unk_04, &var_7C);
         }
@@ -324,11 +334,15 @@ void type_4B9E90::sub_F0C40(RwReal arg_0, RwV3d *arg_4)
         }
         break;
     case 3:
+    {
+        RwV3d var_88;
+
         var_88.x = 0.0f;
         var_88.y = 1.0f;
         var_88.z = 0.0f;
         sub_140F00(&var_60, &unk_00, &var_88);
         break;
+    }
     default:
         sub_F0900();
         return;
@@ -339,6 +353,8 @@ void type_4B9E90::sub_F0C40(RwReal arg_0, RwV3d *arg_4)
     }
     if (unk_2C > 0.0f && !unk_3C)
     {
+        RwV3d var_94;
+
         RwV3dSubMacro(&var_94, &var_60.pos, &unk_30);
         var_98 = RwV3dLength((RwV3d *)&var_94);
         if (unk_2C * 1000.0f < var_98)
@@ -388,6 +404,7 @@ void type_4B9E90::sub_F0C40(RwReal arg_0, RwV3d *arg_4)
 }
 
 // match: ?sub_F1190@@YAXXZ @ 0x000F1190
+// sp-match: ?sub_F1190@@YAXXZ @ 0x000B8390
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_F1190()
 {
@@ -401,6 +418,7 @@ void sub_F1190()
 }
 
 // match: ?sub_F11D0@@YAXM@Z @ 0x000F11D0
+// sp-match: ?sub_F11D0@@YAXM@Z @ 0x000B83B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_F11D0(RwReal arg_0)
 {
@@ -420,6 +438,7 @@ void sub_F11D0(RwReal arg_0)
 }
 
 // match: ?sub_F1230@@YAPAUtype_4B9E90@@XZ @ 0x000F1230
+// sp-match: ?sub_F1230@@YAPAUtype_4B9E90@@XZ @ 0x000B83E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_4B9E90 *sub_F1230()
 {
@@ -440,6 +459,7 @@ type_4B9E90 *sub_F1230()
 }
 
 // match: ?sub_F12A0@@YAXPAUtype_3D3548@@PAURwV3d@@@Z @ 0x000F12A0
+// sp-match: ?sub_F12A0@@YAXPAUtype_3D3548@@PAURwV3d@@@Z @ 0x000B8420
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_F12A0(type_3D3548 *arg_0, RwV3d *arg_4)
 {

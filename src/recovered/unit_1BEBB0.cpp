@@ -26,6 +26,7 @@
 #include "types/alfaobject.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E2FA8
 extern const RwReal flt_3E2FA8 = 16.666666f;
 // 0x003E2FAC
@@ -34,14 +35,17 @@ extern const RwReal flt_3E2FAC = 0.01f;
 extern const RwReal flt_3E2FB0 = 0.01f;
 // 0x003E2FB4
 extern const RwReal flt_3E2FB4 = 16.666666f;
+#endif
 // 0x003E2FB8
 extern const RwV3d stru_3E2FB8 = { 1.0f, 0.0f, 0.0f };
 // 0x003E2FC4
 extern const RwV3d stru_3E2FC4 = { 0.0f, 1.0f, 0.0f };
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E2FD0
 extern const RwReal flt_3E2FD0 = 0.01f;
 // 0x003E2FD4
 extern const RwReal flt_3E2FD4 = 0.01f;
+#endif
 // 0x0042CB40
 RwReal flt_42CB40[4][5] = {
     { 0.0f, 60.0f, 60.0f, 140.0f, 120.0f },
@@ -231,8 +235,10 @@ void type_4F7EB8_1F0::pvf_000(type_1F8560_v *arg_0, type_4F6B00_F4 *arg_4, type_
     RwMatrixRotate(&var_D0, &stru_3E2FC4, arg_4->get_unk_00(), rwCOMBINEPRECONCAT);
     RwMatrixRotate(&var_D0, &stru_3E2FB8, unk_21A4, rwCOMBINEPRECONCAT);
     sub_136DA0(sub_1C5800(*arg_14));
+#ifndef CODFH_SP // MP 0x1BF0C0 only (the network soldier): single player's soldier has no unk_818_v
     if (RwMatrixGetAt(&var_D0))
         unk_818_v = *RwMatrixGetAt(&var_D0);
+#endif
     if (unk_21BC != (*arg_18 & 1))
     {
         vf_1B0(*arg_18 & 1);
@@ -496,9 +502,11 @@ void type_4F7EB8_1F0::sub_1BF5E0(type_4F6B00_F4 *arg_0, type_1F8560_v *arg_4, Rw
         }
         else
             var_60 = 0;
+#ifndef CODFH_SP // (single player has no five-way blend and no twin of sub_1BF5E0)
         var_4C->unk_478 = get_unk_1DC0();
         var_4C->unk_480 = var_60;
         var_4C->sub_76960();
+#endif
     }
     else
         vf_05C();

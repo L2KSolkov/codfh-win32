@@ -161,6 +161,7 @@ static RwModuleInfo geometryModule;
 // match: _geometryTKList @ 0x00436B60
 
 // match: _GeometryAnnihilate @ 0x002D8210
+// sp-match: _GeometryAnnihilate @ 0x001F2CE0
 
 static RwBool
 GeometryAnnihilate(RpGeometry *geometry)
@@ -215,6 +216,7 @@ GeometryAnnihilate(RpGeometry *geometry)
  */
 
 // match: __rpGeometryOpen @ 0x002D7730
+// sp-match: __rpGeometryOpen @ 0x001F2090
 void               *
 _rpGeometryOpen(void *instance, RwInt32 offset,
                 RwInt32 __RWUNUSED__ size)
@@ -239,6 +241,7 @@ _rpGeometryOpen(void *instance, RwInt32 offset,
  */
 
 // match: __rpGeometryClose @ 0x002D7750
+// sp-match: __rpGeometryClose @ 0x001F20B0
 void               *
 _rpGeometryClose(void *instance,
                  RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -386,6 +389,7 @@ RpGeometryTransform(RpGeometry * geometry, const RwMatrix * matrix)
  *
  */
 // match: _RpGeometryCreateSpace @ 0x002D8640
+// sp-match: _RpGeometryCreateSpace @ 0x001F3110
 RpGeometry         *
 RpGeometryCreateSpace(RwReal radius)
 {
@@ -526,6 +530,7 @@ RpMorphTargetGetBoundingSphere(RpMorphTarget *morphTarget)
  *
  */
 const RpMorphTarget *
+// sp-match: _RpMorphTargetCalcBoundingSphere @ 0x001F20C0
 RpMorphTargetCalcBoundingSphere(const RpMorphTarget * morphTarget,
                                 RwSphere * boundingSphere)
 {
@@ -626,6 +631,7 @@ RpMorphTargetCalcBoundingSphere(const RpMorphTarget * morphTarget,
  *
  */
 // match: _RpGeometryAddMorphTargets @ 0x002D7760
+// sp-match: _RpGeometryAddMorphTargets @ 0x001F2200
 RwInt32
 RpGeometryAddMorphTargets(RpGeometry *geometry, RwInt32 mtcount)
 {
@@ -1444,6 +1450,7 @@ RpGeometryGetMaterial(const RpGeometry *geometry, RwInt32 matNum)
  *
  */
 const RpGeometry   *
+// sp-match: _RpGeometryTriangleSetVertexIndices @ 0x001F2390
 RpGeometryTriangleSetVertexIndices(const RpGeometry * geometry,
                                    RpTriangle * triangle,
                                    RwUInt16 vert1, RwUInt16 vert2,
@@ -1496,6 +1503,7 @@ RpGeometryTriangleSetVertexIndices(const RpGeometry * geometry,
  *
  */
 // match: _RpGeometryTriangleSetMaterial @ 0x002D78F0
+// sp-match: _RpGeometryTriangleSetMaterial @ 0x001F23C0
 RpGeometry *
 RpGeometryTriangleSetMaterial(RpGeometry *geometry,
                               RpTriangle *triangle,
@@ -1714,6 +1722,7 @@ RpGeometryGetNumMaterials(const RpGeometry *geometry)
  *
  */
 // match: _RpGeometryForAllMaterials @ 0x002D7950
+// sp-match: _RpGeometryForAllMaterials @ 0x001F2420
 RpGeometry         *
 RpGeometryForAllMaterials(RpGeometry * geometry,
                           RpMaterialCallBack fpCallBack, void *pData)
@@ -1770,6 +1779,7 @@ RpGeometryForAllMaterials(RpGeometry * geometry,
  *
  */
 // match: _RpGeometryLock @ 0x002D79A0
+// sp-match: _RpGeometryLock @ 0x001F2470
 RpGeometry         *
 RpGeometryLock(RpGeometry * geometry, RwInt32 lockMode)
 {
@@ -1830,6 +1840,7 @@ RpGeometryLock(RpGeometry * geometry, RwInt32 lockMode)
  *
  */
 // match: _RpGeometryUnlock @ 0x002D79D0
+// sp-match: _RpGeometryUnlock @ 0x001F24A0
 RpGeometry         *
 RpGeometryUnlock(RpGeometry * geometry)
 {
@@ -2041,6 +2052,7 @@ RpGeometryCSUnLock(RpGeometry *geometry)
  *
  */
 // match: _RpGeometryForAllMeshes @ 0x002D7C00
+// sp-match: _RpGeometryForAllMeshes @ 0x001F26D0
 const RpGeometry   *
 RpGeometryForAllMeshes(const RpGeometry * geometry,
                        RpMeshCallBack fpCallBack, void *pData)
@@ -2136,6 +2148,7 @@ RpGeometryForAllMeshes(const RpGeometry * geometry,
  *
  */
 // match: _RpGeometryCreate @ 0x002D7C30
+// sp-match: _RpGeometryCreate @ 0x001F2700
 RpGeometry *
 RpGeometryCreate(RwInt32 numVerts, RwInt32 numTriangles, RwUInt32 format)
 {
@@ -2330,6 +2343,7 @@ RpGeometryCreate(RwInt32 numVerts, RwInt32 numTriangles, RwUInt32 format)
  * \see RpWorldPluginAttach
  */
 // match: _RpGeometryAddRef @ 0x002D7E50
+// sp-match: _RpGeometryAddRef @ 0x001F2920
 RpGeometry         *
 RpGeometryAddRef(RpGeometry * geometry)
 {
@@ -2371,6 +2385,7 @@ RpGeometryAddRef(RpGeometry * geometry)
  *
  */
 // match: _RpGeometryDestroy @ 0x002D8280
+// sp-match: _RpGeometryDestroy @ 0x001F2D50
 RwBool
 RpGeometryDestroy(RpGeometry * geometry)
 {
@@ -2442,6 +2457,7 @@ RpGeometryDestroy(RpGeometry * geometry)
  *
  */
 // match: _RpGeometryRegisterPlugin @ 0x002D7E60
+// sp-match: _RpGeometryRegisterPlugin @ 0x001F2930
 RwInt32
 RpGeometryRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
                          RwPluginObjectConstructor constructCB,
@@ -2488,6 +2504,7 @@ RpGeometryRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
  *
  */
 // match: _RpGeometryRegisterPluginStream @ 0x002D7E90
+// sp-match: _RpGeometryRegisterPluginStream @ 0x001F2960
 RwInt32
 RpGeometryRegisterPluginStream(RwUInt32 pluginID,
                                RwPluginDataChunkReadCallBack readCB,
@@ -2621,6 +2638,7 @@ RpGeometryValidatePlugins(const RpGeometry * geometry __RWUNUSEDRELEASE__)
 }
 
 // match: _GeometryStreamGetSizeActual @ 0x002D7EC0
+// sp-match: _GeometryStreamGetSizeActual @ 0x001F2990
 static RwInt32
 GeometryStreamGetSizeActual(const RpGeometry *geometry)
 {
@@ -2712,6 +2730,7 @@ GeometryStreamGetSizeActual(const RpGeometry *geometry)
  *
  */
 // match: _RpGeometryStreamGetSize @ 0x002D7F30
+// sp-match: _RpGeometryStreamGetSize @ 0x001F2A00
 RwUInt32
 RpGeometryStreamGetSize(const RpGeometry * geometry)
 {
@@ -2760,6 +2779,7 @@ RpGeometryStreamGetSize(const RpGeometry * geometry)
  *
  */
 // match: _RpGeometryStreamWrite @ 0x002D7F70
+// sp-match: _RpGeometryStreamWrite @ 0x001F2A40
 const RpGeometry   *
 RpGeometryStreamWrite(const RpGeometry * geometry, RwStream * stream)
 {
@@ -3059,6 +3079,7 @@ RpGeometryStreamWrite(const RpGeometry * geometry, RwStream * stream)
  * \see RpWorldPluginAttach
  */
 // match: _RpGeometryStreamRead @ 0x002D82C0
+// sp-match: _RpGeometryStreamRead @ 0x001F2D90
 RpGeometry         *
 RpGeometryStreamRead(RwStream * stream)
 {

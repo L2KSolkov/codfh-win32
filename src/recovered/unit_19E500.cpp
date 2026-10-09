@@ -18,6 +18,12 @@
 #include "types/vec4.h"
 #include "types/type_10F710.h"
 
+#ifdef CODFH_SP
+// Single player's failed shader read reports through the disc-error callback;
+// a successful ReadFile result returns immediately from it.
+void sp_sub_12C410(void *arg_0);
+#endif
+
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003E0620
 extern const RwReal flt_3E0620 = 16.666666f;
@@ -108,6 +114,7 @@ void *dword_4F5A04[11];
 // match: ?flt_42C7D4@@3PAMA @ 0x0042C7D4
 
 // match: ?sub_19E500@@YAXXZ @ 0x0019E500
+// sp-match: ?sub_19E500@@YAXXZ @ 0x0012E330
 
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The matrices set to the identity, the random offsets drawn, and the shader
@@ -130,12 +137,14 @@ void sub_19E500()
 }
 
 // match: ?sub_19E930@@YAXXZ @ 0x0019E930
+// sp-match: ?sub_19E930@@YAXXZ @ 0x0012D7F0
 void sub_19E930()
 {
     D3DDevice_DeleteVertexShader(dword_4F4CF0);
 }
 
 // match: ?sub_19E940@@YAXPAUtype_F2FF0_60@@@Z @ 0x0019E940
+// sp-match: ?sub_19E940@@YAXPAUtype_F2FF0_60@@@Z @ 0x0012D800
 // Frees the system's vertex buffer and vertices.
 void sub_19E940(type_F2FF0_60 *arg_0)
 {
@@ -158,6 +167,7 @@ void sub_19E940(type_F2FF0_60 *arg_0)
 }
 
 // match: ?sub_19E9B0@@YAXPAUtype_19E9B0@@PAURwV3d@@@Z @ 0x0019E9B0
+// sp-match: ?sub_19E9B0@@YAXPAUtype_19E9B0@@PAURwV3d@@@Z @ 0x0012D850
 void sub_19E9B0(type_19E9B0 *arg_0, RwV3d *arg_4)
 {
     arg_0->unk_10.x = arg_4->x;
@@ -166,6 +176,7 @@ void sub_19E9B0(type_19E9B0 *arg_0, RwV3d *arg_4)
 }
 
 // match: ?sub_19E9E0@@YAXPAUtype_19E9B0@@PAURwV3d@@@Z @ 0x0019E9E0
+// sp-match: ?sub_19E9E0@@YAXPAUtype_19E9B0@@PAURwV3d@@@Z @ 0x0012D870
 void sub_19E9E0(type_19E9B0 *arg_0, RwV3d *arg_4)
 {
     arg_0->unk_20.x = arg_4->x;
@@ -174,6 +185,7 @@ void sub_19E9E0(type_19E9B0 *arg_0, RwV3d *arg_4)
 }
 
 // match: ?sub_19EA10@@YAXXZ @ 0x0019EA10
+// sp-match: ?sub_19EA10@@YAXXZ @ 0x0012D890
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Turns the three sets of matrices about z by the frame's time.
 void sub_19EA10()
@@ -192,7 +204,12 @@ void sub_19EA10()
     var_C.x = 0;
     var_C.y = 0;
     var_C.z = 1.0f;
+#ifdef CODFH_SP // shape: SP 0x12D8AB scales by 0.001 as its own step, so nothing folds
+    var_20 = deltaTime * flt_3E0620;
+    var_20 = var_20 * 0.001f;
+#else
     var_20 = deltaTime * flt_3E0620 / 1000.0f;
+#endif
     m_18 = 2.0f;
     var_20 = var_20 * m_18;
     ebp_14 = ebp_14 * var_20;
@@ -207,6 +224,7 @@ void sub_19EA10()
 }
 
 // match: ?sub_19EB20@@YAXPAURwCamera@@@Z @ 0x0019EB20
+// sp-match: ?sub_19EB20@@YAXPAURwCamera@@@Z @ 0x0012E4E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Keeps the camera and its frame's matrix (its flags and padding cleared).
 void sub_19EB20(RwCamera *arg_0)
@@ -214,18 +232,32 @@ void sub_19EB20(RwCamera *arg_0)
     RwMatrix *var_8;
     RwMatrix *l4;
 
+#ifndef CODFH_SP
     dword_4F5A00 = arg_0;
+#endif
     var_8 = RwFrameGetMatrix(RwCameraGetFrame(arg_0));
     dword_4F4D00 = *var_8;
+#ifdef CODFH_SP
+    // shape: the camera kept after the matrix copy (SP 0x12E4F9).
+    dword_4F5A00 = arg_0;
+#endif
     l4 = &dword_4F4D00;
+#ifdef CODFH_SP
+    // shape: the four words as floats, so no zero register (SP 0x12E4FE).
+    *(RwReal *)&l4->flags = 0.0f;
+    *(RwReal *)&l4->pad1 = 0.0f;
+    *(RwReal *)&l4->pad2 = 0.0f;
+#else
     l4->flags = 0;
     l4->pad1 = 0;
     l4->pad2 = 0;
+#endif
     *(RwReal *)&l4->pad3 = 1.0f;
     sub_19FB20();
 }
 
 // match: ?sub_19EB90@@YAXXZ @ 0x0019EB90
+// sp-match: ?sub_19EB90@@YAXXZ @ 0x0012D990
 // Puts back the render states the particles changed, and no shader.
 void sub_19EB90()
 {
@@ -244,6 +276,7 @@ void sub_19EB90()
 }
 
 // match: ?sub_19EC70@@YAPAUtype_F2FF0_60@@PAU1@PAURwMatrixTag@@PAUtype_F3130@@_N@Z @ 0x0019EC70
+// sp-match: ?sub_19EC70@@YAPAUtype_F2FF0_60@@PAU1@PAURwMatrixTag@@PAUtype_F3130@@_N@Z @ 0x0012E9E0
 // Fills a sprite system's shader state from its definition and the matrix
 // it starts at; returns it.
 type_F2FF0_60 *sub_19EC70(type_F2FF0_60 *arg_0, RwMatrix *arg_4, type_F3130 *arg_8, bool arg_C)
@@ -372,18 +405,29 @@ type_F2FF0_60 *sub_19EC70(type_F2FF0_60 *arg_0, RwMatrix *arg_4, type_F3130 *arg
 }
 
 // match: ?sub_19F540@@YAXPAM@Z @ 0x0019F540
+// sp-match: ?sub_19F540@@YAXPAM@Z @ 0x0012DA40
 // Scales the colour arg_0 by the ambient colour.
 void sub_19F540(RwReal *arg_0)
 {
     RwRGBA var_4;
 
     var_4 = stru_4CF768;
+#ifdef CODFH_SP
+    // shape: the red product as its own step, so its scaling is scheduled
+    // before the blue byte's shift (SP 0x12DA67).
+    {
+        RwReal r = var_4.red * arg_0[0];
+        arg_0[0] = r / 256.0f;
+    }
+#else
     arg_0[0] = var_4.red * arg_0[0] / 256.0f;
+#endif
     arg_0[1] = var_4.green * arg_0[1] / 256.0f;
     arg_0[2] = var_4.blue * arg_0[2] / 256.0f;
 }
 
 // match: ?sub_19F5B0@@YAXPAUtype_F2FF0_60@@@Z @ 0x0019F5B0
+// sp-match: ?sub_19F5B0@@YAXPAUtype_F2FF0_60@@@Z @ 0x0012E530
 // Brightens the three colours.
 void sub_19F5B0(type_F2FF0_60 *arg_0)
 {
@@ -396,6 +440,7 @@ void sub_19F5B0(type_F2FF0_60 *arg_0)
 }
 
 // match: ?sub_19F600@@YAXPAM@Z @ 0x0019F600
+// sp-match: ?sub_19F600@@YAXPAM@Z @ 0x0012DAA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Brightens a colour 3.2 times, what goes past 255 in its channels going
 // into its alpha (2.2 times and more), all kept at 255.
@@ -438,6 +483,7 @@ void sub_19F600(RwReal *arg_0)
 }
 
 // match: ?sub_19F740@@YAXPAUtype_F2FF0_60@@PAUtype_F2FF0@@PAUtype_F3130@@I@Z @ 0x0019F740
+// sp-match: ?sub_19F740@@YAXPAUtype_F2FF0_60@@PAUtype_F2FF0@@PAUtype_F3130@@I@Z @ 0x0012EFC0
 // Draws a sprite system's particles with its definition's unk_A4 (0 if
 // negative).
 void sub_19F740(type_F2FF0_60 *arg_0, type_F2FF0 *arg_4, type_F3130 *arg_8, RwUInt32 arg_C)
@@ -449,6 +495,7 @@ void sub_19F740(type_F2FF0_60 *arg_0, type_F2FF0 *arg_4, type_F3130 *arg_8, RwUI
 }
 
 // match: ?sub_19F790@@YAXPBDPAK1@Z @ 0x0019F790
+// sp-match: ?sub_19F790@@YAXPBDPAK1@Z @ 0x0012DB90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Loads the vertex shader file arg_0 with the declaration arg_4 into arg_8.
 void sub_19F790(const RwChar *arg_0, DWORD *arg_4, DWORD *arg_8)
@@ -464,13 +511,18 @@ void sub_19F790(const RwChar *arg_0, DWORD *arg_4, DWORD *arg_8)
     bp_4 = RWSMalloc(bp_8 + 4, 0x34250); // not an address: a memory hint
     memset(bp_4, 0, bp_8 + 4);
     lv_10 = ReadFile(var_C, bp_4, bp_8, &var_14, 0);
+#ifdef CODFH_SP
+    sp_sub_12C410((void *)lv_10);
+#else
     sub_19A750(lv_10);
+#endif
     D3DDevice_CreateVertexShader(arg_4, (DWORD *)bp_4, arg_8, 0);
     CloseHandle(var_C);
     operator delete(bp_4);
 }
 
 // match: ?sub_19F840@@YAXPAUtype_19EC70@@@Z @ 0x0019F840
+// sp-match: ?sub_19F840@@YAXPAUtype_19EC70@@@Z @ 0x0012DC20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Builds the vertex buffer: as many particles as live at once (at most
 // unk_00), four corners each, their ages staggered by unk_74, their index
@@ -529,6 +581,7 @@ void sub_19F840(type_19EC70 *arg_0)
 }
 
 // match: ?sub_19FB20@@YAXXZ @ 0x0019FB20
+// sp-match: ?sub_19FB20@@YAXXZ @ 0x0012DD50
 // Sets up a frame's particle drawing: the clip planes, the view matrix and
 // three projections (with the near plane, 160 and 1), the corner and axis
 // shader constants, the render states (the old ones saved), the shaders and
@@ -551,12 +604,12 @@ void sub_19FB20()
     var_54 = &var_50.pos;
     RwV3dNormalize(&var_60, &var_50.up);
     RwV3dNormalize(&var_6C, &var_50.at);
-    var_78.x = var_6C.x * 100.0f + var_54->x;
+    var_78.x = (var_6C.x * 100.0f) + var_54->x;
     var_78.y = var_6C.y * 100.0f + var_54->y;
     var_78.z = var_6C.z * 100.0f + var_54->z;
     D3DXMatrixLookAtRH((D3DXMATRIX *)&stru_4F59C0, (D3DXVECTOR3 *)var_54, (D3DXVECTOR3 *)&var_78, (D3DXVECTOR3 *)&var_60);
     var_7C = &((RwCamera *)dword_4E5C74)->viewWindow;
-    flt_42C788 = ((0.7002f - var_7C->x) / 0.60684f * 0.12f + 1.38f) * var_7C->x;
+    flt_42C788 = (((0.7002f - var_7C->x) / 0.60684f) * 0.12f + 1.38f) * var_7C->x;
     D3DXMatrixPerspectiveFovRH((D3DXMATRIX *)&stru_4F5980, flt_42C788, flt_42C78C, nearClip, flt_42C784);
     D3DXMatrixPerspectiveFovRH((D3DXMATRIX *)&stru_4F4D40, flt_42C788, flt_42C78C, 160.0f, flt_42C784);
     D3DXMatrixPerspectiveFovRH((D3DXMATRIX *)&stru_4F4CB0, flt_42C788, flt_42C78C, 1.0f, flt_42C784);
@@ -637,6 +690,7 @@ void sub_19FB20()
 }
 
 // match: ?sub_1A0830@@YAHPAUtype_19EC70@@IPAUtype_F2FF0@@@Z @ 0x001A0830
+// sp-match: ?sub_1A0830@@YAHPAUtype_19EC70@@IPAUtype_F2FF0@@@Z @ 0x0012E260
 // Whether a system draws in its own frame.
 RwInt32 sub_1A0830(type_19EC70 *arg_0, RwUInt32 arg_4, type_F2FF0 *arg_8)
 {
@@ -648,6 +702,7 @@ RwInt32 sub_1A0830(type_19EC70 *arg_0, RwUInt32 arg_4, type_F2FF0 *arg_8)
 }
 
 // match: ?sub_1A0860@@YAXPAUtype_19EC70@@PAUtype_F2FF0@@HI@Z @ 0x001A0860
+// sp-match: ?sub_1A0860@@YAXPAUtype_19EC70@@PAUtype_F2FF0@@HI@Z @ 0x0012E560
 // Draws a sprite system's particles: the shader's constants (the transform,
 // the three colours, the times, the terms, the spin set arg_8 and the
 // camera's axes) and the quads, multisampled.
@@ -778,6 +833,7 @@ void sub_1A0860(type_19EC70 *arg_0, type_F2FF0 *arg_4, RwInt32 arg_8, RwUInt32 a
 }
 
 // match: ?sub_1A15C0@@YAXPAUtype_19EC70@@PAH1@Z @ 0x001A15C0
+// sp-match: ?sub_1A15C0@@YAXPAUtype_19EC70@@PAH1@Z @ 0x0012E280
 // The live particles' quads: while the system still emits (or until its
 // emission time passes), the first ones up to the most alive so far (unk_D0);
 // after it, the ones not yet expired.
@@ -790,7 +846,11 @@ void sub_1A15C0(type_19EC70 *arg_0, RwInt32 *arg_4, RwInt32 *arg_8)
     *arg_4 = (RwInt32)(var_4 / arg_0->unk_74) + 1;
     if (*arg_4 > arg_0->unk_00)
         *arg_4 = arg_0->unk_00;
+#ifdef CODFH_SP // shape: SP 0x12E2BE loads the field after the zero
+    if (arg_0->unk_30[3] != 0.0f || arg_0->unk_70 <= arg_0->unk_78)
+#else
     if (0.0f != arg_0->unk_30[3] || arg_0->unk_70 <= arg_0->unk_78)
+#endif
     {
         if (*arg_4 > arg_0->unk_D0)
             arg_0->unk_D0 = *arg_4;

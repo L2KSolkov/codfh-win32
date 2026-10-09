@@ -28,6 +28,9 @@
 // match: ?GetNameToPtrMap@?A0x9c13616b@@YAAAV?$map@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@@std@@XZ @ 0x0012BC90
 // match: __ehhandler$?GetNameToPtrMap@?A0x9c13616b@@YAAAV?$map@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@@std@@XZ-0xE @ 0x00301620
 // match: __ehhandler$?GetNameToPtrMap@?A0x9c13616b@@YAAAV?$map@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@@std@@XZ @ 0x0030162E
+// sp-match: ?GetNameToPtrMap@?A0x9c13616b@@YAAAV?$map@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@@std@@XZ @ 0x000DFB30
+// The name map's comparison, which single player calls out of line (MP expands it):
+// sp-match: ??Rcstrless@?A0x9c13616b@@QBE_NPBD0@Z @ 0x000DF2C0
 
 namespace
 {
@@ -39,6 +42,7 @@ namespace
 }
 
 // match: ?GetRegisteredClassSize@CClassFactory@RWS@@YAIPBD@Z @ 0x0012BD20
+// sp-match: ?GetRegisteredClassSize@CClassFactory@RWS@@YAIPBD@Z @ 0x000DFBC0
 size_t RWS::CClassFactory::GetRegisteredClassSize(const RwChar* pClassName)
       {
          NameToPtrMap::iterator foundIt = GetNameToPtrMap().find(pClassName);
@@ -52,6 +56,7 @@ size_t RWS::CClassFactory::GetRegisteredClassSize(const RwChar* pClassName)
       }
 
 // match: ?RegisterClass@CClassFactory@RWS@@YAXPBDP6APAVCAttributeHandler@2@ABVCAttributePacket@2@@ZIH@Z @ 0x0012BDA0
+// sp-match: ?RegisterClass@CClassFactory@RWS@@YAXPBDP6APAVCAttributeHandler@2@ABVCAttributePacket@2@@ZIH@Z @ 0x000DFC00
 void RWS::CClassFactory::RegisterClass(const RwChar* pClassName, MakeNewPtr makeNewFn, size_t size, RwBool UseLinearMemoryManager)
       {
          SClassInfo* pClassInfo = (SClassInfo *)new(SClassInfo);
@@ -71,6 +76,7 @@ void RWS::CClassFactory::RegisterClass(const RwChar* pClassName, MakeNewPtr make
       }
 
 // match: ?MakeNew@CClassFactory@RWS@@YAPAVCAttributeHandler@2@PBDABVCAttributePacket@2@@Z @ 0x0012BE50
+// sp-match: ?MakeNew@CClassFactory@RWS@@YAPAVCAttributeHandler@2@PBDABVCAttributePacket@2@@Z @ 0x000DFC60
 RWS::CAttributeHandler *RWS::CClassFactory::MakeNew(const RwChar* pClassName, const CAttributePacket& rAttr)
       {
          NameToPtrMap::iterator foundIt = GetNameToPtrMap().find(pClassName);
@@ -93,12 +99,14 @@ RWS::CAttributeHandler *RWS::CClassFactory::MakeNew(const RwChar* pClassName, co
       }
 
 // match: ??0CRegistrar@CClassFactory@RWS@@QAE@PBDP6APAVCAttributeHandler@2@ABVCAttributePacket@2@@ZIH@Z @ 0x0012BEF0
+// sp-match: ??0CRegistrar@CClassFactory@RWS@@QAE@PBDP6APAVCAttributeHandler@2@ABVCAttributePacket@2@@ZIH@Z @ 0x000DFCC0
 RWS::CClassFactory::CRegistrar::CRegistrar(const RwChar* pClassName, MakeNewPtr makeNewFn, size_t size, RwBool UseLinearMemoryManager)
       {
          RegisterClass(pClassName, makeNewFn, size, UseLinearMemoryManager);
       }
 
 // match: ??1CRegistrar@CClassFactory@RWS@@QAE@XZ @ 0x0012BF20
+// sp-match: ??1CRegistrar@CClassFactory@RWS@@QAE@XZ @ 0x000DFCF0
 RWS::CClassFactory::CRegistrar::~CRegistrar()
       {
          NameToPtrMap::iterator it = GetNameToPtrMap().begin();
@@ -135,3 +143,13 @@ RWS::CClassFactory::CRegistrar::~CRegistrar()
 // match: ?_Buynode@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@IAEPAU_Node@?$_Tree_nod@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@2@XZ @ 0x0012CEC0
 // match: __ehhandler$?_Buynode@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@IAEPAU_Node@?$_Tree_nod@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@2@XZ @ 0x00301690
 // match: ?_Dec@const_iterator@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@QAEXXZ @ 0x0012CFE0
+// sp-match: ?_Dec@const_iterator@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@QAEXXZ @ 0x000E1C80
+// sp-match: ?insert@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@QAE?AU?$pair@Viterator@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@_N@2@ABU?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@2@@Z @ 0x000DFA00
+// sp-match: ?find@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@QAE?AViterator@12@ABQBD@Z @ 0x000DF470
+// sp-match: ?_Lbound@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@IBEPAU_Node@?$_Tree_nod@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@2@ABQBD@Z @ 0x000DF320
+// sp-match: ?_Buynode@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@IAEPAU_Node@?$_Tree_nod@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@2@XZ @ 0x000DF430
+// sp-match: ?_Buynode@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@IAEPAU_Node@?$_Tree_nod@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@2@PAU342@00ABU?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@2@D@Z @ 0x000E1DA0
+// sp-match: ?_Erase@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@IAEXPAU_Node@?$_Tree_nod@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@2@@Z @ 0x000DF3F0
+// sp-match: ?erase@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@QAE?AViterator@12@V312@0@Z @ 0x000DF940
+// sp-match: ?erase@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@QAE?AViterator@12@V312@@Z @ 0x000DF4D0
+// sp-match: ?_Insert@?$_Tree@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@std@@IAE?AViterator@12@_NPAU_Node@?$_Tree_nod@V?$_Tmap_traits@PBDPAUSClassInfo@?A0x9c13616b@@Ucstrless@2@V?$allocator@U?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@std@@@std@@$0A@@std@@@2@ABU?$pair@QBDPAUSClassInfo@?A0x9c13616b@@@2@@Z @ 0x000DF790

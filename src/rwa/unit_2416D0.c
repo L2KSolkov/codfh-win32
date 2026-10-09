@@ -21,6 +21,7 @@ extern RwInt32 _InterlockedExchange(RwInt32 volatile *target, RwInt32 value);
 #pragma intrinsic(_InterlockedExchange)
 
 // match: _sub_2416D0 @ 0x002416D0
+// sp-match: _sub_2416D0 @ 0x00155810
 void **
 sub_2416D0(void **semaphore, RwInt32 initial, RwInt32 maximum)
 {
@@ -30,6 +31,7 @@ sub_2416D0(void **semaphore, RwInt32 initial, RwInt32 maximum)
 }
 
 // match: _sub_2416F0 @ 0x002416F0
+// sp-match: _sub_2416F0 @ 0x00155830
 RwBool
 sub_2416F0(void **semaphore)
 {
@@ -44,6 +46,7 @@ sub_2416F0(void **semaphore)
 }
 
 // match: __RwaThreadCreate @ 0x00241710
+// sp-match: __RwaThreadCreate @ 0x00155850
 rwaThread *
 _RwaThreadCreate(rwaThread *thread, void **(*func)(void *data), RwInt32 priority,
                  RwUInt32 stackSize)
@@ -58,6 +61,7 @@ _RwaThreadCreate(rwaThread *thread, void **(*func)(void *data), RwInt32 priority
 }
 
 // match: _sub_241740 @ 0x00241740
+// sp-match: _sub_241740 @ 0x00155880
 void
 sub_241740(rwaThread *thread)
 {
@@ -71,6 +75,7 @@ sub_241740(rwaThread *thread)
 }
 
 // match: _sub_241770 @ 0x00241770
+// sp-match: _sub_241770 @ 0x001558B0
 rwaThread *
 sub_241770(rwaThread *thread, void *data)
 {
@@ -92,6 +97,7 @@ sub_241770(rwaThread *thread, void *data)
 }
 
 // match: _sub_2417B0 @ 0x002417B0
+// sp-match: _sub_2417B0 @ 0x001558F0
 RwUInt32 *
 sub_2417B0(RwUInt32 *target, RwUInt32 value)
 {

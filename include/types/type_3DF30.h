@@ -62,7 +62,11 @@ struct type_3DF30
     // Drops the object with handle arg_0 unless unk_2C0 keeps its kind; the
     // entities it had go to the first object that takes them on (sub_3D150
     // passes those whose update test fails). Stays binary (docs/units.md).
+#ifdef CODFH_SP // single player passes the handle struct (SP 0x2E80D, 0x2F78F)
+    void sub_3E3B0(type_365A0 arg_0);
+#else
     void sub_3E3B0(RwUInt32 arg_0);
+#endif
     // Calls arg_4 with each member entity and arg_C, for the members whose
     // object ranks below arg_0's (by vf_02C) or who have none, with
     // AIData::unk_51C set, a unk_2C bit in arg_8 and flag 4 of

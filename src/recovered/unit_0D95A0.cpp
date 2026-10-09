@@ -62,6 +62,7 @@ bool byte_42929C = true;
 
 
 // match: ?sub_D95A0@@YAXXZ @ 0x000D95A0
+// sp-match: ?sub_D95A0@@YAXXZ @ 0x000A4440
 void sub_D95A0()
 {
     deltaTime = 1.0f;
@@ -77,11 +78,13 @@ void sub_D95A0()
     byte_42929C = true;
 }
 // match: ?sub_D9610@@YAXXZ @ 0x000D9610
+// sp-match: ?sub_D9610@@YAXXZ @ 0x000A44A0
 void sub_D9610()
 {
     sub_D95A0();
 }
 // match: ?sub_D9620@@YAXXZ @ 0x000D9620
+// sp-match: ?sub_D9620@@YAXXZ @ 0x000A44B0
 void sub_D9620()
 {
     if (!dword_4B87CC && !dword_4B87D0)
@@ -182,6 +185,7 @@ void sub_D9620()
     dword_4B87CC = RWS::Time::GetTime();
 }
 // match: ?sub_D98D0@@YAXMM@Z @ 0x000D98D0
+// sp-match: ?sub_D98D0@@YAXMM@Z @ 0x000A46D0
 void sub_D98D0(RwReal arg_0, RwReal arg_4)
 {
     if (dword_4B87DC != 3 && dword_4B87DC != 4)
@@ -205,6 +209,7 @@ void sub_D98D0(RwReal arg_0, RwReal arg_4)
     }
 }
 // match: ?sub_D9950@@YAHXZ @ 0x000D9950
+// sp-match: ?sub_D9950@@YAHXZ @ 0x000A4710
 RwInt32 sub_D9950()
 {
     RwInt32 var_4;
@@ -223,6 +228,7 @@ RwInt32 sub_D9950()
     return var_4;
 }
 // match: ?sub_D99B0@@YAXXZ @ 0x000D99B0
+// sp-match: ?sub_D99B0@@YAXXZ @ 0x000A4770
 void sub_D99B0()
 {
     if (sub_D6640())
@@ -231,6 +237,7 @@ void sub_D99B0()
         sub_D6EB0();
     }
 }
+#ifndef CODFH_SP // MP only: multiplayer's game-loop exit (single player's loop, SP 0xA4930, never leaves); no twin in config/sp/shared.txt
 // match: ?sub_D99D0@@YAXXZ @ 0x000D99D0
 void sub_D99D0()
 {
@@ -238,3 +245,4 @@ void sub_D99D0()
     sub_19D2D0();
     sub_19A750();
 }
+#endif

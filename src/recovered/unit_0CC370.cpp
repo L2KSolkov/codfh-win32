@@ -34,9 +34,11 @@ RWS_REGISTERCLASS(FogTrigger);
 // match: ?MakeNew@FogTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000CC370
 // match: __ehhandler$?MakeNew@FogTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300BA0
 // match: __ehhandler$?MakeNew@FogTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00300BAF
+// sp-match: ?MakeNew@FogTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0009B220
 RWS_DEFINE_MAKENEW(FogTrigger)
 
 // match: ??0FogTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000CC3F0
+// sp-match: ??0FogTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0009B070
 FogTrigger::FogTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_C0 = 0;
@@ -47,15 +49,19 @@ FogTrigger::FogTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 }
 
 // match: ?vf_008@FogTrigger@@UAEHXZ @ 0x000CC460
+// sp-match: ?vf_008@FogTrigger@@UAEHXZ @ 0x00124460
 
 // match: ??_GFogTrigger@@UAEPAXI@Z @ 0x000CC470
+// sp-match: ??_GFogTrigger@@UAEPAXI@Z @ 0x0009B210
 
 // match: ??1FogTrigger@@UAE@XZ @ 0x000CC490
+// sp-match: ??1FogTrigger@@UAE@XZ @ 0x0009B0C0
 FogTrigger::~FogTrigger()
 {
 }
 
 // match: ?HandleAttributes@FogTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000CC4C0
+// sp-match: ?HandleAttributes@FogTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0009B0E0
 void FogTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -82,6 +88,7 @@ void FogTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?sub_CC5D0@FogTrigger@@QAEXH@Z @ 0x000CC5D0
+// sp-match: ?sub_CC5D0@FogTrigger@@QAEXH@Z @ 0x0009B1B0
 void FogTrigger::sub_CC5D0(RwInt32 arg_0)
 {
     unk_C0 = 1;
@@ -90,6 +97,7 @@ void FogTrigger::sub_CC5D0(RwInt32 arg_0)
 }
 
 // match: ??_EFogTrigger@@WBI@AEPAXI@Z @ 0x000CC640
+// sp-match: ??_EFogTrigger@@WBI@AEPAXI@Z @ 0x0009B200
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

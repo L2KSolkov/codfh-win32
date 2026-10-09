@@ -122,7 +122,11 @@ struct type_776F0
     RwUInt32 unk_00;
     RwInt32 unk_04;
     RwInt32 unk_08;
+#ifdef CODFH_SP // 0x100 in single player (SP 0xEE7C0: frame 0x110 with its /GS cookie)
+    RwChar unk_0C[0x100];
+#else
     RwChar unk_0C[0x104];
+#endif
 };
 
 extern RwUInt32 dword_449C90;       // the banks' count
@@ -219,7 +223,13 @@ struct type_449CA0
     };
     void *unk_08;               // the player
 };
-extern type_449CA0 dword_449CA0[0xB3];
+// Its entry count, named for the table.
+#ifdef CODFH_SP // 0xA1 in single player (SP 0x63160 clears 0x1E3 dwords; its loops end at 0x346538)
+enum { dword_449CA0_count = 0xA1 };
+#else
+enum { dword_449CA0_count = 0xB3 };
+#endif
+extern type_449CA0 dword_449CA0[dword_449CA0_count];
 // The next handle serial (0x428C0C): the image keeps it in dword_428BEC's last
 // entry's third field (the code indexes dword_428BEC in 12-byte steps, so the
 // table spans it); named here for what it holds.

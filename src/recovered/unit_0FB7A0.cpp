@@ -10,6 +10,7 @@
 #include "game/functions.h"
 #include "types/type_3D3548.h"
 #include "types/type_3D96F0.h"
+#if !defined(CODFH_SP) || CODFH_SP_PART == 1 // single player: src/sp/units/sp_unit_0FB7A0_1.cpp
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D96EC
@@ -27,6 +28,7 @@ RwInt32 dword_4C1938;
 // 0x004C193C
 RwInt32 dword_4C193C;
 // End of its data definitions.
+#endif // (the declarations below serve every part)
 
 
 // The plugins' offsets.
@@ -72,6 +74,7 @@ RwInt32 sub_19A930(RwInt32 arg_0, RwInt32 arg_4);
 void sub_19A8A0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8);
 
 // Its data (PLAN M5): literals, constants and tables where the image has them.
+#if !defined(CODFH_SP) || CODFH_SP_PART == 1
 // match: ?flt_3D96EC@@3MB @ 0x003D96EC
 // match: ??_7type_3D96F0@@6B@ @ 0x003D96F0
 // match: ??_7type_3D96FC@@6B@ @ 0x003D96FC
@@ -79,6 +82,7 @@ void sub_19A8A0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8);
 // match: ??_7type_3D9718@@6B@ @ 0x003D9718
 
 // match: ?sub_FB7A0@@YAPAUtype_3D96F0@@PAX@Z @ 0x000FB7A0
+// sp-match: ?sub_FB7A0@@YAPAUtype_3D96F0@@PAX@Z @ 0x000BF040
 
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_3D96F0 *sub_FB7A0(void *arg_0)
@@ -94,6 +98,7 @@ type_3D96F0 *sub_FB7A0(void *arg_0)
 void *sub_FB880(void *arg_0, RwInt32 arg_4, RwInt32 arg_8);
 void *sub_FB800(void *arg_0, RwInt32 arg_4, RwInt32 arg_8);
 // match: ?sub_FB7C0@@YAHXZ @ 0x000FB7C0
+// sp-match: ?sub_FB7C0@@YAHXZ @ 0x000BF180
 RwInt32 sub_FB7C0()
 {
     dword_4C1928 = RpAtomicRegisterPlugin(0x1C, 0x42B0, sub_FB800, sub_FB880,
@@ -102,6 +107,7 @@ RwInt32 sub_FB7C0()
 }
 
 // match: ?sub_FB800@@YAPAXPAXHH@Z @ 0x000FB800
+// sp-match: ?sub_FB800@@YAPAXPAXHH@Z @ 0x000BF050
 void *sub_FB800(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_3D96F0 *var_4 = sub_FB7A0(arg_0);
@@ -112,6 +118,7 @@ void *sub_FB800(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_FB880@@YAPAXPAXHH@Z @ 0x000FB880
+// sp-match: ?sub_FB880@@YAPAXPAXHH@Z @ 0x000BF150
 void *sub_FB880(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_3D96F0 *var_4 = sub_FB7A0(arg_0);
@@ -122,12 +129,14 @@ void *sub_FB880(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ??1type_3D96F0@@QAE@XZ @ 0x000FB8F0
+// sp-match: ??1type_3D96F0@@QAE@XZ @ 0x000BF800
 type_3D96F0::~type_3D96F0()
 {
 }
 
 // Sets the atomic's entity (none for 0), the handle copied in.
 // match: ?sub_FB910@@YAXPAURpAtomic@@PAUtype_3D3548@@@Z @ 0x000FB910
+// sp-match: ?sub_FB910@@YAXPAURpAtomic@@PAUtype_3D3548@@@Z @ 0x000BF0A0
 void sub_FB910(RpAtomic *arg_0, type_3D3548 *arg_4)
 {
     type_3D96F0 *var_4 = sub_FB7A0(arg_0);
@@ -145,6 +154,7 @@ void sub_FB910(RpAtomic *arg_0, type_3D3548 *arg_4)
 }
 
 // match: ?sub_FB960@@YAPAUtype_3D3548@@PAURpAtomic@@@Z @ 0x000FB960
+// sp-match: ?sub_FB960@@YAPAUtype_3D3548@@PAURpAtomic@@@Z @ 0x000BF0D0
 type_3D3548 *sub_FB960(RpAtomic *arg_0)
 {
     type_3D96F0 *var_4 = sub_FB7A0(arg_0);
@@ -157,6 +167,7 @@ type_3D3548 *sub_FB960(RpAtomic *arg_0)
 }
 
 // match: ?sub_FB990@@YAXPAURpAtomic@@H@Z @ 0x000FB990
+// sp-match: ?sub_FB990@@YAXPAURpAtomic@@H@Z @ 0x000BF0F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_FB990(RpAtomic *arg_0, RwInt32 arg_4)
 {
@@ -169,6 +180,7 @@ void sub_FB990(RpAtomic *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_FB9C0@@YAHPAURpAtomic@@@Z @ 0x000FB9C0
+// sp-match: ?sub_FB9C0@@YAHPAURpAtomic@@@Z @ 0x000BF110
 RwInt32 sub_FB9C0(RpAtomic *arg_0)
 {
     type_3D96F0_04 bp_8;
@@ -180,6 +192,7 @@ RwInt32 sub_FB9C0(RpAtomic *arg_0)
 }
 
 // match: ?sub_FB9F0@@YAXPAURpAtomic@@H@Z @ 0x000FB9F0
+// sp-match: ?sub_FB9F0@@YAXPAURpAtomic@@H@Z @ 0x000BF130
 void sub_FB9F0(RpAtomic *arg_0, RwInt32 arg_4)
 {
     type_3D96F0 *var_4 = sub_FB7A0(arg_0);
@@ -188,6 +201,7 @@ void sub_FB9F0(RpAtomic *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_FBA10@@YAPAUtype_3D96F0@@PAX@Z @ 0x000FBA10
+// sp-match: ?sub_FBA10@@YAPAUtype_3D96F0@@PAX@Z @ 0x000BF1B0
 type_3D96F0 *sub_FBA10(void *arg_0)
 {
     void *bp_8;
@@ -202,6 +216,7 @@ void *sub_FBA70(void *, RwInt32, RwInt32);
 void *sub_FBAF0(void *, RwInt32, RwInt32);
 
 // match: ?sub_FBA30@@YAHXZ @ 0x000FBA30
+// sp-match: ?sub_FBA30@@YAHXZ @ 0x000BF2C0
 RwInt32 sub_FBA30()
 {
     dword_4C192C = RpClumpRegisterPlugin(0x1C, 0x42B1, sub_FBA70, sub_FBAF0,
@@ -210,6 +225,7 @@ RwInt32 sub_FBA30()
 }
 
 // match: ?sub_FBA70@@YAPAXPAXHH@Z @ 0x000FBA70
+// sp-match: ?sub_FBA70@@YAPAXPAXHH@Z @ 0x000BF1C0
 void *sub_FBA70(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_3D96F0 *var_4 = sub_FBA10(arg_0);
@@ -220,6 +236,7 @@ void *sub_FBA70(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_FBAF0@@YAPAXPAXHH@Z @ 0x000FBAF0
+// sp-match: ?sub_FBAF0@@YAPAXPAXHH@Z @ 0x000BF290
 void *sub_FBAF0(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_3D96F0 *var_4 = sub_FBA10(arg_0);
@@ -231,6 +248,7 @@ void *sub_FBAF0(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 
 // Likewise for a clump.
 // match: ?sub_FBB60@@YAXPAURpClump@@PAUtype_3D3548@@@Z @ 0x000FBB60
+// sp-match: ?sub_FBB60@@YAXPAURpClump@@PAUtype_3D3548@@@Z @ 0x000BF200
 void sub_FBB60(RpClump *arg_0, type_3D3548 *arg_4)
 {
     type_3D96F0 *var_4 = sub_FBA10(arg_0);
@@ -248,6 +266,7 @@ void sub_FBB60(RpClump *arg_0, type_3D3548 *arg_4)
 }
 
 // match: ?sub_FBBB0@@YAPAUtype_3D3548@@PAURpClump@@@Z @ 0x000FBBB0
+// sp-match: ?sub_FBBB0@@YAPAUtype_3D3548@@PAURpClump@@@Z @ 0x000BF230
 type_3D3548 *sub_FBBB0(RpClump *arg_0)
 {
     type_3D96F0 *var_4 = sub_FBA10(arg_0);
@@ -256,6 +275,7 @@ type_3D3548 *sub_FBBB0(RpClump *arg_0)
 }
 
 // match: ?sub_FBBE0@@YAXPAURpClump@@H@Z @ 0x000FBBE0
+// sp-match: ?sub_FBBE0@@YAXPAURpClump@@H@Z @ 0x000BF250
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_FBBE0(RpClump *arg_0, RwInt32 arg_4)
 {
@@ -268,6 +288,7 @@ void sub_FBBE0(RpClump *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_FBC10@@YAXPAURpClump@@PAX@Z @ 0x000FBC10
+// sp-match: ?sub_FBC10@@YAXPAURpClump@@PAX@Z @ 0x000BF270
 void sub_FBC10(RpClump *arg_0, void *arg_4)
 {
     type_3D96F0 *var_4 = sub_FBA10(arg_0);
@@ -276,6 +297,7 @@ void sub_FBC10(RpClump *arg_0, void *arg_4)
 }
 
 // match: ?sub_FBC30@@YAPAUtype_3D96F0@@PAURwFrame@@@Z @ 0x000FBC30
+// sp-match: ?sub_FBC30@@YAPAUtype_3D96F0@@PAURwFrame@@@Z @ 0x000BF2F0
 type_3D96F0 *sub_FBC30(RwFrame *arg_0)
 {
     void *bp_8;
@@ -290,6 +312,7 @@ void *sub_FBC90(void *, RwInt32, RwInt32);
 void *sub_FBD10(void *, RwInt32, RwInt32);
 
 // match: ?sub_FBC50@@YAHXZ @ 0x000FBC50
+// sp-match: ?sub_FBC50@@YAHXZ @ 0x000BF3A0
 RwInt32 sub_FBC50()
 {
     dword_4C1930 = RwFrameRegisterPlugin(0x1C, 0x42B2, sub_FBC90, sub_FBD10,
@@ -298,6 +321,7 @@ RwInt32 sub_FBC50()
 }
 
 // match: ?sub_FBC90@@YAPAXPAXHH@Z @ 0x000FBC90
+// sp-match: ?sub_FBC90@@YAPAXPAXHH@Z @ 0x000BF300
 void *sub_FBC90(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_3D96F0 *var_4 = sub_FBC30((RwFrame *)arg_0);
@@ -308,6 +332,7 @@ void *sub_FBC90(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_FBD10@@YAPAXPAXHH@Z @ 0x000FBD10
+// sp-match: ?sub_FBD10@@YAPAXPAXHH@Z @ 0x000BF370
 void *sub_FBD10(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_3D96F0 *var_4 = sub_FBC30((RwFrame *)arg_0);
@@ -319,6 +344,7 @@ void *sub_FBD10(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 
 // Likewise for a frame.
 // match: ?sub_FBD80@@YAXPAURwFrame@@PAUtype_3D3548@@@Z @ 0x000FBD80
+// sp-match: ?sub_FBD80@@YAXPAURwFrame@@PAUtype_3D3548@@@Z @ 0x000BF340
 void sub_FBD80(RwFrame *arg_0, type_3D3548 *arg_4)
 {
     type_3D96F0 *var_4 = sub_FBC30(arg_0);
@@ -336,6 +362,7 @@ void sub_FBD80(RwFrame *arg_0, type_3D3548 *arg_4)
 }
 
 // match: ?sub_FBDD0@@YAPAUtype_3D96F0@@PAX@Z @ 0x000FBDD0
+// sp-match: ?sub_FBDD0@@YAPAUtype_3D96F0@@PAX@Z @ 0x000BF3D0
 type_3D96F0 *sub_FBDD0(void *arg_0)
 {
     void *bp_8;
@@ -350,6 +377,7 @@ void *sub_FBE30(void *, RwInt32, RwInt32);
 void *sub_FBEB0(void *, RwInt32, RwInt32);
 
 // match: ?sub_FBDF0@@YAHXZ @ 0x000FBDF0
+// sp-match: ?sub_FBDF0@@YAHXZ @ 0x000BF4E0
 RwInt32 sub_FBDF0()
 {
     dword_4C1934 = RpLightRegisterPlugin(0x24, 0x42B3, sub_FBE30, sub_FBEB0,
@@ -358,6 +386,7 @@ RwInt32 sub_FBDF0()
 }
 
 // match: ?sub_FBE30@@YAPAXPAXHH@Z @ 0x000FBE30
+// sp-match: ?sub_FBE30@@YAPAXPAXHH@Z @ 0x000BF470
 void *sub_FBE30(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_3D96F0 *var_4 = sub_FBDD0(arg_0);
@@ -368,6 +397,7 @@ void *sub_FBE30(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_FBEB0@@YAPAXPAXHH@Z @ 0x000FBEB0
+// sp-match: ?sub_FBEB0@@YAPAXPAXHH@Z @ 0x000BF4B0
 void *sub_FBEB0(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_3D96F0 *var_4 = sub_FBDD0(arg_0);
@@ -379,6 +409,7 @@ void *sub_FBEB0(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 
 // Likewise for a light.
 // match: ?sub_FBF20@@YAXPAURpLight@@PAUtype_3D3548@@@Z @ 0x000FBF20
+// sp-match: ?sub_FBF20@@YAXPAURpLight@@PAUtype_3D3548@@@Z @ 0x000BF3E0
 void sub_FBF20(RpLight *arg_0, type_3D3548 *arg_4)
 {
     type_3D96F0 *var_4 = sub_FBDD0(arg_0);
@@ -396,6 +427,7 @@ void sub_FBF20(RpLight *arg_0, type_3D3548 *arg_4)
 }
 
 // match: ?vf_000@type_3D96FC@@UAEXXZ @ 0x000FBF70
+// sp-match: ?vf_000@type_3D96FC@@UAEXXZ @ 0x000BF410
 void type_3D96FC::vf_000()
 {
     type_3D96F0::vf_000();
@@ -404,6 +436,7 @@ void type_3D96FC::vf_000()
 }
 
 // match: ?vf_00C@type_3D96FC@@UAEXPAU1@@Z @ 0x000FBFA0
+// sp-match: ?vf_00C@type_3D96FC@@UAEXPAU1@@Z @ 0x000BF430
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D96FC::vf_00C(type_3D96FC *arg_0)
 {
@@ -413,6 +446,7 @@ void type_3D96FC::vf_00C(type_3D96FC *arg_0)
 }
 
 // match: ?vf_008@type_3D96FC@@UAEXPAX@Z @ 0x000FBFD0
+// sp-match: ?vf_008@type_3D96FC@@UAEXPAX@Z @ 0x000BF450
 void type_3D96FC::vf_008(void *arg_0)
 {
 
@@ -421,6 +455,7 @@ void type_3D96FC::vf_008(void *arg_0)
 }
 
 // match: ?sub_FC000@@YAPAUtype_3D970C@@PAX@Z @ 0x000FC000
+// sp-match: ?sub_FC000@@YAPAUtype_3D970C@@PAX@Z @ 0x000BF510
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_3D970C *sub_FC000(void *arg_0)
 {
@@ -439,6 +474,7 @@ RwStream *sub_FC140(RwStream *, RwInt32, void *, RwInt32, RwInt32);
 RwStream *sub_FC1A0(RwStream *, RwInt32, const void *, RwInt32, RwInt32);
 
 // match: ?sub_FC020@@YAHXZ @ 0x000FC020
+// sp-match: ?sub_FC020@@YAHXZ @ 0x000BF660
 RwInt32 sub_FC020()
 {
     dword_4C1938;
@@ -449,6 +485,7 @@ RwInt32 sub_FC020()
 }
 
 // match: ?sub_FC070@@YAPAXPAXHH@Z @ 0x000FC070
+// sp-match: ?sub_FC070@@YAPAXPAXHH@Z @ 0x000BF620
 void *sub_FC070(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_3D970C *var_4 = sub_FC000(arg_0);
@@ -459,6 +496,7 @@ void *sub_FC070(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_FC0D0@@YAPAXPAXPBXHH@Z @ 0x000FC0D0
+// sp-match: ?sub_FC0D0@@YAPAXPAXPBXHH@Z @ 0x000BF520
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void *sub_FC0D0(void *arg_0, const void *arg_4, RwInt32 arg_8, RwInt32 arg_C)
 {
@@ -472,6 +510,7 @@ void *sub_FC0D0(void *arg_0, const void *arg_4, RwInt32 arg_8, RwInt32 arg_C)
 }
 
 // match: ?sub_FC110@@YAPAXPAXHH@Z @ 0x000FC110
+// sp-match: ?sub_FC110@@YAPAXPAXHH@Z @ 0x000BF550
 void *sub_FC110(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_3D970C *var_4 = sub_FC000(arg_0);
@@ -481,6 +520,7 @@ void *sub_FC110(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_FC140@@YAPAURwStream@@PAU1@HPAXHH@Z @ 0x000FC140
+// sp-match: ?sub_FC140@@YAPAURwStream@@PAU1@HPAXHH@Z @ 0x000BF570
 RwStream *sub_FC140(RwStream *arg_0, RwInt32 arg_4, void *arg_8, RwInt32 arg_C, RwInt32 arg_10)
 {
     type_3D970C *var_4 = sub_FC000(arg_8);
@@ -497,6 +537,7 @@ RwStream *sub_FC140(RwStream *arg_0, RwInt32 arg_4, void *arg_8, RwInt32 arg_C, 
 }
 
 // match: ?sub_FC1A0@@YAPAURwStream@@PAU1@HPBXHH@Z @ 0x000FC1A0
+// sp-match: ?sub_FC1A0@@YAPAURwStream@@PAU1@HPBXHH@Z @ 0x000BF5C0
 RwStream *sub_FC1A0(RwStream *arg_0, RwInt32 arg_4, const void *arg_8, RwInt32 arg_C, RwInt32 arg_10)
 {
     type_3D970C *var_4 = sub_FC000((void *)arg_8);
@@ -509,12 +550,14 @@ RwStream *sub_FC1A0(RwStream *arg_0, RwInt32 arg_4, const void *arg_8, RwInt32 a
 }
 
 // match: ?vf_000@type_3D970C@@UAEXXZ @ 0x000FC1E0
+// sp-match: ?vf_000@type_3D970C@@UAEXXZ @ 0x000BF5F0
 void type_3D970C::vf_000()
 {
     unk_04 = 0;
 }
 
 // match: ?vf_004@type_3D970C@@UAEXPAU1@@Z @ 0x000FC200
+// sp-match: ?vf_004@type_3D970C@@UAEXPAU1@@Z @ 0x000BF600
 void type_3D970C::vf_004(type_3D970C *arg_0)
 {
     unk_04 = arg_0->unk_04;
@@ -524,7 +567,10 @@ void type_3D970C::vf_004(type_3D970C *arg_0)
     }
 }
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 2 // single player: src/sp/units/sp_unit_0FB7A0_2.cpp
 // match: ?vf_000@type_3D96F0@@UAEXXZ @ 0x000FC240
+// sp-match: ?vf_000@type_3D96F0@@UAEXXZ @ 0x000BF6B0
 void type_3D96F0::vf_000()
 {
     unk_04.unk_00 = 1;
@@ -536,6 +582,7 @@ void type_3D96F0::vf_000()
 }
 
 // match: ?vf_004@type_3D96F0@@UAEXPAU1@@Z @ 0x000FC280
+// sp-match: ?vf_004@type_3D96F0@@UAEXPAU1@@Z @ 0x000BF6D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D96F0::vf_004(type_3D96F0 *arg_0)
 {
@@ -551,6 +598,7 @@ void type_3D96F0::vf_004(type_3D96F0 *arg_0)
 }
 
 // match: ?vf_008@type_3D96F0@@UAEXPAX@Z @ 0x000FC2D0
+// sp-match: ?vf_008@type_3D96F0@@UAEXPAX@Z @ 0x000BF7A0
 void type_3D96F0::vf_008(void *arg_0)
 {
     if (unk_18)
@@ -581,6 +629,7 @@ void type_3D96F0::vf_008(void *arg_0)
 }
 
 // match: ?sub_FC360@type_3D96F0@@QAEXPAUtype_3D96F0_node@@@Z @ 0x000FC360
+// sp-match: ?sub_FC360@type_3D96F0@@QAEXPAUtype_3D96F0_node@@@Z @ 0x000BF6F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D96F0::sub_FC360(type_3D96F0_node *arg_0)
 {
@@ -599,6 +648,7 @@ void type_3D96F0::sub_FC360(type_3D96F0_node *arg_0)
 }
 
 // match: ?sub_FC3B0@type_3D96F0@@QAEXPAUtype_3D96F0_node@@@Z @ 0x000FC3B0
+// sp-match: ?sub_FC3B0@type_3D96F0@@QAEXPAUtype_3D96F0_node@@@Z @ 0x000BF710
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D96F0::sub_FC3B0(type_3D96F0_node *arg_0)
 {
@@ -630,6 +680,7 @@ void type_3D96F0::sub_FC3B0(type_3D96F0_node *arg_0)
 }
 
 // match: ?sub_FC440@type_3D96F0@@QAEGXZ @ 0x000FC440
+// sp-match: ?sub_FC440@type_3D96F0@@QAEGXZ @ 0x000BF750
 RwUInt16 type_3D96F0::sub_FC440()
 {
     RwUInt16 var_4;
@@ -650,6 +701,7 @@ RwUInt16 type_3D96F0::sub_FC440()
 }
 
 // match: ?sub_FC490@type_3D96F0@@QAEXG@Z @ 0x000FC490
+// sp-match: ?sub_FC490@type_3D96F0@@QAEXG@Z @ 0x000BF770
 void type_3D96F0::sub_FC490(RwUInt16 arg_0)
 {
     unk_08 = (RwUInt8)arg_0;
@@ -667,7 +719,10 @@ void type_3D96F0::sub_FC490(RwUInt16 arg_0)
     }
 }
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 3 // single player: src/sp/units/sp_unit_0FB7A0_3.cpp
 // match: ?sub_FC4E0@@YAPAUtype_3D9718@@PAX@Z @ 0x000FC4E0
+// sp-match: ?sub_FC4E0@@YAPAUtype_3D9718@@PAX@Z @ 0x000BF7F0
 type_3D9718 *sub_FC4E0(void *arg_0)
 {
     void *bp_8;
@@ -682,6 +737,7 @@ void *sub_FC540(void *, RwInt32, RwInt32);
 void *sub_FC5E0(void *, RwInt32, RwInt32);
 
 // match: ?sub_FC500@@YAHXZ @ 0x000FC500
+// sp-match: ?sub_FC500@@YAHXZ @ 0x000BF8E0
 RwInt32 sub_FC500()
 {
     dword_4C193C = RpWorldRegisterPlugin(0x24, 0x42B5, sub_FC540, sub_FC5E0,
@@ -690,6 +746,7 @@ RwInt32 sub_FC500()
 }
 
 // match: ?sub_FC540@@YAPAXPAXHH@Z @ 0x000FC540
+// sp-match: ?sub_FC540@@YAPAXPAXHH@Z @ 0x000BF860
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void *sub_FC540(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
@@ -708,6 +765,7 @@ void *sub_FC540(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_FC5E0@@YAPAXPAXHH@Z @ 0x000FC5E0
+// sp-match: ?sub_FC5E0@@YAPAXPAXHH@Z @ 0x000BF8A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void *sub_FC5E0(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
@@ -728,6 +786,7 @@ void *sub_FC5E0(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?vf_000@type_3D9718@@UAEXXZ @ 0x000FC670
+// sp-match: ?vf_000@type_3D9718@@UAEXXZ @ 0x000BF810
 void type_3D9718::vf_000()
 {
     type_3D96F0::vf_000();
@@ -736,6 +795,7 @@ void type_3D9718::vf_000()
 }
 
 // match: ?vf_00C@type_3D9718@@UAEXPAU1@@Z @ 0x000FC6A0
+// sp-match: ?vf_00C@type_3D9718@@UAEXPAU1@@Z @ 0x000BF830
 void type_3D9718::vf_00C(type_3D9718 *arg_0)
 {
     RwInt32 var_4;
@@ -746,6 +806,7 @@ void type_3D9718::vf_00C(type_3D9718 *arg_0)
 }
 
 // match: ?vf_008@type_3D9718@@UAEXPAX@Z @ 0x000FC6D0
+// sp-match: ?vf_008@type_3D9718@@UAEXPAX@Z @ 0x000BF850
 void type_3D9718::vf_008(void *arg_0)
 {
     type_3D96F0::vf_008(arg_0);
@@ -774,6 +835,7 @@ void *type_3D970C::operator new(RwUInt32 arg_0, void *arg_4)
     return arg_4;
 }
 
+#ifndef CODFH_SP // single player calls the real one (SP 0xBF240 jumps to it): this stand-in is not in its object
 // ?sub_D4910@type_3D96F0_14@@QAEPAUtype_3D3548@@XZ (folded into 0xD4910)
 struct type_3D3548 *type_3D96F0_14::sub_D4910()
 {
@@ -786,14 +848,17 @@ struct type_3D3548 *type_3D96F0_14::sub_D4910()
     }
     return var_4;
 }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ??3type_3D96F0@@SAXPAX@Z (folded into 0x19A750)
+#ifndef CODFH_SP // single player keeps the calls to the empty delete (SP 0xBF171): its body is not in this object
 void type_3D96F0::operator delete(void * arg_0)
 {
 }
+#endif
 
 // The material extension's stream size: the value's four bytes, the body
 // /OPT:ICF shares with the element sizes at 0x200B80.
@@ -802,3 +867,4 @@ RwInt32 sub_200B80(const void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     return 4;
 }
+#endif

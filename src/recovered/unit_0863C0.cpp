@@ -12,14 +12,26 @@
 #include "types/musicplayer.h"
 #include "rw/bastream.h"
 #include "types/type_3DF8D8.h"
+#ifdef CODFH_SP
+#include "game/data.h"
+#include "game/savestate.h"
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D4798
 extern const RwReal flt_3D4798 = 16.666666f;
 // 0x00428E74
+#ifdef CODFH_SP // file-static in single player: sub_87250 (SP 0x6CC90) matches only with them static
+static RwInt32 dword_428E74 = 4;
+#else
 RwInt32 dword_428E74 = 4;
+#endif
 // 0x00428E78
+#ifdef CODFH_SP // file-static in single player (as dword_428E74)
+static RwInt32 dword_428E78 = 2;
+#else
 RwInt32 dword_428E78 = 2;
+#endif
 // 0x004B1F68
 RwChar byte_4B1F68[256];
 // 0x004B2068
@@ -88,6 +100,7 @@ RwUInt32 dword_4B9194;
 // match: ?dword_428E78@@3HA @ 0x00428E78
 
 // match: ??0type_44E8D8@@QAE@XZ @ 0x000863C0
+// sp-match: ??0type_44E8D8@@QAE@XZ @ 0x0006BDE0
 
 type_44E8D8::type_44E8D8()
 {
@@ -95,6 +108,7 @@ type_44E8D8::type_44E8D8()
 }
 
 // match: ?sub_863E0@type_44E8D8@@QAEXPAUtype_44E8AC@@PAUtype_44E8B0@@@Z @ 0x000863E0
+// sp-match: ?sub_863E0@type_44E8D8@@QAEXPAUtype_44E8AC@@PAUtype_44E8B0@@@Z @ 0x0006CEC0
 void type_44E8D8::sub_863E0(type_44E8AC *arg_0, type_44E8B0 *arg_4)
 {
     unk_254 = arg_0;
@@ -111,6 +125,7 @@ void type_44E8D8::sub_863E0(type_44E8AC *arg_0, type_44E8B0 *arg_4)
 }
 
 // match: ?sub_86470@type_44E8D8@@QAEXXZ @ 0x00086470
+// sp-match: ?sub_86470@type_44E8D8@@QAEXXZ @ 0x0006BDF0
 void type_44E8D8::sub_86470()
 {
     unk_248 = 0;
@@ -157,6 +172,7 @@ void type_44E8D8::sub_86470()
 }
 
 // match: ??1type_44E8D8@@QAE@XZ @ 0x000866A0
+// sp-match: ??1type_44E8D8@@QAE@XZ @ 0x0006DCD0
 type_44E8D8::~type_44E8D8()
 {
     if (unk_00)
@@ -166,6 +182,7 @@ type_44E8D8::~type_44E8D8()
 }
 
 // match: ?sub_866C0@type_44E8D8@@QAEXXZ @ 0x000866C0
+// sp-match: ?sub_866C0@type_44E8D8@@QAEXXZ @ 0x0006DC90
 void type_44E8D8::sub_866C0()
 {
     if (unk_104)
@@ -179,6 +196,7 @@ void type_44E8D8::sub_866C0()
 }
 
 // match: ?sub_86710@type_44E8D8@@QAEXXZ @ 0x00086710
+// sp-match: ?sub_86710@type_44E8D8@@QAEXXZ @ 0x0006BF10
 void type_44E8D8::sub_86710()
 {
     if (unk_244)
@@ -193,6 +211,7 @@ void type_44E8D8::sub_86710()
 }
 
 // match: ?sub_86750@type_44E8D8@@QAEXXZ @ 0x00086750
+// sp-match: ?sub_86750@type_44E8D8@@QAEXXZ @ 0x0006CF20
 void type_44E8D8::sub_86750()
 {
     unk_184 = 0;
@@ -207,6 +226,7 @@ void type_44E8D8::sub_86750()
 }
 
 // match: ?sub_867A0@type_44E8D8@@QAEXXZ @ 0x000867A0
+// sp-match: ?sub_867A0@type_44E8D8@@QAEXXZ @ 0x0006DC30
 void type_44E8D8::sub_867A0()
 {
     RwInt32 var_4;
@@ -234,6 +254,7 @@ void type_44E8D8::sub_867A0()
 }
 
 // match: ?sub_86830@type_44E8D8@@QAE_NXZ @ 0x00086830
+// sp-match: ?sub_86830@type_44E8D8@@QAE_NXZ @ 0x0006BF40
 bool type_44E8D8::sub_86830()
 {
     if (unk_104)
@@ -248,6 +269,7 @@ bool type_44E8D8::sub_86830()
 }
 
 // match: ?sub_86860@type_44E8D8@@QAEXH@Z @ 0x00086860
+// sp-match: ?sub_86860@type_44E8D8@@QAEXH@Z @ 0x0006BF60
 void type_44E8D8::sub_86860(RwInt32 arg_0)
 {
     sub_23FFD0(unk_104, arg_0);
@@ -255,6 +277,7 @@ void type_44E8D8::sub_86860(RwInt32 arg_0)
 
 // Ducks the stream (arg_0 how far; -1 for its own depth).
 // match: ?sub_86890@type_44E8D8@@QAEXM@Z @ 0x00086890
+// sp-match: ?sub_86890@type_44E8D8@@QAEXM@Z @ 0x0006BF80
 void type_44E8D8::sub_86890(RwReal arg_0)
 {
     RwChar var_108[0x100];
@@ -339,6 +362,7 @@ void type_44E8D8::sub_86890(RwReal arg_0)
 
 // Unducks the stream (arg_0 the rate; -1 for dword_44D4CC).
 // match: ?sub_86C40@type_44E8D8@@QAEXM@Z @ 0x00086C40
+// sp-match: ?sub_86C40@type_44E8D8@@QAEXM@Z @ 0x0006C6F0
 void type_44E8D8::sub_86C40(RwReal arg_0)
 {
     RwChar var_108[0x100];
@@ -368,6 +392,7 @@ void type_44E8D8::sub_86C40(RwReal arg_0)
 }
 
 // match: ?sub_86D70@type_44E8D8@@QAEXH@Z @ 0x00086D70
+// sp-match: ?sub_86D70@type_44E8D8@@QAEXH@Z @ 0x0006C990
 void type_44E8D8::sub_86D70(RwInt32 arg_0)
 {
     RwChar var_108[0x100];
@@ -435,6 +460,7 @@ void type_44E8D8::sub_86D70(RwInt32 arg_0)
 }
 
 // match: ?sub_870B0@type_44E8D8@@QAE_NXZ @ 0x000870B0
+// sp-match: ?sub_870B0@type_44E8D8@@QAE_NXZ @ 0x0006CBB0
 bool type_44E8D8::sub_870B0()
 {
     if (unk_248->unk_24 == 0x4F || unk_248->unk_24 == 0x50 || unk_248->unk_24 == 0x55 || unk_248->unk_24 == 0x82)
@@ -472,6 +498,7 @@ bool type_44E8D8::sub_870B0()
 }
 
 // match: ?sub_87250@type_44E8D8@@QAEXXZ @ 0x00087250
+// sp-match: ?sub_87250@type_44E8D8@@QAEXXZ @ 0x0006CC90
 void type_44E8D8::sub_87250()
 {
     type_87250 var_8;
@@ -492,6 +519,13 @@ void type_44E8D8::sub_87250()
     sprintf(unk_154, "%.4d", unk_248->unk_24);
     var_18.unk_00 = unk_154;
     sprintf(byte_4B1F68, "%s", unk_01);
+#ifdef CODFH_SP // single player (SP 0x6CD2C) leaves track 0071 idle on level 1 when dword_4B8780 is set
+    if (sub_19B050() == 1 && dword_4B8780 && strcmp(unk_154, "0071") == 0)
+    {
+        unk_180 = 1;
+        return;
+    }
+#endif
     sub_240010(unk_104, &unk_15C);
     sub_23FE30(unk_104, &var_8);
     if (dword_44E8A0 == 2)
@@ -505,6 +539,7 @@ void type_44E8D8::sub_87250()
 }
 
 // match: ?sub_873B0@type_44E8D8@@QAEXXZ @ 0x000873B0
+// sp-match: ?sub_873B0@type_44E8D8@@QAEXXZ @ 0x0006CF50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_44E8D8::sub_873B0()
 {
@@ -980,9 +1015,16 @@ void type_44E8D8::sub_873B0()
     }
 }
 
+#ifdef CODFH_SP
+// Single player's disc-error handler (unit_19CD50, SP 0x12C410): its one-argument checks
+// after the stream reads call it where multiplayer calls the empty sub_19A750.
+void sp_sub_12C410(void *arg_0);
+#endif
+
 // Reads the pending bank file (arg_0 set: from the loading thread, with the
 // stream lock; clear: a word of it, as a probe).
 // match: ?sub_885B0@@YAXH@Z @ 0x000885B0
+// sp-match: ?sub_885B0@@YAXH@Z @ 0x0006CDE0
 void sub_885B0(RwInt32 arg_0)
 {
     RwStream *var_4;
@@ -999,7 +1041,11 @@ void sub_885B0(RwInt32 arg_0)
         if (!arg_0)
         {
             v8 = RwStreamReadInt32(var_4, &varC, sizeof(RwInt32));
+#ifdef CODFH_SP // the disc-error check (SP 0x6CE19 calls 0x12C410)
+            sp_sub_12C410((void *)v8);
+#else
             sub_19A750(v8);
+#endif
         }
         RwStreamClose(var_4, 0);
     }
@@ -1012,6 +1058,7 @@ void sub_885B0(RwInt32 arg_0)
 }
 
 // match: ?sub_88640@@YAHPAX0PAUtype_88640@@@Z @ 0x00088640
+// sp-match: ?sub_88640@@YAHPAX0PAUtype_88640@@@Z @ 0x0006CE90
 RwInt32 sub_88640(void *arg_0, void *arg_4, type_88640 *arg_8)
 {
     type_88640 *var_4;
@@ -1024,6 +1071,7 @@ RwInt32 sub_88640(void *arg_0, void *arg_4, type_88640 *arg_8)
 }
 
 // match: ?sub_88670@@YAHPAUtype_88670_0@@PAXPAUtype_88670_8@@@Z @ 0x00088670
+// sp-match: ?sub_88670@@YAHPAUtype_88670_0@@PAXPAUtype_88670_8@@@Z @ 0x0006CE50
 RwInt32 sub_88670(type_88670_0 *arg_0, void *arg_4, type_88670_8 *arg_8)
 {
     type_88670_8 *var_4;
@@ -1044,6 +1092,7 @@ RwInt32 sub_88670(type_88670_0 *arg_0, void *arg_4, type_88670_8 *arg_8)
 
 // Whether any player is busy; it answers 0 before it looks.
 // match: ?sub_886D0@type_44E8D8@@QAEHXZ @ 0x000886D0
+// sp-match: ?sub_886D0@type_44E8D8@@QAEHXZ @ 0x0006CEB0
 RwInt32 type_44E8D8::sub_886D0()
 {
     RwInt32 var_4;

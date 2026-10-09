@@ -70,7 +70,9 @@ extern RwReal dword_429E70;
 // The grenades' gravity per frame (-0.069).
 extern RwReal dword_429E90;
 // A velocity from arg_0 and arg_4 under that gravity (the grenade's step).
+#ifndef CODFH_SP // static in single player (unit_161C50)
 void sub_164210(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8);
+#endif
 // A grenade's unk_88 at its start (20).
 extern RwReal dword_429E74;
 // The most a grenade spins per frame (7).
@@ -131,7 +133,22 @@ struct type_161470
     RwReal unk_54;              // dword_429E8C)
     RwInt32 unk_58;
 
+#ifdef CODFH_SP // inline in single player (SP 0x1041A0, 0x105CD0 and 0x1063A0 expand it)
+    void sub_161470()
+    {
+        unk_00 = 1.0e37f;
+        unk_0C = 0;
+        unk_10 = 0;
+        unk_18 = 0;
+        unk_08 = 0;
+        unk_04 = 1.0e37f;
+        unk_50 = 0;
+        unk_54 = 0;
+        unk_58 = 0;
+    }
+#else
     void sub_161470();
+#endif
 };
 typedef RwChar type_161470_size_check[sizeof(type_161470) == 0x5C ? 1 : -1];
 // A material's game data (sub_FC000): an inline with no address and so no

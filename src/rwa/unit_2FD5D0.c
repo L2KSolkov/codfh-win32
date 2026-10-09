@@ -29,6 +29,7 @@ extern RwaFreeList unk_5125EC;      /* the bitmaps' free list */
     (((_x) & 0xFFFF0000) ? rwaLog2U16((_x) >> 16) + 16 : rwaLog2U16(_x))
 
 // match: _sub_2FD5D0 @ 0x002FD5D0
+// sp-match: _sub_2FD5D0 @ 0x00218E50
 RwaAllocBitmap *
 sub_2FD5D0(RwUInt32 numUnits, RwaAllocBitmap *bitmap, RwUInt8 *bits)
 {
@@ -72,6 +73,7 @@ sub_2FD5D0(RwUInt32 numUnits, RwaAllocBitmap *bitmap, RwUInt8 *bits)
 }
 
 // match: _rwaAllocBitmapDestroy @ 0x002FD6C0
+// sp-match: _rwaAllocBitmapDestroy @ 0x00218F40
 void
 rwaAllocBitmapDestroy(RwaAllocBitmap *bitmap)
 {
@@ -87,6 +89,7 @@ rwaAllocBitmapDestroy(RwaAllocBitmap *bitmap)
 
 /* Sets (value non-zero) or clears count bits from bit start. */
 // match: _sub_2FD6F0 @ 0x002FD6F0
+// sp-match: _sub_2FD6F0 @ 0x00218F70
 void
 sub_2FD6F0(RwaAllocBitmap *bitmap, RwUInt32 start, RwUInt32 count, RwUInt32 value)
 {
@@ -130,6 +133,7 @@ sub_2FD6F0(RwaAllocBitmap *bitmap, RwUInt32 start, RwUInt32 count, RwUInt32 valu
 
 /* The number of free units. */
 // match: _sub_2FD7A0 @ 0x002FD7A0
+// sp-match: _sub_2FD7A0 @ 0x00219020
 RwUInt32
 sub_2FD7A0(RwaAllocBitmap *bitmap)
 {
@@ -165,6 +169,7 @@ sub_2FD7A0(RwaAllocBitmap *bitmap)
 }
 
 // match: _sub_2FD800 @ 0x002FD800
+// sp-match: _sub_2FD800 @ 0x00219080
 RwUInt32 *
 sub_2FD800(RwaAllocBitmap *bitmap, RwUInt32 *handle, RwUInt32 a3, RwUInt32 a4, RwUInt32 a5,
            RwUInt32 *out)
@@ -176,6 +181,7 @@ sub_2FD800(RwaAllocBitmap *bitmap, RwUInt32 *handle, RwUInt32 a3, RwUInt32 a4, R
 }
 
 // match: _sub_2FD850 @ 0x002FD850
+// sp-match: _sub_2FD850 @ 0x002190D0
 RwUInt32
 sub_2FD850(RwaAllocBitmap *bitmap, RwUInt32 handle0, RwUInt32 handle1)
 {
@@ -187,6 +193,7 @@ sub_2FD850(RwaAllocBitmap *bitmap, RwUInt32 handle0, RwUInt32 handle1)
 /* _rwaAllocBitmapAlloc, rwad.dll 0x100BB929: the compiler unrolls
  * the ordinary bit loop. Clamp the run before breaking the byte loop. */
 // match: _sub_2FD880 @ 0x002FD880
+// sp-match: _sub_2FD880 @ 0x00219100
 RwBool
 sub_2FD880(RwaAllocBitmap *bitmap, RwUInt32 count, RwUInt32 *handle)
 {
@@ -255,6 +262,7 @@ sub_2FD880(RwaAllocBitmap *bitmap, RwUInt32 count, RwUInt32 *handle)
 }
 
 // match: _sub_2FDAC0 @ 0x002FDAC0
+// sp-match: _sub_2FDAC0 @ 0x00219340
 void
 sub_2FDAC0(RwaAllocBitmap *bitmap, RwUInt32 *handle)
 {

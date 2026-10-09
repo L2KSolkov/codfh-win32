@@ -177,6 +177,7 @@ RpSectorLineItFinished(RpSectorLineIt *it)
 // match: _rcsid @ 0x00417508
 
 // match: _RpSectorBBoxItInit @ 0x002C2720
+// sp-match: _RpSectorBBoxItInit @ 0x001DDB30
 void
 RpSectorBBoxItInit(RpSectorBBoxIt *it,
                    RpWorld        *world,
@@ -207,6 +208,7 @@ RpSectorBBoxItInit(RpSectorBBoxIt *it,
  * \see \ref rpcollisoverview
  */
 // match: _RpSectorBBoxItFindNextWorldSector @ 0x002C2770
+// sp-match: _RpSectorBBoxItFindNextWorldSector @ 0x001DDB80
 RpWorldSector *
 RpSectorBBoxItFindNextWorldSector(RpSectorBBoxIt *it)
 {
@@ -277,6 +279,7 @@ RpSectorBBoxItFindNextWorldSector(RpSectorBBoxIt *it)
  * \see \ref rpcollisoverview
  */
 // match: _RpSectorLineItInit @ 0x002C27F0
+// sp-match: _RpSectorLineItInit @ 0x001DDC00
 void
 RpSectorLineItInit(RpSectorLineIt  *it,
                    RpWorld         *world,
@@ -308,6 +311,7 @@ RpSectorLineItInit(RpSectorLineIt  *it,
  * \see \ref rpcollisoverview
  */
 // match: _RpSectorLineItFindNextWorldSector @ 0x002C28D0
+// sp-match: _RpSectorLineItFindNextWorldSector @ 0x001DDCE0
 RpWorldSector *
 RpSectorLineItFindNextWorldSector(RpSectorLineIt *it)
 {
@@ -354,6 +358,7 @@ RpSectorLineItFindNextWorldSector(RpSectorLineIt *it)
  * \see \ref rpcollisoverview
  */
 // match: _RpSectorLineItSetFarClip @ 0x002C2AB0
+// sp-match: _RpSectorLineItSetFarClip @ 0x001DDEC0
 void
 RpSectorLineItSetFarClip(RpSectorLineIt *it, RwReal value)
 {
@@ -448,6 +453,7 @@ RpSectorLineItSetFarClip(RpSectorLineIt *it, RwReal value)
  * \see \ref rpcollisoverview
  */
 // match: _RpCollSectorLineItInit @ 0x002C2B20
+// sp-match: _RpCollSectorLineItInit @ 0x001DDF30
 void
 RpCollSectorLineItInit(RpCollSectorLineIt  *it,
                        RpCollTree          *tree,
@@ -550,6 +556,7 @@ RpCollSectorLineItInitFromSectorIt(RpCollSectorLineIt  *it,
  * \see \ref rpcollisoverview
  */
 // match: _RpCollSectorLineItFindNextEntries @ 0x002C2DD0
+// sp-match: _RpCollSectorLineItFindNextEntries @ 0x001DE1E0
 void
 RpCollSectorLineItFindNextEntries(RpCollSectorLineIt *it,
                                   RwUInt16           *start,
@@ -587,6 +594,7 @@ RpCollSectorLineItFindNextEntries(RpCollSectorLineIt *it,
  * \see \ref rpcollisoverview
  */
 // match: _RpCollSectorLineItSetFarClip @ 0x002C2FC0
+// sp-match: _RpCollSectorLineItSetFarClip @ 0x001DE3D0
 void
 RpCollSectorLineItSetFarClip(RpCollSectorLineIt *it, RwReal value)
 {
@@ -662,6 +670,7 @@ RpCollSectorLineItSetFarClip(RpCollSectorLineIt *it, RwReal value)
  *
  */
 // match: _RpCollSectorBBoxItInit @ 0x002C3030
+// sp-match: _RpCollSectorBBoxItInit @ 0x001DE440
 void
 RpCollSectorBBoxItInit(RpCollSectorBBoxIt *it,
                        RpCollTree         *tree,
@@ -710,6 +719,7 @@ RpCollSectorBBoxItInit(RpCollSectorBBoxIt *it,
  *
  */
 // match: _RpCollSectorBBoxItFindNextEntries @ 0x002C31B0
+// sp-match: _RpCollSectorBBoxItFindNextEntries @ 0x001DE5C0
 void
 RpCollSectorBBoxItFindNextEntries(RpCollSectorBBoxIt  *it,
                                   RwUInt16            *start,

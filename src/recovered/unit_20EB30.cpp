@@ -7,12 +7,14 @@
 #include "game/livemenu.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E9344
 extern const RwReal flt_3E9344 = 0.01f;
 // 0x003E9348
 extern const RwReal flt_3E9348 = 0.01f;
 // 0x003E934C
 extern const RwReal flt_3E934C = 16.666666f;
+#endif
 // 0x00505180
 RwReal flt_505180;
 // End of its data definitions.

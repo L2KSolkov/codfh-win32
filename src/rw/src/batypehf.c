@@ -89,6 +89,7 @@ RwObjectGetType(RwObject * object)
 // match: _rcsid @ 0x004163B4
 
 // match: __rwObjectHasFrameSetFrame @ 0x002A9B10
+// sp-match: __rwObjectHasFrameSetFrame @ 0x001C4F40
 void
 _rwObjectHasFrameSetFrame(void *object, RwFrame * frame)
 {
@@ -127,6 +128,7 @@ _rwObjectHasFrameSetFrame(void *object, RwFrame * frame)
  */
 
 // match: __rwObjectHasFrameReleaseFrame @ 0x002A9B60
+// sp-match: __rwObjectHasFrameReleaseFrame @ 0x001C4F90
 void
 _rwObjectHasFrameReleaseFrame(void *object)
 {

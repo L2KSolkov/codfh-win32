@@ -10,12 +10,14 @@
 #include "game/parsedfile.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E403C
 extern const RwReal flt_3E403C = 0.01f;
 // 0x003E4040
 extern const RwReal flt_3E4040 = 0.01f;
 // 0x003E4044
 extern const RwReal flt_3E4044 = 16.666666f;
+#endif
 // 0x004FEC70
 RwInt32 dword_4FEC70;
 // End of its data definitions.

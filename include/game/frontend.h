@@ -104,6 +104,10 @@ extern type_D9CF0 unk_4B8744;
 void sub_DA550(bool arg_0);
 void sub_DA570();
 extern bool byte_4B8920;
+#ifdef CODFH_SP // single player times the front end's idleness in it (SP 0xA61DC)
+extern RwReal dword_4B8924;
+#else
 extern RwInt32 dword_4B8924;
+#endif
 
 #endif

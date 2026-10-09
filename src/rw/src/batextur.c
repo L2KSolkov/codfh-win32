@@ -291,6 +291,7 @@ extern void *dword_50F254;
 // match: __rwTexDictionaryFreeListPreallocBlocks @ 0x004354CC
 
 // match: _sub_2A7870 @ 0x002A7870
+// sp-match: _sub_2A7870 @ 0x001C3470
 
 void
 sub_2A7870(void *cs)
@@ -324,6 +325,7 @@ CalculateIndexCharacter(RwUInt8 mipLevel)
 /****************************************************************************/
 
 // match: _TextureDefaultMipmapName @ 0x002A7880
+// sp-match: _TextureDefaultMipmapName @ 0x001C3480
 static              RwBool
 TextureDefaultMipmapName(RwChar * name, RwChar * maskName,
                          RwUInt8 mipLevel, RwInt32 __RWUNUSED__ format)
@@ -353,6 +355,7 @@ TextureDefaultMipmapName(RwChar * name, RwChar * maskName,
 
 /****************************************************************************/
 // match: _PalettizeImage @ 0x002A78E0
+// sp-match: _PalettizeImage @ 0x001C34E0
 static RwBool
 PalettizeImage(RwImage **image, RwInt32 depth)
 {
@@ -412,6 +415,7 @@ PalettizeImage(RwImage **image, RwInt32 depth)
 
 /****************************************************************************/
 // match: _PalettizeMipmaps @ 0x002A79D0
+// sp-match: _PalettizeMipmaps @ 0x001C35D0
 static RwBool
 PalettizeMipmaps(RwRGBA *MipPalette, RwImage *sourceImage,
                  RwImage **mipArray, RwInt32 totalMipLevels,
@@ -519,6 +523,7 @@ PalettizeMipmaps(RwRGBA *MipPalette, RwImage *sourceImage,
 /****************************************************************************/
 
 // match: _TextureImageReadAndSize @ 0x002A7BA0
+// sp-match: _TextureImageReadAndSize @ 0x001C37A0
 static RwImage     *
 TextureImageReadAndSize(const RwChar * name,
                         const RwChar * maskName,
@@ -642,6 +647,7 @@ TextureImageReadAndSize(const RwChar * name,
 
 /* Read just Mip Level #0 */
 // match: _TextureDefaultNormalRead @ 0x002A8840
+// sp-match: _TextureDefaultNormalRead @ 0x001C4440
 static RwTexture   *
 TextureDefaultNormalRead(const RwChar * name, const RwChar * maskName)
 {
@@ -753,6 +759,7 @@ TextureDefaultNormalRead(const RwChar * name, const RwChar * maskName)
 
 /****************************************************************************/
 // match: _TextureDefaultMipmapRead @ 0x002A8A90
+// sp-match: _TextureDefaultMipmapRead @ 0x001C4690
 static RwTexture   *
 TextureDefaultMipmapRead(const RwChar * name, const RwChar * maskName)
 {
@@ -988,6 +995,7 @@ TextureDefaultRead
 /* this function simply chooses which method
  * is appropriate for reading the texture */
 // match: _TextureDefaultRead @ 0x002A8F90
+// sp-match: _TextureDefaultRead @ 0x001C4B90
 static RwTexture   *
 TextureDefaultRead(const RwChar * name, const RwChar * maskName)
 {
@@ -1009,6 +1017,7 @@ TextureDefaultRead(const RwChar * name, const RwChar * maskName)
 
 /****************************************************************************/
 // match: _TextureRasterDefaultBuildMipmaps @ 0x002A7E80
+// sp-match: _TextureRasterDefaultBuildMipmaps @ 0x001C3A80
 static RwRaster    *
 TextureRasterDefaultBuildMipmaps(RwRaster * raster,
                                  RwImage * sourceImage)
@@ -1186,6 +1195,7 @@ TextureRasterDefaultBuildMipmaps(RwRaster * raster,
  */
 
 // match: _TextureAnnihilate @ 0x002A8100
+// sp-match: _TextureAnnihilate @ 0x001C3D00
 static              RwBool
 TextureAnnihilate(RwTexture * texture)
 {
@@ -1236,6 +1246,7 @@ TextureAnnihilate(RwTexture * texture)
  */
 
 // match: _StringCompare @ 0x002A8180
+// sp-match: _StringCompare @ 0x001C3D80
 static              RwBool
 StringCompare(const RwChar * cpA, const RwChar * cpB)
 {
@@ -1283,6 +1294,7 @@ StringCompare(const RwChar * cpA, const RwChar * cpB)
  */
 
 // match: _TextureDefaultFind @ 0x002A8FC0
+// sp-match: _TextureDefaultFind @ 0x001C4BC0
 static RwTexture *
 TextureDefaultFind(const RwChar *name)
 {
@@ -1357,6 +1369,7 @@ TextureDefaultFind(const RwChar *name)
  *
  */
 // match: _RwTextureSetFindCallBack @ 0x002A81D0
+// sp-match: _RwTextureSetFindCallBack @ 0x001C3DD0
 RwBool
 RwTextureSetFindCallBack(RwTextureCallBackFind callBack)
 {
@@ -1384,6 +1397,7 @@ RwTextureSetFindCallBack(RwTextureCallBackFind callBack)
  *
  */
 // match: _RwTextureGetFindCallBack @ 0x002A81F0
+// sp-match: _RwTextureGetFindCallBack @ 0x001C3DF0
 RwTextureCallBackFind
 RwTextureGetFindCallBack(void)
 {
@@ -1414,6 +1428,7 @@ RwTextureGetFindCallBack(void)
  *
  */
 // match: _RwTextureSetReadCallBack @ 0x002A8200
+// sp-match: _RwTextureSetReadCallBack @ 0x001C3E00
 RwBool
 RwTextureSetReadCallBack(RwTextureCallBackRead callBack)
 {
@@ -1440,6 +1455,7 @@ RwTextureSetReadCallBack(RwTextureCallBackRead callBack)
  *
  */
 // match: _RwTextureGetReadCallBack @ 0x002A8220
+// sp-match: _RwTextureGetReadCallBack @ 0x001C3E20
 RwTextureCallBackRead
 RwTextureGetReadCallBack(void)
 {
@@ -1486,6 +1502,7 @@ RwTextureGetReadCallBack(void)
  *
  */
 // match: _RwTextureSetMipmapping @ 0x002A8230
+// sp-match: _RwTextureSetMipmapping @ 0x001C3E30
 RwBool
 RwTextureSetMipmapping(RwBool enable)
 {
@@ -1511,6 +1528,7 @@ RwTextureSetMipmapping(RwBool enable)
  *
  */
 // match: _RwTextureGetMipmapping @ 0x002A8250
+// sp-match: _RwTextureGetMipmapping @ 0x001C3E50
 RwBool
 RwTextureGetMipmapping(void)
 {
@@ -1548,6 +1566,7 @@ RwTextureGetMipmapping(void)
  *
  */
 // match: _RwTextureSetAutoMipmapping @ 0x002A8260
+// sp-match: _RwTextureSetAutoMipmapping @ 0x001C3E60
 RwBool
 RwTextureSetAutoMipmapping(RwBool enable)
 {
@@ -1578,6 +1597,7 @@ RwTextureSetAutoMipmapping(RwBool enable)
  *
  */
 // match: _RwTextureGetAutoMipmapping @ 0x002A8280
+// sp-match: _RwTextureGetAutoMipmapping @ 0x001C3E80
 RwBool
 RwTextureGetAutoMipmapping(void)
 {
@@ -1647,6 +1667,7 @@ _rwTextureGetAutoMipMapState(void)
  *
  */
 // match: _RwTextureSetRaster @ 0x002A8290
+// sp-match: _RwTextureSetRaster @ 0x001C3E90
 RwTexture *
 RwTextureSetRaster(RwTexture *texture, RwRaster *raster)
 {
@@ -1730,6 +1751,7 @@ RwTextureGetRaster(const RwTexture *texture)
  *
  */
 // match: _RwTexDictionaryCreate @ 0x002A82C0
+// sp-match: _RwTexDictionaryCreate @ 0x001C3EC0
 RwTexDictionary *
 RwTexDictionaryCreate(void)
 {
@@ -1769,6 +1791,7 @@ RwTexDictionaryCreate(void)
 /* codfh-match: the database's RwTexDictionaryCreate_Internal: the same from
  * the world arena, zeroed */
 // match: _RwTexDictionaryCreate_Internal @ 0x002A8360
+// sp-match: _RwTexDictionaryCreate_Internal @ 0x001C3F60
 RwTexDictionary *
 RwTexDictionaryCreate_Internal(void)
 {
@@ -1826,6 +1849,7 @@ RwTexDictionaryCreate_Internal(void)
  *
  */
 // match: _RwTexDictionaryDestroy @ 0x002A9090
+// sp-match: _RwTexDictionaryDestroy @ 0x001C4C90
 RwBool
 RwTexDictionaryDestroy(RwTexDictionary *dict)
 {
@@ -1889,6 +1913,7 @@ RwTexDictionaryDestroy(RwTexDictionary *dict)
  * \see RwTexDictionaryFindNamedTexture
  */
 // match: _RwTexDictionaryForAllTextures @ 0x002A8410
+// sp-match: _RwTexDictionaryForAllTextures @ 0x001C4010
 const RwTexDictionary *
 RwTexDictionaryForAllTextures(const RwTexDictionary* dict,
                               RwTextureCallBack fpCallBack, void *pData)
@@ -1955,6 +1980,7 @@ RwTexDictionaryForAllTextures(const RwTexDictionary* dict,
  * \see RwTexDictionaryFindNamedTexture
  */
 // match: _RwTexDictionaryForAllTexDictionaries @ 0x002A8460
+// sp-match: _RwTexDictionaryForAllTexDictionaries @ 0x001C4060
 RwBool
 RwTexDictionaryForAllTexDictionaries(RwTexDictionaryCallBack fpCallBack,
                                      void *pData)
@@ -2031,6 +2057,7 @@ RwTexDictionaryForAllTexDictionaries(RwTexDictionaryCallBack fpCallBack,
  *
  */
 // match: _RwTextureCreate @ 0x002A84E0
+// sp-match: _RwTextureCreate @ 0x001C40E0
 RwTexture *
 RwTextureCreate(RwRaster *raster)
 {
@@ -2141,6 +2168,7 @@ RwTextureAddRef(RwTexture *texture)
  *
  */
 // match: _RwTextureDestroy @ 0x002A8560
+// sp-match: _RwTextureDestroy @ 0x001C4160
 RwBool
 RwTextureDestroy(RwTexture *texture)
 {
@@ -2281,6 +2309,7 @@ RwTextureGetMaskName(RwTexture *texture)
  *
  */
 // match: _RwTextureSetName @ 0x002A8580
+// sp-match: _RwTextureSetName @ 0x001C4180
 RwTexture *
 RwTextureSetName(RwTexture *texture, const RwChar *name)
 {
@@ -2312,6 +2341,7 @@ RwTextureSetName(RwTexture *texture, const RwChar *name)
  *
  */
 // match: _RwTextureSetMaskName @ 0x002A85F0
+// sp-match: _RwTextureSetMaskName @ 0x001C41F0
 RwTexture *
 RwTextureSetMaskName(RwTexture *texture, const RwChar *maskName)
 {
@@ -2386,6 +2416,7 @@ RwTextureGetDictionary(RwTexture *texture)
  *
  */
 // match: _RwTexDictionaryAddTexture @ 0x002A8660
+// sp-match: _RwTexDictionaryAddTexture @ 0x001C4260
 RwTexture *
 RwTexDictionaryAddTexture(RwTexDictionary *dict, RwTexture *texture)
 {
@@ -2462,6 +2493,7 @@ RwTexDictionaryRemoveTexture(RwTexture *texture)
  *
  */
 // match: _RwTexDictionaryFindNamedTexture @ 0x002A86A0
+// sp-match: _RwTexDictionaryFindNamedTexture @ 0x001C42A0
 RwTexture *
 RwTexDictionaryFindNamedTexture(RwTexDictionary *dict, const RwChar *name)
 {
@@ -2532,6 +2564,7 @@ RwTexDictionaryFindNamedTexture(RwTexDictionary *dict, const RwChar *name)
  *
  */
 // match: _RwTexDictionarySetCurrent @ 0x002A86E0
+// sp-match: _RwTexDictionarySetCurrent @ 0x001C42E0
 RwTexDictionary *
 RwTexDictionarySetCurrent(RwTexDictionary *dict)
 {
@@ -2561,6 +2594,7 @@ RwTexDictionarySetCurrent(RwTexDictionary *dict)
  *
  */
 // match: _RwTexDictionaryGetCurrent @ 0x002A8700
+// sp-match: _RwTexDictionaryGetCurrent @ 0x001C4300
 RwTexDictionary *
 RwTexDictionaryGetCurrent(void)
 {
@@ -2684,6 +2718,7 @@ RwTextureGenerateMipmapName(RwChar *name, RwChar *maskName,
  *
  */
 // match: _RwTextureRead @ 0x002A8710
+// sp-match: _RwTextureRead @ 0x001C4310
 RwTexture *
 RwTextureRead(const RwChar *name, const RwChar *maskName)
 {
@@ -3096,6 +3131,7 @@ RwTextureGetAddressingV(const RwTexture *texture)
  *
  */
 // match: _RwTextureRegisterPlugin @ 0x002A87D0
+// sp-match: _RwTextureRegisterPlugin @ 0x001C43D0
 RwInt32
 RwTextureRegisterPlugin(RwInt32 size,
                         RwUInt32 pluginID,
@@ -3415,6 +3451,7 @@ RwTextureGetMipmapNameCallBack(void)
  *
  */
 // match: _RwTextureRasterGenerateMipmaps @ 0x002A8800
+// sp-match: _RwTextureRasterGenerateMipmaps @ 0x001C4400
 RwBool
 RwTextureRasterGenerateMipmaps(RwRaster *raster, RwImage *image)
 {
@@ -3447,6 +3484,7 @@ RwTextureRasterGenerateMipmaps(RwRaster *raster, RwImage *image)
  */
 
 // match: __rwTextureClose @ 0x002A9120
+// sp-match: __rwTextureClose @ 0x001C4D20
 void *
 _rwTextureClose(void *instance,
                 RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -3559,6 +3597,7 @@ static RwFreeList _rwTextureFreeList;
  *
  */
 // match: _RwTextureSetFreeListCreateParams @ 0x002A8820
+// sp-match: _RwTextureSetFreeListCreateParams @ 0x001C4420
 void
 RwTextureSetFreeListCreateParams(RwInt32 blockSize, RwInt32 numBlocksToPrealloc)
 {
@@ -3620,6 +3659,7 @@ RwTexDictionarySetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPr
  */
 
 // match: __rwTextureOpen @ 0x002A91F0
+// sp-match: __rwTextureOpen @ 0x001C4DF0
 void *
 _rwTextureOpen(void *instance, RwInt32 offset,
                RwInt32 __RWUNUSED__ size)

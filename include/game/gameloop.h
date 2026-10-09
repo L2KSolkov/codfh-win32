@@ -209,9 +209,17 @@ struct type_EEF90
     RwInt32 unk_0C;
 };
 // A pad (0x2D0 bytes): its 44 buttons and its rumble.
+// How many buttons a pad record holds: 44 in MP; 40 in single player (its pad records are
+// 0x290 bytes, the pads' block ends at +0xA40 where MP's ends at +0xB40, and its loops compare
+// 0x28 where MP's compare 0x2C: SP 0xB6700, 0xB6A60).
+#ifdef CODFH_SP // SP 0xB6700 and the other pad methods
+enum { type_4B9308_btn_count = 40 };
+#else // MP 0xEE540
+enum { type_4B9308_btn_count = 44 };
+#endif
 struct type_4B9308_pad
 {
-    type_4B9308_btn unk_00[44];
+    type_4B9308_btn unk_00[type_4B9308_btn_count];
     type_EEF90 unk_2C0;
 };
 // An input event (12 bytes; .data): its number (the pads' buttons map
@@ -223,7 +231,7 @@ struct type_429498
     RwInt32 unk_04;
     const RwChar *unk_08;
 };
-extern type_429498 dword_429498[45];
+extern type_429498 dword_429498[type_4B9308_btn_count + 1];   // (45 in MP; 41 in single player: SP 0x3219D8)
 // Set while input is ignored (sub_EE8F0).
 extern RwInt32 dword_4FDA9C;
 
@@ -313,6 +321,15 @@ struct type_4B9308
     // while rumble is on and sounds are.
     void sub_EED30(RwInt32 arg_0, RwInt32 arg_4, RwInt16 arg_8, RwInt16 arg_C);
     void sub_EEE20(RwInt32 arg_0, RwInt32 arg_4, RwUInt8 arg_8, RwInt16 arg_C);
+#ifdef CODFH_SP
+    // Single player only (src/recovered/unit_0EE540.cpp): clears a button's value, selects a
+    // pad and reads it, binds one record, and sets the default bindings (SP 0xB6890, 0xB6A10,
+    // 0xB6C60, 0xB6DC0).
+    void sp_sub_B6890(RwInt32 arg_0, RwInt32 arg_4);
+    void sp_sub_B6A10(RwInt32 arg_0);
+    void sp_sub_B6C60(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8);
+    void sp_sub_B6DC0();
+#endif
 };
 extern type_4B9308 unk_4B9308;
 // The pad library under it; only the widths are known.
@@ -370,8 +387,10 @@ void sub_F2630();
 void sub_172230();
 void sub_1446C0();
 void sub_16D6A0();
-// Frees the index-sound table dword_4E5E40 (the module shutdown).
+#ifndef CODFH_SP
+// Frees the index-sound table dword_4E5E40 (MP 0xD73C0); SP expands this at 0xA288D.
 void sub_D73C0();
+#endif
 type_1CCA10 sub_1CCA10();
 // The multiplayer manager (unk_4F7EB8): cNetController, named by its trace
 // "cNetController::updateVoiceSubSystem()". Its two score messages sit at
@@ -1031,7 +1050,11 @@ void sub_D8F60();
 void sub_D8F80();
 // Loads the front end's message text (arg_0 set keeps it resident);
 // whether it loaded.
+#ifdef CODFH_SP // single player's returns an int (SP 0x11BCD0)
+RwInt32 sub_186880(RwInt32 arg_0);
+#else
 bool sub_186880(RwInt32 arg_0);
+#endif
 #ifdef CODFH_PLAIN
 extern RwInt32 &dword_4B918C;
 #else

@@ -17,12 +17,14 @@
 const RwChar *dword_42D278[5] = { "Not signed in.", "Signing in...", "Sign-In Failed", "Not Signed In: Passcode Needed", "Signed in:" };
 // (Defined after the data: VC7.1 emits a unit's data definitions in reverse order, and
 // the image has these constants before the data's texts.)
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E8404
 extern const RwReal flt_3E8404 = 0.01f;
 // 0x003E8408
 extern const RwReal flt_3E8408 = 0.01f;
 // 0x003E840C
 extern const RwReal flt_3E840C = 16.666666f;
+#endif
 
 // match: ?flt_3E8404@@3MB @ 0x003E8404
 // match: ?flt_3E8408@@3MB @ 0x003E8408

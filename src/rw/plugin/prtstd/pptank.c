@@ -48,6 +48,7 @@ static const char rcsid[] = "@@@@(#)$Id: //RenderWare/RW36Active/rwsdk/plugin/pr
 // match: _rcsid @ 0x00419F28
 
 // match: __rpPrtStdPTankCtor @ 0x002F2620
+// sp-match: __rpPrtStdPTankCtor @ 0x0020D0D0
 RpPrtStdEmitterPTank *
 _rpPrtStdPTankCtor(RpPrtStdEmitterPTank *emtPTank)
 {
@@ -73,6 +74,7 @@ _rpPrtStdPTankCtor(RpPrtStdEmitterPTank *emtPTank)
 }
 
 // match: __rpPrtStdPTankDtor @ 0x002F2660
+// sp-match: __rpPrtStdPTankDtor @ 0x0020D110
 RpPrtStdEmitterPTank *
 _rpPrtStdPTankDtor(RpPrtStdEmitterPTank *emtPTank)
 {
@@ -108,6 +110,7 @@ _rpPrtStdPTankDtor(RpPrtStdEmitterPTank *emtPTank)
 }
 
 // match: __rpPrtStdPTankClone @ 0x002F26C0
+// sp-match: __rpPrtStdPTankClone @ 0x0020D170
 RpPrtStdEmitterPTank *
 _rpPrtStdPTankClone(RpPrtStdEmitterPTank *dstEmtPTank, RpPrtStdEmitterPTank *srcEmtPTank)
 {
@@ -222,6 +225,7 @@ _rpPrtStdPTankCreateDataPtr(RpPrtStdEmitterPTank *emtPTank)
 /************************************************************************/
 
 // match: __rpPrtStdPTankStreamRead @ 0x002F2700
+// sp-match: __rpPrtStdPTankStreamRead @ 0x0020D1B0
 RpPrtStdEmitterPTank *
 _rpPrtStdPTankStreamRead(RwStream *stream, RpPrtStdEmitterPTank *emtPTank)
 {
@@ -248,6 +252,7 @@ _rpPrtStdPTankStreamRead(RwStream *stream, RpPrtStdEmitterPTank *emtPTank)
 }
 
 // match: __rpPrtStdPTankStreamWrite @ 0x002F2750
+// sp-match: __rpPrtStdPTankStreamWrite @ 0x0020D200
 RpPrtStdEmitterPTank *
 _rpPrtStdPTankStreamWrite(RwStream *stream, RpPrtStdEmitterPTank *emtPTank)
 {
@@ -275,6 +280,7 @@ _rpPrtStdPTankStreamWrite(RwStream *stream, RpPrtStdEmitterPTank *emtPTank)
 }
 
 // match: __rpPrtStdPTankStreamGetSize @ 0x002F27A0
+// sp-match: __rpPrtStdPTankStreamGetSize @ 0x0020D250
 RwInt32
 _rpPrtStdPTankStreamGetSize(RpPrtStdEmitterPTank *emtPTank __RWUNUSEDRELEASE__)
 {

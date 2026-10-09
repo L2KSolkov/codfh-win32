@@ -26,6 +26,7 @@ static RwChar dev[5];
  * This function must be implemented in every file system
  */
 // match: _TkXboxFSGetFileObject @ 0x00258310
+// sp-match: _TkXboxFSGetFileObject @ 0x00174180
 RtFile *
 TkXboxFSGetFileObject( RtFileSystem *fs, RwUInt32 index )
 {
@@ -45,6 +46,7 @@ TkXboxFSGetFileObject( RtFileSystem *fs, RwUInt32 index )
  * Perfom any operation needed on closing this file system
  */
 // match: _TkXboxFSClose @ 0x00258330
+// sp-match: _TkXboxFSClose @ 0x001741A0
 static void
 TkXboxFSClose( RtFileSystem *xboxFileSystem )
 {
@@ -61,6 +63,7 @@ TkXboxFSClose( RtFileSystem *xboxFileSystem )
  * Open File
  */
 // match: _TkXboxFSystemFOpen @ 0x002588F0
+// sp-match: _TkXboxFSystemFOpen @ 0x00174760
 RtFileSystemError
 TkXboxFSystemFOpen ( RtFileSystem  *fs,
                      RtFile        *file,
@@ -176,6 +179,7 @@ TkXboxFSystemFOpen ( RtFileSystem  *fs,
  * Close File
  */
 // match: _TkXboxFSystemFClose @ 0x00258350
+// sp-match: _TkXboxFSystemFClose @ 0x001741C0
 void
 TkXboxFSystemFClose ( RtFile *file )
 {
@@ -193,6 +197,7 @@ TkXboxFSystemFClose ( RtFile *file )
  * Read File
  */
 // match: _TkXboxFSystemFRead @ 0x00258370
+// sp-match: _TkXboxFSystemFRead @ 0x001741E0
 RwUInt32
 TkXboxFSystemFRead ( RtFile     *file,
                      void       *pBuffer,
@@ -335,6 +340,7 @@ TkXboxFSystemFRead ( RtFile     *file,
  * Write File
  */
 // match: _TkXboxFSystemFWrite @ 0x00258560
+// sp-match: _TkXboxFSystemFWrite @ 0x001743D0
 RwUInt32
 TkXboxFSystemFWrite ( RtFile       *file,
                       const void   *buffer,
@@ -448,6 +454,7 @@ TkXboxFSystemFWrite ( RtFile       *file,
  * Set Position File
  */
 // match: _TkXboxFSystemSetPosition @ 0x00258710
+// sp-match: _TkXboxFSystemSetPosition @ 0x00174580
 RtInt64
 TkXboxFSystemSetPosition ( RtFile           *file,
                            RwInt32           offset,
@@ -487,6 +494,7 @@ TkXboxFSystemSetPosition ( RtFile           *file,
  * Sync
  */
 // match: _TkXboxFSystemFSync @ 0x00258750
+// sp-match: _TkXboxFSystemFSync @ 0x001745C0
 RtFileStatus
 TkXboxFSystemFSync ( RtFile *file, RwBool block )
 {
@@ -565,6 +573,7 @@ TkXboxFSystemFSync ( RtFile *file, RwBool block )
  * Abort
  */
 // match: _TkXboxFSystemAbort @ 0x00258860
+// sp-match: _TkXboxFSystemAbort @ 0x001746D0
 RwBool
 TkXboxFSystemAbort ( RtFile *file )
 {
@@ -578,6 +587,7 @@ TkXboxFSystemAbort ( RtFile *file )
  * It returns the status of this file
  */
 // match: _TkXboxFSFileGetStatus @ 0x00258870
+// sp-match: _TkXboxFSFileGetStatus @ 0x001746E0
 static RtFileStatus
 TkXboxFSFileGetStatus( RtFile *file )
 {
@@ -595,6 +605,7 @@ TkXboxFSFileGetStatus( RtFile *file )
  * File Exists
  */
 // match: _TkXboxFSystemFileExists @ 0x00258890
+// sp-match: _TkXboxFSystemFileExists @ 0x00174700
 static RwBool
 TkXboxFSystemFileExists( RtFileSystem *fs,
                          const RwChar *fileName )
@@ -632,6 +643,7 @@ TkXboxFSystemFileExists( RtFileSystem *fs,
  *                          or NULL if initialization failed.
  */
 // match: _RtXboxFSystemInit @ 0x00258A30
+// sp-match: _RtXboxFSystemInit @ 0x001748A0
 RtFileSystem *
 RtXboxFSystemInit( RwInt32 maxNbOpenFiles,
                    RwChar *deviceName,

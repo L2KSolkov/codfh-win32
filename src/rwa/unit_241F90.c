@@ -830,6 +830,7 @@ RwInt16 word_42F1A0[768] = {
 
 
 // match: _sub_241F90 @ 0x00241F90
+// sp-match: _sub_241F90 @ 0x001560D0
 RwInt32
 sub_241F90(RwReal gain)
 {
@@ -846,6 +847,7 @@ sub_241F90(RwReal gain)
 }
 
 // match: _sub_241FD0 @ 0x00241FD0
+// sp-match: _sub_241FD0 @ 0x00156110
 void
 sub_241FD0(RwUInt8 **cursor, const void *src, RwInt32 size)
 {
@@ -889,6 +891,7 @@ sub_241FD0(RwUInt8 **cursor, const void *src, RwInt32 size)
 
 
 // match: _sub_242050 @ 0x00242050
+// sp-match: _sub_242050 @ 0x00156190
 void
 sub_242050(RwReal *length, const RwaV3d *vector)
 {
@@ -898,6 +901,7 @@ sub_242050(RwReal *length, const RwaV3d *vector)
 
 
 // match: _sub_2420D0 @ 0x002420D0
+// sp-match: _sub_2420D0 @ 0x00156210
 void
 sub_2420D0(RwUInt32 a, RwUInt32 b, RwUInt32 *resultHigh, RwUInt32 *resultLow)
 {
@@ -919,6 +923,7 @@ sub_2420D0(RwUInt32 a, RwUInt32 b, RwUInt32 *resultHigh, RwUInt32 *resultLow)
 }
 
 // match: _sub_242150 @ 0x00242150
+// sp-match: _sub_242150 @ 0x00156290
 RwUInt8
 sub_242150(RwUInt32 value)
 {

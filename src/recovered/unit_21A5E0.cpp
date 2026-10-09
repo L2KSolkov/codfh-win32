@@ -14,12 +14,14 @@
 #include "types/type_10F710.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E9FD8
 extern const RwReal flt_3E9FD8 = 0.01f;
 // 0x003E9FDC
 extern const RwReal flt_3E9FDC = 0.01f;
 // 0x003E9FE0
 extern const RwReal flt_3E9FE0 = 16.666666f;
+#endif
 // 0x005051D8
 type_21A5E0 *dword_5051D8;
 // End of its data definitions.

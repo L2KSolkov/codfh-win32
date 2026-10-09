@@ -132,6 +132,12 @@ void sub_72AA0(struct type_67620_74 *arg_0);
 void sub_72960(type_72990 *arg_0);
 type_67620_74 *sub_72C40(RwChar *arg_0, bool arg_4);
 type_72990 *sub_72D00(RwChar *arg_0, bool arg_4);
+#ifdef CODFH_SP
+// Single player relocates kind 3 files through a second function with
+// sub_72D00's body (SP 0x5FCF8 calls it apart from kind 2's call at
+// 0x5FCEC), which /OPT:ICF folded into sub_72D00 (SP 0x5F920).
+type_72990 *sp_sub_72D00_kind3(RwChar *arg_0, bool arg_4);
+#endif
 type_72A30 *sub_72F00(RwChar *arg_0, bool arg_4);
 void sub_72FC0(RwInt32 arg_0, type_72FC0 *arg_4);
 void sub_73050(type_72FC0 *arg_0);

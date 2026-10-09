@@ -96,6 +96,7 @@ type_4C00E8 unk_4C00E8;
 // match: ?dword_4296F8@@3HA @ 0x004296F8
 
 // match: ?sub_F5F10@@YAXXZ @ 0x000F5F10
+// sp-match: ?sub_F5F10@@YAXXZ @ 0x000BB850
 
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_F5F10()
@@ -130,6 +131,7 @@ void sub_F5F10()
 }
 
 // match: ?sub_F5FE0@@YAXXZ @ 0x000F5FE0
+// sp-match: ?sub_F5FE0@@YAXXZ @ 0x000BB8D0
 void sub_F5FE0()
 {
     RwInt32 var_4;
@@ -145,6 +147,7 @@ void sub_F5FE0()
 }
 
 // match: ?sub_F6030@@YAXXZ @ 0x000F6030
+// sp-match: ?sub_F6030@@YAXXZ @ 0x000BB910
 void sub_F6030()
 {
     RwInt32 var_4;
@@ -162,6 +165,7 @@ void sub_F6030()
 }
 
 // match: ?sub_F6090@@YAXXZ @ 0x000F6090
+// sp-match: ?sub_F6090@@YAXXZ @ 0x000BB950
 void sub_F6090()
 {
     RwInt32 var_4;
@@ -180,6 +184,7 @@ void sub_F6090()
 }
 
 // match: ?sub_F6100@@YAHH@Z @ 0x000F6100
+// sp-match: ?sub_F6100@@YAHH@Z @ 0x000BB990
 RwInt32 sub_F6100(RwInt32 arg_0)
 {
     RwInt32 var_4 = 0;
@@ -192,6 +197,7 @@ RwInt32 sub_F6100(RwInt32 arg_0)
 }
 
 // match: ?sub_F6130@@YAHH@Z @ 0x000F6130
+// sp-match: ?sub_F6130@@YAHH@Z @ 0x000BB9B0
 RwInt32 sub_F6130(RwInt32 arg_0)
 {
     RwInt32 var_4 = 0;
@@ -204,6 +210,7 @@ RwInt32 sub_F6130(RwInt32 arg_0)
 }
 
 // match: ?sub_F6160@@YAHHI@Z @ 0x000F6160
+// sp-match: ?sub_F6160@@YAHHI@Z @ 0x000BB9D0
 RwInt32 sub_F6160(RwInt32 arg_0, RwUInt32 arg_4)
 {
     RwInt32 var_4 = 0;
@@ -216,6 +223,7 @@ RwInt32 sub_F6160(RwInt32 arg_0, RwUInt32 arg_4)
 }
 
 // match: ?sub_F61A0@@YAHH@Z @ 0x000F61A0
+// sp-match: ?sub_F61A0@@YAHH@Z @ 0x000BB9F0
 RwInt32 sub_F61A0(RwInt32 arg_0)
 {
     RwInt32 var_4;
@@ -231,6 +239,7 @@ RwInt32 sub_F61A0(RwInt32 arg_0)
 }
 
 // match: ?sub_F6200@@YAHH@Z @ 0x000F6200
+// sp-match: ?sub_F6200@@YAHH@Z @ 0x000BBA30
 RwInt32 sub_F6200(RwInt32 arg_0)
 {
     RwInt32 var_4;
@@ -246,6 +255,7 @@ RwInt32 sub_F6200(RwInt32 arg_0)
 }
 
 // match: ?sub_F6270@@YAXH@Z @ 0x000F6270
+// sp-match: ?sub_F6270@@YAXH@Z @ 0x000BBA80
 void sub_F6270(RwInt32 arg_0)
 {
     RwInt32 var_4;
@@ -260,6 +270,7 @@ void sub_F6270(RwInt32 arg_0)
 }
 
 // match: ?sub_F62F0@@YAHPAUtype_169D0@@HIH@Z @ 0x000F62F0
+// sp-match: ?sub_F62F0@@YAHPAUtype_169D0@@HIH@Z @ 0x000BBAD0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_F62F0(type_169D0 *arg_0, RwInt32 arg_4, RwUInt32 arg_8, RwInt32 arg_C)
 {
@@ -298,6 +309,7 @@ RwInt32 sub_F62F0(type_169D0 *arg_0, RwInt32 arg_4, RwUInt32 arg_8, RwInt32 arg_
 }
 
 // match: ?sub_F6400@type_4BFED0@@QAEPAUtype_F6400@@XZ @ 0x000F6400
+// sp-match: ?sub_F6400@type_4BFED0@@QAEPAUtype_F6400@@XZ @ 0x000BBB80
 type_F6400 *type_4BFED0::sub_F6400()
 {
     if (unk_88 >= 0x400)
@@ -308,6 +320,7 @@ type_F6400 *type_4BFED0::sub_F6400()
 }
 
 // match: ?sub_F6450@type_4BFED0@@QAEPAUtype_F6400@@H@Z @ 0x000F6450
+// sp-match: ?sub_F6450@type_4BFED0@@QAEPAUtype_F6400@@H@Z @ 0x000BBBB0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_F6400 *type_4BFED0::sub_F6450(RwInt32 arg_0)
 {
@@ -333,11 +346,13 @@ type_F6400 *type_4BFED0::sub_F6450(RwInt32 arg_0)
 }
 
 // match: ??0type_4BFED0@@QAE@XZ @ 0x000F64F0
+// sp-match: ??0type_4BFED0@@QAE@XZ @ 0x000BC0C0
 type_4BFED0::type_4BFED0()
 {
 }
 
 // match: ?sub_F6510@type_4BFED0@@QAEXXZ @ 0x000F6510
+// sp-match: ?sub_F6510@type_4BFED0@@QAEXXZ @ 0x000BC4D0
 void type_4BFED0::sub_F6510()
 {
     unk_80 = (type_F6400 **)RWSMalloc(0x1000, 0x34254); // not an address: an allocation tag
@@ -355,6 +370,7 @@ void type_4BFED0::sub_F6510()
 }
 
 // match: ?sub_F65E0@type_4BFED0@@QAEXXZ @ 0x000F65E0
+// sp-match: ?sub_F65E0@type_4BFED0@@QAEXXZ @ 0x000BC540
 void type_4BFED0::sub_F65E0()
 {
     sub_F6600();
@@ -362,6 +378,7 @@ void type_4BFED0::sub_F65E0()
 }
 
 // match: ?sub_F6600@type_4BFED0@@QAEXXZ @ 0x000F6600
+// sp-match: ?sub_F6600@type_4BFED0@@QAEXXZ @ 0x000BC0D0
 void type_4BFED0::sub_F6600()
 {
     sub_F6700();
@@ -377,6 +394,7 @@ void type_4BFED0::sub_F6600()
 }
 
 // match: ?sub_F6680@type_4BFED0@@QAEXXZ @ 0x000F6680
+// sp-match: ?sub_F6680@type_4BFED0@@QAEXXZ @ 0x000BC110
 void type_4BFED0::sub_F6680()
 {
     sub_F6600();
@@ -394,6 +412,7 @@ void type_4BFED0::sub_F6680()
 }
 
 // match: ?sub_F6700@type_4BFED0@@QAEXXZ @ 0x000F6700
+// sp-match: ?sub_F6700@type_4BFED0@@QAEXXZ @ 0x000BBC10
 void type_4BFED0::sub_F6700()
 {
     unk_74 = 0;
@@ -410,6 +429,7 @@ void type_4BFED0::sub_F6700()
      ((a)->unk_10.z - (b)->unk_10.z) * ((a)->unk_10.z - (b)->unk_10.z))
 
 // match: ?sub_F6750@@YAMPAUtype_F6400@@PAUtype_F8350@@HHPAUtype_169D0@@PAM@Z @ 0x000F6750
+// sp-match: ?sub_F6750@@YAMPAUtype_F6400@@PAUtype_F8350@@HHPAUtype_169D0@@PAM@Z @ 0x000BBC40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwReal sub_F6750(type_F6400 *arg_0, type_F8350 *arg_4, RwInt32 arg_8, RwInt32 arg_C, type_169D0 *arg_10,
                  RwReal *arg_14)
@@ -443,6 +463,7 @@ RwReal sub_F6750(type_F6400 *arg_0, type_F8350 *arg_4, RwInt32 arg_8, RwInt32 ar
 }
 
 // match: ?sub_F6840@@YAMPAUtype_F6400@@PAUtype_F8350@@HHPAUtype_169D0@@PAM@Z @ 0x000F6840
+// sp-match: ?sub_F6840@@YAMPAUtype_F6400@@PAUtype_F8350@@HHPAUtype_169D0@@PAM@Z @ 0x000BBCC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwReal sub_F6840(type_F6400 *arg_0, type_F8350 *arg_4, RwInt32 arg_8, RwInt32 arg_C, type_169D0 *arg_10,
                  RwReal *arg_14)
@@ -473,6 +494,7 @@ RwReal sub_F6840(type_F6400 *arg_0, type_F8350 *arg_4, RwInt32 arg_8, RwInt32 ar
 }
 
 // match: ?sub_F6970@@YAMPAUtype_F6400@@PAUtype_F8350@@HHPAUtype_169D0@@PAM@Z @ 0x000F6970
+// sp-match: ?sub_F6970@@YAMPAUtype_F6400@@PAUtype_F8350@@HHPAUtype_169D0@@PAM@Z @ 0x000BBDE0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwReal sub_F6970(type_F6400 *arg_0, type_F8350 *arg_4, RwInt32 arg_8, RwInt32 arg_C, type_169D0 *arg_10,
                  RwReal *arg_14)
@@ -521,6 +543,7 @@ RwReal sub_F6970(type_F6400 *arg_0, type_F8350 *arg_4, RwInt32 arg_8, RwInt32 ar
 }
 
 // match: ?sub_F6B00@@YAMPAUtype_F8350@@H0H@Z @ 0x000F6B00
+// sp-match: ?sub_F6B00@@YAMPAUtype_F8350@@H0H@Z @ 0x000BBF00
 RwReal sub_F6B00(type_F8350 *arg_0, RwInt32 arg_4, type_F8350 *arg_8, RwInt32 arg_C)
 {
     RwReal var_4 = NODE_DIST2(arg_0, arg_8);
@@ -533,12 +556,14 @@ RwReal sub_F6B00(type_F8350 *arg_0, RwInt32 arg_4, type_F8350 *arg_8, RwInt32 ar
 }
 
 // match: ?sub_F6B70@@YAHPAUtype_F8350@@PAUtype_169D0@@@Z @ 0x000F6B70
+// sp-match: ?sub_F6B70@@YAHPAUtype_F8350@@PAUtype_169D0@@@Z @ 0x000BBF40
 RwInt32 sub_F6B70(type_F8350 *arg_0, type_169D0 *arg_4)
 {
     return arg_0->unk_00_4;
 }
 
 // match: ?sub_F6B80@@YAHPAUtype_F8350@@PAUtype_169D0@@@Z @ 0x000F6B80
+// sp-match: ?sub_F6B80@@YAHPAUtype_F8350@@PAUtype_169D0@@@Z @ 0x000BBF50
 RwInt32 sub_F6B80(type_F8350 *arg_0, type_169D0 *arg_4)
 {
     if (arg_0->unk_00_2)
@@ -549,6 +574,7 @@ RwInt32 sub_F6B80(type_F8350 *arg_0, type_169D0 *arg_4)
 }
 
 // match: ?sub_F6BB0@@YAP6AMPAUtype_F6400@@PAUtype_F8350@@HHPAUtype_169D0@@PAM@ZH@Z @ 0x000F6BB0
+// sp-match: ?sub_F6BB0@@YAP6AMPAUtype_F6400@@PAUtype_F8350@@HHPAUtype_169D0@@PAM@ZH@Z @ 0x000BBF70
 type_169D0_cost sub_F6BB0(RwInt32 arg_0)
 {
     switch (arg_0)
@@ -564,6 +590,7 @@ type_169D0_cost sub_F6BB0(RwInt32 arg_0)
 }
 
 // match: ?sub_F6BF0@@YAP6AMPAUtype_F8350@@H0H@ZH@Z @ 0x000F6BF0
+// sp-match: ?sub_F6BF0@@YAP6AMPAUtype_F8350@@H0H@ZH@Z @ 0x000BBFA0
 type_169D0_heuristic sub_F6BF0(RwInt32 arg_0)
 {
     switch (arg_0)
@@ -575,6 +602,7 @@ type_169D0_heuristic sub_F6BF0(RwInt32 arg_0)
 }
 
 // match: ?sub_F6C10@@YAP6AHPAUtype_F8350@@PAUtype_169D0@@@ZH@Z @ 0x000F6C10
+// sp-match: ?sub_F6C10@@YAP6AHPAUtype_F8350@@PAUtype_169D0@@@ZH@Z @ 0x000BBFC0
 type_169D0_filter sub_F6C10(RwInt32 arg_0)
 {
     switch (arg_0)
@@ -590,6 +618,7 @@ type_169D0_filter sub_F6C10(RwInt32 arg_0)
 }
 
 // match: ?sub_F6C50@type_4BFED0@@QAEXXZ @ 0x000F6C50
+// sp-match: ?sub_F6C50@type_4BFED0@@QAEXXZ @ 0x000BBFE0
 void type_4BFED0::sub_F6C50()
 {
     unk_94 = 0;
@@ -598,6 +627,7 @@ void type_4BFED0::sub_F6C50()
 }
 
 // match: ?sub_F6C80@type_4BFED0@@QAEXPAUtype_F6400@@@Z @ 0x000F6C80
+// sp-match: ?sub_F6C80@type_4BFED0@@QAEXPAUtype_F6400@@@Z @ 0x000BC000
 void type_4BFED0::sub_F6C80(type_F6400 *arg_0)
 {
     arg_0->unk_00 &= ~2;
@@ -628,6 +658,7 @@ void type_4BFED0::sub_F6C80(type_F6400 *arg_0)
 }
 
 // match: ?sub_F6D60@type_4BFED0@@QAEXPAUtype_F6400@@@Z @ 0x000F6D60
+// sp-match: ?sub_F6D60@type_4BFED0@@QAEXPAUtype_F6400@@@Z @ 0x000BC070
 void type_4BFED0::sub_F6D60(type_F6400 *arg_0)
 {
     type_F6400 *var_4;
@@ -652,6 +683,7 @@ void type_4BFED0::sub_F6D60(type_F6400 *arg_0)
 }
 
 // match: ?sub_F6DE0@type_4BFED0@@QAEHPAUtype_169D0@@H@Z @ 0x000F6DE0
+// sp-match: ?sub_F6DE0@type_4BFED0@@QAEHPAUtype_169D0@@H@Z @ 0x000BC8D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_4BFED0::sub_F6DE0(type_169D0 *arg_0, RwInt32 arg_4)
 {
@@ -700,6 +732,7 @@ RwInt32 type_4BFED0::sub_F6DE0(type_169D0 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_F6FC0@type_4BFED0@@QAEHXZ @ 0x000F6FC0
+// sp-match: ?sub_F6FC0@type_4BFED0@@QAEHXZ @ 0x000BC640
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_4BFED0::sub_F6FC0()
 {
@@ -886,6 +919,7 @@ RwInt32 type_4BFED0::sub_F6FC0()
 }
 
 // match: ?sub_F7470@type_4BFED0@@QAEHPAUtype_169D0@@@Z @ 0x000F7470
+// sp-match: ?sub_F7470@type_4BFED0@@QAEHPAUtype_169D0@@@Z @ 0x000BC560
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_4BFED0::sub_F7470(type_169D0 *arg_0)
 {
@@ -951,6 +985,7 @@ RwInt32 type_4BFED0::sub_F7470(type_169D0 *arg_0)
 // match: ?sub_F7620@type_4BFED0@@QAEHPAUtype_F6400@@PAUtype_169D0@@@Z @ 0x000F7620
 // match: __ehhandler$?sub_F7620@type_4BFED0@@QAEHPAUtype_F6400@@PAUtype_169D0@@@Z-0x8 @ 0x003010F0
 // match: __ehhandler$?sub_F7620@type_4BFED0@@QAEHPAUtype_F6400@@PAUtype_169D0@@@Z @ 0x003010F8
+// sp-match: ?sub_F7620@type_4BFED0@@QAEHPAUtype_F6400@@PAUtype_169D0@@@Z @ 0x000BC160
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_4BFED0::sub_F7620(type_F6400 *arg_0, type_169D0 *arg_4)
 {
@@ -1084,6 +1119,9 @@ RwInt32 type_4BFED0::sub_F7620(type_F6400 *arg_0, type_169D0 *arg_4)
 }
 
 // match: ?sub_F7B00@type_3CE1FC@@QAEXXZ @ 0x000F7B00
+#ifdef CODFH_SP // single player expands it in sub_F7620 (SP 0xBC3F0)
+inline
+#endif
 void type_3CE1FC::sub_F7B00()
 {
     if (unk_08)

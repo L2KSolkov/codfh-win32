@@ -349,6 +349,7 @@ static const S32 ifimquantlevels8[16][64] = {
 // match: _ifimquantlevels8 @ 0x003EFF60
 
 // match: _fastidct8x8 @ 0x0034C400
+// sp-match: _fastidct8x8 @ 0x0025C400
 
 static void fastidct8x8(U8 *out, U32 pitch, S16 *in, const S32 *quant)
 {
@@ -460,12 +461,14 @@ static void fastidct8x8(U8 *out, U32 pitch, S16 *in, const S32 *quant)
 }
 
 // match: _FastIDCT8x8@16 @ 0x0034CAD0
+// sp-match: _FastIDCT8x8@16 @ 0x0025CAD0
 void __stdcall FastIDCT8x8(U8 *out, U32 pitch, S16 *in, U32 quality)
 {
   fastidct8x8(out, pitch, in, ifiquantlevels8[quality]);
 }
 
 // match: _fastidct8x8d @ 0x0034C730
+// sp-match: _fastidct8x8d @ 0x0025C730
 static void fastidct8x8d(U8 *out, U32 pitch, S16 *in, const S32 *quant)
 {
   S32 tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
@@ -588,12 +591,14 @@ static void fastidct8x8d(U8 *out, U32 pitch, S16 *in, const S32 *quant)
 }
 
 // match: _FastIDCT8x8d@16 @ 0x0034CB00
+// sp-match: _FastIDCT8x8d@16 @ 0x0025CB00
 void __stdcall FastIDCT8x8d(U8 *out, U32 pitch, S16 *in, U32 quality)
 {
   fastidct8x8d(out, pitch, in, ifiquantlevels8[quality]);
 }
 
 // match: _FastmIDCT8x8WithMotion@20 @ 0x0034CB30
+// sp-match: _FastmIDCT8x8WithMotion@20 @ 0x0025CB30
 void __stdcall FastmIDCT8x8WithMotion(U8 *out, U32 pitch, S16 *in, U32 quality, U8 *reference)
 {
   S32 tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;

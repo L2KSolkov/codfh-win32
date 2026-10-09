@@ -24,8 +24,10 @@
 #include "rws/csystemcommands.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: single player has no unreferenced 16.666666f here: the two literals follow collquery's (SP 0x2E1928)
 // 0x003D5188
 extern const RwReal flt_3D5188 = 16.666666f;
+#endif
 
 // match: ?flt_3D5188@@3MB @ 0x003D5188
 
@@ -36,6 +38,7 @@ extern const RwReal flt_3D5188 = 16.666666f;
 // match: ?sub_92620@@YAHPAURwV3d@@0000PAM@Z @ 0x00092620
 // match: __real@322bcc77 @ 0x003D518C
 // match: __real@b22bcc77 @ 0x003D5190
+// sp-match: ?sub_92620@@YAHPAURwV3d@@0000PAM@Z @ 0x00073C90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_92620(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwV3d *arg_C, RwV3d *arg_10, RwReal *arg_14)
 {
@@ -103,6 +106,7 @@ RwInt32 sub_92860(RwV3d *arg_0, RwV3d *arg_4, RwReal arg_8, RwReal arg_C)
 }
 // Likewise within the cylinder at the matrix arg_4 (upright in its frame).
 // match: ?sub_92900@@YAHPAURwV3d@@PAURwMatrixTag@@MM@Z @ 0x00092900
+// sp-match: ?sub_92900@@YAHPAURwV3d@@PAURwMatrixTag@@MM@Z @ 0x000742B0
 RwInt32 sub_92900(RwV3d *arg_0, RwMatrix *arg_4, RwReal arg_8, RwReal arg_C)
 {
     RwMatrix var_40;
@@ -115,7 +119,11 @@ RwInt32 sub_92900(RwV3d *arg_0, RwMatrix *arg_4, RwReal arg_8, RwReal arg_C)
     var_50 = var_4C.y;
     var_4C.y = 0.0f;
     var_54 = RwV3dDotProductMacro(&var_4C, &var_4C);
+#ifdef CODFH_SP // shape: SP 0x742B0 compares the sum with the square
+    if (var_54 < arg_8 * arg_8 && -arg_C < var_50 && var_50 < arg_C)
+#else
     if (arg_8 * arg_8 > var_54 && -arg_C < var_50 && var_50 < arg_C)
+#endif
     {
         return 1;
     }

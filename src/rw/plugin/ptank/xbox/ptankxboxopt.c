@@ -41,6 +41,7 @@ static const D3DMATRIX rpPTankXboxOptIdentity =
 // match: _rpPTankXboxOptIdentity @ 0x00419CE8
 
 // match: __rpPTankXboxOptRenderCallBack @ 0x002EAA10
+// sp-match: __rpPTankXboxOptRenderCallBack @ 0x002054C0
 
 RwBool
 _rpPTankXboxOptRenderCallBack(RpAtomic *atomic, RpPTankData *ptankGlobal, RwInt32 actPCount)
@@ -228,6 +229,7 @@ _rpPTankXboxOptRenderCallBack(RpAtomic *atomic, RpPTankData *ptankGlobal, RwInt3
 }
 
 // match: __rpPTankXboxOptInstance @ 0x002EB1A0
+// sp-match: __rpPTankXboxOptInstance @ 0x00205C50
 RwBool
 _rpPTankXboxOptInstance(RpAtomic *atomic, RpPTankData *ptankGlobal __RWUNUSED__,
                         RwInt32 actPCount __RWUNUSED__, RwUInt32 instFlags)
@@ -238,6 +240,7 @@ _rpPTankXboxOptInstance(RpAtomic *atomic, RpPTankData *ptankGlobal __RWUNUSED__,
 }
 
 // match: __rpPTankXboxOptCreate @ 0x002EB1C0
+// sp-match: __rpPTankXboxOptCreate @ 0x00205C70
 RwBool
 _rpPTankXboxOptCreate(RpAtomic *atomic __RWUNUSED__, RpPTankData *ptankGlobal,
                       RwInt32 maxPCount __RWUNUSED__, RwUInt32 dataFlags __RWUNUSED__,

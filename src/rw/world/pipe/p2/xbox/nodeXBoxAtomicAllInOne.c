@@ -30,6 +30,7 @@ static const char rcsid[] = "@@@@(#)$Id: //RenderWare/RW36Active/rwsdk/world/pip
 // match: ?nodeXboxAtomicAllInOneCSL@?1??RxNodeDefinitionGetXboxAtomicAllInOne@@9@9 @ 0x00436D48
 
 // match: __rwXbAtomicDefaultLightingCallback @ 0x002E1EF0
+// sp-match: __rwXbAtomicDefaultLightingCallback @ 0x001FC9C0
 
 void
 _rwXbAtomicDefaultLightingCallback(void *object)
@@ -108,6 +109,7 @@ _rwXbAtomicDefaultLightingCallback(void *object)
 }
 
 // match: _rwXBInstanceDataMorphUpdate @ 0x002E2080
+// sp-match: _rwXBInstanceDataMorphUpdate @ 0x001FCB50
 static void
 rwXBInstanceDataMorphUpdate(RpGeometry *geometry,
                             RxXboxResEntryHeader *instancedHeader,
@@ -231,6 +233,7 @@ instancedHeader->vertexAlpha =
 }
 
 // match: __rxXBAtomicDefaultInstanceCallback @ 0x002E22F0
+// sp-match: __rxXBAtomicDefaultInstanceCallback @ 0x001FCDC0
 RwBool
 _rxXBAtomicDefaultInstanceCallback(void *object,
                                    RxXboxResEntryHeader *instancedHeader,
@@ -295,6 +298,7 @@ _rxXBAtomicDefaultInstanceCallback(void *object,
 }
 
 // match: __rxXBAtomicDefaultReinstanceCallback @ 0x002E2380
+// sp-match: __rxXBAtomicDefaultReinstanceCallback @ 0x001FCE50
 RwBool
 _rxXBAtomicDefaultReinstanceCallback(void *object,
                                      RxXboxResEntryHeader *instancedHeader)
@@ -322,6 +326,7 @@ _rxXBAtomicDefaultReinstanceCallback(void *object,
 }
 
 // match: _XBAtomicAllInOneNode @ 0x002E23E0
+// sp-match: _XBAtomicAllInOneNode @ 0x001FCEB0
 static RwBool
 XBAtomicAllInOneNode(RxPipelineNode *self, const RxPipelineNodeParam *params)
 {
@@ -505,6 +510,7 @@ XBAtomicAllInOneNode(RxPipelineNode *self, const RxPipelineNodeParam *params)
 }
 
 // match: __rxXBAtomicAllInOnePipelineInit @ 0x002E26E0
+// sp-match: __rxXBAtomicAllInOnePipelineInit @ 0x001FD1B0
 RwBool
 _rxXBAtomicAllInOnePipelineInit(RxPipelineNode *node)
 {
@@ -519,6 +525,7 @@ _rxXBAtomicAllInOnePipelineInit(RxPipelineNode *node)
 }
 
 // match: _RxNodeDefinitionGetXboxAtomicAllInOne @ 0x002E2710
+// sp-match: _RxNodeDefinitionGetXboxAtomicAllInOne @ 0x001FD1E0
 RxNodeDefinition *
 RxNodeDefinitionGetXboxAtomicAllInOne(void)
 {

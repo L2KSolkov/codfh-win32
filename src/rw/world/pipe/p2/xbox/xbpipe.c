@@ -68,6 +68,7 @@ const D3DPRIMITIVETYPE RwXboxPrimConvTable[7] =
 // match: _D3D8material @ 0x00436CC0
 
 // match: _XBMeshGetNumVerticesMinIndex @ 0x002DF670
+// sp-match: _XBMeshGetNumVerticesMinIndex @ 0x001FA130
 
 void
 XBMeshGetNumVerticesMinIndex(const RwUInt16 *indices, RwUInt32 numIndices,
@@ -100,6 +101,7 @@ XBMeshGetNumVerticesMinIndex(const RwUInt16 *indices, RwUInt32 numIndices,
 }
 
 // match: __rwXBResourceEntryInstanceDataDestroy @ 0x002DF6C0
+// sp-match: __rwXBResourceEntryInstanceDataDestroy @ 0x001FA180
 void
 _rwXBResourceEntryInstanceDataDestroy(RwResEntry *repEntry)
 {
@@ -114,6 +116,7 @@ _rwXBResourceEntryInstanceDataDestroy(RwResEntry *repEntry)
 
 /* qsort order for triangles: by their sorted vertex indices. */
 // match: _SortTriangles @ 0x002DF6E0
+// sp-match: _SortTriangles @ 0x001FA1A0
 static int
 SortTriangles(const void *pA, const void *pB)
 {
@@ -187,6 +190,7 @@ SortTriangles(const void *pA, const void *pB)
 }
 
 // match: __rxXBInstance @ 0x002DF760
+// sp-match: __rxXBInstance @ 0x001FA220
 RwResEntry *
 _rxXBInstance(void *object,
               void *owner,
@@ -388,6 +392,7 @@ _rxXBInstance(void *object,
 }
 
 // match: __rxXbDefaultRenderFFPObjectSetUp @ 0x002DFAC0
+// sp-match: __rxXbDefaultRenderFFPObjectSetUp @ 0x001FA580
 void
 _rxXbDefaultRenderFFPObjectSetUp(RxXboxResEntryHeader *instancedHeader,
                                  void *object __RWUNUSED__,
@@ -455,6 +460,7 @@ _rxXbDefaultRenderFFPObjectSetUp(RxXboxResEntryHeader *instancedHeader,
 }
 
 // match: __rxXbDefaultRenderFFPMeshSetUp @ 0x002DFC20
+// sp-match: __rxXbDefaultRenderFFPMeshSetUp @ 0x001FA6E0
 void
 _rxXbDefaultRenderFFPMeshSetUp(RxXboxInstanceData *mesh)
 {
@@ -510,6 +516,7 @@ _rxXbDefaultRenderFFPMeshSetUp(RxXboxInstanceData *mesh)
 }
 
 // match: __rxXbDefaultRenderFFPMeshCombinerSetUp @ 0x002DFDB0
+// sp-match: __rxXbDefaultRenderFFPMeshCombinerSetUp @ 0x001FA870
 void
 _rxXbDefaultRenderFFPMeshCombinerSetUp(RxXboxInstanceData *mesh, RwUInt32 flags)
 {
@@ -575,6 +582,7 @@ _rxXbDefaultRenderFFPMeshCombinerSetUp(RxXboxInstanceData *mesh, RwUInt32 flags)
 }
 
 // match: __rxXbDefaultRenderFFPMeshCombinerTearDown @ 0x002E0190
+// sp-match: __rxXbDefaultRenderFFPMeshCombinerTearDown @ 0x001FAC50
 void
 _rxXbDefaultRenderFFPMeshCombinerTearDown(void)
 {
@@ -586,6 +594,7 @@ _rxXbDefaultRenderFFPMeshCombinerTearDown(void)
 }
 
 // match: __rxXbDefaultRenderFFPMesh @ 0x002E0200
+// sp-match: __rxXbDefaultRenderFFPMesh @ 0x001FACC0
 void
 _rxXbDefaultRenderFFPMesh(RxXboxResEntryHeader *instancedHeader,
                           RxXboxInstanceData *mesh,
@@ -631,6 +640,7 @@ _rxXbDefaultRenderFFPMesh(RxXboxResEntryHeader *instancedHeader,
 }
 
 // match: __rxXbDefaultRenderCallback @ 0x002E02A0
+// sp-match: __rxXbDefaultRenderCallback @ 0x001FAD60
 void
 _rxXbDefaultRenderCallback(RxXboxResEntryHeader *resEntryHeader,
                            void *object,
@@ -782,6 +792,7 @@ _rxXbDefaultRenderCallback(RxXboxResEntryHeader *resEntryHeader,
 }
 
 // match: __rxXboxAllInOneSetInstanceCallBack @ 0x002E0780
+// sp-match: __rxXboxAllInOneSetInstanceCallBack @ 0x001FB240
 void
 _rxXboxAllInOneSetInstanceCallBack(RxPipelineNode *node,
                                    RxXboxAllInOneInstanceCallBack callback)
@@ -792,6 +803,7 @@ _rxXboxAllInOneSetInstanceCallBack(RxPipelineNode *node,
 }
 
 // match: __rxXboxAllInOneGetInstanceCallBack @ 0x002E0790
+// sp-match: __rxXboxAllInOneGetInstanceCallBack @ 0x001FB250
 RxXboxAllInOneInstanceCallBack
 _rxXboxAllInOneGetInstanceCallBack(RxPipelineNode *node)
 {

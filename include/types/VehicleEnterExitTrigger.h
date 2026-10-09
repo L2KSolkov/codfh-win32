@@ -40,6 +40,12 @@ public:
     RwInt32 sub_BF470(type_3D3548 *arg_0);
     // Runs sub_BF310 for a player (flag unk_2C_4) when unk_E8 allows.
     void sub_BF590(type_3D3548 *arg_0);
+#ifdef CODFH_SP
+    // What it does when the entity arg_0 leaves it: nothing. Single player's
+    // sub_145640 calls it and LadderTrigger's as two calls (SP 0xF0731,
+    // 0xF073C), both folded (/OPT:ICF) into the empty SP 0xD60D0.
+    void sp_leave(type_3D3548 *arg_0);
+#endif
 
     type_6B960 *unk_C0;         // its registrations for the messages
     type_6B960 *unk_C4;         // unk_C8 and unk_D8

@@ -8,6 +8,7 @@
 #include "types/type_DC400.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E90CC
 extern const RwReal flt_3E90CC = 0.01f;
 // 0x003E90D0
@@ -20,6 +21,7 @@ extern const RwReal flt_3E90D8 = 0.01f;
 extern const RwReal flt_3E90DC = 0.01f;
 // 0x003E90E0
 extern const RwReal flt_3E90E0 = 16.666666f;
+#endif
 // End of its data definitions.
 
 

@@ -36,7 +36,9 @@ RwBool sub_15370(type_3DBC78 *arg_0, RwInt32 arg_4, RwInt32 arg_8);
 
 // sub_3DE00: whether the entity arg_0 may take the entity arg_4 as its
 // target (type_3D410::sub_3DCD0 and type_3CE4F0::sub_34C60 ask).
+#ifndef CODFH_SP // single player's is a static inline (sp/sp_target.h)
 RwInt32 sub_3DE00(type_3D3548 *arg_0, type_3D3548 *arg_4);
+#endif
 
 // sub_6B680: sub_6B5F0's counterpart taking a message id (arg_0) for the
 // name; the other arguments are as there.

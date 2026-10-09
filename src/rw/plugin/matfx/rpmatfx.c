@@ -323,6 +323,7 @@ MatFXGetConstData(const RpMaterial * material,
 // match: __rpMatFXMaterialDataFreeListPreallocBlocks @ 0x00436E88
 
 // match: _MatFXClose @ 0x002F5ED0
+// sp-match: _MatFXClose @ 0x00210660
 
 static void        *
 MatFXClose(void *instance,
@@ -388,6 +389,7 @@ RpMatFXMaterialDataSetFreeListCreateParams(RwInt32 blockSize,
 }
 
 // match: _MatFXOpen @ 0x002F5F00
+// sp-match: _MatFXOpen @ 0x00210690
 static void        *
 MatFXOpen(void *instance,
           RwInt32 offset __RWUNUSED__,
@@ -432,6 +434,7 @@ MatFXOpen(void *instance,
  *              stream read, stream write, stream size.                      *
  *---------------------------------------------------------------------------*/
 // match: _MatFXMaterialConstructor @ 0x002F5F50
+// sp-match: _MatFXMaterialConstructor @ 0x002106E0
 static void        *
 MatFXMaterialConstructor(void *object,
                          RwInt32 offset __RWUNUSED__,
@@ -447,6 +450,7 @@ MatFXMaterialConstructor(void *object,
 }
 
 // match: _MatFXMaterialDataClean @ 0x002F5F70
+// sp-match: _MatFXMaterialDataClean @ 0x00210700
 static rpMatFXMaterialData *
 MatFXMaterialDataClean(rpMatFXMaterialData * materialData)
 {
@@ -537,6 +541,7 @@ MatFXMaterialDataClean(rpMatFXMaterialData * materialData)
 }
 
 // match: _MatFXMaterialDestructor @ 0x002F5FF0
+// sp-match: _MatFXMaterialDestructor @ 0x00210780
 static void        *
 MatFXMaterialDestructor(void *object,
                         RwInt32 offset __RWUNUSED__,
@@ -612,6 +617,7 @@ MatFXMaterialGetData(RpMaterial * material)
 }
 
 // match: _MatFXMaterialCopy @ 0x002F7050
+// sp-match: _MatFXMaterialCopy @ 0x002117E0
 static void        *
 MatFXMaterialCopy(void *dstObject,
                   const void *srcObject,
@@ -805,6 +811,7 @@ MatFXMaterialCopy(void *dstObject,
 }
 
 // match: __rpMatFXStreamWriteTexture @ 0x002F6030
+// sp-match: __rpMatFXStreamWriteTexture @ 0x002107C0
 RwStream *
 _rpMatFXStreamWriteTexture(RwStream *stream, const RwTexture *texture)
 {
@@ -834,6 +841,7 @@ _rpMatFXStreamWriteTexture(RwStream *stream, const RwTexture *texture)
 }
 
 // match: __rpMatFXStreamReadTexture @ 0x002F6080
+// sp-match: __rpMatFXStreamReadTexture @ 0x00210810
 RwStream *
 _rpMatFXStreamReadTexture(RwStream *stream, RwTexture **texture)
 {
@@ -889,6 +897,7 @@ _rpMatFXStreamReadTexture(RwStream *stream, RwTexture **texture)
 }
 
 // match: __rpMatFXStreamSizeTexture @ 0x002F6120
+// sp-match: __rpMatFXStreamSizeTexture @ 0x002108B0
 RwUInt32
 _rpMatFXStreamSizeTexture(const RwTexture * texture)
 {
@@ -909,6 +918,7 @@ _rpMatFXStreamSizeTexture(const RwTexture * texture)
 }
 
 // match: _MatFXMaterialStreamWrite @ 0x002F6140
+// sp-match: _MatFXMaterialStreamWrite @ 0x002108D0
 static RwStream    *
 MatFXMaterialStreamWrite(RwStream      *stream,
                          RwInt32        binaryLength   __RWUNUSEDRELEASE__,
@@ -1059,6 +1069,7 @@ MatFXMaterialStreamWrite(RwStream      *stream,
 }
 
 // match: _MatFXMaterialStreamRead @ 0x002F7250
+// sp-match: _MatFXMaterialStreamRead @ 0x002119E0
 static RwStream    *
 MatFXMaterialStreamRead(RwStream   *stream,
                         RwInt32     binaryLength    __RWUNUSEDRELEASE__,
@@ -1289,6 +1300,7 @@ MatFXMaterialStreamRead(RwStream   *stream,
 }
 
 // match: _MatFXMaterialStreamGetSize @ 0x002F62A0
+// sp-match: _MatFXMaterialStreamGetSize @ 0x00210A30
 static RwInt32
 MatFXMaterialStreamGetSize(const void  *object,
                            RwInt32      offsetInObject  __RWUNUSED__,
@@ -1396,6 +1408,7 @@ MatFXMaterialStreamGetSize(const void  *object,
  *            stream read, stream write, stream size.                        *
  *---------------------------------------------------------------------------*/
 // match: _MatFXAtomicConstructor @ 0x002F6330
+// sp-match: _MatFXAtomicConstructor @ 0x00210AC0
 static void        *
 MatFXAtomicConstructor(void *object,
                        RwInt32 offset __RWUNUSED__,
@@ -1435,6 +1448,7 @@ MatFXAtomicDestructor(void *object,
 }
 
 // match: _MatFXAtomicCopy @ 0x002F6350
+// sp-match: _MatFXAtomicCopy @ 0x00210AE0
 static void        *
 MatFXAtomicCopy(void *dstObject,
                 const void *srcObject,
@@ -1470,6 +1484,7 @@ MatFXAtomicCopy(void *dstObject,
 }
 
 // match: _MatFXAtomicStreamWrite @ 0x002F6370
+// sp-match: _MatFXAtomicStreamWrite @ 0x00210B00
 static RwStream    *
 MatFXAtomicStreamWrite(RwStream    *stream,
                        RwInt32      binaryLength    __RWUNUSEDRELEASE__,
@@ -1495,6 +1510,7 @@ MatFXAtomicStreamWrite(RwStream    *stream,
 }
 
 // match: _MatFXAtomicStreamRead @ 0x002F6E90
+// sp-match: _MatFXAtomicStreamRead @ 0x00211620
 static RwStream    *
 MatFXAtomicStreamRead(RwStream *stream,
                       RwInt32   binaryLength    __RWUNUSEDRELEASE__,
@@ -1527,6 +1543,7 @@ MatFXAtomicStreamRead(RwStream *stream,
 }
 
 // match: _MatFXAtomicStreamGetSize @ 0x002F63A0
+// sp-match: _MatFXAtomicStreamGetSize @ 0x00210B30
 static RwInt32
 MatFXAtomicStreamGetSize(const void *object,
                          RwInt32     offsetInObject __RWUNUSED__,
@@ -1553,6 +1570,7 @@ MatFXAtomicStreamGetSize(const void *object,
  *---------------------------------------------------------------------------*/
 
 // match: _MatFXWorldSectorConstructor @ 0x002F63C0
+// sp-match: _MatFXWorldSectorConstructor @ 0x00210B50
 static void        *
 MatFXWorldSectorConstructor(void *object,
                             RwInt32 offset __RWUNUSED__,
@@ -1594,6 +1612,7 @@ MatFXWorldSectorDestructor(void *object,
 }
 
 // match: _MatFXWorldSectorCopy @ 0x002F63E0
+// sp-match: _MatFXWorldSectorCopy @ 0x00210B70
 static void        *
 MatFXWorldSectorCopy(void *dstObject,
                      const void *srcObject,
@@ -1629,6 +1648,7 @@ MatFXWorldSectorCopy(void *dstObject,
 }
 
 // match: _MatFXWorldSectorStreamWrite @ 0x002F6400
+// sp-match: _MatFXWorldSectorStreamWrite @ 0x00210B90
 static RwStream *
 MatFXWorldSectorStreamWrite(RwStream   *stream,
                             RwInt32     binaryLength    __RWUNUSEDRELEASE__,
@@ -1654,6 +1674,7 @@ MatFXWorldSectorStreamWrite(RwStream   *stream,
 }
 
 // match: _MatFXWorldSectorStreamRead @ 0x002F6EF0
+// sp-match: _MatFXWorldSectorStreamRead @ 0x00211680
 static RwStream *
 MatFXWorldSectorStreamRead(RwStream *stream,
                            RwInt32   binaryLength   __RWUNUSEDRELEASE__,
@@ -1685,6 +1706,7 @@ MatFXWorldSectorStreamRead(RwStream *stream,
 }
 
 // match: _MatFXWorldSectorStreamGetSize @ 0x002F6430
+// sp-match: _MatFXWorldSectorStreamGetSize @ 0x00210BC0
 static RwInt32
 MatFXWorldSectorStreamGetSize(const void *object,
                               RwInt32     offsetInObject __RWUNUSED__,
@@ -1712,6 +1734,7 @@ MatFXWorldSectorStreamGetSize(const void *object,
  *---------------------------------------------------------------------------*/
 
 // match: _GenBumpedTextureName @ 0x002F6450
+// sp-match: _GenBumpedTextureName @ 0x00210BE0
 static void
 GenBumpedTextureName(RwChar *bumpedTexName,
                      const RwTexture *baseTexture,
@@ -1764,6 +1787,7 @@ GenBumpedTextureName(RwChar *bumpedTexName,
 }
 
 // match: __rpMatFXTextureMaskCreate @ 0x002F64B0
+// sp-match: __rpMatFXTextureMaskCreate @ 0x00210C40
 RwTexture          *
 _rpMatFXTextureMaskCreate(const RwTexture * baseTexture,
                           const RwTexture * maskTexture)
@@ -1948,6 +1972,7 @@ _rpMatFXTextureMaskCreate(const RwTexture * baseTexture,
  * \see RpMatFXMaterialSetEffects
  */
 // match: _RpMatFXPluginAttach @ 0x002F74E0
+// sp-match: _RpMatFXPluginAttach @ 0x00211C70
 RwBool
 RpMatFXPluginAttach(void)
 {
@@ -2071,6 +2096,7 @@ RpMatFXPluginAttach(void)
  * \see RpMatFXMaterialSetupDualTexture
  */
 // match: _RpMatFXAtomicEnableEffects @ 0x002F6700
+// sp-match: _RpMatFXAtomicEnableEffects @ 0x00210E90
 RpAtomic           *
 RpMatFXAtomicEnableEffects(RpAtomic * atomic)
 {
@@ -2249,6 +2275,7 @@ RpMatFXWorldSectorQueryEffects(RpWorldSector * worldSector)
  * \see RpMatFXMaterialGetEffects
  */
 // match: _RpMatFXMaterialSetEffects @ 0x002F6F50
+// sp-match: _RpMatFXMaterialSetEffects @ 0x002116E0
 RpMaterial         *
 RpMatFXMaterialSetEffects(RpMaterial * material,
                           RpMatFXMaterialFlags flags)
@@ -2576,6 +2603,7 @@ RpMatFXMaterialSetupDualTexture(RpMaterial * material,
  * \see RpMatFXMaterialGetEffects
  */
 // match: _RpMatFXMaterialGetEffects @ 0x002F6730
+// sp-match: _RpMatFXMaterialGetEffects @ 0x00210EC0
 RpMatFXMaterialFlags
 RpMatFXMaterialGetEffects(const RpMaterial * material)
 {
@@ -2627,6 +2655,7 @@ RpMatFXMaterialGetEffects(const RpMaterial * material)
  * \see RpMatFXMaterialGetBumpMapCoefficient
  */
 // match: _RpMatFXMaterialSetBumpMapTexture @ 0x002F6750
+// sp-match: _RpMatFXMaterialSetBumpMapTexture @ 0x00210EE0
 RpMaterial         *
 RpMatFXMaterialSetBumpMapTexture(RpMaterial * material,
                                  RwTexture * bumpTexture)
@@ -2789,6 +2818,7 @@ RpMatFXMaterialSetBumpMapTexture(RpMaterial * material,
  * \see RpMatFXMaterialGetBumpMapCoefficient
  */
 // match: _RpMatFXMaterialSetBumpMapFrame @ 0x002F68E0
+// sp-match: _RpMatFXMaterialSetBumpMapFrame @ 0x00211070
 RpMaterial         *
 RpMatFXMaterialSetBumpMapFrame(RpMaterial * material, RwFrame * frame)
 {
@@ -2832,6 +2862,7 @@ RpMatFXMaterialSetBumpMapFrame(RpMaterial * material, RwFrame * frame)
  * \see RpMatFXMaterialGetBumpMapCoefficient
  */
 // match: _RpMatFXMaterialSetBumpMapCoefficient @ 0x002F6930
+// sp-match: _RpMatFXMaterialSetBumpMapCoefficient @ 0x002110C0
 RpMaterial         *
 RpMatFXMaterialSetBumpMapCoefficient(RpMaterial * material, RwReal coef)
 {
@@ -2949,6 +2980,7 @@ RpMatFXMaterialGetBumpMapTexture(const RpMaterial * material)
  * \see RpMatFXMaterialGetBumpMapCoefficient
  */
 // match: _RpMatFXMaterialGetBumpMapFrame @ 0x002F6980
+// sp-match: _RpMatFXMaterialGetBumpMapFrame @ 0x00211110
 RwFrame            *
 RpMatFXMaterialGetBumpMapFrame(const RpMaterial * material)
 {
@@ -2987,6 +3019,7 @@ RpMatFXMaterialGetBumpMapFrame(const RpMaterial * material)
  * \see RpMatFXMaterialGetBumpMapFrame
  */
 // match: _RpMatFXMaterialGetBumpMapCoefficient @ 0x002F69C0
+// sp-match: _RpMatFXMaterialGetBumpMapCoefficient @ 0x00211150
 RwReal
 RpMatFXMaterialGetBumpMapCoefficient(const RpMaterial * material)
 {
@@ -3030,6 +3063,7 @@ RpMatFXMaterialGetBumpMapCoefficient(const RpMaterial * material)
  * \see RpMatFXMaterialGetEnvMapCoefficient
  */
 // match: _RpMatFXMaterialSetEnvMapTexture @ 0x002F6A00
+// sp-match: _RpMatFXMaterialSetEnvMapTexture @ 0x00211190
 RpMaterial         *
 RpMatFXMaterialSetEnvMapTexture(RpMaterial * material,
                                 RwTexture * texture)
@@ -3088,6 +3122,7 @@ RpMatFXMaterialSetEnvMapTexture(RpMaterial * material,
  * \see RpMatFXMaterialGetEnvMapCoefficient
  */
 // match: _RpMatFXMaterialSetEnvMapFrame @ 0x002F6A60
+// sp-match: _RpMatFXMaterialSetEnvMapFrame @ 0x002111F0
 RpMaterial         *
 RpMatFXMaterialSetEnvMapFrame(RpMaterial * material, RwFrame * frame)
 {
@@ -3136,6 +3171,7 @@ RpMatFXMaterialSetEnvMapFrame(RpMaterial * material, RwFrame * frame)
  * \see RpMatFXMaterialGetEnvMapCoefficient
  */
 // match: _RpMatFXMaterialSetEnvMapFrameBufferAlpha @ 0x002F6AB0
+// sp-match: _RpMatFXMaterialSetEnvMapFrameBufferAlpha @ 0x00211240
 RpMaterial         *
 RpMatFXMaterialSetEnvMapFrameBufferAlpha(RpMaterial * material,
                                          RwBool useFrameBufferAlpha)
@@ -3185,6 +3221,7 @@ RpMatFXMaterialSetEnvMapFrameBufferAlpha(RpMaterial * material,
  * \see RpMatFXMaterialGetEnvMapCoefficient
  */
 // match: _RpMatFXMaterialSetEnvMapCoefficient @ 0x002F6B00
+// sp-match: _RpMatFXMaterialSetEnvMapCoefficient @ 0x00211290
 RpMaterial         *
 RpMatFXMaterialSetEnvMapCoefficient(RpMaterial * material, RwReal coef)
 {
@@ -3226,6 +3263,7 @@ RpMatFXMaterialSetEnvMapCoefficient(RpMaterial * material, RwReal coef)
  * \see RpMatFXMaterialGetEnvMapCoefficient
  */
 // match: _RpMatFXMaterialGetEnvMapTexture @ 0x002F6B50
+// sp-match: _RpMatFXMaterialGetEnvMapTexture @ 0x002112E0
 RwTexture          *
 RpMatFXMaterialGetEnvMapTexture(const RpMaterial * material)
 {
@@ -3265,6 +3303,7 @@ RpMatFXMaterialGetEnvMapTexture(const RpMaterial * material)
  * \see RpMatFXMaterialGetEnvMapCoefficient
  */
 // match: _RpMatFXMaterialGetEnvMapFrame @ 0x002F6B90
+// sp-match: _RpMatFXMaterialGetEnvMapFrame @ 0x00211320
 RwFrame            *
 RpMatFXMaterialGetEnvMapFrame(const RpMaterial * material)
 {
@@ -3304,6 +3343,7 @@ RpMatFXMaterialGetEnvMapFrame(const RpMaterial * material)
  * \see RpMatFXMaterialGetEnvMapCoefficient
  */
 // match: _RpMatFXMaterialGetEnvMapFrameBufferAlpha @ 0x002F6BD0
+// sp-match: _RpMatFXMaterialGetEnvMapFrameBufferAlpha @ 0x00211360
 RwBool
 RpMatFXMaterialGetEnvMapFrameBufferAlpha(const RpMaterial * material)
 {
@@ -3343,6 +3383,7 @@ RpMatFXMaterialGetEnvMapFrameBufferAlpha(const RpMaterial * material)
  * \see RpMatFXMaterialGetEnvMapFrameBufferAlpha
  */
 // match: _RpMatFXMaterialGetEnvMapCoefficient @ 0x002F6C10
+// sp-match: _RpMatFXMaterialGetEnvMapCoefficient @ 0x002113A0
 RwReal
 RpMatFXMaterialGetEnvMapCoefficient(const RpMaterial * material)
 {
@@ -3379,6 +3420,7 @@ RpMatFXMaterialGetEnvMapCoefficient(const RpMaterial * material)
  * \see RpMatFXMaterialGetDualBlendModes
  */
 // match: _RpMatFXMaterialSetDualTexture @ 0x002F6C50
+// sp-match: _RpMatFXMaterialSetDualTexture @ 0x002113E0
 RpMaterial         *
 RpMatFXMaterialSetDualTexture(RpMaterial * material,
                               RwTexture * texture)
@@ -3439,6 +3481,7 @@ RpMatFXMaterialSetDualTexture(RpMaterial * material,
  * \see RpMatFXMaterialGetDualBlendModes
  */
 // match: _RpMatFXMaterialSetDualBlendModes @ 0x002F6CD0
+// sp-match: _RpMatFXMaterialSetDualBlendModes @ 0x00211460
 RpMaterial         *
 RpMatFXMaterialSetDualBlendModes(RpMaterial * material,
                                  RwBlendFunction srcBlendMode,
@@ -3484,6 +3527,7 @@ RpMatFXMaterialSetDualBlendModes(RpMaterial * material,
  * \see RpMatFXMaterialGetDualBlendModes
  */
 // match: _RpMatFXMaterialGetDualTexture @ 0x002F6D30
+// sp-match: _RpMatFXMaterialGetDualTexture @ 0x002114C0
 RwTexture          *
 RpMatFXMaterialGetDualTexture(const RpMaterial * material)
 {
@@ -3523,6 +3567,7 @@ RpMatFXMaterialGetDualTexture(const RpMaterial * material)
  * \see RpMatFXMaterialGetDualTexture
  */
 // match: _RpMatFXMaterialGetDualBlendModes @ 0x002F6D70
+// sp-match: _RpMatFXMaterialGetDualBlendModes @ 0x00211500
 const RpMaterial *
 RpMatFXMaterialGetDualBlendModes(const RpMaterial * material,
                                  RwBlendFunction *srcBlendMode,
@@ -3594,6 +3639,7 @@ RpMatFXMaterialGetDualBlendModes(const RpMaterial * material,
  * \see RpMatFXMaterialSetDualBlendModes
  */
 // match: _RpMatFXMaterialSetUVTransformMatrices @ 0x002F6DD0
+// sp-match: _RpMatFXMaterialSetUVTransformMatrices @ 0x00211560
 RpMaterial *
 RpMatFXMaterialSetUVTransformMatrices( RpMaterial *material,
                                        RwMatrix *baseTransform,
@@ -3637,6 +3683,7 @@ RpMatFXMaterialSetUVTransformMatrices( RpMaterial *material,
  * \see RpMatFXMaterialSetDualBlendModes
  */
 // match: _RpMatFXMaterialGetUVTransformMatrices @ 0x002F6E30
+// sp-match: _RpMatFXMaterialGetUVTransformMatrices @ 0x002115C0
 const RpMaterial *
 RpMatFXMaterialGetUVTransformMatrices( const RpMaterial *material,
                                        RwMatrix **baseTransform,

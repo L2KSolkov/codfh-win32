@@ -101,6 +101,7 @@ static DWORD Xbox2DNoColorVertexShader = 0;
 // match: _Xbox2DNoColorVertexShaderDecl @ 0x00417278
 
 // match: __rwXbIm2DRenderOpen @ 0x002B9840
+// sp-match: __rwXbIm2DRenderOpen @ 0x001D4C50
 
 RwBool
 _rwXbIm2DRenderOpen(void)
@@ -128,6 +129,7 @@ _rwXbIm2DRenderOpen(void)
 }
 
 // match: __rwXbIm2DRenderClose @ 0x002B98A0
+// sp-match: __rwXbIm2DRenderClose @ 0x001D4CB0
 void
 _rwXbIm2DRenderClose(void)
 {
@@ -151,6 +153,7 @@ _rwXbIm2DRenderClose(void)
 }
 
 // match: __rwXbIm2DRenderSetVertexShader @ 0x002B98F0
+// sp-match: __rwXbIm2DRenderSetVertexShader @ 0x001D4D00
 void
 _rwXbIm2DRenderSetVertexShader(RwBool diffuse, RwBool texcoords)
 {
@@ -188,6 +191,7 @@ _rwXbIm2DRenderSetVertexShader(RwBool diffuse, RwBool texcoords)
 }
 
 // match: _XbIm2DRenderSetup @ 0x002B99B0
+// sp-match: _XbIm2DRenderSetup @ 0x001D4DC0
 static void
 XbIm2DRenderSetup(void)
 {
@@ -234,6 +238,7 @@ XbIm2DRenderSetup(void)
 }
 
 // match: __rwXbIm2DRenderLine @ 0x002B9BE0
+// sp-match: __rwXbIm2DRenderLine @ 0x001D4FF0
 RwBool
 _rwXbIm2DRenderLine(rwXBOXVERTEX *verts, RwInt32 numVerts __RWUNUSED__,
                     RwInt32 vert1, RwInt32 vert2)
@@ -251,6 +256,7 @@ _rwXbIm2DRenderLine(rwXBOXVERTEX *verts, RwInt32 numVerts __RWUNUSED__,
 }
 
 // match: __rwXbIm2DRenderTriangle @ 0x002B9C40
+// sp-match: __rwXbIm2DRenderTriangle @ 0x001D5050
 RwBool
 _rwXbIm2DRenderTriangle(rwXBOXVERTEX *verts, RwInt32 numVerts __RWUNUSED__,
                         RwInt32 vert1, RwInt32 vert2, RwInt32 vert3)
@@ -269,6 +275,7 @@ _rwXbIm2DRenderTriangle(rwXBOXVERTEX *verts, RwInt32 numVerts __RWUNUSED__,
 }
 
 // match: __rwXbIm2DRenderPrimitive @ 0x002B9CB0
+// sp-match: __rwXbIm2DRenderPrimitive @ 0x001D50C0
 RwBool
 _rwXbIm2DRenderPrimitive(RwPrimitiveType primType, rwXBOXVERTEX *verts, RwInt32 numVerts)
 {
@@ -283,6 +290,7 @@ _rwXbIm2DRenderPrimitive(RwPrimitiveType primType, rwXBOXVERTEX *verts, RwInt32 
 }
 
 // match: __rwXbIm2DRenderIndexedPrimitive @ 0x002B9CE0
+// sp-match: __rwXbIm2DRenderIndexedPrimitive @ 0x001D50F0
 RwBool
 _rwXbIm2DRenderIndexedPrimitive(RwPrimitiveType primType,
                                 rwXBOXVERTEX *verts,

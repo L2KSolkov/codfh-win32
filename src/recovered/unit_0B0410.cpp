@@ -38,21 +38,26 @@ RWS_REGISTERCLASS(StartingSections);
 // match: ?MakeNew@StartingSections@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000B0410
 // match: __ehhandler$?MakeNew@StartingSections@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300210
 // match: __ehhandler$?MakeNew@StartingSections@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030021F
+// sp-match: ?MakeNew@StartingSections@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00088620
 RWS_DEFINE_MAKENEW(StartingSections)
 
 // match: ??0StartingSections@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000B0490
+// sp-match: ??0StartingSections@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000883D0
 StartingSections::StartingSections(const RWS::CAttributePacket &attr)
 {
 }
 
 // match: ??_GStartingSections@@UAEPAXI@Z @ 0x000B0520
+// sp-match: ??_GStartingSections@@UAEPAXI@Z @ 0x00088610
 
 // match: ??1StartingSections@@UAE@XZ @ 0x000B0540
 // match: __ehhandler$??1StartingSections@@UAE@XZ-0x8 @ 0x00300230
 // match: __ehhandler$??1StartingSections@@UAE@XZ @ 0x00300238
+// sp-match: ??1StartingSections@@UAE@XZ @ 0x00088410
 // (Defined in the class, in StartingSections.h.)
 
 // match: ?sub_B05C0@StartingSections@@SAXXZ @ 0x000B05C0
+// sp-match: ?sub_B05C0@StartingSections@@SAXXZ @ 0x00088470
 void StartingSections::sub_B05C0()
 {
     RwInt32 var_4;
@@ -66,6 +71,7 @@ void StartingSections::sub_B05C0()
 }
 
 // match: ?HandleAttributes@StartingSections@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000B0610
+// sp-match: ?HandleAttributes@StartingSections@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000884C0
 void StartingSections::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     RWS::CAttributeCommandIterator attrIt(attr, RWS_CLASSID_OF(StartingSections));
@@ -106,6 +112,7 @@ void StartingSections::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_EStartingSections@@WBI@AEPAXI@Z @ 0x000B07C0
+// sp-match: ??_EStartingSections@@WBI@AEPAXI@Z @ 0x00088600
 
 // Members /OPT:ICF folded into shared trivial bodies (config/aliases.txt): defined here for
 // the authentic link (PLAN M7); the placement link takes the shared bodies.

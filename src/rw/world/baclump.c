@@ -229,6 +229,7 @@ static RwModuleInfo clumpModule;
 // match: __rpClumpFreeListPreallocBlocks @ 0x00436B24
 
 // match: _ClumpTidyDestroyClump @ 0x002D58E0
+// sp-match: _ClumpTidyDestroyClump @ 0x001F0240
 
 static void
 ClumpTidyDestroyClump( void *object,
@@ -252,6 +253,7 @@ ClumpTidyDestroyClump( void *object,
  */
 
 // match: _ClumpTidyDestroyAtomic @ 0x002D55E0
+// sp-match: _ClumpTidyDestroyAtomic @ 0x001EFF40
 static void
 ClumpTidyDestroyAtomic( void *object,
                         void *data __RWUNUSED__ )
@@ -274,6 +276,7 @@ static RwUInt32 lastSeenRightsPluginId;
 static RwUInt32 lastSeenExtraData;
 
 // match: __rpReadAtomicRights @ 0x002D4B60
+// sp-match: __rpReadAtomicRights @ 0x001EF4A0
 RwStream*
 _rpReadAtomicRights(RwStream *s,
                     RwInt32 len,
@@ -302,6 +305,7 @@ _rpReadAtomicRights(RwStream *s,
 }
 
 // match: __rpWriteAtomicRights @ 0x002D4BA0
+// sp-match: __rpWriteAtomicRights @ 0x001EF4E0
 RwStream*
 _rpWriteAtomicRights(RwStream *s,
                      RwInt32 len __RWUNUSED__,
@@ -334,6 +338,7 @@ _rpWriteAtomicRights(RwStream *s,
 
 // match: __rpSizeAtomicRights @ 0x002DA140
 RwInt32
+// sp-match: __rpSizeAtomicRights @ 0x001EF520
 _rpSizeAtomicRights(const void *obj,
                     RwInt32 off __RWUNUSED__,
                     RwInt32 size __RWUNUSED__)
@@ -439,6 +444,7 @@ CountCamera(RwCamera * camera, void *pData)
  */
 
 // match: _AtomicSync @ 0x002D55F0
+// sp-match: _AtomicSync @ 0x001EFF50
 static RwObjectHasFrame *
 AtomicSync(RwObjectHasFrame * object)
 {
@@ -476,6 +482,7 @@ AtomicSync(RwObjectHasFrame * object)
  */
 
 // match: _AtomicDefaultRenderCallBack @ 0x002D4BE0
+// sp-match: _AtomicDefaultRenderCallBack @ 0x001EF540
 RpAtomic *
 AtomicDefaultRenderCallBack(RpAtomic *atomic)
 {
@@ -506,6 +513,7 @@ AtomicDefaultRenderCallBack(RpAtomic *atomic)
  */
 
 // match: _ClumpAtomicCloneAndAttach @ 0x002D58F0
+// sp-match: _ClumpAtomicCloneAndAttach @ 0x001F0250
 static RpAtomic    *
 ClumpAtomicCloneAndAttach(RpAtomic * atomic, void *pData)
 {
@@ -560,6 +568,7 @@ ClumpAtomicCloneAndAttach(RpAtomic * atomic, void *pData)
  */
 
 // match: _GeometryListDeinitialize @ 0x002D4C10
+// sp-match: _GeometryListDeinitialize @ 0x001EF570
 static rpGeometryList     *
 GeometryListDeinitialize(rpGeometryList * geomList)
 {
@@ -763,6 +772,7 @@ GeometryListStreamWrite(const rpGeometryList * geomList, RwStream * stream)
  On exit    : FrameList created
  */
 // match: _GeometryListStreamRead @ 0x002D4C50
+// sp-match: _GeometryListStreamRead @ 0x001EF5B0
 static rpGeometryList     *
 GeometryListStreamRead(RwStream * stream, rpGeometryList * geomList)
 {
@@ -864,6 +874,7 @@ GeometryListStreamRead(RwStream * stream, rpGeometryList * geomList)
  */
 
 // match: _ClumpInitCameraExt @ 0x002D4DB0
+// sp-match: _ClumpInitCameraExt @ 0x001EF710
 static void        *
 ClumpInitCameraExt(void *object,
                    RwInt32 offsetInObject __RWUNUSED__,
@@ -917,6 +928,7 @@ ClumpDeInitCameraExt(void *object,
  */
 
 // match: _ClumpInitLightExt @ 0x002D4DD0
+// sp-match: _ClumpInitLightExt @ 0x001EF730
 static void        *
 ClumpInitLightExt(void *object,
                    RwInt32 offsetInObject __RWUNUSED__,
@@ -970,6 +982,7 @@ ClumpDeInitLightExt(void *object,
  */
 
 // match: _DestroyClumpLight @ 0x002D5610
+// sp-match: _DestroyClumpLight @ 0x001EFF70
 static RpLight    *
 DestroyClumpLight( RpLight *light,
                    void *data __RWUNUSED__ )
@@ -996,6 +1009,7 @@ DestroyClumpLight( RpLight *light,
  */
 
 // match: _DestroyClumpCamera @ 0x002D5660
+// sp-match: _DestroyClumpCamera @ 0x001EFFC0
 static RwCamera    *
 DestroyClumpCamera( RwCamera * camera,
                     void *data __RWUNUSED__ )
@@ -1166,6 +1180,7 @@ ClumpCallBack( RpClump * clump,
  */
 
 // match: _DestroyClumpAtomic @ 0x002D56B0
+// sp-match: _DestroyClumpAtomic @ 0x001F0010
 static RpAtomic    *
 DestroyClumpAtomic( RpAtomic * atomic,
                     void * pData __RWUNUSED__ )
@@ -1351,6 +1366,7 @@ ClumpAtomicStreamWrite(RpAtomic * atomic, void *pData)
 }
 
 // match: _ClumpAtomicStreamRead @ 0x002D5990
+// sp-match: _ClumpAtomicStreamRead @ 0x001F02F0
 static RpAtomic    *
 ClumpAtomicStreamRead(RwStream * stream, rwFrameList * fl,
                       rpGeometryList * gl)
@@ -1493,6 +1509,7 @@ ClumpAtomicStreamRead(RwStream * stream, rwFrameList * fl,
  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 // match: __rpAtomicResyncInterpolatedSphere @ 0x002D4DF0
+// sp-match: __rpAtomicResyncInterpolatedSphere @ 0x001EF750
 void
 _rpAtomicResyncInterpolatedSphere(RpAtomic * atomic)
 {
@@ -1616,6 +1633,7 @@ _rpAtomicResyncInterpolatedSphere(RpAtomic * atomic)
  */
 
 // match: _RpAtomicGetWorldBoundingSphere @ 0x002D4F50
+// sp-match: _RpAtomicGetWorldBoundingSphere @ 0x001EF8B0
 const RwSphere     *
 RpAtomicGetWorldBoundingSphere(RpAtomic * atomic)
 {
@@ -1692,6 +1710,7 @@ RpAtomicGetWorldBoundingSphere(RpAtomic * atomic)
  */
 
 // match: __rpClumpClose @ 0x002D5C10
+// sp-match: __rpClumpClose @ 0x001F0570
 void *
 _rpClumpClose(void *instance,
               RwInt32 offset __RWUNUSED__,
@@ -1804,6 +1823,7 @@ RpClumpSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc )
  */
 
 // match: __rpClumpOpen @ 0x002D50A0
+// sp-match: __rpClumpOpen @ 0x001EFA00
 void *
 _rpClumpOpen( void *instance,
               RwInt32 offset,
@@ -1859,6 +1879,7 @@ _rpClumpOpen( void *instance,
  On exit    : TRUE on success
  */
 // match: __rpClumpRegisterExtensions @ 0x002D5150
+// sp-match: __rpClumpRegisterExtensions @ 0x001EFAB0
 RwBool
 _rpClumpRegisterExtensions()
 {
@@ -2261,6 +2282,7 @@ RpClumpRender(RpClump * clump)
  *
  */
 // match: _RpClumpForAllAtomics @ 0x002D51A0
+// sp-match: _RpClumpForAllAtomics @ 0x001EFB00
 RpClump            *
 RpClumpForAllAtomics(RpClump * clump, RpAtomicCallBack callback, void *pData)
 {
@@ -2325,6 +2347,7 @@ RpClumpForAllAtomics(RpClump * clump, RpAtomicCallBack callback, void *pData)
  *
  */
 // match: _RpClumpForAllCameras @ 0x002D51E0
+// sp-match: _RpClumpForAllCameras @ 0x001EFB40
 RpClump            *
 RpClumpForAllCameras(RpClump * clump, RwCameraCallBack callback, void *pData)
 {
@@ -2395,6 +2418,7 @@ RpClumpForAllCameras(RpClump * clump, RwCameraCallBack callback, void *pData)
  *
  */
 // match: _RpClumpForAllLights @ 0x002D5230
+// sp-match: _RpClumpForAllLights @ 0x001EFB90
 RpClump            *
 RpClumpForAllLights(RpClump * clump, RpLightCallBack callback, void *pData)
 {
@@ -2492,6 +2516,7 @@ RpClumpForAllLights(RpClump * clump, RpLightCallBack callback, void *pData)
  *
  */
 // match: _RpAtomicCreate @ 0x002D56D0
+// sp-match: _RpAtomicCreate @ 0x001F0030
 RpAtomic           *
 RpAtomicCreate(void)
 {
@@ -2653,6 +2678,7 @@ RpAtomicCreate(void)
  *
  */
 // match: _RpAtomicSetGeometry @ 0x002D5280
+// sp-match: _RpAtomicSetGeometry @ 0x001EFBE0
 RpAtomic           *
 RpAtomicSetGeometry(RpAtomic * atomic, RpGeometry * geometry, RwUInt32 flags)
 {
@@ -2788,6 +2814,7 @@ RpAtomicGetGeometry(const RpAtomic * atomic)
  *
  */
 // match: _RpAtomicDestroy @ 0x002D5300
+// sp-match: _RpAtomicDestroy @ 0x001EFC60
 RwBool
 RpAtomicDestroy(RpAtomic * atomic)
 {
@@ -3567,6 +3594,7 @@ RpAtomicGetBoundingSphere(RpAtomic * atomic)
  *
  */
 // match: _RpLightGetClump @ 0x002D5380
+// sp-match: _RpLightGetClump @ 0x001EFCE0
 RpClump            *
 RpLightGetClump(const RpLight * light)
 {
@@ -3652,6 +3680,7 @@ RwCameraGetClump(const RwCamera * camera)
  *
  */
 // match: _RpAtomicClone @ 0x002D57C0
+// sp-match: _RpAtomicClone @ 0x001F0120
 RpAtomic *
 RpAtomicClone(RpAtomic *atomic)
 {
@@ -3741,6 +3770,7 @@ RpAtomicClone(RpAtomic *atomic)
  */
 
 // match: _RpClumpClone @ 0x002D5C90
+// sp-match: _RpClumpClone @ 0x001F05F0
 RpClump            *
 RpClumpClone(RpClump * clump)
 {
@@ -3910,6 +3940,7 @@ RpClumpGetCallBack(const RpClump * clump)
  */
 
 // match: _RpClumpCreate @ 0x002D5390
+// sp-match: _RpClumpCreate @ 0x001EFCF0
 RpClump            *
 RpClumpCreate(void)
 {
@@ -3981,6 +4012,7 @@ RpClumpCreate(void)
  *
  */
 // match: _RpClumpDestroy @ 0x002D5870
+// sp-match: _RpClumpDestroy @ 0x001F01D0
 RwBool
 RpClumpDestroy(RpClump * clump)
 {
@@ -4049,6 +4081,7 @@ RpClumpDestroy(RpClump * clump)
  *
  */
 // match: _RpClumpAddAtomic @ 0x002D5400
+// sp-match: _RpClumpAddAtomic @ 0x001EFD60
 RpClump            *
 RpClumpAddAtomic(RpClump * clump, RpAtomic * atomic)
 {
@@ -4096,6 +4129,7 @@ RpClumpAddAtomic(RpClump * clump, RpAtomic * atomic)
  *
  */
 // match: _RpClumpRemoveAtomic @ 0x002D5430
+// sp-match: _RpClumpRemoveAtomic @ 0x001EFD90
 RpClump            *
 RpClumpRemoveAtomic(RpClump * clump, RpAtomic * atomic)
 {
@@ -4141,6 +4175,7 @@ RpClumpRemoveAtomic(RpClump * clump, RpAtomic * atomic)
  *
  */
 // match: _RpClumpAddLight @ 0x002D5460
+// sp-match: _RpClumpAddLight @ 0x001EFDC0
 RpClump            *
 RpClumpAddLight(RpClump * clump, RpLight * light)
 {
@@ -4190,6 +4225,7 @@ RpClumpAddLight(RpClump * clump, RpLight * light)
  *
  */
 // match: _RpClumpRemoveLight @ 0x002D5490
+// sp-match: _RpClumpRemoveLight @ 0x001EFDF0
 RpClump            *
 RpClumpRemoveLight(RpClump * clump, RpLight * light)
 {
@@ -4678,6 +4714,7 @@ RpAtomicStreamRead(RwStream * stream)
  * \see RpWorldPluginAttach
  */
 // match: _RpClumpStreamRead @ 0x002D5D40
+// sp-match: _RpClumpStreamRead @ 0x001F06A0
 RpClump            *
 RpClumpStreamRead(RwStream * stream)
 {
@@ -4968,6 +5005,7 @@ _rpClumpChunkInfoRead(RwStream * stream,
  *
  */
 // match: _RpAtomicRegisterPlugin @ 0x002D54D0
+// sp-match: _RpAtomicRegisterPlugin @ 0x001EFE30
 RwInt32
 RpAtomicRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
                        RwPluginObjectConstructor constructCB,
@@ -5012,6 +5050,7 @@ RpAtomicRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
  *
  */
 // match: _RpClumpRegisterPlugin @ 0x002D5500
+// sp-match: _RpClumpRegisterPlugin @ 0x001EFE60
 RwInt32
 RpClumpRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
                       RwPluginObjectConstructor constructCB,
@@ -5059,6 +5098,7 @@ RpClumpRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
  *
  */
 // match: _RpAtomicRegisterPluginStream @ 0x002D5530
+// sp-match: _RpAtomicRegisterPluginStream @ 0x001EFE90
 RwInt32
 RpAtomicRegisterPluginStream(RwUInt32 pluginID,
                              RwPluginDataChunkReadCallBack readCB,
@@ -5103,6 +5143,7 @@ RpAtomicRegisterPluginStream(RwUInt32 pluginID,
  *
  */
 // match: _RpAtomicSetStreamAlwaysCallBack @ 0x002D5560
+// sp-match: _RpAtomicSetStreamAlwaysCallBack @ 0x001EFEC0
 RwInt32
 RpAtomicSetStreamAlwaysCallBack(RwUInt32 pluginID,
                                      RwPluginDataChunkAlwaysCallBack alwaysCB)
@@ -5145,6 +5186,7 @@ RpAtomicSetStreamAlwaysCallBack(RwUInt32 pluginID,
  *
  */
 // match: _RpAtomicSetStreamRightsCallBack @ 0x002D5580
+// sp-match: _RpAtomicSetStreamRightsCallBack @ 0x001EFEE0
 RwInt32
 RpAtomicSetStreamRightsCallBack(RwUInt32 pluginID,
                                      RwPluginDataChunkRightsCallBack rightsCB)
@@ -5266,6 +5308,7 @@ RpClumpSetStreamAlwaysCallBack(RwUInt32 pluginID,
  *
  */
 // match: _RpAtomicGetPluginOffset @ 0x002D55A0
+// sp-match: _RpAtomicGetPluginOffset @ 0x001EFF00
 RwInt32
 RpAtomicGetPluginOffset(RwUInt32 pluginID)
 {
@@ -5476,6 +5519,7 @@ RpAtomicGetFrame(const RpAtomic * atomic)
  *
  */
 // match: _RpAtomicSetFrame @ 0x002D55C0
+// sp-match: _RpAtomicSetFrame @ 0x001EFF20
 RpAtomic           *
 RpAtomicSetFrame(RpAtomic * atomic, RwFrame * frame)
 {

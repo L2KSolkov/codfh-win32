@@ -307,6 +307,7 @@ void WINAPI D3DDevice_GetBackBuffer(INT BackBuffer, D3DBACKBUFFER_TYPE UnusedTyp
 D3DSurface *WINAPI D3DDevice_GetBackBuffer2(INT BackBuffer);
 void WINAPI D3DDevice_GetBackBufferScale(float *pX, float *pY);
 HRESULT WINAPI D3DDevice_GetRenderTarget(D3DSurface **ppRenderTarget);
+D3DSurface *WINAPI D3DDevice_GetRenderTarget2(void);
 HRESULT WINAPI D3DDevice_GetDepthStencilSurface(D3DSurface **ppZStencilSurface);
 void WINAPI D3DDevice_SetRenderTarget(D3DSurface *pRenderTarget, D3DSurface *pNewZStencil);
 void WINAPI D3DDevice_CopyRects(D3DSurface *pSourceSurface, const RECT *pSourceRectsArray,

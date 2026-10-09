@@ -31,6 +31,7 @@
 #include "types/asynchload.h"
 #include "types/type_4B85F8.h"
 #include "rw/baengine.h"
+#if !defined(CODFH_SP) || CODFH_SP_PART != 2 // single player compiles the rest in another file (src/sp/units/sp_unit_144940_2.cpp)
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003DB9E4
@@ -82,6 +83,15 @@ type_16C2A0 dword_4D1D98;
 // match: _$E11 @ 0x0030BBE0
 // match: _$E12 @ 0x0030E850
 // match: ?sub_144940@type_144940@@QAEXPAVTrigger@@@Z @ 0x00144940
+// sp-match: ?sub_144940@type_144940@@QAEXPAVTrigger@@@Z @ 0x000EFFD0
+// sp-match: _$E2 @ 0x0021DB80
+// sp-match: _$E5 @ 0x0021DBA0
+// sp-match: _$E8 @ 0x0021DBC0
+// sp-match: _$E11 @ 0x0021DBE0
+// sp-match: _$E3 @ 0x0021EBF0
+// sp-match: _$E6 @ 0x0021EC00
+// sp-match: _$E9 @ 0x0021EC10
+// sp-match: _$E12 @ 0x0021EC20
 
 void type_144940::sub_144940(Trigger *arg_0)
 {
@@ -100,6 +110,7 @@ void type_144940::sub_144940(Trigger *arg_0)
 }
 
 // match: sub_144990 @ 0x00144990
+// sp-match: sub_144990 @ 0x000F0000
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_144990()
 {
@@ -122,6 +133,7 @@ void sub_144990()
 }
 
 // match: sub_144A70 @ 0x00144A70
+// sp-match: sub_144A70 @ 0x000F0B70
 void sub_144A70()
 {
     if (dword_4D1D70)
@@ -141,6 +153,7 @@ void sub_144A70()
 
 // match: sub_144AD0 @ 0x00144AD0
 // Warns of what shutdown finds left.
+#ifndef CODFH_SP // single player compiles out the warnings: an empty body, defined in unit_067B10 (SP 0x5A260)
 void sub_144AD0()
 {
     RwInt32 var_4;
@@ -157,8 +170,10 @@ void sub_144AD0()
     if (dword_4D318C.in_use())
         sub_19A750("The sm_proximityMessagePool was not empty at shutdown!");
 }
+#endif
 
 // match: sub_144B80 @ 0x00144B80
+// sp-match: sub_144B80 @ 0x000F0BD0
 // Builds the spatial table from the triggers that test their surroundings.
 void sub_144B80()
 {
@@ -174,6 +189,7 @@ void sub_144B80()
 }
 
 // match: ?sub_144C00@@YAHPAVTrigger@@@Z @ 0x00144C00
+// sp-match: ?sub_144C00@@YAHPAVTrigger@@@Z @ 0x000F0C30
 // Gives the trigger arg_0 the next handle (and a place in the spatial table
 // once it is built).
 RwInt32 sub_144C00(Trigger *arg_0)
@@ -186,6 +202,7 @@ RwInt32 sub_144C00(Trigger *arg_0)
 }
 
 // match: ?sub_144C50@@YAXPAVTrigger@@@Z @ 0x00144C50
+// sp-match: ?sub_144C50@@YAXPAVTrigger@@@Z @ 0x000F0090
 void sub_144C50(Trigger *arg_0)
 {
     dword_4CFE30[arg_0->unk_3C] = 0;
@@ -193,6 +210,7 @@ void sub_144C50(Trigger *arg_0)
 }
 
 // match: ?sub_144C80@@YAXPAUtype_3D3548@@PAHH@Z @ 0x00144C80
+// sp-match: ?sub_144C80@@YAXPAUtype_3D3548@@PAHH@Z @ 0x000F0C70
 // Updates the entity arg_0's trigger volume: the cells of the triggers
 // around its frame now (sub_145B40) are walked against the ones it was in
 // (*arg_4: their mask and list), and it enters (sub_145060) or leaves
@@ -261,6 +279,7 @@ void sub_144C80(type_3D3548 *arg_0, RwInt32 *arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_144E80@@YAFPAPAUtype_144E80@@PAHF@Z @ 0x00144E80
+// sp-match: ?sub_144E80@@YAFPAPAUtype_144E80@@PAHF@Z @ 0x000F00B0
 // The next trigger after arg_8 in the cell list *arg_0 (whose ranges run
 // from unk_00 to unk_02), moving *arg_0 on to its range and the bit *arg_4
 // along; -1 at the end.
@@ -289,6 +308,7 @@ RwInt16 sub_144E80(type_144E80 **arg_0, RwInt32 *arg_4, RwInt16 arg_8)
 }
 
 // match: ?sub_144F20@@YAHPAURwV3d@@PAVTrigger@@@Z @ 0x00144F20
+// sp-match: ?sub_144F20@@YAHPAURwV3d@@PAVTrigger@@@Z @ 0x000F0110
 // Whether the point arg_0 lies in the trigger arg_4's volume, by its shape:
 // a sphere (0), a box (1) or a cylinder (2); 0 for a trigger switched off.
 RwInt32 sub_144F20(RwV3d *arg_0, Trigger *arg_4)
@@ -310,6 +330,7 @@ RwInt32 sub_144F20(RwV3d *arg_0, Trigger *arg_4)
 }
 
 // match: ?sub_145000@@YAHPAURwMatrixTag@@PAVTrigger@@@Z @ 0x00145000
+// sp-match: ?sub_145000@@YAHPAURwMatrixTag@@PAVTrigger@@@Z @ 0x000F01C0
 // The trigger's facing test (vf_028) when it has one (flag 7), else 1.
 RwInt32 sub_145000(RwMatrix *arg_0, Trigger *arg_4)
 {
@@ -319,6 +340,7 @@ RwInt32 sub_145000(RwMatrix *arg_0, Trigger *arg_4)
 }
 
 // match: ?sub_145030@@YAHPAURwMatrixTag@@PAVTrigger@@@Z @ 0x00145030
+// sp-match: ?sub_145030@@YAHPAURwMatrixTag@@PAVTrigger@@@Z @ 0x000F01E0
 // Likewise for its direction test (vf_02C, flag 12).
 RwInt32 sub_145030(RwMatrix *arg_0, Trigger *arg_4)
 {
@@ -328,6 +350,7 @@ RwInt32 sub_145030(RwMatrix *arg_0, Trigger *arg_4)
 }
 
 // match: ?sub_145060@@YAXPAUtype_3D3548@@PAVTrigger@@@Z @ 0x00145060
+// sp-match: ?sub_145060@@YAXPAUtype_3D3548@@PAVTrigger@@@Z @ 0x000F0200
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The entity arg_0 enters the trigger arg_4: the trigger's messages, then
 // what its kind does. A section trigger a player enters queues its section
@@ -345,7 +368,7 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
     SectionTrigger *m_18;
     RwInt32 ebp_14;
     RwUInt16 lv_10;
-    RwInt16 var_C;
+    RwUInt16 var_C;
     RwInt32 bp_8;
     type_4E5D30 *bp_4;
 
@@ -376,9 +399,11 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
                         var_28 = var_20->unk_08;
                         if (var_28 == m_18->unk_C0 || var_28 == m_18->unk_C4 || var_28 == m_18->unk_C8)
                         {
+#ifndef CODFH_SP
                             sub_19A750("Cannot unload section ID %d in bank slot %d because it is specified as one of "
                                        "the sections to keep",
                                        var_28, var_20->get_unk_0A());
+#endif
                             l1C = 0;
                         }
                         if (l1C)
@@ -409,16 +434,20 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
                     if (var_2C->get_unk_08() != m_18->unk_C0 && var_2C->get_unk_08() != m_18->unk_C4
                         && var_2C->get_unk_08() != m_18->unk_C8 && var_2C->get_unk_08() != m_18->unk_CC)
                     {
+#ifndef CODFH_SP
                         if (bp_4)
                             sub_19A750("Unloading more than one section!\n");
+#endif
                         bp_4 = var_2C;
                         var_C = (RwInt16)bp_8;
                         lv_10 = var_2C->unk_08;
                     }
                     if (var_2C->get_unk_08() == m_18->unk_CC)
                     {
+#ifndef CODFH_SP
                         if (ebp_14)
                             sub_19A750("Section to load was loaded twice \n");
+#endif
                         ebp_14 = 1;
                     }
                 }
@@ -427,8 +456,10 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
             {
                 if (lv_10 != 0xFFFF && !sub_82020(0, lv_10))
                 {
+#ifndef CODFH_SP
                     if (bp_4->get_unk_04())
                         sub_19A750("Section being removed while loading\n");
+#endif
                     sub_174030(var_C, 0);
                     bp_4->set_unk_08((RwUInt16)m_18->unk_CC);
                     if (SectionInfo::sub_B0140() && m_18->unk_D0)
@@ -438,7 +469,9 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
             }
             if (!ebp_14 && !sub_81FB0(0, "", m_18->unk_CC))
             {
+#ifndef CODFH_SP
                 sub_19A750("Adding load of section %d to AsynchQueue...\n", m_18->unk_CC);
+#endif
                 sub_81EB0(0, "", m_18->unk_CC);
             }
         }
@@ -495,11 +528,19 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
         if ((arg_0->unk_2C & 0x3FFFFF0) == 0x10)
             ((EndLevelTrigger *)arg_4)->sub_CC250((RwInt32)arg_0);
         break;
+#ifdef CODFH_SP // single player numbers FogTrigger 37 and PASTrigger 38 (their vf_008, SP 0x124460, 0x1244A0)
+    case 37:
+#else
     case 38:
+#endif
         if ((arg_0->unk_2C & 0x3FFFFF0) == 0x10)
             ((FogTrigger *)arg_4)->sub_CC5D0((RwInt32)arg_0);
         break;
+#ifdef CODFH_SP
+    case 38:
+#else
     case 39:
+#endif
         if ((arg_0->unk_2C & 0x3FFFFF0) == 0x10)
             ((PASTrigger *)arg_4)->sub_CC850((RwInt32)arg_0);
         break;
@@ -507,6 +548,7 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
 }
 
 // match: ?sub_145640@@YAXPAUtype_3D3548@@PAVTrigger@@@Z @ 0x00145640
+// sp-match: ?sub_145640@@YAXPAUtype_3D3548@@PAVTrigger@@@Z @ 0x000F06F0
 // The entity arg_0 leaves the trigger arg_4: the trigger's messages, then
 // what its kind does (a player leaves a confined area, and the end-level
 // and PAS triggers see a player go).
@@ -520,12 +562,21 @@ void sub_145640(type_3D3548 *arg_0, Trigger *arg_4)
     case 23:
         ((AddTaskTrigger *)arg_4)->sub_9EFD0(arg_0);
         break;
+#ifdef CODFH_SP // two distinct empty members, called separately (SP 0xF0731, 0xF073C)
+    case 26:
+        ((VehicleEnterExitTrigger *)arg_4)->sp_leave(arg_0);
+        break;
+    case 32:
+        ((LadderTrigger *)arg_4)->sp_leave(arg_0);
+        break;
+#else
     case 26:
         arg_4->sub_15FB30(arg_0);
         break;
     case 32:
         arg_4->sub_15FB30(arg_0);
         break;
+#endif
     case 34:
         ((PulseZoneTrigger *)arg_4)->sub_CB990((RwInt32)arg_0);
         break;
@@ -540,7 +591,11 @@ void sub_145640(type_3D3548 *arg_0, Trigger *arg_4)
         if ((arg_0->unk_2C & 0x3FFFFF0) == 0x10)
             ((EndLevelTrigger *)arg_4)->sub_CC280((RwInt32)arg_0);
         break;
+#ifdef CODFH_SP // single player numbers PASTrigger 38 (its vf_008, SP 0x1244A0; SP 0xF0782)
+    case 38:
+#else
     case 39:
+#endif
         if ((arg_0->unk_2C & 0x3FFFFF0) == 0x10)
             ((PASTrigger *)arg_4)->sub_CC870((RwInt32)arg_0);
         break;
@@ -548,24 +603,28 @@ void sub_145640(type_3D3548 *arg_0, Trigger *arg_4)
 }
 
 // match: sub_145770 @ 0x00145770
+// sp-match: sub_145770 @ 0x000F07E0
 void *sub_145770()
 {
     return dword_4D1D78.sub_16C5A0(0);
 }
 
 // match: sub_145790 @ 0x00145790
+// sp-match: sub_145790 @ 0x000F07F0
 void sub_145790(void *arg_0)
 {
     dword_4D1D78.sub_16C710(arg_0);
 }
 
 // match: ?sub_1457B0@@YAXPAUTrigger_30@@@Z @ 0x001457B0
+// sp-match: ?sub_1457B0@@YAXPAUTrigger_30@@@Z @ 0x000F0800
 void sub_1457B0(Trigger_30 *arg_0)
 {
     dword_4D318C.sub_16C710(arg_0);
 }
 
 // match: ?sub_1457D0@@YAPAUTrigger_30@@XZ @ 0x001457D0
+// sp-match: ?sub_1457D0@@YAPAUTrigger_30@@XZ @ 0x000F0810
 Trigger_30 *sub_1457D0()
 {
     Trigger_30 *var_4;
@@ -582,6 +641,7 @@ Trigger_30 *sub_1457D0()
 }
 
 // match: ?sub_145830@@YAPAUtype_145830@@XZ @ 0x00145830
+// sp-match: ?sub_145830@@YAPAUtype_145830@@XZ @ 0x000F0840
 type_145830 *sub_145830()
 {
     type_145830 *var_4;
@@ -596,6 +656,7 @@ type_145830 *sub_145830()
 }
 
 // match: ?sub_145870@@YAXPAUtype_145830@@@Z @ 0x00145870
+// sp-match: ?sub_145870@@YAXPAUtype_145830@@@Z @ 0x000F0870
 void sub_145870(type_145830 *arg_0)
 {
     if (arg_0)
@@ -607,6 +668,7 @@ void sub_145870(type_145830 *arg_0)
 }
 
 // match: ?sub_1458B0@@YAHPAVTrigger@@@Z @ 0x001458B0
+// sp-match: ?sub_1458B0@@YAHPAVTrigger@@@Z @ 0x000F08A0
 // Whether the trigger arg_0 goes in the spatial table: the kinds that test
 // their surroundings, or any trigger with blocks.
 RwInt32 sub_1458B0(Trigger *arg_0)
@@ -638,6 +700,7 @@ RwInt32 sub_1458B0(Trigger *arg_0)
 }
 
 // match: ?sub_145970@@YAXPAUtype_3D3548@@PAUtype_145B40@@@Z @ 0x00145970
+// sp-match: ?sub_145970@@YAXPAUtype_3D3548@@PAUtype_145B40@@@Z @ 0x000F0930
 // Sends block 6 of each trigger whose bit is set in the cells arg_4 to the
 // entity arg_0.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -659,6 +722,7 @@ void sub_145970(type_3D3548 *arg_0, type_145B40 *arg_4)
 }
 
 // match: ?sub_145A10@@YAXPAVTrigger@@@Z @ 0x00145A10
+// sp-match: ?sub_145A10@@YAXPAVTrigger@@@Z @ 0x000F09A0
 void sub_145A10(Trigger *arg_0)
 {
     if (dword_4D1D74 && !unk_4D1DB8.sub_146E80(arg_0))
@@ -666,6 +730,7 @@ void sub_145A10(Trigger *arg_0)
 }
 
 // match: ?sub_145A40@@YAXPAVTrigger@@@Z @ 0x00145A40
+// sp-match: ?sub_145A40@@YAXPAVTrigger@@@Z @ 0x000F0E00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_145A40(Trigger *arg_0)
 {
@@ -698,6 +763,7 @@ void sub_145A40(Trigger *arg_0)
 }
 
 // match: ?sub_145B40@@YAXPAURwMatrixTag@@PAUtype_145B40@@E@Z @ 0x00145B40
+// sp-match: ?sub_145B40@@YAXPAURwMatrixTag@@PAUtype_145B40@@E@Z @ 0x000F09D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The triggers around the matrix arg_0's position (the spatial table's
 // cell list into arg_4->unk_04) and the mask of those whose volume holds it
@@ -766,7 +832,10 @@ void sub_145B40(RwMatrix *arg_0, type_145B40 *arg_4, RwUInt8 arg_8)
     arg_4->unk_00 = bp_8;
 }
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART != 1 // single player: sp_unit_144940_2.cpp, the second file
 // match: ?sub_145E20@@YAHPBX0@Z @ 0x00145E20
+// sp-match: ?sub_145E20@@YAHPBX0@Z @ 0x000F0EC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 __cdecl sub_145E20(const void *arg_0, const void *arg_4)
 {
@@ -783,16 +852,19 @@ RwInt32 __cdecl sub_145E20(const void *arg_0, const void *arg_4)
 }
 
 // match: ??0type_4D1DB8@@QAE@XZ @ 0x00145E70
+// sp-match: ??0type_4D1DB8@@QAE@XZ @ 0x000F0EF0
 type_4D1DB8::type_4D1DB8()
 {
 }
 
 // match: ??1type_4D1DB8@@QAE@XZ @ 0x00145E90
+// sp-match: ??1type_4D1DB8@@QAE@XZ @ 0x000F0F10
 type_4D1DB8::~type_4D1DB8()
 {
 }
 
 // match: ?sub_145EB0@type_4D1DB8@@QAEXHPAPAUtype_4CFE30@@@Z @ 0x00145EB0
+// sp-match: ?sub_145EB0@type_4D1DB8@@QAEXHPAPAUtype_4CFE30@@@Z @ 0x000F1D80
 // Builds the table from the arg_0 triggers of arg_4: those that go in it
 // (sub_1458B0) are placed, then the cells are finished and the handles'
 // cells cleared.
@@ -813,6 +885,7 @@ void type_4D1DB8::sub_145EB0(RwInt32 arg_0, type_4CFE30 **arg_4)
 }
 
 // match: ?sub_145F50@type_4D1DB8@@QAEXXZ @ 0x00145F50
+// sp-match: ?sub_145F50@type_4D1DB8@@QAEXXZ @ 0x000F0F20
 void type_4D1DB8::sub_145F50()
 {
     if (unk_13AC > 0)
@@ -825,6 +898,7 @@ void type_4D1DB8::sub_145F50()
 }
 
 // match: ?sub_145FB0@type_4D1DB8@@QAEXHPAPAUtype_4CFE30@@@Z @ 0x00145FB0
+// sp-match: ?sub_145FB0@type_4D1DB8@@QAEXHPAPAUtype_4CFE30@@@Z @ 0x000F1A00
 // The extent of the arg_0 triggers of arg_4 that go in the table, and the
 // cells' size (a fiftieth of it); with none, all of space (but z from
 // 1e37).
@@ -868,6 +942,7 @@ void type_4D1DB8::sub_145FB0(RwInt32 arg_0, type_4CFE30 **arg_4)
 }
 
 // match: ?sub_146190@type_4D1DB8@@QAEXXZ @ 0x00146190
+// sp-match: ?sub_146190@type_4D1DB8@@QAEXXZ @ 0x000F0F60
 void type_4D1DB8::sub_146190()
 {
     unk_13A4 = 0;
@@ -878,6 +953,7 @@ void type_4D1DB8::sub_146190()
 }
 
 // match: ?sub_1461F0@type_4D1DB8@@QAEXXZ @ 0x001461F0
+// sp-match: ?sub_1461F0@type_4D1DB8@@QAEXXZ @ 0x000F0F90
 // Sizes the table from the counts sub_146360 left in the cells: a record
 // per occupied cell (and 50 spare), a list element per two triggers in each
 // (and 100 spare); then empties the cells.
@@ -912,6 +988,7 @@ void type_4D1DB8::sub_1461F0()
 }
 
 // match: ?sub_146360@type_4D1DB8@@QAEXPAUtype_4CFE30@@@Z @ 0x00146360
+// sp-match: ?sub_146360@type_4D1DB8@@QAEXPAUtype_4CFE30@@@Z @ 0x000F1B50
 // Counts the trigger arg_0 in each cell its extent covers.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_4D1DB8::sub_146360(type_4CFE30 *arg_0)
@@ -954,6 +1031,7 @@ void type_4D1DB8::sub_146360(type_4CFE30 *arg_0)
 }
 
 // match: ?sub_1464E0@type_4D1DB8@@QAEXPAVTrigger@@@Z @ 0x001464E0
+// sp-match: ?sub_1464E0@type_4D1DB8@@QAEXPAVTrigger@@@Z @ 0x000F1C60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_4D1DB8::sub_1464E0(Trigger *arg_0)
 {
@@ -995,6 +1073,7 @@ void type_4D1DB8::sub_1464E0(Trigger *arg_0)
 }
 
 // match: ?sub_146640@type_4D1DB8@@QAEXPAVTrigger@@@Z @ 0x00146640
+// sp-match: ?sub_146640@type_4D1DB8@@QAEXPAVTrigger@@@Z @ 0x000F17A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_4D1DB8::sub_146640(Trigger *arg_0)
 {
@@ -1010,6 +1089,7 @@ void type_4D1DB8::sub_146640(Trigger *arg_0)
 }
 
 // match: ?sub_1466B0@type_4D1DB8@@QAEPAUtype_144E80@@PAURwV3d@@@Z @ 0x001466B0
+// sp-match: ?sub_1466B0@type_4D1DB8@@QAEPAUtype_144E80@@PAURwV3d@@@Z @ 0x000F1130
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_144E80 *type_4D1DB8::sub_1466B0(RwV3d *arg_0)
 {
@@ -1032,6 +1112,7 @@ type_144E80 *type_4D1DB8::sub_1466B0(RwV3d *arg_0)
 }
 
 // match: ?sub_146770@type_4D1DB8@@QAEXHHPAVTrigger@@@Z @ 0x00146770
+// sp-match: ?sub_146770@type_4D1DB8@@QAEXHHPAVTrigger@@@Z @ 0x000F17D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Adds the trigger arg_8 to the cell (arg_0, arg_4) (a record for it if it
 // has none), keeping the cell's handles in order.
@@ -1118,6 +1199,7 @@ void type_4D1DB8::sub_146770(RwInt32 arg_0, RwInt32 arg_4, Trigger *arg_8)
 }
 
 // match: ?sub_146A00@type_4D1DB8@@QAEXHHPAVTrigger@@@Z @ 0x00146A00
+// sp-match: ?sub_146A00@type_4D1DB8@@QAEXHHPAVTrigger@@@Z @ 0x000F11B0
 // Takes the trigger arg_8 out of the cell (arg_0, arg_4), freeing the
 // emptied list elements at its end (and the cell's record once none is
 // left).
@@ -1174,6 +1256,7 @@ void type_4D1DB8::sub_146A00(RwInt32 arg_0, RwInt32 arg_4, Trigger *arg_8)
 }
 
 // match: ?sub_146B70@type_4D1DB8@@QAEXPAUtype_4CFE30@@PAUtype_146B70@@@Z @ 0x00146B70
+// sp-match: ?sub_146B70@type_4D1DB8@@QAEXPAUtype_4CFE30@@PAUtype_146B70@@@Z @ 0x000F19A0
 void type_4D1DB8::sub_146B70(type_4CFE30 *arg_0, type_146B70 *arg_4)
 {
     switch (((Trigger *)arg_0)->get_unk_46())
@@ -1193,6 +1276,7 @@ void type_4D1DB8::sub_146B70(type_4CFE30 *arg_0, type_146B70 *arg_4)
 }
 
 // match: ?sub_146C30@type_4D1DB8@@QAEXPAURwMatrixTag@@MPAUtype_146B70@@@Z @ 0x00146C30
+// sp-match: ?sub_146C30@type_4D1DB8@@QAEXPAURwMatrixTag@@MPAUtype_146B70@@@Z @ 0x000F1290
 // A sphere's extent: the radius arg_4 either side of the matrix arg_0's
 // position.
 void type_4D1DB8::sub_146C30(RwMatrix *arg_0, RwReal arg_4, type_146B70 *arg_8)
@@ -1207,6 +1291,7 @@ void type_4D1DB8::sub_146C30(RwMatrix *arg_0, RwReal arg_4, type_146B70 *arg_8)
 }
 
 // match: ?sub_146C90@type_4D1DB8@@QAEXPAURwMatrixTag@@MMPAUtype_146B70@@@Z @ 0x00146C90
+// sp-match: ?sub_146C90@type_4D1DB8@@QAEXPAURwMatrixTag@@MMPAUtype_146B70@@@Z @ 0x000F1970
 // A cylinder's extent: a box its diameter wide and arg_8 high.
 void type_4D1DB8::sub_146C90(RwMatrix *arg_0, RwReal arg_4, RwReal arg_8, type_146B70 *arg_C)
 {
@@ -1214,6 +1299,7 @@ void type_4D1DB8::sub_146C90(RwMatrix *arg_0, RwReal arg_4, RwReal arg_8, type_1
 }
 
 // match: ?sub_146CD0@type_4D1DB8@@QAEXPAURwMatrixTag@@MMMPAUtype_146B70@@@Z @ 0x00146CD0
+// sp-match: ?sub_146CD0@type_4D1DB8@@QAEXPAURwMatrixTag@@MMMPAUtype_146B70@@@Z @ 0x000F12D0
 // A box's extent: its eight corners (arg_4, arg_8, arg_C either side of the
 // centre) through the matrix arg_0, and their least and greatest x and z.
 void type_4D1DB8::sub_146CD0(RwMatrix *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C,
@@ -1264,6 +1350,7 @@ void type_4D1DB8::sub_146CD0(RwMatrix *arg_0, RwReal arg_4, RwReal arg_8, RwReal
 }
 
 // match: ?sub_146E80@type_4D1DB8@@QAEHPAVTrigger@@@Z @ 0x00146E80
+// sp-match: ?sub_146E80@type_4D1DB8@@QAEHPAVTrigger@@@Z @ 0x000F1650
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_4D1DB8::sub_146E80(Trigger *arg_0)
 {
@@ -1282,6 +1369,7 @@ RwInt32 type_4D1DB8::sub_146E80(Trigger *arg_0)
 }
 
 // match: ?sub_146F10@type_4D1DB8@@QAEXXZ @ 0x00146F10
+// sp-match: ?sub_146F10@type_4D1DB8@@QAEXXZ @ 0x000F16B0
 void type_4D1DB8::sub_146F10()
 {
     RwInt32 var_4;
@@ -1291,6 +1379,7 @@ void type_4D1DB8::sub_146F10()
 }
 
 // match: ?sub_146F50@type_4D1DB8@@QAEHPAURwV3d@@@Z @ 0x00146F50
+// sp-match: ?sub_146F50@type_4D1DB8@@QAEHPAURwV3d@@@Z @ 0x000F16E0
 // Whether the cell of the point arg_0 changed since sub_146F10 (a point
 // outside any cell counts as changed).
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -1315,6 +1404,7 @@ RwInt32 type_4D1DB8::sub_146F50(RwV3d *arg_0)
 }
 
 // match: ?sub_147020@type_4D1DB8@@QAEHXZ @ 0x00147020
+// sp-match: ?sub_147020@type_4D1DB8@@QAEHXZ @ 0x000F1770
 // Takes the first free cell record (marking it used); -1 when none is.
 RwInt32 type_4D1DB8::sub_147020()
 {
@@ -1330,3 +1420,12 @@ RwInt32 type_4D1DB8::sub_147020()
     }
     return -1;
 }
+
+#ifdef CODFH_SP
+// ?sp_leave@LadderTrigger@@QAEXPAUtype_3D3548@@@Z (single player only, folded into SP 0xD60D0):
+// defined here, in single player's second file, away from its caller sub_145640.
+void LadderTrigger::sp_leave(type_3D3548 *arg_0)
+{
+}
+#endif
+#endif

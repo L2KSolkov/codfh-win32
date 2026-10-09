@@ -209,6 +209,7 @@ static RpMeshopStatic MeshopStatic =
 // match: ?testFrame@?1??_rpTriStripTunnelCost@@9@9 @ 0x00436BE4
 
 // match: _SortPolygons @ 0x002DB0C0
+// sp-match: _SortPolygons @ 0x001F5B60
 
 static int __RWCDECL
 SortPolygons(const void *pA, const void *pB)
@@ -321,6 +322,7 @@ SortPolygons(const void *pA, const void *pB)
  On exit    :
  */
 // match: _SortPolygonsInTriListMesh @ 0x002DB220
+// sp-match: _SortPolygonsInTriListMesh @ 0x001F5CC0
 static RpMesh *
 SortPolygonsInTriListMesh(RpMesh *mesh,
                           RpMeshHeader * meshHeader __RWUNUSED__,
@@ -441,6 +443,7 @@ SortPolygonsInTriListMesh(RpMesh *mesh,
  On exit:
  */
 // match: _TriStripAddEdge @ 0x002DB430
+// sp-match: _TriStripAddEdge @ 0x001F5ED0
 static Edge *
 TriStripAddEdge(RwFreeList *edgeFreeList,
                 Edge **edgelist,
@@ -489,6 +492,7 @@ TriStripAddEdge(RwFreeList *edgeFreeList,
 }
 
 // match: _TriStripBinEntryArrayDestroy @ 0x002DB4B0
+// sp-match: _TriStripBinEntryArrayDestroy @ 0x001F5F50
 static TriBinEntry **
 TriStripBinEntryArrayDestroy(RwUInt32 numTris,
                              MeshOpFreeLists *meshOpFreeLists,
@@ -544,6 +548,7 @@ TriStripBinEntryArrayDestroy(RwUInt32 numTris,
  On exit:
  */
 // match: _TriStripBinEntryArrayCreate @ 0x002DB530
+// sp-match: _TriStripBinEntryArrayCreate @ 0x001F5FD0
 static TriBinEntry **
 TriStripBinEntryArrayCreate(RwUInt32 numTris,
                             MeshOpFreeLists *meshOpFreeLists,
@@ -639,6 +644,7 @@ TriStripGetTriEdge(TriBinEntry *binEntry,
  On exit:
  */
 // match: _TriStripMarkTriUsed @ 0x002DB640
+// sp-match: _TriStripMarkTriUsed @ 0x001F60E0
 static void
 TriStripMarkTriUsed(TriBinEntry *tri,
                     TriBinList *binListArray,
@@ -840,6 +846,7 @@ TriStripIsLastTriInStrip(Edge *outgoingEdge,
  On exit:
  */
 // match: _TriStripFollow @ 0x002DB740
+// sp-match: _TriStripFollow @ 0x001F61E0
 static RwUInt32
 TriStripFollow(TriStripListEntry *strip,
                Edge *nextEdge,
@@ -1064,6 +1071,7 @@ TriStripFollow(TriStripListEntry *strip,
  On exit:
  */
 // match: _TriStripStripTris @ 0x002DBA30
+// sp-match: _TriStripStripTris @ 0x001F64D0
 static RwBool
 TriStripStripTris(RpBuildMeshTriangle *triList,
                   RwUInt32 numTris,
@@ -1767,6 +1775,7 @@ TriStripStripTrisExhaustive(RpBuildMeshTriangle *triList,
  On exit:
  */
 // match: _TriStripJoin @ 0x002DC260
+// sp-match: _TriStripJoin @ 0x001F6D00
 static RwBool
 TriStripJoin(TriStripList *stripList, RwBool maintainWinding)
 {
@@ -1951,6 +1960,7 @@ TriStripJoin(TriStripList *stripList, RwBool maintainWinding)
  On exit:
  */
 // match: _TriStripMeshGenerate @ 0x002DC4D0
+// sp-match: _TriStripMeshGenerate @ 0x001F6F70
 static RpMeshHeader *
 TriStripMeshGenerate(RpBuildMesh *mesh,
                      RwBool preprocess,
@@ -3568,6 +3578,7 @@ RpBuildMeshGenerateTrivialTriStrip(RpBuildMesh *buildMesh,
  *
  */
 // match: _RpBuildMeshGenerateDefaultTriStrip @ 0x002DC910
+// sp-match: _RpBuildMeshGenerateDefaultTriStrip @ 0x001F73B0
 RpMeshHeader *
 RpBuildMeshGenerateDefaultTriStrip(RpBuildMesh *buildMesh,
                                    void * data __RWUNUSED__)
@@ -4710,6 +4721,7 @@ RpMeshSetTriStripMethod(RpTriStripMeshCallBack callback,
  *
  */
 RwBool
+// sp-match: _RpMeshGetTriStripMethod @ 0x001F73D0
 RpMeshGetTriStripMethod(RpTriStripMeshCallBack * callback,
                         void ** data)
 {
@@ -4755,6 +4767,7 @@ RpMeshGetTriStripMethod(RpTriStripMeshCallBack * callback,
  On exit    :
  */
 // match: __rpTriListMeshGenerate @ 0x002DC930
+// sp-match: __rpTriListMeshGenerate @ 0x001F7400
 RpMeshHeader *
 _rpTriListMeshGenerate(RpBuildMesh * buildMesh,
                        void * data __RWUNUSED__)
@@ -4908,6 +4921,7 @@ _rpTriListMeshGenerate(RpBuildMesh * buildMesh,
  On exit    : New mesh list on success, or NULL on failure
  */
 // match: __rpMeshOptimise @ 0x002DCB10
+// sp-match: __rpMeshOptimise @ 0x001F75E0
 RpMeshHeader *
 _rpMeshOptimise(RpBuildMesh * mesh, RwUInt32 flags)
 {

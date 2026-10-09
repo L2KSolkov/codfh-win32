@@ -76,6 +76,7 @@ static DWORD dwDummyshaderVertexShader[] =
 // match: _dwDummyshaderVertexShader @ 0x00436A90
 
 // match: __rpSkinXboxVertexFormatCreate @ 0x002D4320
+// sp-match: __rpSkinXboxVertexFormatCreate @ 0x001EEC70
 
 void
 _rpSkinXboxVertexFormatCreate(void)
@@ -97,6 +98,7 @@ _rpSkinXboxVertexFormatCreate(void)
 }
 
 // match: __rpSkinXboxVertexFormatDestroy @ 0x002D4370
+// sp-match: __rpSkinXboxVertexFormatDestroy @ 0x001EECC0
 void
 _rpSkinXboxVertexFormatDestroy(void)
 {
@@ -194,6 +196,7 @@ SkinStoreVertexFormat(RwInt32 index, const _rpSkinXboxVtxFmt *desc, DWORD *verte
 }
 
 // match: __rpSkinXboxGetVertexFormatShader @ 0x002D4440
+// sp-match: __rpSkinXboxGetVertexFormatShader @ 0x001EED90
 DWORD
 _rpSkinXboxGetVertexFormatShader(const _rpSkinXboxVtxFmt *desc)
 {

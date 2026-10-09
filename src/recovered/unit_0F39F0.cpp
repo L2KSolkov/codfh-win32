@@ -30,13 +30,16 @@
 #include "rw/bavector.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: single player has no unreferenced 16.666666f here: unit_0F4570's constants follow unit_0F2880's "%s.spp" (SP 0x2E58C0-0x2E58C8)
 // 0x003D9304
 extern const RwReal flt_3D9304 = 16.666666f;
+#endif
 
 // match: ?flt_3D9304@@3MB @ 0x003D9304
 
 
 // match: ??3type_F2FF0@@SAXPAX@Z @ 0x000F39F0
+// sp-match: ??3type_F2FF0@@SAXPAX@Z @ 0x000B9E80
 void type_F2FF0::operator delete(void *arg_0)
 {
     if (dword_4BFD44.sub_16C770(arg_0))
@@ -51,6 +54,7 @@ void type_F2FF0::operator delete(void *arg_0)
     dword_4BFDC4--;
 }
 // match: ??0type_F2FF0@@QAE@XZ @ 0x000F3A60
+// sp-match: ??0type_F2FF0@@QAE@XZ @ 0x000B9ED0
 type_F2FF0::type_F2FF0()
 {
     unk_40 = 0;
@@ -64,6 +68,7 @@ type_F2FF0::type_F2FF0()
     unk_60.unk_D8 = 0;
 }
 // match: ??1type_F2FF0@@QAE@XZ @ 0x000F3AE0
+// sp-match: ??1type_F2FF0@@QAE@XZ @ 0x000BA540
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_F2FF0::~type_F2FF0()
 {
@@ -86,6 +91,7 @@ type_F2FF0::~type_F2FF0()
     }
 }
 // match: ?sub_F3B50@type_F2FF0@@QAEHXZ @ 0x000F3B50
+// sp-match: ?sub_F3B50@type_F2FF0@@QAEHXZ @ 0x000B9F00
 RwInt32 type_F2FF0::sub_F3B50()
 {
     if (unk_40 & 4)
@@ -111,6 +117,7 @@ RwInt32 type_F2FF0::sub_F3B50()
     return 1;
 }
 // match: ?sub_F3C00@type_F2FF0@@QAEHPAUtype_F3130@@PAURwMatrixTag@@MHH_N@Z @ 0x000F3C00
+// sp-match: ?sub_F3C00@type_F2FF0@@QAEHPAUtype_F3130@@PAURwMatrixTag@@MHH_N@Z @ 0x000BA580
 RwInt32 type_F2FF0::sub_F3C00(type_F3130 *arg_0, RwMatrix *arg_4, RwReal arg_8, RwInt32 arg_C, RwInt32 arg_10,
                               bool arg_14)
 {
@@ -125,6 +132,7 @@ RwInt32 type_F2FF0::sub_F3C00(type_F3130 *arg_0, RwMatrix *arg_4, RwReal arg_8, 
     return sub_F3C70(arg_0, arg_4, arg_8, arg_C, arg_10, arg_14);
 }
 // match: ?sub_F3C70@type_F2FF0@@QAEHPAUtype_F3130@@PAURwMatrixTag@@MHH_N@Z @ 0x000F3C70
+// sp-match: ?sub_F3C70@type_F2FF0@@QAEHPAUtype_F3130@@PAURwMatrixTag@@MHH_N@Z @ 0x000B9F70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_F2FF0::sub_F3C70(type_F3130 *arg_0, RwMatrix *arg_4, RwReal arg_8, RwInt32 arg_C, RwInt32 arg_10,
                               bool arg_14)
@@ -174,6 +182,7 @@ RwInt32 type_F2FF0::sub_F3C70(type_F3130 *arg_0, RwMatrix *arg_4, RwReal arg_8, 
     return 1;
 }
 // match: ?sub_F3E70@type_F2FF0@@QAEHPAUtype_F3130@@PAURwMatrixTag@@MH@Z @ 0x000F3E70
+// sp-match: ?sub_F3E70@type_F2FF0@@QAEHPAUtype_F3130@@PAURwMatrixTag@@MH@Z @ 0x000BA0D0
 RwInt32 type_F2FF0::sub_F3E70(type_F3130 *arg_0, RwMatrix *arg_4, RwReal arg_8, RwInt32 arg_C)
 {
     RwMatrix var_50;
@@ -242,6 +251,7 @@ RwInt32 type_F2FF0::sub_F3E70(type_F3130 *arg_0, RwMatrix *arg_4, RwReal arg_8, 
     return 1;
 }
 // match: ?sub_F4190@type_F2FF0@@QAEHPAURwCamera@@MM@Z @ 0x000F4190
+// sp-match: ?sub_F4190@type_F2FF0@@QAEHPAURwCamera@@MM@Z @ 0x000BA5C0
 RwInt32 type_F2FF0::sub_F4190(RwCamera *arg_0, RwReal arg_4, RwReal arg_8)
 {
     if (unk_40 & 0x10)
@@ -251,6 +261,7 @@ RwInt32 type_F2FF0::sub_F4190(RwCamera *arg_0, RwReal arg_4, RwReal arg_8)
     return sub_F41D0(arg_0, arg_4, arg_8);
 }
 // match: ?sub_F41D0@type_F2FF0@@QAEHPAURwCamera@@MM@Z @ 0x000F41D0
+// sp-match: ?sub_F41D0@type_F2FF0@@QAEHPAURwCamera@@MM@Z @ 0x000BA320
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_F2FF0::sub_F41D0(RwCamera *arg_0, RwReal arg_4, RwReal arg_8)
 {
@@ -291,7 +302,11 @@ RwInt32 type_F2FF0::sub_F41D0(RwCamera *arg_0, RwReal arg_4, RwReal arg_8)
         {
             w20 = unk_44->unk_20;
             x1C = unk_44->unk_24;
+#ifdef CODFH_SP
+            if (unk_58 > w20 + x1C + 0.1f) // shape: compared the other way round (SP 0xBA3CB)
+#else
             if (w20 + x1C + 0.1f < unk_58)
+#endif
             {
                 bp_4 = 0;
             }
@@ -300,6 +315,7 @@ RwInt32 type_F2FF0::sub_F41D0(RwCamera *arg_0, RwReal arg_4, RwReal arg_8)
     return bp_4;
 }
 // match: ?sub_F4300@type_F2FF0@@QAEHMM@Z @ 0x000F4300
+// sp-match: ?sub_F4300@type_F2FF0@@QAEHMM@Z @ 0x000BA3F0
 RwInt32 type_F2FF0::sub_F4300(RwReal arg_0, RwReal arg_4)
 {
     RwInt32 var_4 = 1;
@@ -328,6 +344,7 @@ RwInt32 type_F2FF0::sub_F4300(RwReal arg_0, RwReal arg_4)
     return var_4;
 }
 // match: ?sub_F43B0@type_F2FF0@@QAEXXZ @ 0x000F43B0
+// sp-match: ?sub_F43B0@type_F2FF0@@QAEXXZ @ 0x000BA450
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_F2FF0::sub_F43B0()
 {
@@ -367,6 +384,7 @@ void type_F2FF0::sub_F43B0()
     }
 }
 // match: ?sub_F4480@type_F2FF0@@QAEXPAUtype_F2880@@@Z @ 0x000F4480
+// sp-match: ?sub_F4480@type_F2FF0@@QAEXPAUtype_F2880@@@Z @ 0x000BA4D0
 void type_F2FF0::sub_F4480(type_F2880 *arg_0)
 {
     arg_0->unk_00 = get_unk_15C();
@@ -378,6 +396,7 @@ void type_F2FF0::sub_F4480(type_F2880 *arg_0)
     unk_15C = arg_0;
 }
 // match: ?sub_F44E0@type_F2FF0@@QAEXPAUtype_F2880@@@Z @ 0x000F44E0
+// sp-match: ?sub_F44E0@type_F2FF0@@QAEXPAUtype_F2880@@@Z @ 0x000BA500
 void type_F2FF0::sub_F44E0(type_F2880 *arg_0)
 {
     type_F2880 *var_4;

@@ -341,6 +341,7 @@ HRESULT type_229A90::vf_00C(DWORD arg_0, UIX_OBJSTATE_TYPE arg_4, DWORD *arg_8)
     return E_NOTIMPL;
 }
 
+// sp-match: ?vf_010@type_229A90@@UAEJKW4_UIX_OBJSTATE_TYPE@@K@Z @ 0x0012AF00
 HRESULT type_229A90::vf_010(DWORD arg_0, UIX_OBJSTATE_TYPE arg_4, DWORD arg_8)
 {
     return E_NOTIMPL;

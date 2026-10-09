@@ -257,6 +257,7 @@ MetricsClose(void *instance __RWUNUSED__,
 // match: __rwMsbBit @ 0x00435388
 
 // match: _CorePluginAttach @ 0x002A67F0
+// sp-match: _CorePluginAttach @ 0x001C1C20
 static              RwBool
 CorePluginAttach(void)
 {
@@ -329,6 +330,7 @@ CorePluginAttach(void)
 }
 
 // match: _MallocWrapper @ 0x002A63E0
+// sp-match: _MallocWrapper @ 0x001C1810
 static void *
 MallocWrapper(RwFreeList *fl, RwUInt32 hint)
 {
@@ -338,6 +340,7 @@ MallocWrapper(RwFreeList *fl, RwUInt32 hint)
 }
 
 // match: _FreeWrapper @ 0x002A63F0
+// sp-match: _FreeWrapper @ 0x001C1820
 static RwFreeList *
 FreeWrapper(RwFreeList *fl, void *pData)
 {
@@ -349,6 +352,7 @@ FreeWrapper(RwFreeList *fl, void *pData)
 }
 
 // match: _EngineOpen @ 0x002A6A20
+// sp-match: _EngineOpen @ 0x001C1E50
 static              RwBool
 EngineOpen(RwDevice * device, RwEngineOpenParams * initParams)
 {
@@ -439,6 +443,7 @@ EngineOpen(RwDevice * device, RwEngineOpenParams * initParams)
  */
 
 // match: __rwDeviceSystemRequest @ 0x002A6410
+// sp-match: __rwDeviceSystemRequest @ 0x001C1840
 RwBool
 _rwDeviceSystemRequest(RwDevice * device, RwInt32 requestID,
                        void *pOut, void *pInOut, RwInt32 numIn)
@@ -516,6 +521,7 @@ _rwDeviceSystemRequest(RwDevice * device, RwInt32 requestID,
  On exit    : Number of engine instances
  */
 // match: __rwGetNumEngineInstances @ 0x002A64F0
+// sp-match: __rwGetNumEngineInstances @ 0x001C1920
 RwUInt32
 _rwGetNumEngineInstances(void)
 {
@@ -551,6 +557,7 @@ _rwGetNumEngineInstances(void)
  *
  */
 // match: _RwEngineGetVersion @ 0x002A6500
+// sp-match: _RwEngineGetVersion @ 0x001C1930
 RwUInt32
 RwEngineGetVersion(void)
 {
@@ -591,6 +598,7 @@ RwEngineGetVersion(void)
  *
  */
 // match: _RwEngineRegisterPlugin @ 0x002A6510
+// sp-match: _RwEngineRegisterPlugin @ 0x001C1940
 RwInt32
 RwEngineRegisterPlugin(RwInt32 size,
                        RwUInt32 pluginID,
@@ -629,6 +637,7 @@ RwEngineRegisterPlugin(RwInt32 size,
  *
  */
 // match: _RwEngineGetPluginOffset @ 0x002A6540
+// sp-match: _RwEngineGetPluginOffset @ 0x001C1970
 RwInt32
 RwEngineGetPluginOffset(RwUInt32 pluginID)
 {
@@ -916,6 +925,7 @@ RwEngineGetNumVideoModes(void)
  *
  */
 // match: _RwEngineGetVideoModeInfo @ 0x002A6560
+// sp-match: _RwEngineGetVideoModeInfo @ 0x001C1990
 RwVideoMode *
 RwEngineGetVideoModeInfo(RwVideoMode *modeinfo, RwInt32 modeIndex)
 {
@@ -954,6 +964,7 @@ RwEngineGetVideoModeInfo(RwVideoMode *modeinfo, RwInt32 modeIndex)
  *
  */
 // match: _RwEngineGetCurrentVideoMode @ 0x002A65B0
+// sp-match: _RwEngineGetCurrentVideoMode @ 0x001C19E0
 RwInt32
 RwEngineGetCurrentVideoMode(void)
 {
@@ -1159,6 +1170,7 @@ RwEngineGetMetrics(void)
  *
  */
 // match: _RwEngineStop @ 0x002A6600
+// sp-match: _RwEngineStop @ 0x001C1A30
 RwBool
 RwEngineStop(void)
 {
@@ -1220,6 +1232,7 @@ RwEngineStop(void)
  *
  */
 // match: _RwEngineStart @ 0x002A6680
+// sp-match: _RwEngineStart @ 0x001C1AB0
 RwBool
 RwEngineStart(void)
 {
@@ -1281,6 +1294,7 @@ RwEngineStart(void)
  *
  */
 // match: _RwEngineClose @ 0x002A6750
+// sp-match: _RwEngineClose @ 0x001C1B80
 RwBool
 RwEngineClose(void)
 {
@@ -1374,6 +1388,7 @@ RwEngineClose(void)
  *
  */
 // match: _RwEngineOpen @ 0x002A6AE0
+// sp-match: _RwEngineOpen @ 0x001C1F10
 RwBool
 RwEngineOpen(RwEngineOpenParams *initParams)
 {
@@ -1454,6 +1469,7 @@ RwEngineOpen(RwEngineOpenParams *initParams)
  *
  */
 // match: _RwEngineTerm @ 0x002A67B0
+// sp-match: _RwEngineTerm @ 0x001C1BE0
 RwBool
 RwEngineTerm(void)
 {
@@ -1558,6 +1574,7 @@ RwEngineTerm(void)
  */
 //@{ 20050513 DDonSS : Threadsafe ó��.. �ܺ� Lock�Լ� ���� �����ϵ��� ���� �߰�
 // match: _RwEngineInit @ 0x002A6B90
+// sp-match: _RwEngineInit @ 0x001C1FC0
 RwBool
 RwEngineInit(const RwMemoryFunctions *memFuncs,
              RwUInt32 openFlags,

@@ -256,6 +256,7 @@ RpLightTieSetFreeListCreateParams(RwInt32 blockSize, RwInt32 numBlocksToPrealloc
 // match: __rpLightTieFreeListPreallocBlocks @ 0x00436BB0
 
 // match: _WorldObjectOpen @ 0x002D8CC0
+// sp-match: _WorldObjectOpen @ 0x001F3790
 
 static void        *
 WorldObjectOpen(void *instance, RwInt32 offset,
@@ -314,6 +315,7 @@ WorldObjectOpen(void *instance, RwInt32 offset,
  */
 
 // match: _WorldObjectClose @ 0x002D8D80
+// sp-match: _WorldObjectClose @ 0x001F3850
 static void        *
 WorldObjectClose(void *instance,
                  RwInt32 offset __RWUNUSED__,
@@ -449,6 +451,7 @@ SectorsInFrustumAddSpace(RpWorldCameraExt * cameraExt, RwInt32 nNum)
  */
 
 // match: _WorldCameraBeginUpdate @ 0x002D8DE0
+// sp-match: _WorldCameraBeginUpdate @ 0x001F38B0
 static RwCamera    *
 WorldCameraBeginUpdate(RwCamera * camera)
 {
@@ -478,6 +481,7 @@ WorldCameraBeginUpdate(RwCamera * camera)
  */
 
 // match: _WorldCameraEndUpdate @ 0x002D8E10
+// sp-match: _WorldCameraEndUpdate @ 0x001F38E0
 static RwCamera    *
 WorldCameraEndUpdate(RwCamera * camera)
 {
@@ -504,6 +508,7 @@ WorldCameraEndUpdate(RwCamera * camera)
  */
 
 // match: _WorldCameraSync @ 0x002D9A50
+// sp-match: _WorldCameraSync @ 0x001F4510
 static RwObjectHasFrame *
 WorldCameraSync(RwObjectHasFrame * object)
 {
@@ -554,6 +559,7 @@ WorldCameraSync(RwObjectHasFrame * object)
  */
 
 // match: _WorldInitCameraExt @ 0x002D9AA0
+// sp-match: _WorldInitCameraExt @ 0x001F4560
 static void        *
 WorldInitCameraExt(void *object,
                    RwInt32 offsetInObject __RWUNUSED__,
@@ -594,6 +600,7 @@ WorldInitCameraExt(void *object,
  */
 
 // match: _WorldCopyCameraExt @ 0x002D9AF0
+// sp-match: _WorldCopyCameraExt @ 0x001F45B0
 static void        *
 WorldCopyCameraExt(void *dstObject,
                    const void *srcObject,
@@ -636,6 +643,7 @@ WorldCopyCameraExt(void *dstObject,
  */
 
 // match: _WorldDeInitCameraExt @ 0x002D8E30
+// sp-match: _WorldDeInitCameraExt @ 0x001F3900
 static void        *
 WorldDeInitCameraExt(void *object,
                      RwInt32 offsetInObject __RWUNUSED__,
@@ -674,6 +682,7 @@ WorldDeInitCameraExt(void *object,
  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 // match: __rpLightTieDestroy @ 0x002D8E80
+// sp-match: __rpLightTieDestroy @ 0x001F3950
 RwBool
 _rpLightTieDestroy(RpLightTie * tie)
 {
@@ -696,6 +705,7 @@ _rpLightTieDestroy(RpLightTie * tie)
 }
 
 // match: __rpTieDestroy @ 0x002D8EC0
+// sp-match: __rpTieDestroy @ 0x001F3990
 RwBool
 _rpTieDestroy(RpTie * tie)
 {
@@ -732,6 +742,7 @@ _rpTieDestroy(RpTie * tie)
  */
 
 // match: _AtomicDestroyTies @ 0x002D8F10
+// sp-match: _AtomicDestroyTies @ 0x001F39E0
 static void
 AtomicDestroyTies(RpAtomic * atomic)
 {
@@ -774,6 +785,7 @@ AtomicDestroyTies(RpAtomic * atomic)
  */
 
 // match: _WorldAttachAtomicSphere @ 0x002D8F70
+// sp-match: _WorldAttachAtomicSphere @ 0x001F3A40
 static void
 WorldAttachAtomicSphere(RpWorld * world, RpAtomic * atomic)
 {
@@ -892,6 +904,7 @@ WorldAttachAtomicSphere(RpWorld * world, RpAtomic * atomic)
  */
 
 // match: _WorldAtomicSync @ 0x002D90C0
+// sp-match: _WorldAtomicSync @ 0x001F3B90
 static RwObjectHasFrame *
 WorldAtomicSync(RwObjectHasFrame * type)
 {
@@ -938,6 +951,7 @@ WorldAtomicSync(RwObjectHasFrame * type)
  */
 
 // match: _WorldInitAtomicExt @ 0x002D9100
+// sp-match: _WorldInitAtomicExt @ 0x001F3BD0
 static void        *
 WorldInitAtomicExt(void *object,
                    RwInt32 offset __RWUNUSED__,
@@ -1002,6 +1016,7 @@ WorldCopyAtomicExt(void *dstObject,
  */
 
 // match: _WorldDeInitAtomicExt @ 0x002D9130
+// sp-match: _WorldDeInitAtomicExt @ 0x001F3C00
 static void        *
 WorldDeInitAtomicExt(void *object,
                      RwInt32 offset __RWUNUSED__,
@@ -1041,6 +1056,7 @@ WorldDeInitAtomicExt(void *object,
  */
 
 // match: _WorldInitClumpExt @ 0x002D9150
+// sp-match: _WorldInitClumpExt @ 0x001F3C20
 static void        *
 WorldInitClumpExt(void *object,
                   RwInt32 offset __RWUNUSED__,
@@ -1069,6 +1085,7 @@ WorldInitClumpExt(void *object,
  */
 
 // match: _WorldCopyClumpExt @ 0x002D9E10
+// sp-match: _WorldCopyClumpExt @ 0x001F48D0
 static void        *
 WorldCopyClumpExt(void *dstObject, const void *srcObject,
                   RwInt32 offset __RWUNUSED__,
@@ -1122,6 +1139,7 @@ WorldDeInitClumpExt(void *object,
  */
 
 // match: _LightDestroyTies @ 0x002D9190
+// sp-match: _LightDestroyTies @ 0x001F3C50
 static void
 LightDestroyTies(RpLight * light)
 {
@@ -1162,6 +1180,7 @@ LightDestroyTies(RpLight * light)
  */
 
 // match: _WorldLightSync @ 0x002D91F0
+// sp-match: _WorldLightSync @ 0x001F3CB0
 static RwObjectHasFrame *
 WorldLightSync(RwObjectHasFrame * object)
 {
@@ -1303,6 +1322,7 @@ WorldLightSync(RwObjectHasFrame * object)
  */
 
 // match: _WorldInitLightExt @ 0x002D93C0
+// sp-match: _WorldInitLightExt @ 0x001F3E80
 static void        *
 WorldInitLightExt(void *object,
                   RwInt32 offset __RWUNUSED__,
@@ -1335,6 +1355,7 @@ WorldInitLightExt(void *object,
  */
 
 // match: _WorldCopyLightExt @ 0x002D9B30
+// sp-match: _WorldCopyLightExt @ 0x001F45F0
 static void        *
 WorldCopyLightExt(void *dstObject,
                   const void *srcObject,
@@ -1368,6 +1389,7 @@ WorldCopyLightExt(void *dstObject,
  */
 
 // match: _WorldDeInitLightExt @ 0x002D93E0
+// sp-match: _WorldDeInitLightExt @ 0x001F3EA0
 static void        *
 WorldDeInitLightExt(void *object,
                     RwInt32 offset __RWUNUSED__,
@@ -1414,6 +1436,7 @@ WorldDeInitLightExt(void *object,
  */
 
 // match: _WorldSyncCamera @ 0x002D93F0
+// sp-match: _WorldSyncCamera @ 0x001F3EB0
 static RpWorld     *
 WorldSyncCamera(RpWorld * world, RwCamera * camera)
 {
@@ -1560,6 +1583,7 @@ WorldSyncCamera(RpWorld * world, RwCamera * camera)
  */
 
 // match: _WorldAddClumpAtomic @ 0x002D9B60
+// sp-match: _WorldAddClumpAtomic @ 0x001F4620
 static RpAtomic    *
 WorldAddClumpAtomic(RpAtomic * atomic, void *data)
 {
@@ -1582,6 +1606,7 @@ WorldAddClumpAtomic(RpAtomic * atomic, void *data)
  */
 
 // match: _WorldRemoveClumpAtomic @ 0x002D9BA0
+// sp-match: _WorldRemoveClumpAtomic @ 0x001F4660
 static RpAtomic    *
 WorldRemoveClumpAtomic(RpAtomic * atomic, void *data)
 {
@@ -1614,6 +1639,7 @@ WorldRemoveClumpAtomic(RpAtomic * atomic, void *data)
  */
 
 // match: _WorldAddClumpLight @ 0x002D9BE0
+// sp-match: _WorldAddClumpLight @ 0x001F46A0
 static RpLight    *
 WorldAddClumpLight(RpLight *light, void *data)
 {
@@ -1636,6 +1662,7 @@ WorldAddClumpLight(RpLight *light, void *data)
  */
 
 // match: _WorldRemoveClumpLight @ 0x002D9C30
+// sp-match: _WorldRemoveClumpLight @ 0x001F46F0
 static RpLight    *
 WorldRemoveClumpLight(RpLight * light, void *data)
 {
@@ -1667,6 +1694,7 @@ WorldRemoveClumpLight(RpLight * light, void *data)
  */
 
 // match: _WorldAddClumpCamera @ 0x002D9C70
+// sp-match: _WorldAddClumpCamera @ 0x001F4730
 static RwCamera    *
 WorldAddClumpCamera(RwCamera * camera, void *data)
 {
@@ -1689,6 +1717,7 @@ WorldAddClumpCamera(RwCamera * camera, void *data)
  */
 
 // match: _WorldRemoveClumpCamera @ 0x002D9CB0
+// sp-match: _WorldRemoveClumpCamera @ 0x001F4770
 static RwCamera    *
 WorldRemoveClumpCamera(RwCamera * camera, void *data)
 {
@@ -1726,6 +1755,7 @@ WorldRemoveClumpCamera(RwCamera * camera, void *data)
  */
 
 // match: _writeGeometryMesh @ 0x002D9640
+// sp-match: _writeGeometryMesh @ 0x001F4100
 static RwStream    *
 writeGeometryMesh(RwStream * stream,
                   RwInt32 binaryLength __RWUNUSED__,
@@ -1758,6 +1788,7 @@ writeGeometryMesh(RwStream * stream,
  */
 
 // match: _readGeometryMesh @ 0x002D9660
+// sp-match: _readGeometryMesh @ 0x001F4120
 static RwStream    *
 readGeometryMesh(RwStream * stream,
                  RwInt32 binaryLength __RWUNUSED__,
@@ -1796,6 +1827,7 @@ readGeometryMesh(RwStream * stream,
  */
 
 // match: _sizeGeometryMesh @ 0x002D9690
+// sp-match: _sizeGeometryMesh @ 0x001F4150
 static RwInt32
 sizeGeometryMesh(const void *object,
                  RwInt32 offsetInObject __RWUNUSED__,
@@ -1822,6 +1854,7 @@ sizeGeometryMesh(const void *object,
  On exit    : Stream pointer on success
  */
 // match: _writeGeometryNative @ 0x002D96B0
+// sp-match: _writeGeometryNative @ 0x001F4170
 static RwStream *
 writeGeometryNative(RwStream *stream,
                     RwInt32 binaryLength __RWUNUSED__,
@@ -1851,6 +1884,7 @@ writeGeometryNative(RwStream *stream,
  On exit    : Stream pointer on success
  */
 // match: _readGeometryNative @ 0x002D96D0
+// sp-match: _readGeometryNative @ 0x001F4190
 static RwStream *
 readGeometryNative(RwStream *stream,
                    RwInt32 binaryLength __RWUNUSED__,
@@ -1885,6 +1919,7 @@ readGeometryNative(RwStream *stream,
  On exit    : Size of mesh when serialised (in bytes)
  */
 // match: _sizeGeometryNative @ 0x002D96F0
+// sp-match: _sizeGeometryNative @ 0x001F41B0
 static RwInt32
 sizeGeometryNative(const void *object,
                    RwInt32 offsetInObject __RWUNUSED__,
@@ -1912,6 +1947,7 @@ sizeGeometryNative(const void *object,
  On exit    : Stream pointer on success
  */
 // match: _writeWorldSectorNative @ 0x002D9700
+// sp-match: _writeWorldSectorNative @ 0x001F41C0
 static RwStream *
 writeWorldSectorNative(RwStream *stream,
                        RwInt32 binaryLength __RWUNUSED__,
@@ -1941,6 +1977,7 @@ writeWorldSectorNative(RwStream *stream,
  On exit    : Stream pointer on success
  */
 // match: _readWorldSectorNative @ 0x002D9720
+// sp-match: _readWorldSectorNative @ 0x001F41E0
 static RwStream *
 readWorldSectorNative(RwStream *stream,
                       RwInt32 binaryLength __RWUNUSED__,
@@ -1975,6 +2012,7 @@ readWorldSectorNative(RwStream *stream,
  On exit    : Size of mesh when serialised (in bytes)
  */
 // match: _sizeWorldSectorNative @ 0x002D9740
+// sp-match: _sizeWorldSectorNative @ 0x001F4200
 static RwInt32
 sizeWorldSectorNative(const void *object,
                       RwInt32 offsetInObject __RWUNUSED__,
@@ -2002,6 +2040,7 @@ sizeWorldSectorNative(const void *object,
  */
 
 // match: _writeSectorMesh @ 0x002D9750
+// sp-match: _writeSectorMesh @ 0x001F4210
 static RwStream    *
 writeSectorMesh(RwStream * stream,
                 RwInt32 binaryLength __RWUNUSED__,
@@ -2036,6 +2075,7 @@ writeSectorMesh(RwStream * stream,
  */
 
 // match: _readSectorMesh @ 0x002D9780
+// sp-match: _readSectorMesh @ 0x001F4240
 static RwStream    *
 readSectorMesh(RwStream * stream,
                RwInt32 binaryLength __RWUNUSED__,
@@ -2076,6 +2116,7 @@ readSectorMesh(RwStream * stream,
  */
 
 // match: _sizeSectorMesh @ 0x002D97B0
+// sp-match: _sizeSectorMesh @ 0x001F4270
 static RwInt32
 sizeSectorMesh(const void *object,
                RwInt32 offsetInObject __RWUNUSED__,
@@ -2100,6 +2141,7 @@ sizeSectorMesh(const void *object,
  */
 
 // match: __rpWorldObjRegisterExtensions @ 0x002D9E40
+// sp-match: __rpWorldObjRegisterExtensions @ 0x001F4900
 RwBool
 _rpWorldObjRegisterExtensions(void)
 {
@@ -2283,6 +2325,7 @@ _rpWorldObjRegisterExtensions(void)
  * \see RpWorldPluginAttach
  */
 // match: _RpWorldAddCamera @ 0x002D97D0
+// sp-match: _RpWorldAddCamera @ 0x001F4290
 RpWorld            *
 RpWorldAddCamera(RpWorld * world, RwCamera * camera)
 {
@@ -2342,6 +2385,7 @@ RpWorldAddCamera(RpWorld * world, RwCamera * camera)
  * \see RpWorldPluginAttach
  */
 // match: _RpWorldRemoveCamera @ 0x002D9800
+// sp-match: _RpWorldRemoveCamera @ 0x001F42C0
 RpWorld            *
 RpWorldRemoveCamera(RpWorld * world, RwCamera * camera)
 {
@@ -2394,6 +2438,7 @@ RpWorldRemoveCamera(RpWorld * world, RwCamera * camera)
  * \see RpWorldPluginAttach
  */
 // match: _RwCameraGetWorld @ 0x002D9830
+// sp-match: _RwCameraGetWorld @ 0x001F42F0
 RpWorld            *
 RwCameraGetWorld(const RwCamera * camera)
 {
@@ -2449,6 +2494,7 @@ RwCameraGetWorld(const RwCamera * camera)
  * \see RpWorldPluginAttach
  */
 // match: _RpWorldAddAtomic @ 0x002D9840
+// sp-match: _RpWorldAddAtomic @ 0x001F4300
 RpWorld            *
 RpWorldAddAtomic(RpWorld * world, RpAtomic * atomic)
 {
@@ -2505,6 +2551,7 @@ RpWorldAddAtomic(RpWorld * world, RpAtomic * atomic)
  * \see RpWorldPluginAttach
  */
 // match: _RpWorldRemoveAtomic @ 0x002D9870
+// sp-match: _RpWorldRemoveAtomic @ 0x001F4330
 RpWorld            *
 RpWorldRemoveAtomic(RpWorld * world, RpAtomic * atomic)
 {
@@ -2554,6 +2601,7 @@ RpWorldRemoveAtomic(RpWorld * world, RpAtomic * atomic)
  * \see RpWorldPluginAttach
  */
 // match: _RpAtomicGetWorld @ 0x002D98B0
+// sp-match: _RpAtomicGetWorld @ 0x001F4370
 RpWorld            *
 RpAtomicGetWorld(const RpAtomic * atomic)
 {
@@ -2662,6 +2710,7 @@ RpAtomicForAllWorldSectors(RpAtomic * atomic,
  * \see RpWorldPluginAttach
  */
 // match: _RpWorldSectorForAllAtomics @ 0x002D98C0
+// sp-match: _RpWorldSectorForAllAtomics @ 0x001F4380
 RpWorldSector      *
 RpWorldSectorForAllAtomics(RpWorldSector * sector,
                            RpAtomicCallBack callback, void *data)
@@ -2939,6 +2988,7 @@ RpWorldSectorForAllLights(RpWorldSector * sector,
  * \see RpWorldPluginAttach
  */
 // match: _RpWorldAddClump @ 0x002D9CE0
+// sp-match: _RpWorldAddClump @ 0x001F47A0
 RpWorld            *
 RpWorldAddClump(RpWorld * world, RpClump * clump)
 {
@@ -3018,6 +3068,7 @@ RpWorldAddClump(RpWorld * world, RpClump * clump)
  * \see RpWorldPluginAttach
  */
 // match: _RpWorldRemoveClump @ 0x002D9D70
+// sp-match: _RpWorldRemoveClump @ 0x001F4830
 RpWorld            *
 RpWorldRemoveClump(RpWorld * world, RpClump * clump)
 {
@@ -3111,6 +3162,7 @@ RpWorldRemoveClump(RpWorld * world, RpClump * clump)
  */
 
 // match: _RwCameraForAllSectorsInFrustum @ 0x002D9960
+// sp-match: _RwCameraForAllSectorsInFrustum @ 0x001F4420
 RwCamera           *
 RwCameraForAllSectorsInFrustum(RwCamera * camera,
                                RpWorldSectorCallBack callback,
@@ -3167,6 +3219,7 @@ RwCameraForAllSectorsInFrustum(RwCamera * camera,
  * \see RpWorldPluginAttach
  */
 // match: _RpClumpGetWorld @ 0x002D99B0
+// sp-match: _RpClumpGetWorld @ 0x001F4470
 RpWorld            *
 RpClumpGetWorld(const RpClump * clump)
 {
@@ -3455,6 +3508,7 @@ RwCameraForAllAtomicsInFrustum(RwCamera *camera,
  * \see RpWorldPluginAttach
  */
 // match: _RpWorldAddLight @ 0x002D99C0
+// sp-match: _RpWorldAddLight @ 0x001F4480
 RpWorld            *
 RpWorldAddLight(RpWorld * world, RpLight * light)
 {
@@ -3534,6 +3588,7 @@ RpWorldAddLight(RpWorld * world, RpLight * light)
  * \see RpWorldPluginAttach
  */
 // match: _RpWorldRemoveLight @ 0x002D9A10
+// sp-match: _RpWorldRemoveLight @ 0x001F44D0
 RpWorld            *
 RpWorldRemoveLight(RpWorld * world, RpLight * light)
 {
@@ -3583,6 +3638,7 @@ RpWorldRemoveLight(RpWorld * world, RpLight * light)
  * \see RpWorldPluginAttach
  */
 // match: _RpLightGetWorld @ 0x002D9A40
+// sp-match: _RpLightGetWorld @ 0x001F4500
 RpWorld            *
 RpLightGetWorld(const RpLight * light)
 {

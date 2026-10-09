@@ -126,6 +126,23 @@ struct type_3DAFC8_2144
     RwReal unk_04;
 };
 
+#ifdef CODFH_SP
+// The difficulty's multiplier of flt_4F28C0 (1 outside 0 to 2): single
+// player's soldiers scale by it where multiplayer multiplies by 1 (vf_1F0,
+// SP 0xEC0B0, the soldier's and type_3DDB98's folded); named for what it
+// returns.
+extern RwReal flt_4F28C0[3];
+extern RwInt32 dword_42B714;
+inline RwReal get_4F28C0()
+{
+    if (dword_42B714 > -1 && dword_42B714 < 3)
+    {
+        return flt_4F28C0[dword_42B714];
+    }
+    return 1.0f;
+}
+#endif
+
 struct type_3DAFC8 : type_3D3548
 {
     // Built from its trigger (sub_134B40 spawns it): the base, its members,
@@ -155,11 +172,13 @@ struct type_3DAFC8 : type_3D3548
         RwReal r = unk_1DC0;
         return r;
     }
+#ifndef CODFH_SP // MP @ 0x1C06A0 (type_3DAFC8's slot 0x05C); SP @ 0x2E6EB4 has no such slot
     virtual void vf_05C()
     {
         unk_35C[0].sub_D48D0(0);
         unk_364[0] = -1;
     }
+#endif
     // The placement pair sub_134B40 builds it in entity memory with, as
     // type_3DAC58's (sub_6CCF0 and the empty sub_19A750), and its plain
     // operator delete (folded into sub_19A750).
@@ -258,7 +277,19 @@ struct type_3DAFC8 : type_3D3548
     }
     // +0x244, new: where it aims, for the five-way blend (sub_139620);
     // returns arg_0.
+#ifdef CODFH_SP // not virtual in single player: its vtable (SP 0x2E6EB8) has no slot for it, MP's
+                // +0x248 on sit 8 lower there (with vf_05C's); SP 0xE9B00 calls vf_25C through +0x254
+    RwV3d *vf_244(RwV3d *arg_0);
+#else
     virtual RwV3d *vf_244(RwV3d *arg_0);
+#endif
+#ifdef CODFH_SP
+    // Single player only: the grenade throw and its helpers (SP 0xE4B50, 0xE4B60, 0xE4BB0;
+    // case 0x76C of vf_170 calls them).
+    void sp_sub_E4B50();
+    void sp_sub_E4B60(RwV3d *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C, RwReal arg_10);
+    void sp_sub_E4BB0();
+#endif
     // +0x248: an infinite ammunition clip on or off ("InfiniteAmmoClip").
     virtual void vf_248(RwInt32 arg_0);
     // +0x24C: whether it fires at no target ("SetFireAtNoTarget").
@@ -448,6 +479,7 @@ struct type_3DAFC8 : type_3D3548
     RwInt32 unk_80C;            // the node unk_834 follows (vf_04C)
     RwInt32 unk_810;            // its pickup (below 0x6E; -1 for none) and
     RwInt32 unk_814;            // how many ("SetPickup")
+#ifndef CODFH_SP // MP +0x818..+0x823; single player has none: its vtable-paired methods (vf_094 SP, vf_09C, ...) read MP's +0x824..+0x898 0xC lower, +0x810/+0x814 in place, and AIData stays at +0x8A0 (16-aligned)
     union
     {
         struct
@@ -459,6 +491,7 @@ struct type_3DAFC8 : type_3D3548
         RwV3d unk_818_v;        // where its weapon's timed shots go
                                 // (type_15CCE0::sub_15D600)
     };
+#endif
     RwInt32 unk_824;            // flags: 1 and 2 the five-way blends of
                                 // modes 0 and 1 (sub_139550, vf_21C); head
                                 // tracking's (sub_1340D0) 4 on, 8 kept when
@@ -633,7 +666,11 @@ struct type_3DAFC8 : type_3D3548
     void sub_13F940(RwReal arg_0);
     // The five-way blend's weighting (as type_3D32F8::sub_76E70) and the
     // sector of *arg_0 among the directions arg_4[1] to arg_4[4].
+#ifdef CODFH_SP // single player's sub_13A070 takes no blend (SP 0xE6580 ends ret 8)
+    void sub_13A070(RwInt32 *arg_0, RwReal *arg_4);
+#else
     void sub_13A070(RwInt32 *arg_0, RwReal *arg_4, RwReal arg_8);
+#endif
     RwInt32 sub_13A1F0(RwV3d *arg_0, RwV3d *arg_4);
     // Aims its mounted weapon (vf_04C passes its time); the argument is
     // unused.
@@ -667,7 +704,11 @@ struct type_3DAFC8 : type_3D3548
     // sub_177340 with every other copy).
     virtual RwReal vf_1F0()
     {
+#ifdef CODFH_SP // single player scales by the difficulty (SP 0xEC0B0)
+        return unk_3E0.sub_15EDE0() * get_4F28C0();
+#else
         return unk_3E0.sub_15EDE0() * 1.0f;
+#endif
     }
     // Overrides the image's vtable has whose bodies are type_3DDB98's vf_078
     // and type_3D5658's vf_0E4 and vf_0E8 (ICF folded them; defined in

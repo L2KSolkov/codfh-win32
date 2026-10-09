@@ -211,7 +211,9 @@ struct RpSectorLineIt
     RwUInt32                unk_00[9];
     RpSectorLineItNodeInfo  stack[64 + 1];
     RpSectorLineItNodeInfo *curr;
+#ifndef CODFH_SP // single player's iterator ends at curr: sub_91F40 reads it at the top of its frame (SP 0x73EA0)
     RwUInt32                unk_334;
+#endif
 };
 
 typedef struct RpCollSectorLineItNodeInfo RpCollSectorLineItNodeInfo;

@@ -56,6 +56,7 @@ static RwModuleInfo sectorModule;
 // match: _sectorTKList @ 0x00436BB4
 
 // match: __rpSectorOpen @ 0x002DA070
+// sp-match: __rpSectorOpen @ 0x001F4B30
 
 void               *
 _rpSectorOpen(void *instance,
@@ -78,6 +79,7 @@ _rpSectorOpen(void *instance,
  */
 
 // match: __rpSectorClose @ 0x002DA080
+// sp-match: __rpSectorClose @ 0x001F4B40
 void               *
 _rpSectorClose(void *instance,
                RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -125,6 +127,7 @@ _rpSectorClose(void *instance,
  *
  */
 // match: _RpWorldSectorRender @ 0x002DA090
+// sp-match: _RpWorldSectorRender @ 0x001F4B50
 RpWorldSector      *
 RpWorldSectorRender(RpWorldSector * sector)
 {
@@ -449,6 +452,7 @@ RpWorldSectorGetTriangles(const RpWorldSector * sector)
  *
  */
 // match: _RpWorldSectorRegisterPlugin @ 0x002DA0A0
+// sp-match: _RpWorldSectorRegisterPlugin @ 0x001F4B60
 RwInt32
 RpWorldSectorRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
                             RwPluginObjectConstructor constructCB,
@@ -500,6 +504,7 @@ RpWorldSectorRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
  *
  */
 // match: _RpWorldSectorRegisterPluginStream @ 0x002DA0D0
+// sp-match: _RpWorldSectorRegisterPluginStream @ 0x001F4B90
 RwInt32
 RpWorldSectorRegisterPluginStream(RwUInt32 pluginID,
                                   RwPluginDataChunkReadCallBack readCB,

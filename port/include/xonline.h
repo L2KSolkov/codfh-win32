@@ -31,6 +31,8 @@ typedef XONLINETASK_HANDLE *PXONLINETASK_HANDLE;
 
 #define XONLINE_GAMERTAG_SIZE 16
 #define XONLINE_MAX_LOGON_USERS 4
+/* SP's Live manager reserves 16 saved-user records before unk_748 at 0x748. */
+#define XONLINE_MAX_STORED_ONLINE_USERS 16
 
 #pragma pack(push, 4)
 
@@ -157,6 +159,8 @@ HRESULT WINAPI XOnlineSaveLogonState(PXONLINE_LOGON_STATE pLogonState);
 HRESULT WINAPI XOnlineRetrieveLogonState(const XONLINE_LOGON_STATE *pLogonState,
                                          PXONLINE_USER pUsers, DWORD *pdwServiceIDs,
                                          DWORD *pdwServices);
+HRESULT WINAPI XOnlineGetUsers(PXONLINE_USER pUsers, DWORD *pdwUsers);
+BOOL WINAPI XOnlineIsUserVoiceAllowed(DWORD dwUserFlags);
 
 HRESULT WINAPI XOnlineMatchSessionCreate(DWORD dwPublicFilled, DWORD dwPublicOpen,
                                          DWORD dwPrivateFilled, DWORD dwPrivateOpen,

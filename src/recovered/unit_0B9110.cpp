@@ -9,6 +9,10 @@
 #include "game/functions.h"
 #include "types/CSoundBankSelector.h"
 #include "types/type_4B8EF0.h"
+#ifdef CODFH_SP
+#include "game/data.h" // dword_4B8720, for sub_B9800
+#include "types/soundbank.h" // dword_4B1B60, for sub_B9800
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D6554
@@ -43,11 +47,13 @@ RWS_REGISTERCLASS(CSoundBankSelector);
 // match: ?MakeNew@CSoundBankSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000B9110
 // match: __ehhandler$?MakeNew@CSoundBankSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300350
 // match: __ehhandler$?MakeNew@CSoundBankSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030035F
+// sp-match: ?MakeNew@CSoundBankSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0008DFE0
 RWS_DEFINE_MAKENEW(CSoundBankSelector)
 
 // match: ??0CSoundBankSelector@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000B9190
 // match: __ehhandler$??0CSoundBankSelector@@QAE@ABVCAttributePacket@RWS@@@Z-0x13 @ 0x00300370
 // match: __ehhandler$??0CSoundBankSelector@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300383
+// sp-match: ??0CSoundBankSelector@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0008DC00
 CSoundBankSelector::CSoundBankSelector(const RWS::CAttributePacket &attr)
 {
     RwInt32 r10;
@@ -68,10 +74,12 @@ CSoundBankSelector::CSoundBankSelector(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_GCSoundBankSelector@@UAEPAXI@Z @ 0x000B9390
+// sp-match: ??_GCSoundBankSelector@@UAEPAXI@Z @ 0x0008DD70
 
 // match: ??1CSoundBankSelector@@UAE@XZ @ 0x000B93B0
 // match: __ehhandler$??1CSoundBankSelector@@UAE@XZ-0x2F @ 0x00300390
 // match: __ehhandler$??1CSoundBankSelector@@UAE@XZ @ 0x003003BF
+// sp-match: ??1CSoundBankSelector@@UAE@XZ @ 0x0008D8D0
 CSoundBankSelector::~CSoundBankSelector()
 {
     UnLinkMsg(iMsgSparkStartSystem);
@@ -82,6 +90,7 @@ CSoundBankSelector::~CSoundBankSelector()
 
 // Command 0: its banks.
 // match: ?HandleAttributes@CSoundBankSelector@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000B9470
+// sp-match: ?HandleAttributes@CSoundBankSelector@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0008DD80
 void CSoundBankSelector::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     RWS::CAttributeHandler::HandleAttributes(attr);
@@ -99,6 +108,7 @@ void CSoundBankSelector::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?HandleEvents@CSoundBankSelector@@UAEXAAVCMsg@RWS@@@Z @ 0x000B94F0
+// sp-match: ?HandleEvents@CSoundBankSelector@@UAEXAAVCMsg@RWS@@@Z @ 0x0008DE00
 void CSoundBankSelector::HandleEvents(RWS::CMsg &pMsg)
 {
     RwInt32 var_4;
@@ -125,6 +135,7 @@ void CSoundBankSelector::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?sub_B95B0@CSoundBankSelector@@QAEXPBI@Z @ 0x000B95B0
+// sp-match: ?sub_B95B0@CSoundBankSelector@@QAEXPBI@Z @ 0x0008D970
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void CSoundBankSelector::sub_B95B0(const RwUInt32 *arg_0)
 {
@@ -195,11 +206,14 @@ void CSoundBankSelector::sub_B95B0(const RwUInt32 *arg_0)
 }
 
 // match: ?sub_B9800@CSoundBankSelector@@QAEXXZ @ 0x000B9800
+// sp-match: ?sub_B9800@CSoundBankSelector@@QAEXXZ @ 0x0008DB00
 void CSoundBankSelector::sub_B9800()
 {
     RwInt32 var_4;
 
+#ifndef CODFH_SP // single player compiles the debug prints out (SP 0x8DB00)
     sub_19A750("SoundBank Loading begin...\n");
+#endif
     var_4 = 0;
     for (var_4 = 0; var_4 < 6; var_4++)
     {
@@ -213,8 +227,10 @@ void CSoundBankSelector::sub_B9800()
             if (dword_4B1A20[unk_20[var_4].unk_08].unk_18.unk_00.unk_00 == unk_20[var_4].unk_00.unk_00 &&
                 dword_4B1A20[unk_20[var_4].unk_08].unk_18.unk_00.unk_04 == unk_20[var_4].unk_00.unk_04)
             {
+#ifndef CODFH_SP
                 sub_19A750("Sound bank god ID: %x,%x is already loaded to slot %d",
                            unk_20[var_4].unk_00.unk_00, unk_20[var_4].unk_00.unk_00, unk_20[var_4].unk_08);
+#endif
                 continue;
             }
             if (dword_4B1A20[unk_20[var_4].unk_08].unk_10)
@@ -226,7 +242,27 @@ void CSoundBankSelector::sub_B9800()
         dword_4B8EF0.sub_E9FB0(5);
         sub_D9450();
     }
+#ifdef CODFH_SP // single player then loads one bank of the second set, picked by the restart count (SP 0x8DB9D)
+    {
+        RwInt32 i;
+        RwInt32 n;
+
+        for (n = 0, i = dword_4B8720 % 10; n < 10; n++)
+        {
+            if (dword_4B1B60[i].unk_00.unk_00 != -1 && dword_4B1B60[i].unk_00.unk_04 != -1)
+            {
+                sub_82C70(&dword_4B1B60[i], 0);
+                return;
+            }
+            i++;
+            if (i >= 10)
+                i = 0;
+        }
+    }
+#else
     sub_19A750("SoundBank Loading end...\n");
+#endif
 }
 
 // match: ??_ECSoundBankSelector@@WBI@AEPAXI@Z @ 0x000B99B0
+// sp-match: ??_ECSoundBankSelector@@WBI@AEPAXI@Z @ 0x0008DBF0

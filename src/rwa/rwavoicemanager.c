@@ -122,6 +122,7 @@ RwUInt32 dword_5069F8;
 
 
 // match: _sub_23E690 @ 0x0023E690
+// sp-match: _sub_23E690 @ 0x00150680
 
 RwBool
 sub_23E690(rwaInstance *output, rwaInstance **voices, RwInt32 count)
@@ -221,6 +222,7 @@ DSPResourceMgr_Shutdown(void)
 }
 
 // match: _sub_23E8A0 @ 0x0023E8A0
+// sp-match: _sub_23E8A0 @ 0x00150820
 RwBool
 sub_23E8A0(rwaEmitter *emitter)
 {
@@ -239,6 +241,7 @@ sub_23E8A0(rwaEmitter *emitter)
 }
 
 // match: _sub_23E8E0 @ 0x0023E8E0
+// sp-match: _sub_23E8E0 @ 0x00150860
 static void
 sub_23E8E0(rwaSound *sound)
 {
@@ -275,6 +278,7 @@ sub_23E8E0(rwaSound *sound)
 
 
 // match: _sub_23E980 @ 0x0023E980
+// sp-match: _sub_23E980 @ 0x00150900
 static void
 sub_23E980(rwaSound *sound)
 {
@@ -404,6 +408,7 @@ listed:
 }
 
 // match: _sub_23EBD0 @ 0x0023EBD0
+// sp-match: _sub_23EBD0 @ 0x00150B50
 void
 sub_23EBD0(void)
 {
@@ -499,6 +504,7 @@ sub_23EBD0(void)
 }
 
 // match: _sub_23EE70 @ 0x0023EE70
+// sp-match: _sub_23EE70 @ 0x00150DF0
 static void
 sub_23EE70(rwaSound *sound)
 {
@@ -517,6 +523,7 @@ sub_23EE70(rwaSound *sound)
 }
 
 // match: _SoundStopper_Transition @ 0x0023EEC0
+// sp-match: _SoundStopper_Transition @ 0x00150E40
 void
 SoundStopper_Transition(rwaSound *sound, RwInt32 state)
 {

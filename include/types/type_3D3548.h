@@ -239,6 +239,14 @@ struct type_7C8D0_34
     RwInt32 unk_0C;
 };
 
+// How many records type_7C8D0's ring unk_34 holds: 12 in MP; 4 in single player (its
+// constructor, SP 0x63390, sets up four and puts the tracks at +0x140 where MP's puts them at
+// +0x1C0; MP's +0x100..+0x1B0 sit 0x80 lower).
+#ifdef CODFH_SP // SP 0x63390
+enum { type_7C8D0_ring_size = 4 };
+#else // MP 0x78D60
+enum { type_7C8D0_ring_size = 12 };
+#endif
 struct type_7C8D0
 {
     // Destroyed through its vtable (CAnimObjectPool's sub_78CC0); pooled,
@@ -258,7 +266,7 @@ struct type_7C8D0
     RwReal unk_28;              // its scale
     RwUInt32 unk_2C;            // its tracks' count
     type_7C8D0_30 *unk_30;      // its tracks (just past it)
-    type_7C8D0_34 unk_34[12];
+    type_7C8D0_34 unk_34[type_7C8D0_ring_size];
     RwUInt8 unk_F4[0xC];
     // Unaligned matrices: an aligned RwMatrix member would pad the vtable
     // pointer to 16 bytes and move every field (the image's player is 0x1C0
@@ -318,7 +326,17 @@ struct type_7C8D0
     RwInt32 sub_7C940();
     bool sub_7C9D0(RwReal arg_0);
     // Whether the newest queued animation has its flag set.
+#ifdef CODFH_SP // single player expands it inline over its four-record ring (SP 0xE6EE0, 0xE6800)
+    bool sub_76920()
+    {
+        RwInt32 var_4;
+
+        var_4 = (unk_20 + unk_24 - 1) % type_7C8D0_ring_size;
+        return (bool)unk_34[var_4].unk_08_30;
+    }
+#else
     bool sub_76920();
+#endif
     // The weight of the animation arg_0, and setting it (arg_4); only the
     // widths are known.
     RwReal sub_7C9A0(RwInt32 arg_0);
@@ -331,7 +349,22 @@ struct type_7C8D0
     bool sub_79CE0(RwInt32 arg_0, bool arg_4);
     // Whether the queued animation arg_0 still plays; only the widths are
     // known.
+#ifdef CODFH_SP // an inline in single player: VC keeps it out of line (SP 0xE43E0), but its
+                // callers know its body (SP 0xE68B0 keeps unk_824 in a register across it)
+    bool sub_76E00(RwInt32 arg_0)
+    {
+        RwInt32 var_4;
+        RwInt32 local_8;
+
+        local_8 = arg_0 & 0xFF;
+        var_4 = (unk_20 + unk_24 - 1) % type_7C8D0_ring_size;
+        if (unk_30[local_8].unk_00 == arg_0)
+            return unk_30[local_8].unk_04 == var_4;
+        return false;
+    }
+#else
     bool sub_76E00(RwInt32 arg_0);
+#endif
     // The id of the queued animation arg_0 before the newest: an inline
     // with no address and so no database name, named for its field.
     // Evidence: type_3D32F8's sub_76860 loads its constant 0 and adds 1
@@ -352,7 +385,7 @@ struct type_7C8D0
     }
     RwInt16 get_unk_34_id(RwInt32 arg_0)
     {
-        RwInt32 i = (unk_20 + unk_24 - (arg_0 + 1)) % 12;
+        RwInt32 i = (unk_20 + unk_24 - (arg_0 + 1)) % type_7C8D0_ring_size;
         return (RwInt16)unk_34[i].unk_08_0;
     }
     // Clears the newest record's unk_08_30 (type_78AC0::sub_6DF40 does the
@@ -360,9 +393,13 @@ struct type_7C8D0
     // name, named for what it does. Evidence: the mounted weapon's fire
     // (type_3DC9B0::sub_169380) indexes the ring through a local of its own
     // after a copy of the player.
+#ifdef CODFH_SP // SP drops this addressless helper after its callers inline it.
+    __forceinline void clear_last_unk_08_30()
+#else
     void clear_last_unk_08_30()
+#endif
     {
-        RwInt32 i = (unk_20 + unk_24 - 1) % 12;
+        RwInt32 i = (unk_20 + unk_24 - 1) % type_7C8D0_ring_size;
         unk_34[i].unk_08_30 = 0;
     }
     // Turns towards the direction *arg_0 ("SetTurnMode"): sub_79D50 from
@@ -398,7 +435,7 @@ struct type_7C8D0
         return r;
     }
 };
-typedef RwChar type_7C8D0_size_check[sizeof(type_7C8D0) == 0x1C0 ? 1 : -1];
+typedef RwChar type_7C8D0_size_check[sizeof(type_7C8D0) == 0x100 + 0x10 * type_7C8D0_ring_size ? 1 : -1];
 
 typedef struct RpClump RpClump;
 
@@ -617,7 +654,9 @@ struct type_3D3548
     // sub_75E40 matches its trigger's unk_C0 and unk_C8).
     // Pure (the vtable's slot is _purecall).
     virtual RwInt32 vf_058(struct type_3DF8D8_04 *arg_0) = 0;
+#ifndef CODFH_SP // MP @ 0x3D3548 slot 0x05C; SP @ 0x2E08D0 has no such slot (0x05C is vf_060)
     virtual void vf_05C();
+#endif
     // +0x060: a touch by the entity arg_0 (the player's sub_10EF70 pushes
     // itself out of it); 0.
     virtual RwInt32 vf_060(type_3D3548 *arg_0);
@@ -983,6 +1022,19 @@ struct type_3D3548
                                     // (sub_14B570)
         };
     };
+#ifdef CODFH_SP
+    // Clears flag 2 of unk_28 when arg_0 holds, else sets it: single
+    // player's inline, named for its address (SP 0xD5B40, its out-of-line
+    // copy; the projectile generators sub_11DF00 and sub_11E850 expand it
+    // for a constant and call it for a random argument).
+    void sp_sub_D5B40(RwInt32 arg_0)
+    {
+        if (arg_0)
+            unk_28 &= ~2;
+        else
+            unk_28 |= 2;
+    }
+#endif
     union
     {
         RwUInt32 unk_2C;    // sub_12170 tests (unk_2C & 0x3FFFFF0) == 0x20000
@@ -1575,6 +1627,10 @@ RwInt32 sub_FCAE0(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwV3d *arg_C, RwInt3
 // field it compares. Evidence for its shape: callers copy an argument that is
 // an expression into a temporary and assign 0 directly on the null path,
 // which is what an inline function with an early return expands to.
+#ifdef CODFH_SP // static in single player: where VC keeps it out of line, it is a static copy
+                // with its arguments in registers (SP 0x210B0, eax/ecx; called from SP 0x9E3E0, 0xE5100, 0xE7F10)
+static
+#endif
 inline RwInt32 cmp_unk_2C(type_3D3548 *arg_0, type_3D3548 *arg_4)
 {
     RwInt32 k0;

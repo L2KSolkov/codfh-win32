@@ -5,6 +5,7 @@
 #include "rws/idfromstring.h"
 
 // match: ?GenerateUIntIdFromString@RWS@@YAIPBD@Z @ 0x0012F1B0
+// sp-match: ?GenerateUIntIdFromString@RWS@@YAIPBD@Z @ 0x000E0FB0
 RwUInt32 RWS::GenerateUIntIdFromString(const RwChar *cptr)
    {
       if (!cptr) return (0);

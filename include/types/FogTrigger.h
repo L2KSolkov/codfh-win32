@@ -28,7 +28,11 @@ public:
     // Inline: the constructor's vtable emits them after it, before ??_G (the image's order).
     virtual RwInt32 vf_008()
     {
+#ifdef CODFH_SP // single player numbers it 0x25 (its vtable 0x2E32E8 +8: SP 0x124460)
+        return 0x25;
+#else
         return 0x26;
+#endif
     }
 
     // Sets the fog (sub_128C80) and clip (sub_128CD0) distances, their

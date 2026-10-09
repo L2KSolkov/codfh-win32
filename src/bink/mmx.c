@@ -43,6 +43,7 @@ static S32 MMX_available(void)
 // match: _decode_MMX_avail @ 0x00431188
 
 // match: _check_for_MMX @ 0x0025D910
+// sp-match: _check_for_MMX @ 0x00179780
 
 void check_for_MMX(U32 flags)
 {

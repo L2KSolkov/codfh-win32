@@ -152,6 +152,7 @@ RwInt32 dword_4F30A0;
 // match: ?dword_429B94@@3PAKA @ 0x00429B94
 
 // match: ?sub_122FB0@@YAXXZ @ 0x00122FB0
+// sp-match: ?sub_122FB0@@YAXXZ @ 0x000D93C0
 
 // Sets the clones up: no file or clump, the two lights on frames of their
 // own, the copies' frame, and the two vertex shaders.
@@ -188,6 +189,7 @@ void sub_122FB0()
 }
 
 // match: ?sub_1230F0@@YAXXZ @ 0x001230F0
+// sp-match: ?sub_1230F0@@YAXXZ @ 0x000D9490
 // Frees what sub_122FB0 and the loads made.
 void sub_1230F0()
 {
@@ -222,6 +224,7 @@ void sub_1230F0()
 }
 
 // match: ?sub_1231F0@@YAPAUtype_1231F0@@H@Z @ 0x001231F0
+// sp-match: ?sub_1231F0@@YAPAUtype_1231F0@@H@Z @ 0x000D9550
 // The first group of the level section arg_0 (-1: the last), or 0 past the
 // file's sections.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -246,20 +249,24 @@ type_1231F0 *sub_1231F0(RwInt32 arg_0)
         v8 = (type_1231F0 *)(var_4 + ((RwInt32 *)var_4)[arg_0 + 1]);
         return v8;
     }
-    stk_C = dword_4CEAB0;
-    if (arg_0 > ((RwInt32 *)stk_C)[0])
+    else
     {
-        return 0;
+        stk_C = dword_4CEAB0;
+        if (arg_0 > ((RwInt32 *)stk_C)[0])
+        {
+            return 0;
+        }
+        if (arg_0 == -1)
+        {
+            arg_0 = ((RwInt32 *)stk_C)[0];
+        }
+        var_10 = (type_1231F0 *)(stk_C + ((RwInt32 *)stk_C)[arg_0]);
+        return var_10;
     }
-    if (arg_0 == -1)
-    {
-        arg_0 = ((RwInt32 *)stk_C)[0];
-    }
-    var_10 = (type_1231F0 *)(stk_C + ((RwInt32 *)stk_C)[arg_0]);
-    return var_10;
 }
 
 // match: ?sub_123280@@YAXPAURwStream@@I@Z @ 0x00123280
+// sp-match: ?sub_123280@@YAXPAURwStream@@I@Z @ 0x000DA520
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Reads the clone file (arg_4 bytes) from the stream arg_0: its version,
 // every group's pass unchosen, and the vertex buffers when it carries its
@@ -295,6 +302,7 @@ void sub_123280(RwStream *arg_0, RwUInt32 arg_4)
 }
 
 // match: ?sub_123380@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x00123380
+// sp-match: ?sub_123380@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x000D95A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Puts the atomic arg_0 in the slot its "CloneID" names, at the origin.
 RpAtomic *sub_123380(RpAtomic *arg_0, void *arg_4)
@@ -324,6 +332,7 @@ RpAtomic *sub_123380(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_123440@@YAXPAURwStream@@@Z @ 0x00123440
+// sp-match: ?sub_123440@@YAXPAURwStream@@@Z @ 0x000D9640
 // Reads the clones' clump from the stream arg_0, replacing the last.
 void sub_123440(RwStream *arg_0)
 {
@@ -345,6 +354,7 @@ void sub_123440(RwStream *arg_0)
 }
 
 // match: ?sub_1234D0@@YAXH@Z @ 0x001234D0
+// sp-match: ?sub_1234D0@@YAXH@Z @ 0x000DA5C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws the clones of pass arg_0 in the sections loaded (and the file's
 // last): each group lit as it says, its copies through RenderWare or the
@@ -515,14 +525,35 @@ void sub_1234D0(RwInt32 arg_0)
 }
 
 // match: ?sub_123980@@YAXXZ @ 0x00123980
+// sp-match: ?sub_123980@@YAXXZ @ 0x000D96F0
 void sub_123980()
 {
     RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTION, (void *)rwALPHATESTFUNCTIONGREATER);
     RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, (void *)dword_4F3080);
+#ifdef CODFH_SP
+    // Single player culls back faces except in levels 14, 17, 30 and 36 to 38
+    // (SP 0xD970B: a switch on the level, its table at 0xD974C).
+    switch (sub_19B050())
+    {
+    case 14:
+    case 17:
+    case 30:
+    case 36:
+    case 37:
+    case 38:
+        RwRenderStateSet(rwRENDERSTATECULLMODE, (void *)rwCULLMODECULLNONE);
+        break;
+    default:
+        RwRenderStateSet(rwRENDERSTATECULLMODE, (void *)rwCULLMODECULLBACK);
+        break;
+    }
+#else
     RwRenderStateSet(rwRENDERSTATECULLMODE, (void *)rwCULLMODECULLNONE);
+#endif
 }
 
 // match: ?sub_1239B0@@YAXPAUtype_1231F0@@H@Z @ 0x001239B0
+// sp-match: ?sub_1239B0@@YAXPAUtype_1231F0@@H@Z @ 0x000D9770
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Chooses the pass of the group arg_0 (the arg_4th drawn; the first resets
 // the overrides): the first for a clone over 1000 across, else the second
@@ -542,7 +573,12 @@ void sub_1239B0(type_1231F0 *arg_0, RwInt32 arg_4)
         dword_4CF334 = 0;
     }
     var_10 = sub_19B050();
+#ifdef CODFH_SP
+    // single player keeps level 30's big clones on the second pass (SP 0xD979F)
+    if (var_10 != 30 && bp_8->boundingSphere.radius > 1000.0f)
+#else
     if (bp_8->boundingSphere.radius > 1000.0f)
+#endif
     {
         arg_0->unk_3A = 0;
         bp_4 = 1;
@@ -557,9 +593,17 @@ void sub_1239B0(type_1231F0 *arg_0, RwInt32 arg_4)
     }
     else if (!bp_4)
     {
+#ifdef CODFH_SP
+        // shape: a block-scoped count (SP 0xD97F3 stores it after the pushes)
+        RwInt32 lC = 0;
+        RpGeometryForAllMeshes(RpAtomicGetGeometry(bp_8), sub_123A80, &lC);
+        if (lC > 0)
+#else
         var_C = 0;
         RpGeometryForAllMeshes(RpAtomicGetGeometry(bp_8), sub_123A80, &var_C);
         if (var_C > 0)
+#endif
+
         {
             arg_0->unk_3A = 1;
         }
@@ -571,6 +615,7 @@ void sub_1239B0(type_1231F0 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_123A80@@YAPAURpMesh@@PAU1@PAURpMeshHeader@@PAX@Z @ 0x00123A80
+// sp-match: ?sub_123A80@@YAPAURpMesh@@PAU1@PAURpMeshHeader@@PAX@Z @ 0x000D96B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Counts into arg_8 the meshes whose texture's raster has the flag.
 RpMesh *sub_123A80(RpMesh *arg_0, RpMeshHeader *arg_4, void *arg_8)
@@ -591,6 +636,7 @@ RpMesh *sub_123A80(RpMesh *arg_0, RpMeshHeader *arg_4, void *arg_8)
 }
 
 // match: ?sub_123AF0@@YAXPAURpAtomic@@HPAURwRGBAReal@@11PAURwV3d@@@Z @ 0x00123AF0
+// sp-match: ?sub_123AF0@@YAXPAURpAtomic@@HPAURwRGBAReal@@11PAURwV3d@@@Z @ 0x000D9820
 // Starts drawing the atomic arg_0 (lit when arg_4 is 1), tinted by arg_8
 // (white without): for a lit atomic outside the clones pass, sets the
 // ambient light to arg_C and the view light to the colour arg_10 (scaled by
@@ -675,7 +721,12 @@ void sub_123AF0(RpAtomic *arg_0, RwInt32 arg_4, RwRGBAReal *arg_8, RwRGBAReal *a
             RwV3dCrossProductMacro(&var_90.right, &var_48, &dword_4CEAB8);
             var_90.at = dword_4CEAB8;
             RwV3dCrossProductMacro(&var_90.up, &var_90.at, &var_90.right);
+#ifdef CODFH_SP
+            // single player compares the scale as a real with 1.0f (SP 0xD9B13 fucompp)
+            if (dword_4F30A8.unk_04 != 1.0f)
+#else
             if (*(RwInt32 *)&dword_4F30A8.unk_04 != 0x3F800000)   // 1.0f's bits; not an address
+#endif
             {
                 var_24.red *= dword_4F30A8.unk_04;
                 var_24.green *= dword_4F30A8.unk_04;
@@ -693,6 +744,7 @@ void sub_123AF0(RpAtomic *arg_0, RwInt32 arg_4, RwRGBAReal *arg_8, RwRGBAReal *a
 }
 
 // match: ?sub_123FE0@@YAXPAUtype_1243F0@@HPAUtype_1231F0@@@Z @ 0x00123FE0
+// sp-match: ?sub_123FE0@@YAXPAUtype_1243F0@@HPAUtype_1231F0@@@Z @ 0x000DA260
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws the atomic sub_123AF0 started at the arg_4 copies from arg_0 (of
 // the group arg_8): through the shaders when the group has its own data,
@@ -763,6 +815,7 @@ void sub_123FE0(type_1243F0 *arg_0, RwInt32 arg_4, type_1231F0 *arg_8)
 }
 
 // match: ?sub_1241D0@@YAPAUtype_1231F0@@PAU1@@Z @ 0x001241D0
+// sp-match: ?sub_1241D0@@YAPAUtype_1231F0@@PAU1@@Z @ 0x000D9BE0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The group after arg_0 (in the files from version 0x10001).
 type_1231F0 *sub_1241D0(type_1231F0 *arg_0)
@@ -783,6 +836,7 @@ type_1231F0 *sub_1241D0(type_1231F0 *arg_0)
 }
 
 // match: ?sub_124210@@YAPAURpMesh@@PAU1@PAURpMeshHeader@@PAX@Z @ 0x00124210
+// sp-match: ?sub_124210@@YAPAURpMesh@@PAU1@PAURpMeshHeader@@PAX@Z @ 0x000D9C10
 // Hands the material of the dword_4CEA88th mesh to arg_8.
 RpMesh *sub_124210(RpMesh *arg_0, RpMeshHeader *arg_4, void *arg_8)
 {
@@ -797,6 +851,7 @@ RpMesh *sub_124210(RpMesh *arg_0, RpMeshHeader *arg_4, void *arg_8)
 }
 
 // match: ?sub_124250@@YAXPAUtype_124250@@H@Z @ 0x00124250
+// sp-match: ?sub_124250@@YAXPAUtype_124250@@H@Z @ 0x000D9C40
 // Fills in the material of the mesh arg_0, the arg_4th of the atomic drawn.
 void sub_124250(type_124250 *arg_0, RwInt32 arg_4)
 {
@@ -809,6 +864,7 @@ void sub_124250(type_124250 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_124290@@YAXXZ @ 0x00124290
+// sp-match: ?sub_124290@@YAXXZ @ 0x000DA3F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Gives each group of a file with its own data its copies' radii and a
 // vertex buffer, one per clone.
@@ -863,6 +919,7 @@ void sub_124290()
 }
 
 // match: ?sub_1243F0@@YAXPAUtype_1231F0@@@Z @ 0x001243F0
+// sp-match: ?sub_1243F0@@YAXPAUtype_1231F0@@@Z @ 0x000D9C70
 // Sets each copy's bounding radius: its matrix's largest axis by the
 // group's radius scale.
 void sub_1243F0(type_1231F0 *arg_0)
@@ -913,6 +970,7 @@ void sub_1243F0(type_1231F0 *arg_0)
 }
 
 // match: ?sub_1245D0@@YAXPAUtype_1231F0@@PAUtype_1243F0@@@Z @ 0x001245D0
+// sp-match: ?sub_1245D0@@YAXPAUtype_1231F0@@PAUtype_1243F0@@@Z @ 0x000D9DA0
 // Draws the group arg_0's copies from arg_4 with the vertex shaders: the
 // first of the pass sets up the view, projection and clip planes; each copy
 // in view is drawn unk_4C times (at least once), mesh by mesh.
@@ -923,7 +981,6 @@ void sub_1245D0(type_1231F0 *arg_0, type_1243F0 *arg_4)
     RpMaterial *var_14C;
     RwInt32 var_148;
     RwInt32 var_144;
-    RwV3d var_140;
     RwV3d *var_134;
     XGMATRIX var_130;
     XGMATRIX var_F0;
@@ -931,14 +988,10 @@ void sub_1245D0(type_1231F0 *arg_0, type_1243F0 *arg_4)
     type_124250 *var_AC;
     RwUInt8 *var_A8;
     RwInt32 var_A4;
-    RwSphere var_A0;
-    __declspec(align(16)) RwReal var_90[4];
     RwReal var_74[4];
-    RwReal var_58[4];
     RwV2d *var_44;
     RwReal var_40;
     RwReal var_3C;
-    RwV3d var_38;
     RwV3d *var_2C;
     RwV3d *var_28;
     RwReal var_24;
@@ -963,6 +1016,8 @@ void sub_1245D0(type_1231F0 *arg_0, type_1243F0 *arg_4)
     }
     if (!dword_4CEAC4)
     {
+        RwV3d var_38;
+
         var_14 = (RwCamera *)dword_4E5C74;
         var_18 = RwFrameGetMatrix(RwCameraGetFrame(var_14));
         var_20 = *(RwReal *)&dword_4CF540 > 20.0f ? *(RwReal *)&dword_4CF540 : 20.0f;
@@ -972,22 +1027,25 @@ void sub_1245D0(type_1231F0 *arg_0, type_1243F0 *arg_4)
         var_28 = &var_18->up;
         var_2C = &var_18->pos;
         var_38 = var_18->at;
-        var_38.x = var_38.x * 100.0f + var_2C->x;
-        var_38.y = var_38.y * 100.0f + var_2C->y;
-        var_38.z = var_38.z * 100.0f + var_2C->z;
+        var_38.x = (var_38.x * 100.0f) + var_2C->x;
+        var_38.y = (var_38.y * 100.0f) + var_2C->y;
+        var_38.z = (var_38.z * 100.0f) + var_2C->z;
         D3DXMatrixLookAtRH((D3DXMATRIX *)&pM2, (D3DXVECTOR3 *)var_2C, (D3DXVECTOR3 *)&var_38,
                            (D3DXVECTOR3 *)var_28);
         var_3C = 1.0f;
         var_40 = 1.3333334f;
         var_44 = &((RwCamera *)dword_4E5C74)->viewWindow;
         D3DXMatrixPerspectiveFovRH((D3DXMATRIX *)&stru_4CF340,
-                                   ((0.7002f - var_44->x) / 0.60684f * 0.12f + 1.38f) * var_44->x,
+                                   (((0.7002f - var_44->x) / 0.60684f) * 0.12f + 1.38f) * var_44->x,
                                    var_40, var_20, var_24);
         RwXboxSetCurrentPixelShader(0);
         RwRenderStateSet(rwRENDERSTATEFOGENABLE, (void *)0);
     }
     if (arg_0->unk_38 == 1)
     {
+        RwReal var_58[4];
+        __declspec(align(16)) RwReal var_90[4];
+
         RwXboxSetCurrentVertexShader(vertexShader);
         var_58[0] = arg_0->unk_08.red * 1.15f > 1.0f ? 1.0f : arg_0->unk_08.red * 1.15f;
         var_58[1] = arg_0->unk_08.green * 1.15f > 1.0f ? 1.0f : arg_0->unk_08.green * 1.15f;
@@ -1013,6 +1071,8 @@ void sub_1245D0(type_1231F0 *arg_0, type_1243F0 *arg_4)
     }
     while (var_10--)
     {
+        RwSphere var_A0;
+
         RwV3dTransformPoint(&var_A0.center, &dword_4CEA8C->boundingSphere.center, &arg_4->unk_00);
         var_A0.radius = arg_4->unk_4C;
         dword_4CF310++;
@@ -1031,6 +1091,8 @@ void sub_1245D0(type_1231F0 *arg_0, type_1243F0 *arg_4)
             D3DDevice_SetVertexShaderConstant(0, &var_130, 4);
             if (arg_0->unk_38 == 1)
             {
+                RwV3d var_140;
+
                 var_134 = &arg_4->unk_40;
                 var_140.x = var_134->x;
                 var_140.y = var_134->y;
@@ -1073,6 +1135,7 @@ void sub_1245D0(type_1231F0 *arg_0, type_1243F0 *arg_4)
 }
 
 // match: ?sub_124D70@@YAXXZ @ 0x00124D70
+// sp-match: ?sub_124D70@@YAXXZ @ 0x000DA230
 void sub_124D70()
 {
     if (dword_4CF30C == 1)

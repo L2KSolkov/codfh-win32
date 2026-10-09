@@ -17,6 +17,7 @@
 #include "types/type_3CE6D0.h"
 #include "types/type_3CE5AC.h"
 #include "types/type_3D3548.h"
+#include "sp/sp_target.h"   // sub_3DE00 in single player
 #include "types/type_3DAFC8.h"
 #include "types/type_3DBC78.h"
 #include "types/type_3DF30.h"
@@ -41,6 +42,7 @@ extern const RwReal flt_3CE5A8 = 16.666666f;
 // match: __ehhandler$?sub_37490@type_3CE5AC@@QAEPAUtype_F8350@@PAUtype_3D410@@@Z>1 @ 0x0041AF7C
 
 // match: ??0type_3CE5AC@@QAE@XZ @ 0x00036730
+// sp-match: ??0type_3CE5AC@@QAE@XZ @ 0x0002A400
 
 // symbol: ??_7type_3CE5AC@@6B@ = 0x003CE5AC
 type_3CE5AC::type_3CE5AC()
@@ -48,14 +50,18 @@ type_3CE5AC::type_3CE5AC()
 }
 
 // match: ?vf_02C@type_3CE5AC@@UAEHXZ @ 0x00036780
+// sp-match: ?vf_02C@type_3CE5AC@@UAEHXZ @ 0x0002A420
 
 // match: ??_Gtype_3CE5AC@@UAEPAXI@Z @ 0x00036790
 // match: ??1type_3CE5AC@@UAE@XZ @ 0x000367B0
+// sp-match: ??1type_3CE5AC@@UAE@XZ @ 0x0002A430
+// sp-match: ??_Gtype_3CE5AC@@UAEPAXI@Z @ 0x0002AC30
 type_3CE5AC::~type_3CE5AC()
 {
 }
 
 // match: ?vf_004@type_3CE5AC@@UAEXPAUtype_3DF30@@@Z @ 0x000367D0
+// sp-match: ?vf_004@type_3CE5AC@@UAEXPAUtype_3DF30@@@Z @ 0x0002A440
 void type_3CE5AC::vf_004(type_3DF30 *arg_0)
 {
     unk_1C = 0;
@@ -71,6 +77,7 @@ void type_3CE5AC::vf_004(type_3DF30 *arg_0)
 }
 
 // match: sub_36850 @ 0x00036850
+// sp-match: sub_36850 @ 0x0002A470
 // Gives up: clears the state and sends both members back to their group.
 void type_3CE5AC::sub_36850(type_3D410 *arg_0)
 {
@@ -112,6 +119,7 @@ void type_3CE5AC::sub_36850(type_3D410 *arg_0)
 }
 
 // match: ?vf_00C@type_3CE5AC@@UAEHMPAUtype_3D410@@@Z @ 0x000369E0
+// sp-match: ?vf_00C@type_3CE5AC@@UAEHMPAUtype_3D410@@@Z @ 0x0002B6A0
 RwInt32 type_3CE5AC::vf_00C(RwReal arg_0, type_3D410 *arg_4)
 {
     AIData *local_8;
@@ -195,6 +203,15 @@ RwInt32 type_3CE5AC::vf_00C(RwReal arg_0, type_3D410 *arg_4)
     case 3: {
         RwInt32 var_20;
 
+#ifdef CODFH_SP // shape: SP 0x2B93A keeps the first unk_48 = 1 block inline, the second check jumps back to it
+        if (local_8->unk_58 == 0)
+            unk_48 = 1;
+        else if (var_4->unk_58 == 0) {
+            unk_48 = 1;
+            break;
+        }
+        else if (local_8->unk_5C == 6 && local_8->unk_58 == 4) {
+#else
         if (local_8->unk_58 == 0) {
             unk_48 = 1;
             break;
@@ -204,6 +221,7 @@ RwInt32 type_3CE5AC::vf_00C(RwReal arg_0, type_3D410 *arg_4)
             break;
         }
         if (local_8->unk_5C == 6 && local_8->unk_58 == 4) {
+#endif
             var_20 = 0;
             if (unk_34.sub_D4910()->vf_008() != 0)
                 var_20 = unk_34.sub_D4910()->vf_008()->get_unk_5E0();
@@ -290,12 +308,14 @@ RwInt32 type_3CE5AC::vf_00C(RwReal arg_0, type_3D410 *arg_4)
 }
 
 // match: ?vf_010@type_3CE5AC@@UAEHPAUtype_3D410@@@Z @ 0x000371D0
+// sp-match: ?vf_010@type_3CE5AC@@UAEHPAUtype_3D410@@@Z @ 0x0002A560
 RwInt32 type_3CE5AC::vf_010(type_3D410 *arg_0)
 {
     return 0x7FFFFFFF;
 }
 
 // match: sub_371F0 @ 0x000371F0
+// sp-match: sub_371F0 @ 0x0002B680
 // Looks for a spot (sub_37490), keeping it in unk_1C.
 RwBool type_3CE5AC::sub_371F0(type_3D410 *arg_0)
 {
@@ -304,6 +324,7 @@ RwBool type_3CE5AC::sub_371F0(type_3D410 *arg_0)
 }
 
 // match: sub_37220 @ 0x00037220
+// sp-match: sub_37220 @ 0x0002A570
 RwInt32 sub_37220(RwInt32 arg_0, type_3D410 *arg_4)
 {
     type_3D3548 *var_4;
@@ -319,6 +340,7 @@ RwInt32 sub_37220(RwInt32 arg_0, type_3D410 *arg_4)
 }
 
 // match: ?sub_37270@type_3CE5AC@@QAEPAUtype_F8350@@PAUtype_3D3548@@MM@Z @ 0x00037270
+// sp-match: ?sub_37270@type_3CE5AC@@QAEPAUtype_F8350@@PAUtype_3D3548@@MM@Z @ 0x0002A5A0
 // The nearest kind-14 node within the radius arg_4 of arg_0 that lies ahead
 // of it (the facing's dot product with the direction to it over arg_8).
 type_F8350 *type_3CE5AC::sub_37270(type_3D3548 *arg_0, RwReal arg_4, RwReal arg_8)
@@ -362,6 +384,7 @@ type_F8350 *type_3CE5AC::sub_37270(type_3D3548 *arg_0, RwReal arg_4, RwReal arg_
 // match: ?sub_37490@type_3CE5AC@@QAEPAUtype_F8350@@PAUtype_3D410@@@Z @ 0x00037490
 // match: __ehhandler$?sub_37490@type_3CE5AC@@QAEPAUtype_F8350@@PAUtype_3D410@@@Z-8 @ 0x002FF5C0
 // match: __ehhandler$?sub_37490@type_3CE5AC@@QAEPAUtype_F8350@@PAUtype_3D410@@@Z @ 0x002FF5C8
+// sp-match: ?sub_37490@type_3CE5AC@@QAEPAUtype_F8350@@PAUtype_3D410@@@Z @ 0x0002AC40
 // The spot near the group's leader (the player): a door node within 800
 // (sub_37270) whose linked kind-7 and kind-8 nodes nearest it that face the
 // leader become the two members' nodes (unk_20 and unk_24, with their numbers);
@@ -460,6 +483,7 @@ type_F8350 *type_3CE5AC::sub_37490(type_3D410 *arg_0)
 }
 
 // match: sub_37C20 @ 0x00037C20
+// sp-match: sub_37C20 @ 0x0002A710
 // Whether the spot arg_0 can still be used: flag 7 of its unk_00 or a state
 // from 3 on.
 RwInt32 type_3CE5AC::sub_37C20(type_F8350 *arg_0, type_3D410 *arg_4)
@@ -468,6 +492,7 @@ RwInt32 type_3CE5AC::sub_37C20(type_F8350 *arg_0, type_3D410 *arg_4)
 }
 
 // match: sub_37C60 @ 0x00037C60
+// sp-match: sub_37C60 @ 0x0002AFE0
 // Finds the group member nearest the node arg_0 (sub_37D80), and when the
 // node suits it (sub_38AD0) sends it there (action 5); returns the member.
 type_3D3548 *type_3CE5AC::sub_37C60(type_F8350 *arg_0, RwInt32 arg_4, type_3D410 *arg_8)
@@ -500,6 +525,7 @@ type_3D3548 *type_3CE5AC::sub_37C60(type_F8350 *arg_0, RwInt32 arg_4, type_3D410
 }
 
 // match: sub_37D80 @ 0x00037D80
+// sp-match: sub_37D80 @ 0x0002A730
 void sub_37D80(type_3D3548 *arg_0, void *arg_4)
 {
     type_37C60_1C *var_4;
@@ -519,6 +545,7 @@ void sub_37D80(type_3D3548 *arg_0, void *arg_4)
 }
 
 // match: sub_37E50 @ 0x00037E50
+// sp-match: sub_37E50 @ 0x0002A7D0
 // Takes the entity arg_0 on as the first or second member (whichever is
 // free), taking it from the object it served (vf_014).
 RwInt32 type_3CE5AC::sub_37E50(type_3D3548 *arg_0)
@@ -553,6 +580,7 @@ RwInt32 type_3CE5AC::sub_37E50(type_3D3548 *arg_0)
 }
 
 // match: ?vf_014@type_3CE5AC@@UAEXPAUtype_3D3548@@@Z @ 0x00037F50
+// sp-match: ?vf_014@type_3CE5AC@@UAEXPAUtype_3D3548@@@Z @ 0x0002A880
 void type_3CE5AC::vf_014(type_3D3548 *arg_0)
 {
     if (unk_30.sub_D4910() == arg_0)
@@ -563,6 +591,7 @@ void type_3CE5AC::vf_014(type_3D3548 *arg_0)
 }
 
 // match: sub_37FB0 @ 0x00037FB0
+// sp-match: sub_37FB0 @ 0x0002B0E0
 // Gets the first member to its node: 0 while it is not there yet.
 RwInt32 type_3CE5AC::sub_37FB0(type_3D410 *arg_0)
 {
@@ -582,6 +611,7 @@ RwInt32 type_3CE5AC::sub_37FB0(type_3D410 *arg_0)
 }
 
 // match: sub_38050 @ 0x00038050
+// sp-match: sub_38050 @ 0x0002B150
 // Likewise for the second member.
 RwInt32 type_3CE5AC::sub_38050(type_3D410 *arg_0)
 {
@@ -601,6 +631,7 @@ RwInt32 type_3CE5AC::sub_38050(type_3D410 *arg_0)
 }
 
 // match: ?sub_380F0@type_3CE5AC@@QAEHPAUtype_3D410@@@Z @ 0x000380F0
+// sp-match: ?sub_380F0@type_3CE5AC@@QAEHPAUtype_3D410@@@Z @ 0x0002B1C0
 // Whether the spot unk_1C still holds: it passes sub_37C20, the leader is the
 // player and near it (the spot sub_37270 finds, or within 900 ahead, 500
 // otherwise); before the members move (state 3 or less) neither the player's
@@ -612,9 +643,7 @@ RwBool type_3CE5AC::sub_380F0(type_3D410 *arg_0)
     type_3DF30 *var_8;
     type_3D3548 *var_C;
     type_F8350 *var_10;
-    RwV3d var_20;
     RwReal var_2C;
-    RwMatrix var_70;
     RwReal var_74;
     RwReal var_78;
     type_F8350 *var_7C;
@@ -649,6 +678,9 @@ RwBool type_3CE5AC::sub_380F0(type_3D410 *arg_0)
     }
     if (!var_10)
     {
+        RwV3d var_20;
+        RwMatrix var_70;
+
         RwV3dSubMacro(&var_20, &unk_1C->unk_10, var_C->sub_CD550());
         var_2C = RwV3dDotProductMacro(&var_20, &var_20);
         RwV3dNormalize(&var_20, &var_20);
@@ -743,6 +775,7 @@ RwBool type_3CE5AC::sub_380F0(type_3D410 *arg_0)
 }
 
 // match: ?sub_38AD0@type_3CE5AC@@QAEHPAUtype_3D3548@@PAUtype_F8350@@@Z @ 0x00038AD0
+// sp-match: ?sub_38AD0@type_3CE5AC@@QAEHPAUtype_3D3548@@PAUtype_F8350@@@Z @ 0x0002A8C0
 RwInt32 type_3CE5AC::sub_38AD0(type_3D3548 *arg_0, type_F8350 *arg_4)
 {
     AIData *var_8;
@@ -769,6 +802,7 @@ RwInt32 type_3CE5AC::sub_38AD0(type_3D3548 *arg_0, type_F8350 *arg_4)
 }
 
 // match: ?sub_38D80@type_3CE5AC@@QAEHPAUtype_3D3548@@PAUtype_F8350@@@Z @ 0x00038D80
+// sp-match: ?sub_38D80@type_3CE5AC@@QAEHPAUtype_3D3548@@PAUtype_F8350@@@Z @ 0x0002AA40
 RwInt32 type_3CE5AC::sub_38D80(type_3D3548 *arg_0, type_F8350 *arg_4)
 {
     AIData *var_8;

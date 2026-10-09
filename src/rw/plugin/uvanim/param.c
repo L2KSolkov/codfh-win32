@@ -106,6 +106,7 @@ MACRO_STOP
 // match: __real@c2652ee0 @ 0x003EB18C
 
 // match: _RpUVAnimParamKeyFrameApply @ 0x0022C470
+// sp-match: _RpUVAnimParamKeyFrameApply @ 0x00131150
 
 void
 RpUVAnimParamKeyFrameApply(void *pMatrix, void *pVoidIFrame)
@@ -136,6 +137,7 @@ RpUVAnimParamKeyFrameApply(void *pMatrix, void *pVoidIFrame)
  * \return None
  */
 // match: _RpUVAnimParamKeyFrameInterpolate @ 0x0022C530
+// sp-match: _RpUVAnimParamKeyFrameInterpolate @ 0x00131210
 void
 RpUVAnimParamKeyFrameInterpolate(void * pVoidOut, void * pVoidIn1,
                            void * pVoidIn2, RwReal time,
@@ -186,6 +188,7 @@ RpUVAnimParamKeyFrameInterpolate(void * pVoidOut, void * pVoidIn1,
  * \return None
  */
 // match: _RpUVAnimParamKeyFrameBlend @ 0x0022C610
+// sp-match: _RpUVAnimParamKeyFrameBlend @ 0x001312F0
 void
 RpUVAnimParamKeyFrameBlend(void * pVoidOut,
                      void * pVoidIn1,
@@ -323,6 +326,7 @@ RpUVAnimParamKeyFrameAdd(void * pVoidOut __RWUNUSEDRELEASE__, void * pVoidIn1 __
  *
  */
 // match: _RpUVAnimParamKeyFrameDataInitFromMatrix @ 0x0022C6F0
+// sp-match: _RpUVAnimParamKeyFrameDataInitFromMatrix @ 0x001313C0
 RpUVAnimParamKeyFrameData *
 RpUVAnimParamKeyFrameDataInitFromMatrix(
                               RpUVAnimParamKeyFrameData *data,

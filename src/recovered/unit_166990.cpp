@@ -99,6 +99,7 @@ RwReal flt_429E9C = 7.0f;
 type_4E1B70 dword_4E1B70[7];
 
 // match: ?sub_166990@@YAPAUtype_4E1B70@@H@Z @ 0x00166990
+// sp-match: ?sub_166990@@YAPAUtype_4E1B70@@H@Z @ 0x00106B30
 type_4E1B70 *sub_166990(RwInt32 arg_0)
 {
     if (arg_0 < 7)
@@ -109,6 +110,7 @@ type_4E1B70 *sub_166990(RwInt32 arg_0)
 // match: ?sub_1669B0@@YAPAUtype_3D3548@@PAUtype_712B0@@@Z @ 0x001669B0
 // match: __ehhandler$?sub_1669B0@@YAPAUtype_3D3548@@PAUtype_712B0@@@Z-0x11 @ 0x00301F80
 // match: __ehhandler$?sub_1669B0@@YAPAUtype_3D3548@@PAUtype_712B0@@@Z @ 0x00301F91
+// sp-match: ?sub_1669B0@@YAPAUtype_3D3548@@PAUtype_712B0@@@Z @ 0x00109F30
 // Builds the mounted weapon for the trigger arg_0, or warns that there is
 // no entity memory for it.
 type_3D3548 *sub_1669B0(type_712B0 *arg_0)
@@ -122,37 +124,50 @@ type_3D3548 *sub_1669B0(type_712B0 *arg_0)
             sub_D5A60(var_10, 0);
             var_10 = 0;
         }
-    } else
+    }
+#ifndef CODFH_SP
+    // Single player compiles the debug print out (SP 0x109F30).
+    else
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
                    "location(%6.2f,%6.2f,%6.2f)",
                    arg_0->unk_90, arg_0->unk_94, arg_0->unk_98);
+#endif
     return var_10;
 }
 
 // match: ??0type_3DC9B0@@QAE@PAUtype_712B0@@@Z @ 0x00166AC0
 // match: __ehhandler$??0type_3DC9B0@@QAE@PAUtype_712B0@@@Z-0x32 @ 0x00301EF0
 // match: __ehhandler$??0type_3DC9B0@@QAE@PAUtype_712B0@@@Z @ 0x00301F22
+// sp-match: ??0type_3DC9B0@@QAE@PAUtype_712B0@@@Z @ 0x00109EB0
 // (Defined in the class.)
 
 // match: ?vf_1F8@type_3DC9B0@@UAEPAUtype_3D3548@@H@Z @ 0x00166B90
+// sp-match: ?vf_1F8@type_3DC9B0@@UAEPAUtype_3D3548@@H@Z @ 0x00109B70
 
 // match: ?vf_1FC@type_3DC9B0@@UAEXPAUtype_3D3548@@H@Z @ 0x00166BB0
+// sp-match: ?vf_1FC@type_3DC9B0@@UAEXPAUtype_3D3548@@H@Z @ 0x00109B80
 
 // match: ?vf_098@type_3DC9B0@@UAEPAUtype_3D2E7C@@XZ @ 0x00166BD0
+// sp-match: ?vf_098@type_3DC9B0@@UAEPAUtype_3D2E7C@@XZ @ 0x00109BA0
 
 // match: ?vf_09C@type_3DC9B0@@UAEHXZ @ 0x00166BF0
+// sp-match: ?vf_09C@type_3DC9B0@@UAEHXZ @ 0x00109BB0
 
 // match: ?vf_0A0@type_3DC9B0@@UAEXI@Z @ 0x00166C10
+// sp-match: ?vf_0A0@type_3DC9B0@@UAEXI@Z @ 0x00109BC0
 
 // match: ??_Gtype_3DC9B0@@UAEPAXI@Z @ 0x00166C30
 // match: ??1type_3DC9B0@@UAE@XZ @ 0x00166C60
 // match: __ehhandler$??1type_3DC9B0@@UAE@XZ-0x42 @ 0x00301F30
 // match: __ehhandler$??1type_3DC9B0@@UAE@XZ @ 0x00301F72
+// sp-match: ??1type_3DC9B0@@UAE@XZ @ 0x00109BF0
+// sp-match: ??_Gtype_3DC9B0@@UAEPAXI@Z @ 0x00109BD0
 // (Defined in the class: vf_230, called directly as in any destructor,
 // then the members' destructors and the base's.)
 
 // match: ?sub_166D40@@YAPAUtype_3D3548@@HHPAURwMatrixTag@@HPAUtype_712B0@@HHHHHH@Z @ 0x00166D40
 // match: __ehhandler$?sub_166D40@@YAPAUtype_3D3548@@HHPAURwMatrixTag@@HPAUtype_712B0@@HHHHHH@Z @ 0x00301F91
+// sp-match: ?sub_166D40@@YAPAUtype_3D3548@@HHPAURwMatrixTag@@HPAUtype_712B0@@HHHHHH@Z @ 0x00109FD0
 type_3D3548 *sub_166D40(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, RwInt32 arg_C, type_712B0 *arg_10,
                         RwInt32 arg_14, RwInt32 arg_18, RwInt32 arg_1C, RwInt32 arg_20, RwInt32 arg_24,
                         RwInt32 arg_28)
@@ -167,6 +182,7 @@ type_3D3548 *sub_166D40(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, RwInt32 a
 }
 
 // match: ??0type_3DC9B0@@QAE@HHPAURwMatrixTag@@HPAUtype_712B0@@HHHHHH@Z @ 0x00166E00
+// sp-match: ??0type_3DC9B0@@QAE@HHPAURwMatrixTag@@HPAUtype_712B0@@HHHHHH@Z @ 0x00109AA0
 type_3DC9B0::type_3DC9B0(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, RwInt32 arg_C, type_712B0 *arg_10,
                          RwInt32 arg_14, RwInt32 arg_18, RwInt32 arg_1C, RwInt32 arg_20, RwInt32 arg_24,
                          RwInt32 arg_28)
@@ -177,6 +193,7 @@ type_3DC9B0::type_3DC9B0(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, RwInt32 
 }
 
 // match: ?sub_166F20@type_3DC9B0@@QAEXPAUtype_712B0@@@Z @ 0x00166F20
+// sp-match: ?sub_166F20@type_3DC9B0@@QAEXPAUtype_712B0@@@Z @ 0x00109C80
 void type_3DC9B0::sub_166F20(type_712B0 *arg_0)
 {
     MountedWeaponTrigger *var_4;
@@ -188,6 +205,7 @@ void type_3DC9B0::sub_166F20(type_712B0 *arg_0)
 }
 
 // match: ?sub_166FA0@type_3DC9B0@@QAEHHHPAURwMatrixTag@@HPAUtype_712B0@@HHHHHH@Z @ 0x00166FA0
+// sp-match: ?sub_166FA0@type_3DC9B0@@QAEHHHPAURwMatrixTag@@HPAUtype_712B0@@HHHHHH@Z @ 0x00108C30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Sets it up with the settings arg_0 (its settings index; arg_4 kept) for
 // the trigger arg_10 (arg_14 its kind: 1 a vehicle's, 2 an animated
@@ -354,6 +372,7 @@ RwInt32 type_3DC9B0::sub_166FA0(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, R
 }
 
 // match: ?vf_230@type_3DC9B0@@UAEXXZ @ 0x00167820
+// sp-match: ?vf_230@type_3DC9B0@@UAEXXZ @ 0x00109140
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Shuts it down: its user dismounted, its script object freed, its
 // animation released, its trigger's script object let go, and its buffer.
@@ -397,6 +416,7 @@ void type_3DC9B0::vf_230()
 }
 
 // match: ?vf_054@type_3DC9B0@@UAEXH@Z @ 0x00167970
+// sp-match: ?vf_054@type_3DC9B0@@UAEXH@Z @ 0x00106B50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The base's (sub_D2820), unless the player is on it.
 void type_3DC9B0::vf_054(RwInt32 arg_0)
@@ -415,6 +435,7 @@ void type_3DC9B0::vf_054(RwInt32 arg_0)
 }
 
 // match: ?sub_1679C0@type_3DC9B0@@QAEXH@Z @ 0x001679C0
+// sp-match: ?sub_1679C0@type_3DC9B0@@QAEXH@Z @ 0x00106B90
 void type_3DC9B0::sub_1679C0(RwInt32 arg_0)
 {
     RpAtomic *var_4;
@@ -428,6 +449,7 @@ void type_3DC9B0::sub_1679C0(RwInt32 arg_0)
 }
 
 // match: ?vf_1C4@type_3DC9B0@@UAEXH@Z @ 0x00167A00
+// sp-match: ?vf_1C4@type_3DC9B0@@UAEXH@Z @ 0x00106BC0
 void type_3DC9B0::vf_1C4(RwInt32 arg_0)
 {
     set_xyz(&unk_10C, -1.0f, -1.0f, -1.0f);
@@ -435,6 +457,7 @@ void type_3DC9B0::vf_1C4(RwInt32 arg_0)
 }
 
 // match: ?sub_167A50@@YAXPAURwMatrixTag@@PAM11@Z @ 0x00167A50
+// sp-match: ?sub_167A50@@YAXPAURwMatrixTag@@PAM11@Z @ 0x00106BF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_167A50(RwMatrix *arg_0, RwReal *arg_4, RwReal *arg_8, RwReal *arg_C)
 {
@@ -466,6 +489,7 @@ void sub_167A50(RwMatrix *arg_0, RwReal *arg_4, RwReal *arg_8, RwReal *arg_C)
 }
 
 // match: ?sub_167BC0@type_3DC9B0@@QAEXXZ @ 0x00167BC0
+// sp-match: ?sub_167BC0@type_3DC9B0@@QAEXXZ @ 0x00107D30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DC9B0::sub_167BC0()
 {
@@ -503,6 +527,21 @@ void type_3DC9B0::sub_167BC0()
             v2C = unk_3BC - frm_24;
             var_3C = sub_16A790();
             var_30 = sub_16A890();
+#ifdef CODFH_SP
+            // shape: the angles on the left, and the yaw's limit compared as a float
+            // (SP 0x107EA5: fucompp with 180 and 360).
+            if (l40 < -var_3C)
+                l40 = -var_3C;
+            else if (l40 > var_3C)
+                l40 = var_3C;
+            if (var_30 != 180.0f && var_30 != 360.0f)
+            {
+                if (v2C < -var_30)
+                    v2C = -var_30;
+                else if (v2C > var_30)
+                    v2C = var_30;
+            }
+#else
             if (-var_3C > l40)
                 l40 = -var_3C;
             else if (l40 > var_3C)
@@ -515,6 +554,7 @@ void type_3DC9B0::sub_167BC0()
                 else if (v2C > var_30)
                     v2C = var_30;
             }
+#endif
             unk_3B8 = l40;
             unk_3BC = v2C;
             RwMatrixSetIdentityMacro(lv_10);
@@ -541,6 +581,7 @@ void type_3DC9B0::sub_167BC0()
 }
 
 // match: ?vf_038@type_3DC9B0@@UAEXM@Z @ 0x00167FA0
+// sp-match: ?vf_038@type_3DC9B0@@UAEXM@Z @ 0x00109220
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Kind 4 starts its animation and its procedural track (sub_16B0C0) once.
 void type_3DC9B0::vf_038(RwReal arg_0)
@@ -557,7 +598,11 @@ void type_3DC9B0::vf_038(RwReal arg_0)
             get_unk_284()->sub_794C0(0);
             unk_284->sub_796A0(var_C, bp_4->unk_C8->unk_34, 0, bp_8, 0, 1.0f, 1.0f);
             unk_4D0 = get_unk_284()->sub_79930(sub_16B0C0, 1.0f, 1.0f);
+#ifdef CODFH_SP // SP expands type_78AC0::sub_6DF40 here (SP 0x1092CD: % 4 ring)
+            get_unk_284()->clear_last_unk_08_30();
+#else
             ((type_78AC0 *)get_unk_284())->sub_6DF40();
+#endif
             // An unused slot below the temporaries (see unused_slot).
             unused_slot();
         }
@@ -565,6 +610,7 @@ void type_3DC9B0::vf_038(RwReal arg_0)
 }
 
 // match: ?vf_03C@type_3DC9B0@@UAEXM@Z @ 0x00168090
+// sp-match: ?vf_03C@type_3DC9B0@@UAEXM@Z @ 0x00109CE0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its step by arg_0: the base's; hidden from explosions while it has no
 // unk_334; with the player on it, the player dismounted while changing
@@ -632,6 +678,7 @@ void type_3DC9B0::vf_03C(RwReal arg_0)
 }
 
 // match: ?vf_04C@type_3DC9B0@@UAEXM@Z @ 0x00168300
+// sp-match: ?vf_04C@type_3DC9B0@@UAEXM@Z @ 0x00108040
 // Its update by arg_0: the base's, its aim (not kind 4), and with the player
 // on it the player's camera: at the settings' view, blending towards the
 // zoomed view while zooming in or out (and the field of view), turned with
@@ -744,6 +791,7 @@ void type_3DC9B0::vf_04C(RwReal arg_0)
 }
 
 // match: ?sub_168820@type_3DC9B0@@QAEXPAUtype_10F710@@@Z @ 0x00168820
+// sp-match: ?sub_168820@type_3DC9B0@@QAEXPAUtype_10F710@@@Z @ 0x00106CC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Mounts the player arg_0 (not without its weapon part): its aim from the
 // player's frame, the HUD's weapon display and the look reset, the mount
@@ -799,6 +847,7 @@ void type_3DC9B0::sub_168820(type_10F710 *arg_0)
 }
 
 // match: ?sub_168A90@type_3DC9B0@@QAEXPAUtype_10F710@@@Z @ 0x00168A90
+// sp-match: ?sub_168A90@type_3DC9B0@@QAEXPAUtype_10F710@@@Z @ 0x001083C0
 // Dismounts the player arg_0: the player's frame at the way off
 // (sub_16A030), the HUD's weapon display back, its firing sound stopped,
 // the dismount sound, the player's weapon taken up again, its trigger's
@@ -868,6 +917,7 @@ void type_3DC9B0::sub_168A90(type_10F710 *arg_0)
 }
 
 // match: ?sub_168E10@type_3DC9B0@@QAEHPAUtype_3DAFC8@@@Z @ 0x00168E10
+// sp-match: ?sub_168E10@type_3DC9B0@@QAEHPAUtype_3DAFC8@@@Z @ 0x00108610
 // Mounts the soldier arg_0 (0 when someone else uses it): its aim zeroed
 // and reset, its trigger's reload setting, and its trigger's script told
 // "EntityAttachedToWeapon".
@@ -893,6 +943,7 @@ RwInt32 type_3DC9B0::sub_168E10(type_3DAFC8 *arg_0)
 }
 
 // match: ?sub_168F40@type_3DC9B0@@QAEXXZ @ 0x00168F40
+// sp-match: ?sub_168F40@type_3DC9B0@@QAEXXZ @ 0x00106E60
 void type_3DC9B0::sub_168F40()
 {
     RwFrame *var_4;
@@ -906,6 +957,7 @@ void type_3DC9B0::sub_168F40()
 }
 
 // match: ?sub_169000@type_3DC9B0@@QAEXPAUtype_3DAFC8@@@Z @ 0x00169000
+// sp-match: ?sub_169000@type_3DC9B0@@QAEXPAUtype_3DAFC8@@@Z @ 0x001086D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Dismounts the soldier arg_0 (when it is its user): its trigger's script
 // told "EntityDetachedFromWeapon", its firing sound stopped, its firing
@@ -942,12 +994,14 @@ void type_3DC9B0::sub_169000(type_3DAFC8 *arg_0)
 }
 
 // match: ?sub_169170@type_3DC9B0@@QAEXH@Z @ 0x00169170
+// sp-match: ?sub_169170@type_3DC9B0@@QAEXH@Z @ 0x00106EA0
 void type_3DC9B0::sub_169170(RwInt32 arg_0)
 {
     unk_4F4 = arg_0;
 }
 
 // match: ?sub_169190@type_3DC9B0@@QAEHPAUtype_3D3548@@@Z @ 0x00169190
+// sp-match: ?sub_169190@type_3DC9B0@@QAEHPAUtype_3D3548@@@Z @ 0x00106EB0
 RwInt32 type_3DC9B0::sub_169190(type_3D3548 *arg_0)
 {
     Trigger *var_4;
@@ -981,6 +1035,7 @@ RwInt32 type_3DC9B0::sub_169190(type_3D3548 *arg_0)
 }
 
 // match: ?sub_169350@type_3DC9B0@@QAEHH@Z @ 0x00169350
+// sp-match: ?sub_169350@type_3DC9B0@@QAEHH@Z @ 0x00106FF0
 RwInt32 type_3DC9B0::sub_169350(RwInt32 arg_0)
 {
     if (arg_0)
@@ -989,6 +1044,7 @@ RwInt32 type_3DC9B0::sub_169350(RwInt32 arg_0)
 }
 
 // match: ?sub_169380@type_3DC9B0@@QAEHXZ @ 0x00169380
+// sp-match: ?sub_169380@type_3DC9B0@@QAEHXZ @ 0x00109310
 // Fires it for its user (none: 0): its firing sound, a projectile (kind 4
 // two, from its tags 1 and 2 or 3 and 4 by turns) along its muzzle's matrix
 // turned by a random spread, one round of its trigger's ammunition ("OutOfAmmo"
@@ -1121,7 +1177,11 @@ RwInt32 type_3DC9B0::sub_169380()
                     unk_284->sub_796A0((RtAnimAnimation *)var_11C, var_8->unk_C8->unk_2C, 0,
                                        (type_783F0 *)var_118, 0, 1.0f, 1.0f);
                 }
+#ifdef CODFH_SP
+                ((type_78AC0 *)get_unk_284())->sub_6DF40();
+#else
                 get_unk_284()->clear_last_unk_08_30();
+#endif
                 unk_484 = 1;
                 unk_494 = 1;
             }
@@ -1133,6 +1193,7 @@ RwInt32 type_3DC9B0::sub_169380()
 }
 
 // match: ?sub_169B70@type_3DC9B0@@QAEHXZ @ 0x00169B70
+// sp-match: ?sub_169B70@type_3DC9B0@@QAEHXZ @ 0x00107010
 // Whether it can fire: not held off (unk_478), its reload time passed and
 // ammunition left.
 RwInt32 type_3DC9B0::sub_169B70()
@@ -1145,6 +1206,7 @@ RwInt32 type_3DC9B0::sub_169B70()
 // match: ?sub_169BC0@@YAHPAUtype_F2FF0@@@Z @ 0x00169BC0
 // match: __ehhandler$?sub_169BC0@@YAHPAUtype_F2FF0@@@Z-0x8 @ 0x00301FA0
 // match: __ehhandler$?sub_169BC0@@YAHPAUtype_F2FF0@@@Z @ 0x00301FA8
+// sp-match: ?sub_169BC0@@YAHPAUtype_F2FF0@@@Z @ 0x00107040
 RwInt32 sub_169BC0(type_F2FF0 *arg_0)
 {
     RwInt32 var_14 = 1;
@@ -1170,6 +1232,7 @@ RwInt32 sub_169BC0(type_F2FF0 *arg_0)
 }
 
 // match: ?vf_170@type_3DC9B0@@UAEXHHHH@Z @ 0x00169CC0
+// sp-match: ?vf_170@type_3DC9B0@@UAEXHHHH@Z @ 0x00109890
 // Its handler for the message arg_0 with the data arg_4: 1 (its animation
 // ended) replays the fire animation while it keeps firing, else ends it
 // (kind 4 plays its unk_34 and releases the hold); 0x516 spawns the
@@ -1177,15 +1240,25 @@ RwInt32 sub_169BC0(type_F2FF0 *arg_0)
 void type_3DC9B0::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C)
 {
     type_4E1B70 *var_8 = sub_166990(unk_3B0);
+#ifdef CODFH_SP
+    // shape: the animation lookups' outputs at function scope, so they keep
+    // their own slots (SP 0x109979, 0x1099F2: frame 0x58).
+    RwInt32 var_10;
+    RwInt32 var_14;
+    RwInt32 var_18;
+    RwInt32 var_1C;
+#endif
 
     switch (arg_0)
     {
     case 1:
         if (unk_484 && unk_470 && unk_410 - unk_4C8 < 3.0f)
         {
+#ifndef CODFH_SP
             RwInt32 var_10;
             RwInt32 var_14;
 
+#endif
             if (sub_77B70(var_8->unk_C8->unk_2C, (void **)(&var_14), (void **)(&var_10)))
             {
                 unk_284->sub_794C0(0);
@@ -1198,16 +1271,22 @@ void type_3DC9B0::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
         {
             if (unk_3B0 == 4)
             {
+#ifndef CODFH_SP
                 RwInt32 var_18;
                 RwInt32 var_1C;
 
+#endif
                 if (sub_77B70(var_8->unk_C8->unk_34, (void **)(&var_1C), (void **)(&var_18)))
                 {
                     unk_284->sub_794C0(0);
                     unk_284->sub_796A0((RtAnimAnimation *)var_1C, var_8->unk_C8->unk_34, 0, (type_783F0 *)var_18,
                                        0, 1.0f, 1.0f);
                     get_unk_284()->sub_79930(sub_16B0C0, 1.0f, 1.0f);
+#ifdef CODFH_SP // SP expands the clear helper here (SP 0x109A60)
+                    get_unk_284()->clear_last_unk_08_30();
+#else
                     ((type_78AC0 *)get_unk_284())->sub_6DF40();
+#endif
                 }
             }
             unk_484 = 0;
@@ -1238,6 +1317,7 @@ void type_3DC9B0::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
 }
 
 // match: ?sub_169F30@type_3DC9B0@@QAEXPAURwMatrixTag@@H@Z @ 0x00169F30
+// sp-match: ?sub_169F30@type_3DC9B0@@QAEXPAURwMatrixTag@@H@Z @ 0x001070D0
 // The matrix of its muzzle (-1: the weapon's frame moved by its settings'
 // offset) or of its bone "FR01" to "FR04" (1 to 3, else 4) into *arg_0.
 void type_3DC9B0::sub_169F30(RwMatrix *arg_0, RwInt32 arg_4)
@@ -1272,6 +1352,7 @@ void type_3DC9B0::sub_169F30(RwMatrix *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_16A030@type_3DC9B0@@QAEXPAURwMatrixTag@@@Z @ 0x0016A030
+// sp-match: ?sub_16A030@type_3DC9B0@@QAEXPAURwMatrixTag@@@Z @ 0x00107190
 // Its seat's matrix into *arg_0: its mount frame's (unk_340) raised 120
 // and moved by its settings' unk_74, through the frame's parents to world
 // space; then turns the weapon's frame to its pitch and yaw in place.
@@ -1313,6 +1394,7 @@ void type_3DC9B0::sub_16A030(RwMatrix *arg_0)
 }
 
 // match: ?sub_16A1D0@type_3DC9B0@@QAEXPAUtype_10F710@@H@Z @ 0x0016A1D0
+// sp-match: ?sub_16A1D0@type_3DC9B0@@QAEXPAUtype_10F710@@H@Z @ 0x001072B0
 // Zooms it in (arg_4, when its settings allow it, unk_A4) or out for the
 // player arg_0.
 void type_3DC9B0::sub_16A1D0(type_10F710 *arg_0, RwInt32 arg_4)
@@ -1332,6 +1414,7 @@ void type_3DC9B0::sub_16A1D0(type_10F710 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_16A240@type_3DC9B0@@QAEHXZ @ 0x0016A240
+// sp-match: ?sub_16A240@type_3DC9B0@@QAEHXZ @ 0x001087D0
 // Its key: the path node of kind 0xC nearest it (within 500), turned to its
 // "MONA" bone's matrix (sub_16A3B0) and taken as its node (sub_F7BA0); the
 // node's index, or -1 with none.
@@ -1360,6 +1443,7 @@ RwInt32 type_3DC9B0::sub_16A240()
 }
 
 // match: ?sub_16A340@@YAPAUtype_3DC9B0@@H@Z @ 0x0016A340
+// sp-match: ?sub_16A340@@YAPAUtype_3DC9B0@@H@Z @ 0x00107300
 // The mounted weapon (list 13) whose key (unk_4EC) is arg_0, or 0.
 type_3DC9B0 *sub_16A340(RwInt32 arg_0)
 {
@@ -1378,6 +1462,7 @@ type_3DC9B0 *sub_16A340(RwInt32 arg_0)
 }
 
 // match: ?sub_16A380@@YAPAUtype_3DC9B0@@PAUtype_F8350@@@Z @ 0x0016A380
+// sp-match: ?sub_16A380@@YAPAUtype_3DC9B0@@PAUtype_F8350@@@Z @ 0x00107330
 type_3DC9B0 *sub_16A380(type_F8350 *arg_0)
 {
     RwInt32 var_4 = sub_FA920(arg_0);
@@ -1386,6 +1471,7 @@ type_3DC9B0 *sub_16A380(type_F8350 *arg_0)
 }
 
 // match: ?sub_16A3B0@type_3DC9B0@@QAEHPAURwMatrixTag@@HH@Z @ 0x0016A3B0
+// sp-match: ?sub_16A3B0@type_3DC9B0@@QAEHPAURwMatrixTag@@HH@Z @ 0x00107350
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The matrix of its bone "MONA" (arg_4) or "ATMT" into *arg_0, in world
 // space unless arg_8; 0 without a clump.
@@ -1411,6 +1497,7 @@ RwInt32 type_3DC9B0::sub_16A3B0(RwMatrix *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_16A440@type_3DC9B0@@QAEXPAURwMatrixTag@@@Z @ 0x0016A440
+// sp-match: ?sub_16A440@type_3DC9B0@@QAEXPAURwMatrixTag@@@Z @ 0x001073C0
 // Turns the weapon's frame to the world matrix *arg_0 (its rotation only,
 // relative to its mount frame's), keeping its position.
 void type_3DC9B0::sub_16A440(RwMatrix *arg_0)
@@ -1437,6 +1524,7 @@ void type_3DC9B0::sub_16A440(RwMatrix *arg_0)
 }
 
 // match: ?sub_16A580@type_3DC9B0@@QAEXPAURwV3d@@@Z @ 0x0016A580
+// sp-match: ?sub_16A580@type_3DC9B0@@QAEXPAURwV3d@@@Z @ 0x001074C0
 // The point it aims at into *arg_0: 1000 along its aim from its muzzle.
 void type_3DC9B0::sub_16A580(RwV3d *arg_0)
 {
@@ -1448,6 +1536,7 @@ void type_3DC9B0::sub_16A580(RwV3d *arg_0)
 }
 
 // match: ?sub_16A620@type_3DC9B0@@QAEXXZ @ 0x0016A620
+// sp-match: ?sub_16A620@type_3DC9B0@@QAEXXZ @ 0x00107530
 // Puts the weapon's frame back to its rest matrix (unk_500).
 void type_3DC9B0::sub_16A620()
 {
@@ -1457,12 +1546,14 @@ void type_3DC9B0::sub_16A620()
 }
 
 // match: ?sub_16A660@type_3DC9B0@@QAEXXZ @ 0x0016A660
+// sp-match: ?sub_16A660@type_3DC9B0@@QAEXXZ @ 0x001088A0
 void type_3DC9B0::sub_16A660()
 {
     unk_3B4 = sub_16A680();
 }
 
 // match: ?sub_16A680@type_3DC9B0@@QAEHXZ @ 0x0016A680
+// sp-match: ?sub_16A680@type_3DC9B0@@QAEHXZ @ 0x00107550
 RwInt32 type_3DC9B0::sub_16A680()
 {
     type_4E1B70 *var_4 = sub_166990(unk_3B0);
@@ -1480,6 +1571,7 @@ RwInt32 type_3DC9B0::sub_16A680()
 }
 
 // match: ?sub_16A790@type_3DC9B0@@QAEMXZ @ 0x0016A790
+// sp-match: ?sub_16A790@type_3DC9B0@@QAEMXZ @ 0x001075F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The pitch's limit (in degrees): its trigger's (by kind) unless -1, else
 // its settings' unk_B0.
@@ -1512,6 +1604,7 @@ RwReal type_3DC9B0::sub_16A790()
 }
 
 // match: ?sub_16A890@type_3DC9B0@@QAEMXZ @ 0x0016A890
+// sp-match: ?sub_16A890@type_3DC9B0@@QAEMXZ @ 0x00107670
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Likewise the yaw's (unk_D8, unk_168, unk_1D8 and unk_B4).
 RwReal type_3DC9B0::sub_16A890()
@@ -1543,6 +1636,7 @@ RwReal type_3DC9B0::sub_16A890()
 }
 
 // match: ?sub_16A990@type_3DC9B0@@QAEHPAURwV3d@@MM@Z @ 0x0016A990
+// sp-match: ?sub_16A990@type_3DC9B0@@QAEHPAURwV3d@@MM@Z @ 0x001076F0
 RwInt32 type_3DC9B0::sub_16A990(RwV3d *arg_0, RwReal arg_4, RwReal arg_8)
 {
     RpClump *var_4 = unk_25C.unk_08;
@@ -1557,6 +1651,7 @@ RwInt32 type_3DC9B0::sub_16A990(RwV3d *arg_0, RwReal arg_4, RwReal arg_8)
 }
 
 // match: ?vf_058@type_3DC9B0@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x0016AA00
+// sp-match: ?vf_058@type_3DC9B0@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x00107740
 RwInt32 type_3DC9B0::vf_058(type_3DF8D8_04 *arg_0)
 {
     type_4E1B70 *var_4 = 0;
@@ -1575,6 +1670,7 @@ RwInt32 type_3DC9B0::vf_058(type_3DF8D8_04 *arg_0)
 }
 
 // match: ?sub_16AAE0@type_3DC9B0@@QAEXXZ @ 0x0016AAE0
+// sp-match: ?sub_16AAE0@type_3DC9B0@@QAEXXZ @ 0x001077C0
 // Its NPC user's aim and firing: with a target, turns its aim matrix
 // (unk_540) towards the target's aim point by at most flt_429E94 degrees
 // (kept when the aim stays in its limits, sub_16A990); then tells the
@@ -1665,6 +1761,7 @@ void type_3DC9B0::sub_16AAE0()
 }
 
 // match: ?sub_16B0C0@@YAXPAUtype_7C8D0@@PAUtype_80300@@H_N@Z @ 0x0016B0C0
+// sp-match: ?sub_16B0C0@@YAXPAUtype_7C8D0@@PAUtype_80300@@H_N@Z @ 0x001088B0
 // Kind 4's animation callback (the weapon arg_8): on its first start it
 // bakes a pose key of its hierarchy's rest pose (bones 1 to 3 masked
 // in), on later starts restores it; between starts it turns its bones 1 to
@@ -1752,6 +1849,7 @@ void sub_16B0C0(type_7C8D0 *arg_0, type_80300 *arg_4, RwInt32 arg_8, bool arg_C)
 }
 
 // match: ?sub_16B5C0@type_3DC9B0@@QAEMXZ @ 0x0016B5C0
+// sp-match: ?sub_16B5C0@type_3DC9B0@@QAEMXZ @ 0x00107C30
 // The shorter of its burst bounds (sub_16B620 the longer; sub_16B680 and
 // sub_16B6E0 likewise its pause's). The picked bound goes through the FPU
 // into the conditional's temporary (the double round trip), where a plain
@@ -1764,6 +1862,7 @@ RwReal type_3DC9B0::sub_16B5C0()
 }
 
 // match: ?sub_16B620@type_3DC9B0@@QAEMXZ @ 0x0016B620
+// sp-match: ?sub_16B620@type_3DC9B0@@QAEMXZ @ 0x00107C70
 RwReal type_3DC9B0::sub_16B620()
 {
     type_4E1B70 *var_4 = sub_166990(unk_3B0);
@@ -1772,6 +1871,7 @@ RwReal type_3DC9B0::sub_16B620()
 }
 
 // match: ?sub_16B680@type_3DC9B0@@QAEMXZ @ 0x0016B680
+// sp-match: ?sub_16B680@type_3DC9B0@@QAEMXZ @ 0x00107CB0
 RwReal type_3DC9B0::sub_16B680()
 {
     type_4E1B70 *var_4 = sub_166990(unk_3B0);
@@ -1780,6 +1880,7 @@ RwReal type_3DC9B0::sub_16B680()
 }
 
 // match: ?sub_16B6E0@type_3DC9B0@@QAEMXZ @ 0x0016B6E0
+// sp-match: ?sub_16B6E0@type_3DC9B0@@QAEMXZ @ 0x00107CF0
 RwReal type_3DC9B0::sub_16B6E0()
 {
     type_4E1B70 *var_4 = sub_166990(unk_3B0);
@@ -1812,9 +1913,13 @@ void *type_3DC9B0::operator new(RwUInt32 arg_0, void *arg_4)
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ??3type_3DC9B0@@SAXPAX@Z (folded into 0x19A750)
+#ifndef CODFH_SP
+// Single player keeps the deleting destructor's call (SP 0x109BE0), so the empty body is
+// not in this file there.
 void type_3DC9B0::operator delete(void * arg_0)
 {
 }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

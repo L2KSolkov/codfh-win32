@@ -30,6 +30,7 @@ rwaFreeListBlockData(rwaFreeListBlock *block, RwUInt32 size, RwUInt32 alignment)
 }
 
 // match: _sub_243670 @ 0x00243670
+// sp-match: _sub_243670 @ 0x00158B90
 void *
 sub_243670(RwaFreeList *freeList, RwUInt32 hint)
 {
@@ -113,6 +114,7 @@ sub_243670(RwaFreeList *freeList, RwUInt32 hint)
 }
 
 // match: _sub_2437A0 @ 0x002437A0
+// sp-match: _sub_2437A0 @ 0x00158CC0
 void
 sub_2437A0(RwaFreeList *freeList, void *entry)
 {
@@ -176,6 +178,7 @@ sub_2437A0(RwaFreeList *freeList, void *entry)
 }
 
 // match: _sub_243880 @ 0x00243880
+// sp-match: _sub_243880 @ 0x00158DA0
 static void
 sub_243880(RwaFreeList *freeList)
 {
@@ -203,6 +206,7 @@ sub_243880(RwaFreeList *freeList)
 }
 
 // match: _sub_2438E0 @ 0x002438E0
+// sp-match: _sub_2438E0 @ 0x00158E00
 void
 sub_2438E0(RwaFreeList *freeList)
 {
@@ -212,6 +216,7 @@ sub_2438E0(RwaFreeList *freeList)
 }
 
 // match: _sub_243900 @ 0x00243900
+// sp-match: _sub_243900 @ 0x00158E20
 void
 sub_243900(void)
 {
@@ -226,6 +231,7 @@ sub_243900(void)
 }
 
 // match: _sub_243950 @ 0x00243950
+// sp-match: _sub_243950 @ 0x00158E70
 RwaFreeList *
 sub_243950(RwUInt32 entrySize, RwUInt32 entriesPerBlock, RwUInt32 alignment, RwUInt32 noBlocks,
            RwaFreeList *freeList, RwUInt32 hint)
@@ -307,6 +313,7 @@ sub_243950(RwUInt32 entrySize, RwUInt32 entriesPerBlock, RwUInt32 alignment, RwU
 }
 
 // match: _sub_243A80 @ 0x00243A80
+// sp-match: _sub_243A80 @ 0x00158FA0
 RwBool
 sub_243A80(void)
 {

@@ -101,6 +101,7 @@ StackEntry;
 // match: _rcsid @ 0x004174B0
 
 // match: __repartition @ 0x002BD860
+// sp-match: __repartition @ 0x001D8C70
 static void
 _repartition(RwUInt8 * l,
              RwUInt8 * r,
@@ -197,6 +198,7 @@ _repartition(RwUInt8 * l,
    _rx_rxRadixExchangeSort() ensures this is the case prior to calling */
 
 // match: __insertionsort @ 0x002BD980
+// sp-match: __insertionsort @ 0x001D8D90
 static void
 _insertionsort(RwUInt8 * elements,
                RwUInt32 numElements,
@@ -225,6 +227,7 @@ _insertionsort(RwUInt8 * elements,
 }
 
 // match: __rx_rxRadixExchangeSort @ 0x002BDA00
+// sp-match: __rx_rxRadixExchangeSort @ 0x001D8E10
 void
 _rx_rxRadixExchangeSort(void *elements,
                   RwUInt32 numElements,

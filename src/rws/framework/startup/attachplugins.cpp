@@ -42,6 +42,7 @@ RwInt32 sub_FBC50();
 RwInt32 sub_FC020();
 
 // match: ?AttachPlugins@StartUp@RWS@@YA_NXZ @ 0x00132510
+// sp-match: ?AttachPlugins@StartUp@RWS@@YA_NXZ @ 0x000E2F50
 bool RWS::StartUp::AttachPlugins()
       {
          typedef RwBool (__cdecl *functor)(void);

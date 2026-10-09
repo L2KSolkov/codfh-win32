@@ -462,6 +462,7 @@ IsFlat2d(const RtCubicBezier control)
 // match: __rt2dPathFreeListPreallocBlocks @ 0x00431090
 
 // match: _SubPathDestroy2d @ 0x00252A20
+// sp-match: _SubPathDestroy2d @ 0x00167830
 
 static Rt2dPath    *
 SubPathDestroy2d(Rt2dPath * path)
@@ -648,6 +649,7 @@ Rt2dPathCopy(Rt2dPath * dst, const Rt2dPath * src)
  * \see Rt2dPathRCurveto
  */
 // match: _Rt2dPathMoveto @ 0x00253B10
+// sp-match: _Rt2dPathMoveto @ 0x00168E30
 Rt2dPath           *
 Rt2dPathMoveto(Rt2dPath * path, RwReal x, RwReal y)
 {
@@ -705,6 +707,7 @@ Rt2dPathMoveto(Rt2dPath * path, RwReal x, RwReal y)
  * \see Rt2dPathMoveto
  */
 // match: _Rt2dPathLineto @ 0x00252A60
+// sp-match: _Rt2dPathLineto @ 0x00167870
 Rt2dPath           *
 Rt2dPathLineto(Rt2dPath * path, RwReal x, RwReal y)
 {
@@ -808,6 +811,7 @@ Rt2dPathRLineto(Rt2dPath * path, RwReal x, RwReal y)
  * \see Rt2dPathMoveto
  */
 // match: _Rt2dPathCurveto @ 0x00252BC0
+// sp-match: _Rt2dPathCurveto @ 0x001679D0
 Rt2dPath           *
 Rt2dPathCurveto(Rt2dPath * path, RwReal x1, RwReal y1, RwReal x2,
                 RwReal y2, RwReal x3, RwReal y3)
@@ -915,6 +919,7 @@ Rt2dPathRCurveto(Rt2dPath * path, RwReal x1, RwReal y1, RwReal x2,
  * \see Rt2dPathEmpty
  */
 // match: _Rt2dPathClose @ 0x00252E90
+// sp-match: _Rt2dPathClose @ 0x00167CA0
 Rt2dPath           *
 Rt2dPathClose(Rt2dPath * path)
 {
@@ -1236,6 +1241,7 @@ Rt2dPathOval(Rt2dPath * path, RwReal x, RwReal y, RwReal w, RwReal h)
 /****************************************************************************/
 
 // match: __rt2dScratchPath @ 0x00253A00
+// sp-match: __rt2dScratchPath @ 0x00168C60
 Rt2dPath           *
 _rt2dScratchPath(void)
 {
@@ -1316,6 +1322,7 @@ SubPathLineto2dInline(Rt2dPath *path, const RwV2d *pt)
 }
 
 // match: _Flatten2d @ 0x002530C0
+// sp-match: _Flatten2d @ 0x00167ED0
 static void
 Flatten2d(Rt2dPath * const flat, const RtCubicBezier control, int depth)
 {
@@ -1353,6 +1360,7 @@ Flatten2d(Rt2dPath * const flat, const RtCubicBezier control, int depth)
 /****************************************************************************/
 
 // match: __rt2dSubPathFlatten @ 0x00253530
+// sp-match: __rt2dSubPathFlatten @ 0x00168340
 Rt2dPath           *
 _rt2dSubPathFlatten(Rt2dPath * flat, const Rt2dPath * path)
 {
@@ -1407,6 +1415,7 @@ _rt2dSubPathFlatten(Rt2dPath * flat, const Rt2dPath * path)
 
 /****************************************************************************/
 Rt2dBBox           *
+// sp-match: __rt2dFlatSubPathExtendBBox @ 0x00168620
 _rt2dFlatSubPathExtendBBox(const Rt2dPath * path, Rt2dBBox * bbox)
 {
     rt2dPathNode       *pnode;
@@ -1518,6 +1527,7 @@ Rt2dPathGetBBox(const Rt2dPath * path, Rt2dBBox * bbox)
 /****************************************************************************/
 
 // match: __rt2dPathOptimize @ 0x00253810
+// sp-match: __rt2dPathOptimize @ 0x001687F0
 Rt2dPath           *
 _rt2dPathOptimize(Rt2dPath * path)
 {
@@ -1704,6 +1714,7 @@ Rt2dPathFlatten(Rt2dPath * path)
  * \see Rt2dClose
  */
 // match: _Rt2dPathDestroy @ 0x00253840
+// sp-match: _Rt2dPathDestroy @ 0x00168820
 RwBool
 Rt2dPathDestroy(Rt2dPath * path)
 {
@@ -1723,6 +1734,7 @@ Rt2dPathDestroy(Rt2dPath * path)
 
 /****************************************************************************/
 static void
+// sp-match: _rt2dPathDestruct @ 0x00168880
 rt2dPathDestruct(Rt2dPath *path)
 {
     RWFUNCTION(RWSTRING("rt2dPathDestruct"));
@@ -1733,7 +1745,11 @@ rt2dPathDestruct(Rt2dPath *path)
     {
         rwSListDestroy((RwSList *)(path->segments));
     }
+#ifdef CODFH_SP /* single player frees the segments without a NULL test (SP 0x168880; MP drops the function) */
+    else
+#else
     else if(NULL != path->segments)
+#endif
     {
         RwFree(path->segments);
     }
@@ -1783,6 +1799,7 @@ rt2dPathDestruct(Rt2dPath *path)
  * \see Rt2dPathUnlock
  */
 // match: _Rt2dPathCreate @ 0x00253A40
+// sp-match: _Rt2dPathCreate @ 0x00168CA0
 Rt2dPath           *
 Rt2dPathCreate(void)
 {
@@ -1832,6 +1849,7 @@ Rt2dPathCreate(void)
  * \see Rt2dPathOval
  */
 // match: _Rt2dPathLock @ 0x002538A0
+// sp-match: _Rt2dPathLock @ 0x001688D0
 Rt2dPath *
 Rt2dPathLock(Rt2dPath *path)
 {
@@ -1912,6 +1930,7 @@ Rt2dPathLock(Rt2dPath *path)
  */
 
 // match: _Rt2dPathUnlock @ 0x00253970
+// sp-match: _Rt2dPathUnlock @ 0x001689A0
 Rt2dPath *
 Rt2dPathUnlock(Rt2dPath *path)
 {
@@ -1941,6 +1960,7 @@ Rt2dPathUnlock(Rt2dPath *path)
 /****************************************************************************/
 
 // match: __rt2dPathClose @ 0x002539B0
+// sp-match: __rt2dPathClose @ 0x001689E0
 void
 _rt2dPathClose(void)
 {
@@ -1973,6 +1993,7 @@ static RwFreeList _rt2dPathFreeList;
  *
  */
 // match: _Rt2dPathSetFreeListCreateParams @ 0x002539E0
+// sp-match: _Rt2dPathSetFreeListCreateParams @ 0x00168A10
 void
 Rt2dPathSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc )
 {
@@ -1992,6 +2013,7 @@ Rt2dPathSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc 
 /****************************************************************************/
 
 // match: __rt2dPathOpen @ 0x00253A90
+// sp-match: __rt2dPathOpen @ 0x00168CF0
 RwBool
 _rt2dPathOpen(void)
 {
@@ -2181,6 +2203,7 @@ Rt2dPathStreamWrite(Rt2dPath *path, RwStream *stream)
 }
 
 static Rt2dPath *
+// sp-match: _rt2dPathStreamRead_V0x01 @ 0x00168A30
 rt2dPathStreamRead_V0x01(Rt2dPath *path, _rt2streamPath *sPath, RwStream *stream)
 {
     Rt2dPath           *wrkPath;
@@ -2260,6 +2283,7 @@ rt2dPathStreamRead_V0x01(Rt2dPath *path, _rt2streamPath *sPath, RwStream *stream
 }
 
 Rt2dPath *
+// sp-match: __rt2dPathStreamReadTo @ 0x00168AF0
 _rt2dPathStreamReadTo(Rt2dPath *path, RwStream *stream)
 {
     _rt2streamPath      sPath;
@@ -2329,6 +2353,7 @@ _rt2dPathStreamReadTo(Rt2dPath *path, RwStream *stream)
  * \see RwStreamClose
  */
 Rt2dPath *
+// sp-match: _Rt2dPathStreamRead @ 0x00168D70
 Rt2dPathStreamRead(RwStream *stream)
 {
     Rt2dPath           *path = Rt2dPathCreate();
@@ -2479,6 +2504,7 @@ Rt2dPathMorph(Rt2dPath *result, Rt2dPath *source, Rt2dPath *destination, RwReal 
 #define p2 nodeListb->pos
 
 static RwBool
+// sp-match: __RwV2dIsInPathAlgo1 @ 0x00168B40
 _RwV2dIsInPathAlgo1(RwV2d *point, Rt2dPath *path)
 {
     rt2dPathNode *nodeList, *nodeListb;
@@ -2533,6 +2559,7 @@ _RwV2dIsInPathAlgo1(RwV2d *point, Rt2dPath *path)
  * \see Rt2dPathCreateMorphResultPath
  */
 RwBool
+// sp-match: _RwV2dIsInPath @ 0x00168C40
 RwV2dIsInPath(RwV2d *point, Rt2dPath *path)
 {
     RwBool result = FALSE;

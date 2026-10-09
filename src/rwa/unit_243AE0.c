@@ -64,6 +64,7 @@ extern RwUInt8 unk_3ED52C[];
 extern RwUInt8 unk_3ED54C[];
 extern RwUInt8 unk_3ED57C[];
 // Its data definitions (PLAN M5), in the image's address order.
+#if !defined(CODFH_SP) || CODFH_SP_PART == 1 // single player: its interface IDs open sp_unit_247430.c's .rdata (SP 0x2EE6C4)
 // 0x003ED670
 const RwaUUID unk_3ED670 = { 0x09D1A6D5, 0x3810, 0x4D0D, { 0xAC, 0xAC, 0x9B, 0x0A, 0x5A, 0x92, 0xA8, 0xA1 } };
 // 0x003ED680
@@ -101,10 +102,14 @@ const RwaUUID unk_3ED770 = { 0x57674FA8, 0x6D69, 0x4333, { 0xBA, 0x2B, 0xF5, 0xC
 // 0x003ED780
 const RwaUUID unk_3ED780 = { 0xFA669EFC, 0xEFD0, 0x459F, { 0x86, 0x6B, 0xEF, 0x8C, 0xAA, 0xCA, 0xD6, 0xD3 } };
 // 0x003ED790
+#ifndef CODFH_SP // MP only: the next object's UUID follows unk_3ED780 at SP 0x2EE7E4 (single player's copy is unit_243B40.c's, SP 0x2EE5C0)
 void *const unk_3ED790[1] =
 {
     0,
 };
+#endif
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 2 // single player: its tables between unit_247430's aRws1 and off_42FB54 (SP 0x32BDC8)
 // 0x0042F7D8
 void *unk_42F7D8[40] =
 {
@@ -150,7 +155,11 @@ void *unk_42F7D8[40] =
     (void *)0x1,
 };
 // 0x0042F878
+#ifdef CODFH_SP // no trailing word: the next object's data follows at SP 0x32BF1C (table at SP 0x32BE68)
+void *unk_42F878[45] =
+#else
 void *unk_42F878[46] =
+#endif
 {
     (void *)&unk_3ED690,
     0,
@@ -197,10 +206,14 @@ void *unk_42F878[46] =
     0,
     (void *)&unk_3ED52C,
     (void *)0x1,
+#ifndef CODFH_SP
     0,
+#endif
 };
+#endif
 // End of its data definitions.
 
+#if !defined(CODFH_SP) || CODFH_SP_PART == 3 // single player: its code after unit_247430's sub_249160 (SP 0x15D320)
 // match: _unk_3ED670 @ 0x003ED670
 
 
@@ -210,6 +223,7 @@ void *unk_42F878[46] =
 // match: _unk_42F878 @ 0x0042F878
 
 // match: _RwaListenerInterfaceRegister_0 @ 0x00243AE0
+// sp-match: _RwaListenerInterfaceRegister_0 @ 0x0015D320
 
 RwaObjInterfaceDef *
 RwaListenerInterfaceRegister_0(void)
@@ -226,11 +240,13 @@ RwaListenerInterfaceRegister_0(void)
 }
 
 // match: _sub_243B30 @ 0x00243B30
+// sp-match: _sub_243B30 @ 0x0015D370
 RwBool
 sub_243B30(void)
 {
     return sub_243EA0(&unk_507064);
 }
+#endif
 
 
 

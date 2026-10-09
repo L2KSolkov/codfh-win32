@@ -22,6 +22,7 @@ static RwUInt8 unk_507004[0x24];    /* wave definitions */
 static RwUInt32 dword_507028;
 // match: _sub_242910 @ 0x00242910
 // match: __real@40e38e39 @ 0x003ED66C
+// sp-match: _sub_242910 @ 0x00157370
 RwBool
 sub_242910(void)
 {
@@ -37,6 +38,7 @@ sub_242910(void)
     return FALSE;
 }
 // match: _sub_242950 @ 0x00242950
+// sp-match: _sub_242950 @ 0x001573B0
 const RwaUUID *
 sub_242950(const RwaUUID *uuid, RwBool (*callback)(RwaWave *wave, void *data), void *data)
 {
@@ -65,6 +67,7 @@ sub_242950(const RwaUUID *uuid, RwBool (*callback)(RwaWave *wave, void *data), v
     return uuid;
 }
 // match: _sub_2429D0 @ 0x002429D0
+// sp-match: _sub_2429D0 @ 0x00157430
 RwBool
 sub_2429D0(const RwaWaveFormat *format1, const RwaWaveFormat *format2)
 {
@@ -87,6 +90,7 @@ extern const RwaUUID unk_3ED5DC;
 extern const RwaUUID unk_3ED5BC;
 extern const RwaUUID unk_3ED5CC;
 // match: _sub_242A30 @ 0x00242A30
+// sp-match: _sub_242A30 @ 0x00157490
 RwUInt32
 sub_242A30(const RwaWaveFormat *format)
 {
@@ -127,6 +131,7 @@ sub_242A30(const RwaWaveFormat *format)
     return 0;
 }
 // match: _sub_242B30 @ 0x00242B30
+// sp-match: _sub_242B30 @ 0x00157590
 void
 sub_242B30(RwaWaveFormat *format)
 {
@@ -139,6 +144,7 @@ sub_242B30(RwaWaveFormat *format)
     format->extraSize = 0;
 }
 // match: _RwaWaveDefAssignID @ 0x00242B60
+// sp-match: _RwaWaveDefAssignID @ 0x001575C0
 RwaWaveDef *
 RwaWaveDefAssignID(RwaWaveDef *waveDef, const RwaUUID *uuid, const RwChar *name)
 {
@@ -150,6 +156,7 @@ RwaWaveDefAssignID(RwaWaveDef *waveDef, const RwaUUID *uuid, const RwChar *name)
     return sub_240BF0(&waveDef->uniqueID, name) ? waveDef : NULL;
 }
 // match: _sub_242B90 @ 0x00242B90
+// sp-match: _sub_242B90 @ 0x001575F0
 RwBool
 sub_242B90(RwaWaveDef *waveDef)
 {
@@ -185,6 +192,7 @@ sub_242B90(RwaWaveDef *waveDef)
     return TRUE;
 }
 // match: _sub_242C10 @ 0x00242C10
+// sp-match: _sub_242C10 @ 0x00157670
 RwBool
 sub_242C10(rwaObjDef *parent, rwaObjDef *objDef, rwaWaveDefFind *find)
 {
@@ -205,6 +213,7 @@ sub_242C10(rwaObjDef *parent, rwaObjDef *objDef, rwaWaveDefFind *find)
     return FALSE;
 }
 // match: _sub_242C60 @ 0x00242C60
+// sp-match: _sub_242C60 @ 0x001576C0
 void
 sub_242C60(const rwaWaveFormatDesc *desc, RwaWaveFormat *format, RwBool init)
 {
@@ -229,6 +238,7 @@ sub_242C60(const rwaWaveFormatDesc *desc, RwaWaveFormat *format, RwBool init)
     }
 }
 // match: _sub_242CC0 @ 0x00242CC0
+// sp-match: _sub_242CC0 @ 0x00157720
 RwBool
 sub_242CC0(const rwaWaveFormatDesc *desc, const RwaWaveFormat *format)
 {
@@ -245,6 +255,7 @@ sub_242CC0(const rwaWaveFormatDesc *desc, const RwaWaveFormat *format)
     return FALSE;
 }
 // match: _sub_242D20 @ 0x00242D20
+// sp-match: _sub_242D20 @ 0x00157780
 void
 sub_242D20(RwaWaveDef *waveDef, rwaWaveFormatDesc **formats, RwUInt32 noFormats)
 {
@@ -263,6 +274,7 @@ sub_242D20(RwaWaveDef *waveDef, rwaWaveFormatDesc **formats, RwUInt32 noFormats)
     waveDef->format = 0;
 }
 // match: _sub_242D60 @ 0x00242D60
+// sp-match: _sub_242D60 @ 0x001577C0
 RwUInt32
 sub_242D60(const RwaWaveFormat *format)
 {
@@ -281,6 +293,7 @@ sub_242D60(const RwaWaveFormat *format)
     return size;
 }
 // match: _sub_242D80 @ 0x00242D80
+// sp-match: _sub_242D80 @ 0x001577E0
 RwBool
 sub_242D80(RwaWaveDef *waveDef, const RwaWaveFormat *format)
 {
@@ -310,6 +323,7 @@ sub_242D80(RwaWaveDef *waveDef, const RwaWaveFormat *format)
 }
 extern const RwaUUID *unk_42F7A0[9];
 // match: _sub_242DE0 @ 0x00242DE0
+// sp-match: _sub_242DE0 @ 0x00157840
 const RwaUUID *
 sub_242DE0(const RwaUUID *uuid)
 {
@@ -326,6 +340,7 @@ sub_242DE0(const RwaUUID *uuid)
     return NULL;
 }
 // match: _sub_242E20 @ 0x00242E20
+// sp-match: _sub_242E20 @ 0x00157880
 const RwaUUID *
 sub_242E20(RwUInt32 index)
 {
@@ -335,6 +350,7 @@ extern const RwaUUID unk_3ED63C;
 extern const RwaUUID unk_3ED62C;
 extern const RwaUUID unk_3ED64C;
 // match: _sub_242E30 @ 0x00242E30
+// sp-match: _sub_242E30 @ 0x00157890
 RwUInt32
 sub_242E30(const RwaWaveFormat *format)
 {
@@ -388,6 +404,7 @@ sub_242E30(const RwaWaveFormat *format)
     return RwaUUIDCompare(format->dataType, &unk_3ED63C) ? 0x180 : 0;
 }
 // match: _sub_242FA0 @ 0x00242FA0
+// sp-match: _sub_242FA0 @ 0x00157A00
 void
 sub_242FA0(RwaWaveFormat *format)
 {
@@ -410,6 +427,7 @@ sub_242FA0(RwaWaveFormat *format)
     format->unk19 = 0;
 }
 // match: _sub_243060 @ 0x00243060
+// sp-match: _sub_243060 @ 0x00157AC0
 RwBool
 sub_243060(rwaObjDef *parent, rwaObjDef *objDef)
 {
@@ -427,6 +445,7 @@ sub_243060(rwaObjDef *parent, rwaObjDef *objDef)
 }
 extern rwaObjDef *dword_516C60;
 // match: _sub_243090 @ 0x00243090
+// sp-match: _sub_243090 @ 0x00157AF0
 RwaWaveDef *
 sub_243090(rwaObjDef *objDef, RwaWaveDef *waveDef)
 {
@@ -476,6 +495,7 @@ sub_243090(rwaObjDef *objDef, RwaWaveDef *waveDef)
     return waveDef;
 }
 // match: _sub_243130 @ 0x00243130
+// sp-match: _sub_243130 @ 0x00157B90
 RwaWaveDef *
 sub_243130(const RwaUUID *uuid)
 {
@@ -489,6 +509,7 @@ sub_243130(const RwaUUID *uuid)
     return find.found;
 }
 // match: _sub_243160 @ 0x00243160
+// sp-match: _sub_243160 @ 0x00157BC0
 RwaWaveFormat *
 sub_243160(RwaWaveFormat *format, RwUInt8 *buffer, RwBool write, RwBool swap)
 {
@@ -591,6 +612,7 @@ sub_243160(RwaWaveFormat *format, RwUInt8 *buffer, RwBool write, RwBool swap)
     }
 }
 // match: _sub_2433C0 @ 0x002433C0
+// sp-match: _sub_2433C0 @ 0x00157E20
 RwUInt32
 sub_2433C0(const RwaWaveFormat *format, RwUInt32 size)
 {
@@ -612,6 +634,7 @@ sub_2433C0(const RwaWaveFormat *format, RwUInt32 size)
     return samples / ((format->flags & 4) ? 1 : format->noChannels);
 }
 // match: __rwaWaveDefCloseModule @ 0x00243460
+// sp-match: __rwaWaveDefCloseModule @ 0x00157EC0
 void
 _rwaWaveDefCloseModule(void)
 {

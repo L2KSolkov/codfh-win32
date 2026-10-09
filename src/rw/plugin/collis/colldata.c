@@ -43,6 +43,7 @@ RwInt32 _rpCollisionWorldSectorDataOffset = 0;
 // match: _rcsid @ 0x00417518
 
 // match: _CollisionOpen @ 0x002C3340
+// sp-match: _CollisionOpen @ 0x001DE750
 static void        *
 CollisionOpen(void *instance,
               RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -60,6 +61,7 @@ CollisionOpen(void *instance,
 
 
 // match: _CollisionClose @ 0x002C3360
+// sp-match: _CollisionClose @ 0x001DE770
 static void        *
 CollisionClose(void *instance,
                RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -81,6 +83,7 @@ CollisionClose(void *instance,
  */
 
 // match: _CollisionDataDestructor @ 0x002C3370
+// sp-match: _CollisionDataDestructor @ 0x001DE780
 static void *
 CollisionDataDestructor(void *object,
                         RwInt32 offset,
@@ -103,6 +106,7 @@ CollisionDataDestructor(void *object,
 
 
 // match: _CollisionDataConstructor @ 0x002FC4B0
+// sp-match: _CollisionDataConstructor @ 0x00203690
 static void *
 CollisionDataConstructor(void *object,
                          RwInt32 offset,
@@ -121,6 +125,7 @@ CollisionDataConstructor(void *object,
 
 
 // match: _CollisionDataStreamGetSize @ 0x002C33A0
+// sp-match: _CollisionDataStreamGetSize @ 0x001DE7B0
 static              RwInt32
 CollisionDataStreamGetSize(const void *object,
                            RwInt32 offsetInObject,
@@ -150,6 +155,7 @@ CollisionDataStreamGetSize(const void *object,
 
 
 // match: _CollisionDataStreamWrite @ 0x002C33C0
+// sp-match: _CollisionDataStreamWrite @ 0x001DE7D0
 static RwStream    *
 CollisionDataStreamWrite(RwStream * stream,
                          RwInt32 __RWUNUSED__ binaryLength,
@@ -184,6 +190,7 @@ CollisionDataStreamWrite(RwStream * stream,
 
 
 // match: _CollisionDataStreamRead @ 0x002C3410
+// sp-match: _CollisionDataStreamRead @ 0x001DE820
 static RwStream    *
 CollisionDataStreamRead(RwStream *stream,
                         RwInt32 __RWUNUSED__ binaryLength,
@@ -272,6 +279,7 @@ CollisionDataStreamRead(RwStream *stream,
 }
 
 // match: _CollisionGeometryPluginAttach @ 0x002C3570
+// sp-match: _CollisionGeometryPluginAttach @ 0x001DE980
 static RwBool
 CollisionGeometryPluginAttach(void)
 {
@@ -307,6 +315,7 @@ CollisionGeometryPluginAttach(void)
 
 
 // match: _CollisionWorldSectorPluginAttach @ 0x002C35D0
+// sp-match: _CollisionWorldSectorPluginAttach @ 0x001DE9E0
 static RwBool
 CollisionWorldSectorPluginAttach(void)
 {
@@ -347,6 +356,7 @@ CollisionWorldSectorPluginAttach(void)
  */
 
 // match: _CollisionAtomicInit @ 0x002C3630
+// sp-match: _CollisionAtomicInit @ 0x001DEA40
 static void        *
 CollisionAtomicInit(void *object,
                     RwInt32 __RWUNUSED__ offset,
@@ -786,6 +796,7 @@ RpCollisionWorldQueryData(RpWorld *world)
  * \see \ref rpcollisoverview
  */
 // match: _RpCollisionPluginAttach @ 0x002C3650
+// sp-match: _RpCollisionPluginAttach @ 0x001DEA60
 RwBool
 RpCollisionPluginAttach(void)
 {

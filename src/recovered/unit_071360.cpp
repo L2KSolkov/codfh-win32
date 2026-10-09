@@ -82,6 +82,20 @@ type_16C2A0 dword_449950[3];
 // match: _$E17 @ 0x0030DDD0
 // match: _$E19 @ 0x00309B00
 // match: _$E20 @ 0x0030DDE0
+// sp-match: _$E1 @ 0x0021C4D0
+// sp-match: _$E4 @ 0x0021C4F0
+// sp-match: _$E7 @ 0x0021C510
+// sp-match: _$E10 @ 0x0021C530
+// sp-match: _$E13 @ 0x0021C550
+// sp-match: _$E16 @ 0x0021C570
+// sp-match: _$E19 @ 0x0021C590
+// sp-match: _$E2 @ 0x0021E1B0
+// sp-match: _$E5 @ 0x0021E1C0
+// sp-match: _$E8 @ 0x0021E1D0
+// sp-match: _$E11 @ 0x0021E1E0
+// sp-match: _$E14 @ 0x0021E1F0
+// sp-match: _$E17 @ 0x0021E200
+// sp-match: _$E20 @ 0x0021E210
 
 struct type_46120;
 
@@ -89,6 +103,7 @@ type_3D2DB8 *sub_71A90();
 type_46120 *sub_71B90();
 
 // match: sub_71360 @ 0x00071360
+// sp-match: sub_71360 @ 0x0005D330
 // Clears the registers and sets the counters and the pools' sizes.
 void sub_71360()
 {
@@ -106,6 +121,7 @@ void sub_71360()
 }
 
 // match: sub_713E0 @ 0x000713E0
+// sp-match: sub_713E0 @ 0x0005D370
 // Sets the pools up.
 void sub_713E0()
 {
@@ -121,6 +137,7 @@ void sub_713E0()
 }
 
 // match: sub_714F0 @ 0x000714F0
+// sp-match: sub_714F0 @ 0x0005E400
 // Restart: checks the pools and clears the registers.
 void sub_714F0()
 {
@@ -137,6 +154,7 @@ void sub_714F0()
 }
 
 // match: sub_71560 @ 0x00071560
+// sp-match: sub_71560 @ 0x0005E440
 // Shutdown: checks the pools and shuts them down.
 void sub_71560()
 {
@@ -153,6 +171,7 @@ void sub_71560()
 }
 
 // match: sub_715E0 @ 0x000715E0
+// sp-match: sub_715E0 @ 0x0005D480
 // Warns of pools with elements still out.
 void sub_715E0()
 {
@@ -161,38 +180,53 @@ void sub_715E0()
 
     if (dword_449A50.in_use()) {
         sub_19A750("CheckAllocations");
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
         sub_19A750("Alfa Object Pool is not empty at restart/shutdown!");
+#endif
     }
     if (dword_449A10.in_use()) {
         sub_19A750("CheckAllocations");
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
         sub_19A750("Alfa AI Object Pool is not empty at restart/shutdown!");
+#endif
     }
     if (dword_4499B0.in_use()) {
         sub_19A750("CheckAllocations");
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
         sub_19A750("Alfa Input List Pool is not empty at restart/shutdown!");
+#endif
     }
     if (dword_449A30.in_use()) {
         sub_19A750("CheckAllocations");
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
         sub_19A750("Alfa StateMachine Object Pool is not empty at restart/shutdown!");
+#endif
     }
     if (dword_4499F0.in_use()) {
         sub_19A750("CheckAllocations");
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
         sub_19A750("Alfa Task Object Pool is not empty at restart/shutdown!");
+#endif
     }
     if (dword_4499D0.in_use()) {
         sub_19A750("CheckAllocations");
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
         sub_19A750("Alfa Task Tree Pool is not empty at restart/shutdown!");
+#endif
     }
     for (var_4 = 0; var_4 < 3; var_4++) {
         local_8 = &dword_449950[var_4];
         if (local_8->in_use()) {
             sub_19A750("CheckAllocations");
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
             sub_19A750("Alfa Mem Pool %d is not empty at restart!");
+#endif
         }
     }
 }
 
 // match: ?sub_71770@@YAPAUtype_3D2C88@@H@Z @ 0x00071770
+// sp-match: ?sub_71770@@YAPAUtype_3D2C88@@H@Z @ 0x0005E4C0
 type_3D2C88 *sub_71770(RwInt32 arg_0)
 {
     switch (arg_0) {
@@ -207,8 +241,22 @@ type_3D2C88 *sub_71770(RwInt32 arg_0)
 }
 
 // match: ?sub_717B0@@YAXPAUtype_3D2C88@@@Z @ 0x000717B0
+// sp-match: ?sub_717B0@@YAXPAUtype_3D2C88@@@Z @ 0x0005D550
 void sub_717B0(type_3D2C88 *arg_0)
 {
+#ifdef CODFH_SP // shape: SP 0x5D550 passes the handle as its struct (operator RwUInt32), not through a word local
+    switch (arg_0->vf_014()) {
+    case 1:
+        sub_67520(arg_0->get_unk_04_h());
+        break;
+    case 2:
+        sub_67520(arg_0->get_unk_04_h());
+        break;
+    case 3:
+        sub_67520(arg_0->get_unk_04_h());
+        break;
+    }
+#else
     switch (arg_0->vf_014()) {
     case 1:
         sub_67520(arg_0->get_unk_04());
@@ -220,9 +268,11 @@ void sub_717B0(type_3D2C88 *arg_0)
         sub_67520(arg_0->get_unk_04());
         break;
     }
+#endif
 }
 
 // match: ?sub_71820@@YAPAUtype_3D2E20_118@@XZ @ 0x00071820
+// sp-match: ?sub_71820@@YAPAUtype_3D2E20_118@@XZ @ 0x0005D580
 type_3D2E20_118 *sub_71820()
 {
     type_3D2E20_118 *var_4;
@@ -234,6 +284,7 @@ type_3D2E20_118 *sub_71820()
 }
 
 // match: ?sub_71850@@YAXPAUtype_3D2E20_118@@@Z @ 0x00071850
+// sp-match: ?sub_71850@@YAXPAUtype_3D2E20_118@@@Z @ 0x0005D5A0
 void sub_71850(type_3D2E20_118 *arg_0)
 {
     dword_4499B0.sub_16C710(arg_0);
@@ -242,6 +293,7 @@ void sub_71850(type_3D2E20_118 *arg_0)
 // match: ?sub_71870@@YAIXZ @ 0x00071870
 // match: __ehhandler$?sub_71870@@YAIXZ-0x11 @ 0x002FF8A0
 // match: __ehhandler$?sub_71870@@YAIXZ @ 0x002FF8B1
+// sp-match: ?sub_71870@@YAIXZ @ 0x0005E4E0
 // A new AI object; returns its handle.
 RwUInt32 sub_71870()
 {
@@ -257,6 +309,7 @@ RwUInt32 sub_71870()
 }
 
 // match: ?sub_71940@@YAXPAUtype_3D2E7C@@@Z @ 0x00071940
+// sp-match: ?sub_71940@@YAXPAUtype_3D2E7C@@@Z @ 0x0005EAA0
 void sub_71940(type_3D2E7C *arg_0)
 {
     arg_0->unk_04 = 0;
@@ -265,12 +318,18 @@ void sub_71940(type_3D2E7C *arg_0)
 }
 
 // match: ?sub_71970@@YAXPAUtype_3D2C88@@@Z @ 0x00071970
+// sp-match: ?sub_71970@@YAXPAUtype_3D2C88@@@Z @ 0x0005D5B0
 void sub_71970(type_3D2C88 *arg_0)
 {
+#ifdef CODFH_SP // shape: SP 0x5D5B0 passes the handle as its struct (operator RwUInt32), not through a word local
+    sub_67520(arg_0->get_unk_04_h());
+#else
     sub_67520(arg_0->get_unk_04());
+#endif
 }
 
 // match: ?sub_71990@@YAPAUtype_3D2CD0@@XZ @ 0x00071990
+// sp-match: ?sub_71990@@YAPAUtype_3D2CD0@@XZ @ 0x0005D5C0
 type_3D2CD0 *sub_71990()
 {
     type_3D2CD0 *var_10;
@@ -285,6 +344,7 @@ type_3D2CD0 *sub_71990()
 }
 
 // match: ?sub_71A60@@YAXPAUtype_3D2CD0@@@Z @ 0x00071A60
+// sp-match: ?sub_71A60@@YAXPAUtype_3D2CD0@@@Z @ 0x0005D620
 void sub_71A60(type_3D2CD0 *arg_0)
 {
     arg_0->unk_04 = 0;
@@ -293,6 +353,7 @@ void sub_71A60(type_3D2CD0 *arg_0)
 }
 
 // match: ?sub_71A90@@YAPAUtype_3D2DB8@@XZ @ 0x00071A90
+// sp-match: ?sub_71A90@@YAPAUtype_3D2DB8@@XZ @ 0x0005D640
 type_3D2DB8 *sub_71A90()
 {
     type_3D2DB8 *var_10;
@@ -307,6 +368,7 @@ type_3D2DB8 *sub_71A90()
 }
 
 // match: ?sub_71B60@@YAXPAUtype_3D2DB8@@@Z @ 0x00071B60
+// sp-match: ?sub_71B60@@YAXPAUtype_3D2DB8@@@Z @ 0x0005D6A0
 void sub_71B60(type_3D2DB8 *arg_0)
 {
     arg_0->unk_04 = 0;
@@ -315,6 +377,7 @@ void sub_71B60(type_3D2DB8 *arg_0)
 }
 
 // match: ?sub_71B90@@YAPAUtype_46120@@XZ @ 0x00071B90
+// sp-match: ?sub_71B90@@YAPAUtype_46120@@XZ @ 0x0005D6C0
 type_46120 *sub_71B90()
 {
     type_3D2E20 *var_10;
@@ -329,6 +392,7 @@ type_46120 *sub_71B90()
 }
 
 // match: ?sub_71C60@@YAXPAUtype_3D2E20@@@Z @ 0x00071C60
+// sp-match: ?sub_71C60@@YAXPAUtype_3D2E20@@@Z @ 0x0005E540
 void sub_71C60(type_3D2E20 *arg_0)
 {
     if (arg_0->unk_114 != 0)
@@ -339,6 +403,7 @@ void sub_71C60(type_3D2E20 *arg_0)
 }
 
 // match: ?sub_71CA0@@YAPAUtype_3D2E20_114@@XZ @ 0x00071CA0
+// sp-match: ?sub_71CA0@@YAPAUtype_3D2E20_114@@XZ @ 0x0005D720
 type_3D2E20_114 *sub_71CA0()
 {
     type_3D2E20_114 *var_4;
@@ -348,12 +413,14 @@ type_3D2E20_114 *sub_71CA0()
 }
 
 // match: ?sub_71CC0@@YAXPAUtype_3D2E20_114@@@Z @ 0x00071CC0
+// sp-match: ?sub_71CC0@@YAXPAUtype_3D2E20_114@@@Z @ 0x0005D730
 void sub_71CC0(type_3D2E20_114 *arg_0)
 {
     dword_4499D0.sub_16C710(arg_0);
 }
 
 // match: ?sub_71CE0@@YAPAHH@Z @ 0x00071CE0
+// sp-match: ?sub_71CE0@@YAPAHH@Z @ 0x0005D740
 // Scripts' locals of arg_0 bytes from the first memory pool with room.
 RwInt32 *sub_71CE0(RwInt32 arg_0)
 {
@@ -367,6 +434,7 @@ RwInt32 *sub_71CE0(RwInt32 arg_0)
 }
 
 // match: ?sub_71D50@@YAXPAH@Z @ 0x00071D50
+// sp-match: ?sub_71D50@@YAXPAH@Z @ 0x0005D790
 void sub_71D50(RwInt32 *arg_0)
 {
     RwInt32 var_4;
@@ -378,6 +446,7 @@ void sub_71D50(RwInt32 *arg_0)
 }
 
 // match: ?sub_71DB0@@YAXHHPAX@Z @ 0x00071DB0
+// sp-match: ?sub_71DB0@@YAXHHPAX@Z @ 0x0005D7D0
 void sub_71DB0(RwInt32 arg_0, RwInt32 arg_4, void *arg_8)
 {
     switch (arg_4) {
@@ -398,6 +467,7 @@ void sub_71DB0(RwInt32 arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: ?sub_71E40@@YAXHHPAX@Z @ 0x00071E40
+// sp-match: ?sub_71E40@@YAXHHPAX@Z @ 0x0005D830
 void sub_71E40(RwInt32 arg_0, RwInt32 arg_4, void *arg_8)
 {
     switch (arg_4) {

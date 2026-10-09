@@ -104,6 +104,7 @@ U32 unk_52F748 = 0;
 // match: _unk_52F748 @ 0x0052F748
 
 // match: _quanttos16s @ 0x00344AB0
+// sp-match: _quanttos16s @ 0x00254AB0
 
 static void quanttos16s(U32 count, S16 *out, F32 *src, F32 scale)
 {
@@ -118,6 +119,7 @@ static void quanttos16s(U32 count, S16 *out, F32 *src, F32 scale)
 }
 
 // match: _quanttos16chans2 @ 0x00344B00
+// sp-match: _quanttos16chans2 @ 0x00254B00
 static void quanttos16chans2(S16 *out, F32 *src, U32 count, F32 scale)
 {
   U32 i;
@@ -134,6 +136,7 @@ static void quanttos16chans2(S16 *out, F32 *src, U32 count, F32 scale)
 }
 
 // match: _read_rle_samples @ 0x00344B80
+// sp-match: _read_rle_samples @ 0x00254B80
 static void read_rle_samples(F32 *coeffs, U32 count, VARBITS *vb, F32 *quants, U32 *bandtops)
 {
   U32 *cur = vb->cur;
@@ -224,6 +227,7 @@ static F32 binkaudioagent_fxptof(U32 v)
 }
 
 // match: _Unquant @ 0x00344E70
+// sp-match: _Unquant @ 0x00254E70
 static U32 Unquant(U32 size, F32 scale, U32 chans, U32 flags, U32 *ip, F32 *work, S16 *out, void *in,
                    U32 bands, U32 *bandtops)
 {
@@ -276,6 +280,7 @@ static U32 Unquant(U32 size, F32 scale, U32 chans, U32 flags, U32 *ip, F32 *work
 }
 
 // match: _BinkAudioDecompressOpen@12 @ 0x00345230
+// sp-match: _BinkAudioDecompressOpen@12 @ 0x00255230
 RADEXPFUNC U32 RADEXPLINK BinkAudioDecompressOpen(U32 freq, U32 chans, U32 flags)
 {
   U32 size;
@@ -362,6 +367,7 @@ static void copyoverlap(void *dst, void *src, U32 bytes, U32 overlap)
 }
 
 // match: _BinkAudioDecompress@20 @ 0x00345460
+// sp-match: _BinkAudioDecompress@20 @ 0x00255460
 RADEXPFUNC void RADEXPLINK BinkAudioDecompress(U32 handle, void PTR4 *PTR4 *out, U32 PTR4 *outlen,
   void PTR4 *in, void PTR4 *PTR4 *inend)
 {
@@ -391,6 +397,7 @@ RADEXPFUNC void RADEXPLINK BinkAudioDecompress(U32 handle, void PTR4 *PTR4 *out,
 }
 
 // match: _BinkAudioDecompressClose@4 @ 0x00345530
+// sp-match: _BinkAudioDecompressClose@4 @ 0x00255530
 RADEXPFUNC void RADEXPLINK BinkAudioDecompressClose(U32 handle)
 {
   radfree((void *)handle);

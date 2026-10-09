@@ -1,6 +1,9 @@
 // The HUD (type_DC400). The original file name is not in the
 // image, so it is named for its start address.
 
+#ifdef CODFH_SP // the Live manager's message and render (sp_sub_A7930, SP 0xA7930); first, for d3d8.h
+#include "game/xboxlive.h"
+#endif
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -29,6 +32,9 @@
 #include "rw/bastream.h"
 #include "rw/babintex.h"
 #include "game/parsedfile.h"
+#ifdef CODFH_SP // the pause message box (sub_DD1C0, SP 0xACDB0)
+#include "game/waitscreen.h"
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D8058
@@ -36,6 +42,7 @@ extern const RwReal flt_3D8058 = 16.666666f;
 // 0x003D805C
 extern const RwV3d unk_3D805C = { 0.0f, 0.0f, 1.0f };
 // 0x003D8068
+#ifndef CODFH_SP // MP only: two scales and the objective keys (SP 0x2E3A60 follows unk_3D805C with sub_E0E90's literals)
 extern const RwReal flt_3D8068 = 0.01f;
 // 0x003D806C
 extern const RwReal flt_3D806C = 0.01f;
@@ -50,6 +57,7 @@ extern const RwChar unk_3D8070[7][0x20] =
     "HUD_OBJECTIVECOMPLETED",
     "HUD_OBJECTIVEDESTROYED",
 };
+#endif
 // 0x004293C0
 RwReal flt_4293C0 = 50.0f;
 // 0x004293C4
@@ -77,19 +85,26 @@ RwReal flt_4293F0 = 2.0f;
 // 0x004293F4
 RwReal flt_4293F4 = -1.0f;
 // 0x004293F8
+#ifndef CODFH_SP // MP only: the network game's HUD scales (SP 0x3216A0 holds dword_429400 after flt_4293F4)
 RwReal flt_4293F8 = 0.38f;
 // 0x004293FC
 RwReal flt_4293FC = 0.095f;
+#endif
 // 0x00429400
 RwInt32 dword_429400 = 36;
 // 0x00429404
+#ifndef CODFH_SP // MP only (SP 0x3216A4 holds unk_4B8B48 after dword_429400)
 RwInt32 dword_429404 = 206;
+#endif
 // 0x004B8970
 RwReal dword_4B8970;
 // 0x004B8974
 RwUInt8 byte_4B8974;
 // 0x004B8975
 bool byte_4B8975;
+#ifdef CODFH_SP // single player's pause message box retries (SP 0x3B4804, between byte_4B8975 and dword_4B897C; SP 0xACDB0)
+RwInt32 dword_sp_4B8978;
+#endif
 // 0x004B897C
 RwInt32 dword_4B897C;
 // 0x004B8980
@@ -115,6 +130,7 @@ RwRGBA unk_4B8F38;
 
 // Globals with constructors defined here (their initializers and exit
 // functions at the end of .text).
+#ifndef CODFH_SP // MP only: the network game's HUD texts (default.xbe has no HUD_* strings; only MP-only code reads them)
 type_4B89B0 unk_4B89B0[7];
 type_4B89B0 unk_4B8B20;
 type_4B89B0 unk_4B8B04;
@@ -122,6 +138,7 @@ std::string unk_4B8AB0[3];
 type_4B89B0 unk_4B8990;
 type_4B89B0 unk_4B8A74;
 type_4B89B0 unk_4B8A90;
+#endif
 // Two keys no code reads.
 type_3DF8D8_04 unk_4B8B48(0xF2AA7ACD, 0x7D1EA238);
 type_3DF8D8_04 unk_4B8B40(0x1CA63F25, 0x204B2F73);
@@ -354,6 +371,7 @@ type_3DF8D8_04 unk_4B8B40(0x1CA63F25, 0x204B2F73);
 // match: ??0type_DC400@@QAE@XZ @ 0x000DC400
 // match: __ehhandler$??0type_DC400@@QAE@XZ-0x52 @ 0x00300D10
 // match: __ehhandler$??0type_DC400@@QAE@XZ @ 0x00300D62
+// sp-match: ??0type_DC400@@QAE@XZ @ 0x000A99B0
 
 type_DC400::type_DC400()
 {
@@ -362,10 +380,15 @@ type_DC400::type_DC400()
 
 // match: ??0type_DC500@@QAE@XZ @ 0x000DC500
 // match: ??0type_DC530@@QAE@XZ @ 0x000DC530
+// sp-match: ??0type_DC530@@QAE@XZ @ 0x000A76C0
+// sp-match: ??0type_DC500@@QAE@XZ @ 0x000A76B0
+// The CRT's inline ceilf (math.h), kept out of line in single player for sub_E5480 (SP 0xA875B calls it):
+// sp-match: _ceilf @ 0x000A7690
 
 // match: ??1type_DC400@@QAE@XZ @ 0x000DC560
 // match: __ehhandler$??1type_DC400@@QAE@XZ-0x42 @ 0x00300D70
 // match: __ehhandler$??1type_DC400@@QAE@XZ @ 0x00300DB2
+// sp-match: ??1type_DC400@@QAE@XZ @ 0x000A76D0
 type_DC400::~type_DC400()
 {
 }
@@ -373,6 +396,7 @@ type_DC400::~type_DC400()
 // match: ?sub_DC5F0@type_DC400@@QAEHPAURwCamera@@@Z @ 0x000DC5F0
 // match: __ehhandler$?sub_DC5F0@type_DC400@@QAEHPAURwCamera@@@Z-0xB @ 0x00300DC0
 // match: __ehhandler$?sub_DC5F0@type_DC400@@QAEHPAURwCamera@@@Z @ 0x00300DCB
+// sp-match: ?sub_DC5F0@type_DC400@@QAEHPAURwCamera@@@Z @ 0x000AC7D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_DC400::sub_DC5F0(RwCamera *arg_0)
 {
@@ -396,7 +420,7 @@ RwInt32 type_DC400::sub_DC5F0(RwCamera *arg_0)
     unk_08 = 0;
     unk_1A024 = 0;
     unk_1A020 = dword_4F28F0->get_unk_180();
-    for (ebp_14 = 0; ebp_14 < 151; ebp_14++)
+    for (ebp_14 = 0; ebp_14 < type_DC400_items; ebp_14++)
     {
         unk_E0[ebp_14].unk_00[0] = 0;
         unk_E0[ebp_14].unk_20 = 0;
@@ -411,7 +435,11 @@ RwInt32 type_DC400::sub_DC5F0(RwCamera *arg_0)
         unk_E0[ebp_14].unk_50 = 1;
         unk_E0[ebp_14].unk_58 = 0;
         unk_E0[ebp_14].unk_60[0] = 0;
+#ifdef CODFH_SP // shape: single player's ten label items are 65 to 74 (SP 0xAC7D0)
+        if (ebp_14 >= 65 && ebp_14 <= 74)
+#else
         if (ebp_14 >= 106 && ebp_14 < 122)
+#endif
         {
             unk_E0[ebp_14].unk_24 = 1.0f;
         }
@@ -440,18 +468,22 @@ RwInt32 type_DC400::sub_DC5F0(RwCamera *arg_0)
             unk_E0[ebp_14].unk_1E8.z = 0.0f;
         unk_E0[ebp_14].unk_1F4.x = unk_E0[ebp_14].unk_1F4.y = unk_E0[ebp_14].unk_1F4.z = 0.0f;
         unk_E0[ebp_14].unk_200 = 0;
-        for (var_20 = 0; var_20 < 40; var_20++)
+        for (var_20 = 0; var_20 < type_DC400_children; var_20++)
         {
             unk_E0[ebp_14].unk_204[var_20] = 0;
         }
         unk_E0[ebp_14].unk_2A4 = 0;
         RwMatrixSetIdentity(&unk_E0[ebp_14].unk_1A0);
         unk_E0[ebp_14].unk_2AC = 0;
+#ifndef CODFH_SP // MP only: single player's items have no unk_2B0..unk_2BC (SP 0xAC7D0 clears unk_2AC last)
         unk_E0[ebp_14].unk_2B0 = 0;
         unk_E0[ebp_14].unk_2B4 = 0;
         unk_E0[ebp_14].unk_2B8 = 0;
         unk_E0[ebp_14].unk_2BC = 1;
+#endif
+#ifndef CODFH_SP // MP only: single player's HUD has no +0x5C..+0xB7 block (include/types/type_DC400.h)
         unk_94 = -2;
+#endif
     }
     unk_04 = ((type_4B86F8 *)&dword_4B86F8)->unk_00_4;
     unk_1A028 = 0;
@@ -460,7 +492,9 @@ RwInt32 type_DC400::sub_DC5F0(RwCamera *arg_0)
     unk_1A044 = 0;
     unk_1A048 = 0;
     unk_1A04C[0] = 0;
+#ifndef CODFH_SP // single player has one objective pointer (SP 0xAC7D0)
     unk_1A04C[1] = 0;
+#endif
     memset(unk_1A054, 0, sizeof(unk_1A054));
     unk_1A0CC = 0;
     unk_1A0D0 = 0;
@@ -485,10 +519,14 @@ RwInt32 type_DC400::sub_DC5F0(RwCamera *arg_0)
     unk_1A14C.x = unk_1A14C.y = unk_1A154.x = unk_1A154.y = 1.0f;
     unk_10 = 1;
     unk_1A15C = 0;
-    for (var_28 = 0; var_28 < 16; var_28++)
+    for (var_28 = 0; var_28 < type_DC400_labels; var_28++)
     {
         unk_1A1A8[var_28].unk_24 = 0;
+#ifdef CODFH_SP // shape: single player's label items are 65 to 74 (SP 0xAC7D0)
+        unk_1A1A8[var_28].unk_2C = var_28 + 65;
+#else
         unk_1A1A8[var_28].unk_2C = var_28 + 106;
+#endif
         unk_E0[unk_1A1A8[var_28].unk_2C].unk_190.alpha = 0;
         unk_E0[unk_1A1A8[var_28].unk_2C].unk_190.blue = 0;
         unk_E0[unk_1A1A8[var_28].unk_2C].unk_190.green = 0;
@@ -508,6 +546,7 @@ RwInt32 type_DC400::sub_DC5F0(RwCamera *arg_0)
     unk_1A4B8 = 0;
     unk_1A4BC = 0;
     memset(unk_1A4C0, 0, sizeof(unk_1A4C0));
+#ifndef CODFH_SP // MP only: single player's HUD has no +0x5C..+0xB7 block (include/types/type_DC400.h); no in-game screens
     unk_84 = -1.0f;
     unk_5C = 1.0f;
     unk_7C = 0;
@@ -525,6 +564,7 @@ RwInt32 type_DC400::sub_DC5F0(RwCamera *arg_0)
     unk_94 = -666;
     unk_90 = 0;
     unk_1A4B0 = new type_1FF250;
+#endif
     return 1;
 }
 
@@ -532,6 +572,7 @@ RwInt32 type_DC400::sub_DC5F0(RwCamera *arg_0)
 // items' layout (sub_E6610). arg_0 is unused; a check compiled out of this
 // build (an empty if on unk_00) shifts the registers that follow it.
 // match: ?sub_DD180@type_DC400@@QAEXM@Z @ 0x000DD180
+// sp-match: ?sub_DD180@type_DC400@@QAEXM@Z @ 0x000AA480
 void type_DC400::sub_DD180(RwReal arg_0)
 {
     if (byte_4B8975)
@@ -559,6 +600,7 @@ void type_DC400::sub_DD180(RwReal arg_0)
 // match: ?sub_DD1C0@type_DC400@@QAEXM@Z @ 0x000DD1C0
 // match: __ehhandler$?sub_DD1C0@type_DC400@@QAEXM@Z-0x8 @ 0x00300DE0
 // match: __ehhandler$?sub_DD1C0@type_DC400@@QAEXM@Z @ 0x00300DE8
+// sp-match: ?sub_DD1C0@type_DC400@@QAEXM@Z @ 0x000ACDB0
 void type_DC400::sub_DD1C0(RwReal arg_0)
 {
     type_10F710 *v_1C;
@@ -577,6 +619,7 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
     {
         sub_DFE00(v_1C->vf_17C());
         sub_E0340(v_1C->vf_0BC());
+#ifndef CODFH_SP // MP only: the network game's items (SP 0xACDB0 has none)
         if (type_4F8054::get() && unk_4F7EB8.sub_1AF670())
         {
             v_24 = unk_4F7EB8.sub_1AEC70();
@@ -610,6 +653,7 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
             {
                 sub_E09E0(0x42, 0);
             }
+#ifndef CODFH_SP // MP only: single player's HUD has no +0x5C..+0xB7 block (include/types/type_DC400.h) (the CTF icons)
             if (v_28 == 2)
             {
                 unk_E0[73].unk_110 = unk_98[unk_4F7EB8.sub_1AF2F0(2)];
@@ -624,6 +668,7 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
                 unk_E0[78].unk_110 = unk_98[unk_4F7EB8.sub_1AF2F0(2)];
                 unk_E0[80].unk_110 = unk_A8[unk_4F7EB8.sub_1AF2F0(2)];
             }
+#endif
             dword_4B9190->sub_E7050(0x50, (RwUInt32)Width * flt_4293F8, (RwUInt32)Height * flt_4293FC);
             sub_E09E0(0x51, 0);
             sub_E09E0(0x4B, 0);
@@ -707,6 +752,8 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
                 break;
             }
         }
+#endif
+#ifndef CODFH_SP // MP only: single player's HUD has no +0x5C..+0xB7 block (include/types/type_DC400.h) (unk_90: the scoreboard and console modes)
         if (unk_90 == 1)
         {
             if (type_4F8054::get() && unk_4F7EB8.sub_1AF670())
@@ -787,8 +834,11 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
                 flt_4B8B3C = 0;
             }
         }
+#endif
+#ifndef CODFH_SP // MP only: single player hides no inventory and lays out no items here (SP 0xACDB0)
         sub_E09E0(0x14, 0);
         sub_E6610(&unk_E0[0]);
+#endif
         if (v_1C->unk_1A0C)
         {
             sub_E6270(0xB, unk_1A154.x, unk_1A154.y);
@@ -801,13 +851,17 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
             sub_E6270(0xC, unk_1A14C.x, unk_1A14C.y);
             sub_E6270(0xD, unk_1A14C.x, unk_1A14C.y);
         }
+#ifndef CODFH_SP
         if (unk_90 != 1 && v_1C->unk_1A48[v_1C->unk_1AE4])
+#else
+        if (v_1C->unk_1A48[v_1C->unk_1AE4])
+#endif
         {
             sub_E08B0(v_1C->unk_1A48[v_1C->unk_1AE4]->sub_11D690());
         }
         sub_DFFC0(v_1C->unk_2104);
     }
-    for (v_114 = 0; v_114 < 16; v_114++)
+    for (v_114 = 0; v_114 < type_DC400_labels; v_114++)
     {
         v_118 = unk_1A1A8[v_114].unk_28.sub_D4910();
         strcpy(unk_1A1A8[v_114].unk_00, "");
@@ -823,6 +877,37 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
                 RwRGBAReal v_128;
                 type_10F710 *v_134;
 
+#ifdef CODFH_SP // single player colours a colour-coded name by its soldier's health (SP 0xACDB0), not green/red by side
+                if (((type_3DAFC8 *)v_118)->unk_64C)
+                {
+                    RwReal v_sp_health;
+
+                    v_sp_health = v_118->vf_17C();
+                    if (v_sp_health < 0.0f)
+                    {
+                        v_sp_health = 0.0f;
+                    }
+                    if (v_sp_health > 0.5f)
+                    {
+                        v_sp_health = (v_sp_health - 0.5f) * 2.0f;
+                        v_128.red = 1.0f - v_sp_health;
+                        v_128.blue = v_sp_health * 0.25f;
+                        v_128.green = 1.0f;
+                    }
+                    else
+                    {
+                        v_128.red = 1.0f;
+                        v_128.green = v_sp_health * 2.0f;
+                        v_128.blue = 0;
+                    }
+                }
+                else
+                {
+                    v_128.red = 0;
+                    v_128.blue = 0.25f;
+                    v_128.green = 1.0f;
+                }
+#else
                 v_128.red = 0;
                 v_128.green = 0.75f;
                 v_128.blue = 0;
@@ -832,6 +917,7 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
                     v_128.green = 0;
                     v_128.blue = 0;
                 }
+#endif
                 v_128.alpha = 1.0f;
                 if (unk_1A1A8[v_114].unk_20 > flt_4B9160)
                 {
@@ -868,7 +954,7 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
             }
         }
     }
-    for (v_148 = 0; v_148 < 151; v_148++)
+    for (v_148 = 0; v_148 < type_DC400_items; v_148++)
     {
         if (unk_E0[v_148].unk_20)
         {
@@ -932,17 +1018,30 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
                     }
                 }
             }
+#ifndef CODFH_SP // MP only: single player leaves the items' alphas to their fades (SP 0xACDB0)
             sub_E3B90(v_148, flt_4B8F18);
+#endif
+#ifndef CODFH_SP // MP only: single player's HUD has no +0x5C..+0xB7 block (include/types/type_DC400.h)
             sub_E3B90(0x49, unk_5C);
             sub_E3B90(0x4E, unk_5C);
+#endif
         }
     }
+#ifdef CODFH_SP // single player turns the compass only while unpaused (SP 0xACDB0); its crosshair is item 49
+    if (unk_E0[29].unk_20 && !unk_04)
+    {
+        sub_E4030(arg_0);
+    }
+    if (unk_E0[49].unk_20)
+    {
+#else
     if (unk_E0[29].unk_20)
     {
         sub_E4030(arg_0);
     }
     if (unk_E0[90].unk_20)
     {
+#endif
         sub_DEF40(arg_0);
     }
     if (unk_08)
@@ -964,8 +1063,13 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
             switch (unk_1A030)
             {
             case 1:
+#ifdef CODFH_SP // shape: single player's t34 body and turret are items 59 and 60 (SP 0xACDB0)
+                v_160 = 59;
+                v_164 = 60;
+#else
                 v_160 = 100;
                 v_164 = 101;
+#endif
                 break;
             case 2:
                 break;
@@ -990,8 +1094,13 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
                 sub_EC2D0(v_174, (RwInt32)&v_1C0, 0x41464952, 0, 1); // not an address: 'RIFA'
                 v_1C4 = v_1C0.at.x;
                 v_1C8 = v_1C0.right.x;
+#ifdef CODFH_SP // shape: the heading normalised first (SP 0xACDB0)
+                v_170 = sub_13F9E0(v_170);
+                v_1D0 = ((RwReal)atan2(v_1C8, v_1C4)) * 57.295776f;
+#else
                 v_1D0 = ((RwReal)atan2(v_1C8, v_1C4)) * 57.295776f;
                 v_170 = sub_13F9E0(v_170);
+#endif
                 unk_1A038 = sub_13F9E0(v_1D0 - v_170);
                 v_210 = v_15C->unk_7B0.unk_170;
                 v_1D0 = ((RwReal)atan2(v_210.right.x, v_210.at.x)) * 57.295776f;
@@ -1065,7 +1174,11 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
     }
     if (!unk_04 && unk_1A0A8)
     {
+#ifdef CODFH_SP // shape: the time left over the length first (SP 0xACDB0)
+        unk_1A0C4 = ((unk_1A0C0_f - unk_1A0AC) / unk_1A0C0_f) * unk_1A0BC;
+#else
         unk_1A0C4 = (unk_1A0C0_f - unk_1A0AC) / unk_1A0C0_f * unk_1A0BC;
+#endif
         unk_1A0AC += arg_0 * flt_3D8058 * 0.001f;
         if (unk_1A0AC > unk_1A0C0_f)
         {
@@ -1091,7 +1204,11 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
                     unk_1A0D4[v_224].unk_00.x = 0;
                     unk_1A0D4[v_224].unk_0C = 0;
                     unk_1A0D4[v_224].unk_14.sub_D48D0(0);
+#ifdef CODFH_SP // shape: single player's hit indicators are items 0x5C to 0x60 (SP 0xACDB0)
+                    sub_E09E0(v_224 + 0x5C, 0);
+#else
                     sub_E09E0(v_224 + 0x8B, 0);
+#endif
                     // The original jumps from here straight to the loop's
                     // step.
                     continue;
@@ -1104,15 +1221,93 @@ void type_DC400::sub_DD1C0(RwReal arg_0)
                 unk_1A0D4[v_224].unk_00.y = 0;
                 RwV3dNormalize(&v_230, &v_230);
                 RwV3dNormalize(&unk_1A0D4[v_224].unk_00, &unk_1A0D4[v_224].unk_00);
+#ifdef CODFH_SP // shape: items 0x5C to 0x60 (SP 0xACDB0)
+                sub_E5F60(v_224 + 0x5C, -(v_234 = sub_141240(&v_220->at, &unk_1A0D4[v_224].unk_00) + 180.0f));
+                sub_E3B90(v_224 + 0x5C, unk_1A0D4[v_224].unk_0C / dword_4B9154);
+#else
                 sub_E5F60(v_224 + 0x8B, -(v_234 = sub_141240(&v_220->at, &unk_1A0D4[v_224].unk_00) + 180.0f));
                 sub_E3B90(v_224 + 0x8B, unk_1A0D4[v_224].unk_0C / dword_4B9154);
+#endif
             }
         }
     }
     sub_E74D0(2, (RwV2d *)&unk_4B8F90);
+#ifndef CODFH_SP // MP only: no in-game screens
     unk_1A4B0->sub_2003E0(arg_0 / 60.0f);
+#endif
+#ifdef CODFH_SP // single player's pause (SP 0xACDB0): its fade-in timer, the pause message box, then the objectives' list fading in
+    if (unk_04)
+    {
+        if (unk_1A4B4 >= dword_4B8F5C)
+        {
+            unk_1A4B8 = 1;
+            unk_1A4B4 = 0;
+        }
+        else if (!unk_1A4B8)
+        {
+            unk_1A4B4 += arg_0 * flt_3D8058;
+            if (unk_1A4B4 >= dword_4B8F5C)
+            {
+                if (dword_42926C)
+                {
+                    sub_186E70(0, 0, 0);
+                }
+                else if (sub_188350() != 4)
+                {
+                    sub_186E70(4, 0, 0);
+                }
+                unk_1A4B8 = 1;
+                unk_1A4B4 = 0;
+            }
+        }
+        if (!dword_42926C)
+        {
+            if (sub_188350() != 4)
+            {
+                if (++dword_sp_4B8978 >= 2)
+                {
+                    sub_186E70(4, 0, 0);
+                }
+            }
+            else
+            {
+                dword_sp_4B8978 = 0;
+            }
+        }
+        if (unk_1A4B8)
+        {
+            RwInt8 v_sp_1;
+            type_4E56A0 *v_sp_8;
+            bool v_sp_level;
+            RwInt32 v_sp_n;
+
+            v_sp_1 = byte_4E564D;
+            v_sp_8 = sub_1708B0(v_sp_1);
+            v_sp_level = sub_19B050() == 30;
+            v_sp_n = 0;
+            while (v_sp_8)
+            {
+                if ((v_sp_8->unk_04 & 2) && (!(v_sp_8->unk_04 & 4) || !v_sp_level))
+                {
+                    if (v_sp_n <= unk_1A4BC && v_sp_8->unk_14 < dword_4B8F5C)
+                    {
+                        v_sp_8->unk_14 += arg_0 * 133.33333f;
+                    }
+                    if (v_sp_8->unk_14 > dword_4B8F5C)
+                    {
+                        v_sp_8->unk_14 = dword_4B8F5C;
+                    }
+                    v_sp_n++;
+                }
+                v_sp_1 = sub_170890(v_sp_1);
+                v_sp_8 = sub_1708B0(v_sp_1);
+            }
+        }
+    }
+#endif
 }
 // match: ?sub_DEB80@type_DC400@@QAEXH@Z @ 0x000DEB80
+// sp-match: ?sub_DEB80@type_DC400@@QAEXH@Z @ 0x000A9A30
 void type_DC400::sub_DEB80(RwInt32 arg_0)
 {
     RwInt32 var_4;
@@ -1131,18 +1326,31 @@ void type_DC400::sub_DEB80(RwInt32 arg_0)
         break;
     case 3:
         var_4 = 0;
+#ifdef CODFH_SP // shape: single player's items 0x37 and 0x36 (SP 0xA9A30)
+        sub_E09E0(0x37, 0);
+        sub_E09E0(0x36, 0);
+#else
         sub_E09E0(0x60, 0);
         sub_E09E0(0x5F, 0);
+#endif
         break;
     }
+#ifdef CODFH_SP // shape: single player's crosshair arms are items 0x32 to 0x35 (SP 0xA9A30)
+    sub_E09E0(0x32, var_4);
+    sub_E09E0(0x33, var_4);
+    sub_E09E0(0x34, var_4);
+    sub_E09E0(0x35, var_4);
+#else
     sub_E09E0(0x5B, var_4);
     sub_E09E0(0x5C, var_4);
     sub_E09E0(0x5D, var_4);
     sub_E09E0(0x5E, var_4);
+#endif
     unk_1A4A8 = arg_0;
 }
 
 // match: ?sub_DEC40@type_DC400@@QAEXPAURwV3d@@0@Z @ 0x000DEC40
+// sp-match: ?sub_DEC40@type_DC400@@QAEXPAURwV3d@@0@Z @ 0x000A7740
 // Projects arg_0 through the main camera (dword_4E5C74) at the player's field
 // of view, its view matrix scaled for the screen's aspect (and 4:3 widening),
 // into *arg_4: x and y in pixels of its frame buffer scaled by the player's
@@ -1199,36 +1407,101 @@ void type_DC400::sub_DEC40(RwV3d *arg_0, RwV3d *arg_4)
     if (arg_4->z > var_14 && arg_4->z < var_18)
     {
         var_E4 = 1.0f / arg_4->z;
+#ifdef CODFH_SP // shape: the size times the depth first, then the coordinate (SP 0xA7740)
+        arg_4->x = arg_4->x * (var_34 * var_E4);
+        arg_4->y = arg_4->y * (var_38 * var_E4);
+#else
         arg_4->x = var_34 * var_E4 * arg_4->x;
         arg_4->y = var_38 * var_E4 * arg_4->y;
+#endif
     }
 }
 
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_A7930@@YAXPAUtype_DA580@@H@Z @ 0x000A7930
+// Single player only (SP 0xA7930, no MP twin; the HUD's render calls it last): with arg_4
+// set and the game paused, the Live manager (dword_4F3130) puts its message up at
+// (30, 358) on the main camera; then it renders it. arg_0 (the HUD's font) is unused.
+void sp_sub_A7930(type_DA580 *arg_0, RwInt32 arg_4)
+{
+    RwV2d var_10;
+    RwV2d var_8;
+    RwInt32 var_show;
+
+    var_show = ((type_4B86F8 *)&dword_4B86F8)->unk_00_4;
+    if (!arg_4)
+    {
+        var_show = 0;
+    }
+    if (var_show)
+    {
+        var_8.x = 30.0f;
+        var_8.y = 358.0f;
+        var_10.x = 0.0f;
+        var_10.y = 358.0f;
+        dword_4F3130.sp_sub_12BE30((RwCamera *)dword_4E5C74, &var_8, 0, 0, &var_10, 0, 0, 0);
+    }
+    dword_4F3130.sp_sub_12A970();
+}
+#endif
+
 // match: ?sub_DEEB0@type_DC400@@QAEXH@Z @ 0x000DEEB0
+// sp-match: ?sub_DEEB0@type_DC400@@QAEXH@Z @ 0x000A9AA0
 void type_DC400::sub_DEEB0(RwInt32 arg_0)
 {
     if (unk_1A020 && unk_1A4A8 != 3)
     {
+#ifdef CODFH_SP // shape: single player's crosshair-over-buddy is item 0x36 (SP 0xA9AA0)
+        sub_E09E0(0x36, arg_0);
+#else
         sub_E09E0(0x5F, arg_0);
+#endif
     }
 }
 
 // match: ?sub_DEEF0@type_DC400@@QAEXH@Z @ 0x000DEEF0
+// sp-match: ?sub_DEEF0@type_DC400@@QAEXH@Z @ 0x000AA4B0
 void type_DC400::sub_DEEF0(RwInt32 arg_0)
 {
     if (unk_1A4A8 != 3)
     {
+#ifdef CODFH_SP // shape: single player's enemy hit indicator is item 0x37 (SP 0xAA4B0)
+        sub_E09E0(0x37, arg_0);
+        sub_E3B90(0x37, 1.0f);
+#else
         sub_E09E0(0x60, arg_0);
         sub_E3B90(0x60, 1.0f);
+#endif
         unk_1A4AC = 0;
     }
 }
 
 // match: ?sub_DEF40@type_DC400@@QAEXM@Z @ 0x000DEF40
+// sp-match: ?sub_DEF40@type_DC400@@QAEXM@Z @ 0x000AA4F0
 void type_DC400::sub_DEF40(RwReal arg_0)
 {
     RwReal var_4;
 
+#ifdef CODFH_SP // shape: single player's items 0x36 and 0x37 (SP 0xAA4F0)
+    if (sub_E0A10(0x36))
+    {
+        sub_E09E0(0x36, 0);
+    }
+    if (sub_E0A10(0x37))
+    {
+        var_4 = 1.0f - unk_1A4AC / unk_1A0C8;
+        if (var_4 < 0.0f)
+        {
+            var_4 = 0.0f;
+        }
+        sub_E3B90(0x37, var_4);
+        if (unk_1A4AC > unk_1A0C8)
+        {
+            sub_E09E0(0x37, 0);
+        }
+        unk_1A4AC += arg_0;
+    }
+#else
     if (sub_E0A10(0x5F))
     {
         sub_E09E0(0x5F, 0);
@@ -1247,6 +1520,7 @@ void type_DC400::sub_DEF40(RwReal arg_0)
         }
         unk_1A4AC += arg_0;
     }
+#endif
 }
 
 // Stops the object sub_1FF250 returns. An inline with no address and so no
@@ -1266,6 +1540,7 @@ inline void stop_1FF250()
 // of this build (an empty if on unk_00) shifts the registers of their
 // restoring.
 // match: ?sub_DF000@type_DC400@@QAEXPAURwCamera@@@Z @ 0x000DF000
+// sp-match: ?sub_DF000@type_DC400@@QAEXPAURwCamera@@@Z @ 0x000AA590
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_DF000(RwCamera *arg_0)
 {
@@ -1317,13 +1592,17 @@ void type_DC400::sub_DF000(RwCamera *arg_0)
     {
         arg_0 = unk_1A02C;
     }
+#ifndef CODFH_SP // MP only: single player renders whatever dword_42926C (SP 0xAA590 has no check)
     if (!dword_42926C)
     {
+#ifndef CODFH_SP // MP only: no in-game screens
         RwCameraBeginUpdate(arg_0);
         unk_1A4B0->sub_1FFE80();
         RwCameraEndUpdate(arg_0);
+#endif
         return;
     }
+#endif
     RwCameraBeginUpdate(arg_0);
     lcl_28 = 1;
     m_18 = (type_10F710 *)sub_1745A0(dword_429EB0);
@@ -1340,7 +1619,7 @@ void type_DC400::sub_DF000(RwCamera *arg_0)
     if (lcl_28)
     {
         RWS::CameraHelper::SetFieldOfView(((type_10F710 *)sub_1745A0(dword_429EB0))->unk_534, frm_24);
-        for (s40 = 0; s40 < 16; s40++)
+        for (s40 = 0; s40 < type_DC400_labels; s40++)
         {
             w44 = (type_3DAFC8 *)unk_1A1A8[s40].unk_28.sub_D4910();
             strcpy(unk_1A1A8[s40].unk_00, "");
@@ -1371,8 +1650,13 @@ void type_DC400::sub_DF000(RwCamera *arg_0)
                 if (m_54.z > stk_74 && m_54.z < local_60)
                 {
                     var_A0 = 1.0f / m_54.z;
+#ifdef CODFH_SP // shape: the size times the depth first, then the coordinate (SP 0xAA590)
+                    m_54.x = m_54.x * (m_80 * var_A0);
+                    m_54.y = m_54.y * (m_84 * var_A0);
+#else
                     m_54.x = m_80 * var_A0 * m_54.x;
                     m_54.y = m_84 * var_A0 * m_54.y;
+#endif
                     m_54.y = m_84 - m_54.y;
                     local_A8 = m_54.x;
                     local_A4 = unk_1A028->sub_DA7B0(w44->unk_62C, 0.0f) * l7C;
@@ -1384,7 +1668,11 @@ void type_DC400::sub_DF000(RwCamera *arg_0)
                     {
                         local_A8 -= local_A4;
                     }
+#ifdef CODFH_SP // shape: the place on the left of each test (SP 0xAA590)
+                    if (local_A8 > var_70 && local_A8 < l6C && m_54.y > var9C && y98 > m_54.y)
+#else
                     if (var_70 < local_A8 && l6C > local_A8 && var9C < m_54.y && y98 > m_54.y)
+#endif
                     {
                         m_54.x = m_54.x - var_70;
                         m_54.y = m_54.y - var9C;
@@ -1421,6 +1709,26 @@ void type_DC400::sub_DF000(RwCamera *arg_0)
     RwRenderStateSet(rwRENDERSTATETEXTUREADDRESS, (void *)rwTEXTUREADDRESSCLAMP);
     RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTION, (void *)rwALPHATESTFUNCTIONGREATER);
     RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, (void *)0);
+#ifdef CODFH_SP // single player (SP 0xAA590): the items unless paused, the flash, the pause screen and its items (item 0x59), then the subtitles
+    if (!unk_04)
+    {
+        sub_E5480(&unk_E0[0]);
+    }
+    if (unk_1A0A8)
+    {
+        sub_E5C60();
+    }
+    if (unk_04)
+    {
+        sp_sub_A81E0();
+        if (sub_188350() != 1)
+        {
+            sp_sub_A7FB0();
+        }
+        sub_E5480(&unk_E0[0x59]);
+    }
+    sp_sub_A7930(dword_4B9190->unk_1A028, 1);
+#else
     sub_E79C0();
     if (sub_1FF250() && sub_1FF250()->sub_200740()
         && (sub_1FF250()->get_unk_0C() == 6 || sub_1FF250()->get_unk_0C() == 7))
@@ -1439,7 +1747,10 @@ void type_DC400::sub_DF000(RwCamera *arg_0)
     {
         sub_E5C60();
     }
+#endif
+#ifndef CODFH_SP // MP only: no in-game screens
     unk_1A4B0->sub_1FFE80();
+#endif
     if (unk_00)
     {
     }
@@ -1459,6 +1770,7 @@ void type_DC400::sub_DF000(RwCamera *arg_0)
 }
 
 // match: ?sub_DF880@type_DC400@@QAEXXZ @ 0x000DF880
+// sp-match: ?sub_DF880@type_DC400@@QAEXXZ @ 0x000ACB80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_DF880()
 {
@@ -1474,12 +1786,20 @@ void type_DC400::sub_DF880()
         unk_1A0D4[l4].unk_0C = 0;
         unk_1A0D4[l4].unk_10 = 0;
         unk_1A0D4[l4].unk_14.sub_D48D0(0);
+#ifdef CODFH_SP // shape: single player's hit indicators are items 0x5C to 0x60 (SP 0xACB80)
+        sub_E09E0(l4 + 0x5C, 0);
+#else
         sub_E09E0(l4 + 0x8B, 0);
+#endif
     }
-    for (var_8 = 0; var_8 < 16; var_8++)
+    for (var_8 = 0; var_8 < type_DC400_labels; var_8++)
     {
         unk_1A1A8[var_8].unk_24 = 0;
+#ifdef CODFH_SP // shape: single player's buddy status labels are items 0x41 to 0x4A (SP 0xACB80)
+        unk_1A1A8[var_8].unk_2C = var_8 + 0x41;
+#else
         unk_1A1A8[var_8].unk_2C = var_8 + 106;
+#endif
     }
     unk_1A0A8 = 0;
     unk_04 = 0;
@@ -1492,6 +1812,7 @@ void type_DC400::sub_DF880()
 }
 
 // match: ?sub_DF9F0@type_DC400@@QAEHXZ @ 0x000DF9F0
+// sp-match: ?sub_DF9F0@type_DC400@@QAEHXZ @ 0x000A9AD0
 RwInt32 type_DC400::sub_DF9F0()
 {
     if (unk_1A028)
@@ -1505,11 +1826,14 @@ RwInt32 type_DC400::sub_DF9F0()
     unk_1A4B4 = 0;
     unk_1A4B8 = 0;
     unk_1A4BC = 0;
+#ifndef CODFH_SP // MP only: no in-game screens
     delete unk_1A4B0;
+#endif
     return 1;
 }
 
 // match: ?sub_DFB00@type_DC400@@QAE_NPBD0@Z @ 0x000DFB00
+// sp-match: ?sub_DFB00@type_DC400@@QAE_NPBD0@Z @ 0x000ACC90
 bool type_DC400::sub_DFB00(const RwChar *arg_0, const RwChar *arg_4)
 {
     unk_1A024 = sub_E8320(arg_0);
@@ -1520,6 +1844,7 @@ bool type_DC400::sub_DFB00(const RwChar *arg_0, const RwChar *arg_4)
 }
 
 // match: ?sub_DFB40@type_DC400@@QAEXPAUtype_3D3548@@PAURwV3d@@@Z @ 0x000DFB40
+// sp-match: ?sub_DFB40@type_DC400@@QAEXPAUtype_3D3548@@PAURwV3d@@@Z @ 0x000AAB90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_DFB40(type_3D3548 *arg_0, RwV3d *arg_4)
 {
@@ -1569,9 +1894,15 @@ void type_DC400::sub_DFB40(type_3D3548 *arg_0, RwV3d *arg_4)
                         unk_1A0D4[ebp_14].unk_10 = 1;
                         unk_1A0D4[ebp_14].unk_14.sub_D48D0(arg_0);
                         l1C = sub_141240(&bp_8->at, &unk_1A0D4[ebp_14].unk_00) + 180.0f;
+#ifdef CODFH_SP // shape: single player's hit indicators are items 0x5C to 0x60 (SP 0xAAB90)
+                        sub_E5F60(ebp_14 + 0x5C, -l1C);
+                        sub_E3B90(ebp_14 + 0x5C, 1.0f);
+                        sub_E09E0(ebp_14 + 0x5C, 1);
+#else
                         sub_E5F60(ebp_14 + 0x8B, -l1C);
                         sub_E3B90(ebp_14 + 0x8B, 1.0f);
                         sub_E09E0(ebp_14 + 0x8B, 1);
+#endif
                     }
                     break;
                 }
@@ -1582,6 +1913,7 @@ void type_DC400::sub_DFB40(type_3D3548 *arg_0, RwV3d *arg_4)
 }
 
 // match: ?sub_DFDD0@type_DC400@@QAEXXZ @ 0x000DFDD0
+// sp-match: ?sub_DFDD0@type_DC400@@QAEXXZ @ 0x000A9B30
 void type_DC400::sub_DFDD0()
 {
     dword_4CF9A8 ^= 1;
@@ -1589,6 +1921,7 @@ void type_DC400::sub_DFDD0()
 }
 
 // match: ?sub_DFE00@type_DC400@@QAEXM@Z @ 0x000DFE00
+// sp-match: ?sub_DFE00@type_DC400@@QAEXM@Z @ 0x000AAD20
 void type_DC400::sub_DFE00(RwReal arg_0)
 {
     if (unk_B8 == arg_0)
@@ -1614,8 +1947,21 @@ void type_DC400::sub_DFE00(RwReal arg_0)
 }
 
 // match: ?sub_DFEB0@type_DC400@@QAEX_NPAUtype_3D3548@@@Z @ 0x000DFEB0
+// sp-match: ?sub_DFEB0@type_DC400@@QAEX_NPAUtype_3D3548@@@Z @ 0x000ACCD0
 void type_DC400::sub_DFEB0(bool arg_0, type_3D3548 *arg_4)
 {
+#ifdef CODFH_SP // shape: single player's buddy health is item 0x61 (SP 0xACCD0)
+    if (unk_E0[0x61].unk_20)
+    {
+        if (arg_0)
+        {
+            sub_E0A30(0x61, 1);
+        }
+        else
+        {
+            sub_E0A30(0x61, -1);
+        }
+#else
     if (unk_E0[0x90].unk_20)
     {
         if (arg_0)
@@ -1626,6 +1972,7 @@ void type_DC400::sub_DFEB0(bool arg_0, type_3D3548 *arg_4)
         {
             sub_E0A30(0x90, -1);
         }
+#endif
         unk_00 = arg_0;
         if (arg_4)
         {
@@ -1642,6 +1989,7 @@ void type_DC400::sub_DFEB0(bool arg_0, type_3D3548 *arg_4)
 }
 
 // match: ?sub_DFF40@type_DC400@@QAEXH@Z @ 0x000DFF40
+// sp-match: ?sub_DFF40@type_DC400@@QAEXH@Z @ 0x000AADB0
 void type_DC400::sub_DFF40(RwInt32 arg_0)
 {
     RwInt32 var_4;
@@ -1650,6 +1998,17 @@ void type_DC400::sub_DFF40(RwInt32 arg_0)
     unk_1A1A4 = var_4;
     switch (var_4)
     {
+#ifdef CODFH_SP // shape: single player's buddy icon is item 0x62 (SP 0xAADB0)
+    case 1:
+        sub_E39B0(0x62, "hud_person_buddy_health", 1);
+        break;
+    case 2:
+        sub_E39B0(0x62, "hud_m12_buddy_health", 1);
+        break;
+    default:
+        sub_E39B0(0x62, "hud_t34_buddy_health", 1);
+        break;
+#else
     case 1:
         sub_E39B0(0x91, "hud_person_buddy_health", 1);
         break;
@@ -1659,12 +2018,14 @@ void type_DC400::sub_DFF40(RwInt32 arg_0)
     default:
         sub_E39B0(0x91, "hud_t34_buddy_health", 1);
         break;
+#endif
     }
 }
 
 // match: ?sub_DFFC0@type_DC400@@QAEXUtype_D48D0@@@Z @ 0x000DFFC0
 // match: __ehhandler$?sub_DFFC0@type_DC400@@QAEXUtype_D48D0@@@Z-0x8 @ 0x00300E00
 // match: __ehhandler$?sub_DFFC0@type_DC400@@QAEXUtype_D48D0@@@Z @ 0x00300E08
+// sp-match: ?sub_DFFC0@type_DC400@@QAEXUtype_D48D0@@@Z @ 0x000ACD40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_DFFC0(type_D48D0 arg_0)
 {
@@ -1672,7 +2033,11 @@ void type_DC400::sub_DFFC0(type_D48D0 arg_0)
     type_3D3548 *lv_10;
 
     lv_10 = arg_0.sub_D4910();
+#ifdef CODFH_SP // shape: single player's buddy items 0x61 and 0x64 (SP 0xACD40)
+    if (lv_10 && unk_E0[0x61].unk_20)
+#else
     if (lv_10 && unk_E0[0x90].unk_20)
+#endif
     {
         if (lv_10->unk_28_9)
         {
@@ -1685,11 +2050,16 @@ void type_DC400::sub_DFFC0(type_D48D0 arg_0)
             {
                 var_14 = 0.0f;
             }
+#ifdef CODFH_SP // shape: item 0x64 (SP 0xACD40)
+            sub_E6270(0x64, var_14, 1.0f);
+#else
             sub_E6270(0x93, var_14, 1.0f);
+#endif
         }
     }
 }
 
+#ifndef CODFH_SP // MP only: no single-player twin, it sets unk_84 (absent there)
 // match: ?sub_E0080@type_DC400@@QAEXM@Z @ 0x000E0080
 void type_DC400::sub_E0080(RwReal arg_0)
 {
@@ -1711,6 +2081,7 @@ void type_DC400::sub_E0080(RwReal arg_0)
         sub_E6270(0x96, 1.0f, unk_84);
     }
 }
+#endif
 
 // match: ?sub_E0110@type_DC400@@QAEXM@Z @ 0x000E0110
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -1776,6 +2147,7 @@ void type_DC400::sub_E02E0(RwInt32 arg_0)
 }
 
 // match: ?sub_E0340@type_DC400@@QAEXH@Z @ 0x000E0340
+// sp-match: ?sub_E0340@type_DC400@@QAEXH@Z @ 0x000A9B50
 void type_DC400::sub_E0340(RwInt32 arg_0)
 {
     if (unk_BC != arg_0)
@@ -1804,6 +2176,7 @@ void type_DC400::sub_E0340(RwInt32 arg_0)
 }
 
 // match: ?sub_E0410@type_DC400@@QAEXH@Z @ 0x000E0410
+// sp-match: ?sub_E0410@type_DC400@@QAEXH@Z @ 0x000A9BD0
 void type_DC400::sub_E0410(RwInt32 arg_0)
 {
     type_10F710 *var_4;
@@ -1811,6 +2184,20 @@ void type_DC400::sub_E0410(RwInt32 arg_0)
     var_4 = (type_10F710 *)sub_1745A0(0);
     if (var_4 && var_4->unk_1B2C)
     {
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+        sub_E09E0(0x4D, 0);
+        sub_E09E0(0x4E, 0);
+        sub_E09E0(0x4F, 0);
+        sub_E09E0(0x50, 0);
+        sub_E09E0(0x4C, 0);
+        sub_E09E0(0x51, 0);
+        sub_E09E0(0x53, 0);
+        sub_E09E0(0x54, 0);
+        sub_E09E0(0x55, 0);
+        sub_E09E0(0x56, 0);
+        sub_E09E0(0x57, 0);
+        sub_E09E0(0x58, 0);
+#else
         sub_E09E0(0x7C, 0);
         sub_E09E0(0x7D, 0);
         sub_E09E0(0x7E, 0);
@@ -1823,10 +2210,25 @@ void type_DC400::sub_E0410(RwInt32 arg_0)
         sub_E09E0(0x85, 0);
         sub_E09E0(0x86, 0);
         sub_E09E0(0x87, 0);
+#endif
     }
     else
     {
         unk_C0 = arg_0;
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+        sub_E09E0(0x4D, 0);
+        sub_E09E0(0x4E, 0);
+        sub_E09E0(0x4F, 0);
+        sub_E09E0(0x50, 0);
+        sub_E09E0(0x4C, 0);
+        sub_E09E0(0x51, 0);
+        sub_E09E0(0x53, 0);
+        sub_E09E0(0x54, 0);
+        sub_E09E0(0x55, 0);
+        sub_E09E0(0x56, 0);
+        sub_E09E0(0x57, 0);
+        sub_E09E0(0x58, 0);
+#else
         sub_E09E0(0x7C, 0);
         sub_E09E0(0x7D, 0);
         sub_E09E0(0x7E, 0);
@@ -1839,54 +2241,109 @@ void type_DC400::sub_E0410(RwInt32 arg_0)
         sub_E09E0(0x85, 0);
         sub_E09E0(0x86, 0);
         sub_E09E0(0x87, 0);
+#endif
         switch (unk_C0)
         {
         case 8:
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E09E0(0x53, 1);
+#else
             sub_E09E0(0x82, 1);
+#endif
             break;
         case 9:
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E09E0(0x54, 1);
+#else
             sub_E09E0(0x83, 1);
+#endif
             break;
         case 1:
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E09E0(0x4E, 1);
+#else
             sub_E09E0(0x7D, 1);
+#endif
             break;
         case 4:
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E09E0(0x50, 1);
+#else
             sub_E09E0(0x7F, 1);
+#endif
             break;
         case 5:
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E09E0(0x4D, 1);
+#else
             sub_E09E0(0x7C, 1);
+#endif
             break;
         case 2:
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E09E0(0x4D, 1);
+#else
             sub_E09E0(0x7C, 1);
+#endif
             break;
         case 7:
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E09E0(0x4C, 1);
+#else
             sub_E09E0(0x7B, 1);
+#endif
             break;
         case 10:
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E09E0(0x56, 1);
+#else
             sub_E09E0(0x85, 1);
+#endif
             break;
         case 11:
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E09E0(0x57, 1);
+#else
             sub_E09E0(0x86, 1);
+#endif
             break;
         case 3:
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E09E0(0x51, 1);
+#else
             sub_E09E0(0x80, 1);
+#endif
             break;
         case 6:
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E09E0(0x4D, 1);
+            sub_E09E0(0x52, 1);
+#else
             sub_E09E0(0x7C, 1);
             sub_E09E0(0x81, 1);
+#endif
             break;
         case 12:
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E09E0(0x58, 1);
+#else
             sub_E09E0(0x87, 1);
+#endif
             break;
         }
         if (arg_0)
         {
+#ifdef CODFH_SP // shape: single player numbers its HUD items differently (SP 0xA9BD0)
+            sub_E3B50(0x4B);
+#else
             sub_E3B50(0x7A);
+#endif
         }
     }
 }
 
 // match: ?sub_E06E0@type_DC400@@QAEXH@Z @ 0x000E06E0
+// sp-match: ?sub_E06E0@type_DC400@@QAEXH@Z @ 0x000A9D80
 void type_DC400::sub_E06E0(RwInt32 arg_0)
 {
     if (arg_0 != unk_CC)
@@ -1924,7 +2381,34 @@ void type_DC400::sub_E06E0(RwInt32 arg_0)
     sub_E0410(unk_C0);
 }
 
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_A9E00@type_DC400@@QAEXH@Z @ 0x000A9E00
+// Single player only (SP 0xA9E00, called from SP 0xCB733): sets unk_D0 and from it the
+// mode unk_C0 (0xB while it is not -1, else 0) through sub_E0410.
+void type_DC400::sp_sub_A9E00(RwInt32 arg_0)
+{
+    if (arg_0 != unk_D0)
+    {
+        unk_D0 = arg_0;
+    }
+    switch (unk_D0)
+    {
+    case -1:
+        unk_C0 = 0;
+        break;
+    case 0:
+        unk_C0 = 0xB;
+        break;
+    default:
+        unk_C0 = 0xB;
+        break;
+    }
+    sub_E0410(unk_C0);
+}
+#endif
+
 // match: ?sub_E07A0@type_DC400@@QAEXHH@Z @ 0x000E07A0
+// sp-match: ?sub_E07A0@type_DC400@@QAEXHH@Z @ 0x000A9E40
 void type_DC400::sub_E07A0(RwInt32 arg_0, RwInt32 arg_4)
 {
     sub_E3B50(0xE);
@@ -1933,6 +2417,7 @@ void type_DC400::sub_E07A0(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_E07D0@type_DC400@@QAEXXZ @ 0x000E07D0
+// sp-match: ?sub_E07D0@type_DC400@@QAEXXZ @ 0x000A9E60
 void type_DC400::sub_E07D0()
 {
     sub_E3B50(0xE);
@@ -1941,6 +2426,7 @@ void type_DC400::sub_E07D0()
 }
 
 // match: ?sub_E0800@type_DC400@@QAEXH@Z @ 0x000E0800
+// sp-match: ?sub_E0800@type_DC400@@QAEXH@Z @ 0x000A79A0
 void type_DC400::sub_E0800(RwInt32 arg_0)
 {
     unk_C8 = arg_0;
@@ -1972,6 +2458,7 @@ void type_DC400::sub_E0800(RwInt32 arg_0)
 }
 
 // match: ?sub_E08B0@type_DC400@@QAEXM@Z @ 0x000E08B0
+// sp-match: ?sub_E08B0@type_DC400@@QAEXM@Z @ 0x000AADF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E08B0(RwReal arg_0)
 {
@@ -2002,10 +2489,17 @@ void type_DC400::sub_E08B0(RwReal arg_0)
         var_C = lv_10->unk_1A48[lv_10->unk_1AE4]->sub_11D690();
         bp_4 = m_18 * var_C + bp_8;
         var_20 = 1.0f;
+#ifdef CODFH_SP // shape: single player's crosshair arms are items 0x32 to 0x35 (SP 0xAADF0)
+        sub_E6200(0x32, 0.0f, -bp_4);
+        sub_E6200(0x35, bp_4 * var_20, 0.0f);
+        sub_E6200(0x33, 0.0f, bp_4);
+        sub_E6200(0x34, -bp_4 * var_20, 0.0f);
+#else
         sub_E6200(0x5B, 0.0f, -bp_4);
         sub_E6200(0x5E, bp_4 * var_20, 0.0f);
         sub_E6200(0x5C, 0.0f, bp_4);
         sub_E6200(0x5D, -bp_4 * var_20, 0.0f);
+#endif
     }
 }
 
@@ -2013,8 +2507,48 @@ void type_DC400::sub_E08B0(RwReal arg_0)
 // frame keeps a local above `this` and a switch temporary below it, so the
 // dead part switched on arg_0 (the rest of it is unknown).
 // match: ?sub_E09D0@type_DC400@@QAEXH@Z @ 0x000E09D0
+// sp-match: ?sub_E09D0@type_DC400@@QAEXH@Z @ 0x000A9E80
 void type_DC400::sub_E09D0(RwInt32 arg_0)
 {
+#ifdef CODFH_SP // SP 0xA9E80: single player shows the inventory item of arg_0 (MP returns at once)
+    RwInt32 lv_item;
+
+    sub_E09E0(0x15, 0);
+    sub_E09E0(0x16, 0);
+    sub_E09E0(0x17, 0);
+    sub_E09E0(0x19, 0);
+    sub_E09E0(0x1A, 0);
+    sub_E09E0(0x18, 0);
+    sub_E09E0(0x1B, 0);
+    switch (arg_0)
+    {
+    case 0:
+        return;
+    case 6:
+        lv_item = 0x17;
+        break;
+    case 9:
+        lv_item = 0x15;
+        break;
+    case 8:
+        lv_item = 0x18;
+        break;
+    case 7:
+        lv_item = 0x19;
+        break;
+    case 5:
+        lv_item = 0x1A;
+        break;
+    default:
+        lv_item = 0x16;
+        break;
+    }
+    sub_E09E0(lv_item, 1);
+    sub_E09E0(0x1B, 1);
+    sub_E09E0(0x1C, 1);
+    sub_E09E0(0x14, 1);
+    sub_E3B50(0x14);
+#else
     RwInt32 var_4;
 
     return;
@@ -2023,21 +2557,25 @@ void type_DC400::sub_E09D0(RwInt32 arg_0)
     default:
         break;
     }
+#endif
 }
 
 // match: ?sub_E09E0@type_DC400@@QAEXHH@Z @ 0x000E09E0
+// sp-match: ?sub_E09E0@type_DC400@@QAEXHH@Z @ 0x000A7A20
 void type_DC400::sub_E09E0(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_E0[arg_0].unk_50 = arg_4;
 }
 
 // match: ?sub_E0A10@type_DC400@@QAEHH@Z @ 0x000E0A10
+// sp-match: ?sub_E0A10@type_DC400@@QAEHH@Z @ 0x000A7A40
 RwInt32 type_DC400::sub_E0A10(RwInt32 arg_0)
 {
     return unk_E0[arg_0].unk_50;
 }
 
 // match: ?sub_E0A30@type_DC400@@QAEXHH@Z @ 0x000E0A30
+// sp-match: ?sub_E0A30@type_DC400@@QAEXHH@Z @ 0x000A7A60
 void type_DC400::sub_E0A30(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_E0[arg_0].unk_50 = 1;
@@ -2045,12 +2583,18 @@ void type_DC400::sub_E0A30(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_E0A70@type_DC400@@QAEXM@Z @ 0x000E0A70
+// sp-match: ?sub_E0A70@type_DC400@@QAEXM@Z @ 0x000AAEB0
 void type_DC400::sub_E0A70(RwReal arg_0)
 {
+#ifdef CODFH_SP // shape: single player's vehicle health bar is item 0x3F (SP 0xAAEB0)
+    sub_E6270(0x3F, arg_0, 1.0f);
+#else
     sub_E6270(0x68, arg_0, 1.0f);
+#endif
 }
 
 // match: ?sub_E0A90@type_DC400@@QAEXM@Z @ 0x000E0A90
+// sp-match: ?sub_E0A90@type_DC400@@QAEXM@Z @ 0x000AAED0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E0A90(RwReal arg_0)
 {
@@ -2058,17 +2602,26 @@ void type_DC400::sub_E0A90(RwReal arg_0)
     RwRGBA bp_8;
     RwRGBA bp_4;
 
+#ifdef CODFH_SP // shape: single player's vehicle armour bar is item 0x40 (SP 0xAAED0)
+    sub_E6270(0x40, arg_0, 1.0f);
+#else
     sub_E6270(0x69, arg_0, 1.0f);
+#endif
     var_C = unk_4B8F34;
     bp_4 = unk_4B8F38;
     bp_8.red = (RwUInt8)(var_C.red + (bp_4.red - var_C.red) * arg_0);
     bp_8.green = (RwUInt8)(var_C.green + (bp_4.green - var_C.green) * arg_0);
     bp_8.blue = (RwUInt8)(var_C.blue + (bp_4.blue - var_C.blue) * arg_0);
     bp_8.alpha = 0xFF;
+#ifdef CODFH_SP // shape: item 0x40 (SP 0xAAED0)
+    sub_E7270(0x40, &bp_8, &bp_8, &var_C, &var_C);
+#else
     sub_E7270(0x69, &bp_8, &bp_8, &var_C, &var_C);
+#endif
 }
 
 // match: ?sub_E0B60@type_DC400@@QAEXHPAUtype_3D3548@@H@Z @ 0x000E0B60
+// sp-match: ?sub_E0B60@type_DC400@@QAEXHPAUtype_3D3548@@H@Z @ 0x000AAFA0
 void type_DC400::sub_E0B60(RwInt32 arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
 {
     if (!arg_4)
@@ -2079,7 +2632,11 @@ void type_DC400::sub_E0B60(RwInt32 arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
     unk_1A034.sub_D48D0(arg_4);
     if (arg_8 == 1)
     {
+#ifdef CODFH_SP // shape: single player's t34 reticle is item 0x39 (SP 0xAAFA0)
+        sub_E09E0(0x39, 0);
+#else
         sub_E09E0(0x62, 0);
+#endif
         sub_E09E0(3, 1);
         sub_E09E0(4, 1);
         sub_E09E0(7, 0);
@@ -2092,12 +2649,27 @@ void type_DC400::sub_E0B60(RwInt32 arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
     }
     else
     {
+#ifdef CODFH_SP // shape: item 0x39 (SP 0xAAFA0)
+        sub_E09E0(0x39, 0);
+#else
         sub_E09E0(0x62, 0);
+#endif
         sub_E09E0(3, 0);
     }
     sub_DEB80(0);
     switch (unk_1A030)
     {
+#ifdef CODFH_SP // shape: single player's t34 root is item 0x38 (SP 0xAAFA0)
+    case 1:
+        sub_E09E0(0x38, 1);
+        break;
+    case 2:
+        sub_E09E0(0x38, 1);
+        break;
+    case 3:
+        sub_E09E0(0x38, 1);
+        break;
+#else
     case 1:
         sub_E09E0(0x61, 1);
         break;
@@ -2107,11 +2679,13 @@ void type_DC400::sub_E0B60(RwInt32 arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
     case 3:
         sub_E09E0(0x61, 1);
         break;
+#endif
     }
     unk_08 = 1;
 }
 
 // match: ?sub_E0CC0@type_DC400@@QAEXXZ @ 0x000E0CC0
+// sp-match: ?sub_E0CC0@type_DC400@@QAEXXZ @ 0x000AB090
 void type_DC400::sub_E0CC0()
 {
     switch (unk_1A030)
@@ -2119,7 +2693,11 @@ void type_DC400::sub_E0CC0()
     case 1:
     case 2:
     case 3:
+#ifdef CODFH_SP // shape: single player's t34 root is item 0x38 (SP 0xAB090)
+        sub_E09E0(0x38, 0);
+#else
         sub_E09E0(0x61, 0);
+#endif
         break;
     }
     sub_E09E0(3, 1);
@@ -2138,14 +2716,20 @@ void type_DC400::sub_E0CC0()
 }
 
 // match: ?sub_E0DD0@type_DC400@@QAEXXZ @ 0x000E0DD0
+// sp-match: ?sub_E0DD0@type_DC400@@QAEXXZ @ 0x000A7A90
 void type_DC400::sub_E0DD0()
 {
     unk_04 = 1;
+#ifdef CODFH_SP // shape: single player's pause root is item 0x59 (SP 0xA7A90)
+    sub_E09E0(0x59, 1);
+#else
     sub_E09E0(0x88, 1);
+#endif
     flt_4B8984 = 0;
 }
 
 // match: ?sub_E0E00@type_DC400@@QAEXXZ @ 0x000E0E00
+// sp-match: ?sub_E0E00@type_DC400@@QAEXXZ @ 0x000A7AB0
 void type_DC400::sub_E0E00()
 {
     RwInt8 var_1;
@@ -2163,15 +2747,301 @@ void type_DC400::sub_E0E00()
         var_8 = sub_1708B0(var_1);
     }
     unk_1A4BC = 0;
+#ifdef CODFH_SP // shape: single player's pause root is item 0x59 (SP 0xA7AB0)
+    sub_E09E0(0x59, 0);
+#else
     sub_E09E0(0x88, 0);
+#endif
 }
 
 // match: ?sub_E0E90@type_DC400@@QAEXXZ @ 0x000E0E90
 // match: __ehhandler$?sub_E0E90@type_DC400@@QAEXXZ-0x70 @ 0x00300E20
 // match: __ehhandler$?sub_E0E90@type_DC400@@QAEXXZ @ 0x00300E90
+// sp-match: ?sub_E0E90@type_DC400@@QAEXXZ @ 0x000AB150
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E0E90()
 {
+#ifdef CODFH_SP // single player builds its own HUD (SP 0xAB150): 101 items, no multiplayer, CTF or objective items,
+                // no texts or fonts, a hud_logo item, the pause root at 0x59 and the hit indicators from 0x5C
+    RwInt32 lv_10;
+
+    sub_E6570(0, 1);
+    sub_E6570(1, 2);
+    sub_E6570(0, 3);
+    sub_E6570(3, 4);
+    sub_E6570(4, 5);
+    sub_E6570(4, 6);
+    sub_E6570(3, 7);
+    sub_E6570(7, 8);
+    sub_E6570(7, 9);
+    sub_E6570(3, 0xA);
+    sub_E6570(0xA, 0xB);
+    sub_E6570(0xA, 0xC);
+    sub_E6570(0xA, 0xD);
+    sub_E6570(3, 0xE);
+    sub_E6570(0xE, 0xF);
+    sub_E6570(0xE, 0x10);
+    sub_E6570(0xE, 0x13);
+    sub_E6570(0xE, 0x12);
+    sub_E6570(3, 0x14);
+    sub_E6570(0x14, 0x15);
+    sub_E6570(0x14, 0x16);
+    sub_E6570(0x14, 0x17);
+    sub_E6570(0x14, 0x19);
+    sub_E6570(0x14, 0x1A);
+    sub_E6570(0x14, 0x18);
+    sub_E6570(0x14, 0x1B);
+    sub_E6570(0x14, 0x1C);
+    sub_E6570(0, 0x31);
+    sub_E6570(0x31, 0x32);
+    sub_E6570(0x31, 0x33);
+    sub_E6570(0x31, 0x34);
+    sub_E6570(0x31, 0x35);
+    sub_E6570(0x31, 0x36);
+    sub_E6570(0x31, 0x37);
+    sub_E6570(0, 0x61);
+    sub_E6570(0x61, 0x63);
+    sub_E6570(0x61, 0x62);
+    sub_E6570(0x61, 0x64);
+    sub_E6570(0, 0x1D);
+    sub_E6570(0x1D, 0x1E);
+    sub_E6570(0x1D, 0x1F);
+    sub_E6570(0x1D, 0x20);
+    sub_E6570(0x1D, 0x21);
+    for (lv_10 = 0; lv_10 < 15; lv_10++)
+    {
+        sub_E6570(0x1D, lv_10 + 0x22);
+    }
+    sub_E6570(0, 0x4B);
+    sub_E6570(0x4B, 0x4C);
+    sub_E6570(0x4B, 0x4D);
+    sub_E6570(0x4B, 0x4E);
+    sub_E6570(0x4B, 0x4F);
+    sub_E6570(0x4B, 0x50);
+    sub_E6570(0x4B, 0x51);
+    sub_E6570(0x4B, 0x53);
+    sub_E6570(0x4B, 0x54);
+    sub_E6570(0x4B, 0x55);
+    sub_E6570(0x4B, 0x56);
+    sub_E6570(0x4B, 0x57);
+    sub_E6570(0x4B, 0x52);
+    sub_E6570(0x4B, 0x58);
+    sub_E6570(0, 0x38);
+    sub_E6570(0x38, 0x39);
+    sub_E6570(0x38, 0x3A);
+    sub_E6570(0x3A, 0x3B);
+    sub_E6570(0x3A, 0x3C);
+    sub_E6570(0x38, 0x3D);
+    sub_E6570(0x3D, 0x3E);
+    sub_E6570(0x3D, 0x3F);
+    sub_E6570(0x3D, 0x40);
+    sub_E6570(0, 0x41);
+    sub_E6570(0, 0x42);
+    sub_E6570(0, 0x43);
+    sub_E6570(0, 0x44);
+    sub_E6570(0, 0x45);
+    sub_E6570(0, 0x46);
+    sub_E6570(0, 0x47);
+    sub_E6570(0, 0x48);
+    sub_E6570(0, 0x49);
+    sub_E6570(0, 0x4A);
+    sub_E6570(0, 0x59);
+    sub_E6570(0x59, 0x5A);
+    sub_E6570(0, 0x5B);
+    for (lv_10 = 0; lv_10 < 5; lv_10++)
+    {
+        sub_E6570(0x5B, lv_10 + 0x5C);
+    }
+    sub_E83F0();
+    sub_E6F90(0, "hud_root", false, true, false, false, false, false);
+    sub_E6F90(1, "hud_subtitle", false, true, false, false, false, false);
+    sub_E6F90(2, "hud_subtitle_text", false, false, true, false, true, false);
+    sub_E6F90(3, "hud_soldier_root", false, true, false, false, false, false);
+    sub_E6F90(4, "hud_health", false, true, false, true, true, false);
+    sub_E6F90(5, "hud_health_frame", true, false, false, false, true, true);
+    sub_E6F90(6, "hud_health_bar", false, false, false, false, true, true);
+    sub_E6F90(7, "hud_healthpack", false, true, false, true, true, false);
+    sub_E6F90(8, "hud_inventory_medpack", true, false, false, false, true, true);
+    sub_E6F90(9, "hud_healthpack_txt", false, false, true, true, true, false);
+    sub_E6F90(0x4B, "hud_actions", false, true, false, false, true, false);
+    sub_E6F90(0x4C, "hud_action_radio", true, false, false, false, false, true);
+    sub_E6F90(0x4D, "hud_action_get", true, false, false, false, false, true);
+    sub_E6F90(0x4E, "hud_action_gogogo", true, false, false, false, false, true);
+    sub_E6F90(0x4F, "hud_action_openbox", true, false, false, false, false, true);
+    sub_E6F90(0x50, "hud_action_opendoor", true, false, false, false, false, true);
+    sub_E6F90(0x51, "hud_action_healfriendly", true, false, false, false, false, true);
+    sub_E6F90(0x53, "hud_action_drivevehicle", true, false, false, false, false, true);
+    sub_E6F90(0x54, "hud_action_dismount", true, false, false, false, false, true);
+    sub_E6F90(0x55, "hud_action_rollbarrel", true, false, false, false, false, true);
+    sub_E6F90(0x56, "hud_action_plantbomb", true, false, false, false, false, true);
+    sub_E6F90(0x57, "hud_action_mountMG", true, false, false, false, false, true);
+    sub_E6F90(0x52, "hud_action_text_dump", false, false, true, false, true, false);
+    sub_E6F90(0x58, "hud_action_disarmmine", true, false, false, false, false, true);
+    sub_E6F90(0x1D, "hud_compass", false, true, false, false, true, false);
+    sub_E6F90(0x1E, "hud_compass_glass", true, false, false, false, false, true);
+    sub_E6F90(0x1F, "hud_compass_bg", true, false, false, false, false, true);
+    sub_E6F90(0x20, "hud_compass_star", true, false, false, false, false, false);
+    sub_E6F90(0x21, "hud_compass_star_pulse", true, false, false, false, false, false);
+    for (lv_10 = 0; lv_10 < 15; lv_10++)
+    {
+        sub_E6F90(lv_10 + 0x22, "hud_compass_star", true, false, false, false, false, false);
+        sub_E09E0(lv_10 + 0x22, 0);
+    }
+    sub_E6F90(0xA, "hud_posture", false, true, false, false, true, false);
+    sub_E6F90(0xB, "hud_posture_stand", true, false, false, false, true, false);
+    sub_E6F90(0xC, "hud_posture_crouch", true, false, false, false, true, false);
+    sub_E6F90(0xD, "hud_posture_prone", true, false, false, false, true, false);
+    sub_E6F90(0xE, "hud_ammo_root", false, true, false, true, true, false);
+    sub_E6F90(0x12, "hud_ammo_grenicon", true, false, false, false, true, false);
+    sub_E6F90(0x13, "hud_ammo", true, false, false, false, false, true);
+    sub_E6F90(0xF, "hud_ammo_txtammo", false, false, true, false, true, false);
+    sub_E6F90(0x10, "hud_ammo_txtclips", false, false, true, false, true, false);
+    sub_E6F90(0x11, "hud_ammo_txtgrens", false, false, true, false, true, false);
+    sub_E6F90(0x14, "hud_inventory_root", false, true, false, true, true, false);
+    sub_E6F90(0x15, "hud_inventory_grenadeG", true, false, false, false, true, true);
+    sub_E6F90(0x16, "hud_inventory_grenadeR", true, false, false, false, true, true);
+    sub_E6F90(0x18, "hud_inventory_grenadeA", true, false, false, false, true, true);
+    sub_E6F90(0x19, "hud_inventory_tellermine", true, false, false, false, true, true);
+    sub_E6F90(0x1A, "hud_inventory_stickymine", true, false, false, false, true, true);
+    sub_E6F90(0x17, "hud_inventory_radio", true, false, false, false, true, true);
+    sub_E6F90(0x1B, "hud_inventory_txt", false, false, true, false, true, false);
+    sub_E6F90(0x1C, "hud_inventory", true, false, false, false, true, true);
+    sub_E6F90(0x31, "hud_crosshair", false, true, false, false, true, false);
+    sub_E6F90(0x32, "hud_crosshair", true, false, false, false, false, true);
+    sub_E6F90(0x33, "hud_crosshair", true, false, false, false, false, true);
+    sub_E6F90(0x34, "hud_crosshair", true, false, false, false, false, true);
+    sub_E6F90(0x35, "hud_crosshair", true, false, false, false, false, true);
+    sub_E6F90(0x36, "hud_crosshair_overbuddy", true, false, false, false, false, true);
+    sub_E6F90(0x37, "hud_enemy_hit_indicator", true, false, false, false, false, true);
+    sub_E6F90(0x61, "hud_buddy_health root", false, true, false, true, true, false);
+    sub_E6F90(0x62, "hud_t34_buddy_health", true, false, false, false, true, false);
+    sub_E6F90(0x64, "hud_buddy_health_bar", false, false, false, false, true, true);
+    sub_E6F90(0x63, "hud_health_frame", true, false, false, false, true, false);
+    sub_E6F90(0x38, "hud_t34_root", false, true, false, false, true, false);
+    sub_E6F90(0x39, "hud_t34_reticle", true, false, false, false, true, true);
+    sub_E6F90(0x3A, "hud_tank_arrow", true, false, false, false, true, false);
+    sub_E6F90(0x3B, "hud_t34_turret", true, false, false, false, true, false);
+    sub_E6F90(0x3C, "hud_t34_body", true, false, false, false, true, true);
+    sub_E6F90(0x3D, "hud_vehicle_life", false, true, false, false, true, false);
+    sub_E6F90(0x3E, "hud_vehicle_lifeframe", true, true, false, false, true, false);
+    sub_E6F90(0x3F, "hud_vehicle_healthbar", false, false, false, false, true, true);
+    sub_E6F90(0x40, "hud vehicle_armorbar", false, false, false, false, true, true);
+    sub_E6F90(0x41, "hud_buddy_status", false, false, true, false, true, false);
+    sub_E6F90(0x42, "hud_buddy_status_1", false, false, true, false, true, false);
+    sub_E6F90(0x43, "hud_buddy_status_2", false, false, true, false, true, false);
+    sub_E6F90(0x44, "hud_buddy_status_3", false, false, true, false, true, false);
+    sub_E6F90(0x45, "hud_buddy_status_4", false, false, true, false, true, false);
+    sub_E6F90(0x46, "hud_buddy_status_5", false, false, true, false, true, false);
+    sub_E6F90(0x47, "hud_buddy_status_6", false, false, true, false, true, false);
+    sub_E6F90(0x48, "hud_buddy_status_7", false, false, true, false, true, false);
+    sub_E6F90(0x49, "hud_buddy_status_8", false, false, true, false, true, false);
+    sub_E6F90(0x4A, "hud_buddy_status_9", false, false, true, false, true, false);
+    sub_E6F90(0x59, "hud_pause_root", false, true, false, false, false, false);
+    sub_E6F90(0x5A, "hud_logo", true, false, false, false, true, false);
+    sub_E6F90(0x5B, "hid_hit_root", false, true, false, false, false, true);
+    for (lv_10 = 0; lv_10 < 5; lv_10++)
+    {
+        sub_E6F90(lv_10 + 0x5C, "hud_hit_indicator5", true, false, false, false, true, false);
+        sub_E09E0(lv_10 + 0x5C, 0);
+    }
+    for (lv_10 = 0; lv_10 < type_DC400_items; lv_10++)
+    {
+        if (!unk_E0[lv_10].unk_00[0])
+        {
+            continue;
+        }
+        if (!sub_E39B0(lv_10, unk_E0[lv_10].unk_00, 0))
+        {
+            continue;
+        }
+        sub_E7140(lv_10, 0.0f);
+        RwMatrixSetIdentity(&unk_E0[lv_10].unk_1A0);
+        unk_E0[lv_10].unk_E0[0].x = 0.0f - unk_E0[lv_10].unk_188.x * 0.5f;
+        unk_E0[lv_10].unk_E0[0].y = unk_E0[lv_10].unk_188.y * 0.5f + 0.0f;
+        unk_E0[lv_10].unk_E0[1].x = 0.0f - unk_E0[lv_10].unk_188.x * 0.5f;
+        unk_E0[lv_10].unk_E0[1].y = 0.0f - unk_E0[lv_10].unk_188.y * 0.5f;
+        unk_E0[lv_10].unk_E0[2].x = unk_E0[lv_10].unk_188.x * 0.5f + 0.0f;
+        unk_E0[lv_10].unk_E0[2].y = unk_E0[lv_10].unk_188.y * 0.5f + 0.0f;
+        unk_E0[lv_10].unk_E0[3].x = unk_E0[lv_10].unk_188.x * 0.5f + 0.0f;
+        unk_E0[lv_10].unk_E0[3].y = 0.0f - unk_E0[lv_10].unk_188.y * 0.5f;
+        if (unk_E0[lv_10].unk_200)
+        {
+            sub_E7140(lv_10, unk_E0[lv_10].unk_200->unk_1E4 + 0.01f);
+        }
+        RwIm2DVertexSetU(&unk_E0[lv_10].unk_118[0], 0.0f, 1.0f);
+        RwIm2DVertexSetV(&unk_E0[lv_10].unk_118[0], 1.0f, 1.0f);
+        RwIm2DVertexSetU(&unk_E0[lv_10].unk_118[1], 0.0f, 1.0f);
+        RwIm2DVertexSetV(&unk_E0[lv_10].unk_118[1], 0.0f, 1.0f);
+        RwIm2DVertexSetU(&unk_E0[lv_10].unk_118[2], 1.0f, 1.0f);
+        RwIm2DVertexSetV(&unk_E0[lv_10].unk_118[2], 1.0f, 1.0f);
+        RwIm2DVertexSetU(&unk_E0[lv_10].unk_118[3], 1.0f, 1.0f);
+        RwIm2DVertexSetV(&unk_E0[lv_10].unk_118[3], 0.0f, 1.0f);
+        sub_E5F60(lv_10, unk_E0[lv_10].unk_1E0);
+        unk_E0[lv_10].unk_20 = 1;
+    }
+    sub_E7140(4, 0.0f);
+    sub_E7140(5, 0.02f);
+    sub_E7140(6, 0.01f);
+    sub_E7140(8, 0.0f);
+    sub_E7140(9, 0.0f);
+    sub_E7140(0x1D, 0.0f);
+    sub_E7140(0x20, 0.1f);
+    sub_E7140(0x21, 0.1f);
+    for (lv_10 = 0; lv_10 < 15; lv_10++)
+    {
+        sub_E7140(lv_10 + 0x22, 0.1f);
+    }
+    sub_E7140(0x1E, 0.2f);
+    sub_E7140(0x1F, 0.3f);
+    sub_E7140(0x13, 0.3f);
+    sub_E7140(0x1C, 0.2f);
+    sub_E7140(0x15, 0.0f);
+    sub_E7140(0x16, 0.0f);
+    sub_E7140(0x17, 0.0f);
+    sub_E7140(0x18, 0.0f);
+    sub_E7140(0x19, 0.0f);
+    sub_E7140(0x1A, 0.0f);
+    sub_E7140(0x1B, 0.0f);
+    sub_E7140(0x3A, 0.3f);
+    sub_E7140(0x3B, 0.1f);
+    sub_E7140(0x3C, 0.2f);
+    sub_E7140(0x3E, 0.1f);
+    sub_E7140(0x40, 0.0f);
+    sub_E7140(0x3F, 0.0f);
+    sub_E5F60(0x35, 90.0f);
+    sub_E5F60(0x33, 180.0f);
+    sub_E5F60(0x34, 270.0f);
+    sub_E09E0(0x4D, 0);
+    sub_E09E0(0x4E, 0);
+    sub_E09E0(0x4F, 0);
+    sub_E09E0(0x50, 0);
+    sub_E09E0(0x4C, 0);
+    sub_E09E0(0x51, 0);
+    sub_E09E0(0x53, 0);
+    sub_E09E0(0x54, 0);
+    sub_E09E0(0x55, 0);
+    sub_E09E0(0x56, 0);
+    sub_E09E0(0x57, 0);
+    sub_E09E0(0x58, 0);
+    sub_E09E0(0x15, 0);
+    sub_E09E0(0x16, 0);
+    sub_E09E0(0x18, 0);
+    sub_E09E0(0x19, 0);
+    sub_E09E0(0x1A, 0);
+    sub_E09E0(0x17, 0);
+    sub_E09E0(0x1B, 0);
+    sub_E09E0(0x1C, 0);
+    sub_E09E0(0x14, 0);
+    sub_E09E0(0x38, 0);
+    sub_E09E0(0x59, 0);
+    sub_E09E0(0x36, 0);
+    sub_E09E0(0x37, 0);
+    sub_E8470();
+    sub_E3B90(0x52, 1.0f);
+    sub_E3B90(9, 1.0f);
+    sub_E70D0(&unk_E0[0]);
+    sub_E6610(&unk_E0[0]);
+#else
     RwInt32 var_14;
     RwInt32 lv_10;
 
@@ -2374,6 +3244,7 @@ void type_DC400::sub_E0E90()
     sub_E7380(0x42, ":");
     sub_E7380(0x58, "Press  to skip");
     sub_E7380(0x59, "You are following XXX");
+#ifndef CODFH_SP // MP only: single player's HUD has no +0x5C..+0xB7 block (include/types/type_DC400.h) (single player has no hud_ctf_ textures)
     sub_E0080(1.0f);
     unk_98[0] = RwTexDictionaryFindNamedTexture(unk_1A024, "hud_ctf_british");
     unk_98[1] = RwTexDictionaryFindNamedTexture(unk_1A024, "hud_ctf_american");
@@ -2383,6 +3254,7 @@ void type_DC400::sub_E0E90()
     unk_A8[1] = RwTexDictionaryFindNamedTexture(unk_1A024, "hud_ctf_flag_icon_american");
     unk_A8[2] = RwTexDictionaryFindNamedTexture(unk_1A024, "hud_ctf_flag_icon_soviet");
     unk_A8[3] = RwTexDictionaryFindNamedTexture(unk_1A024, "hud_ctf_flag_icon_german");
+#endif
     for (var_14 = 0; var_14 < 7; var_14++)
     {
         unk_4B89B0[var_14] = sub_E3970(unk_3D8070[var_14], 1);
@@ -2396,8 +3268,10 @@ void type_DC400::sub_E0E90()
     unk_4B8AB0[1] = sub_E3970("HUD_2ND", 1);
     unk_4B8AB0[2] = sub_E3970("HUD_3RD", 1);
     sub_E7380(0x58, unk_4B8B04.c_str());
+#ifndef CODFH_SP // MP only: single player's HUD has no +0x5C..+0xB7 block (include/types/type_DC400.h) (single player has no codfont fonts)
     unk_88 = sub_1E5A80("codfontl");
     unk_8C = sub_1E5A80("codfontn");
+#endif
     sub_E6F90(0x7a, "hud_actions", false, true, false, false, true, false);
     sub_E6F90(0x7b, "hud_action_radio", true, false, false, false, false, true);
     sub_E6F90(0x7c, "hud_action_get", true, false, false, false, false, true);
@@ -2494,7 +3368,7 @@ void type_DC400::sub_E0E90()
         sub_E6F90(lv_10 + 0x8B, "hud_hit_indicator5", true, false, false, false, true, false);
         sub_E09E0(lv_10 + 0x8B, 0);
     }
-    for (lv_10 = 0; lv_10 < 151; lv_10++)
+    for (lv_10 = 0; lv_10 < type_DC400_items; lv_10++)
     {
         if (!unk_E0[lv_10].unk_00[0])
         {
@@ -2636,15 +3510,19 @@ void type_DC400::sub_E0E90()
     sub_E3B90(9, 1.0f);
     sub_E70D0(&unk_E0[0]);
     sub_E6610(&unk_E0[0]);
+#endif
 }
 
+#ifndef CODFH_SP // MP only: no twin in config/sp/shared.txt; its only callers are the HUD's multiplayer parts (already MP only)
 // match: ?sub_E3970@@YA?AUtype_1A5EA0@@PBDH@Z @ 0x000E3970
 type_1A5EA0 sub_E3970(const RwChar *arg_0, RwInt32 arg_4)
 {
     return unk_4FEB0C.sub_1CAF30(arg_0, arg_4);
 }
+#endif
 
 // match: ?sub_E39B0@type_DC400@@QAEHHPBDH@Z @ 0x000E39B0
+// sp-match: ?sub_E39B0@type_DC400@@QAEHHPBDH@Z @ 0x000A9F60
 RwInt32 type_DC400::sub_E39B0(RwInt32 arg_0, const RwChar *arg_4, RwInt32 arg_8)
 {
     if (unk_E0[arg_0].unk_54)
@@ -2672,7 +3550,11 @@ RwInt32 type_DC400::sub_E39B0(RwInt32 arg_0, const RwChar *arg_4, RwInt32 arg_8)
             unk_E0[arg_0].unk_188.y = (RwReal)unk_E0[arg_0].unk_114->height;
             if (arg_8)
             {
+#ifdef CODFH_SP // shape: single player's buddy icon is item 0x62 (SP 0xA9F60)
+                sub_E70D0(&unk_E0[0x62]);
+#else
                 sub_E70D0(&unk_E0[0x91]);
+#endif
             }
         }
     }
@@ -2680,6 +3562,7 @@ RwInt32 type_DC400::sub_E39B0(RwInt32 arg_0, const RwChar *arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_E3B50@type_DC400@@QAEXH@Z @ 0x000E3B50
+// sp-match: ?sub_E3B50@type_DC400@@QAEXH@Z @ 0x000A7B20
 void type_DC400::sub_E3B50(RwInt32 arg_0)
 {
     unk_E0[arg_0].unk_28 = 1;
@@ -2687,6 +3570,7 @@ void type_DC400::sub_E3B50(RwInt32 arg_0)
 }
 
 // match: ?sub_E3B90@type_DC400@@QAEXHM@Z @ 0x000E3B90
+// sp-match: ?sub_E3B90@type_DC400@@QAEXHM@Z @ 0x000AA030
 void type_DC400::sub_E3B90(RwInt32 arg_0, RwReal arg_4)
 {
     RwInt32 var_4;
@@ -2711,11 +3595,19 @@ void type_DC400::sub_E3B90(RwInt32 arg_0, RwReal arg_4)
         unk_E0[0x1B].unk_24 = arg_4;
         unk_E0[0x1C].unk_24 = arg_4;
     }
+#ifdef CODFH_SP // shape: single player's buddy items 0x61, 0x64 and 0x63 (SP 0xAA030)
+    if (arg_0 == 0x61)
+    {
+        unk_E0[0x64].unk_24 = arg_4;
+        unk_E0[0x63].unk_24 = arg_4;
+    }
+#else
     if (arg_0 == 0x90)
     {
         unk_E0[0x93].unk_24 = arg_4;
         unk_E0[0x92].unk_24 = arg_4;
     }
+#endif
     if (arg_0 == 7)
     {
         unk_E0[9].unk_24 = arg_4;
@@ -2723,6 +3615,7 @@ void type_DC400::sub_E3B90(RwInt32 arg_0, RwReal arg_4)
 }
 
 // match: ?sub_E3CB0@type_DC400@@QAEXPAUtype_DC400_E0@@H@Z @ 0x000E3CB0
+// sp-match: ?sub_E3CB0@type_DC400@@QAEXPAUtype_DC400_E0@@H@Z @ 0x000A7B50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E3CB0(type_DC400_E0 *arg_0, RwInt32 arg_4)
 {
@@ -2739,7 +3632,7 @@ void type_DC400::sub_E3CB0(type_DC400_E0 *arg_0, RwInt32 arg_4)
         bp_4 = RwIm2DVertexGetBlue(&arg_0->unk_118[lv_10]);
         RwIm2DVertexSetIntRGBA(&arg_0->unk_118[lv_10], var_C, bp_8, bp_4, arg_4);
     }
-    for (var_14 = 0; var_14 < 40; var_14++)
+    for (var_14 = 0; var_14 < type_DC400_children; var_14++)
     {
         if (arg_0->unk_204[var_14] && arg_0->unk_204[var_14]->unk_20)
         {
@@ -2749,6 +3642,7 @@ void type_DC400::sub_E3CB0(type_DC400_E0 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_E3DB0@type_DC400@@QAEXPAUtype_DC400_E0@@H@Z @ 0x000E3DB0
+// sp-match: ?sub_E3DB0@type_DC400@@QAEXPAUtype_DC400_E0@@H@Z @ 0x000A7C50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E3DB0(type_DC400_E0 *arg_0, RwInt32 arg_4)
 {
@@ -2771,6 +3665,7 @@ void type_DC400::sub_E3DB0(type_DC400_E0 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_E3E60@type_DC400@@QAEXMPAURwV3d@@0PAMM@Z @ 0x000E3E60
+// sp-match: ?sub_E3E60@type_DC400@@QAEXMPAURwV3d@@0PAMM@Z @ 0x000A7D20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E3E60(RwReal arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal *arg_C, RwReal arg_10)
 {
@@ -2812,6 +3707,7 @@ void type_DC400::sub_E3E60(RwReal arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal *arg
 // match: ?sub_E4030@type_DC400@@QAEXM@Z @ 0x000E4030
 // match: __ehhandler$?sub_E4030@type_DC400@@QAEXM@Z-0x8 @ 0x00300EA0
 // match: __ehhandler$?sub_E4030@type_DC400@@QAEXM@Z @ 0x00300EA8
+// sp-match: ?sub_E4030@type_DC400@@QAEXM@Z @ 0x000ABF70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E4030(RwReal arg_0)
 {
@@ -2830,7 +3726,9 @@ void type_DC400::sub_E4030(RwReal arg_0)
     RwV3d lcl_F0;
     RwInt32 varE4;
     RwReal xE0;
+#ifndef CODFH_SP
     RwV3d varDC;
+#endif
     RwInt32 vD0;
     RwReal stk_CC;
     RwReal stk_C8;
@@ -2861,7 +3759,9 @@ void type_DC400::sub_E4030(RwReal arg_0)
     RwReal l3C;
     RwV3d local_38;
     RwV3d *stk_2C;
+#ifndef CODFH_SP
     RwV3d var28;
+#endif
     RwCamera *l1C;
     RwV3d m_18;
 
@@ -2893,6 +3793,7 @@ void type_DC400::sub_E4030(RwReal arg_0)
     unk_1A044 = l3C + unk_1A040;
     sub_E5F60(0x1F, -unk_1A044);
     sub_E5F60(0x1F, -unk_1A044);
+#ifndef CODFH_SP // single player has no marker items 0x31..0x40 and resets none (SP 0xAC0CA)
     sub_E09E0(0x31, 0);
     sub_E09E0(0x32, 0);
     sub_E09E0(0x33, 0);
@@ -2911,6 +3812,12 @@ void type_DC400::sub_E4030(RwReal arg_0)
     sub_E09E0(0x21, 0);
     sub_E09E0(0x3F, 0);
     sub_E09E0(0x40, 0);
+#endif
+#ifdef CODFH_SP // single player points at one objective, sp_sub_10DBA0's (SP 0xAC0CA)
+    var_74 = 0;
+    var_78 = sub_1708B0(sp_sub_10DBA0());
+    {
+#else
     std::vector<RwInt32> y5C;
 
     sub_1708E0(&y5C);
@@ -2918,6 +3825,7 @@ void type_DC400::sub_E4030(RwReal arg_0)
     for (var_74 = 0; var_74 < loc44; var_74++)
     {
         var_78 = (type_4E56A0 *)y5C[var_74];
+#endif
         if (var_78 && var_78->unk_40 != -1)
         {
             loc88 = 0;
@@ -2934,7 +3842,11 @@ void type_DC400::sub_E4030(RwReal arg_0)
                 {
                     sub_E09E0(0x20, 0);
                     sub_E09E0(0x21, 0);
+#ifdef CODFH_SP // single player stops here (SP 0xAC114)
+                    return;
+#else
                     continue;
+#endif
                 }
                 break;
             case 0:
@@ -2947,7 +3859,11 @@ void type_DC400::sub_E4030(RwReal arg_0)
                 {
                     sub_E09E0(0x20, 0);
                     sub_E09E0(0x21, 0);
+#ifdef CODFH_SP // single player stops here (SP 0xAC114)
+                    return;
+#else
                     continue;
+#endif
                 }
                 break;
             }
@@ -2957,6 +3873,10 @@ void type_DC400::sub_E4030(RwReal arg_0)
                 slot_A8 = (x90 = var_78->unk_3C->sub_BA450(stk_2C, 100.0f, 1.0f)) - var94;
                 if (slot_A8 != 0.0f)
                 {
+#ifdef CODFH_SP // shape: block-scoped, sharing var28's slot (SP frame 0x98)
+                    RwV3d varDC;
+
+#endif
                     if (var_78->unk_4C == -1.0f)
                     {
                         var_78->unk_4C = 1.0f;
@@ -3119,7 +4039,28 @@ void type_DC400::sub_E4030(RwReal arg_0)
                     w48 = 1.0f;
                 }
             }
+#ifdef CODFH_SP // shape: declared here, sharing varDC's slot (SP 0xAC63A)
+            RwV3d var28;
+
+#endif
             sub_E3E60(arg_0, &var28, &local_38, &unk_1A04C[var_74], w48);
+#ifdef CODFH_SP // single player shows the objective's arrow (0x20) and pulse (0x21) (SP 0xAC647)
+            sub_E09E0(0x20, 1);
+            sub_E6200(0x20, var28.x, var28.z);
+            sub_E6610(&unk_E0[0x20]);
+            if (sub_1712C0(var_78, &u84, &bp_7C))
+            {
+                sub_E09E0(0x21, 1);
+                sub_E6200(0x21, var28.x, var28.z);
+                sub_E6270(0x21, u84, u84);
+                sub_E3B90(0x21, bp_7C);
+                sub_E6610(&unk_E0[0x21]);
+            }
+            else
+            {
+                sub_E09E0(0x21, 0);
+            }
+#else
             sub_E09E0(0x20, 0);
             sub_E09E0(0x21, 0);
             if (var_74 == 0)
@@ -3255,7 +4196,15 @@ void type_DC400::sub_E4030(RwReal arg_0)
                 }
                 break;
             }
+#endif
         }
+#ifdef CODFH_SP // no objective: arrow and pulse hidden (SP 0xAC6C9)
+        else
+        {
+            sub_E09E0(0x20, 0);
+            sub_E09E0(0x21, 0);
+        }
+#endif
     }
     for (l124 = 0; l124 < 15; l124++)
     {
@@ -3282,6 +4231,7 @@ void type_DC400::sub_E4030(RwReal arg_0)
 }
 
 // match: ?sub_E52B0@type_DC400@@QAEXPBD@Z @ 0x000E52B0
+// sp-match: ?sub_E52B0@type_DC400@@QAEXPBD@Z @ 0x000A7E90
 void type_DC400::sub_E52B0(const RwChar *arg_0)
 {
     RwChar var_48[0x40];
@@ -3323,7 +4273,161 @@ void type_DC400::sub_E52B0(const RwChar *arg_0)
     }
 }
 
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_A7FB0@type_DC400@@QAEXXZ @ 0x000A7FB0
+// Single player only (SP 0xA7FB0): the pause screen's objectives list, from
+// dword_4B8F54 down by the font's line height. Each shown objective (flag 2; not
+// flag 4 on level 30) reads "- " and its text in its colour (dword_4B8F48 for flag 4,
+// dword_4B8F4C for 8, dword_4B8F50 for 0x10, else dword_4B8F44), faded in by its
+// unk_14 of dword_4B8F5C; the next one starts once this one is past half
+// (unk_1A4BC counts them).
+void type_DC400::sp_sub_A7FB0()
+{
+    RwChar var_80[0x80];
+    Rt2dBBox var_bbox;
+    RwV2d var_pos;
+    RwReal var_scale;
+    RwV2d var_at;
+    RwInt8 var_id;
+    RwRGBA var_c;
+    bool var_level;
+    type_4E56A0 *var_o;
+    RwInt32 var_n;
+
+    var_pos.x = dword_4B8F54.x;
+    var_pos.y = dword_4B8F54.y;
+    var_n = 0;
+    var_at = var_pos;
+    var_at.y -= unk_1A028->sub_DA790();
+    var_scale = 1.0f;
+    if (dword_4CF9A8)
+    {
+        var_scale = 0.8333333f;
+    }
+    var_id = byte_4E564D;
+    var_o = sub_1708B0(var_id);
+    var_level = sub_19B050() == 30;
+    Rt2dCTMPush();
+    Rt2dCTMSetIdentity();
+    Rt2dCTMScale(dword_4B8970 * var_scale, 1.0f);
+    while (var_o)
+    {
+        if ((var_o->unk_04 & 2) && (!(var_o->unk_04 & 4) || !var_level))
+        {
+            if (var_o->unk_04 & 4)
+            {
+                var_c = dword_4B8F48;
+            }
+            else if (var_o->unk_04 & 8)
+            {
+                var_c = dword_4B8F4C;
+            }
+            else if (var_o->unk_04 & 0x10)
+            {
+                var_c = dword_4B8F50;
+            }
+            else
+            {
+                var_c = dword_4B8F44;
+            }
+            if (var_n <= unk_1A4BC)
+            {
+                var_c.alpha = (RwUInt8)(var_o->unk_14 / dword_4B8F5C * 255.0f);
+            }
+            else
+            {
+                var_c.alpha = 0;
+            }
+            if (var_n == unk_1A4BC && var_c.alpha > 0x80)
+            {
+                unk_1A4BC++;
+            }
+            sprintf(var_80, "- ");
+            var_o->unk_00->sub_197550(var_80 + 2, var_o->unk_08);
+            var_bbox.x = var_pos.x / dword_4B8970;
+            var_bbox.y = var_at.y - 0.5f + unk_1A028->sub_DA790();
+            var_bbox.w = 1.0f - (var_bbox.x + var_bbox.x);
+            var_bbox.h = 0.5f;
+            unk_1A028->sub_DAC60(var_80, &var_bbox, 0.0f, 0, &var_c, 0.0f);
+            var_at.y -= unk_1A028->sub_DA8C0(var_80, &var_bbox, 0.0f);
+            var_n++;
+        }
+        var_id = sub_170890(var_id);
+        var_o = sub_1708B0(var_id);
+    }
+    Rt2dCTMPop();
+}
+
+// sp-match: ?sp_sub_A81E0@type_DC400@@QAEXXZ @ 0x000A81E0
+// Single player only (SP 0xA81E0): the pause screen's black over the whole screen, as
+// sub_E5C60's flash, at unk_1A4B4 of dword_4B8F5C of the opacity dword_4B8F60 while it
+// fades in (unk_1A4B8 clear), then at dword_4B8F60.
+void type_DC400::sp_sub_A81E0()
+{
+    RwInt32 var_94;
+    void *var_90;
+    void *l8C;
+    void *var_88;
+    void *lcl_84;
+    void *var_80;
+    void *var_7C;
+    void *m_78;
+    void *v74;
+    RwIm2DVertex l70[4];
+    RwInt32 var_alpha;
+
+    if (unk_1A4B8)
+    {
+        var_alpha = (RwInt32)(dword_4B8F60 * 255.0f);
+    }
+    else
+    {
+        var_alpha = (RwInt32)(unk_1A4B4 / dword_4B8F5C * dword_4B8F60 * 255.0f);
+    }
+    RwRenderStateGet(rwRENDERSTATESRCBLEND, &m_78);
+    RwRenderStateGet(rwRENDERSTATEDESTBLEND, &l8C);
+    RwRenderStateGet(rwRENDERSTATEVERTEXALPHAENABLE, &lcl_84);
+    RwRenderStateGet(rwRENDERSTATEZWRITEENABLE, &var_80);
+    RwRenderStateGet(rwRENDERSTATEZTESTENABLE, &var_90);
+    RwRenderStateGet(rwRENDERSTATEFOGENABLE, &v74);
+    RwRenderStateGet(rwRENDERSTATETEXTURERASTER, &var_7C);
+    RwRenderStateGet(rwRENDERSTATESHADEMODE, &var_88);
+    RwRenderStateSet(rwRENDERSTATESRCBLEND, (void *)rwBLENDSRCALPHA);
+    RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void *)rwBLENDINVSRCALPHA);
+    RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, (void *)TRUE);
+    RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, (void *)FALSE);
+    RwRenderStateSet(rwRENDERSTATEZTESTENABLE, (void *)FALSE);
+    RwRenderStateSet(rwRENDERSTATEFOGENABLE, (void *)FALSE);
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    RwRenderStateSet(rwRENDERSTATESHADEMODE, (void *)rwSHADEMODEGOURAUD);
+    RwIm2DVertexSetScreenX(&l70[0], 0.0f);
+    RwIm2DVertexSetScreenY(&l70[0], 0.0f);
+    RwIm2DVertexSetScreenX(&l70[1], 0.0f);
+    RwIm2DVertexSetScreenY(&l70[1], (RwReal)(RwUInt32)Height);
+    RwIm2DVertexSetScreenX(&l70[2], (RwReal)(RwUInt32)Width);
+    RwIm2DVertexSetScreenY(&l70[2], (RwReal)(RwUInt32)Height);
+    RwIm2DVertexSetScreenX(&l70[3], (RwReal)(RwUInt32)Width);
+    RwIm2DVertexSetScreenY(&l70[3], 0.0f);
+    for (var_94 = 0; var_94 < 4; var_94++)
+    {
+        RwIm2DVertexSetScreenZ(&l70[var_94], RwIm2DGetNearScreenZ());
+        RwIm2DVertexSetRecipCameraZ(&l70[var_94], 1.0f / RwCameraGetNearClipPlane(unk_1A02C));
+        RwIm2DVertexSetIntRGBA(&l70[var_94], 0, 0, 0, var_alpha);
+    }
+    RwIm2DRenderPrimitive(rwPRIMTYPETRIFAN, l70, 4);
+    RwRenderStateSet(rwRENDERSTATESRCBLEND, m_78);
+    RwRenderStateSet(rwRENDERSTATEDESTBLEND, l8C);
+    RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, lcl_84);
+    RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, var_80);
+    RwRenderStateSet(rwRENDERSTATEZTESTENABLE, var_90);
+    RwRenderStateSet(rwRENDERSTATEFOGENABLE, v74);
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, var_7C);
+    RwRenderStateSet(rwRENDERSTATESHADEMODE, var_88);
+}
+#endif
+
 // match: ?sub_E5480@type_DC400@@QAEXPAUtype_DC400_E0@@@Z @ 0x000E5480
+// sp-match: ?sub_E5480@type_DC400@@QAEXPAUtype_DC400_E0@@@Z @ 0x000A8450
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E5480(type_DC400_E0 *arg_0)
 {
@@ -3348,17 +4452,19 @@ void type_DC400::sub_E5480(type_DC400_E0 *arg_0)
     {
         return;
     }
-    for (bp_4 = 0; bp_4 < 40; bp_4++)
+    for (bp_4 = 0; bp_4 < type_DC400_children; bp_4++)
     {
         if (arg_0->unk_204[bp_4] && arg_0->unk_204[bp_4]->unk_20)
         {
             sub_E5480(arg_0->unk_204[bp_4]);
         }
     }
+#ifndef CODFH_SP // MP only: single player's items have no unk_2B0 (SP 0xA8450 has no check)
     if (arg_0->unk_2B0)
     {
         return;
     }
+#endif
     if (arg_0->unk_58 && unk_1A028)
     {
         var_14 = 1.0f;
@@ -3373,7 +4479,11 @@ void type_DC400::sub_E5480(type_DC400_E0 *arg_0)
         Rt2dCTMScale(lv_10 * dword_4B8970, 1.0f);
         var_C.x = arg_0->unk_1F4.x / (RwReal)(RwUInt32)Width;
         var_C.y = arg_0->unk_1F4.y / (RwReal)(RwUInt32)Height;
+#ifdef CODFH_SP // shape: the scale over the aspect first (SP 0xA8450)
+        var_C.x = (1.1666666f / dword_4B8970) * var_C.x;
+#else
         var_C.x = 1.1666666f / dword_4B8970 * var_C.x;
+#endif
         if (dword_4CF9A8)
         {
             var_C.x = (var_14 + flt_4293C4) * var_C.x;
@@ -3438,7 +4548,11 @@ void type_DC400::sub_E5480(type_DC400_E0 *arg_0)
                 }
                 unk_1A028->sub_DAC60(unk_1A15C, &u430, loc1C, 0, &dword_4B8F98, 0.0f);
                 unk_1A028->sub_DAC60(unk_1A164, &u430, loc1C, 0, &dword_4B8F9C, 0.0f);
+#ifdef CODFH_SP // shape: the frame time scaled first (SP 0xA8450 multiplies by 16.67 and by 1/1000)
+                unk_1A160 = (deltaTime * flt_3D8058) / 1000.0f + unk_1A160;
+#else
                 unk_1A160 = deltaTime * flt_3D8058 / 1000.0f + unk_1A160;
+#endif
                 unk_1A15C = 0;
             }
         }
@@ -3507,6 +4621,7 @@ void type_DC400::sub_E5480(type_DC400_E0 *arg_0)
 }
 
 // match: ?sub_E5C60@type_DC400@@QAEXXZ @ 0x000E5C60
+// sp-match: ?sub_E5C60@type_DC400@@QAEXXZ @ 0x000A89F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E5C60()
 {
@@ -3563,6 +4678,7 @@ void type_DC400::sub_E5C60()
 }
 
 // match: ?sub_E5F60@type_DC400@@QAEXHM@Z @ 0x000E5F60
+// sp-match: ?sub_E5F60@type_DC400@@QAEXHM@Z @ 0x000AA100
 void type_DC400::sub_E5F60(RwInt32 arg_0, RwReal arg_4)
 {
     RwV3d var_C;
@@ -3582,6 +4698,7 @@ void type_DC400::sub_E5F60(RwInt32 arg_0, RwReal arg_4)
 }
 
 // match: ?sub_E6200@type_DC400@@QAEXHMM@Z @ 0x000E6200
+// sp-match: ?sub_E6200@type_DC400@@QAEXHMM@Z @ 0x000AA220
 void type_DC400::sub_E6200(RwInt32 arg_0, RwReal arg_4, RwReal arg_8)
 {
     RwV3d var_C;
@@ -3594,6 +4711,7 @@ void type_DC400::sub_E6200(RwInt32 arg_0, RwReal arg_4, RwReal arg_8)
 }
 
 // match: ?sub_E6270@type_DC400@@QAEXHMM@Z @ 0x000E6270
+// sp-match: ?sub_E6270@type_DC400@@QAEXHMM@Z @ 0x000AA280
 void type_DC400::sub_E6270(RwInt32 arg_0, RwReal arg_4, RwReal arg_8)
 {
     RwV3d var_C;
@@ -3617,6 +4735,7 @@ void type_DC400::sub_E6270(RwInt32 arg_0, RwReal arg_4, RwReal arg_8)
 }
 
 // match: ?sub_E6570@type_DC400@@QAEXHH@Z @ 0x000E6570
+// sp-match: ?sub_E6570@type_DC400@@QAEXHH@Z @ 0x000A8C20
 void type_DC400::sub_E6570(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_E0[arg_0].unk_204[unk_E0[arg_0].unk_2A4] = &unk_E0[arg_4];
@@ -3625,6 +4744,7 @@ void type_DC400::sub_E6570(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_E6610@type_DC400@@QAEXPAUtype_DC400_E0@@@Z @ 0x000E6610
+// sp-match: ?sub_E6610@type_DC400@@QAEXPAUtype_DC400_E0@@@Z @ 0x000A8C80
 // Lays out the item arg_0 (its children first) when it is marked (unk_2A8):
 // its quad from its size (unk_188, in 512-wide units, less a 20-pixel bar),
 // through each of its ancestors' matrices and offsets (some items and
@@ -3655,7 +4775,7 @@ void type_DC400::sub_E6610(type_DC400_E0 *arg_0)
         return;
     }
     var_8 = arg_0;
-    for (var_C = 0; var_C < 40; var_C++)
+    for (var_C = 0; var_C < type_DC400_children; var_C++)
     {
         if (arg_0->unk_204[var_C] && arg_0->unk_204[var_C]->unk_20)
         {
@@ -3669,7 +4789,11 @@ void type_DC400::sub_E6610(type_DC400_E0 *arg_0)
         {
             var_10 = 1.0f / 1.333f;
         }
+#ifdef CODFH_SP // shape: the width over 512 first (SP 0xA8C80 keeps 1/512 and 0.5 apart)
+        var_1C = ((RwReal)(RwUInt32)Width / 512.0f) * arg_0->unk_188.x * 0.5f;
+#else
         var_1C = (RwReal)(RwUInt32)Width / 512.0f * arg_0->unk_188.x * 0.5f;
+#endif
         var_44 = ((RwReal)(RwUInt32)Height - 20.0f) * arg_0->unk_188.y / (RwReal)(RwUInt32)Height
                  * ((RwReal)(RwUInt32)Width / (RwReal)(RwUInt32)Height) * 0.5f;
         arg_0->unk_E0[0].x = -var_1C;
@@ -3687,9 +4811,15 @@ void type_DC400::sub_E6610(type_DC400_E0 *arg_0)
             var_54 = arg_0 - unk_E0;
             switch (var_54)
             {
+#ifdef CODFH_SP // shape: single player's vehicle bars and buddy health bar are items 63, 64 and 100 (SP 0xA8C80)
+            case 63:
+            case 64:
+            case 100:
+#else
             case 104:
             case 105:
             case 147:
+#endif
                 if (var_50.x > 0.0f)
                 {
                     var_64 = (RwReal)(RwUInt32)Width * arg_0->unk_188.x / 512.0f - arg_0->unk_188.x;
@@ -3706,7 +4836,12 @@ void type_DC400::sub_E6610(type_DC400_E0 *arg_0)
                 }
                 break;
             }
+#ifdef CODFH_SP // shape: the scale and the division stay two steps (SP 0xA8C80 multiplies by 512 and by 1/448)
+            var_50.y *= 512.0f;
+            var_50.y /= 448.0f;
+#else
             var_50.y = var_50.y * 512.0f / 448.0f;
+#endif
             if (var_8->unk_200)
             {
                 var_90 = var_8->unk_200 - unk_E0;
@@ -3716,19 +4851,31 @@ void type_DC400::sub_E6610(type_DC400_E0 *arg_0)
                 case 10:
                 case 14:
                 case 29:
+#ifdef CODFH_SP // shape: single player's item 56 (MP 97; SP 0xA8C80)
+                case 56:
+#else
                 case 97:
+#endif
                     var_50.y -= 25.0f;
                     break;
                 case 4:
                     var_50.y -= 18.5f;
                     break;
+#ifdef CODFH_SP // shape: single player's buddy health is item 97 (SP 0xA8C80)
+                case 97:
+#else
                 case 144:
+#endif
                     var_50.y += 25.0f;
                     break;
                 case 20:
                     var_50.y += 25.0f;
                     break;
+#ifdef CODFH_SP // shape: single player's crosshair is item 49 (SP 0xA8C80)
+                case 49:
+#else
                 case 90:
+#endif
                     var_98 = (type_10F710 *)sub_1745A0(dword_429EB0);
                     if (var_98 && var_98->unk_4D0)
                     {
@@ -3786,6 +4933,7 @@ void type_DC400::sub_E6610(type_DC400_E0 *arg_0)
 }
 
 // match: ?sub_E6F90@type_DC400@@QAEXHPBD_N11111@Z @ 0x000E6F90
+// sp-match: ?sub_E6F90@type_DC400@@QAEXHPBD_N11111@Z @ 0x000A9480
 void type_DC400::sub_E6F90(RwInt32 arg_0, const RwChar *arg_4, bool arg_8, bool arg_C, bool arg_10, bool arg_14,
                            bool arg_18, bool arg_1C)
 {
@@ -3799,6 +4947,7 @@ void type_DC400::sub_E6F90(RwInt32 arg_0, const RwChar *arg_4, bool arg_8, bool 
 }
 
 // match: ?sub_E7050@type_DC400@@QAEXHMM@Z @ 0x000E7050
+// sp-match: ?sub_E7050@type_DC400@@QAEXHMM@Z @ 0x000AA3E0
 void type_DC400::sub_E7050(RwInt32 arg_0, RwReal arg_4, RwReal arg_8)
 {
     RwReal var_4;
@@ -3814,11 +4963,12 @@ void type_DC400::sub_E7050(RwInt32 arg_0, RwReal arg_4, RwReal arg_8)
 }
 
 // match: ?sub_E70D0@type_DC400@@QAEXPAUtype_DC400_E0@@@Z @ 0x000E70D0
+// sp-match: ?sub_E70D0@type_DC400@@QAEXPAUtype_DC400_E0@@@Z @ 0x000A94F0
 void type_DC400::sub_E70D0(type_DC400_E0 *arg_0)
 {
     RwInt32 var_4;
 
-    for (var_4 = 0; var_4 < 40; var_4++)
+    for (var_4 = 0; var_4 < type_DC400_children; var_4++)
     {
         if (arg_0->unk_204[var_4] && arg_0->unk_204[var_4]->unk_20)
         {
@@ -3829,6 +4979,7 @@ void type_DC400::sub_E70D0(type_DC400_E0 *arg_0)
 }
 
 // match: ?sub_E7140@type_DC400@@QAEXHM@Z @ 0x000E7140
+// sp-match: ?sub_E7140@type_DC400@@QAEXHM@Z @ 0x000A9540
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E7140(RwInt32 arg_0, RwReal arg_4)
 {
@@ -3851,6 +5002,7 @@ void type_DC400::sub_E7140(RwInt32 arg_0, RwReal arg_4)
 }
 
 // match: ?sub_E7200@type_DC400@@QAEXHHHHH@Z @ 0x000E7200
+// sp-match: ?sub_E7200@type_DC400@@QAEXHHHHH@Z @ 0x000A95C0
 void type_DC400::sub_E7200(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C, RwInt32 arg_10)
 {
     RwInt32 var_4;
@@ -3862,6 +5014,7 @@ void type_DC400::sub_E7200(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 
 }
 
 // match: ?sub_E7270@type_DC400@@QAEXHPAURwRGBA@@000@Z @ 0x000E7270
+// sp-match: ?sub_E7270@type_DC400@@QAEXHPAURwRGBA@@000@Z @ 0x000A9610
 void type_DC400::sub_E7270(RwInt32 arg_0, RwRGBA *arg_4, RwRGBA *arg_8, RwRGBA *arg_C, RwRGBA *arg_10)
 {
     RwIm2DVertexSetIntRGBA(&unk_E0[arg_0].unk_118[0], arg_4->red, arg_4->green, arg_4->blue, arg_4->alpha);
@@ -3872,13 +5025,14 @@ void type_DC400::sub_E7270(RwInt32 arg_0, RwRGBA *arg_4, RwRGBA *arg_8, RwRGBA *
 }
 
 // match: ?sub_E7380@type_DC400@@QAEXHPBD@Z @ 0x000E7380
+// sp-match: ?sub_E7380@type_DC400@@QAEXHPBD@Z @ 0x000A96B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E7380(RwInt32 arg_0, const RwChar *arg_4)
 {
     const RwChar *var_8;
     RwInt32 l4;
 
-    if (arg_4 && arg_0 < 151)
+    if (arg_4 && arg_0 < type_DC400_items)
     {
         if (arg_0 == 2)
         {
@@ -3906,15 +5060,17 @@ void type_DC400::sub_E7380(RwInt32 arg_0, const RwChar *arg_4)
 }
 
 // match: ?sub_E7480@type_DC400@@QAEXHPAURwRGBAReal@@@Z @ 0x000E7480
+// sp-match: ?sub_E7480@type_DC400@@QAEXHPAURwRGBAReal@@@Z @ 0x000A9790
 void type_DC400::sub_E7480(RwInt32 arg_0, RwRGBAReal *arg_4)
 {
-    if (arg_4 && arg_0 < 151)
+    if (arg_4 && arg_0 < type_DC400_items)
     {
         unk_E0[arg_0].unk_34 = *arg_4;
     }
 }
 
 // match: ?sub_E74D0@type_DC400@@QAEXHPAURwV2d@@@Z @ 0x000E74D0
+// sp-match: ?sub_E74D0@type_DC400@@QAEXHPAURwV2d@@@Z @ 0x000A97D0
 void type_DC400::sub_E74D0(RwInt32 arg_0, RwV2d *arg_4)
 {
     if (!arg_4)
@@ -3926,6 +5082,7 @@ void type_DC400::sub_E74D0(RwInt32 arg_0, RwV2d *arg_4)
     sub_E70D0(&unk_E0[arg_0]);
 }
 
+#ifndef CODFH_SP // MP only: no single-player twins, they set unk_2B0, unk_2BC and unk_2B4 (absent there)
 // match: ?sub_E7540@type_DC400@@QAEXHH@Z @ 0x000E7540
 void type_DC400::sub_E7540(RwInt32 arg_0, RwInt32 arg_4)
 {
@@ -3943,6 +5100,7 @@ void type_DC400::sub_E75A0(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_E0[arg_0].unk_2B4 = arg_4;
 }
+#endif
 
 // match: ?sub_E75D0@type_DC400@@QAEXHURwRGBA@@@Z @ 0x000E75D0
 void type_DC400::sub_E75D0(RwInt32 arg_0, RwRGBA arg_4)
@@ -3950,6 +5108,7 @@ void type_DC400::sub_E75D0(RwInt32 arg_0, RwRGBA arg_4)
     unk_E0[arg_0].unk_190 = arg_4;
 }
 
+#ifndef CODFH_SP // MP only: no single-player twin (SP 0xAA590 draws no item texts), it reads unk_2B0 (absent there)
 // match: ?sub_E7600@type_DC400@@QAEXPAUtype_DC400_E0@@@Z @ 0x000E7600
 // match: __ehhandler$?sub_E7600@type_DC400@@QAEXPAUtype_DC400_E0@@@Z-0x23 @ 0x00300EC0
 // match: __ehhandler$?sub_E7600@type_DC400@@QAEXPAUtype_DC400_E0@@@Z @ 0x00300EE3
@@ -3963,7 +5122,7 @@ void type_DC400::sub_E7600(type_DC400_E0 *arg_0)
     {
         return;
     }
-    for (lv_10 = 0; lv_10 < 40; lv_10++)
+    for (lv_10 = 0; lv_10 < type_DC400_children; lv_10++)
     {
         if (arg_0->unk_204[lv_10] && arg_0->unk_204[lv_10]->unk_20)
         {
@@ -3972,6 +5131,7 @@ void type_DC400::sub_E7600(type_DC400_E0 *arg_0)
     }
     if (arg_0->unk_2B0)
     {
+#ifndef CODFH_SP // MP only: the text through the kujuUI fonts (unk_88, unk_8C)
         if (arg_0->unk_58 && arg_0->unk_60 && arg_0->unk_60[0])
         {
             type_E8780<type_1E5A60> var_18;
@@ -4016,6 +5176,7 @@ void type_DC400::sub_E7600(type_DC400_E0 *arg_0)
             }
         }
         else
+#endif
         {
             if (arg_0->unk_54)
             {
@@ -4030,7 +5191,9 @@ void type_DC400::sub_E7600(type_DC400_E0 *arg_0)
         }
     }
 }
+#endif
 
+#ifndef CODFH_SP // MP only: no single-player twin, it reads unk_90/unk_60 (absent there)
 // match: ?sub_E79C0@type_DC400@@QAEXXZ @ 0x000E79C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E79C0()
@@ -4054,6 +5217,7 @@ void type_DC400::sub_E79C0()
         sub_E7AB0(var_10, var_C, bp_8, bp_4, unk_E0[0x57].unk_190);
     }
 }
+#endif
 
 // match: ?sub_E7AB0@type_DC400@@QAEXMMMMURwRGBA@@@Z @ 0x000E7AB0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -4111,6 +5275,7 @@ void type_DC400::sub_E7AB0(RwReal arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_
     RwRenderStateSet(rwRENDERSTATESHADEMODE, var_88);
 }
 
+#ifndef CODFH_SP // MP only: no single-player twin, it reads unk_90/unk_60 (absent there)
 // match: ?sub_E7D00@type_DC400@@QAEXXZ @ 0x000E7D00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E7D00()
@@ -4137,6 +5302,7 @@ void type_DC400::sub_E7D00()
         sub_E8220(var_1C->c_str(), var_14, unk_60[dword_4F6950.sub_1A3D50(1)]);
     }
 }
+#endif
 
 // Not in the image: a stand-in for a function the original object held here, which
 // the link dropped (/OPT:REF) but whose literals stayed first: "%s%s", the game
@@ -4157,6 +5323,7 @@ void dropped_3D8C40(RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C)
     sprintf(arg_0, "%s%s", arg_0, lv_4);
 }
 
+#ifndef CODFH_SP // MP only: no twin in config/sp/shared.txt; its only callers are the HUD's multiplayer parts (already MP only)
 // match: ?sub_E7EF0@type_DC400@@QAEXXZ @ 0x000E7EF0
 // match: __ehhandler$?sub_E7EF0@type_DC400@@QAEXXZ-0x8 @ 0x00300EF0
 // match: __ehhandler$?sub_E7EF0@type_DC400@@QAEXXZ @ 0x00300EF8
@@ -4198,6 +5365,7 @@ void type_DC400::sub_E7EF0()
         }
     }
 }
+#endif
 
 // match: ?sub_E8220@type_DC400@@QAEXPBDURwV3d@@URwRGBA@@@Z @ 0x000E8220
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -4238,6 +5406,7 @@ void type_DC400::sub_E82F0(RwCamera *arg_0)
 // Reads the texture dictionary arg_0 (a level path, sub_D7F20); 0 when it
 // will not open or holds none.
 // match: ?sub_E8320@@YAPAURwTexDictionary@@PBD@Z @ 0x000E8320
+// sp-match: ?sub_E8320@@YAPAURwTexDictionary@@PBD@Z @ 0x000A9810
 RwTexDictionary *sub_E8320(const RwChar *arg_0)
 {
     RwChar var_210[0x200];
@@ -4247,7 +5416,9 @@ RwTexDictionary *sub_E8320(const RwChar *arg_0)
     l4 = 0;
     var8 = 0;
     sub_D7F20(var_210, arg_0);
+#ifndef CODFH_SP // MP only: single player compiles out the debug print (SP 0xA9810)
     sub_19A750("Loading HUD Texture Dictionary file from: %s...", var_210);
+#endif
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_210);
     if (l4)
     {
@@ -4261,6 +5432,7 @@ RwTexDictionary *sub_E8320(const RwChar *arg_0)
 }
 
 // match: ?sub_E83D0@@YAXPAURwTexDictionary@@@Z @ 0x000E83D0
+// sp-match: ?sub_E83D0@@YAXPAURwTexDictionary@@@Z @ 0x000A9890
 void sub_E83D0(RwTexDictionary *arg_0)
 {
     if (arg_0)
@@ -4270,6 +5442,7 @@ void sub_E83D0(RwTexDictionary *arg_0)
 }
 
 // match: ?sub_E83F0@type_DC400@@QAEXXZ @ 0x000E83F0
+// sp-match: ?sub_E83F0@type_DC400@@QAEXXZ @ 0x000A98B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_DC400::sub_E83F0()
 {
@@ -4290,22 +5463,32 @@ void type_DC400::sub_E83F0()
 }
 
 // match: ?sub_E8470@type_DC400@@QAEXXZ @ 0x000E8470
+// sp-match: ?sub_E8470@type_DC400@@QAEXXZ @ 0x000AA430
 void type_DC400::sub_E8470()
 {
+#ifdef CODFH_SP // shape: single player's buddy items are 0x61, 0x63 and 0x64 (SP 0xAA430)
+    sub_E09E0(0x61, 0);
+    sub_E7140(0x61, 0.0f);
+    sub_E7140(0x63, 0.01f);
+    sub_E7140(0x64, 0.01f);
+    sub_E3B90(0x61, flt_4B8F14);
+#else
     sub_E09E0(0x90, 0);
     sub_E7140(0x90, 0.0f);
     sub_E7140(0x92, 0.01f);
     sub_E7140(0x93, 0.01f);
     sub_E3B90(0x90, flt_4B8F14);
+#endif
     unk_1A1A4 = 1;
 }
 
 // match: ?sub_E84E0@type_DC400@@QAEPAUtype_DC530@@PAUtype_3DAFC8@@@Z @ 0x000E84E0
+// sp-match: ?sub_E84E0@type_DC400@@QAEPAUtype_DC530@@PAUtype_3DAFC8@@@Z @ 0x000A98F0
 type_DC530 *type_DC400::sub_E84E0(type_3DAFC8 *arg_0)
 {
     RwInt32 var_4;
 
-    for (var_4 = 0; var_4 < 16; var_4++)
+    for (var_4 = 0; var_4 < type_DC400_labels; var_4++)
     {
         if (unk_1A1A8[var_4].unk_28.sub_D4910() == arg_0 && unk_1A1A8[var_4].unk_24)
         {
@@ -4313,7 +5496,7 @@ type_DC530 *type_DC400::sub_E84E0(type_3DAFC8 *arg_0)
             return &unk_1A1A8[var_4];
         }
     }
-    for (var_4 = 0; var_4 < 16; var_4++)
+    for (var_4 = 0; var_4 < type_DC400_labels; var_4++)
     {
         if (!unk_1A1A8[var_4].unk_24)
         {

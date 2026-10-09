@@ -15,6 +15,7 @@ extern RwaUniqueID *sub_240C30(RwaUniqueID *uniqueID);
 extern RwInt32 RwaUUIDCompare(const RwaUUID *uuid1, const RwaUUID *uuid2);
 
 // match: _sub_244600 @ 0x00244600
+// sp-match: _sub_244600 @ 0x0015D380
 void
 sub_244600(RwaParamType *paramType)
 {
@@ -25,6 +26,7 @@ sub_244600(RwaParamType *paramType)
 }
 
 // match: _sub_244630 @ 0x00244630
+// sp-match: _sub_244630 @ 0x0015D3B0
 void
 sub_244630(RwaSymbolTable *table)
 {
@@ -36,6 +38,7 @@ sub_244630(RwaSymbolTable *table)
 /* Return types: rwacore_ps2.h declares both symbol-table mutations as
  * RwaSymbolTable*. The image leaves table in EAX at 0x244682/0x2446C6. */
 // match: _sub_244650 @ 0x00244650
+// sp-match: _sub_244650 @ 0x0015D3D0
 RwaSymbolTable *
 sub_244650(RwaSymbolTable *table, RwaParamType *paramType)
 {
@@ -50,6 +53,7 @@ sub_244650(RwaSymbolTable *table, RwaParamType *paramType)
 }
 
 // match: _sub_244690 @ 0x00244690
+// sp-match: _sub_244690 @ 0x0015D410
 RwaSymbolTable *
 sub_244690(RwaSymbolTable *table, RwaParamType *paramType)
 {
@@ -70,6 +74,7 @@ sub_244690(RwaSymbolTable *table, RwaParamType *paramType)
 }
 
 // match: _sub_2446D0 @ 0x002446D0
+// sp-match: _sub_2446D0 @ 0x0015D450
 RwaParamType *
 sub_2446D0(RwaSymbolTable *table, const RwaUUID *uuid)
 {
@@ -91,6 +96,7 @@ sub_2446D0(RwaSymbolTable *table, const RwaUUID *uuid)
 }
 
 // match: _sub_244720 @ 0x00244720
+// sp-match: _sub_244720 @ 0x0015D4A0
 RwaParamType *
 sub_244720(RwaSymbolTable *table, RwaParamType *parent)
 {
@@ -112,6 +118,7 @@ sub_244720(RwaSymbolTable *table, RwaParamType *parent)
 }
 
 // match: _sub_244750 @ 0x00244750
+// sp-match: _sub_244750 @ 0x0015D4D0
 RwaParamType *
 sub_244750(RwaSymbolTable *table, RwInt32 index)
 {

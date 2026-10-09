@@ -40,7 +40,11 @@ struct type_4E56A0
     RwUInt8 unk_09[0x3];
     RwReal unk_0C;              // its nag timer (60 at first) and its
     RwReal unk_10;              // reload
+#ifdef CODFH_SP // a float in single player (SP 0xACDB0 loads and adds it)
+    RwReal unk_14;
+#else
     RwInt32 unk_14;
+#endif
     type_6B960 *unk_18;         // its messages: activate, complete, fail,
     type_6B960 *unk_1C;         // counter up and counter down (freed by
     type_6B960 *unk_20;         // sub_6BC40)
@@ -121,5 +125,10 @@ RwV3d *sub_171340(RwInt32 arg_0);
 type_4E56A0 *sub_1708B0(RwInt8 arg_0);
 // The index after record arg_0's.
 RwInt8 sub_170890(RwInt8 arg_0);
+#ifdef CODFH_SP
+// Single player only (SP 0x10DBA0): the objective the target system points
+// at (the HUD, SP 0xAC0CA, and sp_sub_10E2B0 ask it).
+RwInt8 sp_sub_10DBA0();
+#endif
 
 #endif

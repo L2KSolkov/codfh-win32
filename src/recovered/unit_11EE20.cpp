@@ -53,6 +53,9 @@ struct type_16C2A0 dword_4CEA48;
 // match: _$E2 @ 0x0030B7D0
 // match: _$E3 @ 0x0030E5F0
 // match: ?sub_11EE20@@YAXPAUtype_3D3548@@PAUtype_1227C0@@H@Z @ 0x0011EE20
+// sp-match: _$E2 @ 0x0021D830
+// sp-match: _$E3 @ 0x0021E980
+// sp-match: ?sub_11EE20@@YAXPAUtype_3D3548@@PAUtype_1227C0@@H@Z @ 0x000D7540
 
 // Its turret's callback: turns the turret towards what it aims at (or back
 // to its own facing without a line of sight once the wait is over) by its
@@ -67,7 +70,6 @@ void sub_11EE20(type_3D3548 *arg_0, type_1227C0 *arg_4, RwInt32 arg_8)
     RwV3d var_AC;
     type_3D3548 *var_B0;
     RwInt32 var_B4;
-    RwV3d var_C0;
     RwInt32 var_C4;
     RwV3d var_D0;
     RwReal var_D4;
@@ -90,6 +92,8 @@ void sub_11EE20(type_3D3548 *arg_0, type_1227C0 *arg_4, RwInt32 arg_8)
         }
         if (var_4->vf_018())
         {
+            RwV3d var_C0;
+
             var_B0 = var_4->unk_24.sub_D4910();
             var_B4 = 0;
             if (var_B0)
@@ -147,6 +151,7 @@ void sub_11EE20(type_3D3548 *arg_0, type_1227C0 *arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_11F2B0@@YAXPAUtype_3D3548@@PAUtype_1227C0@@H@Z @ 0x0011F2B0
+// sp-match: ?sub_11F2B0@@YAXPAUtype_3D3548@@PAUtype_1227C0@@H@Z @ 0x000D67A0
 // Its barrel's callback: keeps the barrel at the turret's tagged matrix
 // 'OPR0'+arg_8 (arg_8 0 to 9) or its frame's.
 void sub_11F2B0(type_3D3548 *arg_0, type_1227C0 *arg_4, RwInt32 arg_8)
@@ -188,16 +193,19 @@ void sub_11F2B0(type_3D3548 *arg_0, type_1227C0 *arg_4, RwInt32 arg_8)
 // match: ??0type_1227C0@@QAE@XZ @ 0x0011F3D0
 // match: __ehhandler$??0type_1227C0@@QAE@XZ-0x40 @ 0x00301510
 // match: __ehhandler$??0type_1227C0@@QAE@XZ @ 0x00301550
+// sp-match: ??0type_1227C0@@QAE@XZ @ 0x000D7810
 type_1227C0::type_1227C0()
 {
     unk_100 = 0;
 }
 
 // match: ??0type_F2880@@QAE@XZ @ 0x0011F4D0
+// sp-match: ??0type_F2880@@QAE@XZ @ 0x000B8470
 // (In its class: its out-of-line copy, emitted for the constructor's array
 // of three.)
 
 // match: ?vf_004@type_1227C0@@UAEXPAVProjectileGeneratorTrigger@@@Z @ 0x0011F500
+// sp-match: ?vf_004@type_1227C0@@UAEXPAVProjectileGeneratorTrigger@@@Z @ 0x000D83C0
 // Sets it up from its trigger arg_0: its burst, turret, sound and target
 // settings, its path (the spline of the object under the trigger's unk_E8)
 // and its named target point (unk_F0), then its first firing stage.
@@ -260,6 +268,7 @@ void type_1227C0::vf_004(ProjectileGeneratorTrigger *arg_0)
 }
 
 // match: ?vf_008@type_1227C0@@UAEXXZ @ 0x0011F7D0
+// sp-match: ?vf_008@type_1227C0@@UAEXXZ @ 0x000D7B90
 void type_1227C0::vf_008()
 {
     RwInt32 var_4;
@@ -293,6 +302,7 @@ void type_1227C0::vf_008()
 }
 
 // match: ?sub_11F8E0@type_1227C0@@QAEHXZ @ 0x0011F8E0
+// sp-match: ?sub_11F8E0@type_1227C0@@QAEHXZ @ 0x000D6860
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_1227C0::sub_11F8E0()
 {
@@ -368,6 +378,7 @@ inline RwInt32 pgn_tag(RwInt32 arg_0)
 }
 
 // match: ?sub_11F9E0@type_1227C0@@QAEXXZ @ 0x0011F9E0
+// sp-match: ?sub_11F9E0@type_1227C0@@QAEXXZ @ 0x000D68E0
 void type_1227C0::sub_11F9E0()
 {
     type_3D3548 *var_8;
@@ -394,6 +405,7 @@ void type_1227C0::sub_11F9E0()
 }
 
 // match: ?vf_010@type_1227C0@@UAEXM@Z @ 0x0011FAD0
+// sp-match: ?vf_010@type_1227C0@@UAEXM@Z @ 0x000D8560
 // Its update by arg_0 seconds: follows its parent, counts down its turret's
 // wait and its sound's replay (restarting the delay when its turret or
 // barrel changes kind), then, when a shot is due (or forced), aims at its
@@ -408,8 +420,10 @@ void type_1227C0::vf_010(RwReal arg_0)
     RwInt32 local_14;
     RwUInt32 var18;
     type_3D3548 *var_1C;
+#ifndef CODFH_SP
     RwV3d bp_28;
     RwV3d lv_34;
+#endif
 
     var_8 = unk_18.unk_08_pg;
     sub_11F9E0();
@@ -470,6 +484,9 @@ void type_1227C0::vf_010(RwReal arg_0)
     }
     if (var_8->unk_E4 == 2)
     {
+#ifdef CODFH_SP // shape: block-scoped vectors share a slot (SP 0xD8560 frame 0x14)
+        RwV3d bp_28;
+#endif
         RwV3dScaleMacro(&bp_28, &unk_70.at, 100.0f);
         RwV3dAddMacro(&bp_28, &unk_70.pos, &bp_28);
         sub_1218A0(&bp_28, unk_60);
@@ -524,6 +541,9 @@ void type_1227C0::vf_010(RwReal arg_0)
     case 3:
         if (unk_DC)
         {
+#ifdef CODFH_SP // shape: block-scoped vectors share a slot (SP 0xD8560 frame 0x14)
+            RwV3d lv_34;
+#endif
             unk_DC->sub_BA990(unk_CC, &lv_34, 0);
             sub_1218A0(&lv_34, unk_60);
             unk_CC += unk_D0;
@@ -586,6 +606,7 @@ void type_1227C0::vf_010(RwReal arg_0)
 }
 
 // match: ?sub_120150@type_1227C0@@QAEXXZ @ 0x00120150
+// sp-match: ?sub_120150@type_1227C0@@QAEXXZ @ 0x000D6990
 // Forces a shot now ("PG_ForcedFire").
 void type_1227C0::sub_120150()
 {
@@ -594,6 +615,7 @@ void type_1227C0::sub_120150()
 }
 
 // match: ?sub_120170@type_1227C0@@QAEXXZ @ 0x00120170
+// sp-match: ?sub_120170@type_1227C0@@QAEXXZ @ 0x000D7C50
 // After a shot: at the burst's end, stops its sound, draws the next burst's
 // shots and the pause before it, and moves to the next firing stage once
 // its shots there are spent; after its bursts, the long pause.
@@ -636,6 +658,7 @@ void type_1227C0::sub_120170()
 }
 
 // match: ?sub_120310@type_1227C0@@QAEXXZ @ 0x00120310
+// sp-match: ?sub_120310@type_1227C0@@QAEXXZ @ 0x000D7D60
 // Starts over: stops its sound, notes its turret's and barrel's kinds, and
 // takes its first firing stage with shots (none for a point or path).
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -714,6 +737,7 @@ void type_1227C0::sub_120310()
 }
 
 // match: ?sub_1205C0@type_1227C0@@QAEXXZ @ 0x001205C0
+// sp-match: ?sub_1205C0@type_1227C0@@QAEXXZ @ 0x000D69A0
 // The next firing stage with shots after the current one, or none.
 void type_1227C0::sub_1205C0()
 {
@@ -752,6 +776,7 @@ void type_1227C0::sub_1205C0()
 }
 
 // match: ?sub_120740@type_1227C0@@QAEHM@Z @ 0x00120740
+// sp-match: ?sub_120740@type_1227C0@@QAEHM@Z @ 0x000D7EF0
 RwInt32 type_1227C0::sub_120740(RwReal arg_0)
 {
     if (unk_48)
@@ -772,6 +797,7 @@ RwInt32 type_1227C0::sub_120740(RwReal arg_0)
 }
 
 // match: ?sub_1207A0@type_1227C0@@QAEHXZ @ 0x001207A0
+// sp-match: ?sub_1207A0@type_1227C0@@QAEHXZ @ 0x000D7F40
 // Fires at its target point (raised by the target's height offset), spread
 // at random within unk_60 across for a point target; whether it fired.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -810,6 +836,7 @@ RwInt32 type_1227C0::sub_1207A0()
 }
 
 // match: ?sub_120930@type_1227C0@@QAEXM@Z @ 0x00120930
+// sp-match: ?sub_120930@type_1227C0@@QAEXM@Z @ 0x000D6A70
 // Its first shot at the target: aims at it, and starts the walk of the
 // aim point from arg_0 off to one side at a random angle, the last point
 // twice as far to the other.
@@ -834,6 +861,7 @@ void type_1227C0::sub_120930(RwReal arg_0)
 }
 
 // match: ?sub_120A70@type_1227C0@@QAEXXZ @ 0x00120A70
+// sp-match: ?sub_120A70@type_1227C0@@QAEXXZ @ 0x000D6B30
 // Its next shot at the target: walks the aim point on from the last by a
 // random step (the trigger's unk_184 to unk_188), turned about the vertical
 // by a random angle within the trigger's unk_18C either way.
@@ -877,6 +905,7 @@ void type_1227C0::sub_120A70()
 }
 
 // match: ?sub_120DE0@type_1227C0@@QAEHXZ @ 0x00120DE0
+// sp-match: ?sub_120DE0@type_1227C0@@QAEHXZ @ 0x000D8070
 // Picks its target by its trigger's unk_E4: the player (0), the nearest
 // enemy (1) or none (2); whether it has one.
 RwInt32 type_1227C0::sub_120DE0()
@@ -907,6 +936,7 @@ RwInt32 type_1227C0::sub_120DE0()
 }
 
 // match: ?sub_120E80@type_1227C0@@QAEPAUtype_3D3548@@XZ @ 0x00120E80
+// sp-match: ?sub_120E80@type_1227C0@@QAEPAUtype_3D3548@@XZ @ 0x000D7890
 // The nearest entity not on its trigger's side (unk_DC) nor dead: a player
 // or an AI-controlled one flagged as a target (AIData::unk_49C_6), or any
 // other vehicle or soldier kind (vf_024, vf_01C) but side 4.
@@ -949,7 +979,11 @@ type_3D3548 *type_1227C0::sub_120E80()
                         var_4 = v34;
                     }
                 }
+#ifdef CODFH_SP // shape: constant on the left (SP 0xD7926 and eax,7; cmp al,4)
+                else if ((v20->vf_024() || v20->vf_01C()) && 4 != (v20->unk_2C & 7))
+#else
                 else if ((v20->vf_024() || v20->vf_01C()) && (v20->unk_2C & 7) != 4)
+#endif
                 {
                     stk_4C = &RwFrameGetLTM(v20->get_unk_340())->pos;
                     RwV3dSubMacro(&var_44, &var_18, stk_4C);
@@ -967,6 +1001,7 @@ type_3D3548 *type_1227C0::sub_120E80()
 }
 
 // match: ?sub_1210A0@type_1227C0@@QAEHPAURwV3d@@@Z @ 0x001210A0
+// sp-match: ?sub_1210A0@type_1227C0@@QAEHPAURwV3d@@@Z @ 0x000D6DB0
 // With its arc check on (unk_D4), whether *arg_0 lies within its firing
 // arcs (the trigger's unk_134 and unk_138) from its matrix; 1 otherwise.
 RwInt32 type_1227C0::sub_1210A0(RwV3d *arg_0)
@@ -982,6 +1017,7 @@ RwInt32 type_1227C0::sub_1210A0(RwV3d *arg_0)
 }
 
 // match: ?sub_121100@type_1227C0@@QAEHPAURwV3d@@PAURwMatrixTag@@@Z @ 0x00121100
+// sp-match: ?sub_121100@type_1227C0@@QAEHPAURwV3d@@PAURwMatrixTag@@@Z @ 0x000D6DF0
 // Likewise from the matrix *arg_4.
 RwInt32 type_1227C0::sub_121100(RwV3d *arg_0, RwMatrix *arg_4)
 {
@@ -996,6 +1032,7 @@ RwInt32 type_1227C0::sub_121100(RwV3d *arg_0, RwMatrix *arg_4)
 }
 
 // match: ?sub_121150@type_1227C0@@QAEXXZ @ 0x00121150
+// sp-match: ?sub_121150@type_1227C0@@QAEXXZ @ 0x000D79B0
 // Starts its sound, unless it plays: the trigger's (unk_140), or by the
 // trigger's unk_13C one of the global gun sounds.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -1047,6 +1084,7 @@ inline RwReal get_spread_multiplier()
 }
 
 // match: ?sub_121230@type_1227C0@@QAEXPAURwV3d@@PAURwMatrixTag@@@Z @ 0x00121230
+// sp-match: ?sub_121230@type_1227C0@@QAEXPAURwV3d@@PAURwMatrixTag@@@Z @ 0x000D6E30
 // Turns the matrix *arg_4 by a random angle within its trigger's spread
 // (unk_12C about its up row, unk_130 about its right row), scaled by the
 // difficulty, and leaves its at row in *arg_0.
@@ -1067,6 +1105,7 @@ void type_1227C0::sub_121230(RwV3d *arg_0, RwMatrix *arg_4)
 }
 
 // match: ?sub_1213D0@@YAXPAURwV3d@@PAURwMatrixTag@@@Z @ 0x001213D0
+// sp-match: ?sub_1213D0@@YAXPAURwV3d@@PAURwMatrixTag@@@Z @ 0x000D6F80
 // Builds the rows of *arg_4 about the direction *arg_0 (its at row), upright
 // unless it points nearly straight up or down; the identity for a direction
 // too short.
@@ -1098,6 +1137,7 @@ void sub_1213D0(RwV3d *arg_0, RwMatrix *arg_4)
 }
 
 // match: ?sub_1215E0@@YAHPAURwV3d@@0MMHPAURwMatrixTag@@@Z @ 0x001215E0
+// sp-match: ?sub_1215E0@@YAHPAURwV3d@@0MMHPAURwMatrixTag@@@Z @ 0x000D70C0
 // The direction to lob a shell from *arg_0 to *arg_4 at the speed arg_8
 // under the gravity arg_C (the high arc with arg_10), as the rows of
 // *arg_14; whether it can reach.
@@ -1173,6 +1213,7 @@ RwInt32 sub_1215E0(RwV3d *arg_0, RwV3d *arg_4, RwReal arg_8, RwReal arg_C, RwInt
 }
 
 // match: ?sub_121870@type_1227C0@@QAEXXZ @ 0x00121870
+// sp-match: ?sub_121870@type_1227C0@@QAEXXZ @ 0x000D72C0
 // "PG_TargetDefault": no entity, and the nearest from then on.
 void type_1227C0::sub_121870()
 {
@@ -1181,9 +1222,14 @@ void type_1227C0::sub_121870()
 }
 
 // match: ?sub_1218A0@type_1227C0@@QAEXPAURwV3d@@H@Z @ 0x001218A0
+// sp-match: ?sub_1218A0@type_1227C0@@QAEXPAURwV3d@@H@Z @ 0x000D72E0
 // "PG_TargetPoint": the point *arg_0 with the spread arg_4, and no firing
 // stages.
+#ifdef CODFH_SP // the spread is a real in single player (include/types/type_1227C0.h)
+void type_1227C0::sub_1218A0(RwV3d *arg_0, RwReal arg_4)
+#else
 void type_1227C0::sub_1218A0(RwV3d *arg_0, RwInt32 arg_4)
+#endif
 {
     unk_54 = *arg_0;
     unk_B0 = *arg_0;
@@ -1194,9 +1240,14 @@ void type_1227C0::sub_1218A0(RwV3d *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_121910@type_1227C0@@QAEXPAUtype_3DF8D8_04@@H@Z @ 0x00121910
+// sp-match: ?sub_121910@type_1227C0@@QAEXPAUtype_3DF8D8_04@@H@Z @ 0x000D7340
 // "PG_TargetNamedPoint": the position of the object under the key *arg_0.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
+#ifdef CODFH_SP // the spread is a real in single player (include/types/type_1227C0.h)
+void type_1227C0::sub_121910(type_3DF8D8_04 *arg_0, RwReal arg_4)
+#else
 void type_1227C0::sub_121910(type_3DF8D8_04 *arg_0, RwInt32 arg_4)
+#endif
 {
     type_3DF8D8 *var_4;
     type_3DF8D8 *v8;
@@ -1213,6 +1264,7 @@ void type_1227C0::sub_121910(type_3DF8D8_04 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_121960@type_1227C0@@QAEHPAUtype_3D3548@@@Z @ 0x00121960
+// sp-match: ?sub_121960@type_1227C0@@QAEHPAUtype_3D3548@@@Z @ 0x000D7370
 // "PG_TargetObjectByScript": the entity arg_0, if it is AI-controlled and
 // flagged as a target, or on no side, or the generator on none; whether it
 // took it.
@@ -1230,14 +1282,24 @@ RwInt32 type_1227C0::sub_121960(type_3D3548 *arg_0)
         {
             if (var_4->unk_49C_6)
             {
+#ifdef CODFH_SP // SP 0xD7370
+                // shape: the direct id store lets both take paths share their tail.
+                unk_24.unk_00 = arg_0->get_unk_384_h().unk_00;
+#else // MP 0x121960
                 unk_24 = arg_0->get_unk_384_h().unk_00;
+#endif
                 unk_38 = 1;
                 return 1;
             }
         }
         else if ((arg_0->unk_2C & 7) == 0 || local_8->unk_DC == 0)
         {
+#ifdef CODFH_SP // SP 0xD7370
+            // shape: as in the AI-controlled take path, copy the id directly.
+            unk_24.unk_00 = arg_0->get_unk_384_h().unk_00;
+#else // MP 0x121960
             unk_24 = arg_0->get_unk_384_h().unk_00;
+#endif
             unk_38 = 1;
             return 1;
         }
@@ -1246,6 +1308,7 @@ RwInt32 type_1227C0::sub_121960(type_3D3548 *arg_0)
 }
 
 // match: ?sub_121A30@type_1227C0@@QAEXH@Z @ 0x00121A30
+// sp-match: ?sub_121A30@type_1227C0@@QAEXH@Z @ 0x000D80D0
 // "PG_EnableFiringStages".
 void type_1227C0::sub_121A30(RwInt32 arg_0)
 {
@@ -1254,6 +1317,7 @@ void type_1227C0::sub_121A30(RwInt32 arg_0)
 }
 
 // match: ?sub_121A50@type_1227C0@@QAEXXZ @ 0x00121A50
+// sp-match: ?sub_121A50@type_1227C0@@QAEXXZ @ 0x000D7A70
 // ClearSound: stops its sound, playing its trigger's end sound (unk_148,
 // with unk_150) or the global one, at the point it fires from.
 void type_1227C0::sub_121A50()
@@ -1267,7 +1331,9 @@ void type_1227C0::sub_121A50()
         var_4 = unk_18.unk_08_pg;
         if (var_4 == 0)
         {
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xD7A70)
             sub_19A750("WARNING: ProjectileGenerator::ClearSound(): Trigger not valid! -RJB");
+#endif
             return;
         }
         sub_122150(&var_10);
@@ -1288,12 +1354,14 @@ void type_1227C0::sub_121A50()
 }
 
 // match: ?sub_121B30@type_1227C0@@QAEXH@Z @ 0x00121B30
+// sp-match: ?sub_121B30@type_1227C0@@QAEXH@Z @ 0x000D73D0
 void type_1227C0::sub_121B30(RwInt32 arg_0)
 {
     unk_104 = arg_0;
 }
 
 // match: ?sub_121B50@@YAHPAUtype_F2FF0@@@Z @ 0x00121B50
+// sp-match: ?sub_121B50@@YAHPAUtype_F2FF0@@@Z @ 0x000D7B20
 RwInt32 sub_121B50(type_F2FF0 *arg_0)
 {
     type_1227C0 *var_4;
@@ -1305,6 +1373,7 @@ RwInt32 sub_121B50(type_F2FF0 *arg_0)
 }
 
 // match: ?sub_121B90@type_1227C0@@QAEXPAUtype_F2FF0@@H@Z @ 0x00121B90
+// sp-match: ?sub_121B90@type_1227C0@@QAEXPAUtype_F2FF0@@H@Z @ 0x000D7B50
 void type_1227C0::sub_121B90(type_F2FF0 *arg_0, RwInt32 arg_4)
 {
     unk_108[arg_4].sub_F2880(arg_0);
@@ -1316,12 +1385,14 @@ void type_1227C0::sub_121B90(type_F2FF0 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_121BE0@type_1227C0@@QAEPAUtype_F2FF0@@H@Z @ 0x00121BE0
+// sp-match: ?sub_121BE0@type_1227C0@@QAEPAUtype_F2FF0@@H@Z @ 0x000D73E0
 type_F2FF0 *type_1227C0::sub_121BE0(RwInt32 arg_0)
 {
     return unk_108[arg_0].get_unk_08();
 }
 
 // match: ?sub_121C10@type_1227C0@@QAEPAUSplinePath@@XZ @ 0x00121C10
+// sp-match: ?sub_121C10@type_1227C0@@QAEPAUSplinePath@@XZ @ 0x000D7400
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 SplinePath *type_1227C0::sub_121C10()
 {
@@ -1338,6 +1409,7 @@ SplinePath *type_1227C0::sub_121C10()
 }
 
 // match: ?sub_121C70@type_1227C0@@QAEXPAUtype_3D3548@@H@Z @ 0x00121C70
+// sp-match: ?sub_121C70@type_1227C0@@QAEXPAUtype_3D3548@@H@Z @ 0x000D7430
 void type_1227C0::sub_121C70(type_3D3548 *arg_0, RwInt32 arg_4)
 {
     RpClump *var_8;
@@ -1361,6 +1433,7 @@ void type_1227C0::sub_121C70(type_3D3548 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_121D20@type_1227C0@@QAEXH@Z @ 0x00121D20
+// sp-match: ?sub_121D20@type_1227C0@@QAEXH@Z @ 0x000D80E0
 // "PG_ManipulateProjectileGenerator": starts (arg_0 1) or stops firing. On
 // starting, finds the entities under its trigger's keys that it has none
 // for yet: its parent (unk_C0; at its tagged matrix 'PGN0'+unk_E4), its
@@ -1469,6 +1542,7 @@ void type_1227C0::sub_121D20(RwInt32 arg_0)
 }
 
 // match: ?sub_122150@type_1227C0@@QAEXPAURwV3d@@@Z @ 0x00122150
+// sp-match: ?sub_122150@type_1227C0@@QAEXPAURwV3d@@@Z @ 0x000D74A0
 // The point it fires from: its turret's 'FIRE' tag or frame, else its own
 // position.
 void type_1227C0::sub_122150(RwV3d *arg_0)

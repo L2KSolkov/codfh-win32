@@ -12,6 +12,7 @@
 // match: __ehhandler$??1alfahash@@QAE@XZ>1 @ 0x0041B4BC
 
 // match: ??0alfahash@@QAE@XZ @ 0x000676A0
+// sp-match: ??0alfahash@@QAE@XZ @ 0x00057C50
 
 alfahash::alfahash()
 {
@@ -23,12 +24,14 @@ alfahash::alfahash()
 // match: ??1alfahash@@QAE@XZ @ 0x000676E0
 // match: __ehhandler$??1alfahash@@QAE@XZ-0xB @ 0x002FF880
 // match: __ehhandler$??1alfahash@@QAE@XZ @ 0x002FF88B
+// sp-match: ??1alfahash@@QAE@XZ @ 0x00057DE0
 alfahash::~alfahash()
 {
     sub_67780();
 }
 
 // match: ?sub_67730@alfahash@@QAEXHHP6AIPAX@ZP6A_N00@Z@Z @ 0x00067730
+// sp-match: ?sub_67730@alfahash@@QAEXHHP6AIPAX@ZP6A_N00@Z@Z @ 0x00057E30
 void alfahash::sub_67730(RwInt32 arg_0, RwInt32 arg_4, RwUInt32 (*arg_8)(void *),
                          bool (*arg_C)(void *, void *))
 {
@@ -41,6 +44,7 @@ void alfahash::sub_67730(RwInt32 arg_0, RwInt32 arg_4, RwUInt32 (*arg_8)(void *)
 }
 
 // match: ?sub_67780@alfahash@@QAEXXZ @ 0x00067780
+// sp-match: ?sub_67780@alfahash@@QAEXXZ @ 0x00057C70
 void alfahash::sub_67780()
 {
     if (unk_30 != 0)
@@ -50,12 +54,14 @@ void alfahash::sub_67780()
 }
 
 // match: ?sub_677C0@alfahash@@QAEXH@Z @ 0x000677C0
+// sp-match: ?sub_677C0@alfahash@@QAEXH@Z @ 0x00057CA0
 void alfahash::sub_677C0(RwInt32 arg_0)
 {
     m_pool.sub_16C2C0(arg_0, 8, "alfahash::m_pool", 4, 0);
 }
 
 // match: ?sub_677F0@alfahash@@QAEXH@Z @ 0x000677F0
+// sp-match: ?sub_677F0@alfahash@@QAEXH@Z @ 0x00057CC0
 void alfahash::sub_677F0(RwInt32 arg_0)
 {
     RwInt32 var_4;
@@ -66,6 +72,7 @@ void alfahash::sub_677F0(RwInt32 arg_0)
 }
 
 // match: ?sub_67850@alfahash@@QAE_NPAX@Z @ 0x00067850
+// sp-match: ?sub_67850@alfahash@@QAE_NPAX@Z @ 0x00057F10
 bool alfahash::sub_67850(void *arg_0)
 {
     alfahash_node *local_8;
@@ -82,6 +89,7 @@ bool alfahash::sub_67850(void *arg_0)
 }
 
 // match: ?sub_678C0@alfahash@@QAEXPAX@Z @ 0x000678C0
+// sp-match: ?sub_678C0@alfahash@@QAEXPAX@Z @ 0x00057E70
 void alfahash::sub_678C0(void *arg_0)
 {
     alfahash_node *var_10;
@@ -107,6 +115,7 @@ void alfahash::sub_678C0(void *arg_0)
 }
 
 // match: ?sub_67970@alfahash@@QAEPAXPAX@Z @ 0x00067970
+// sp-match: ?sub_67970@alfahash@@QAEPAXPAX@Z @ 0x00057EE0
 void *alfahash::sub_67970(void *arg_0)
 {
     alfahash_node *local_8;
@@ -120,6 +129,7 @@ void *alfahash::sub_67970(void *arg_0)
 }
 
 // match: ?sub_679C0@alfahash@@QAEPAUalfahash_node@@PAU2@PAX@Z @ 0x000679C0
+// sp-match: ?sub_679C0@alfahash@@QAEPAUalfahash_node@@PAU2@PAX@Z @ 0x00057D10
 alfahash_node *alfahash::sub_679C0(alfahash_node *arg_0, void *arg_4)
 {
     alfahash_node *var_4;
@@ -130,6 +140,7 @@ alfahash_node *alfahash::sub_679C0(alfahash_node *arg_0, void *arg_4)
 }
 
 // match: ?sub_67A10@alfahash@@QAEIPAX@Z @ 0x00067A10
+// sp-match: ?sub_67A10@alfahash@@QAEIPAX@Z @ 0x00057D40
 RwUInt32 alfahash::sub_67A10(void *arg_0)
 {
     RwUInt32 var_4;
@@ -140,6 +151,7 @@ RwUInt32 alfahash::sub_67A10(void *arg_0)
 }
 
 // match: ?sub_67A40@alfahash@@QAEPAUalfahash_node@@PAX@Z @ 0x00067A40
+// sp-match: ?sub_67A40@alfahash@@QAEPAUalfahash_node@@PAX@Z @ 0x00057D60
 alfahash_node *alfahash::sub_67A40(void *arg_0)
 {
     alfahash_node *var_4;
@@ -151,12 +163,14 @@ alfahash_node *alfahash::sub_67A40(void *arg_0)
 }
 
 // match: ?sub_67A80@alfahash@@QAEXPAUalfahash_node@@@Z @ 0x00067A80
+// sp-match: ?sub_67A80@alfahash@@QAEXPAUalfahash_node@@@Z @ 0x00057D80
 void alfahash::sub_67A80(alfahash_node *arg_0)
 {
     m_pool.sub_16C710(arg_0);
 }
 
 // match: ?sub_67AA0@alfahash@@QAEXP6A_NPAX@Z@Z @ 0x00067AA0
+// sp-match: ?sub_67AA0@alfahash@@QAEXP6A_NPAX@Z@Z @ 0x00057D90
 void alfahash::sub_67AA0(bool (*arg_0)(void *))
 {
     alfahash_node *varC;

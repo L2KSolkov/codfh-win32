@@ -88,6 +88,7 @@ static RwInt32 _rt2dAnimFListPreallocBlocks = 1;
 // match: _rcsid @ 0x003EE558
 
 // match: _Rt2dAnimOpen @ 0x002573B0
+// sp-match: _Rt2dAnimOpen @ 0x0016FFA0
 void
 Rt2dAnimOpen(void)
 {
@@ -147,6 +148,7 @@ Rt2dAnimOpen(void)
  * \see Rt2dAnimOpen
  */
 // match: _Rt2dAnimClose @ 0x002574C0
+// sp-match: _Rt2dAnimClose @ 0x001700B0
 void
 Rt2dAnimClose(void)
 {

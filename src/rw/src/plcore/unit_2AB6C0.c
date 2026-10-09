@@ -17,6 +17,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/src/plcore/
 // match: _rcsid @ 0x00416458
 
 // match: _RwOsGetFileInterface @ 0x002AB6C0
+// sp-match: _RwOsGetFileInterface @ 0x001C6AF0
 RwFileFunctions *
 RwOsGetFileInterface(void)
 {
@@ -24,6 +25,7 @@ RwOsGetFileInterface(void)
 }
 
 // match: _sub_2AB6D0 @ 0x002AB6D0
+// sp-match: _sub_2AB6D0 @ 0x001C6B00
 RwBool
 sub_2AB6D0(const RwChar *name)
 {
@@ -41,6 +43,7 @@ sub_2AB6D0(const RwChar *name)
 }
 
 // match: _sub_2AB700 @ 0x002AB700
+// sp-match: _sub_2AB700 @ 0x001C6B30
 RwBool
 sub_2AB700(void)
 {

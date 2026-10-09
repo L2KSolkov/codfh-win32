@@ -323,6 +323,7 @@ DebugAllocFailure(rwResHeapHeader * heapInfo)
 // match: _rcsid @ 0x00416FD8
 
 // match: _splitBlock @ 0x002B8C00
+// sp-match: _splitBlock @ 0x001D4020
 static void
 splitBlock(rwResHeapBlockHeader * block, RwUInt32 size)
 {
@@ -379,6 +380,7 @@ splitBlock(rwResHeapBlockHeader * block, RwUInt32 size)
  *  management. Returns NULL if size is not sufficient.
  */
 // match: __rwResHeapInit @ 0x002B8C60
+// sp-match: __rwResHeapInit @ 0x001D4080
 RwBool
 _rwResHeapInit(void *resHeap, RwUInt32 size)
 {
@@ -455,6 +457,7 @@ _rwResHeapClose(void *resHeap __RWUNUSED__)
  *  if they are unused.
  */
 // match: __rwResHeapFree @ 0x002B8CC0
+// sp-match: __rwResHeapFree @ 0x001D40D0
 void
 _rwResHeapFree(void *memory)
 {
@@ -549,6 +552,7 @@ _rwResHeapFree(void *memory)
 #endif
  */
 // match: __rwResHeapAlloc @ 0x002B8D40
+// sp-match: __rwResHeapAlloc @ 0x001D4150
 void               *
 _rwResHeapAlloc(void *resHeap, RwUInt32 size)
 {

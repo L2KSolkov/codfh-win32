@@ -311,6 +311,7 @@ EDGEFN S32 name(U32 n, S32 x)                                            \
 #define SWAPTABLES(a,b) { U32 *p=YUVTables[a]; U32 i=256; do { U32 s=*p; *p=p[((b)-(a))*256]; p[((b)-(a))*256]=s; ++p; } while (--i); }
 
 // match: _FreeYUVGlobalMemory @ 0x0034A300
+// sp-match: _FreeYUVGlobalMemory @ 0x0025A300
 void FreeYUVGlobalMemory(void)
 {
   if (z2hbuf1)
@@ -322,6 +323,7 @@ void FreeYUVGlobalMemory(void)
 }
 
 // match: ?zoom2heven@@YGXJ@Z @ 0x0034A330
+// sp-match: ?zoom2heven@@YGXJ@Z @ 0x0025A330
 EDGEFN void __stdcall zoom2heven(S32 n)
 {
   U8 *out0 = S.out0;
@@ -350,6 +352,7 @@ EDGEFN void __stdcall zoom2heven(S32 n)
 }
 
 // match: ?zoom2hodd@@YGXJ@Z @ 0x0034A400
+// sp-match: ?zoom2hodd@@YGXJ@Z @ 0x0025A400
 EDGEFN void __stdcall zoom2hodd(S32 n)
 {
   U8 *out0 = S.out0;
@@ -378,6 +381,7 @@ EDGEFN void __stdcall zoom2hodd(S32 n)
 }
 
 // match: ?zoom2hevenbuf@@YGXJ@Z @ 0x0034A4D0
+// sp-match: ?zoom2hevenbuf@@YGXJ@Z @ 0x0025A4D0
 EDGEFN void __stdcall zoom2hevenbuf(S32 n)
 {
   U8 *out0 = S.out0;
@@ -397,6 +401,7 @@ EDGEFN void __stdcall zoom2hevenbuf(S32 n)
 }
 
 // match: ?zoom2hoddbuf@@YGXJ@Z @ 0x0034A590
+// sp-match: ?zoom2hoddbuf@@YGXJ@Z @ 0x0025A590
 EDGEFN void __stdcall zoom2hoddbuf(S32 n)
 {
   U8 *out0 = S.out0;
@@ -416,6 +421,7 @@ EDGEFN void __stdcall zoom2hoddbuf(S32 n)
 }
 
 // match: ?checktime@@YAXK@Z @ 0x0034A650
+// sp-match: ?checktime@@YAXK@Z @ 0x0025A650
 static void checktime(U32 cycles)
 {
   U32 t = *dbltimeaddr;
@@ -466,6 +472,7 @@ static void checktime(U32 cycles)
 }
 
 // match: ?timedbleven@@YGXJ@Z @ 0x0034A730
+// sp-match: ?timedbleven@@YGXJ@Z @ 0x0025A730
 EDGEFN void __stdcall timedbleven(S32 n)
 {
   U32 cycles;
@@ -477,6 +484,7 @@ EDGEFN void __stdcall timedbleven(S32 n)
 }
 
 // match: ?timedblodd@@YGXJ@Z @ 0x0034A770
+// sp-match: ?timedblodd@@YGXJ@Z @ 0x0025A770
 EDGEFN void __stdcall timedblodd(S32 n)
 {
   U32 cycles;
@@ -488,6 +496,7 @@ EDGEFN void __stdcall timedblodd(S32 n)
 }
 
 // match: ?dorightedge@@YAXXZ @ 0x0034AC40
+// sp-match: ?dorightedge@@YAXXZ @ 0x0025AC40
 EDGEFN void dorightedge(void)
 {
   U32 *addr = alnaddr;
@@ -521,6 +530,7 @@ EDGEFN void dorightedge(void)
 }
 
 // match: ?checkrdtsc@@YAXXZ @ 0x0034BB10
+// sp-match: ?checkrdtsc@@YAXXZ @ 0x0025BB10
 // (its __try's scope table, .rdata)
 // match: $T3588 @ 0x003EEDF0
 EDGEFN void checkrdtsc(void)
@@ -540,6 +550,7 @@ EDGEFN void checkrdtsc(void)
 
 #pragma code_seg("BINK32")
 // match: ?dounaligned32rowm2w@@YAXKK@Z @ 0x0034E020
+// sp-match: ?dounaligned32rowm2w@@YAXKK@Z @ 0x0025E020
 EDGEFN void dounaligned32rowm2w(U32 x, U32 n)
 {
   while (n)
@@ -554,6 +565,7 @@ EDGEFN void dounaligned32rowm2w(U32 x, U32 n)
 }
 
 // match: ?dounaligned32colm2w@@YAJKJ@Z @ 0x0034E070
+// sp-match: ?dounaligned32colm2w@@YAJKJ@Z @ 0x0025E070
 EDGEFN S32 dounaligned32colm2w(U32 n, S32 x)
 {
   U32 i = n;
@@ -574,6 +586,7 @@ EDGEFN S32 dounaligned32colm2w(U32 n, S32 x)
 }
 
 // match: ?dounaligned32rowm2h@@YAXKK@Z @ 0x0034E100
+// sp-match: ?dounaligned32rowm2h@@YAXKK@Z @ 0x0025E100
 EDGEFN void dounaligned32rowm2h(U32 x, U32 n)
 {
   while (n)
@@ -588,6 +601,7 @@ EDGEFN void dounaligned32rowm2h(U32 x, U32 n)
 }
 
 // match: ?dounaligned32colm2h@@YAJKJ@Z @ 0x0034E160
+// sp-match: ?dounaligned32colm2h@@YAJKJ@Z @ 0x0025E160
 EDGEFN S32 dounaligned32colm2h(U32 n, S32 x)
 {
   U32 i = n;
@@ -608,6 +622,7 @@ EDGEFN S32 dounaligned32colm2h(U32 n, S32 x)
 }
 
 // match: ?dounaligned32rowm2wh@@YAXKK@Z @ 0x0034E200
+// sp-match: ?dounaligned32rowm2wh@@YAXKK@Z @ 0x0025E200
 EDGEFN void dounaligned32rowm2wh(U32 x, U32 n)
 {
   while (n)
@@ -624,6 +639,7 @@ EDGEFN void dounaligned32rowm2wh(U32 x, U32 n)
 }
 
 // match: ?dounaligned32colm2wh@@YAJKJ@Z @ 0x0034E270
+// sp-match: ?dounaligned32colm2wh@@YAJKJ@Z @ 0x0025E270
 EDGEFN S32 dounaligned32colm2wh(U32 n, S32 x)
 {
   U32 i = n;
@@ -648,6 +664,7 @@ EDGEFN S32 dounaligned32colm2wh(U32 n, S32 x)
 }
 
 // match: ?dounaligned32row2w@@YAXKK@Z @ 0x0034E340
+// sp-match: ?dounaligned32row2w@@YAXKK@Z @ 0x0025E340
 EDGEFN void dounaligned32row2w(U32 x, U32 n)
 {
   U32 i = x;
@@ -675,6 +692,7 @@ EDGEFN void dounaligned32row2w(U32 x, U32 n)
 }
 
 // match: ?dounaligned32col2w@@YAJKJ@Z @ 0x0034E410
+// sp-match: ?dounaligned32col2w@@YAJKJ@Z @ 0x0025E410
 EDGEFN S32 dounaligned32col2w(U32 n, S32 x)
 {
   do
@@ -705,45 +723,64 @@ EDGEFN S32 dounaligned32col2w(U32 n, S32 x)
 }
 
 // match: ?dounaligned32row2h@@YAXKK@Z @ 0x0034E510
+// sp-match: ?dounaligned32row2h@@YAXKK@Z @ 0x0025E510
 EDGEROW(dounaligned32row2h, PIX32, PUT32_2H, 4, NOADV)
 // match: ?dounaligned32col2h@@YAJKJ@Z @ 0x0034E5E0
+// sp-match: ?dounaligned32col2h@@YAJKJ@Z @ 0x0025E5E0
 EDGECOL(dounaligned32col2h, PIX32, PUT32_2H, 4, NOADV)
 // match: ?dounaligned32row2wh@@YAXKK@Z @ 0x0034E700
+// sp-match: ?dounaligned32row2wh@@YAXKK@Z @ 0x0025E700
 EDGEROW(dounaligned32row2wh, PIX32, PUT32_2WH, 8, NOADV)
 // match: ?dounaligned32col2wh@@YAJKJ@Z @ 0x0034E7F0
+// sp-match: ?dounaligned32col2wh@@YAJKJ@Z @ 0x0025E7F0
 EDGECOL(dounaligned32col2wh, PIX32, PUT32_2WH, 8, NOADV)
 
 // match: ?dounaligned32row@@YAXKK@Z @ 0x0034EA20
+// sp-match: ?dounaligned32row@@YAXKK@Z @ 0x0025EA20
 EDGEROW(dounaligned32row, PIX32, PUT32, 4, NOADV)
 // match: ?dounaligned32col@@YAJKJ@Z @ 0x0034EAE0
+// sp-match: ?dounaligned32col@@YAJKJ@Z @ 0x0025EAE0
 EDGECOL(dounaligned32col, PIX32, PUT32, 4, NOADV)
 
 #pragma code_seg("BINK32A")
 // match: ?dounaligned32arowm2w@@YAXKK@Z @ 0x0034F1C0
+// sp-match: ?dounaligned32arowm2w@@YAXKK@Z @ 0x0025F1C0
 EDGEROWM(dounaligned32arowm2w, MONO32A, PUT32_2W, 8)
 // match: ?dounaligned32acolm2w@@YAJKJ@Z @ 0x0034F230
+// sp-match: ?dounaligned32acolm2w@@YAJKJ@Z @ 0x0025F230
 EDGECOLM(dounaligned32acolm2w, MONO32A, PUT32_2W, 8)
 // match: ?dounaligned32arowm2h@@YAXKK@Z @ 0x0034F2F0
+// sp-match: ?dounaligned32arowm2h@@YAXKK@Z @ 0x0025F2F0
 EDGEROWM(dounaligned32arowm2h, MONO32A, PUT32_2H, 4)
 // match: ?dounaligned32acolm2h@@YAJKJ@Z @ 0x0034F360
+// sp-match: ?dounaligned32acolm2h@@YAJKJ@Z @ 0x0025F360
 EDGECOLM(dounaligned32acolm2h, MONO32A, PUT32_2H, 4)
 // match: ?dounaligned32arowm2wh@@YAXKK@Z @ 0x0034F420
+// sp-match: ?dounaligned32arowm2wh@@YAXKK@Z @ 0x0025F420
 EDGEROWM(dounaligned32arowm2wh, MONO32A, PUT32_2WH, 8)
 // match: ?dounaligned32acolm2wh@@YAJKJ@Z @ 0x0034F4B0
+// sp-match: ?dounaligned32acolm2wh@@YAJKJ@Z @ 0x0025F4B0
 EDGECOLM(dounaligned32acolm2wh, MONO32A, PUT32_2WH, 8)
 // match: ?dounaligned32arow2w@@YAXKK@Z @ 0x0034F5B0
+// sp-match: ?dounaligned32arow2w@@YAXKK@Z @ 0x0025F5B0
 EDGEROW(dounaligned32arow2w, PIX32A, PUT32_2W, 8, NOADV)
 // match: ?dounaligned32acol2w@@YAJKJ@Z @ 0x0034F690
+// sp-match: ?dounaligned32acol2w@@YAJKJ@Z @ 0x0025F690
 EDGECOL(dounaligned32acol2w, PIX32A, PUT32_2W, 8, NOADV)
 // match: ?dounaligned32arow2h@@YAXKK@Z @ 0x0034F7C0
+// sp-match: ?dounaligned32arow2h@@YAXKK@Z @ 0x0025F7C0
 EDGEROW(dounaligned32arow2h, PIX32A, PUT32_2H, 4, NOADV)
 // match: ?dounaligned32acol2h@@YAJKJ@Z @ 0x0034F8B0
+// sp-match: ?dounaligned32acol2h@@YAJKJ@Z @ 0x0025F8B0
 EDGECOL(dounaligned32acol2h, PIX32A, PUT32_2H, 4, NOADV)
 // match: ?dounaligned32arow2wh@@YAXKK@Z @ 0x0034F9F0
+// sp-match: ?dounaligned32arow2wh@@YAXKK@Z @ 0x0025F9F0
 EDGEROW(dounaligned32arow2wh, PIX32A, PUT32_2WH, 8, NOADV)
 // match: ?dounaligned32acol2wh@@YAJKJ@Z @ 0x0034FAF0
+// sp-match: ?dounaligned32acol2wh@@YAJKJ@Z @ 0x0025FAF0
 EDGECOL(dounaligned32acol2wh, PIX32A, PUT32_2WH, 8, NOADV)
 // match: ?dounaligned32arowm@@YAXKK@Z @ 0x0034FC60
+// sp-match: ?dounaligned32arowm@@YAXKK@Z @ 0x0025FC60
 EDGEFN void dounaligned32arowm(U32 x, U32 n)
 {
   while (n)
@@ -757,6 +794,7 @@ EDGEFN void dounaligned32arowm(U32 x, U32 n)
 }
 
 // match: ?dounaligned32acolm@@YAJKJ@Z @ 0x0034FCD0
+// sp-match: ?dounaligned32acolm@@YAJKJ@Z @ 0x0025FCD0
 EDGEFN S32 dounaligned32acolm(U32 n, S32 x)
 {
   U32 i = n;
@@ -776,114 +814,165 @@ EDGEFN S32 dounaligned32acolm(U32 n, S32 x)
 }
 
 // match: ?dounaligned32arow@@YAXKK@Z @ 0x0034FD90
+// sp-match: ?dounaligned32arow@@YAXKK@Z @ 0x0025FD90
 EDGEROW(dounaligned32arow, PIX32AP, PUT32, 4, ADVA)
 // match: ?dounaligned32acol@@YAJKJ@Z @ 0x0034FE70
+// sp-match: ?dounaligned32acol@@YAJKJ@Z @ 0x0025FE70
 EDGECOL(dounaligned32acol, PIX32AP, PUT32, 4, ADVA)
 
 #pragma code_seg("BINK16")
 // match: ?dounaligned16rowm2h@@YAXKK@Z @ 0x00350620
+// sp-match: ?dounaligned16rowm2h@@YAXKK@Z @ 0x00260620
 EDGEROWM16(dounaligned16rowm2h, MONO16, PUT16_2H, 2)
 // match: ?dounaligned16colm2h@@YAJKJ@Z @ 0x00350680
+// sp-match: ?dounaligned16colm2h@@YAJKJ@Z @ 0x00260680
 EDGECOLM16(dounaligned16colm2h, MONO16, PUT16_2H, 2)
 // match: ?dounaligned16rowm2w@@YAXKK@Z @ 0x00350720
+// sp-match: ?dounaligned16rowm2w@@YAXKK@Z @ 0x00260720
 EDGEROWM16(dounaligned16rowm2w, MONO16, PUT16_2W, 4)
 // match: ?dounaligned16colm2w@@YAJKJ@Z @ 0x00350770
+// sp-match: ?dounaligned16colm2w@@YAJKJ@Z @ 0x00260770
 EDGECOLM16(dounaligned16colm2w, MONO16, PUT16_2W, 4)
 // match: ?dounaligned16rowm2wh@@YAXKK@Z @ 0x00350800
+// sp-match: ?dounaligned16rowm2wh@@YAXKK@Z @ 0x00260800
 EDGEROWM16(dounaligned16rowm2wh, MONO16, PUT16_2WH, 4)
 // match: ?dounaligned16colm2wh@@YAJKJ@Z @ 0x00350870
+// sp-match: ?dounaligned16colm2wh@@YAJKJ@Z @ 0x00260870
 EDGECOLM16(dounaligned16colm2wh, MONO16, PUT16_2WH, 4)
 // match: ?dounaligned16row2h@@YAXKK@Z @ 0x00350950
+// sp-match: ?dounaligned16row2h@@YAXKK@Z @ 0x00260950
 EDGEROW16(dounaligned16row2h, PIX16, PUT16_2H, 2, NOADV)
 // match: ?dounaligned16col2h@@YAJKJ@Z @ 0x00350A30
+// sp-match: ?dounaligned16col2h@@YAJKJ@Z @ 0x00260A30
 EDGECOL16(dounaligned16col2h, PIX16, PUT16_2H, 2, NOADV)
 // match: ?dounaligned16row2w@@YAXKK@Z @ 0x00350B60
+// sp-match: ?dounaligned16row2w@@YAXKK@Z @ 0x00260B60
 EDGEROW16(dounaligned16row2w, PIX16, PUT16_2W, 4, NOADV)
 // match: ?dounaligned16col2w@@YAJKJ@Z @ 0x00350C40
+// sp-match: ?dounaligned16col2w@@YAJKJ@Z @ 0x00260C40
 EDGECOL16(dounaligned16col2w, PIX16, PUT16_2W, 4, NOADV)
 // match: ?dounaligned16row2wh@@YAXKK@Z @ 0x00350D70
+// sp-match: ?dounaligned16row2wh@@YAXKK@Z @ 0x00260D70
 EDGEROW16(dounaligned16row2wh, PIX16, PUT16_2WH, 4, NOADV)
 // match: ?dounaligned16col2wh@@YAJKJ@Z @ 0x00350E70
+// sp-match: ?dounaligned16col2wh@@YAJKJ@Z @ 0x00260E70
 EDGECOL16(dounaligned16col2wh, PIX16, PUT16_2WH, 4, NOADV)
 // match: ?dounaligned16rowm@@YAXKK@Z @ 0x00350FE0
+// sp-match: ?dounaligned16rowm@@YAXKK@Z @ 0x00260FE0
 EDGEROWM16(dounaligned16rowm, MONO16, PUT16, 2)
 // match: ?dounaligned16colm@@YAJKJ@Z @ 0x00351030
+// sp-match: ?dounaligned16colm@@YAJKJ@Z @ 0x00261030
 EDGECOLM16(dounaligned16colm, MONO16, PUT16, 2)
 // match: ?dounaligned16row@@YAXKK@Z @ 0x003510B0
+// sp-match: ?dounaligned16row@@YAXKK@Z @ 0x002610B0
 EDGEROW16(dounaligned16row, PIX16, PUT16, 2, NOADV)
 // match: ?dounaligned16col@@YAJKJ@Z @ 0x00351180
+// sp-match: ?dounaligned16col@@YAJKJ@Z @ 0x00261180
 EDGECOL16(dounaligned16col, PIX16, PUT16, 2, NOADV)
 
 #pragma code_seg("BINK4444")
 // match: ?dounaligned16a4rowm2h@@YAXKK@Z @ 0x00351880
+// sp-match: ?dounaligned16a4rowm2h@@YAXKK@Z @ 0x00261880
 EDGEROWM16(dounaligned16a4rowm2h, MONO16A4, PUT16_2H, 2)
 // match: ?dounaligned16a4colm2h@@YAJKJ@Z @ 0x003518F0
+// sp-match: ?dounaligned16a4colm2h@@YAJKJ@Z @ 0x002618F0
 EDGECOLM16(dounaligned16a4colm2h, MONO16A4, PUT16_2H, 2)
 // match: ?dounaligned16a4rowm2w@@YAXKK@Z @ 0x003519D0
+// sp-match: ?dounaligned16a4rowm2w@@YAXKK@Z @ 0x002619D0
 EDGEROWM16(dounaligned16a4rowm2w, MONO16A4, PUT16_2W, 4)
 // match: ?dounaligned16a4colm2w@@YAJKJ@Z @ 0x00351A40
+// sp-match: ?dounaligned16a4colm2w@@YAJKJ@Z @ 0x00261A40
 EDGECOLM16(dounaligned16a4colm2w, MONO16A4, PUT16_2W, 4)
 // match: ?dounaligned16a4rowm2wh@@YAXKK@Z @ 0x00351B10
+// sp-match: ?dounaligned16a4rowm2wh@@YAXKK@Z @ 0x00261B10
 EDGEROWM16(dounaligned16a4rowm2wh, MONO16A4, PUT16_2WH, 4)
 // match: ?dounaligned16a4colm2wh@@YAJKJ@Z @ 0x00351BA0
+// sp-match: ?dounaligned16a4colm2wh@@YAJKJ@Z @ 0x00261BA0
 EDGECOLM16(dounaligned16a4colm2wh, MONO16A4, PUT16_2WH, 4)
 // match: ?dounaligned16a4row2h@@YAXKK@Z @ 0x00351CB0
+// sp-match: ?dounaligned16a4row2h@@YAXKK@Z @ 0x00261CB0
 EDGEROW16(dounaligned16a4row2h, PIX16A4, PUT16_2H, 2, NOADV)
 // match: ?dounaligned16a4col2h@@YAJKJ@Z @ 0x00351DA0
+// sp-match: ?dounaligned16a4col2h@@YAJKJ@Z @ 0x00261DA0
 EDGECOL16(dounaligned16a4col2h, PIX16A4, PUT16_2H, 2, NOADV)
 // match: ?dounaligned16a4row2w@@YAXKK@Z @ 0x00351F00
+// sp-match: ?dounaligned16a4row2w@@YAXKK@Z @ 0x00261F00
 EDGEROW16(dounaligned16a4row2w, PIX16A4, PUT16_2W, 4, NOADV)
 // match: ?dounaligned16a4col2w@@YAJKJ@Z @ 0x00351FF0
+// sp-match: ?dounaligned16a4col2w@@YAJKJ@Z @ 0x00261FF0
 EDGECOL16(dounaligned16a4col2w, PIX16A4, PUT16_2W, 4, NOADV)
 // match: ?dounaligned16a4row2wh@@YAXKK@Z @ 0x00352150
+// sp-match: ?dounaligned16a4row2wh@@YAXKK@Z @ 0x00262150
 EDGEROW16(dounaligned16a4row2wh, PIX16A4, PUT16_2WH, 4, NOADV)
 // match: ?dounaligned16a4col2wh@@YAJKJ@Z @ 0x00352260
+// sp-match: ?dounaligned16a4col2wh@@YAJKJ@Z @ 0x00262260
 EDGECOL16(dounaligned16a4col2wh, PIX16A4, PUT16_2WH, 4, NOADV)
 // match: ?dounaligned16a4rowm@@YAXKK@Z @ 0x00352400
+// sp-match: ?dounaligned16a4rowm@@YAXKK@Z @ 0x00262400
 EDGEROWM16(dounaligned16a4rowm, MONO16A4, PUT16, 2)
 // match: ?dounaligned16a4colm@@YAJKJ@Z @ 0x00352460
+// sp-match: ?dounaligned16a4colm@@YAJKJ@Z @ 0x00262460
 EDGECOLM16(dounaligned16a4colm, MONO16A4, PUT16, 2)
 // match: ?dounaligned16a4row@@YAXKK@Z @ 0x00352520
+// sp-match: ?dounaligned16a4row@@YAXKK@Z @ 0x00262520
 EDGEROW16(dounaligned16a4row, PIX16A4P, PUT16, 2, ADVA)
 // match: ?dounaligned16a4col@@YAJKJ@Z @ 0x00352610
+// sp-match: ?dounaligned16a4col@@YAJKJ@Z @ 0x00262610
 EDGECOL16(dounaligned16a4col, PIX16A4P, PUT16, 2, ADVA)
 
 #pragma code_seg("BINK5551")
 // match: ?dounaligned16a1rowm2h@@YAXKK@Z @ 0x00352D60
+// sp-match: ?dounaligned16a1rowm2h@@YAXKK@Z @ 0x00262D60
 EDGEROWM16(dounaligned16a1rowm2h, MONO16A1, PUT16_2H, 2)
 // match: ?dounaligned16a1colm2h@@YAJKJ@Z @ 0x00352DD0
+// sp-match: ?dounaligned16a1colm2h@@YAJKJ@Z @ 0x00262DD0
 EDGECOLM16(dounaligned16a1colm2h, MONO16A1, PUT16_2H, 2)
 // match: ?dounaligned16a1rowm2w@@YAXKK@Z @ 0x00352EB0
+// sp-match: ?dounaligned16a1rowm2w@@YAXKK@Z @ 0x00262EB0
 EDGEROWM16(dounaligned16a1rowm2w, MONO16A1, PUT16_2W, 4)
 // match: ?dounaligned16a1colm2w@@YAJKJ@Z @ 0x00352F20
+// sp-match: ?dounaligned16a1colm2w@@YAJKJ@Z @ 0x00262F20
 EDGECOLM16(dounaligned16a1colm2w, MONO16A1, PUT16_2W, 4)
 // match: ?dounaligned16a1rowm2wh@@YAXKK@Z @ 0x00352FF0
+// sp-match: ?dounaligned16a1rowm2wh@@YAXKK@Z @ 0x00262FF0
 EDGEROWM16(dounaligned16a1rowm2wh, MONO16A1, PUT16_2WH, 4)
 // match: ?dounaligned16a1colm2wh@@YAJKJ@Z @ 0x00353080
+// sp-match: ?dounaligned16a1colm2wh@@YAJKJ@Z @ 0x00263080
 EDGECOLM16(dounaligned16a1colm2wh, MONO16A1, PUT16_2WH, 4)
 // match: ?dounaligned16a1row2h@@YAXKK@Z @ 0x00353190
+// sp-match: ?dounaligned16a1row2h@@YAXKK@Z @ 0x00263190
 EDGEROW16(dounaligned16a1row2h, PIX16A1, PUT16_2H, 2, NOADV)
 // match: ?dounaligned16a1col2h@@YAJKJ@Z @ 0x00353280
+// sp-match: ?dounaligned16a1col2h@@YAJKJ@Z @ 0x00263280
 EDGECOL16(dounaligned16a1col2h, PIX16A1, PUT16_2H, 2, NOADV)
 // match: ?dounaligned16a1row2w@@YAXKK@Z @ 0x00353400
+// sp-match: ?dounaligned16a1row2w@@YAXKK@Z @ 0x00263400
 EDGEROW16(dounaligned16a1row2w, PIX16A1, PUT16_2W, 4, NOADV)
 // match: ?dounaligned16a1col2w@@YAJKJ@Z @ 0x003534F0
+// sp-match: ?dounaligned16a1col2w@@YAJKJ@Z @ 0x002634F0
 EDGECOL16(dounaligned16a1col2w, PIX16A1, PUT16_2W, 4, NOADV)
 // match: ?dounaligned16a1row2wh@@YAXKK@Z @ 0x00353660
+// sp-match: ?dounaligned16a1row2wh@@YAXKK@Z @ 0x00263660
 EDGEROW16(dounaligned16a1row2wh, PIX16A1, PUT16_2WH, 4, NOADV)
 // match: ?dounaligned16a1col2wh@@YAJKJ@Z @ 0x00353770
+// sp-match: ?dounaligned16a1col2wh@@YAJKJ@Z @ 0x00263770
 EDGECOL16(dounaligned16a1col2wh, PIX16A1, PUT16_2WH, 4, NOADV)
 // match: ?dounaligned16a1rowm@@YAXKK@Z @ 0x00353920
+// sp-match: ?dounaligned16a1rowm@@YAXKK@Z @ 0x00263920
 EDGEROWM16(dounaligned16a1rowm, MONO16A1, PUT16, 2)
 // match: ?dounaligned16a1colm@@YAJKJ@Z @ 0x00353980
+// sp-match: ?dounaligned16a1colm@@YAJKJ@Z @ 0x00263980
 EDGECOLM16(dounaligned16a1colm, MONO16A1, PUT16, 2)
 // match: ?dounaligned16a1row@@YAXKK@Z @ 0x00353A30
+// sp-match: ?dounaligned16a1row@@YAXKK@Z @ 0x00263A30
 EDGEROW16(dounaligned16a1row, PIX16A1P, PUT16, 2, ADVA)
 // match: ?dounaligned16a1col@@YAJKJ@Z @ 0x00353B20
+// sp-match: ?dounaligned16a1col@@YAJKJ@Z @ 0x00263B20
 EDGECOL16(dounaligned16a1col, PIX16A1P, PUT16, 2, ADVA)
 
 #pragma code_seg("BINKYUY2")
 // match: ?dounalignedYUY2rowm2wh@@YAXKK@Z @ 0x00354280
+// sp-match: ?dounalignedYUY2rowm2wh@@YAXKK@Z @ 0x00264280
 EDGEFN void dounalignedYUY2rowm2wh(U32 x, U32 n)
 {
   S32 i;
@@ -903,6 +992,7 @@ EDGEFN void dounalignedYUY2rowm2wh(U32 x, U32 n)
 }
 
 // match: ?dounalignedYUY2rowm2w@@YAXKK@Z @ 0x00354420
+// sp-match: ?dounalignedYUY2rowm2w@@YAXKK@Z @ 0x00264420
 EDGEFN void dounalignedYUY2rowm2w(U32 x, U32 n)
 {
   S32 i;
@@ -920,6 +1010,7 @@ EDGEFN void dounalignedYUY2rowm2w(U32 x, U32 n)
 }
 
 // match: ?dounalignedYUY2rowm2h@@YAXKK@Z @ 0x00354560
+// sp-match: ?dounalignedYUY2rowm2h@@YAXKK@Z @ 0x00264560
 EDGEFN void dounalignedYUY2rowm2h(U32 x, U32 n)
 {
   S32 i;
@@ -936,6 +1027,7 @@ EDGEFN void dounalignedYUY2rowm2h(U32 x, U32 n)
 }
 
 // match: ?dounalignedYUY2row2wh@@YAXKK@Z @ 0x00354670
+// sp-match: ?dounalignedYUY2row2wh@@YAXKK@Z @ 0x00264670
 EDGEFN void dounalignedYUY2row2wh(U32 x, U32 n)
 {
   S32 i;
@@ -958,6 +1050,7 @@ EDGEFN void dounalignedYUY2row2wh(U32 x, U32 n)
 }
 
 // match: ?dounalignedYUY2row2w@@YAXKK@Z @ 0x00354860
+// sp-match: ?dounalignedYUY2row2w@@YAXKK@Z @ 0x00264860
 EDGEFN void dounalignedYUY2row2w(U32 x, U32 n)
 {
   S32 i;
@@ -977,6 +1070,7 @@ EDGEFN void dounalignedYUY2row2w(U32 x, U32 n)
 }
 
 // match: ?dounalignedYUY2row2h@@YAXKK@Z @ 0x00354A00
+// sp-match: ?dounalignedYUY2row2h@@YAXKK@Z @ 0x00264A00
 EDGEFN void dounalignedYUY2row2h(U32 x, U32 n)
 {
   S32 i;
@@ -995,6 +1089,7 @@ EDGEFN void dounalignedYUY2row2h(U32 x, U32 n)
 }
 
 // match: ?dounalignedYUY2rowm@@YAXKK@Z @ 0x00354B60
+// sp-match: ?dounalignedYUY2rowm@@YAXKK@Z @ 0x00264B60
 EDGEFN void dounalignedYUY2rowm(U32 x, U32 n)
 {
   S32 i;
@@ -1010,6 +1105,7 @@ EDGEFN void dounalignedYUY2rowm(U32 x, U32 n)
 }
 
 // match: ?dounalignedYUY2row@@YAXKK@Z @ 0x00354C40
+// sp-match: ?dounalignedYUY2row@@YAXKK@Z @ 0x00264C40
 EDGEFN void dounalignedYUY2row(U32 x, U32 n)
 {
   S32 i;
@@ -1027,6 +1123,7 @@ EDGEFN void dounalignedYUY2row(U32 x, U32 n)
 }
 
 // match: ?dounalignedYUY2colm2wh@@YAJKJ@Z @ 0x00354310
+// sp-match: ?dounalignedYUY2colm2wh@@YAJKJ@Z @ 0x00264310
 EDGEFN S32 dounalignedYUY2colm2wh(U32 n, S32 x)
 {
   U32 i = n;
@@ -1055,6 +1152,7 @@ EDGEFN S32 dounalignedYUY2colm2wh(U32 n, S32 x)
 }
 
 // match: ?dounalignedYUY2colm2w@@YAJKJ@Z @ 0x00354490
+// sp-match: ?dounalignedYUY2colm2w@@YAJKJ@Z @ 0x00264490
 EDGEFN S32 dounalignedYUY2colm2w(U32 n, S32 x)
 {
   U32 i = n;
@@ -1079,6 +1177,7 @@ EDGEFN S32 dounalignedYUY2colm2w(U32 n, S32 x)
 }
 
 // match: ?dounalignedYUY2colm2h@@YAJKJ@Z @ 0x003545C0
+// sp-match: ?dounalignedYUY2colm2h@@YAJKJ@Z @ 0x002645C0
 EDGEFN S32 dounalignedYUY2colm2h(U32 n, S32 x)
 {
   U32 i = n;
@@ -1101,6 +1200,7 @@ EDGEFN S32 dounalignedYUY2colm2h(U32 n, S32 x)
 }
 
 // match: ?dounalignedYUY2col2wh@@YAJKJ@Z @ 0x00354730
+// sp-match: ?dounalignedYUY2col2wh@@YAJKJ@Z @ 0x00264730
 EDGEFN S32 dounalignedYUY2col2wh(U32 n, S32 x)
 {
   U32 i = n;
@@ -1132,6 +1232,7 @@ EDGEFN S32 dounalignedYUY2col2wh(U32 n, S32 x)
 }
 
 // match: ?dounalignedYUY2col2w@@YAJKJ@Z @ 0x00354900
+// sp-match: ?dounalignedYUY2col2w@@YAJKJ@Z @ 0x00264900
 EDGEFN S32 dounalignedYUY2col2w(U32 n, S32 x)
 {
   U32 i = n;
@@ -1158,6 +1259,7 @@ EDGEFN S32 dounalignedYUY2col2w(U32 n, S32 x)
 }
 
 // match: ?dounalignedYUY2col2h@@YAJKJ@Z @ 0x00354A80
+// sp-match: ?dounalignedYUY2col2h@@YAJKJ@Z @ 0x00264A80
 EDGEFN S32 dounalignedYUY2col2h(U32 n, S32 x)
 {
   U32 i = n;
@@ -1182,6 +1284,7 @@ EDGEFN S32 dounalignedYUY2col2h(U32 n, S32 x)
 }
 
 // match: ?dounalignedYUY2colm@@YAJKJ@Z @ 0x00354BB0
+// sp-match: ?dounalignedYUY2colm@@YAJKJ@Z @ 0x00264BB0
 EDGEFN S32 dounalignedYUY2colm(U32 n, S32 x)
 {
   U32 i = n;
@@ -1202,6 +1305,7 @@ EDGEFN S32 dounalignedYUY2colm(U32 n, S32 x)
 }
 
 // match: ?dounalignedYUY2col@@YAJKJ@Z @ 0x00354CB0
+// sp-match: ?dounalignedYUY2col@@YAJKJ@Z @ 0x00264CB0
 EDGEFN S32 dounalignedYUY2col(U32 n, S32 x)
 {
   U32 i = n;
@@ -1225,6 +1329,7 @@ EDGEFN S32 dounalignedYUY2col(U32 n, S32 x)
 
 #pragma code_seg("BINK32")
 // match: ?dounaligned32rowm@@YAXKK@Z @ 0x0034E940
+// sp-match: ?dounaligned32rowm@@YAXKK@Z @ 0x0025E940
 EDGEFN void dounaligned32rowm(U32 x, U32 n)
 {
   while (n)
@@ -1237,6 +1342,7 @@ EDGEFN void dounaligned32rowm(U32 x, U32 n)
 }
 
 // match: ?dounaligned32colm@@YAJKJ@Z @ 0x0034E990
+// sp-match: ?dounaligned32colm@@YAJKJ@Z @ 0x0025E990
 EDGEFN S32 dounaligned32colm(U32 n, S32 x)
 {
   U32 i = n;
@@ -1265,6 +1371,7 @@ void YUV_blit_mask(void *dest, U32 destx, U32 desty, U32 destpitch,
 
 #pragma code_seg("BINK32")
 // match: _YUV_blit_32bpp_mask@60 @ 0x0034EC20
+// sp-match: _YUV_blit_32bpp_mask@60 @ 0x0025EC20
 YUVBLITMASK(YUV_blit_32bpp_mask)
 {
  YUV_blit_mask(dest,destx,desty,destpitch,(U8*)mask,maskpitch,yplane,srcx,srcy,srcw,srch,ywidth,yheight,flags,aplane,&blits32);
@@ -1272,6 +1379,7 @@ YUVBLITMASK(YUV_blit_32bpp_mask)
 
 #pragma code_seg("BINK32A")
 // match: _YUV_blit_32abpp_mask@60 @ 0x0034FFF0
+// sp-match: _YUV_blit_32abpp_mask@60 @ 0x0025FFF0
 YUVBLITMASK(YUV_blit_32abpp_mask)
 {
  YUV_blit_mask(dest,destx,desty,destpitch,(U8*)mask,maskpitch,yplane,srcx,srcy,srcw,srch,ywidth,yheight,flags,aplane,&blits32a);
@@ -1279,6 +1387,7 @@ YUVBLITMASK(YUV_blit_32abpp_mask)
 
 #pragma code_seg("BINK16")
 // match: _YUV_blit_16bpp_mask@60 @ 0x003512E0
+// sp-match: _YUV_blit_16bpp_mask@60 @ 0x002612E0
 YUVBLITMASK(YUV_blit_16bpp_mask)
 {
  YUV_blit_mask(dest,destx,desty,destpitch,(U8*)mask,maskpitch,yplane,srcx,srcy,srcw,srch,ywidth,yheight,flags,aplane,&blits16);
@@ -1286,6 +1395,7 @@ YUVBLITMASK(YUV_blit_16bpp_mask)
 
 #pragma code_seg("BINK4444")
 // match: _YUV_blit_16a4bpp_mask@60 @ 0x003527B0
+// sp-match: _YUV_blit_16a4bpp_mask@60 @ 0x002627B0
 YUVBLITMASK(YUV_blit_16a4bpp_mask)
 {
  YUV_blit_mask(dest,destx,desty,destpitch,(U8*)mask,maskpitch,yplane,srcx,srcy,srcw,srch,ywidth,yheight,flags,aplane,&blits16a4);
@@ -1293,6 +1403,7 @@ YUVBLITMASK(YUV_blit_16a4bpp_mask)
 
 #pragma code_seg("BINK5551")
 // match: _YUV_blit_16a1bpp_mask@60 @ 0x00353CD0
+// sp-match: _YUV_blit_16a1bpp_mask@60 @ 0x00263CD0
 YUVBLITMASK(YUV_blit_16a1bpp_mask)
 {
  YUV_blit_mask(dest,destx,desty,destpitch,(U8*)mask,maskpitch,yplane,srcx,srcy,srcw,srch,ywidth,yheight,flags,aplane,&blits16a1);
@@ -1300,6 +1411,7 @@ YUVBLITMASK(YUV_blit_16a1bpp_mask)
 
 #pragma code_seg("BINKYUY2")
 // match: _YUV_blit_YUY2_mask@60 @ 0x00354DF0
+// sp-match: _YUV_blit_YUY2_mask@60 @ 0x00264DF0
 YUVBLITMASK(YUV_blit_YUY2_mask)
 {
  YUV_blit_mask(dest,destx,desty,destpitch,(U8*)mask,maskpitch,yplane,srcx,srcy,srcw,srch,ywidth,yheight,flags,aplane,&blitsyuy2);

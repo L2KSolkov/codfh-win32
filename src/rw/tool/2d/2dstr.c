@@ -152,6 +152,7 @@ Rt2dObjectStringCreate(const RwChar *textString, const RwChar *font)
 }
 
 static _rt2dObjectString *
+// sp-match: __rt2dObjectStringInitTextString @ 0x0016BA80
 _rt2dObjectStringInitTextString(_rt2dObjectString *objectString,
                                 const RwChar *textString)
 {
@@ -202,6 +203,7 @@ _rt2dObjectStringInitTextString(_rt2dObjectString *objectString,
 }
 
 Rt2dObject  *
+// sp-match: __rt2dObjectStringInit @ 0x0016BEA0
 _rt2dObjectStringInit(Rt2dObject* object, const RwChar *textString, const RwChar *font)
 {
     RWFUNCTION(RWSTRING("_rt2dObjectStringInit"));
@@ -254,6 +256,7 @@ _rt2dObjectStringInit(Rt2dObject* object, const RwChar *textString, const RwChar
 // match: _rcsid @ 0x003EE3C8
 
 // match: __rt2dObjectStringDestruct @ 0x00256CE0
+// sp-match: __rt2dObjectStringDestruct @ 0x0016BB30
 RwBool
 _rt2dObjectStringDestruct(Rt2dObject *object)
 {
@@ -348,6 +351,7 @@ Rt2dObjectStringGetBrush(Rt2dObject *object)
  * \see Rt2dObjectStringSetFont
  */
 RwChar *
+// sp-match: _Rt2dObjectStringGetText @ 0x0016BB70
 Rt2dObjectStringGetText(Rt2dObject *object)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dObjectStringGetText"));
@@ -448,6 +452,7 @@ Rt2dObjectStringSetBrush(Rt2dObject *object, Rt2dBrush *brush)
  * \see Rt2dObjectStringSetFont
  */
 extern Rt2dObject *
+// sp-match: _Rt2dObjectStringSetText @ 0x0016BB80
 Rt2dObjectStringSetText(Rt2dObject *object, const RwChar *text)
 {
     Rt2dFont    *font;
@@ -468,10 +473,14 @@ Rt2dObjectStringSetText(Rt2dObject *object, const RwChar *text)
         /* if the length is insufficient, reallocation necessary */
         if (newSize > object->data.objectString.maxLength)
         {
+#ifdef CODFH_SP /* single player frees the old text without a NULL test (SP 0x16BB80; MP drops the function) */
+            RwFree(object->data.objectString.textString);
+#else
             if( NULL != object->data.objectString.textString)
             {        
                 RwFree(object->data.objectString.textString);
             }
+#endif
 
             object->data.objectString.textString =
                 (RwChar *)RwMalloc(newSize + 2,
@@ -492,10 +501,14 @@ Rt2dObjectStringSetText(Rt2dObject *object, const RwChar *text)
         /* if the length is insufficient, reallocation necessary */
         if (newSize > object->data.objectString.maxLength)
         {
+#ifdef CODFH_SP /* single player frees the old text without a NULL test (SP 0x16BB80; MP drops the function) */
+            RwFree(object->data.objectString.textString);
+#else
             if( NULL != object->data.objectString.textString )
             {        
                 RwFree(object->data.objectString.textString);
             }
+#endif
 
             object->data.objectString.textString =
                 (RwChar *)RwMalloc(newSize + 1,
@@ -615,6 +628,7 @@ MACRO_STOP
  * \see Rt2dSceneRender
  */
 Rt2dObject *
+// sp-match: _Rt2dObjectStringRender @ 0x0016BC70
 Rt2dObjectStringRender(Rt2dObject *object)
 {
     RwRGBAReal multColor,offsColor;
@@ -651,6 +665,18 @@ Rt2dObjectStringRender(Rt2dObject *object)
 
         BrushSetup();
 
+#ifdef CODFH_SP /* single player shows the text through the word after Rt2dGlobals.fontReadFunc when it is set (SP 0x16BC70 calls [0x40693C], set by SP 0x16BE90, cleared by _rt2dFontOpen; MP drops the function) */
+        if (Rt2dGlobals.unknown)
+        {
+            ((Rt2dFont *(*)(Rt2dFont *, const RwChar *, RwReal, RwV2d *, Rt2dBrush *))
+                Rt2dGlobals.unknown)( object->data.objectString.font->font,
+                                      object->data.objectString.textString,
+                                      object->data.objectString.height,
+                                      &anchor,
+                                      brush );
+        }
+        else
+#endif
         Rt2dFontShow (  object->data.objectString.font->font,
                         object->data.objectString.textString,
                         object->data.objectString.height,
@@ -668,7 +694,16 @@ Rt2dObjectStringRender(Rt2dObject *object)
     RWRETURN(object);
 }
 
+#ifdef CODFH_SP /* single player only: sets the word Rt2dObjectStringRender draws through (SP 0x16BE90 stores its argument at 0x40693C, Rt2dGlobals.unknown; the front end hands it its font callback, sp_sub_A59D0) */
+void
+sp_sub_16BE90(Rt2dFont *(*callback)(Rt2dFont *, const RwChar *, RwReal, RwV2d *, Rt2dBrush *))
+{
+    Rt2dGlobals.unknown = (RwUInt32)callback;
+}
+#endif
+
 Rt2dObject  *
+// sp-match: __rt2dObjectStringStreamReadTo @ 0x0016BF70
 _rt2dObjectStringStreamReadTo( Rt2dObject *object, RwStream *stream )
 {
     RwUInt32 size, version;

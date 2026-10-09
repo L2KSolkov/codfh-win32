@@ -33,7 +33,9 @@ struct type_19D580
     RwUInt8 unk_10C;            // it opened
     RwUInt8 unk_10D[0x3];
     void *unk_110;              // its file (closed with it)
+#ifndef CODFH_SP // 0x114 bytes in single player (SP 0xB1B30: its /GS cookie at 0x118 of a 0x11C frame)
     RwUInt8 unk_114[0x4];
+#endif
 
     // Clears it; its unk_01 (true).
     bool sub_19D580();

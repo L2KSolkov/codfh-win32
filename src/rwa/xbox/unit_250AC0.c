@@ -79,7 +79,11 @@ void *off_430AB0[36] =
     0,
 };
 // 0x00430B40
+#ifdef CODFH_SP // ends with the two words multiplayer has after off_430EA0 (128, 1: SP 0x32D43C; tri.c's data follows at SP 0x32D444; table at SP 0x32D3B0)
+void *off_430B40[37] =
+#else
 void *off_430B40[36] =
+#endif
 {
     (void *)&unk_3EDF98,
     0,
@@ -116,7 +120,12 @@ void *off_430B40[36] =
     0,
     (void *)&unk_3ED56C,
     (void *)0x1,
+#ifdef CODFH_SP
+    (void *)0x80,
+    (void *)0x1,
+#else
     0,
+#endif
 };
 // 0x00507DE8
 RwUInt8 dword_507DE8[40];
@@ -125,6 +134,7 @@ RwUInt8 dword_507DE8[40];
 // match: _off_430B40 @ 0x00430B40
 
 // match: _sub_250AC0 @ 0x00250AC0
+// sp-match: _sub_250AC0 @ 0x001660D0
 
 void *
 sub_250AC0(void)
@@ -141,6 +151,7 @@ sub_250AC0(void)
 }
 
 // match: _sub_250B10 @ 0x00250B10
+// sp-match: _sub_250B10 @ 0x00166120
 RwBool
 sub_250B10(void)
 {

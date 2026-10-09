@@ -15,6 +15,8 @@
 
 // match: _$E1 @ 0x0030BC10
 // match: _$E2 @ 0x0030E860
+// sp-match: _$E2 @ 0x0021EC30
+// sp-match: _$E1 @ 0x0021DC00
 
 // Globals with constructors defined here (their initializers and exit
 // functions at the end of .text).
@@ -22,6 +24,7 @@
 type_4D53F8 dword_4D53F8[128];
 
 // match: ?sub_15C790@@YAXXZ @ 0x0015C790
+// sp-match: ?sub_15C790@@YAXXZ @ 0x001003F0
 // Clears every NPC weapon's settings (the game's set-up, sub_D6820).
 void sub_15C790()
 {
@@ -32,6 +35,7 @@ void sub_15C790()
 }
 
 // match: ?sub_15C7D0@@YAXXZ @ 0x0015C7D0
+// sp-match: ?sub_15C7D0@@YAXXZ @ 0x00100410
 // Marks every one unready (the game's shutdown, sub_D7040).
 void sub_15C7D0()
 {
@@ -44,6 +48,7 @@ void sub_15C7D0()
 // match: ??0type_4D53F8@@QAE@XZ @ 0x0015C810
 // match: __ehhandler$??0type_4D53F8@@QAE@XZ-0xB @ 0x00301DD0
 // match: __ehhandler$??0type_4D53F8@@QAE@XZ @ 0x00301DDB
+// sp-match: ??0type_4D53F8@@QAE@XZ @ 0x00100430
 type_4D53F8::type_4D53F8()
 {
     unk_44 = 0;
@@ -52,6 +57,7 @@ type_4D53F8::type_4D53F8()
 // match: ??1type_4D53F8@@QAE@XZ @ 0x0015C920
 // match: __ehhandler$??1type_4D53F8@@QAE@XZ-0xB @ 0x00301DF0
 // match: __ehhandler$??1type_4D53F8@@QAE@XZ @ 0x00301DFB
+// sp-match: ??1type_4D53F8@@QAE@XZ @ 0x001004B0
 type_4D53F8::~type_4D53F8()
 {
     if (unk_44)
@@ -59,6 +65,7 @@ type_4D53F8::~type_4D53F8()
 }
 
 // match: ?sub_15C980@type_4D53F8@@QAEHXZ @ 0x0015C980
+// sp-match: ?sub_15C980@type_4D53F8@@QAEHXZ @ 0x000FFB40
 RwInt32 type_4D53F8::sub_15C980()
 {
     unk_44 = 0;
@@ -84,6 +91,7 @@ RwInt32 type_4D53F8::sub_15C980()
 }
 
 // match: ?sub_15CA80@type_4D53F8@@QAEHXZ @ 0x0015CA80
+// sp-match: ?sub_15CA80@type_4D53F8@@QAEHXZ @ 0x000FFBB0
 RwInt32 type_4D53F8::sub_15CA80()
 {
     unk_44 = 0;
@@ -91,6 +99,7 @@ RwInt32 type_4D53F8::sub_15CA80()
 }
 
 // match: ?sub_15CAA0@type_4D53F8@@QAEHXZ @ 0x0015CAA0
+// sp-match: ?sub_15CAA0@type_4D53F8@@QAEHXZ @ 0x000FFBC0
 RwInt32 type_4D53F8::sub_15CAA0()
 {
     unk_44 = 1;
@@ -98,6 +107,7 @@ RwInt32 type_4D53F8::sub_15CAA0()
 }
 
 // match: ?sub_15CAC0@type_4D53F8@@QAEXXZ @ 0x0015CAC0
+// sp-match: ?sub_15CAC0@type_4D53F8@@QAEXXZ @ 0x000FFBD0
 void type_4D53F8::sub_15CAC0()
 {
     sub_198900((type_3DF8D8_04 *)&unk_48, 26, 0, 0, 0, 0);
@@ -106,6 +116,7 @@ void type_4D53F8::sub_15CAC0()
 }
 
 // match: ?sub_15CB10@@YAPAUtype_4D53F8@@H@Z @ 0x0015CB10
+// sp-match: ?sub_15CB10@@YAPAUtype_4D53F8@@H@Z @ 0x000FFC10
 type_4D53F8 *sub_15CB10(RwInt32 arg_0)
 {
     if (arg_0 < 0 || arg_0 >= 128)
@@ -114,6 +125,7 @@ type_4D53F8 *sub_15CB10(RwInt32 arg_0)
 }
 
 // match: ?sub_15CB40@@YAHPBUtype_3DF8D8_04@@@Z @ 0x0015CB40
+// sp-match: ?sub_15CB40@@YAHPBUtype_3DF8D8_04@@@Z @ 0x000FFC30
 RwInt32 sub_15CB40(const type_3DF8D8_04 *arg_0)
 {
     RwInt32 var_4;
@@ -131,42 +143,49 @@ RwInt32 sub_15CB40(const type_3DF8D8_04 *arg_0)
 }
 
 // match: ?sub_15CBD0@type_4D53F8@@QAEXM@Z @ 0x0015CBD0
+// sp-match: ?sub_15CBD0@type_4D53F8@@QAEXM@Z @ 0x000FFC90
 void type_4D53F8::sub_15CBD0(RwReal arg_0)
 {
     unk_94.unk_40_r = arg_0;
 }
 
 // match: ?sub_15CBF0@type_4D53F8@@QAEXH@Z @ 0x0015CBF0
+// sp-match: ?sub_15CBF0@type_4D53F8@@QAEXH@Z @ 0x000FFCA0
 void type_4D53F8::sub_15CBF0(RwInt32 arg_0)
 {
     unk_94.unk_44 = arg_0;
 }
 
 // match: ?sub_15CC10@type_4D53F8@@QAEXH@Z @ 0x0015CC10
+// sp-match: ?sub_15CC10@type_4D53F8@@QAEXH@Z @ 0x000FFCB0
 void type_4D53F8::sub_15CC10(RwInt32 arg_0)
 {
     unk_94.unk_48 = arg_0;
 }
 
 // match: ?sub_15CC30@type_4D53F8@@QAEXI@Z @ 0x0015CC30
+// sp-match: ?sub_15CC30@type_4D53F8@@QAEXI@Z @ 0x000FFCC0
 void type_4D53F8::sub_15CC30(RwUInt32 arg_0)
 {
     unk_94.unk_04_r = (RwReal)arg_0;
 }
 
 // match: ?sub_15CC60@type_4D53F8@@QAEXM@Z @ 0x0015CC60
+// sp-match: ?sub_15CC60@type_4D53F8@@QAEXM@Z @ 0x000FFCE0
 void type_4D53F8::sub_15CC60(RwReal arg_0)
 {
     unk_94.unk_4C_r = arg_0;
 }
 
 // match: ?sub_15CC80@type_4D53F8@@QAEXM@Z @ 0x0015CC80
+// sp-match: ?sub_15CC80@type_4D53F8@@QAEXM@Z @ 0x000FFCF0
 void type_4D53F8::sub_15CC80(RwReal arg_0)
 {
     unk_E4 = arg_0;
 }
 
 // match: ?sub_15CCA0@type_4D53F8@@QAEXH@Z @ 0x0015CCA0
+// sp-match: ?sub_15CCA0@type_4D53F8@@QAEXH@Z @ 0x000FFD00
 void type_4D53F8::sub_15CCA0(RwInt32 arg_0)
 {
     unk_74 = arg_0;

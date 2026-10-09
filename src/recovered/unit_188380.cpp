@@ -72,6 +72,11 @@ void sub_18F1C0(type_4EBE00 *arg_0, RwInt32 arg_4);
 void sub_18F330(type_4EBE00 *arg_0, RwInt32 arg_4);
 void sub_1A2580(type_4EBE00 *arg_0, RwInt32 arg_4);
 
+#ifdef CODFH_SP
+// SP callback @ 0x00121970 replaces MP callback @ 0x0018D680.
+void sp_sub_121970(type_4EBE00 *arg_0, RwInt32 arg_4);
+#endif
+
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x0042B518
 // The messages' openers by number (sub_186E70), ended by -1.
@@ -115,7 +120,11 @@ type_42B518 off_42B518[47] = {
     { 41, sub_18DCA0 },
     { 42, sub_18DDD0 },
     { 43, sub_18DE80 },
+#ifdef CODFH_SP
+    { 44, sp_sub_121970 }, // SP 0x00121970; MP 0x0018D680.
+#else
     { 44, sub_18D680 },
+#endif
     { 0, sub_18DF80 },
     { 1, sub_18E640 },
     { 3, sub_18F020 },
@@ -173,6 +182,7 @@ extern type_4F3130 dword_4F3130;   // unit_19BF20 defines it (its initializer, .
 // match: ?off_42B518@@3PAUtype_42B518@@A @ 0x0042B518
 
 // match: ??0type_4EBE00@@QAE@XZ @ 0x00188380
+// sp-match: ??0type_4EBE00@@QAE@XZ @ 0x0011E380
 
 type_4EBE00::type_4EBE00()
 {
@@ -180,6 +190,7 @@ type_4EBE00::type_4EBE00()
 }
 
 // match: ?sub_1883B0@type_4EBE00@@QAEXXZ @ 0x001883B0
+// sp-match: ?sub_1883B0@type_4EBE00@@QAEXXZ @ 0x0011D7C0
 void type_4EBE00::sub_1883B0()
 {
     RwInt32 var_4;
@@ -203,6 +214,7 @@ void type_4EBE00::sub_1883B0()
 }
 
 // match: ?sub_188490@type_4EBE00@@QAEXXZ @ 0x00188490
+// sp-match: ?sub_188490@type_4EBE00@@QAEXXZ @ 0x0011D830
 // Closes it.
 void type_4EBE00::sub_188490()
 {
@@ -211,6 +223,7 @@ void type_4EBE00::sub_188490()
 }
 
 // match: ?sub_1884B0@type_4EBE00@@QAEXMM@Z @ 0x001884B0
+// sp-match: ?sub_1884B0@type_4EBE00@@QAEXMM@Z @ 0x0011E3A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its width: the widest heading line or line with its widest choice (a
 // choice with a button icon, $, drawn at the small size); its height from
@@ -307,6 +320,7 @@ void type_4EBE00::sub_1884B0(RwReal arg_0, RwReal arg_4)
 }
 
 // match: ?sub_1888F0@type_4EBE00@@QAEXPAURwCamera@@M@Z @ 0x001888F0
+// sp-match: ?sub_1888F0@type_4EBE00@@QAEXPAURwCamera@@M@Z @ 0x0011C2F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_4EBE00::sub_1888F0(RwCamera *arg_0, RwReal arg_4)
 {
@@ -328,6 +342,7 @@ void type_4EBE00::sub_1888F0(RwCamera *arg_0, RwReal arg_4)
 }
 
 // match: ?sub_188970@type_4EBE00@@QAEPAUtype_4EBE00_DC@@XZ @ 0x00188970
+// sp-match: ?sub_188970@type_4EBE00@@QAEPAUtype_4EBE00_DC@@XZ @ 0x0011E6B0
 type_4EBE00_DC *type_4EBE00::sub_188970()
 {
     unk_DC[unk_2C].sub_18A110();
@@ -336,6 +351,7 @@ type_4EBE00_DC *type_4EBE00::sub_188970()
 }
 
 // match: ?sub_1889C0@type_4EBE00@@QAEXMM@Z @ 0x001889C0
+// sp-match: ?sub_1889C0@type_4EBE00@@QAEXMM@Z @ 0x0011C340
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Lays it out: its corners about the boxes' centre (dword_4EBD08, higher
 // and shorter, while a level script runs) offset by arg_0 and arg_4 and
@@ -563,6 +579,7 @@ void type_4EBE00::sub_1889C0(RwReal arg_0, RwReal arg_4)
 }
 
 // match: ?sub_189FB0@type_4EBE00@@QAEHH@Z @ 0x00189FB0
+// sp-match: ?sub_189FB0@type_4EBE00@@QAEHH@Z @ 0x0011D840
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The first selectable line below arg_0 (wrapping), or -1.
 RwInt32 type_4EBE00::sub_189FB0(RwInt32 arg_0)
@@ -583,6 +600,7 @@ RwInt32 type_4EBE00::sub_189FB0(RwInt32 arg_0)
 }
 
 // match: ?sub_18A060@type_4EBE00@@QAEHH@Z @ 0x0018A060
+// sp-match: ?sub_18A060@type_4EBE00@@QAEHH@Z @ 0x0011D8B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The first selectable line above arg_0 (wrapping), or -1.
 RwInt32 type_4EBE00::sub_18A060(RwInt32 arg_0)
@@ -604,6 +622,7 @@ RwInt32 type_4EBE00::sub_18A060(RwInt32 arg_0)
 }
 
 // match: ?sub_18A110@type_4EBE00_DC@@QAEXXZ @ 0x0018A110
+// sp-match: ?sub_18A110@type_4EBE00_DC@@QAEXXZ @ 0x0011D930
 void type_4EBE00_DC::sub_18A110()
 {
     RwInt32 var_4;
@@ -619,6 +638,7 @@ void type_4EBE00_DC::sub_18A110()
 }
 
 // match: ?sub_18A190@type_4EBE00_DC@@QAEPAUtype_4EBE00_100@@PBD@Z @ 0x0018A190
+// sp-match: ?sub_18A190@type_4EBE00_DC@@QAEPAUtype_4EBE00_100@@PBD@Z @ 0x0011D050
 type_4EBE00_100 *type_4EBE00_DC::sub_18A190(const RwChar *arg_0)
 {
     strcpy(unk_100[unk_260].unk_00, arg_0);
@@ -627,6 +647,7 @@ type_4EBE00_100 *type_4EBE00_DC::sub_18A190(const RwChar *arg_0)
 }
 
 // match: ?sub_18A1F0@type_4EBE00_DC@@QAEXHPAURwV2d@@PAUtype_4EBE00@@@Z @ 0x0018A1F0
+// sp-match: ?sub_18A1F0@type_4EBE00_DC@@QAEXHPAURwV2d@@PAUtype_4EBE00@@@Z @ 0x0011D090
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws the line at *arg_4 in the style arg_0: its text, ": " and its
 // choice selected; centred in the box arg_8 when it is (without its last
@@ -664,6 +685,7 @@ void type_4EBE00_DC::sub_18A1F0(RwInt32 arg_0, RwV2d *arg_4, type_4EBE00 *arg_8)
 }
 
 // match: ?sub_18A380@type_4EBE00_DC@@QAEHXZ @ 0x0018A380
+// sp-match: ?sub_18A380@type_4EBE00_DC@@QAEHXZ @ 0x0011D230
 RwInt32 type_4EBE00_DC::sub_18A380()
 {
     RwInt32 var_4;
@@ -677,6 +699,7 @@ RwInt32 type_4EBE00_DC::sub_18A380()
 }
 
 // match: ?sub_18A3E0@type_4EBE00_100@@QAEXXZ @ 0x0018A3E0
+// sp-match: ?sub_18A3E0@type_4EBE00_100@@QAEXXZ @ 0x0011D270
 void type_4EBE00_100::sub_18A3E0()
 {
     unk_00[0] = 0;
@@ -685,12 +708,14 @@ void type_4EBE00_100::sub_18A3E0()
 }
 
 // match: ??0type_4EBE00_04@@QAE@XZ @ 0x0018A410
+// sp-match: ??0type_4EBE00_04@@QAE@XZ @ 0x0011D980
 type_4EBE00_04::type_4EBE00_04()
 {
     sub_18A430();
 }
 
 // match: ?sub_18A430@type_4EBE00_04@@QAEXXZ @ 0x0018A430
+// sp-match: ?sub_18A430@type_4EBE00_04@@QAEXXZ @ 0x0011D280
 void type_4EBE00_04::sub_18A430()
 {
     RwInt32 var_4;
@@ -700,6 +725,7 @@ void type_4EBE00_04::sub_18A430()
 }
 
 // match: ?sub_18A470@@YAPAUtype_18A470@@PBDPAU1@@Z @ 0x0018A470
+// sp-match: ?sub_18A470@@YAPAUtype_18A470@@PBDPAU1@@Z @ 0x0011E6E0
 // The entry of the table arg_4 named arg_0, or 0.
 type_18A470 *sub_18A470(const RwChar *arg_0, type_18A470 *arg_4)
 {
@@ -712,6 +738,7 @@ type_18A470 *sub_18A470(const RwChar *arg_0, type_18A470 *arg_4)
 }
 
 // match: ?sub_18A4B0@@YAPADPAD0@Z @ 0x0018A4B0
+// sp-match: ?sub_18A4B0@@YAPADPAD0@Z @ 0x0011E740
 // The start of the line after arg_0 (before arg_4), skipping escaped
 // characters and newlines inside quotes; 0 at the end.
 RwChar *sub_18A4B0(RwChar *arg_0, RwChar *arg_4)
@@ -735,6 +762,7 @@ RwChar *sub_18A4B0(RwChar *arg_0, RwChar *arg_4)
 }
 
 // match: ?sub_18A530@@YAPADPAUtype_18A530@@@Z @ 0x0018A530
+// sp-match: ?sub_18A530@@YAPADPAUtype_18A530@@@Z @ 0x0011E790
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The end of the cursor's field (a comma or a newline).
 RwChar *sub_18A530(type_18A530 *arg_0)
@@ -750,6 +778,7 @@ RwChar *sub_18A530(type_18A530 *arg_0)
 }
 
 // match: ?sub_18A580@@YAPADPAUtype_18A530@@@Z @ 0x0018A580
+// sp-match: ?sub_18A580@@YAPADPAUtype_18A530@@@Z @ 0x0011E7C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Copies the cursor's field into its buffer (at most 31 characters, with a
 // warning when longer); where it ends (a newline ends it early).
@@ -787,6 +816,7 @@ RwChar *sub_18A580(type_18A530 *arg_0)
 }
 
 // match: ?sub_18A630@@YAPADPAX@Z @ 0x0018A630
+// sp-match: ?sub_18A630@@YAPADPAX@Z @ 0x0011E820
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Measures the cursor's quoted field (its token a count): the characters
 // counted, a quote pair dropped and an escaped quote kept; where it ends.
@@ -832,6 +862,7 @@ RwChar *sub_18A630(void *arg_0)
 }
 
 // match: ?sub_18A730@@YAPADPAX@Z @ 0x0018A730
+// sp-match: ?sub_18A730@@YAPADPAX@Z @ 0x0011E890
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Copies the cursor's quoted field to its output (a quote pair dropped, an
 // escaped quote kept, then a terminator), and points the tag's string at
@@ -894,6 +925,7 @@ RwChar *sub_18A730(void *arg_0)
 }
 
 // match: ?sub_18A890@@YAPADPBDPAUtype_18A470@@PAD@Z @ 0x0018A890
+// sp-match: ?sub_18A890@@YAPADPBDPAUtype_18A470@@PAD@Z @ 0x0011E940
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Loads the message strings file arg_0 (a CSV of tags and a column per
 // language) into the name table arg_4's strings: a first pass sizes them,

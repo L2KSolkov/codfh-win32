@@ -269,6 +269,7 @@ RtLineTriangleIntersectionTest(RwLine * line, RwV3d * normal,
 // match: _rcsid @ 0x003ED1D8
 
 // match: _RtLineSphereIntersectionTest @ 0x0023B640
+// sp-match: _RtLineSphereIntersectionTest @ 0x0014F8C0
 RwBool
 RtLineSphereIntersectionTest(RwLine * line,
                              RwSphere * sphere,

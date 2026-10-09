@@ -23,9 +23,24 @@
 #include "types/type_3D3548.h"
 #include "rws/csystemcommands.h"
 
+#ifdef CODFH_SP // static in single player (defined below)
+static bool sub_8F770(type_8BEC0 *arg_0, type_8BEC0 *arg_4);
+#endif
+#ifdef CODFH_SP
+// The query's point and its height limit are this file's own in single player:
+// sub_92430 and sub_92540 schedule their loads across stores as for statics
+// (SP 0x741D0, 0x73BD0).
+static RwV3d dword_4B25A0;
+static RwReal flt_4B25AC;
+#endif
+
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D5110
 extern const RwReal flt_3D5110 = 16.666666f;
+#ifdef CODFH_SP // SP only: a second unreferenced 16.666666f follows flt_3D5110 (SP 0x2E191C)
+// SP 0x002E191C
+extern const RwReal sp_flt_2E191C = 16.666666f;
+#endif
 
 // match: ?flt_3D5110@@3MB @ 0x003D5110
 
@@ -36,6 +51,7 @@ extern const RwReal flt_3D5110 = 16.666666f;
 // match: ?sub_8E670@type_8E670@@QAEXPAUtype_8F3E0@@@Z @ 0x0008E670
 // match: ??_C@_0EI@GLJADIGI@?$CK?$CK?$CKSECTOR?5HAS?5TOO?5MANY?5VOLUMES?$CB?5@ @ 0x003D5118
 // match: ??_C@_0CH@DPGMGIKO@?$CK?$CK?$CKCOULD?5NOT?5STORE?5LIGHT?5VOLUME?5@ @ 0x003D5160
+// sp-match: ?sub_8E670@type_8E670@@QAEXPAUtype_8F3E0@@@Z @ 0x00070F60
 void type_8E670::sub_8E670(type_8F3E0 *arg_0)
 {
     RwReal var_4;
@@ -77,6 +93,7 @@ extern const RwReal flt_3D5110;
 // A frame of the fades (a tenth of the step each), the countdown at unk_1C,
 // and dword_4B2560's time running down at 1000/60 a second.
 // match: ?sub_8E750@type_8E670@@QAEXXZ @ 0x0008E750
+// sp-match: ?sub_8E750@type_8E670@@QAEXXZ @ 0x00070FD0
 void type_8E670::sub_8E750()
 {
     if (unk_00 && unk_04 < 1.0f)
@@ -102,7 +119,13 @@ void type_8E670::sub_8E750()
     }
     if (unk_20)
     {
+#ifdef CODFH_SP
+        // shape: the frames in a local, then by a thousandth (SP 0x71059 multiplies twice).
+        RwReal frames = deltaTime * flt_3D5110;
+        dword_4B2560.unk_00 -= frames * 0.001f;
+#else
         dword_4B2560.unk_00 -= deltaTime * flt_3D5110 / 1000.0f;
+#endif
         if (dword_4B2560.unk_00 <= 0.0f)
         {
             dword_4B2560.unk_00 = 0.0f;
@@ -111,6 +134,7 @@ void type_8E670::sub_8E750()
     }
 }
 // match: ?sub_8E870@type_8E670@@QAEXPAUtype_8F210@@@Z @ 0x0008E870
+// sp-match: ?sub_8E870@type_8E670@@QAEXPAUtype_8F210@@@Z @ 0x000720E0
 // Fills the light list arg_0 from the zones: entry 0 the ambient (each
 // zone's unk_30 by its weight, plus the flash at unk_10 by the countdown
 // unk_1C, clamped to 1), then each zone's two lights (a point at unk_40 or
@@ -221,6 +245,7 @@ void type_8E670::sub_8E870(type_8F210 *arg_0)
 // Starts the zones' effect with arg_0 (1 or 2) points for arg_4 seconds;
 // the points and values given replace the old ones.
 // match: ?sub_8F140@type_8E670@@QAEXHMPAURwV3d@@PAUtype_8BEC0@@01@Z @ 0x0008F140
+// sp-match: ?sub_8F140@type_8E670@@QAEXHMPAURwV3d@@PAUtype_8BEC0@@01@Z @ 0x000710A0
 void type_8E670::sub_8F140(RwInt32 arg_0, RwReal arg_4, RwV3d *arg_8, type_8BEC0 *arg_C,
                            RwV3d *arg_10, type_8BEC0 *arg_14)
 {
@@ -253,6 +278,7 @@ void type_8E670::sub_8F140(RwInt32 arg_0, RwReal arg_4, RwV3d *arg_8, type_8BEC0
 }
 // Hands out the zones' effect.
 // match: ?sub_8F210@type_8E670@@QAEXPAUtype_8F210@@@Z @ 0x0008F210
+// sp-match: ?sub_8F210@type_8E670@@QAEXPAUtype_8F210@@@Z @ 0x00071170
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_8E670::sub_8F210(type_8F210 *arg_0)
 {
@@ -275,6 +301,7 @@ void type_8E670::sub_8F210(type_8F210 *arg_0)
     }
 }
 // match: ??0type_8F300@@QAE@XZ @ 0x0008F300
+// sp-match: ??0type_8F300@@QAE@XZ @ 0x000711F0
 type_8F300::type_8F300()
 {
     unk_04 = 0;
@@ -282,6 +309,7 @@ type_8F300::type_8F300()
 }
 // Reads the table from arg_0: the header, the offsets and the data.
 // match: ?sub_8F330@type_8F300@@QAEXPAURwStream@@@Z @ 0x0008F330
+// sp-match: ?sub_8F330@type_8F300@@QAEXPAURwStream@@@Z @ 0x00071200
 void type_8F300::sub_8F330(RwStream *arg_0)
 {
     RwStreamRead(arg_0, this, 4);
@@ -292,6 +320,7 @@ void type_8F300::sub_8F330(RwStream *arg_0)
     unk_00 = unk_00 >> 24;
 }
 // match: ?sub_8F3E0@type_8F300@@QAE_NPAUtype_8F3E0@@PAUtype_8BEC0@@@Z @ 0x0008F3E0
+// sp-match: ?sub_8F3E0@type_8F300@@QAE_NPAUtype_8F3E0@@PAUtype_8BEC0@@@Z @ 0x00071270
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 bool type_8F300::sub_8F3E0(type_8F3E0 *arg_0, type_8BEC0 *arg_4)
 {
@@ -340,6 +369,7 @@ bool type_8F300::sub_8F3E0(type_8F3E0 *arg_0, type_8BEC0 *arg_4)
     return false;
 }
 // match: ?sub_8F570@type_8F300@@QAEXPAURpWorld@@@Z @ 0x0008F570
+// sp-match: ?sub_8F570@type_8F300@@QAEXPAURpWorld@@@Z @ 0x000714D0
 void type_8F300::sub_8F570(RpWorld *arg_0)
 {
     RwInt32 var_4;
@@ -353,6 +383,7 @@ void type_8F300::sub_8F570(RpWorld *arg_0)
     }
 }
 // match: ?sub_8F5C0@@YAPAURpWorldSector@@PAU1@PAX@Z @ 0x0008F5C0
+// sp-match: ?sub_8F5C0@@YAPAURpWorldSector@@PAU1@PAX@Z @ 0x00071390
 // Adds the zone *arg_4 to the list of the world sector arg_0 (type_8F8C0)
 // when the sector's box overlaps the zone's; at most 24 zones a sector.
 RpWorldSector *sub_8F5C0(RpWorldSector *arg_0, void *arg_4)
@@ -372,7 +403,10 @@ RpWorldSector *sub_8F5C0(RpWorldSector *arg_0, void *arg_4)
     }
     if (((type_8F8C0 *)arg_0)->unk_10 && (((type_8F8C0 *)arg_0)->unk_10 & 0xFFFFFF00) != 0xFFFFFF00)
     {
+#ifndef CODFH_SP
+        // Single player compiles the debug prints out (SP 0x71390).
         sub_19A750("***COULD NOT STORE LIGHT VOLUME INFO!\n");
+#endif
         return arg_0;
     }
     if (!(var_74 = ((type_8F8C0 *)arg_0)->unk_10 & 0xFF))
@@ -390,13 +424,21 @@ RpWorldSector *sub_8F5C0(RpWorldSector *arg_0, void *arg_4)
         var_7C = &((type_8F8C0 *)arg_0)->unk_10;
         *var_7C = ++var_74 | 0xFFFFFF00;
     }
+#ifndef CODFH_SP
     else
     {
         sub_19A750("***SECTOR HAS TOO MANY VOLUMES! Volume number %i is a potential issue \n", var_4);
     }
+#endif
     return arg_0;
 }
 // match: ?sub_8F770@@YA_NPAUtype_8BEC0@@0@Z @ 0x0008F770
+// sp-match: ?sub_8F770@@YA_NPAUtype_8BEC0@@0@Z @ 0x000708F0
+#ifdef CODFH_SP
+// shape: internal linkage in single player, which passes the boxes in registers
+// (SP 0x708F0: edx, ecx).
+static
+#endif
 bool sub_8F770(type_8BEC0 *arg_0, type_8BEC0 *arg_4)
 {
     if (((arg_0[0].unk_00 <= arg_4[1].unk_00 && arg_0[0].unk_00 >= arg_4[0].unk_00) ||
@@ -411,6 +453,7 @@ bool sub_8F770(type_8BEC0 *arg_0, type_8BEC0 *arg_4)
     return false;
 }
 // match: ?sub_8F870@type_8F300@@QAEXPAURpWorld@@@Z @ 0x0008F870
+// sp-match: ?sub_8F870@type_8F300@@QAEXPAURpWorld@@@Z @ 0x00071520
 void type_8F300::sub_8F870(RpWorld *arg_0)
 {
     RwInt32 var_4;
@@ -424,6 +467,7 @@ void type_8F300::sub_8F870(RpWorld *arg_0)
     }
 }
 // match: ?sub_8F8C0@@YAPAURpWorldSector@@PAU1@PAX@Z @ 0x0008F8C0
+// sp-match: ?sub_8F8C0@@YAPAURpWorldSector@@PAU1@PAX@Z @ 0x00071480
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpWorldSector *sub_8F8C0(RpWorldSector *arg_0, void *arg_4)
 {
@@ -444,6 +488,7 @@ RpWorldSector *sub_8F8C0(RpWorldSector *arg_0, void *arg_4)
     return arg_0;
 }
 // match: ?sub_8F940@@YAHXZ @ 0x0008F940
+// sp-match: ?sub_8F940@@YAHXZ @ 0x00072680
 RwInt32 sub_8F940()
 {
     return ++dword_4B25B0;
@@ -455,66 +500,110 @@ RwInt32 sub_8F940()
 // squared distance in local_c) if it is the nearest yet; bp_4 records that
 // some edge was outside. The macro locals' names give the image's slots
 // (docs/toolchain.md); the operand order needs the two comma expressions.
-#define NEAREST_EDGE(A, B, U, V, W)                                             \
-    do {                                                                        \
-        RwV3d edge;                                                             \
-                                                                                \
-        edge.U = (B)->U - (A)->U;                                               \
-        edge.V = (B)->V - (A)->V;                                               \
-        do {                                                                    \
-            RwReal cross;                                                       \
-            RwInt32 crossed;                                                    \
-            RwReal along;                                                       \
-            RwV3d nearest;                                                      \
-            RwReal l2;                                                          \
-                                                                                \
-            cross = (fp_2c.V - (0, (A)->V)) * edge.U - (fp_2c.U - (0, (A)->U)) * edge.V; \
-            crossed = (*(RwInt32 *)&cross ^ *(RwInt32 *)&orient) < 0;           \
-            if (crossed) {                                                      \
-                edge.W = (B)->W - (A)->W;                                       \
-                along = RwV3dDotProduct(&fp_2c, &edge) - RwV3dDotProduct((A), &edge); \
-                if (along <= 0.0f)                                              \
-                    nearest = *(A);                                             \
-                else {                                                          \
-                    l2 = RwV3dDotProduct(&edge, &edge);                         \
-                    inside = 0.0f < l2 && along < l2;                           \
-                    if (inside) {                                               \
-                        along /= l2;                                            \
-                        RwV3dScale(&nearest, &edge, along);                     \
-                        RwV3dAdd(&nearest, (A), &nearest);                      \
-                    } else                                                      \
-                        nearest = *(B);                                         \
-                }                                                               \
-                RwV3dSub(&edge, &t20, &nearest);                                \
-                o30 = RwV3dDotProduct(&edge, &edge);                            \
-                if (!bp_4 || local_c > o30) {                                   \
-                    *arg_8 = nearest;                                           \
-                    local_c = o30;                                              \
-                }                                                               \
-            }                                                                   \
-            bp_4 |= crossed;                                                    \
-        } while (0);                                                            \
+// The sign test reads both bit patterns as volatile: single player reloads
+// orient's slot at every edge and loads cross into a register before the xor
+// (SP 0x7279C, 0x72946), which also gives its 0x38-byte frame.
+// The edge traversal below uses these expressions in both builds.
+#define NEAREST_DOT(A)                                                                       \
+    RwV3dDotProduct((A), &edge)
+#define NEAREST_SQUARED(out)                                                                 \
+    out = RwV3dDotProduct(&edge, &edge)
+#define NEAREST_ORIENT(U, V)                                                                 \
+    ((0, arg_0[1]->U) - arg_0[0]->U) * ((0, arg_0[2]->V) - arg_0[0]->V)                      \
+    - ((0, arg_0[1]->V) - arg_0[0]->V) * ((0, arg_0[2]->U) - arg_0[0]->U)
+#ifdef CODFH_SP // shape: x87 operand lifetimes in sub_8F960 (SP 0x72690).
+// These reads retain the target's operand order; preserve the vector macro's parentheses.
+#define NEAREST_DOT_Y(A)                                                                     \
+    ((((( ((((A))->x) * ((&edge)->x))) +                                                     \
+        ( ((((A))->y) * ((*(volatile RwReal *)&((&edge)->y))))))) +                          \
+        ( ((((A))->z) * ((&edge)->z)))))
+#define NEAREST_DOT_X(A)                                                                     \
+    ((((( ((((A))->x) * ((*(volatile RwReal *)&((&edge)->x))))) +                            \
+        ( ((((A))->y) * ((&edge)->y))))) +                                                   \
+        ( ((((A))->z) * ((&edge)->z)))))
+#define NEAREST_SQUARED_Z(out)                                                               \
+    out = ((((( (((&edge)->x) * ((&edge)->x))) +                                             \
+        ( (((&edge)->y) * ((&edge)->y))))) +                                                 \
+        ( (((*(volatile RwReal *)&((&edge)->z))) * ((&edge)->z)))))
+#define NEAREST_SQUARED_YXZ(out)                                                             \
+    out = edge.y * edge.y;                                                                   \
+    out += edge.x * edge.x;                                                                  \
+    out += edge.z * edge.z
+#define NEAREST_ORIENT_XY(U, V)                                                              \
+    ((0, arg_0[1]->U) - arg_0[0]->U) * ((0, arg_0[2]->V) - arg_0[0]->V)                      \
+    - ((0, (*(volatile RwReal *)&(arg_0[1]->V))) - arg_0[0]->V) * ((0, arg_0[2]->U) - arg_0[0]->U)
+#else // MP 0x8F960: the original vector macro expressions.
+#define NEAREST_DOT_Y NEAREST_DOT
+#define NEAREST_DOT_X NEAREST_DOT
+#define NEAREST_SQUARED_Z NEAREST_SQUARED
+#define NEAREST_SQUARED_YXZ NEAREST_SQUARED
+#define NEAREST_ORIENT_XY NEAREST_ORIENT
+#endif
+
+#define NEAREST_EDGE(A, B, U, V, W, DOT, LENGTH, DISTANCE)                                   \
+    do {                                                                                     \
+        RwV3d edge;                                                                          \
+                                                                                             \
+        edge.U = (B)->U - (A)->U;                                                            \
+        edge.V = (B)->V - (A)->V;                                                            \
+        do {                                                                                 \
+            RwReal cross;                                                                    \
+            RwInt32 crossed;                                                                 \
+            RwReal along;                                                                    \
+            RwV3d nearest;                                                                   \
+            RwReal l2;                                                                       \
+                                                                                             \
+            cross = (fp_2c.V - (0, (A)->V)) * edge.U - (fp_2c.U - (0, (A)->U)) * edge.V;     \
+            crossed = (*(volatile RwInt32 *)&cross ^ *(volatile RwInt32 *)&orient) < 0;      \
+            if (crossed) {                                                                   \
+                edge.W = (B)->W - (A)->W;                                                    \
+                along = RwV3dDotProduct(&fp_2c, &edge) - DOT(A);                             \
+                if (along <= 0.0f)                                                           \
+                    nearest = *(A);                                                          \
+                else {                                                                       \
+                    LENGTH(l2);                                                              \
+                    inside = 0.0f < l2 && along < l2;                                        \
+                    if (inside) {                                                            \
+                        along /= l2;                                                         \
+                        RwV3dScale(&nearest, &edge, along);                                  \
+                        RwV3dAdd(&nearest, (A), &nearest);                                   \
+                    } else                                                                   \
+                        nearest = *(B);                                                      \
+                }                                                                            \
+                RwV3dSub(&edge, &t20, &nearest);                                             \
+                DISTANCE(o30);                                                               \
+                if (!bp_4 || local_c > o30) {                                                \
+                    *arg_8 = nearest;                                                        \
+                    local_c = o30;                                                           \
+                }                                                                            \
+            }                                                                                \
+            bp_4 |= crossed;                                                                 \
+        } while (0);                                                                         \
     } while (0)
 
 // The triangle projected on its U and V axes: its three edges in turn until
 // the projected point falls within one's span.
-#define NEAREST_CASE(U, V, W)                                                   \
-    do {                                                                        \
-        RwInt32 inside;                                                         \
-        RwReal orient;                                                          \
-                                                                                \
-        inside = 0;                                                             \
-        orient = ((0, arg_0[1]->U) - arg_0[0]->U) * ((0, arg_0[2]->V) - arg_0[0]->V) \
-             - ((0, arg_0[1]->V) - arg_0[0]->V) * ((0, arg_0[2]->U) - arg_0[0]->U); \
-        NEAREST_EDGE(arg_0[1], arg_0[2], U, V, W);                              \
-        if (!inside) {                                                          \
-            NEAREST_EDGE(arg_0[2], arg_0[0], U, V, W);                          \
-            if (!inside)                                                        \
-                NEAREST_EDGE(arg_0[0], arg_0[1], U, V, W);                      \
-        }                                                                       \
+#define NEAREST_CASE(U, V, W, ORIENT, FIRST_DOT, SECOND_DOT,                                 \
+                     SECOND_LENGTH, SECOND_DISTANCE)                                         \
+    do {                                                                                     \
+        RwInt32 inside;                                                                      \
+        RwReal orient;                                                                       \
+                                                                                             \
+        inside = 0;                                                                          \
+        orient = ORIENT(U, V);                                                               \
+        NEAREST_EDGE(arg_0[1], arg_0[2], U, V, W, FIRST_DOT,                                 \
+                     NEAREST_SQUARED, NEAREST_SQUARED);                                      \
+        if (!inside) {                                                                       \
+            NEAREST_EDGE(arg_0[2], arg_0[0], U, V, W, SECOND_DOT,                            \
+                     SECOND_LENGTH, SECOND_DISTANCE);                                        \
+            if (!inside)                                                                     \
+                NEAREST_EDGE(arg_0[0], arg_0[1], U, V, W, NEAREST_DOT,                       \
+                             NEAREST_SQUARED, NEAREST_SQUARED);                              \
+        }                                                                                    \
     } while (0)
 
 // match: ?sub_8F960@@YAMPAPAURwV3d@@PAU1@1@Z @ 0x0008F960
+// sp-match: ?sub_8F960@@YAMPAPAURwV3d@@PAU1@1@Z @ 0x00072690
 // The point of the triangle arg_0 (normal arg_4) nearest *arg_8, into
 // *arg_8; returns its squared distance. The point projects onto the plane;
 // if that falls outside an edge (in the projection on the normal's two
@@ -537,20 +626,38 @@ RwReal sub_8F960(RwV3d **arg_0, RwV3d *arg_4, RwV3d *arg_8)
     l34 = *(RwInt32 *)&arg_4->x & 0x7FFFFFFF;
     bp_8 = *(RwInt32 *)&arg_4->y & 0x7FFFFFFF;
     lv_10 = *(RwInt32 *)&arg_4->z & 0x7FFFFFFF;
+#ifdef CODFH_SP // shape: source views and product reads in SP 0x72690.
+    {
+        RwV3d const &v = *arg_8;
+        t20 = v;
+    }
+    {
+        RwV3d * const &q = arg_0[0];
+        ebp_14 = RwV3dDotProduct(q, arg_4) -
+            ((((( (((arg_8)->x) * ((arg_4)->x))) +
+                ( (((arg_8)->y) * ((*(volatile RwReal *)&((arg_4)->y))))))) +
+                ( (((*(volatile RwReal *)&((arg_8)->z))) * ((arg_4)->z)))));
+    }
+#else // MP 0x8F960.
     t20 = *arg_8;
     ebp_14 = RwV3dDotProduct(arg_0[0], arg_4) - RwV3dDotProduct(arg_8, arg_4);
+#endif
     RwV3dScale(&fp_2c, arg_4, ebp_14);
     RwV3dAdd(&fp_2c, &fp_2c, arg_8);
     if (lv_10 > bp_8) {
         if (lv_10 > l34)
-            NEAREST_CASE(x, y, z);
+            NEAREST_CASE(x, y, z, NEAREST_ORIENT_XY,
+                         NEAREST_DOT, NEAREST_DOT, NEAREST_SQUARED_Z, NEAREST_SQUARED);
         else
-            NEAREST_CASE(y, z, x);
+            NEAREST_CASE(y, z, x, NEAREST_ORIENT,
+                         NEAREST_DOT, NEAREST_DOT, NEAREST_SQUARED, NEAREST_SQUARED);
     } else {
         if (bp_8 > l34)
-            NEAREST_CASE(z, x, y);
+            NEAREST_CASE(z, x, y, NEAREST_ORIENT,
+                         NEAREST_DOT_Y, NEAREST_DOT_X, NEAREST_SQUARED_YXZ, NEAREST_SQUARED_YXZ);
         else
-            NEAREST_CASE(y, z, x);
+            NEAREST_CASE(y, z, x, NEAREST_ORIENT,
+                         NEAREST_DOT, NEAREST_DOT, NEAREST_SQUARED, NEAREST_SQUARED);
     }
     if (!bp_4) {
         *arg_8 = fp_2c;
@@ -562,7 +669,16 @@ RwReal sub_8F960(RwV3d **arg_0, RwV3d *arg_4, RwV3d *arg_8)
 
 #undef NEAREST_CASE
 #undef NEAREST_EDGE
+#undef NEAREST_DOT
+#undef NEAREST_SQUARED
+#undef NEAREST_ORIENT
+#undef NEAREST_DOT_Y
+#undef NEAREST_DOT_X
+#undef NEAREST_SQUARED_Z
+#undef NEAREST_SQUARED_YXZ
+#undef NEAREST_ORIENT_XY
 // match: ?sub_91F40@@YAHPAURpWorld@@PAURwLine@@PAUtype_91F40@@HHH@Z @ 0x00091F40
+// sp-match: ?sub_91F40@@YAHPAURpWorld@@PAURwLine@@PAUtype_91F40@@HHH@Z @ 0x00073EA0
 // The line arg_4 through the world arg_0 (timed as section 0x21): each world
 // sector along it, each run of its collision tree's triangles along it, each
 // triangle the line crosses (sub_92620) whose surface passes the filter
@@ -632,10 +748,16 @@ RwInt32 sub_91F40(RpWorld *arg_0, RwLine *arg_4, type_91F40 *arg_8, RwInt32 arg_
             for (t54c = lv_550; t54c < lv_550 + bp_548; t54c++) {
                 frm_554 = t53c[t54c];
                 w564 = &var540[frm_554];
+#ifdef CODFH_SP // single player passes the vertices straight to the test: the
+                // nearest hit's vertices (frm_35c, var36c, l368) are not kept (SP 0x73FDC)
+                if (sub_92620(&arg_4->start, &local_c, &stk_374[w564->vertIndex[0]],
+                              &stk_374[w564->vertIndex[1]], &stk_374[w564->vertIndex[2]], &lv_560)) {
+#else
                 loc568 = &stk_374[w564->vertIndex[0]];
                 fp_558 = &stk_374[w564->vertIndex[1]];
                 local_55c = &stk_374[w564->vertIndex[2]];
                 if (sub_92620(&arg_4->start, &local_c, loc568, fp_558, local_55c, &lv_560)) {
+#endif
                     v578 = arg_0->materials[w564->matIndex];
                     v574 = sub_FC000(v578);
                     p56c = v574->unk_04 & 0xFFFF0000;
@@ -662,9 +784,11 @@ RwInt32 sub_91F40(RpWorld *arg_0, RwLine *arg_4, type_91F40 *arg_8, RwInt32 arg_
                         v358 = w564;
                         l364 = var370;
                         lv_10 = stk_374;
+#ifndef CODFH_SP
                         frm_35c = loc568;
                         var36c = fp_558;
                         l368 = local_55c;
+#endif
                         v354 = 1;
                         if (!arg_C)
                             break;
@@ -695,6 +819,7 @@ RwInt32 sub_91F40(RpWorld *arg_0, RwLine *arg_4, type_91F40 *arg_8, RwInt32 arg_
     return v354;
 }
 // match: ?sub_92430@@YAMPAURwV3d@@PAUtype_92430@@M@Z @ 0x00092430
+// sp-match: ?sub_92430@@YAMPAURwV3d@@PAUtype_92430@@M@Z @ 0x000741D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwReal sub_92430(RwV3d *arg_0, type_92430 *arg_4, RwReal arg_8)
 {
@@ -723,6 +848,7 @@ RwReal sub_92430(RwV3d *arg_0, type_92430 *arg_4, RwReal arg_8)
     return arg_4->unk_04;
 }
 // match: ?sub_92540@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x00092540
+// sp-match: ?sub_92540@@YAPAURpCollisionTriangle@@PAURpIntersection@@PAURpWorldSector@@PAU1@MPAX@Z @ 0x00073BD0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpCollisionTriangle *sub_92540(RpIntersection *arg_0, RpWorldSector *arg_4, RpCollisionTriangle *arg_8,
                                RwReal arg_C, void *arg_10)
@@ -742,7 +868,7 @@ RpCollisionTriangle *sub_92540(RpIntersection *arg_0, RpWorldSector *arg_4, RpCo
         var_14->unk_00 = &((type_92540 *)arg_4)->unk_04[arg_8->index];
         var_14->unk_20 = ((type_92540 *)arg_4)->unk_08;
         var_14->unk_08 = var_C;
-        if (-flt_4B25AC < lv_10)
+        if (lv_10 > -flt_4B25AC)
         {
             return 0;
         }

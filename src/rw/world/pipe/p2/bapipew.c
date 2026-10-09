@@ -617,6 +617,7 @@ RpGeometrySortByMaterial(const RpGeometry * source,
 // match: _rcsid @ 0x004194C0
 
 // match: _RpWorldSetDefaultSectorPipeline @ 0x002E0EF0
+// sp-match: _RpWorldSetDefaultSectorPipeline @ 0x001FB9C0
 RxPipeline        *
 RpWorldSetDefaultSectorPipeline(RxPipeline * pipeline)
 {
@@ -982,6 +983,7 @@ RpWorldSectorGetPipeline(RpWorldSector *sector, RxPipeline **pipeline)
  *
  */
 // match: _RpAtomicSetDefaultPipeline @ 0x002E0F10
+// sp-match: _RpAtomicSetDefaultPipeline @ 0x001FB9E0
 RxPipeline        *
 RpAtomicSetDefaultPipeline(RxPipeline * pipeline)
 {
@@ -1417,6 +1419,7 @@ RpMaterialGetPipeline(RpMaterial *material,
  _rpWorldPipelineClose
  */
 // match: __rpWorldPipelineClose @ 0x002E0F30
+// sp-match: __rpWorldPipelineClose @ 0x001FBA00
 void
 _rpWorldPipelineClose(void)
 {
@@ -1437,6 +1440,7 @@ _rpWorldPipelineClose(void)
  _rpWorldPipelineOpen
  */
 // match: __rpWorldPipelineOpen @ 0x002E0F40
+// sp-match: __rpWorldPipelineOpen @ 0x001FBA10
 RwBool
 _rpWorldPipelineOpen(void)
 {

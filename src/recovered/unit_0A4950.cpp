@@ -31,22 +31,27 @@ RWS_REGISTERCLASS(CMountedWeaponBehavior);
 // match: ?MakeNew@CMountedWeaponBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A4950
 // match: __ehhandler$?MakeNew@CMountedWeaponBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFEF0
 // match: __ehhandler$?MakeNew@CMountedWeaponBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFEFF
+// sp-match: ?MakeNew@CMountedWeaponBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00080D20
 RWS_DEFINE_MAKENEW(CMountedWeaponBehavior)
 
 // match: ??0CMountedWeaponBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A49D0
+// sp-match: ??0CMountedWeaponBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00080720
 CMountedWeaponBehavior::CMountedWeaponBehavior(const RWS::CAttributePacket &attr)
 {
 }
 
 // match: ??_GCMountedWeaponBehavior@@UAEPAXI@Z @ 0x000A4A60
+// sp-match: ??_GCMountedWeaponBehavior@@UAEPAXI@Z @ 0x000807D0
 
 // match: ??1CMountedWeaponBehavior@@UAE@XZ @ 0x000A4A80
 // match: __ehhandler$??1CMountedWeaponBehavior@@UAE@XZ-0x8 @ 0x002FFF10
 // match: __ehhandler$??1CMountedWeaponBehavior@@UAE@XZ @ 0x002FFF18
+// sp-match: ??1CMountedWeaponBehavior@@UAE@XZ @ 0x00080760
 // (Defined in the class, in CMountedWeaponBehavior.h.)
 
 // Command 0 picks the settings; commands 1 to 41 fill them.
 // match: ?HandleAttributes@CMountedWeaponBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A4B00
+// sp-match: ?HandleAttributes@CMountedWeaponBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000807E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void CMountedWeaponBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 {
@@ -71,7 +76,7 @@ void CMountedWeaponBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
         {
         case 1:
             var18 = *(const RwReal *)loc10->GetAs_RwChar_ptr();
-            var18 = var18 * 0.5f * 0.017453292f;
+            var18 = (var18 * 0.5f) * 0.017453292f;
             local_14->unk_10 = tan_ref(var18);
             break;
         case 2:
@@ -204,6 +209,7 @@ void CMountedWeaponBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_ECMountedWeaponBehavior@@WBI@AEPAXI@Z @ 0x000A5350
+// sp-match: ??_ECMountedWeaponBehavior@@WBI@AEPAXI@Z @ 0x000807C0
 
 // Members /OPT:ICF folded into shared trivial bodies (config/aliases.txt): defined here for
 // the authentic link (PLAN M7); the placement link takes the shared bodies.

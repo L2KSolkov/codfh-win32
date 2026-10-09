@@ -83,6 +83,7 @@ static RtFileSystem *defaultFileSystem;   /** Default file system */
 // match: ??_C@_01MIFGBAGJ@?$CL?$AA@ @ 0x003EE8B4
 
 // match: _RtFSManagerOpen @ 0x00257AB0
+// sp-match: _RtFSManagerOpen @ 0x00173930
 
 RwBool
 RtFSManagerOpen( RwInt32 maxNbFS )
@@ -165,6 +166,7 @@ TkFSManagerDisplayInfo( void )
  * Cast a RtInt64
  */
 // match: _TkFSManagerGetValue @ 0x00257AF0
+// sp-match: _TkFSManagerGetValue @ 0x00161130
 RwUInt32
 TkFSManagerGetValue(RtInt64 value)
 {
@@ -299,6 +301,7 @@ RtFSManagerSetCallBack( RtFSManagerCallBackCode cbCode,
  * Can we register one more file system?
  */
 // match: __rtFSManagerIsNewFSRegistrable @ 0x00257B00
+// sp-match: __rtFSManagerIsNewFSRegistrable @ 0x00173970
 RwBool
 _rtFSManagerIsNewFSRegistrable( void )
 {
@@ -347,6 +350,7 @@ _rtFSManagerIsNewFSRegistrable( void )
  * \return  TRUE if sucessful, FALSE otherwise.
  */
 // match: _RtFSManagerRegister @ 0x00257E40
+// sp-match: _RtFSManagerRegister @ 0x00173CB0
 RwBool
 RtFSManagerRegister( RtFileSystem *fs )
 {
@@ -536,6 +540,7 @@ RtFSManagerUnregister( RtFileSystem *fs )
  *                  file system with the specified name has been registered.
  */
 // match: _RtFSManagerGetFileSystemFromName @ 0x00257B30
+// sp-match: _RtFSManagerGetFileSystemFromName @ 0x001739A0
 RtFileSystem *
 RtFSManagerGetFileSystemFromName( RwChar *fsName )
 {
@@ -580,6 +585,7 @@ RtFSManagerGetFileSystemFromName( RwChar *fsName )
  * is already in use by another registered file system.
  */
 // match: __rtFSManagerIsFSNameInUse @ 0x00257B80
+// sp-match: __rtFSManagerIsFSNameInUse @ 0x001739F0
 RwBool
 _rtFSManagerIsFSNameInUse( RwChar *fsName )
 {
@@ -604,6 +610,7 @@ _rtFSManagerIsFSNameInUse( RwChar *fsName )
  * This function open a file on a specific file system.
  */
 // match: __rtFSManagerFOpenOnFS @ 0x00257EB0
+// sp-match: __rtFSManagerFOpenOnFS @ 0x00173D20
 RtFile *
 _rtFSManagerFOpenOnFS( RtFileSystem *fs,
                        const RwChar *fileName,
@@ -741,6 +748,7 @@ _rtFSManagerFOpenOnFS( RtFileSystem *fs,
  * \return  NULL if failed, a pointer to a RtFile object if successful.
  */
 // match: _RtFSManagerFOpen @ 0x00257FA0
+// sp-match: _RtFSManagerFOpen @ 0x00173E10
 RtFile *
 RtFSManagerFOpen( const RwChar       *filename,
                   RtFileAccessFlag    access,
@@ -769,6 +777,7 @@ RtFSManagerFOpen( const RwChar       *filename,
  * Return the file system manager.
  */
 // match: __rtGetFSManager @ 0x00257BB0
+// sp-match: __rtGetFSManager @ 0x00173A20
 RtFSManager *
 _rtGetFSManager( void )
 {
@@ -780,6 +789,7 @@ _rtGetFSManager( void )
  * Gets a registered file system its device name.
  */
 // match: __rtGetFileSystemFromDeviceName @ 0x00257BC0
+// sp-match: __rtGetFileSystemFromDeviceName @ 0x00173A30
 RtFileSystem *
 _rtGetFileSystemFromDeviceName( const RwChar *deviceName )
 {
@@ -835,6 +845,7 @@ _rtGetFileSystemFromDeviceName( const RwChar *deviceName )
  *                  corresponding file system has been found.
  */
 // match: _RtFSManagerGetFileSystemFromFileName @ 0x00257C00
+// sp-match: _RtFSManagerGetFileSystemFromFileName @ 0x00173A70
 RtFileSystem *
 RtFSManagerGetFileSystemFromFileName( const RwChar *fileName )
 {
@@ -921,6 +932,7 @@ RtFSManagerGetFileSystemFromFileName( const RwChar *fileName )
  *              system
  */
 // match: _RtFSManagerSetDefaultFileSystem @ 0x00257CA0
+// sp-match: _RtFSManagerSetDefaultFileSystem @ 0x00173B10
 void
 RtFSManagerSetDefaultFileSystem( RtFileSystem *fs )
 {
@@ -962,6 +974,7 @@ RtFSManagerGetDefaultFileSystem( void )
  * \ref RtFSManagerFOpen
  */
 // match: _RwFopen @ 0x00257FE0
+// sp-match: _RwFopen @ 0x00173E50
 void *
 RwFopen( const RwChar       *name,
          const RwChar       *access)
@@ -1044,6 +1057,7 @@ RwFopen( const RwChar       *name,
  * \return  This function will return 0.
  */
 // match: _RwFclose @ 0x00257CB0
+// sp-match: _RwFclose @ 0x00173B20
 RwInt32
 RwFclose(void *fptr)
 {
@@ -1077,6 +1091,7 @@ RwFclose(void *fptr)
  * \return  The number of object(s) read.
  */
 // match: _RwFread @ 0x00257CF0
+// sp-match: _RwFread @ 0x00173B60
 size_t
 RwFread( void *addr,
          size_t size,
@@ -1145,6 +1160,7 @@ RwFwrite( const void *addr,
  * \return  0 if successful, -1 otherwise.
  */
 // match: _RwFseek @ 0x00257D20
+// sp-match: _RwFseek @ 0x00173B90
 RwInt32
 RwFseek( void    *fptr,
          long     offset,
@@ -1360,6 +1376,7 @@ RwFexist( const RwChar * name )
  * \return  Current position of the file.
  */
 // match: _RwFtell @ 0x00257D90
+// sp-match: _RwFtell @ 0x00173C00
 RwInt32
 RwFtell( void *fptr )
 {
@@ -1387,6 +1404,7 @@ RwFtell( void *fptr )
  * \return  TRUE if successful, FALSE otherwise.
  */
 // match: _RwFAsyncCancel @ 0x00257DA0
+// sp-match: _RwFAsyncCancel @ 0x00173C10
 RwBool
 RwFAsyncCancel( RtFile *fptr )
 {
@@ -1405,6 +1423,7 @@ RwFAsyncCancel( RtFile *fptr )
  * \param	fs  File system to synchronise.
  */
 // match: _RtFSManagerSyncAllFilesOnFileSystem @ 0x00257DB0
+// sp-match: _RtFSManagerSyncAllFilesOnFileSystem @ 0x00173C20
 void
 RtFSManagerSyncAllFilesOnFileSystem( RtFileSystem *fs )
 {
@@ -1431,6 +1450,7 @@ RtFSManagerSyncAllFilesOnFileSystem( RtFileSystem *fs )
  *      all the files on all the registered file systems.
  */
 // match: _RtFSManagerSyncAllFiles @ 0x00257DF0
+// sp-match: _RtFSManagerSyncAllFiles @ 0x00173C60
 void
 RtFSManagerSyncAllFiles( void )
 {

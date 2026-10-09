@@ -174,6 +174,7 @@ RxHeap *_rxHeapGlobal         = (RxHeap *)NULL;
 // match: __rxPipesFreeListPreallocBlocks @ 0x00435720
 
 // match: __rxPipelineClose @ 0x002B8DD0
+// sp-match: __rxPipelineClose @ 0x001D41E0
 
 RwBool
 _rxPipelineClose(void)
@@ -242,6 +243,7 @@ RxPipelineSetFreeListCreateParams(RwInt32 blockSize, RwInt32 numBlocksToPrealloc
 /*****************************************************************************/
 
 // match: __rxPipelineOpen @ 0x002B8E30
+// sp-match: __rxPipelineOpen @ 0x001D4240
 RwBool
 _rxPipelineOpen(void)
 {
@@ -298,6 +300,7 @@ _rxPipelineOpen(void)
 
 /*****************************************************************************/
 // match: _PipelineNodeDestroy @ 0x002B8EE0
+// sp-match: _PipelineNodeDestroy @ 0x001D42F0
 RxPipelineNode *
 PipelineNodeDestroy(RxPipelineNode * node, RxPipeline *pipeline)
 {
@@ -765,6 +768,7 @@ MACRO_STOP
  * \see RxHeapFree
  */
 // match: _RxHeapGetGlobalHeap @ 0x002B9110
+// sp-match: _RxHeapGetGlobalHeap @ 0x001D4520
 RxHeap             *
 RxHeapGetGlobalHeap(void)
 {
@@ -2169,6 +2173,7 @@ ExecuteNode(RxPipeline * _pipeline,
  * \see RxLockedPipeAddFragment
  */
 // match: _RxPipelineExecute @ 0x002B9120
+// sp-match: _RxPipelineExecute @ 0x001D4530
 RxPipeline         *
 RxPipelineExecute(RxPipeline * pipeline, void *data, RwBool heapReset)
 {
@@ -2278,6 +2283,7 @@ RxPipelineExecute(RxPipeline * pipeline, void *data, RwBool heapReset)
  * \see RxPipelineExecute
  */
 // match: _RxPipelineCreate @ 0x002B91C0
+// sp-match: _RxPipelineCreate @ 0x001D45D0
 RxPipeline         *
 RxPipelineCreate(void)
 {
@@ -2315,6 +2321,7 @@ RxPipelineCreate(void)
 }
 
 // match: __rxPipelineDestroy @ 0x002B9230
+// sp-match: __rxPipelineDestroy @ 0x001D4640
 void
 _rxPipelineDestroy(RxPipeline * Pipeline)
 {

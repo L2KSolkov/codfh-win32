@@ -134,6 +134,7 @@ RwFrameListSetAutoUpdate(RwBool flag)
 // match: __rwFrameListDirtyListUpdate @ 0x00438C88
 
 // match: _RwFrameRegisterPluginStream @ 0x002FEC90
+// sp-match: _RwFrameRegisterPluginStream @ 0x00219480
 
 RwInt32
 RwFrameRegisterPluginStream(RwUInt32 pluginID,
@@ -330,6 +331,7 @@ _rwFrameListFindFrame(const rwFrameList * frameList,
  */
 
 // match: __rwFrameListDeinitialize @ 0x002FECC0
+// sp-match: __rwFrameListDeinitialize @ 0x002194B0
 rwFrameList        *
 _rwFrameListDeinitialize(rwFrameList * frameList)
 {
@@ -505,6 +507,7 @@ _rwFrameListStreamWrite(const rwFrameList * frameList, RwStream * stream)
  On exit    : FrameList created
  */
 // match: __rwFrameListStreamRead @ 0x002FECE0
+// sp-match: __rwFrameListStreamRead @ 0x002194D0
 rwFrameList        *
 _rwFrameListStreamRead(RwStream * stream, rwFrameList * frameList)
 {

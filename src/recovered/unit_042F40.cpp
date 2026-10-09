@@ -103,9 +103,12 @@ extern const RwReal flt_3CE954 = 16.666666f;
 // match: ?Instance@CLinearMemoryManager@RWS@@SAPAV12@XZ @ 0x00043010
 // match: __ehhandler$?Instance@CLinearMemoryManager@RWS@@SAPAV12@XZ-0xE @ 0x002FF730
 // match: __ehhandler$?Instance@CLinearMemoryManager@RWS@@SAPAV12@XZ @ 0x002FF73E
+// sp-match: ?Instance@CLinearMemoryManager@RWS@@SAPAV12@XZ @ 0x00032E10
+// sp-match: ?MakeNew@CDebugScript@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00032E70
 RWS_DEFINE_MAKENEW(CDebugScript)
 
 // match: ??0CDebugScript@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00043070
+// sp-match: ??0CDebugScript@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000324B0
 CDebugScript::CDebugScript(const RWS::CAttributePacket &attr) : unk_20(0)
 {
 }
@@ -113,15 +116,20 @@ CDebugScript::CDebugScript(const RWS::CAttributePacket &attr) : unk_20(0)
 // match: ??_GCAttributeHandler@RWS@@UAEPAXI@Z @ 0x00043100
 // match: ??_GCEventHandler@RWS@@UAEPAXI@Z @ 0x00043130
 // match: ??_GCDebugScript@@UAEPAXI@Z @ 0x00043160
+// sp-match: ??_GCAttributeHandler@RWS@@UAEPAXI@Z @ 0x00032470
+// sp-match: ??_GCEventHandler@RWS@@UAEPAXI@Z @ 0x00032490
+// sp-match: ??_GCDebugScript@@UAEPAXI@Z @ 0x00032740
 
 // match: ??1CDebugScript@@UAE@XZ @ 0x00043180
 // match: __ehhandler$??1CDebugScript@@UAE@XZ-0x8 @ 0x002FF750
 // match: __ehhandler$??1CDebugScript@@UAE@XZ @ 0x002FF758
+// sp-match: ??1CDebugScript@@UAE@XZ @ 0x000324F0
 CDebugScript::~CDebugScript()
 {
 }
 
 // match: ?HandleAttributes@CDebugScript@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00043200
+// sp-match: ?HandleAttributes@CDebugScript@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00032550
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void CDebugScript::HandleAttributes(const RWS::CAttributePacket &attr)
 {
@@ -177,6 +185,10 @@ void CDebugScript::HandleAttributes(const RWS::CAttributePacket &attr)
     }
 }
 
+// (std::string's constructor from a C string, which single player keeps out of line here:
+// its one copy, between this unit's STL functions in the image)
+// sp-match: ??0?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAE@PBD@Z @ 0x00032C00
+
 // The Dinkumware STL functions the unit instantiates (the XDK's headers,
 // compiled here at /Od): std::vector's reserve (CLinearMemoryManager's
 // constructor) and _Xlen, which throws std::length_error, and the
@@ -211,10 +223,24 @@ void CDebugScript::HandleAttributes(const RWS::CAttributePacket &attr)
 // match: ?_Inside@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@IAE_NPBD@Z @ 0x00044060
 // match: ??$_Uninit_copy@Viterator@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@std@@PAPAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@3@@std@@YAPAPAULinearMemoryPool@CLinearMemoryManager@RWS@@Viterator@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@0@0PAPAU123@AAV?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@0@U_Nonscalar_ptr_iterator_tag@0@@Z @ 0x000440D0
 // match: __ehhandler$??$_Uninit_copy@Viterator@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@std@@PAPAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@3@@std@@YAPAPAULinearMemoryPool@CLinearMemoryManager@RWS@@Viterator@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@0@0PAPAU123@AAV?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@0@U_Nonscalar_ptr_iterator_tag@0@@Z @ 0x002FF7F0
+// sp-match: ?reserve@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@std@@QAEXI@Z @ 0x00032D40
+// sp-match: ?_Xlen@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@std@@IBEXXZ @ 0x00032C40
+// sp-match: ??0logic_error@std@@QAE@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@@Z @ 0x00032BA0
+// sp-match: ?what@logic_error@std@@UBEPBDXZ @ 0x000329B0
+// sp-match: ??1logic_error@std@@UAE@XZ @ 0x00032970
+// sp-match: ?assign@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV12@ABV12@II@Z @ 0x000329C0
+// sp-match: ??0length_error@std@@QAE@ABV01@@Z @ 0x00032D20
+// sp-match: ??0logic_error@std@@QAE@ABV01@@Z @ 0x00032CB0
+// sp-match: ?erase@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV12@II@Z @ 0x00032750
+// sp-match: ?_Copy@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@IAEXII@Z @ 0x000327D0
+// sp-match: ?assign@?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@QAEAAV12@PBDI@Z @ 0x00032AB0
+// sp-match: ??$_Uninit_copy@Viterator@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@std@@PAPAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@3@@std@@YAPAPAULinearMemoryPool@CLinearMemoryManager@RWS@@Viterator@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@0@0PAPAU123@AAV?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@0@U_Nonscalar_ptr_iterator_tag@0@@Z @ 0x00032910
+// sp-match: ??_Glogic_error@std@@UAEPAXI@Z @ 0x000DEA80
 
 // The this-adjusting thunk the CEventHandler part's vtable (off_3CE968) holds
 // for the scalar deleting destructor.
 // match: ??_ECDebugScript@@WBI@AEPAXI@Z @ 0x000441A0
+// sp-match: ??_ECDebugScript@@WBI@AEPAXI@Z @ 0x00032730
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

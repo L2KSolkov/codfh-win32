@@ -49,11 +49,13 @@ RWS_REGISTERCLASS(CAnimPackSelector);
 // match: ?MakeNew@CAnimPackSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A0A50
 // match: __ehhandler$?MakeNew@CAnimPackSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFCB0
 // match: __ehhandler$?MakeNew@CAnimPackSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFCBF
+// sp-match: ?MakeNew@CAnimPackSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007E020
 RWS_DEFINE_MAKENEW(CAnimPackSelector)
 
 // match: ??0CAnimPackSelector@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A0AD0
 // match: __ehhandler$??0CAnimPackSelector@@QAE@ABVCAttributePacket@RWS@@@Z-0x13 @ 0x002FFCD0
 // match: __ehhandler$??0CAnimPackSelector@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x002FFCE3
+// sp-match: ??0CAnimPackSelector@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007DEF0
 CAnimPackSelector::CAnimPackSelector(const RWS::CAttributePacket &attr)
 {
     dword_4B67CC = this;
@@ -63,10 +65,12 @@ CAnimPackSelector::CAnimPackSelector(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_GCAnimPackSelector@@UAEPAXI@Z @ 0x000A0C70
+// sp-match: ??_GCAnimPackSelector@@UAEPAXI@Z @ 0x0007E010
 
 // match: ??1CAnimPackSelector@@UAE@XZ @ 0x000A0C90
 // match: __ehhandler$??1CAnimPackSelector@@UAE@XZ-0x2F @ 0x002FFCF0
 // match: __ehhandler$??1CAnimPackSelector@@UAE@XZ @ 0x002FFD1F
+// sp-match: ??1CAnimPackSelector@@UAE@XZ @ 0x0007DB90
 CAnimPackSelector::~CAnimPackSelector()
 {
     UnLinkMsg(iMsgSparkStartSystem);
@@ -75,6 +79,7 @@ CAnimPackSelector::~CAnimPackSelector()
 }
 
 // match: ?sub_A0D40@CAnimPackSelector@@QAEXXZ @ 0x000A0D40
+// sp-match: ?sub_A0D40@CAnimPackSelector@@QAEXXZ @ 0x0007DC20
 void CAnimPackSelector::sub_A0D40()
 {
     RwInt32 var_4;
@@ -93,6 +98,7 @@ void CAnimPackSelector::sub_A0D40()
 // Command 0: the six packs of the first set (their names looked up); command
 // 1: the key.
 // match: ?HandleAttributes@CAnimPackSelector@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A0DD0
+// sp-match: ?HandleAttributes@CAnimPackSelector@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007DC60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void CAnimPackSelector::HandleAttributes(const RWS::CAttributePacket &attr)
 {
@@ -130,12 +136,14 @@ void CAnimPackSelector::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_ECAnimPackSelector@@WBI@AEPAXI@Z @ 0x000A11D0
+// sp-match: ??_ECAnimPackSelector@@WBI@AEPAXI@Z @ 0x0007DEE0
 
 // When the system starts (or on its second message): plays the pack music,
 // then loads each of the six animation packs (the restart set's where one
 // is given) not yet loaded, keeping the music and the loading screen
 // going between them.
 // match: ?HandleEvents@CAnimPackSelector@@UAEXAAVCMsg@RWS@@@Z @ 0x000A0F10
+// sp-match: ?HandleEvents@CAnimPackSelector@@UAEXAAVCMsg@RWS@@@Z @ 0x0007DD40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void CAnimPackSelector::HandleEvents(RWS::CMsg &pMsg)
 {
@@ -146,7 +154,10 @@ void CAnimPackSelector::HandleEvents(RWS::CMsg &pMsg)
 
     if (pMsg.Id.p_msgrec == iMsgSparkStartSystem.p_msgrec || pMsg.Id.p_msgrec == dword_4B67C0.p_msgrec)
     {
+#ifndef CODFH_SP
+        // single player compiles the debug prints out (SP 0x7DD40)
         sub_19A750("AnimPack Loading begin...");
+#endif
         if (unk_20.unk_00 && unk_20.unk_04 && !dword_4B8720)
         {
             bp_8 = (type_5E730 *)sub_198800(&unk_20);
@@ -176,14 +187,18 @@ void CAnimPackSelector::HandleEvents(RWS::CMsg &pMsg)
             {
                 if (!sub_774F0(*(type_449C94_08 *)&var_C->unk_00, bp_4))
                 {
+#ifndef CODFH_SP
                     sub_19A750("Loading animation group god ID: %x,%x to slot %d from file %s",
                                var_C->unk_00.unk_00, var_C->unk_00.unk_04, bp_4, var_C->unk_08);
+#endif
                     sub_77540(var_C->unk_08, *(type_449C94_08 *)&var_C->unk_00, bp_4, 1, 0);
                 }
                 else
                 {
+#ifndef CODFH_SP
                     sub_19A750("Animation group god ID: %x,%x Name: %s is already loaded to slot %d",
                                var_C->unk_00.unk_00, var_C->unk_00.unk_04, var_C->unk_08, bp_4);
+#endif
                 }
             }
             dword_4B8EF0.sub_E9FB0(4);
@@ -193,11 +208,14 @@ void CAnimPackSelector::HandleEvents(RWS::CMsg &pMsg)
         {
             UnLinkMsg(iMsgSparkStartSystem);
         }
+#ifndef CODFH_SP
         sub_19A750("AnimPack Loading end...");
+#endif
     }
 }
 
 // match: ?sub_A1130@CAnimPackSelector@@QAEXHPAUtype_3DF8D8_04@@@Z @ 0x000A1130
+// sp-match: ?sub_A1130@CAnimPackSelector@@QAEXHPAUtype_3DF8D8_04@@@Z @ 0x0007DE70
 void CAnimPackSelector::sub_A1130(RwInt32 arg_0, type_3DF8D8_04 *arg_4)
 {
     unk_118[arg_0].unk_00 = *arg_4;
@@ -208,6 +226,7 @@ void CAnimPackSelector::sub_A1130(RwInt32 arg_0, type_3DF8D8_04 *arg_4)
 }
 
 // match: ?sub_A11A0@CAnimPackSelector@@QAEXHPAUtype_3DF8D8_04@@@Z @ 0x000A11A0
+// sp-match: ?sub_A11A0@CAnimPackSelector@@QAEXHPAUtype_3DF8D8_04@@@Z @ 0x0007DEC0
 void CAnimPackSelector::sub_A11A0(RwInt32 arg_0, type_3DF8D8_04 *arg_4)
 {
     *arg_4 = unk_118[arg_0].unk_00;

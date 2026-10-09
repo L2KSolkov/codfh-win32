@@ -112,6 +112,7 @@ extern RwInt32 unk_4E739C;
 extern RwInt32 unk_4E73A0;
 
 // match: ?sub_183130@type_4E73A8@@QAEXXZ @ 0x00183130
+// sp-match: ?sub_183130@type_4E73A8@@QAEXXZ @ 0x0011A700
 // Builds the menu: its root, the second menu (dword_4E73F0), and the
 // renderer switches, the game speed, unlimited ammunition and the debug
 // switches.
@@ -153,6 +154,7 @@ void type_4E73A8::sub_183130()
 }
 
 // match: ?sub_1833D0@type_4E73A8@@QAEXXZ @ 0x001833D0
+// sp-match: ?sub_1833D0@type_4E73A8@@QAEXXZ @ 0x0011A480
 // Frees the menu (the second menu first), leaving its root empty.
 void type_4E73A8::sub_1833D0()
 {
@@ -168,6 +170,7 @@ void type_4E73A8::sub_1833D0()
 }
 
 // match: ?sub_183440@type_4E73A8@@QAEPAUtype_4E73A8_14@@PAU2@PBD@Z @ 0x00183440
+// sp-match: ?sub_183440@type_4E73A8@@QAEPAUtype_4E73A8_14@@PAU2@PBD@Z @ 0x00119BB0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_4E73A8_14 *type_4E73A8::sub_183440(type_4E73A8_14 *arg_0, const RwChar *arg_4)
 {
@@ -215,12 +218,14 @@ type_4E73A8_14 *type_4E73A8::sub_183440(type_4E73A8_14 *arg_0, const RwChar *arg
 }
 
 // match: ?sub_183610@type_4E73A8@@QAEPAUtype_4E73A8_18@@PAUtype_4E73A8_14@@PBDPAXH@Z @ 0x00183610
+// sp-match: ?sub_183610@type_4E73A8@@QAEPAUtype_4E73A8_18@@PAUtype_4E73A8_14@@PBDPAXH@Z @ 0x0011A4C0
 type_4E73A8_18 *type_4E73A8::sub_183610(type_4E73A8_14 *arg_0, const RwChar *arg_4, void *arg_8, RwInt32 arg_C)
 {
     return sub_183700(arg_0, arg_4, arg_8, arg_C, 0);
 }
 
 // match: ?sub_183640@type_4E73A8@@QAEXPAUtype_4E73A8_14@@@Z @ 0x00183640
+// sp-match: ?sub_183640@type_4E73A8@@QAEXPAUtype_4E73A8_14@@@Z @ 0x00119CF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_4E73A8::sub_183640(type_4E73A8_14 *arg_0)
 {
@@ -246,6 +251,7 @@ void type_4E73A8::sub_183640(type_4E73A8_14 *arg_0)
 }
 
 // match: ?sub_183700@type_4E73A8@@QAEPAUtype_4E73A8_18@@PAUtype_4E73A8_14@@PBDPAXHH@Z @ 0x00183700
+// sp-match: ?sub_183700@type_4E73A8@@QAEPAUtype_4E73A8_18@@PAUtype_4E73A8_14@@PBDPAXHH@Z @ 0x00119D80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_4E73A8_18 *type_4E73A8::sub_183700(type_4E73A8_14 *arg_0, const RwChar *arg_4, void *arg_8, RwInt32 arg_C,
                                         RwInt32 arg_10)
@@ -300,6 +306,7 @@ inline RwReal fmod2pi_(RwReal x)
          : ((RwReal)fmod((RwDouble)((x) + 251.32741f), (RwDouble)6.28318f) - 6.28318f))
 
 // match: ?sub_183840@type_4E73A8@@QAEXXZ @ 0x00183840
+// sp-match: ?sub_183840@type_4E73A8@@QAEXXZ @ 0x00119E70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its step while open (unk_14), from the pad once past frame 60: up and
 // down move through the group (wrapping), left and right change the item
@@ -328,7 +335,12 @@ void type_4E73A8::sub_183840()
         return;
     locC = 0;
     bp_4 = (RwInt32)unk_4B9308.sub_EE8F0(0, 0xF);
+#ifdef CODFH_SP
+    // single player numbers this input 0x27 (SP 0x119E95)
+    r10 = (RwInt32)unk_4B9308.sub_EE8F0(0, 0x27);
+#else
     r10 = (RwInt32)unk_4B9308.sub_EE8F0(0, 0x2B);
+#endif
     if (unk_14)
     {
         bp_18 = 0.9f;
@@ -395,12 +407,25 @@ void type_4E73A8::sub_183840()
                     break;
                 case 12:
                     ebp_34 = *(RwReal *)unk_10->unk_0C;
+#ifdef CODFH_SP
+                    // shape: the degree conversions in two steps each, so /O2 keeps
+                    // two multiplies (SP 0x11A099, 0x11A0E3)
+                    ebp_34 = ebp_34 * 3.14159f * 2.0f;
+                    ebp_34 /= 360.0f;
+                    ebp_34 += locC * 3.14159f * 2.0f / 360.0f;
+                    ebp_34 = WRAP_ANGLE(ebp_34);
+                    if (r10)
+                        ebp_34 = 0;
+                    ebp_34 = 360.0f * ebp_34;
+                    ebp_34 /= 6.28318f;
+#else
                     ebp_34 = ebp_34 * 3.14159f * 2.0f / 360.0f;
                     ebp_34 += locC * 3.14159f * 2.0f / 360.0f;
                     ebp_34 = WRAP_ANGLE(ebp_34);
                     if (r10)
                         ebp_34 = 0;
                     ebp_34 = 360.0f * ebp_34 / 6.28318f;
+#endif
                     *(RwReal *)unk_10->unk_0C = ebp_34;
                     break;
                 case 10:
@@ -477,6 +502,7 @@ void type_4E73A8::sub_183840()
 }
 
 // match: ?sub_183FD0@type_4E73A8@@QAEHXZ @ 0x00183FD0
+// sp-match: ?sub_183FD0@type_4E73A8@@QAEHXZ @ 0x0011A4E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_4E73A8::sub_183FD0()
 {
@@ -500,6 +526,7 @@ RwInt32 type_4E73A8::sub_183FD0()
 }
 
 // match: ?sub_1840C0@type_4E73A8@@QAEXXZ @ 0x001840C0
+// sp-match: ?sub_1840C0@type_4E73A8@@QAEXXZ @ 0x0011A590
 void type_4E73A8::sub_1840C0()
 {
     Rt2dCTMPop();
@@ -509,6 +536,7 @@ void type_4E73A8::sub_1840C0()
 }
 
 // match: ?sub_184100@type_4E73A8@@QAEXPAURwCamera@@@Z @ 0x00184100
+// sp-match: ?sub_184100@type_4E73A8@@QAEXPAURwCamera@@@Z @ 0x0011A980
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws the second menu and, while open, this one: its group's name, then
 // each item (">" marks the selected one) with its value by kind (a group
@@ -568,7 +596,13 @@ void type_4E73A8::sub_184100(RwCamera *arg_0)
                 sprintf(m_E0, "%s %s", vE8, var_1BC->unk_04);
                 m_E4 = *(RwReal *)var_1BC->unk_0C;
                 m_E4 = fmod2pi_(m_E4 + 251.32741f);
+#ifdef CODFH_SP
+                // shape: the conversion to degrees in two steps (SP 0x11AB78)
+                m_E4 = 360.0f * m_E4;
+                m_E4 /= 6.28318f;
+#else
                 m_E4 = 360.0f * m_E4 / 6.28318f;
+#endif
                 if (m_E4 > 180.0f)
                     m_E4 -= 360.0f;
                 sprintf(var_1B8, "%4.2f", m_E4);
@@ -576,9 +610,18 @@ void type_4E73A8::sub_184100(RwCamera *arg_0)
             case 12:
                 sprintf(m_E0, "%s %s", vE8, var_1BC->unk_04);
                 m_E4 = *(RwReal *)var_1BC->unk_0C;
+#ifdef CODFH_SP
+                // shape: the degree conversions in two steps each (SP 0x11ABD4, 0x11ABF1)
+                m_E4 = m_E4 * 3.14159f * 2.0f;
+                m_E4 /= 360.0f;
+                m_E4 = fmod2pi_(m_E4 + 251.32741f);
+                m_E4 = 360.0f * m_E4;
+                m_E4 /= 6.28318f;
+#else
                 m_E4 = m_E4 * 3.14159f * 2.0f / 360.0f;
                 m_E4 = fmod2pi_(m_E4 + 251.32741f);
                 m_E4 = 360.0f * m_E4 / 6.28318f;
+#endif
                 if (m_E4 > 180.0f)
                     m_E4 -= 360.0f;
                 sprintf(var_1B8, "%4.2f", m_E4);
@@ -621,6 +664,7 @@ void type_4E73A8::sub_184100(RwCamera *arg_0)
 }
 
 // match: ?sub_184760@type_4E73A8@@QAEXXZ @ 0x00184760
+// sp-match: ?sub_184760@type_4E73A8@@QAEXXZ @ 0x0011A2E0
 // Keeps the render states it draws with, then sets them: no texture, no
 // depth test or write, no culling, vertex alpha, fog or blending.
 void type_4E73A8::sub_184760()
@@ -644,6 +688,7 @@ void type_4E73A8::sub_184760()
 }
 
 // match: ?sub_184870@type_4E73A8@@QAEXXZ @ 0x00184870
+// sp-match: ?sub_184870@type_4E73A8@@QAEXXZ @ 0x0011A3A0
 // Puts the render states back.
 void type_4E73A8::sub_184870()
 {
@@ -658,6 +703,7 @@ void type_4E73A8::sub_184870()
 }
 
 // match: ?sub_184910@type_4E73A8@@QAEXPBD@Z @ 0x00184910
+// sp-match: ?sub_184910@type_4E73A8@@QAEXPBD@Z @ 0x0011A920
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Measures the help text arg_0, then draws it from (0x300, 0x600) within
 // the screen's width less 96.
@@ -689,6 +735,7 @@ void type_4E73A8::sub_184910(const RwChar *arg_0)
 }
 
 // match: ?sub_1849C0@type_4E73A8@@QAEXPBDHPAH1H@Z @ 0x001849C0
+// sp-match: ?sub_1849C0@type_4E73A8@@QAEXPBDHPAH1H@Z @ 0x0011A5C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Wraps the text arg_0 at newlines and within arg_10 (15 units a
 // character), each line 15 below the last: drawn from (*arg_8, *arg_C)
@@ -759,6 +806,7 @@ void type_4E73A8::sub_1849C0(const RwChar *arg_0, RwInt32 arg_4, RwInt32 *arg_8,
 }
 
 // match: ?sub_184C50@type_4E73A8@@QAEXPBDHH@Z @ 0x00184C50
+// sp-match: ?sub_184C50@type_4E73A8@@QAEXPBDHH@Z @ 0x0011A410
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_4E73A8::sub_184C50(const RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
@@ -777,6 +825,7 @@ void type_4E73A8::sub_184C50(const RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_184CC0@type_4E73A8@@QAEXXZ @ 0x00184CC0
+// sp-match: ?sub_184CC0@type_4E73A8@@QAEXXZ @ 0x0011A470
 // Its text colour (yellow): the dynamic initializer (0x30BF80) calls it.
 void type_4E73A8::sub_184CC0()
 {

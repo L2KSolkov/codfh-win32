@@ -13,6 +13,7 @@ extern RwUInt32 dword_5069F8;
 extern RwUInt32 dword_5069FC;
 
 // match: _sub_23E610 @ 0x0023E610
+// sp-match: _sub_23E610 @ 0x00150600
 void
 sub_23E610(void)
 {
@@ -32,6 +33,7 @@ sub_23E610(void)
  * sub_23F9F0 to sub_243FF0; 0x244073-0x244082 uses its return as
  * allocated interface storage. EAX preserves the previous cursor. */
 // match: _sub_23E680 @ 0x0023E680
+// sp-match: _sub_23E680 @ 0x00150670
 void *
 sub_23E680(RwUInt32 amount, void *data)
 {

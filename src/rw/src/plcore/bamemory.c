@@ -193,6 +193,7 @@ RwMemoryGetLastAllocLine( void )
 // match: _FreeListsEnabled @ 0x004354D0
 
 // match: __rwFreeListEnable @ 0x002A9340
+// sp-match: __rwFreeListEnable @ 0x001C2CA0
 
 void
 _rwFreeListEnable(RwBool enabled)
@@ -254,6 +255,7 @@ FreeListCreate(
 
 
 // match: __rwFreeListModuleOpen @ 0x002A9A40
+// sp-match: __rwFreeListModuleOpen @ 0x001C33A0
 static RwBool
 _rwFreeListModuleOpen( void )
 {
@@ -283,6 +285,7 @@ _rwFreeListModuleOpen( void )
 
 
 // match: __rwFreeListModuleClose @ 0x002A9840
+// sp-match: __rwFreeListModuleClose @ 0x001C31A0
 static void
 _rwFreeListModuleClose ( void )
 {
@@ -325,6 +328,7 @@ _rwFreeListModuleClose ( void )
 
 
 // match: _FreeListCreate @ 0x002A98A0
+// sp-match: _FreeListCreate @ 0x001C3200
 RwFreeList *
 FreeListCreate(
     RwUInt32    entrySize,
@@ -500,6 +504,7 @@ _rwFreeListCreate(RwInt32 entrySize,
  * \see RwFreeListPurgeAllFreeLists
  */
 // match: _RwFreeListCreate @ 0x002A99E0
+// sp-match: _RwFreeListCreate @ 0x001C3340
 RwFreeList *
 RwFreeListCreate(RwInt32 entrySize, RwInt32 entriesPerBlock,
                  RwInt32 alignment, RwUInt32 hint)
@@ -552,6 +557,7 @@ RwFreeListCreate(RwInt32 entrySize, RwInt32 entriesPerBlock,
  * \see RwFreeListPurgeAllFreeLists
  */
 // match: _RwFreeListCreateAndPreallocateSpace @ 0x002A9A00
+// sp-match: _RwFreeListCreateAndPreallocateSpace @ 0x001C3360
 RwFreeList*
 RwFreeListCreateAndPreallocateSpace(RwInt32 entrySize,
                                     RwInt32 entriesPerBlock,
@@ -573,6 +579,7 @@ RwFreeListCreateAndPreallocateSpace(RwInt32 entrySize,
 
 
 // match: __RwFreeListFree @ 0x002A9350
+// sp-match: __RwFreeListFree @ 0x001C2CB0
 void
 _RwFreeListFree(RwFreeList *freeList)
 {
@@ -627,6 +634,7 @@ _RwFreeListFree(RwFreeList *freeList)
  *
  */
 // match: _RwFreeListDestroy @ 0x002A93B0
+// sp-match: _RwFreeListDestroy @ 0x001C2D10
 RwBool
 RwFreeListDestroy(RwFreeList * freeList)
 {
@@ -738,6 +746,7 @@ extern void *dword_50F250;
 extern void *dword_50F254;
 
 // match: __rwFreeListAllocReal @ 0x002A93E0
+// sp-match: __rwFreeListAllocReal @ 0x001C2D40
 void *
 _rwFreeListAllocReal(RwFreeList * freeList, RwUInt32 hint)
 {
@@ -910,6 +919,7 @@ RwFreeListFree(RwFreeList * freelist, void *pBlock)
 #endif
 
 // match: _FreeListBlockIsEmpty @ 0x002A9520
+// sp-match: _FreeListBlockIsEmpty @ 0x001C2E80
 static RwBool
 FreeListBlockIsEmpty(RwUInt8 *heap, RwUInt32 heapEntries)
 {
@@ -927,6 +937,7 @@ FreeListBlockIsEmpty(RwUInt8 *heap, RwUInt32 heapEntries)
 }
 
 // match: __rwFreeListFreeReal @ 0x002A9550
+// sp-match: __rwFreeListFreeReal @ 0x001C2EB0
 RwFreeList *
 _rwFreeListFreeReal(RwFreeList * freeList, void *entry)
 {
@@ -1042,6 +1053,7 @@ _rwFreeListFreeReal(RwFreeList * freeList, void *entry)
  *
  */
 // match: _RwFreeListPurge @ 0x002A9610
+// sp-match: _RwFreeListPurge @ 0x001C2F70
 RwInt32
 RwFreeListPurge(RwFreeList * freeList)
 {
@@ -1127,6 +1139,7 @@ RwFreeListPurge(RwFreeList * freeList)
  *
  */
 // match: _RwFreeListForAllUsed @ 0x002A96A0
+// sp-match: _RwFreeListForAllUsed @ 0x001C3000
 RwFreeList *
 RwFreeListForAllUsed(RwFreeList * freeList,
                      RwFreeListCallBack fpCallBack, void *pData)
@@ -1246,6 +1259,7 @@ RwFreeListForAllUsed(RwFreeList * freeList,
  *
  */
 // match: _RwFreeListPurgeAllFreeLists @ 0x002A97A0
+// sp-match: _RwFreeListPurgeAllFreeLists @ 0x001C3100
 RwInt32
 RwFreeListPurgeAllFreeLists(void)
 {
@@ -1280,6 +1294,7 @@ RwFreeListPurgeAllFreeLists(void)
 
 /* This is just a call to malloc which accepts memory hint too */
 // match: _HMalloc @ 0x002A97E0
+// sp-match: _HMalloc @ 0x001C3140
 static void *
 HMalloc(size_t size, RwUInt32 hint __RWUNUSED__)
 {
@@ -1289,6 +1304,7 @@ HMalloc(size_t size, RwUInt32 hint __RWUNUSED__)
 
 /* This is just a call to realloc which accepts memory hint too */
 // match: _HRealloc @ 0x002A97F0
+// sp-match: _HRealloc @ 0x001C3150
 static void *
 HRealloc(void *mem, size_t newSize, RwUInt32 hint __RWUNUSED__)
 {
@@ -1298,6 +1314,7 @@ HRealloc(void *mem, size_t newSize, RwUInt32 hint __RWUNUSED__)
 
 /* This is just a call to calloc which accepts memory hint too */
 // match: _HCalloc @ 0x002A9810
+// sp-match: _HCalloc @ 0x001C3170
 static void *
 HCalloc(size_t numObj, size_t sizeObj, RwUInt32 hint __RWUNUSED__)
 {
@@ -1306,6 +1323,7 @@ HCalloc(size_t numObj, size_t sizeObj, RwUInt32 hint __RWUNUSED__)
 }
 
 // match: __rwMemoryOpen @ 0x002A9AA0
+// sp-match: __rwMemoryOpen @ 0x001C3400
 RwBool
 _rwMemoryOpen(const RwMemoryFunctions * memFuncs)
 {
@@ -1342,6 +1360,7 @@ _rwMemoryOpen(const RwMemoryFunctions * memFuncs)
 
 
 // match: __rwMemoryClose @ 0x002A9A30
+// sp-match: __rwMemoryClose @ 0x001C3390
 void
 _rwMemoryClose(void)
 {
@@ -1377,6 +1396,7 @@ _rwMemoryClose(void)
  * \see RwEngineInit, RwMemoryFunctions.
  */
 // match: _RwOsGetMemoryInterface @ 0x002A9830
+// sp-match: _RwOsGetMemoryInterface @ 0x001C3190
 RwMemoryFunctions *
 RwOsGetMemoryInterface(void)
 {

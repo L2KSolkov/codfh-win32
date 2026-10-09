@@ -411,6 +411,7 @@ Rt2dAnimObjectUpdateSetObject(Rt2dAnimObjectUpdate *update, Rt2dObject *object)
 
 
 RwSList *
+// sp-match: __rt2dKeyFrameListCreateLockedRep @ 0x001724F0
 _rt2dKeyFrameListCreateLockedRep(Rt2dAnimProps *props)
 {
     Rt2dAnimObjectUpdate *first, *finish, *current;
@@ -494,6 +495,7 @@ Rt2dKeyFrameListCreate(Rt2dAnimProps *props)
 // match: _rcsid @ 0x003EE818
 
 // match: _Rt2dKeyFrameListDestroy @ 0x00257A40
+// sp-match: _Rt2dKeyFrameListDestroy @ 0x001725A0
 RwBool
 Rt2dKeyFrameListDestroy(Rt2dKeyFrameList *keyframeList)
 {
@@ -1102,6 +1104,7 @@ rt2dKeyFrameTransformStreamReadTo(Rt2dKeyFrameTransform *transform, RwStream *st
 }
 
 static Rt2dKeyFrameColor *
+// sp-match: _rt2dKeyFrameColorStreamReadTo @ 0x001725F0
 rt2dKeyFrameColorStreamReadTo(Rt2dKeyFrameColor *color, RwStream *stream)
 {
     RwReal colors[4];
@@ -1128,6 +1131,7 @@ rt2dKeyFrameColorStreamReadTo(Rt2dKeyFrameColor *color, RwStream *stream)
 }
 
 static Rt2dKeyFrameShow *
+// sp-match: _rt2dKeyFrameShowStreamReadTo @ 0x00172640
 rt2dKeyFrameShowStreamReadTo(Rt2dKeyFrameShow *show, RwStream *stream)
 {
     RwInt32 showinf[2];
@@ -1151,6 +1155,7 @@ rt2dKeyFrameShowStreamReadTo(Rt2dKeyFrameShow *show, RwStream *stream)
 }
 
 static Rt2dKeyFrameMorph *
+// sp-match: _rt2dKeyFrameMorphStreamReadTo @ 0x00172680
 rt2dKeyFrameMorphStreamReadTo(Rt2dKeyFrameMorph *morph, RwStream *stream)
 {
     Rt2dKeyFrameMorph smorph;
@@ -1392,6 +1397,7 @@ Rt2dKeyFrameListStreamWrite(Rt2dKeyFrameList *keyframeList, RwStream *stream)
 }
 
 Rt2dKeyFrameList *
+// sp-match: __rt2dKeyFrameListStreamReadTo @ 0x001726C0
 _rt2dKeyFrameListStreamReadTo(RwStream *stream, Rt2dKeyFrameList *keyframeList)
 {
     _rt2dStreamKeyFrameList skeyframeList;
@@ -1677,6 +1683,7 @@ _rt2dKeyFrameListStreamReadTo(RwStream *stream, Rt2dKeyFrameList *keyframeList)
  *
  */
 Rt2dKeyFrameList *
+// sp-match: _Rt2dKeyFrameListStreamRead @ 0x00172A20
 Rt2dKeyFrameListStreamRead(RwStream *stream)
 {
     Rt2dKeyFrameList *keyframeList;
@@ -1714,6 +1721,7 @@ Rt2dKeyFrameListStreamRead(RwStream *stream)
  * \see Rt2dKeyFrameListApply
  */
 Rt2dKeyFrameList *
+// sp-match: _Rt2dKeyFrameListAdvance @ 0x00172A40
 Rt2dKeyFrameListAdvance(Rt2dKeyFrameList *keyframeList,
                         Rt2dAnimProps *props)
 {
@@ -1773,6 +1781,7 @@ Rt2dKeyFrameListAdvance(Rt2dKeyFrameList *keyframeList,
 
 /****************************************************************************/
 static Rt2dAnimObjectUpdate *
+// sp-match: _rt2dAnimApplyTransform @ 0x00172B90
 rt2dAnimApplyTransform(Rt2dAnimObjectUpdate *update,
                        Rt2dKeyFrameTransform *action,
                        RwReal alpha __RWUNUSED__)
@@ -1922,6 +1931,7 @@ rt2dAnimApplyMorph(Rt2dAnimObjectUpdate *update,
 
 
 static void
+// sp-match: _rt2dObjectModify @ 0x00172D30
 rt2dObjectModify(Rt2dAnimProps *props)
 {
     RwInt32 objectCount,i;
@@ -2029,6 +2039,7 @@ rt2dObjectModify(Rt2dAnimProps *props)
  * \see Rt2dKeyFrameListAdvance
  */
 Rt2dKeyFrameList *
+// sp-match: _Rt2dKeyFrameListApply @ 0x00172E20
 Rt2dKeyFrameListApply(Rt2dKeyFrameList *keyframeList, Rt2dAnimProps *props,
                       RwReal alpha)
 {

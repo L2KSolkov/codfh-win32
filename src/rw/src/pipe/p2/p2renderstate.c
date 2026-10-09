@@ -55,6 +55,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/src/pipe/p2
 // match: _rcsid @ 0x004173D0
 
 // match: _RxRenderStateVectorSetDefaultRenderStateVector @ 0x002BB1C0
+// sp-match: _RxRenderStateVectorSetDefaultRenderStateVector @ 0x001D65D0
 RxRenderStateVector *
 RxRenderStateVectorSetDefaultRenderStateVector(RxRenderStateVector * rsvp)
 {

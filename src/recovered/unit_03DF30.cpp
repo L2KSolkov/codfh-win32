@@ -65,12 +65,19 @@ type_16C2A0 dword_4395F8;
 
 // match: _$E2 @ 0x00309870
 // match: _$E3 @ 0x0030DCC0
+// sp-match: _$E3 @ 0x0021E0F0
+// sp-match: _$E2 @ 0x0021C2F0
 
 // In the AIManeuverManager's unit (unit_03CA10.cpp).
 type_365A0 sub_3CE20(RwInt32 arg_0);
 void sub_3D0B0(type_365A0 arg_0);
 RwUInt32 sub_3D120(type_3DF30 *arg_0, type_3D410 *arg_4, RwInt32 arg_8);
+#ifdef CODFH_SP
+// Single player passes and returns the handle by value (SP 0x2E770).
+type_365A0 sub_3D150(type_3DF30 *arg_0, type_3D410 *arg_4, type_365A0 arg_8, RwInt32 arg_C);
+#else
 RwUInt32 sub_3D150(type_3DF30 *arg_0, type_3D410 *arg_4, RwUInt32 arg_8, RwInt32 arg_C);
+#endif
 // The other updates sub_3ED10 runs: the AIHearing class's (sub_3C2B0), the
 // Distance Scheduler's (sub_350F0), and two whose owners are not known.
 void sub_3C2B0(RwReal arg_0);
@@ -88,6 +95,7 @@ type_3DF30 *sub_3EEE0();
 type_3DF30 *sub_3F080(RwInt32 arg_0);
 
 // match: ??0type_3DF30@@QAE@XZ @ 0x0003DF30
+// sp-match: ??0type_3DF30@@QAE@XZ @ 0x0002EF30
 type_3DF30::type_3DF30()
 {
     unk_00 = 0;
@@ -96,6 +104,7 @@ type_3DF30::type_3DF30()
 }
 
 // match: sub_3DF90 @ 0x0003DF90
+// sp-match: sub_3DF90 @ 0x0002F640
 void type_3DF30::sub_3DF90(RwInt32 arg_0)
 {
     RwInt32 var_4;
@@ -117,6 +126,7 @@ void type_3DF30::sub_3DF90(RwInt32 arg_0)
 }
 
 // match: sub_3E0A0 @ 0x0003E0A0
+// sp-match: sub_3E0A0 @ 0x0002EF60
 void type_3DF30::sub_3E0A0()
 {
     type_365A0 stk_18;
@@ -146,6 +156,7 @@ void type_3DF30::sub_3E0A0()
 }
 
 // match: sub_3E180 @ 0x0003E180
+// sp-match: sub_3E180 @ 0x0002F6F0
 void type_3DF30::sub_3E180(RwReal arg_0)
 {
     RwUInt32 var_1C;
@@ -162,7 +173,12 @@ void type_3DF30::sub_3E180(RwReal arg_0)
         unk_2A8 = l10;
         sub_3D3E0(unk_2A8)->vf_004(this);
     }
+#ifdef CODFH_SP
+    // the handle by value (SP 0x2F739)
+    stk_14 = sub_3D150(this, &unk_04, *(type_365A0 *)&unk_2A8, unk_2DC).unk_00;
+#else
     stk_14 = sub_3D150(this, &unk_04, unk_2A8, unk_2DC);
+#endif
     local_C.unk_00 = stk_14;
     if (local_C.unk_00 != 0)
         sub_3E2C0(local_C);
@@ -171,8 +187,13 @@ void type_3DF30::sub_3E180(RwReal arg_0)
         var18 = lv_8->unk_14;
         var_4 = sub_3D3E0(var18);
         if (lv_8->vf_00C(arg_0, &unk_04) == 0) {
+#ifdef CODFH_SP
+            // the handle struct through get_unk_18() (SP 0x2F78F loads it over lv_8's register).
+            sub_3E3B0(lv_8->get_unk_18());
+#else
             var_1C = lv_8->unk_18;
             sub_3E3B0(var_1C);
+#endif
         }
         lv_8 = var_4;
     }
@@ -180,6 +201,7 @@ void type_3DF30::sub_3E180(RwReal arg_0)
 }
 
 // match: sub_3E2C0 @ 0x0003E2C0
+// sp-match: sub_3E2C0 @ 0x0002F000
 void type_3DF30::sub_3E2C0(type_365A0 arg_0)
 {
     type_3CE6D0 *bp_4 = sub_3D3E0(arg_0.unk_00);
@@ -206,9 +228,16 @@ void type_3DF30::sub_3E2C0(type_365A0 arg_0)
 }
 
 // match: sub_3E3B0 @ 0x0003E3B0
+// sp-match: sub_3E3B0 @ 0x0002F0A0
+#ifdef CODFH_SP
+void type_3DF30::sub_3E3B0(type_365A0 arg_0)
+{
+    type_3CE6D0 *bp_4 = sub_3D3E0(arg_0.unk_00);
+#else
 void type_3DF30::sub_3E3B0(RwUInt32 arg_0)
 {
     type_3CE6D0 *bp_4 = sub_3D3E0(arg_0);
+#endif
 
     if (bp_4 && unk_2C0[bp_4->vf_030()])
         return;
@@ -245,18 +274,25 @@ void type_3DF30::sub_3E3B0(RwUInt32 arg_0)
 }
 
 // match: sub_3E570 @ 0x0003E570
+// sp-match: sub_3E570 @ 0x0002F1C0
 void type_3DF30::sub_3E570(type_3CE6D0 *arg_0, void (*arg_4)(type_3D3548 *, void *),
                            RwInt32 arg_8, void *arg_C)
 {
+#ifndef CODFH_SP
     AIData *var_10;
     RwUInt32 ebp_C;
+#endif
     type_3CE6D0 *v8;
     type_3D3548 *var_4;
 
     for (var_4 = unk_00; var_4 != 0; var_4 = var_4->vf_118()) {
+#ifdef CODFH_SP // shape: the handle straight from the getter (SP 0x2F1E0 pushes it from eax, no locals kept)
+        v8 = sub_3D3E0(var_4->vf_120()->get_unk_574());
+#else
         var_10 = var_4->vf_120();
         ebp_C = var_10->unk_574;
         v8 = sub_3D3E0(ebp_C);
+#endif
         if (!((v8 == 0 || v8->vf_02C() >= arg_0->vf_02C())
                 && var_4->vf_120()->unk_51C != 0 && (var_4->unk_2C & 0x3FFFFF0 & arg_8) != 0
                 && ((var_4->vf_120()->unk_49C >> 4) & 1) != 0))
@@ -266,6 +302,7 @@ void type_3DF30::sub_3E570(type_3CE6D0 *arg_0, void (*arg_4)(type_3D3548 *, void
 }
 
 // match: sub_3E650 @ 0x0003E650
+// sp-match: sub_3E650 @ 0x0002F260
 void type_3DF30::sub_3E650(type_3D3548 *arg_0, RwInt32 arg_4)
 {
     RwUInt32 varC;
@@ -291,6 +328,7 @@ void type_3DF30::sub_3E650(type_3D3548 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_3E710 @ 0x0003E710
+// sp-match: sub_3E710 @ 0x0002F2F0
 RwInt32 type_3DF30::sub_3E710(type_3D3548 *arg_0)
 {
     RwInt32 local_8;
@@ -305,6 +343,7 @@ RwInt32 type_3DF30::sub_3E710(type_3D3548 *arg_0)
 }
 
 // match: sub_3E780 @ 0x0003E780
+// sp-match: sub_3E780 @ 0x0002F320
 void type_3DF30::sub_3E780(type_3D3548 *arg_0)
 {
     if (arg_0 != 0)
@@ -314,6 +353,7 @@ void type_3DF30::sub_3E780(type_3D3548 *arg_0)
 }
 
 // match: sub_3E7C0 @ 0x0003E7C0
+// sp-match: sub_3E7C0 @ 0x0002F340
 void type_3DF30::sub_3E7C0(type_3D3548 *arg_0)
 {
     AIData *local_20;
@@ -354,6 +394,7 @@ void type_3DF30::sub_3E7C0(type_3D3548 *arg_0)
 }
 
 // match: sub_3E8F0 @ 0x0003E8F0
+// sp-match: sub_3E8F0 @ 0x0002F410
 void type_3DF30::sub_3E8F0(RwInt32 arg_0)
 {
     RwUInt32 var_10;
@@ -372,6 +413,7 @@ void type_3DF30::sub_3E8F0(RwInt32 arg_0)
 }
 
 // match: sub_3E990 @ 0x0003E990
+// sp-match: sub_3E990 @ 0x0002F480
 void type_3DF30::sub_3E990(type_3D3548 *arg_0, RwInt32 arg_4)
 {
     RwUInt32 local_8;
@@ -389,6 +431,7 @@ void type_3DF30::sub_3E990(type_3D3548 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_3EA20 @ 0x0003EA20
+// sp-match: sub_3EA20 @ 0x0002F4E0
 void type_3DF30::sub_3EA20(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_2C0[arg_0] = arg_4;
@@ -397,6 +440,7 @@ void type_3DF30::sub_3EA20(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: sub_3EA50 @ 0x0003EA50
+// sp-match: sub_3EA50 @ 0x0002F500
 void type_3DF30::sub_3EA50(RwV3d *arg_0)
 {
     RwUInt32 local_8;
@@ -413,6 +457,7 @@ void type_3DF30::sub_3EA50(RwV3d *arg_0)
 }
 
 // match: sub_3EAD0 @ 0x0003EAD0
+// sp-match: sub_3EAD0 @ 0x0002F550
 void type_3DF30::sub_3EAD0(RwReal arg_0)
 {
     RwUInt32 local_8;
@@ -433,6 +478,7 @@ void type_3DF30::sub_3EAD0(RwReal arg_0)
 }
 
 // match: sub_3EB80 @ 0x0003EB80
+// sp-match: sub_3EB80 @ 0x0002F5C0
 void type_3DF30::sub_3EB80(RwInt32 arg_0, RwInt32 arg_4)
 {
     RwUInt32 local_8;
@@ -453,14 +499,21 @@ void type_3DF30::sub_3EB80(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: sub_3EC40 @ 0x0003EC40
+// sp-match: sub_3EC40 @ 0x0002F7C0
 void sub_3EC40()
 {
+#ifdef CODFH_SP
+    // Single player's squad pool has 5 slots, not 25 (SP 0x2F7C9).
+    dword_4395F8.sub_16C2C0(5, 0x2E0, "m_freeSquadList", 4, 0);
+#else
     dword_4395F8.sub_16C2C0(0x19, 0x2E0, "m_freeSquadList", 4, 0);
+#endif
     dword_4395F4 = 1;
     dword_4395F0 = 0;
 }
 
 // match: sub_3EC80 @ 0x0003EC80
+// sp-match: sub_3EC80 @ 0x0002FA40
 // The restart: the squads go, and ids start again from 1.
 void sub_3EC80()
 {
@@ -470,6 +523,7 @@ void sub_3EC80()
 }
 
 // match: sub_3ECA0 @ 0x0003ECA0
+// sp-match: sub_3ECA0 @ 0x0002FA60
 // The shutdown: the squads go, and so does their pool.
 void sub_3ECA0()
 {
@@ -479,6 +533,7 @@ void sub_3ECA0()
 }
 
 // match: sub_3ECC0 @ 0x0003ECC0
+// sp-match: sub_3ECC0 @ 0x0002F7F0
 // Warns about each squad that still has an entity.
 void sub_3ECC0()
 {
@@ -491,13 +546,17 @@ void sub_3ECC0()
     while (local_8 != 0) {
         var_4 = local_8->unk_2AC;
         varC = local_8->unk_00;
+#ifndef CODFH_SP
+        // Single player compiles the debug print out (SP 0x2F7F0 only walks the list).
         if (varC != 0)
             sub_19A750("An entity was not removed from a squad during restart/shutdown!");
+#endif
         local_8 = var_4;
     }
 }
 
 // match: sub_3ED10 @ 0x0003ED10
+// sp-match: sub_3ED10 @ 0x0002F810
 // The AI update, with the time step arg_0: the other schedulers, every
 // squad, then the per-frame counts.
 void sub_3ED10(RwReal arg_0)
@@ -528,6 +587,7 @@ void sub_3ED10(RwReal arg_0)
 }
 
 // match: sub_3EE10 @ 0x0003EE10
+// sp-match: sub_3EE10 @ 0x0002FA80
 // Puts the entity arg_0 in a squad: the one whose id its AI object keeps,
 // else the best fit (sub_3E710), else a new one.
 void sub_3EE10(type_3D3548 *arg_0)
@@ -569,6 +629,7 @@ void sub_3EE10(type_3D3548 *arg_0)
 // match: ?sub_3EEE0@@YAPAUtype_3DF30@@XZ @ 0x0003EEE0
 // match: __ehhandler$?sub_3EEE0@@YAPAUtype_3DF30@@XZ-0x11 @ 0x002FF6F0
 // match: __ehhandler$?sub_3EEE0@@YAPAUtype_3DF30@@XZ @ 0x002FF701
+// sp-match: ?sub_3EEE0@@YAPAUtype_3DF30@@XZ @ 0x0002F8C0
 // Builds a squad in its pool slot, assigns the next id and links it first.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_3DF30 *sub_3EEE0()
@@ -585,6 +646,7 @@ type_3DF30 *sub_3EEE0()
 }
 
 // match: sub_3EFB0 @ 0x0003EFB0
+// sp-match: sub_3EFB0 @ 0x0002F950
 // Takes the squad arg_0 off the list, destroys it and frees its slot.
 void sub_3EFB0(type_3DF30 *arg_0)
 {
@@ -610,6 +672,7 @@ void sub_3EFB0(type_3DF30 *arg_0)
 }
 
 // match: sub_3F040 @ 0x0003F040
+// sp-match: sub_3F040 @ 0x0002F9B0
 void sub_3F040()
 {
     type_3DF30 *local_8;
@@ -625,6 +688,7 @@ void sub_3F040()
 }
 
 // match: sub_3F080 @ 0x0003F080
+// sp-match: sub_3F080 @ 0x0002F9E0
 // The squad with the id arg_0, else 0.
 type_3DF30 *sub_3F080(RwInt32 arg_0)
 {
@@ -640,6 +704,7 @@ type_3DF30 *sub_3F080(RwInt32 arg_0)
 }
 
 // match: sub_3F0D0 @ 0x0003F0D0
+// sp-match: sub_3F0D0 @ 0x0002FA10
 // The squad on the side arg_0, else 0.
 type_3DF30 *sub_3F0D0(RwInt32 arg_0)
 {
@@ -658,9 +723,12 @@ type_3DF30 *sub_3F0D0(RwInt32 arg_0)
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ?sub_19A750@@YAXM@Z (folded into 0x19A750)
+#ifndef CODFH_SP
+// Single player keeps sub_3ED10's call (SP 0x2F82B), so the empty body is not in this file there.
 void sub_19A750(RwReal arg_0)
 {
 }
+#endif
 
 // ??2@YAPAXIPAX@Z (folded into 0x6CCF0): the global placement new sub_3EEE0 calls out of
 // line (defined here for the authentic link, so no library's copy comes in)

@@ -405,6 +405,14 @@ type_3DF8D8_04 dword_4B1F24[3];
 // match: _$E101 @ 0x0030A340
 // match: _$E103 @ 0x0030A390
 // match: ?sub_824A0@@YAPAXII@Z @ 0x000824A0
+// sp-match: _$E86 @ 0x0021C6F0
+// sp-match: _$E88 @ 0x0021C700
+// sp-match: _$E91 @ 0x0021C730
+// sp-match: _$E94 @ 0x0021C760
+// sp-match: _$E89 @ 0x0021E2F0
+// sp-match: _$E92 @ 0x0021E2C0
+// sp-match: _$E95 @ 0x0021E2E0
+// sp-match: ?sub_824A0@@YAPAXII@Z @ 0x00069550
 
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void *sub_824A0(RwUInt32 arg_0, RwUInt32 arg_4)
@@ -418,8 +426,12 @@ void *sub_824A0(RwUInt32 arg_0, RwUInt32 arg_4)
     var_C = (RwUInt32)RwMalloc(bp_8, arg_4);
     if (var_C > 0)
     {
+#ifdef CODFH_SP // shape:
+        bp_4 = ((var_C + 8) >> 3) * 8;
+#else
         bp_4 = (var_C + 8) >> 3;
         bp_4 <<= 3;
+#endif
         var_10 = (RwUInt32 *)(bp_4 - 4);
         *var_10 = var_C;
     }
@@ -430,7 +442,14 @@ void *sub_824A0(RwUInt32 arg_0, RwUInt32 arg_4)
     return (void *)bp_4;
 }
 
+#ifdef CODFH_SP
+// Single player's disc-error handler (unit_19CD50, SP 0x12C410): its one-argument checks
+// after the stream reads call it where multiplayer calls the empty sub_19A750.
+void sp_sub_12C410(void *arg_0);
+#endif
+
 // match: ?sub_82500@@YAXXZ @ 0x00082500
+// sp-match: ?sub_82500@@YAXXZ @ 0x0006A3D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_82500()
 {
@@ -442,14 +461,23 @@ void sub_82500()
 
     sub_85840(var_120, 0);
     var_4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_120);
+#ifdef CODFH_SP // single player compiles the debug print out (no string in SP; SP 0x6A3D0)
+    if (var_4)
+    {
+#else
     if (!var_4)
     {
         sub_19A750("ERROR: Could not open file %s!\n", var_120);
     }
     else
     {
+#endif
         slot_1C = RwStreamReadChunkHeaderInfo(var_4, &var_18);
+#ifdef CODFH_SP // the disc-error check (SP 0x6A414 calls 0x12C410)
+        sp_sub_12C410((void *)slot_1C);
+#else
         sub_19A750(slot_1C);
+#endif
         for (local_124 = 0; local_124 < 0x10E; local_124++)
         {
             RwStreamRead(var_4, &dword_44C0B0[local_124], sizeof(RwInt32));
@@ -460,11 +488,14 @@ void sub_82500()
 
 
 // match: ?sub_825E0@@YAXPAUtype_825E0@@H@Z @ 0x000825E0
+// sp-match: ?sub_825E0@@YAXPAUtype_825E0@@H@Z @ 0x0006A460
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_825E0(type_825E0 *arg_0, RwInt32 arg_4)
 {
     type_199010 *var_250;
+#ifndef CODFH_SP // shape: single player scopes it to the memory stream's block (SP 0x6A460 shares its slot)
     RwMemory var_24C;
+#endif
     RwUInt32 var_244;
     type_84230 local_240;
     RwInt32 var_20;
@@ -480,15 +511,24 @@ void sub_825E0(type_825E0 *arg_0, RwInt32 arg_4)
     bp_4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, local_240.unk_110);
     if (!bp_4)
     {
+#ifndef CODFH_SP // single player compiles the debug print out (no string in SP; SP 0x6A460)
         sub_19A750("ERROR: Could not open file %s!\n", local_240.unk_110);
+#endif
         return;
     }
     if (arg_4)
     {
         var_244 = RwStreamRead(bp_4, dword_44E8C4, 0x100000); // not an address: 1 MB
+#ifdef CODFH_SP // the disc-error check (SP 0x6A51F calls 0x12C410)
+        sp_sub_12C410((void *)var_244);
+#else
         sub_19A750((void *)var_244);
+#endif
         RwStreamClose(bp_4, 0);
         sub_82330();
+#ifdef CODFH_SP // shape:
+        RwMemory var_24C;
+#endif
         var_24C.start = dword_44E8C4;
         var_24C.length = var_244;
         bp_4 = RwStreamOpen(rwSTREAMMEMORY, rwSTREAMREAD, &var_24C);
@@ -631,6 +671,7 @@ void sub_825E0(type_825E0 *arg_0, RwInt32 arg_4)
 
 // "LoadSoundBankSynchronously".
 // match: ?sub_82C70@@YAXPAUtype_825E0@@_N@Z @ 0x00082C70
+// sp-match: ?sub_82C70@@YAXPAUtype_825E0@@_N@Z @ 0x0006A8D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_82C70(type_825E0 *arg_0, bool arg_4)
 {
@@ -654,9 +695,11 @@ void sub_82C70(type_825E0 *arg_0, bool arg_4)
     sub_23BFE0(dword_44C0A8);
     if (l4->unk_00)
     {
+#ifndef CODFH_SP // single player compiles the debug prints out (no strings in SP; SP 0x6A8D0)
         sub_19A750("LoadSoundBankSynchronously: Attempting to load a sound bank into slot %d that has not been "
                    "unloaded! (Or is still loading!)",
                    arg_0->unk_08);
+#endif
         dword_44E8D4 = 0;
         return;
     }
@@ -666,12 +709,14 @@ void sub_82C70(type_825E0 *arg_0, bool arg_4)
     {
         sub_19BB40(var_210, 1);
     }
+#ifndef CODFH_SP
     if (dword_44E870)
     {
         sub_19A750("Loading sound bank god ID: %x,%x to slot %d from file %s\n", l4->unk_18.unk_00.unk_00,
                    l4->unk_18.unk_00.unk_04, arg_0->unk_08, var_210);
     }
     sub_19A750("JB SYNC: Loading %s\n", var_210);
+#endif
     m_10C = RwFopen(var_210, "rb");
     if (!m_10C)
     {
@@ -685,14 +730,22 @@ void sub_82C70(type_825E0 *arg_0, bool arg_4)
     if (m_10C)
     {
         dword_44C0A8 = sub_23C490(m_10C, 0, 0, 0, dword_44C0A8);
+#ifdef CODFH_SP // the disc-error check (SP 0x6AA00 calls 0x12C410)
+        sp_sub_12C410((void *)dword_44C0A8);
+#else
         sub_19A750(dword_44C0A8);
+#endif
         if (dword_44C0A8->unk_2C == 0x100)
         {
             l4->unk_10 = dword_44C0A8->unk_00;
         }
         else
         {
+#ifdef CODFH_SP // the disc-error check (SP 0x6AA21 calls 0x12C410)
+            sp_sub_12C410((void *)0);
+#else
             sub_19A750((void *)0);
+#endif
         }
         RwFclose(m_10C);
         if (arg_4)
@@ -700,10 +753,12 @@ void sub_82C70(type_825E0 *arg_0, bool arg_4)
             sub_19BB40(var_210, 0);
         }
     }
+#ifndef CODFH_SP
     if (dword_44E870)
     {
         sub_19A750("Loading sound bank AGD\n");
     }
+#endif
     if (arg_4)
     {
         sub_19BB40(var_108, 1);
@@ -722,16 +777,19 @@ void sub_82C70(type_825E0 *arg_0, bool arg_4)
     var_218 = dword_44D48C - var_214;
     dword_44D48C = var_214;
     dword_44E768 += var_218;
+#ifndef CODFH_SP
     if (dword_44E870)
     {
         sub_19A750("Sound Bank Loaded!\n");
     }
+#endif
     dword_44E8D4 = 0;
 }
 
 // The sound system's set-up: the DSP image, the output stream and its
 // listener, the wave bank and the voice streams.
 // match: ?sub_82F50@@YAHXZ @ 0x00082F50
+// sp-match: ?sub_82F50@@YAHXZ @ 0x0006AAD0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_82F50()
 {
@@ -786,13 +844,23 @@ RwInt32 sub_82F50()
     return var_40;
 }
 
+#ifdef CODFH_SP // rwabase.c's pair (SP 0x32A850); multiplayer's copy is unk_42E548[54]
+extern "C" void *unk_42E620[2];
+#endif
+
 // match: ?sub_83100@@YAHXZ @ 0x00083100
+// sp-match: ?sub_83100@@YAHXZ @ 0x00069580
 RwInt32 sub_83100()
 {
     RwInt32 var_4;
 
+#ifdef CODFH_SP // single player keeps the core in rwabase's own pair unk_42E620 (SP 0x6958A stores it at 0x32A850)
+    unk_42E620[0] = (void *)RwaCoreOpen(0, 1);
+    var_4 = (RwInt32)unk_42E620[0];
+#else
     unk_42E548[54] = (void *)RwaCoreOpen(0, 1);
     var_4 = (RwInt32)unk_42E548[54];
+#endif
     var_4 = sub_23E3A0();
     var_4 = sub_24EC10();
     dword_44E8C4 = (RwUInt8 *)RWSMalloc(0x100000, 0x34250); // not an address: an allocation tag
@@ -801,6 +869,7 @@ RwInt32 sub_83100()
 }
 
 // match: ?sub_83170@@YAHXZ @ 0x00083170
+// sp-match: ?sub_83170@@YAHXZ @ 0x000695D0
 RwInt32 sub_83170()
 {
     RwInt32 var_4;
@@ -841,6 +910,7 @@ void sub_831D0()
 
 // Resets the sound system's state.
 // match: ?sub_83280@@YAHXZ @ 0x00083280
+// sp-match: ?sub_83280@@YAHXZ @ 0x0006AC10
 RwInt32 sub_83280()
 {
     RwInt32 var_4;
@@ -908,6 +978,7 @@ RwInt32 sub_83280()
 
 // Restarts the sound system, keeping dword_4B1C20.
 // match: ?sub_83510@@YAXXZ @ 0x00083510
+// sp-match: ?sub_83510@@YAXXZ @ 0x0006BD70
 void sub_83510()
 {
     type_4B1C20 var_18[3];
@@ -929,6 +1000,7 @@ void sub_83510()
 
 // Stops the sound system's sounds and resets its state.
 // match: ?sub_835E0@@YAXXZ @ 0x000835E0
+// sp-match: ?sub_835E0@@YAXXZ @ 0x0006BC30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_835E0()
 {
@@ -978,10 +1050,14 @@ void sub_835E0()
 
 // match: ??1type_837D0@@QAE@XZ @ 0x000837D0
 // (Defined in the class, in soundbank.h.)
+// sp-match: ??_Gtype_837D0@@QAEPAXI@Z @ 0x00069500
+// (Single player: the destructor expanded into its scalar deleting destructor, which
+// deletes the rest of the list by calling itself; no separate destructor.)
 
 // Carves the group arg_0's virtual voice lists from arg_4's pool into
 // arg_8.
 // match: ?sub_83850@@YAXHPAUtype_8A980@@PAPAH@Z @ 0x00083850
+// sp-match: ?sub_83850@@YAXHPAUtype_8A980@@PAPAH@Z @ 0x00069620
 void sub_83850(RwInt32 arg_0, type_8A980 *arg_4, RwInt32 **arg_8)
 {
     RwInt32 var_4;
@@ -1028,6 +1104,9 @@ void sub_83850(RwInt32 arg_0, type_8A980 *arg_4, RwInt32 **arg_8)
 }
 
 // match: ??0type_83A70@@QAE@XZ @ 0x00083A70
+#ifdef CODFH_SP
+inline // SP has no out-of-line copy: SP 0x69620 expands it
+#endif
 type_83A70::type_83A70()
 {
     unk_00 = 0;
@@ -1049,18 +1128,21 @@ type_83A70::type_83A70()
 }
 
 // match: ?sub_83B20@@YAXXZ @ 0x00083B20
+// sp-match: ?sub_83B20@@YAXXZ @ 0x000697B0
 void sub_83B20()
 {
     sub_83850(8, &dword_4B1E98, dword_44E5C4);
 }
 
 // match: ?sub_83B40@@YAXXZ @ 0x00083B40
+// sp-match: ?sub_83B40@@YAXXZ @ 0x000697D0
 void sub_83B40()
 {
     dword_4B1E98.sub_88DF0();
 }
 
 // match: ?sub_83B50@@YAXXZ @ 0x00083B50
+// sp-match: ?sub_83B50@@YAXXZ @ 0x000697E0
 void sub_83B50()
 {
     if (dword_4F39D4)
@@ -1085,6 +1167,7 @@ void sub_83B70()
 
 // Waits for the three music players to stop.
 // match: ?sub_83BB0@@YAXXZ @ 0x00083BB0
+// sp-match: ?sub_83BB0@@YAXXZ @ 0x0006AD80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_83BB0()
 {
@@ -1123,6 +1206,7 @@ void sub_83BB0()
 }
 
 // match: ?sub_83C60@@YAXPAUtype_825E0@@@Z @ 0x00083C60
+// sp-match: ?sub_83C60@@YAXPAUtype_825E0@@@Z @ 0x00069800
 void sub_83C60(type_825E0 *arg_0)
 {
     arg_0->unk_00.unk_00 = -1;
@@ -1132,6 +1216,7 @@ void sub_83C60(type_825E0 *arg_0)
 }
 
 // match: ?sub_83C90@@YAXXZ @ 0x00083C90
+// sp-match: ?sub_83C90@@YAXXZ @ 0x00069820
 void sub_83C90()
 {
     RwInt32 var_4;
@@ -1146,6 +1231,7 @@ void sub_83C90()
 }
 
 // match: ?sub_83CF0@@YAXXZ @ 0x00083CF0
+// sp-match: ?sub_83CF0@@YAXXZ @ 0x00069860
 void sub_83CF0()
 {
     RwInt32 var_4;
@@ -1158,6 +1244,7 @@ void sub_83CF0()
 
 // A free virtual voice slot, or -1.
 // match: ?sub_83D30@@YAHXZ @ 0x00083D30
+// sp-match: ?sub_83D30@@YAHXZ @ 0x00069880
 RwInt32 sub_83D30()
 {
     RwInt32 var_4;
@@ -1173,6 +1260,7 @@ RwInt32 sub_83D30()
 }
 
 // match: ?sub_83D70@@YAXH@Z @ 0x00083D70
+// sp-match: ?sub_83D70@@YAXH@Z @ 0x000698A0
 void sub_83D70(RwInt32 arg_0)
 {
     RwInt32 var_4;
@@ -1189,6 +1277,7 @@ void sub_83D70(RwInt32 arg_0)
 }
 
 // match: ?sub_83DD0@@YAXPAUtype_199010@@@Z @ 0x00083DD0
+// sp-match: ?sub_83DD0@@YAXPAUtype_199010@@@Z @ 0x000698E0
 // Gives the sound arg_0 its name in the current language (sub_1986B0).
 void sub_83DD0(type_199010 *arg_0)
 {
@@ -1197,6 +1286,7 @@ void sub_83DD0(type_199010 *arg_0)
 
 // "UnloadBank".
 // match: ?sub_83DE0@@YAHH@Z @ 0x00083DE0
+// sp-match: ?sub_83DE0@@YAHH@Z @ 0x0006ADE0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_83DE0(RwInt32 arg_0)
 {
@@ -1212,21 +1302,27 @@ RwInt32 sub_83DE0(RwInt32 arg_0)
     if (bp_4->unk_18.unk_00.unk_00 == -1 && bp_4->unk_18.unk_00.unk_04 == -1 && !bp_4->unk_14
         && !bp_4->unk_10)
     {
+#ifndef CODFH_SP // single player compiles the debug prints out (no strings in SP; SP 0x6ADE0)
         sub_19A750("UnloadBank:Sound bank slot %d is already empty...", arg_0);
+#endif
         return 1;
     }
+#ifndef CODFH_SP
     if (dword_44E870)
     {
         sub_19A750("Unloading sound bank god ID: %x,%x from slot %d", bp_4->unk_18.unk_00.unk_00,
                    bp_4->unk_18.unk_00.unk_04, arg_0);
     }
+#endif
     if (bp_4->unk_00)
     {
+#ifndef CODFH_SP
         if (dword_44E870)
         {
             sub_19A750("Error Unloading sound bank. The sound bank you tried to unload is still loading! Ignoring "
                        "unload request.");
         }
+#endif
         return 0;
     }
     if (bp_4->unk_14)
@@ -1275,6 +1371,9 @@ RwInt32 sub_83DE0(RwInt32 arg_0)
 }
 
 // match: ??1type_825E0_node@@QAE@XZ @ 0x00084020
+#ifdef CODFH_SP
+inline // SP has no out-of-line copy: SP 0x6ADE0 expands it
+#endif
 type_825E0_node::~type_825E0_node()
 {
     unk_0C->unk_1A--;
@@ -1289,6 +1388,7 @@ type_825E0_node::~type_825E0_node()
 }
 
 // match: ?sub_84090@@YAHPAUtype_825E0_id@@0@Z @ 0x00084090
+// sp-match: ?sub_84090@@YAHPAUtype_825E0_id@@0@Z @ 0x000698F0
 RwInt32 sub_84090(type_825E0_id *arg_0, type_825E0_id *arg_4)
 {
     RwInt32 var_4;
@@ -1306,6 +1406,7 @@ RwInt32 sub_84090(type_825E0_id *arg_0, type_825E0_id *arg_4)
 
 // The wave of the sound arg_0 in a loaded bank, or 0.
 // match: ?sub_840D0@@YAHPAUtype_199010@@@Z @ 0x000840D0
+// sp-match: ?sub_840D0@@YAHPAUtype_199010@@@Z @ 0x00069910
 RwInt32 sub_840D0(type_199010 *arg_0)
 {
     RwInt32 var_4;
@@ -1325,6 +1426,7 @@ RwInt32 sub_840D0(type_199010 *arg_0)
 }
 
 // match: ?sub_84170@@YAXHH@Z @ 0x00084170
+// sp-match: ?sub_84170@@YAXHH@Z @ 0x00069980
 void sub_84170(RwInt32 arg_0, RwInt32 arg_4)
 {
     RwInt32 var_4;
@@ -1341,6 +1443,7 @@ void sub_84170(RwInt32 arg_0, RwInt32 arg_4)
 
 // Moves dword_428E2C on to the next bank request in use.
 // match: ?sub_841C0@@YAXXZ @ 0x000841C0
+// sp-match: ?sub_841C0@@YAXXZ @ 0x000699B0
 void sub_841C0()
 {
     RwInt32 var_4;
@@ -1360,6 +1463,7 @@ void sub_841C0()
 }
 
 // match: ?sub_84230@@YAXPAUtype_84230@@@Z @ 0x00084230
+// sp-match: ?sub_84230@@YAXPAUtype_84230@@@Z @ 0x00069A70
 // Clears the load request arg_0.
 void sub_84230(type_84230 *arg_0)
 {
@@ -1373,6 +1477,7 @@ void sub_84230(type_84230 *arg_0)
 
 // Drops the first bank request, moving the rest up.
 // match: ?sub_84280@@YAXXZ @ 0x00084280
+// sp-match: ?sub_84280@@YAXXZ @ 0x0006AF20
 void sub_84280()
 {
     RwInt32 var_4;
@@ -1390,6 +1495,7 @@ void sub_84280()
 
 // Queues the bank request arg_0.
 // match: ?sub_84300@@YAXPAUtype_825E0@@@Z @ 0x00084300
+// sp-match: ?sub_84300@@YAXPAUtype_825E0@@@Z @ 0x0006AF70
 void sub_84300(type_825E0 *arg_0)
 {
     RwInt32 var_4;
@@ -1403,19 +1509,25 @@ void sub_84300(type_825E0 *arg_0)
         if (dword_4AF038[var_4].unk_00.unk_00.unk_00 == -1 && dword_4AF038[var_4].unk_00.unk_00.unk_04 == -1)
         {
             dword_4AF038[var_4].unk_00 = *arg_0;
+#ifndef CODFH_SP
+            // Single player compiles the debug prints out (SP 0x6AF70).
             if (dword_44E870)
             {
                 sub_19A750("^^^^^^^ADDING BANK %d TO SOUND BANK LOADING QUEUE^^^^^^^^^^^^", arg_0->unk_0C);
             }
+#endif
             sub_858E0(dword_4AF038[var_4].unk_110, dword_4AF038[var_4].unk_10, dword_4AF038[var_4].unk_00.unk_0C);
             return;
         }
     }
+#ifndef CODFH_SP
     sub_19A750("Too many things in the sound bank loading queue!!!");
+#endif
 }
 
 // "LoadSoundBankAsynchronously".
 // match: ?sub_843F0@@YAXXZ @ 0x000843F0
+// sp-match: ?sub_843F0@@YAXXZ @ 0x0006AFF0
 void sub_843F0()
 {
     RwInt32 var_4;
@@ -1450,8 +1562,10 @@ void sub_843F0()
             if (v8->unk_18.unk_00.unk_00 == dword_4AF038[0].unk_00.unk_00.unk_00
                 && v8->unk_18.unk_00.unk_04 == dword_4AF038[0].unk_00.unk_00.unk_04)
             {
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x6AFF0)
                 sub_19A750("LoadSoundBankAsynchronously: Bank %d is already loaded in slot %d!! Ignoring load request...",
                            dword_4AF038[0].unk_00.unk_0C, dword_4AF038[0].unk_00.unk_08);
+#endif
                 sub_84280();
                 sub_6B5F0("SoundBankLoaded", 0, 0, 0, 0, 0, 1, 0);
                 v8->unk_00 = 0;
@@ -1484,6 +1598,7 @@ void sub_843F0()
 // Silences the effects: each playing voice's volume becomes its sound's
 // volume scaled by (100 - unk_13)%, and the music players' -1.
 // match: ?sub_84610@@YAXXZ @ 0x00084610
+// sp-match: ?sub_84610@@YAXXZ @ 0x00069AA0
 void sub_84610()
 {
     RwReal var_4;
@@ -1494,8 +1609,14 @@ void sub_84610()
     {
         if (dword_44C4E8[v8] && ((((type_44C4E8 *)dword_44C4E8[v8])->unk_34 & 2) != 0) != 0)
         {
+#ifdef CODFH_SP // shape:
+            RwReal sp_a = (100 - ((type_199010 *)dword_44D4E0[v8])->unk_13) / 100.0f;
+            RwReal sp_b = ((type_199010 *)dword_44D4E0[v8])->unk_10 / 100.0f;
+            var_4 = sp_a * sp_b;
+#else
             var_4 = (100 - ((type_199010 *)dword_44D4E0[v8])->unk_13) / 100.0f
                     * (((type_199010 *)dword_44D4E0[v8])->unk_10 / 100.0f);
+#endif
             do
             {
                 ((type_44C4E8 *)dword_44C4E8[v8])->unk_40 = var_4;
@@ -1515,6 +1636,7 @@ void sub_84610()
 
 // Whether the first music player is playing (asked three times).
 // match: ?sub_84730@@YAHXZ @ 0x00084730
+// sp-match: ?sub_84730@@YAHXZ @ 0x00069B60
 RwInt32 sub_84730()
 {
     RwInt32 var_4;
@@ -1531,6 +1653,7 @@ RwInt32 sub_84730()
 
 // Sets the effects' volumes from the music volume.
 // match: ?sub_84770@@YAXXZ @ 0x00084770
+// sp-match: ?sub_84770@@YAXXZ @ 0x00069B90
 void sub_84770()
 {
     RwInt32 var_4;
@@ -1542,7 +1665,7 @@ void sub_84770()
         if (dword_44C4E8[var_4] && ((((type_44C4E8 *)dword_44C4E8[var_4])->unk_34 & 2) != 0) != 0
             && dword_44C4E8[var_4] != dword_44E8BC && dword_44C4E8[var_4] != dword_44E8B8)
         {
-            v8 = ((type_199010 *)dword_44D4E0[var_4])->unk_10 / 100.0f * (1.0f - flt_44E88C);
+            v8 = (((type_199010 *)dword_44D4E0[var_4])->unk_10 / 100.0f) * (1.0f - flt_44E88C);
             do
             {
                 ((type_44C4E8 *)dword_44C4E8[var_4])->unk_40 = v8;
@@ -1561,6 +1684,7 @@ void sub_84770()
 
 // Sets the effects' pitches (dword_428E30 scales them).
 // match: ?sub_848A0@@YAXXZ @ 0x000848A0
+// sp-match: ?sub_848A0@@YAXXZ @ 0x0006B190
 void sub_848A0()
 {
     RwInt32 var_4;
@@ -1574,7 +1698,9 @@ void sub_848A0()
             && dword_44C4E8[v8] != dword_44E8BC && dword_44C4E8[v8] != dword_44E8B8)
         {
             stk_C = ((type_199010 *)dword_44D4E0[v8])->unk_1C * flt_428E30;
+#ifndef CODFH_SP // single player compiles the debug trace out (no string in SP; SP 0x6B190)
             sub_84C40("RwaVirtualVoiceSetFreq(sm_VirtualVoiceMasterList[i], TempPitch);");
+#endif
             sub_170ED0(&stk_C);
             do
             {
@@ -1629,6 +1755,7 @@ void sub_84A00()
 
 // Likewise from flt_44E5E8.
 // match: ?sub_84B20@@YAXXZ @ 0x00084B20
+// sp-match: ?sub_84B20@@YAXXZ @ 0x0006B260
 void sub_84B20()
 {
     RwInt32 var_4;
@@ -1640,8 +1767,10 @@ void sub_84B20()
         if (dword_44C4E8[var_4] && ((((type_44C4E8 *)dword_44C4E8[var_4])->unk_34 & 2) != 0) != 0
             && dword_44C4E8[var_4] != dword_44E8B8)
         {
-            v8 = ((type_199010 *)dword_44D4E0[var_4])->unk_10 / 100.0f * (1.0f - flt_44E5E8);
+            v8 = (((type_199010 *)dword_44D4E0[var_4])->unk_10 / 100.0f) * (1.0f - flt_44E5E8);
+#ifndef CODFH_SP // single player compiles the debug trace out (no string in SP; SP 0x6B260)
             sub_84C40("RwaVirtualVoiceSetGain(sm_VirtualVoiceMasterList[i], TempVol);");
+#endif
             do
             {
                 ((type_44C4E8 *)dword_44C4E8[var_4])->unk_40 = v8;
@@ -1661,14 +1790,17 @@ void sub_84B20()
 // match: ?sub_84C40@@YAXPBD@Z @ 0x00084C40
 void sub_84C40(const RwChar *arg_0)
 {
+#ifndef CODFH_SP // MP only: single player compiles the debug print out (an empty function folded into sp_nullsub_1, SP 0xC2A96 calls it)
     if (dword_44E888)
     {
         sub_19A750("<<[%d]---==$$##: %s\n", dword_4B87D8, arg_0);
     }
+#endif
 }
 
 // Fades the effects: arg_0 + 1 over flt_44D488, clamped to [0, 1].
 // match: ?sub_84C70@@YAXM@Z @ 0x00084C70
+// sp-match: ?sub_84C70@@YAXM@Z @ 0x00069C40
 void sub_84C70(RwReal arg_0)
 {
     RwReal var_4;
@@ -1689,7 +1821,12 @@ void sub_84C70(RwReal arg_0)
     {
         if (dword_44C4E8[v8] && ((((type_44C4E8 *)dword_44C4E8[v8])->unk_34 & 2) != 0) != 0)
         {
+#ifdef CODFH_SP // shape:
+            RwReal sp_b = ((type_199010 *)dword_44D4E0[v8])->unk_10 / 100.0f;
+            stk_C = sp_b * (1.0f - (1.0f - var_4) * flt_44E5E8);
+#else
             stk_C = ((type_199010 *)dword_44D4E0[v8])->unk_10 / 100.0f * (1.0f - (1.0f - var_4) * flt_44E5E8);
+#endif
             do
             {
                 ((type_44C4E8 *)dword_44C4E8[v8])->unk_40 = stk_C;
@@ -1708,6 +1845,7 @@ void sub_84C70(RwReal arg_0)
 
 // Sets the effects' pitches from flt_44E808 (all but dword_44E8B8).
 // match: ?sub_84DB0@@YAXXZ @ 0x00084DB0
+// sp-match: ?sub_84DB0@@YAXXZ @ 0x00069D30
 void sub_84DB0()
 {
     RwInt32 var_4;
@@ -1721,7 +1859,9 @@ void sub_84DB0()
             && dword_44C4E8[v8] != dword_44E8B8)
         {
             stk_C = ((type_199010 *)dword_44D4E0[v8])->unk_1C * flt_44E808;
+#ifndef CODFH_SP // single player compiles the debug trace out (no string in SP; SP 0x69D30)
             sub_84C40("RwaVirtualVoiceSetFreq(sm_VirtualVoiceMasterList[i], TempPitch);");
+#endif
             sub_170ED0(&stk_C);
             do
             {
@@ -1745,6 +1885,7 @@ void sub_84DB0()
 
 // Fades the effects' pitches like sub_84C70 their volumes.
 // match: ?sub_84EF0@@YAXM@Z @ 0x00084EF0
+// sp-match: ?sub_84EF0@@YAXM@Z @ 0x00069DF0
 void sub_84EF0(RwReal arg_0)
 {
     RwInt32 var_4;
@@ -1768,7 +1909,9 @@ void sub_84EF0(RwReal arg_0)
         {
             var_10 = ((type_199010 *)dword_44D4E0[stk_C])->unk_1C * v8
                      + (1.0f - v8) * ((type_199010 *)dword_44D4E0[stk_C])->unk_1C * flt_44E808;
+#ifndef CODFH_SP // single player compiles the debug trace out (no string in SP; SP 0x69DF0)
             sub_84C40("RwaVirtualVoiceSetFreq(sm_VirtualVoiceMasterList[i], TempPitch);");
+#endif
             sub_170ED0(&var_10);
             do
             {
@@ -1791,6 +1934,7 @@ void sub_84EF0(RwReal arg_0)
 }
 
 // match: ?sub_85090@@YAXMH@Z @ 0x00085090
+// sp-match: ?sub_85090@@YAXMH@Z @ 0x0006B310
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_85090(RwReal arg_0, RwInt32 arg_4)
 {
@@ -1873,8 +2017,16 @@ void sub_85090(RwReal arg_0, RwInt32 arg_4)
     {
         if (dword_4B1CA0[bp_4].unk_04)
         {
+#ifdef CODFH_SP // single player holds the delayed sounds while paused (SP 0x6B48F tests dword_4B86F8 bit 4)
+            if (!((dword_4B86F8 >> 4) & 1))
+            {
+                lv_10 = flt_429288 * flt_3D4340 * 0.001f;
+                dword_4B1CA0[bp_4].unk_00 = lv_10 + dword_4B1CA0[bp_4].unk_00;
+            }
+#else
             lv_10 = flt_429288 * flt_3D4340 * 0.001f;
             dword_4B1CA0[bp_4].unk_00 = lv_10 + dword_4B1CA0[bp_4].unk_00;
+#endif
             if (dword_4B1CA0[bp_4].unk_00 >= dword_4B1CA0[bp_4].unk_04->unk_00 * 0.1f)
             {
                 if (!dword_4B1CA0[bp_4].unk_14)
@@ -1981,6 +2133,7 @@ void sub_85090(RwReal arg_0, RwInt32 arg_4)
         }
         break;
     }
+#ifndef CODFH_SP // single player pauses and resumes directly (sub_85D60, sub_860E0); SP 0x6B310 has no such switch
     switch (dword_44E89C)
     {
     case 1:
@@ -1992,6 +2145,7 @@ void sub_85090(RwReal arg_0, RwInt32 arg_4)
         dword_44E89C = 0;
         break;
     }
+#endif
     sub_16D7F0(0x24);
     sub_86350();
     sub_83B50();
@@ -1999,6 +2153,7 @@ void sub_85090(RwReal arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_857B0@@YAXM@Z @ 0x000857B0
+// sp-match: ?sub_857B0@@YAXM@Z @ 0x0006B7F0
 // Stops the sound system's voice (dword_4B1E98) and calls an empty method of
 // each of the three music players (pDtor, not their destructor, sub_866A0).
 void sub_857B0(RwReal arg_0)
@@ -2013,6 +2168,7 @@ void sub_857B0(RwReal arg_0)
 }
 
 // match: ?sub_85800@@YAXPAPAUtype_44C4E8@@@Z @ 0x00085800
+// sp-match: ?sub_85800@@YAXPAPAUtype_44C4E8@@@Z @ 0x00069F20
 // Stops the voice *arg_0: fades it out when playing (sub_EAB80), else
 // forgets it.
 void sub_85800(type_44C4E8 **arg_0)
@@ -2033,6 +2189,7 @@ void sub_85800(type_44C4E8 **arg_0)
 // The sound table's files for the current language: ASLocate.agd into
 // arg_0 and the language's directory into arg_4 (either may be 0).
 // match: ?sub_85840@@YAXPAD0@Z @ 0x00085840
+// sp-match: ?sub_85840@@YAXPAD0@Z @ 0x00069F50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_85840(RwChar *arg_0, RwChar *arg_4)
 {
@@ -2054,6 +2211,7 @@ void sub_85840(RwChar *arg_0, RwChar *arg_4)
 // The bank arg_8's two files: its .agd into arg_0 and its .awd into arg_4
 // (banks are grouped by thirty).
 // match: ?sub_858E0@@YAXPAD0F@Z @ 0x000858E0
+// sp-match: ?sub_858E0@@YAXPAD0F@Z @ 0x00069FF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_858E0(RwChar *arg_0, RwChar *arg_4, RwInt16 arg_8)
 {
@@ -2073,12 +2231,14 @@ void sub_858E0(RwChar *arg_0, RwChar *arg_4, RwInt16 arg_8)
 }
 
 // match: ?sub_83760@type_4B1CA0@@QAEXXZ @ 0x00083760
+// sp-match: ?sub_83760@type_4B1CA0@@QAEXXZ @ 0x0006A390
 // (Defined in the class, in soundbank.h.)
 
 // match: ?sub_85730@type_4B1CA0@@QAEXXZ @ 0x00085730
 // (Defined in the class, in soundbank.h.)
 
 // match: ?sub_85A00@type_4B1CA0@@QAEXPAUtype_825E0_id@@M@Z @ 0x00085A00
+// sp-match: ?sub_85A00@type_4B1CA0@@QAEXPAUtype_825E0_id@@M@Z @ 0x0006A110
 void type_4B1CA0::sub_85A00(type_825E0_id *arg_0, RwReal arg_4)
 {
     type_837D0 *var_4;
@@ -2122,6 +2282,7 @@ void type_4B1CA0::sub_85A00(type_825E0_id *arg_0, RwReal arg_4)
 }
 
 // match: ?sub_85B90@@YAHXZ @ 0x00085B90
+// sp-match: ?sub_85B90@@YAHXZ @ 0x0006A1F0
 RwInt32 sub_85B90()
 {
     RwInt32 var_4;
@@ -2139,6 +2300,7 @@ RwInt32 sub_85B90()
 }
 
 // match: ?sub_85C10@@YAHXZ @ 0x00085C10
+// sp-match: ?sub_85C10@@YAHXZ @ 0x0006A250
 RwInt32 sub_85C10()
 {
     RwInt32 var_4;
@@ -2161,6 +2323,7 @@ RwInt32 sub_85C10()
 }
 
 // match: ?sub_85CC0@@YAHXZ @ 0x00085CC0
+// sp-match: ?sub_85CC0@@YAHXZ @ 0x0006A2F0
 RwInt32 sub_85CC0()
 {
     RwInt32 var_4;
@@ -2184,9 +2347,10 @@ RwInt32 sub_85CC0()
 }
 
 // match: ?sub_85D60@@YAXXZ @ 0x00085D60
+// sp-match: ?sub_85D60@@YAXXZ @ 0x0006B820
 // Sets dword_44E89C and returns: the rest (pausing the playing voices,
 // keeping their parameter 7, and waiting for the music players to settle)
-// is dead code that the image still carries.
+// is dead code that the image still carries. Single player runs it.
 void sub_85D60()
 {
     // Names for the frame slots (tools/local_names.py).
@@ -2197,8 +2361,10 @@ void sub_85D60()
     RwInt32 stk_14;
     RwInt32 loc18;
 
+#ifndef CODFH_SP // single player pauses the voices (SP 0x6B820 has no early return)
     dword_44E89C = 1;
     return;
+#endif
     for (var_8 = 0; var_8 < 0x3E8; var_8++)
     {
         if (dword_44C4E8[var_8])
@@ -2286,6 +2452,7 @@ void sub_85D60()
 }
 
 // match: ?sub_86090@@YAHXZ @ 0x00086090
+// sp-match: ?sub_86090@@YAHXZ @ 0x0006A340
 RwInt32 sub_86090()
 {
     RwInt32 var_4;
@@ -2301,9 +2468,11 @@ RwInt32 sub_86090()
 }
 
 // match: ?sub_860E0@@YAXXZ @ 0x000860E0
+// sp-match: ?sub_860E0@@YAXXZ @ 0x0006BA60
 // sub_85D60's counterpart: sets dword_44E89C to 3 and returns; the rest
 // (resuming the voices, the music players' streams and the current player's
-// weapon sound) is dead code that the image still carries.
+// weapon sound) is dead code that the image still carries. Single player
+// runs it, after one update of the sound core.
 void sub_860E0()
 {
     // Names for the frame slots (tools/local_names.py).
@@ -2314,8 +2483,13 @@ void sub_860E0()
     RwInt32 stk_14;
     type_4C19C0 *loc18;
 
+#ifdef CODFH_SP // single player resumes the voices (SP 0x6BA60 has no early return)
+    sub_86350();
+    sub_83B50();
+#else
     dword_44E89C = 3;
     return;
+#endif
     for (var_8 = 0; var_8 < 0x3E8; var_8++)
     {
         if (dword_44C4E8[var_8] && ((type_44C4E8 *)dword_44C4E8[var_8])->unk_50)
@@ -2371,6 +2545,7 @@ void sub_860E0()
 }
 
 // match: ?sub_86350@@YAXXZ @ 0x00086350
+// sp-match: ?sub_86350@@YAXXZ @ 0x0006A370
 void sub_86350()
 {
     bool var_1;
@@ -2383,6 +2558,7 @@ void sub_86350()
 }
 
 // match: ??0type_4B1CA0@@QAE@XZ @ 0x00086370
+// sp-match: ??0type_4B1CA0@@QAE@XZ @ 0x0006A380
 type_4B1CA0::type_4B1CA0()
 {
     unk_04 = 0;
@@ -2400,10 +2576,12 @@ type_4B1CA0::~type_4B1CA0()
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ?sub_170ED0@@YAHPAM@Z (folded into 0x170ED0)
+#ifndef CODFH_SP // single player calls it (SP 0x69D30 calls the folded SP 0x6CEB0); a body here lets /O2 drop the calls
 RwInt32 sub_170ED0(RwReal * arg_0)
 {
     return 0;
 }
+#endif
 
 
 #ifdef CODFH_PLAIN

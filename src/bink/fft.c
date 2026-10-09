@@ -48,6 +48,7 @@ static void dctsub(S32 n, F32 *a, S32 nc, F32 *c);
 // match: __real@3f490fdb @ 0x003EEDFC
 
 // match: _makewt @ 0x00258D30
+// sp-match: _makewt @ 0x00174BA0
 
 static void makewt(S32 nw, S32 *ip, F32 *w)
 {
@@ -106,6 +107,7 @@ static void makewt(S32 nw, S32 *ip, F32 *w)
 }
 
 // match: _makect @ 0x00258E80
+// sp-match: _makect @ 0x00174CF0
 static void makect(S32 nc, S32 *ip, F32 *c)
 {
   S32 j, nch;
@@ -127,6 +129,7 @@ static void makect(S32 nc, S32 *ip, F32 *c)
 }
 
 // match: _bitrv2 @ 0x00258F00
+// sp-match: _bitrv2 @ 0x00174D70
 static void bitrv2(S32 n, S32 *ip, F32 *a)
 {
   S32 j, j1, k, k1, l, m, m2;
@@ -234,6 +237,7 @@ static void bitrv2(S32 n, S32 *ip, F32 *a)
 }
 
 // match: _bitrv2conj @ 0x00259340
+// sp-match: _bitrv2conj @ 0x001751B0
 static void bitrv2conj(S32 n, S32 *ip, F32 *a)
 {
   S32 j, j1, k, k1, l, m, m2;
@@ -350,6 +354,7 @@ static void bitrv2conj(S32 n, S32 *ip, F32 *a)
 }
 
 // match: _bitrv216 @ 0x00259800
+// sp-match: _bitrv216 @ 0x00175670
 static void bitrv216(F32 *a)
 {
   F32 x1r, x1i, x2r, x2i, x3r, x3i, x4r, x4i,
@@ -407,6 +412,7 @@ static void bitrv216(F32 *a)
 }
 
 // match: _bitrv216neg @ 0x002598E0
+// sp-match: _bitrv216neg @ 0x00175750
 static void bitrv216neg(F32 *a)
 {
   F32 x1r, x1i, x2r, x2i, x3r, x3i, x4r, x4i,
@@ -477,6 +483,7 @@ static void bitrv216neg(F32 *a)
 }
 
 // match: _bitrv208 @ 0x00259A10
+// sp-match: _bitrv208 @ 0x00175880
 static void bitrv208(F32 *a)
 {
   F32 x1r, x1i, x3r, x3i, x4r, x4i, x6r, x6i;
@@ -500,6 +507,7 @@ static void bitrv208(F32 *a)
 }
 
 // match: _bitrv208neg @ 0x00259A60
+// sp-match: _bitrv208neg @ 0x001758D0
 static void bitrv208neg(F32 *a)
 {
   F32 x1r, x1i, x2r, x2i, x3r, x3i, x4r, x4i,
@@ -537,6 +545,7 @@ static void bitrv208neg(F32 *a)
 
 
 // match: _cftf1st @ 0x00259AE0
+// sp-match: _cftf1st @ 0x00175950
 static void cftf1st(S32 n, F32 *a, F32 *w)
 {
   S32 j, j0, j1, j2, j3, k, m, mh;
@@ -744,6 +753,7 @@ static void cftf1st(S32 n, F32 *a, F32 *w)
 }
 
 // match: _cftb1st @ 0x0025A340
+// sp-match: _cftb1st @ 0x001761B0
 static void cftb1st(S32 n, F32 *a, F32 *w)
 {
   S32 j, j0, j1, j2, j3, k, m, mh;
@@ -951,6 +961,7 @@ static void cftb1st(S32 n, F32 *a, F32 *w)
 }
 
 // match: _cftmdl1 @ 0x0025ABC0
+// sp-match: _cftmdl1 @ 0x00176A30
 static void cftmdl1(S32 n, F32 *a, F32 *w)
 {
   S32 j, j0, j1, j2, j3, k, m, mh;
@@ -1062,6 +1073,7 @@ static void cftmdl1(S32 n, F32 *a, F32 *w)
 }
 
 // match: _cftmdl2 @ 0x0025AF90
+// sp-match: _cftmdl2 @ 0x00176E00
 static void cftmdl2(S32 n, F32 *a, F32 *w)
 {
   S32 j, j0, j1, j2, j3, k, kr, m, mh;
@@ -1197,6 +1209,7 @@ static void cftmdl2(S32 n, F32 *a, F32 *w)
 }
 
 // match: _cftf161 @ 0x0025B500
+// sp-match: _cftf161 @ 0x00177370
 static void cftf161(F32 *a, F32 *w)
 {
   F32 wn4r, wk1r, wk1i,
@@ -1356,6 +1369,7 @@ static void cftf161(F32 *a, F32 *w)
 }
 
 // match: _cftf162 @ 0x0025BA90
+// sp-match: _cftf162 @ 0x00177900
 static void cftf162(F32 *a, F32 *w)
 {
   F32 wn4r, wk1r, wk1i, wk2r, wk2i, wk3r, wk3i,
@@ -1539,6 +1553,7 @@ static void cftf162(F32 *a, F32 *w)
 }
 
 // match: _cftf081 @ 0x0025C0E0
+// sp-match: _cftf081 @ 0x00177F50
 static void cftf081(F32 *a, F32 *w)
 {
   F32 wn4r, x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i,
@@ -1601,6 +1616,7 @@ static void cftf081(F32 *a, F32 *w)
 }
 
 // match: _cftf082 @ 0x0025C2D0
+// sp-match: _cftf082 @ 0x00178140
 static void cftf082(F32 *a, F32 *w)
 {
   F32 wn4r, wk1r, wk1i, x0r, x0i, x1r, x1i,
@@ -1673,6 +1689,7 @@ static void cftf082(F32 *a, F32 *w)
 }
 
 // match: _cftf040 @ 0x0025C4F0
+// sp-match: _cftf040 @ 0x00178360
 static void cftf040(F32 *a)
 {
   F32 x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i;
@@ -1696,6 +1713,7 @@ static void cftf040(F32 *a)
 }
 
 // match: _cftb040 @ 0x0025C590
+// sp-match: _cftb040 @ 0x00178400
 static void cftb040(F32 *a)
 {
   F32 x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i;
@@ -1731,6 +1749,7 @@ static void cftx020(F32 *a)
 }
 
 // match: _rftfsub @ 0x0025C630
+// sp-match: _rftfsub @ 0x001784A0
 static void rftfsub(S32 n, F32 *a, S32 nc, F32 *c)
 {
   S32 j, k, kk, ks, m;
@@ -1757,6 +1776,7 @@ static void rftfsub(S32 n, F32 *a, S32 nc, F32 *c)
 }
 
 // match: _rftbsub @ 0x0025C6F0
+// sp-match: _rftbsub @ 0x00178560
 static void rftbsub(S32 n, F32 *a, S32 nc, F32 *c)
 {
   S32 j, k, kk, ks, m;
@@ -1783,6 +1803,7 @@ static void rftbsub(S32 n, F32 *a, S32 nc, F32 *c)
 }
 
 // match: _dctsub @ 0x0025C7B0
+// sp-match: _dctsub @ 0x00178620
 static void dctsub(S32 n, F32 *a, S32 nc, F32 *c)
 {
   S32 j, k, kk, ks, m;
@@ -1805,6 +1826,7 @@ static void dctsub(S32 n, F32 *a, S32 nc, F32 *c)
 }
 
 // match: _cftfx41 @ 0x0025C990
+// sp-match: _cftfx41 @ 0x00178800
 static void cftfx41(S32 n, F32 *a, S32 nw, F32 *w)
 {
   if (n == 128)
@@ -1842,6 +1864,7 @@ static void cftfx42(S32 n, F32 *a, S32 nw, F32 *w)
 }
 
 // match: _cftexp1 @ 0x0025CA00
+// sp-match: _cftexp1 @ 0x00178870
 static void cftexp1(S32 n, F32 *a, S32 nw, F32 *w)
 {
   S32 j, k, l;
@@ -1878,6 +1901,7 @@ static void cftexp1(S32 n, F32 *a, S32 nw, F32 *w)
 }
 
 // match: _cftexp2 @ 0x0025CE00
+// sp-match: _cftexp2 @ 0x00178C70
 static void cftexp2(S32 n, F32 *a, S32 nw, F32 *w)
 {
   S32 j, k, l, m;
@@ -1921,6 +1945,7 @@ static void cftexp2(S32 n, F32 *a, S32 nw, F32 *w)
 }
 
 // match: _cftrec1 @ 0x0025D2A0
+// sp-match: _cftrec1 @ 0x00179110
 static void cftrec1(S32 n, F32 *a, S32 nw, F32 *w)
 {
   S32 m;
@@ -1941,6 +1966,7 @@ static void cftrec1(S32 n, F32 *a, S32 nw, F32 *w)
 }
 
 // match: _cftrec2 @ 0x0025D340
+// sp-match: _cftrec2 @ 0x001791B0
 static void cftrec2(S32 n, F32 *a, S32 nw, F32 *w)
 {
   S32 m;
@@ -1961,6 +1987,7 @@ static void cftrec2(S32 n, F32 *a, S32 nw, F32 *w)
 }
 
 // match: _cftfsub @ 0x0025D3E0
+// sp-match: _cftfsub @ 0x00179250
 static void cftfsub(S32 n, F32 *a, S32 *ip, S32 nw, F32 *w)
 {
   S32 m;
@@ -2010,6 +2037,7 @@ static void cftfsub(S32 n, F32 *a, S32 *ip, S32 nw, F32 *w)
 }
 
 // match: _cftbsub @ 0x0025D510
+// sp-match: _cftbsub @ 0x00179380
 static void cftbsub(S32 n, F32 *a, S32 *ip, S32 nw, F32 *w)
 {
   S32 m;
@@ -2059,6 +2087,7 @@ static void cftbsub(S32 n, F32 *a, S32 *ip, S32 nw, F32 *w)
 }
 
 // match: _rdft@20 @ 0x0025D640
+// sp-match: _rdft@20 @ 0x001794B0
 RADEXPFUNC void RADEXPLINK rdft(S32 n, S32 isgn, F32 *a, S32 *ip, F32 *w)
 {
   S32 nw, nc;
@@ -2108,6 +2137,7 @@ RADEXPFUNC void RADEXPLINK rdft(S32 n, S32 isgn, F32 *a, S32 *ip, F32 *w)
 }
 
 // match: _ddct@20 @ 0x0025D780
+// sp-match: _ddct@20 @ 0x001795F0
 RADEXPFUNC void RADEXPLINK ddct(S32 n, S32 isgn, F32 *a, S32 *ip, F32 *w)
 {
   S32 j, nw, nc;

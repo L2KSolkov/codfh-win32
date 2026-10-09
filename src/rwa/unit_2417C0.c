@@ -554,6 +554,7 @@ RwUInt8 unk_506C3C[796];
 // match: _unk_42EE18 @ 0x0042EE18
 
 // match: _RwaListenerInterfaceRegister @ 0x002417C0
+// sp-match: _RwaListenerInterfaceRegister @ 0x00155900
 
 void *
 RwaListenerInterfaceRegister(void)
@@ -570,6 +571,7 @@ RwaListenerInterfaceRegister(void)
 }
 
 // match: _sub_241810 @ 0x00241810
+// sp-match: _sub_241810 @ 0x00155950
 RwBool
 sub_241810(void)
 {
@@ -577,6 +579,7 @@ sub_241810(void)
 }
 
 // match: _RwaVoice3DInterfaceRegister @ 0x00241820
+// sp-match: _RwaVoice3DInterfaceRegister @ 0x00155960
 void *
 RwaVoice3DInterfaceRegister(void)
 {
@@ -592,6 +595,7 @@ RwaVoice3DInterfaceRegister(void)
 }
 
 // match: _sub_241870 @ 0x00241870
+// sp-match: _sub_241870 @ 0x001559B0
 RwBool
 sub_241870(void)
 {
@@ -599,6 +603,7 @@ sub_241870(void)
 }
 
 // match: _RwaVirtualVoiceInterfaceRegister @ 0x00241880
+// sp-match: _RwaVirtualVoiceInterfaceRegister @ 0x001559C0
 void *
 RwaVirtualVoiceInterfaceRegister(void)
 {
@@ -614,6 +619,7 @@ RwaVirtualVoiceInterfaceRegister(void)
 }
 
 // match: _sub_2418D0 @ 0x002418D0
+// sp-match: _sub_2418D0 @ 0x00155A10
 RwBool
 sub_2418D0(void)
 {

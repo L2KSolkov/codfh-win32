@@ -34,11 +34,13 @@ RWS_REGISTERCLASS(ParticleTrigger);
 // match: ?MakeNew@ParticleTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A6D80
 // match: __ehhandler$?MakeNew@ParticleTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFFF0
 // match: __ehhandler$?MakeNew@ParticleTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFFFF
+// sp-match: ?MakeNew@ParticleTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000836F0
 RWS_DEFINE_MAKENEW(ParticleTrigger)
 
 // match: ??0ParticleTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A6E00
 // match: __ehhandler$??0ParticleTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x8 @ 0x00300010
 // match: __ehhandler$??0ParticleTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300018
+// sp-match: ??0ParticleTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00082520
 ParticleTrigger::ParticleTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     memset(unk_C0, 0, 0x2BC);
@@ -47,12 +49,15 @@ ParticleTrigger::ParticleTrigger(const RWS::CAttributePacket &attr) : Trigger(at
 }
 
 // match: ?vf_008@ParticleTrigger@@UAEHXZ @ 0x000A6EF0
+// sp-match: ?vf_008@ParticleTrigger@@UAEHXZ @ 0x000825E0
 
 // match: ??_GParticleTrigger@@UAEPAXI@Z @ 0x000A6F00
+// sp-match: ??_GParticleTrigger@@UAEPAXI@Z @ 0x000836E0
 
 // match: ??1ParticleTrigger@@UAE@XZ @ 0x000A6F20
 // match: __ehhandler$??1ParticleTrigger@@UAE@XZ-0x8 @ 0x00300030
 // match: __ehhandler$??1ParticleTrigger@@UAE@XZ @ 0x00300038
+// sp-match: ??1ParticleTrigger@@UAE@XZ @ 0x00082600
 ParticleTrigger::~ParticleTrigger()
 {
     sub_A8F40();
@@ -62,6 +67,7 @@ ParticleTrigger::~ParticleTrigger()
 
 // Commands in fives, one per emitter (0 to 123).
 // match: ?HandleAttributes@ParticleTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A6FA0
+// sp-match: ?HandleAttributes@ParticleTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00082680
 void ParticleTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -504,6 +510,7 @@ void ParticleTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 
 // On dword_4B67B8 it stops its emitters.
 // match: ?HandleEvents@ParticleTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000A8D30
+// sp-match: ?HandleEvents@ParticleTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000836B0
 void ParticleTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
     Trigger::HandleEvents(pMsg);
@@ -514,6 +521,7 @@ void ParticleTrigger::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?vf_020@ParticleTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000A8D70
+// sp-match: ?vf_020@ParticleTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000823C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_3D3548 *ParticleTrigger::vf_020()
 {
@@ -546,6 +554,7 @@ type_3D3548 *ParticleTrigger::vf_020()
 }
 
 // match: ?sub_A8EE0@ParticleTrigger@@QAEXPAUtype_F5740@@@Z @ 0x000A8EE0
+// sp-match: ?sub_A8EE0@ParticleTrigger@@QAEXPAUtype_F5740@@@Z @ 0x00082480
 void ParticleTrigger::sub_A8EE0(type_F5740 *arg_0)
 {
     RwInt32 var_4;
@@ -560,6 +569,7 @@ void ParticleTrigger::sub_A8EE0(type_F5740 *arg_0)
 }
 
 // match: ?sub_A8F40@ParticleTrigger@@QAEXXZ @ 0x000A8F40
+// sp-match: ?sub_A8F40@ParticleTrigger@@QAEXXZ @ 0x000824E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void ParticleTrigger::sub_A8F40()
 {
@@ -578,3 +588,4 @@ void ParticleTrigger::sub_A8F40()
 }
 
 // match: ??_EParticleTrigger@@WBI@AEPAXI@Z @ 0x000A8FB0
+// sp-match: ??_EParticleTrigger@@WBI@AEPAXI@Z @ 0x000825F0

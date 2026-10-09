@@ -144,6 +144,7 @@ RwStreamSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc 
 // match: __rwStreamFreeListPreallocBlocks @ 0x0043548C
 
 // match: __rwStreamModuleOpen @ 0x002A6C50
+// sp-match: __rwStreamModuleOpen @ 0x001C2080
 
 void               *
 _rwStreamModuleOpen(void *instance, RwInt32 offset,
@@ -177,6 +178,7 @@ _rwStreamModuleOpen(void *instance, RwInt32 offset,
  */
 
 // match: __rwStreamModuleClose @ 0x002A6CA0
+// sp-match: __rwStreamModuleClose @ 0x001C20D0
 void               *
 _rwStreamModuleClose(void *instance,
                      RwInt32 __RWUNUSED__ offset,
@@ -236,6 +238,7 @@ StreamFileInitialize(RwStream * stream,
 }
 
 // match: _StreamFileNameInitialize @ 0x002A6CD0
+// sp-match: _StreamFileNameInitialize @ 0x001C2100
 static RwStream    *
 StreamFileNameInitialize(RwStream * stream,
                          RwStreamAccessType accessType,
@@ -290,6 +293,7 @@ StreamFileNameInitialize(RwStream * stream,
 }
 
 // match: _StreamMemoryInitialize @ 0x002A6D60
+// sp-match: _StreamMemoryInitialize @ 0x001C2190
 static RwStream    *
 StreamMemoryInitialize(RwStream * stream,
                        RwStreamAccessType accessType,
@@ -400,6 +404,7 @@ StreamCustomInitialize(RwStream * stream,
  *
  */
 // match: __rwStreamInitialize @ 0x002A6DE0
+// sp-match: __rwStreamInitialize @ 0x001C2210
 RwStream           *
 _rwStreamInitialize(RwStream * stream, RwBool rwOwned, RwStreamType type,
                    RwStreamAccessType accessType, const void *pData)
@@ -466,6 +471,7 @@ _rwStreamInitialize(RwStream * stream, RwBool rwOwned, RwStreamType type,
  *
  */
 // match: _RwStreamRead @ 0x002A6EE0
+// sp-match: _RwStreamRead @ 0x001C2310
 RwUInt32
 RwStreamRead(RwStream *stream, void *buffer, RwUInt32 length)
 {
@@ -564,6 +570,7 @@ RwStreamRead(RwStream *stream, void *buffer, RwUInt32 length)
  *
  */
 // match: _RwStreamWrite @ 0x002A7050
+// sp-match: _RwStreamWrite @ 0x001C2480
 RwStream *
 RwStreamWrite(RwStream *stream, void const *buffer, RwUInt32 length)
 {
@@ -688,6 +695,7 @@ RwStreamWrite(RwStream *stream, void const *buffer, RwUInt32 length)
  *
  */
 // match: _RwStreamSkip @ 0x002A7210
+// sp-match: _RwStreamSkip @ 0x001C2640
 RwStream *
 RwStreamSkip(RwStream *stream, RwUInt32 offset)
 {
@@ -796,6 +804,7 @@ RwStreamSkip(RwStream *stream, RwUInt32 offset)
  *
  */
 // match: _RwStreamClose @ 0x002A7340
+// sp-match: _RwStreamClose @ 0x001C2770
 RwBool
 RwStreamClose(RwStream *stream, void *pData)
 {
@@ -902,6 +911,7 @@ RwStreamClose(RwStream *stream, void *pData)
  *
  */
 // match: _RwStreamOpen @ 0x002A7410
+// sp-match: _RwStreamOpen @ 0x001C2840
 RwStream *
 RwStreamOpen(RwStreamType type, RwStreamAccessType accessType,
              const void *pData)

@@ -138,6 +138,7 @@ _rt2dPickRegionInit(Rt2dObject *pickRegion)
 // match: _rcsid @ 0x003EE404
 
 // match: __rt2dPickRegionDestruct @ 0x00256D20
+// sp-match: __rt2dPickRegionDestruct @ 0x0016D550
 RwBool
 _rt2dPickRegionDestruct(Rt2dObject *object)
 {
@@ -223,6 +224,7 @@ Rt2dPickRegionGetPath(Rt2dObject *pickRegion)
  * \see Rt2dPickRegionGetPath
  */
 RwBool
+// sp-match: _Rt2dPickRegionIsPointIn @ 0x0016D570
 Rt2dPickRegionIsPointIn(Rt2dObject *pickRegion, RwV2d *point)
 {
     RwV2d localPoint;
@@ -374,6 +376,7 @@ Rt2dPickRegionStreamGetSize(Rt2dObject *pickRegion)
 
 
 Rt2dObject *
+// sp-match: __rt2dPickRegionStreamReadTo @ 0x0016D5F0
 _rt2dPickRegionStreamReadTo(Rt2dObject *pickRegion, RwStream *stream)
 {
     RwUInt32 size, version;
@@ -456,6 +459,7 @@ Rt2dPickRegionStreamRead(RwStream *stream)
 }
 
 Rt2dObject *
+// sp-match: __rt2dPickRegionRender @ 0x0016D650
 _rt2dPickRegionRender(Rt2dObject *object)
 {
     RWFUNCTION(RWSTRING("_rt2dPickRegionRender"));

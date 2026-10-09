@@ -65,37 +65,44 @@ RWS_REGISTERCLASS(CWeaponBehavior);
 
 // match: _$E2 @ 0x0030ACC0
 // match: _$E3 @ 0x0030E210
+// sp-match: _$E2 @ 0x0021D050
 
 // (The class factory's registration and its exit thunk.)
 RWS_IMPLEMENT_CLASSID(CExplosiveBehavior);
 RWS_REGISTERCLASS(CExplosiveBehavior);
 // match: _$E5 @ 0x0030ACF0
 // match: _$E6 @ 0x0030E220
+// sp-match: _$E5 @ 0x0021D080
 // (The class factory's registration and its exit thunk.)
 RWS_IMPLEMENT_CLASSID(CTankBehavior);
 RWS_REGISTERCLASS(CTankBehavior);
 // match: _$E8 @ 0x0030AD20
 // match: _$E9 @ 0x0030E230
+// sp-match: _$E8 @ 0x0021D0B0
 // (The class factory's registration and its exit thunk.)
 RWS_IMPLEMENT_CLASSID(CAntiTankBehavior);
 RWS_REGISTERCLASS(CAntiTankBehavior);
 // match: _$E11 @ 0x0030AD50
 // match: _$E12 @ 0x0030E240
+// sp-match: _$E11 @ 0x0021D0E0
 // (The class factory's registration and its exit thunk.)
 RWS_IMPLEMENT_CLASSID(CGrenadeBehavior);
 RWS_REGISTERCLASS(CGrenadeBehavior);
 // match: _$E14 @ 0x0030AD80
 // match: _$E15 @ 0x0030E250
+// sp-match: _$E14 @ 0x0021D110
 // (The class factory's registration and its exit thunk.)
 
 // match: ?MakeNew@CWeaponBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C10B0
 // match: __ehhandler$?MakeNew@CWeaponBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300670
 // match: __ehhandler$?MakeNew@CWeaponBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030067F
+// sp-match: ?MakeNew@CWeaponBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00095F60
 RWS_DEFINE_MAKENEW(CWeaponBehavior)
 
 // match: ??0CWeaponBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C1130
 // match: __ehhandler$??0CWeaponBehavior@@QAE@ABVCAttributePacket@RWS@@@Z-0x13 @ 0x00300610
 // match: __ehhandler$??0CWeaponBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300623
+// sp-match: ??0CWeaponBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00093810
 CWeaponBehavior::CWeaponBehavior(const RWS::CAttributePacket &attr)
 {
     unk_24 = 0;
@@ -103,10 +110,12 @@ CWeaponBehavior::CWeaponBehavior(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_GCWeaponBehavior@@UAEPAXI@Z @ 0x000C1210
+// sp-match: ??_GCWeaponBehavior@@UAEPAXI@Z @ 0x00093A80
 
 // match: ??1CWeaponBehavior@@UAE@XZ @ 0x000C1230
 // match: __ehhandler$??1CWeaponBehavior@@UAE@XZ-0x2F @ 0x00300630
 // match: __ehhandler$??1CWeaponBehavior@@UAE@XZ @ 0x0030065F
+// sp-match: ??1CWeaponBehavior@@UAE@XZ @ 0x00093890
 CWeaponBehavior::~CWeaponBehavior()
 {
     UnLinkMsg(dword_4B8750);
@@ -118,6 +127,7 @@ CWeaponBehavior::~CWeaponBehavior()
 // reproduces; commands 83, 88, 93, 160, 170 and 180 also update the players'
 // copies of the weapon once they have them (unk_24).
 // match: ?HandleAttributes@CWeaponBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C12C0
+// sp-match: ?HandleAttributes@CWeaponBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00093A90
 void CWeaponBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     type_4C19C0 *var_14;
@@ -152,7 +162,13 @@ void CWeaponBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
         {
             RwReal var_18 = *(const RwReal *)ebp_10->GetAs_RwChar_ptr();
 
+#ifdef CODFH_SP
+            // shape: two separate products, not folded into one constant (SP: fmul 0.5, fmul 0.017453292)
+            var_18 = var_18 * 0.5f;
+            var_18 = var_18 * 0.017453292f;
+#else
             var_18 = var_18 * 0.5f * 0.017453292f;
+#endif
             var_14->unk_324 = tan_ref(var_18);
             break;
         }
@@ -1176,6 +1192,7 @@ void CWeaponBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 
 // On dword_4B8750: the players have their weapons (unk_24), once.
 // match: ?HandleEvents@CWeaponBehavior@@UAEXAAVCMsg@RWS@@@Z @ 0x000C47F0
+// sp-match: ?HandleEvents@CWeaponBehavior@@UAEXAAVCMsg@RWS@@@Z @ 0x00096940
 void CWeaponBehavior::HandleEvents(RWS::CMsg &pMsg)
 {
     if (pMsg.Id.p_msgrec == dword_4B8750.p_msgrec)
@@ -1186,23 +1203,28 @@ void CWeaponBehavior::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?MakeNew@CExplosiveBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C4830
+// sp-match: ?MakeNew@CExplosiveBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00095FC0
 // (its EH handler is CWeaponBehavior's,
 // folded by /OPT:ICF.)
 RWS_DEFINE_MAKENEW(CExplosiveBehavior)
 
 // match: ??0CExplosiveBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C48B0
+// sp-match: ??0CExplosiveBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00093900
 CExplosiveBehavior::CExplosiveBehavior(const RWS::CAttributePacket &attr) : CWeaponBehavior(attr)
 {
 }
 
 // match: ??_GCExplosiveBehavior@@UAEPAXI@Z @ 0x000C48E0
+// sp-match: ??_GCExplosiveBehavior@@UAEPAXI@Z @ 0x00095A30
 
 // match: ??1CExplosiveBehavior@@UAE@XZ @ 0x000C4900
+// sp-match: ??1CExplosiveBehavior@@UAE@XZ @ 0x00093920
 CExplosiveBehavior::~CExplosiveBehavior()
 {
 }
 
 // match: ?HandleAttributes@CExplosiveBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C4930
+// sp-match: ?HandleAttributes@CExplosiveBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00095A40
 void CExplosiveBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     type_4C19C0 *local_C;
@@ -1259,29 +1281,35 @@ void CExplosiveBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?HandleEvents@CExplosiveBehavior@@UAEXAAVCMsg@RWS@@@Z @ 0x000C4BF0
+// sp-match: ?HandleEvents@CExplosiveBehavior@@UAEXAAVCMsg@RWS@@@Z @ 0x00093940
 void CExplosiveBehavior::HandleEvents(RWS::CMsg &pMsg)
 {
     CWeaponBehavior::HandleEvents(pMsg);
 }
 
 // match: ?MakeNew@CTankBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C4C10
+// sp-match: ?MakeNew@CTankBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00096020
 // (its EH handler is CWeaponBehavior's,
 // folded by /OPT:ICF.)
 RWS_DEFINE_MAKENEW(CTankBehavior)
 
 // match: ??0CTankBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C4C90
+// sp-match: ??0CTankBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00093950
 CTankBehavior::CTankBehavior(const RWS::CAttributePacket &attr) : CExplosiveBehavior(attr)
 {
 }
 
 // match: ??_GCTankBehavior@@UAEPAXI@Z @ 0x000C4CC0
+// sp-match: ??_GCTankBehavior@@UAEPAXI@Z @ 0x00095C40
 
 // match: ??1CTankBehavior@@UAE@XZ @ 0x000C4CE0
+// sp-match: ??1CTankBehavior@@UAE@XZ @ 0x00093970
 CTankBehavior::~CTankBehavior()
 {
 }
 
 // match: ?HandleAttributes@CTankBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C4D10
+// sp-match: ?HandleAttributes@CTankBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00095C50
 void CTankBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     CExplosiveBehavior::HandleAttributes(attr);
@@ -1294,24 +1322,29 @@ void CTankBehavior::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?MakeNew@CAntiTankBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C4D30
+// sp-match: ?MakeNew@CAntiTankBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00096080
 // (its EH handler is CWeaponBehavior's,
 // folded by /OPT:ICF.)
 RWS_DEFINE_MAKENEW(CAntiTankBehavior)
 
 // match: ??0CAntiTankBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C4DB0
+// sp-match: ??0CAntiTankBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000939A0
 CAntiTankBehavior::CAntiTankBehavior(const RWS::CAttributePacket &attr) : CExplosiveBehavior(attr)
 {
 }
 
 // match: ??_GCAntiTankBehavior@@UAEPAXI@Z @ 0x000C4DE0
+// sp-match: ??_GCAntiTankBehavior@@UAEPAXI@Z @ 0x00095C60
 
 // match: ??1CAntiTankBehavior@@UAE@XZ @ 0x000C4E00
+// sp-match: ??1CAntiTankBehavior@@UAE@XZ @ 0x000939C0
 CAntiTankBehavior::~CAntiTankBehavior()
 {
 }
 
 // Command 0 names a value (a kind 1) whose number goes to unk_4DC.
 // match: ?HandleAttributes@CAntiTankBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C4E30
+// sp-match: ?HandleAttributes@CAntiTankBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00095C70
 void CAntiTankBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     type_4C19C0 *local_C;
@@ -1346,24 +1379,29 @@ void CAntiTankBehavior::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?MakeNew@CGrenadeBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C4F10
+// sp-match: ?MakeNew@CGrenadeBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000960E0
 // (its EH handler is CWeaponBehavior's,
 // folded by /OPT:ICF.)
 RWS_DEFINE_MAKENEW(CGrenadeBehavior)
 
 // match: ??0CGrenadeBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C4F90
+// sp-match: ??0CGrenadeBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000939E0
 CGrenadeBehavior::CGrenadeBehavior(const RWS::CAttributePacket &attr) : CExplosiveBehavior(attr)
 {
     unk_20 = 1;
 }
 
 // match: ??_GCGrenadeBehavior@@UAEPAXI@Z @ 0x000C4FD0
+// sp-match: ??_GCGrenadeBehavior@@UAEPAXI@Z @ 0x00095D30
 
 // match: ??1CGrenadeBehavior@@UAE@XZ @ 0x000C4FF0
+// sp-match: ??1CGrenadeBehavior@@UAE@XZ @ 0x00093A10
 CGrenadeBehavior::~CGrenadeBehavior()
 {
 }
 
 // match: ?HandleAttributes@CGrenadeBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C5020
+// sp-match: ?HandleAttributes@CGrenadeBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00095D40
 void CGrenadeBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     type_4C19C0 *local_C;
@@ -1440,17 +1478,23 @@ void CGrenadeBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 // CTankBehavior's and CAntiTankBehavior's, identical, are folded into this
 // one by /OPT:ICF.
 // match: ?HandleEvents@CGrenadeBehavior@@UAEXAAVCMsg@RWS@@@Z @ 0x000C5310
+// sp-match: ?HandleEvents@CGrenadeBehavior@@UAEXAAVCMsg@RWS@@@Z @ 0x00093990
 void CGrenadeBehavior::HandleEvents(RWS::CMsg &pMsg)
 {
     CExplosiveBehavior::HandleEvents(pMsg);
 }
 
 // match: ??_ECTankBehavior@@WBI@AEPAXI@Z @ 0x000C5330
+// sp-match: ??_ECTankBehavior@@WBI@AEPAXI@Z @ 0x00093A30
 
 // match: ??_ECAntiTankBehavior@@WBI@AEPAXI@Z @ 0x000C5340
+// sp-match: ??_ECAntiTankBehavior@@WBI@AEPAXI@Z @ 0x00093A40
 
 // match: ??_ECGrenadeBehavior@@WBI@AEPAXI@Z @ 0x000C5350
+// sp-match: ??_ECGrenadeBehavior@@WBI@AEPAXI@Z @ 0x00093A60
 
 // match: ??_ECWeaponBehavior@@WBI@AEPAXI@Z @ 0x000C5360
+// sp-match: ??_ECWeaponBehavior@@WBI@AEPAXI@Z @ 0x00093A50
 
 // match: ??_ECExplosiveBehavior@@WBI@AEPAXI@Z @ 0x000C5370
+// sp-match: ??_ECExplosiveBehavior@@WBI@AEPAXI@Z @ 0x00093A70

@@ -64,13 +64,22 @@ RWS_REGISTERCLASS(AddTaskTrigger);
 // match: ??_7AddTaskTrigger@@6BCAttributeHandler@RWS@@@ @ 0x003D58D0
 // match: ??_C@_0N@IEEPMDEE@AddTaskGroup?$AA@ @ 0x003D5900
 // match: ??_C@_0BA@PFNAONHM@AddTaskToObject?$AA@ @ 0x003D5910
+// sp-match: ?vf_01C@Trigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x0007C270
+// sp-match: ?vf_008@AddTaskTrigger@@UAEHXZ @ 0x0007C280
+// sp-match: ??_GAddTaskTrigger@@UAEPAXI@Z @ 0x0007C5A0
+// sp-match: ??_EAddTaskTrigger@@WBI@AEPAXI@Z @ 0x0007C590
+// sp-match: ?vf_00C@Trigger@@UAEHXZ @ 0x00028300
+// sp-match: ?vf_018@Trigger@@UAEHXZ @ 0x00088220
+// sp-match: ?vf_024@Trigger@@UAEHXZ @ 0x00061D70
 
 // match: ?MakeNew@AddTaskTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0009DD80
 // match: __ehhandler$?MakeNew@AddTaskTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFB90
 // match: __ehhandler$?MakeNew@AddTaskTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFB9F
+// sp-match: ?MakeNew@AddTaskTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007CC60
 RWS_DEFINE_MAKENEW(AddTaskTrigger)
 
 // match: ??0AddTaskTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0009DE00
+// sp-match: ??0AddTaskTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007C1A0
 AddTaskTrigger::AddTaskTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_D4 = -1;
@@ -99,6 +108,7 @@ AddTaskTrigger::AddTaskTrigger(const RWS::CAttributePacket &attr) : Trigger(attr
 // match: ??1AddTaskTrigger@@UAE@XZ @ 0x0009E070
 // match: __ehhandler$??1AddTaskTrigger@@UAE@XZ-0x8 @ 0x002FFBB0
 // match: __ehhandler$??1AddTaskTrigger@@UAE@XZ @ 0x002FFBB8
+// sp-match: ??1AddTaskTrigger@@UAE@XZ @ 0x0007C290
 AddTaskTrigger::~AddTaskTrigger()
 {
     if (unk_C0 != 0)
@@ -113,6 +123,7 @@ AddTaskTrigger::~AddTaskTrigger()
 // band (times 100, squared); 8: how many at a time; 10: the entity lists;
 // 11: its point's object; 12: a second task; 13 to 18: by side.
 // match: ?HandleAttributes@AddTaskTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0009E0F0
+// sp-match: ?HandleAttributes@AddTaskTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007C820
 void AddTaskTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -226,6 +237,7 @@ void AddTaskTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 // On dword_4B67B8 it drops its registration and restarts its count; on
 // dword_4B67C0 it registers sub_9E850 on its task group's message.
 // match: ?HandleEvents@AddTaskTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x0009E770
+// sp-match: ?HandleEvents@AddTaskTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x0007CBD0
 void AddTaskTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
     type_4492FC *var_4;
@@ -248,6 +260,7 @@ void AddTaskTrigger::HandleEvents(RWS::CMsg &pMsg)
     }
 }
 // match: ?sub_9E850@@YAHPAVAddTaskTrigger@@PAUtype_9E850_4@@@Z @ 0x0009E850
+// sp-match: ?sub_9E850@@YAHPAVAddTaskTrigger@@PAUtype_9E850_4@@@Z @ 0x0007C790
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_9E850(AddTaskTrigger *arg_0, type_9E850_4 *arg_4)
 {
@@ -279,6 +292,7 @@ RwInt32 sub_9E850(AddTaskTrigger *arg_0, type_9E850_4 *arg_4)
     return 1;
 }
 // match: ?sub_9E930@AddTaskTrigger@@QAEXPAUtype_3D2E7C@@PAUtype_67620@@PAUtype_3DF8D8_04@@@Z @ 0x0009E930
+// sp-match: ?sub_9E930@AddTaskTrigger@@QAEXPAUtype_3D2E7C@@PAUtype_67620@@PAUtype_3DF8D8_04@@@Z @ 0x0007C300
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void AddTaskTrigger::sub_9E930(type_3D2E7C *arg_0, type_67620 *arg_4, type_3DF8D8_04 *arg_8)
 {
@@ -291,6 +305,7 @@ void AddTaskTrigger::sub_9E930(type_3D2E7C *arg_0, type_67620 *arg_4, type_3DF8D
     sub_6B5F0("AddTaskToObject", (type_67620 *)arg_0, (type_42E00_10 *)((RwInt32)this), (type_3D2E7C *)((RwInt32)arg_4), (RwInt32 *)(&var_8), 2, true, false);
 }
 // match: ?sub_9E990@AddTaskTrigger@@QAEXPAUtype_67620@@@Z @ 0x0009E990
+// sp-match: ?sub_9E990@AddTaskTrigger@@QAEXPAUtype_67620@@@Z @ 0x0007C5B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void AddTaskTrigger::sub_9E990(type_67620 *arg_0)
 {
@@ -396,6 +411,7 @@ void AddTaskTrigger::sub_9E990(type_67620 *arg_0)
     }
 }
 // match: ?sub_9ECE0@AddTaskTrigger@@QAEXPAUtype_3D3548@@PAUtype_9ECE0@@PAH@Z @ 0x0009ECE0
+// sp-match: ?sub_9ECE0@AddTaskTrigger@@QAEXPAUtype_3D3548@@PAUtype_9ECE0@@PAH@Z @ 0x0007C350
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void AddTaskTrigger::sub_9ECE0(type_3D3548 *arg_0, type_9ECE0 *arg_4, RwInt32 *arg_8)
 {
@@ -464,6 +480,7 @@ void AddTaskTrigger::sub_9ECE0(type_3D3548 *arg_0, type_9ECE0 *arg_4, RwInt32 *a
     }
 }
 // match: ?sub_9EED0@AddTaskTrigger@@QAEXPAUtype_3D3548@@@Z @ 0x0009EED0
+// sp-match: ?sub_9EED0@AddTaskTrigger@@QAEXPAUtype_3D3548@@@Z @ 0x0007C480
 void AddTaskTrigger::sub_9EED0(type_3D3548 *arg_0)
 {
     RwInt32 var_4;
@@ -488,6 +505,7 @@ void AddTaskTrigger::sub_9EED0(type_3D3548 *arg_0)
     }
 }
 // match: ?sub_9EFD0@AddTaskTrigger@@QAEXPAUtype_3D3548@@@Z @ 0x0009EFD0
+// sp-match: ?sub_9EFD0@AddTaskTrigger@@QAEXPAUtype_3D3548@@@Z @ 0x0007C500
 void AddTaskTrigger::sub_9EFD0(type_3D3548 *arg_0)
 {
     RwInt32 var_4;

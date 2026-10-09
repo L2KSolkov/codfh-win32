@@ -16,6 +16,18 @@ static RwUInt8 unk_50708C[0x24];        /* interface definitions */
 static rwaLink dword_5070B0;            /* all interface definitions */
 static RwUInt32 dword_5070B8;
 
+#ifdef CODFH_SP
+/* An unreferenced null pointer: default.xbe has it after unit_242910's __real@40e38e39 and before
+ * unit_245240's IDs (SP 0x2EE5C0), where this object's code follows unit_242910's; multiplayer's
+ * copy (0x3ED790, after unit_243AE0's interface IDs, this object's code following that unit's)
+ * stays in unit_243AE0.c, its placed row there. */
+// sp-match: _unk_3ED790 @ 0x002EE5C0
+void *const unk_3ED790[1] =
+{
+    0,
+};
+#endif
+
 /* prepareInterfaceDefinition: an inline with no address, named for its role.
  * Evidence: sub_243E20 has a shared initialization block after allocation and
  * flag selection; a pointer-returning inline preserves its branch placement. */
@@ -69,6 +81,7 @@ static __forceinline rwaObjInterface *allocateInterfaceInstance(RwUInt32 size, v
     return objInterface;
 }
 // match: _sub_243B40 @ 0x00243B40
+// sp-match: _sub_243B40 @ 0x00157EF0
 RwBool
 sub_243B40(void)
 {
@@ -86,6 +99,7 @@ sub_243B40(void)
     return FALSE;
 }
 // match: _sub_243B80 @ 0x00243B80
+// sp-match: _sub_243B80 @ 0x00157F30
 RwBool
 sub_243B80(rwaObjInterface *objInterface)
 {
@@ -107,6 +121,7 @@ sub_243B80(rwaObjInterface *objInterface)
     return TRUE;
 }
 // match: _sub_243BC0 @ 0x00243BC0
+// sp-match: _sub_243BC0 @ 0x00157F70
 RwaObjInterfaceDef *
 sub_243BC0(RwaObjInterfaceDef *def, rwaObjDef *objDef, RwBool a)
 {
@@ -155,6 +170,7 @@ sub_243BC0(RwaObjInterfaceDef *def, rwaObjDef *objDef, RwBool a)
     return compatible ? def : NULL;
 }
 // match: _sub_243CD0 @ 0x00243CD0
+// sp-match: _sub_243CD0 @ 0x00158080
 RwaObjInterfaceDef *
 sub_243CD0(RwaObjInterfaceDef *def, _rwaParamID *inputs, RwUInt32 noInputs,
            _rwaParamID *outputs, RwUInt32 noOutputs)
@@ -219,6 +235,7 @@ sub_243CD0(RwaObjInterfaceDef *def, _rwaParamID *inputs, RwUInt32 noInputs,
     }
 }
 // match: _RwaWaveDictAssignID @ 0x00243DF0
+// sp-match: _RwaWaveDictAssignID @ 0x001581A0
 RwaObjInterfaceDef *
 RwaWaveDictAssignID(RwaObjInterfaceDef *def, const RwaUUID *uuid, const RwChar *name)
 {
@@ -228,6 +245,7 @@ RwaWaveDictAssignID(RwaObjInterfaceDef *def, const RwaUUID *uuid, const RwChar *
     return def;
 }
 // match: _sub_243E20 @ 0x00243E20
+// sp-match: _sub_243E20 @ 0x001581D0
 RwaObjInterfaceDef *
 sub_243E20(RwaObjInterfaceDef *def)
 {
@@ -254,6 +272,7 @@ sub_243E20(RwaObjInterfaceDef *def)
     return def;
 }
 // match: _sub_243EA0 @ 0x00243EA0
+// sp-match: _sub_243EA0 @ 0x00158250
 RwBool
 sub_243EA0(RwaObjInterfaceDef *def)
 {
@@ -295,6 +314,7 @@ sub_243EA0(RwaObjInterfaceDef *def)
     return TRUE;
 }
 // match: _sub_243F40 @ 0x00243F40
+// sp-match: _sub_243F40 @ 0x001582F0
 RwaObjInterfaceDef *
 sub_243F40(const RwaUUID *uuid)
 {
@@ -318,6 +338,7 @@ sub_243F40(const RwaUUID *uuid)
     return NULL;
 }
 // match: _sub_243F90 @ 0x00243F90
+// sp-match: _sub_243F90 @ 0x00158340
 void
 sub_243F90(void)
 {
@@ -332,6 +353,7 @@ sub_243F90(void)
     dword_5070B8 = 0;
 }
 // match: _sub_243FF0 @ 0x00243FF0
+// sp-match: _sub_243FF0 @ 0x001583A0
 rwaObjInterface *
 sub_243FF0(RwaObjInterfaceDef *def, rwaObjDef *objDef,
            void *(*allocFunc)(RwUInt32 size, void *data), void *data)

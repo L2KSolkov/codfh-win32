@@ -40,6 +40,12 @@
 #include "types/type_10F710.h"
 #include "rws/maths.h"
 
+#ifdef CODFH_SP // static in single player (defined below)
+static RwInt32 sub_181A90(type_3DE350 *arg_0, RwV3d *arg_4, RwReal arg_8, RwV3d *arg_C, RwReal *arg_10,
+                          RwReal *arg_14, RwReal *arg_18);
+static RwInt32 sub_181D20(type_3DE350 *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal *arg_C);
+#endif
+
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003DE0DC
 extern const RwReal flt_3DE0DC = 16.666666f;
@@ -67,6 +73,7 @@ extern const RwReal flt_3DE0DC = 16.666666f;
 // match: ?sub_17E680@@YAPAUtype_3D3548@@PAVGimpVehicleTrigger@@@Z @ 0x0017E680
 // match: __ehhandler$?sub_17E680@@YAPAUtype_3D3548@@PAVGimpVehicleTrigger@@@Z-0x35 @ 0x00302220
 // match: __ehhandler$?sub_17E680@@YAPAUtype_3D3548@@PAVGimpVehicleTrigger@@@Z @ 0x00302255
+// sp-match: ?sub_17E680@@YAPAUtype_3D3548@@PAVGimpVehicleTrigger@@@Z @ 0x00119A70
 
 // Builds the gimp vehicle for the trigger arg_0, or warns that there is no
 // entity memory for it.
@@ -81,38 +88,47 @@ type_3D3548 *sub_17E680(GimpVehicleTrigger *arg_0)
             sub_D5A60(var_10, 0);
             var_10 = 0;
         }
-    } else
+    }
+#ifndef CODFH_SP
+    // Single player compiles the debug print out (SP 0x119A70).
+    else
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
                    "location(%6.2f,%6.2f,%6.2f)",
                    arg_0->unk_90, arg_0->unk_94, arg_0->unk_98);
+#endif
     return var_10;
 }
 
 // match: ?vf_0E0@type_3DE0E0@@UAEPAEXZ @ 0x0017E7E0
+// sp-match: ?vf_0E0@type_3DE0E0@@UAEPAEXZ @ 0x00117C80
 RwUInt8 *type_3DE0E0::vf_0E0()
 {
     return (RwUInt8 *)unk_96C;
 }
 
 // match: ?vf_094@type_3DE0E0@@UAEXI@Z @ 0x0017E800
+// sp-match: ?vf_094@type_3DE0E0@@UAEXI@Z @ 0x00117C90
 void type_3DE0E0::vf_094(RwUInt32 arg_0)
 {
     unk_968 = arg_0;
 }
 
 // match: ?vf_09C@type_3DE0E0@@UAEHXZ @ 0x0017E820
+// sp-match: ?vf_09C@type_3DE0E0@@UAEHXZ @ 0x00117CA0
 RwInt32 type_3DE0E0::vf_09C()
 {
     return unk_964;
 }
 
 // match: ?vf_0A0@type_3DE0E0@@UAEXI@Z @ 0x0017E840
+// sp-match: ?vf_0A0@type_3DE0E0@@UAEXI@Z @ 0x00117CB0
 void type_3DE0E0::vf_0A0(RwUInt32 arg_0)
 {
     unk_964 = arg_0;
 }
 
 // match: ?vf_234@type_3DE0E0@@UAEHH@Z @ 0x0017E860
+// sp-match: ?vf_234@type_3DE0E0@@UAEHH@Z @ 0x00117CC0
 RwInt32 type_3DE0E0::vf_234(RwInt32 arg_0)
 {
     unk_658.unk_300 = arg_0;
@@ -120,12 +136,14 @@ RwInt32 type_3DE0E0::vf_234(RwInt32 arg_0)
 }
 
 // match: ?vf_174@type_3DE0E0@@UAEHXZ @ 0x0017E880
+// sp-match: ?vf_174@type_3DE0E0@@UAEHXZ @ 0x00117CE0
 RwInt32 type_3DE0E0::vf_174()
 {
     return unk_980;
 }
 
 // match: ?vf_180@type_3DE0E0@@UAEXH@Z @ 0x0017E8A0
+// sp-match: ?vf_180@type_3DE0E0@@UAEXH@Z @ 0x00117CF0
 void type_3DE0E0::vf_180(RwInt32 arg_0)
 {
     unk_980 += arg_0;
@@ -134,55 +152,71 @@ void type_3DE0E0::vf_180(RwInt32 arg_0)
 }
 
 // match: ?vf_178@type_3DE0E0@@UAEXH@Z @ 0x0017E8F0
+// sp-match: ?vf_178@type_3DE0E0@@UAEXH@Z @ 0x00117D20
 void type_3DE0E0::vf_178(RwInt32 arg_0)
 {
     unk_980 = arg_0;
 }
 
 // match: ?vf_17C@type_3DE0E0@@UAEMXZ @ 0x0017E910
+// sp-match: ?vf_17C@type_3DE0E0@@UAEMXZ @ 0x00117D30
 RwReal type_3DE0E0::vf_17C()
 {
     return (RwReal)unk_980 / unk_984;
 }
 
 // match: ?vf_23C@type_3DE0E0@@UAEHXZ @ 0x0017E930
+// sp-match: ?vf_23C@type_3DE0E0@@UAEHXZ @ 0x00117D40
 RwInt32 type_3DE0E0::vf_23C()
 {
     return unk_988;
 }
 
 // match: ?vf_240@type_3DE0E0@@UAEMXZ @ 0x0017E950
+// sp-match: ?vf_240@type_3DE0E0@@UAEMXZ @ 0x00117D50
 RwReal type_3DE0E0::vf_240()
 {
     return (RwReal)unk_988 / unk_98C;
 }
 
 // match: ?vf_124@type_3DE0E0@@UAEXM@Z @ 0x0017E970
+// sp-match: ?vf_124@type_3DE0E0@@UAEXM@Z @ 0x00117D60
 void type_3DE0E0::vf_124(RwReal arg_0)
 {
     unk_978 = arg_0;
 }
 
 // match: ?vf_0F4@type_3DE0E0@@UAEPAUSplinePath@@XZ @ 0x0017E990
+// sp-match: ?vf_0F4@type_3DE0E0@@UAEPAUSplinePath@@XZ @ 0x00117D70
 SplinePath *type_3DE0E0::vf_0F4()
 {
     return unk_97C;
 }
 
 // match: ?vf_248@type_3DE0E0@@UAEMXZ @ 0x0017E9B0
+// sp-match: ?vf_248@type_3DE0E0@@UAEMXZ @ 0x000FEBD0
 RwReal type_3DE0E0::vf_248()
 {
     return -360.0f;
 }
 
+#ifdef CODFH_SP
+// sp-match: ??0type_3DE0E0@@QAE@XZ @ 0x00117D80
+// (Defined in the class: the bare constructor, which single player calls out
+// of line from the subclass's (SP 0x119A0D); multiplayer expands it.)
+#endif
+
 // match: ??_Gtype_3DE0E0@@UAEPAXI@Z @ 0x0017E9D0
 // match: ??1type_3DE0E0@@UAE@XZ @ 0x0017EA00
 // match: __ehhandler$??1type_3DE0E0@@UAE@XZ-0x24 @ 0x00302260
 // match: __ehhandler$??1type_3DE0E0@@UAE@XZ @ 0x00302284
+// sp-match: ??1type_3DE0E0@@UAE@XZ @ 0x00117C20
+// sp-match: ??_Gtype_3DE0E0@@UAEPAXI@Z @ 0x00117DE0
 // (Defined in the class: vf_230, called directly as in any destructor,
 // then the members' destructors and the base's.)
 
 // match: ?sub_17EA70@type_3DE0E0@@QAEHPAVGimpVehicleTrigger@@@Z @ 0x0017EA70
+// sp-match: ?sub_17EA70@type_3DE0E0@@QAEHPAVGimpVehicleTrigger@@@Z @ 0x00117E00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its set-up from its trigger arg_0, as the tank's (type_3DBC78's
 // sub_14D2C0): its trigger's object told of it, the base's set-up, its
@@ -320,6 +354,7 @@ RwInt32 type_3DE0E0::sub_17EA70(GimpVehicleTrigger *arg_0)
 }
 
 // match: ?sub_17F2E0@type_3DE0E0@@QAEXPAUtype_3DF8D8@@@Z @ 0x0017F2E0
+// sp-match: ?sub_17F2E0@type_3DE0E0@@QAEXPAUtype_3DF8D8@@@Z @ 0x00116CD0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its model from its data arg_0 (as the tank's vf_2F8): for its own
 // trigger (kind 0x23), the base's set-up of the model object arg_0 names
@@ -353,6 +388,7 @@ void type_3DE0E0::sub_17F2E0(type_3DF8D8 *arg_0)
 }
 
 // match: ?vf_230@type_3DE0E0@@UAEXXZ @ 0x0017F3E0
+// sp-match: ?vf_230@type_3DE0E0@@UAEXXZ @ 0x00116D80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Shuts it down once: its performance player and script object released,
 // its animation and its trigger's object let go, and unk_630 freed.
@@ -398,6 +434,7 @@ void type_3DE0E0::vf_230()
 }
 
 // match: ?vf_058@type_3DE0E0@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x0017F550
+// sp-match: ?vf_058@type_3DE0E0@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x00116E80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Whether arg_0 is one of the keys 0 to 2 of its data's model object (the
 // tank's vf_058 is folded into it).
@@ -424,6 +461,7 @@ RwInt32 type_3DE0E0::vf_058(type_3DF8D8_04 *arg_0)
 }
 
 // match: ?sub_17F620@@YAXPAUtype_7C8D0@@PAUtype_80300@@H_N@Z @ 0x0017F620
+// sp-match: ?sub_17F620@@YAXPAUtype_7C8D0@@PAUtype_80300@@H_N@Z @ 0x00118200
 // Its animation's procedural track (vf_038 starts it; arg_8 is the gimp
 // vehicle), as the tank's (sub_150350): at its start it builds its pose key
 // once (every node's rotation relative to its frame, bone 100 translated),
@@ -530,6 +568,7 @@ void sub_17F620(type_7C8D0 *arg_0, type_80300 *arg_4, RwInt32 arg_8, bool arg_C)
 }
 
 // match: ?sub_17FC00@type_3D3548@@QAEXPAUtype_7CBD0@@HPAURwV3d@@1MH@Z @ 0x0017FC00
+// sp-match: ?sub_17FC00@type_3D3548@@QAEXPAUtype_7CBD0@@HPAURwV3d@@1MH@Z @ 0x00116F00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Moves node arg_4 of the pose key arg_0 by arg_8 (when given) and turns it
 // about the axis arg_C by arg_10 degrees (RtQuatRotate): its rotation
@@ -572,6 +611,7 @@ void type_3D3548::sub_17FC00(type_7CBD0 *arg_0, RwInt32 arg_4, RwV3d *arg_8, RwV
 }
 
 // match: ?vf_038@type_3DE0E0@@UAEXM@Z @ 0x0017FEB0
+// sp-match: ?vf_038@type_3DE0E0@@UAEXM@Z @ 0x00118600
 // Its animation's procedural track (sub_17F620) started once (as the
 // tank's).
 void type_3DE0E0::vf_038(RwReal arg_0)
@@ -580,12 +620,17 @@ void type_3DE0E0::vf_038(RwReal arg_0)
     {
         get_unk_284()->sub_794C0(0);
         unk_62C = get_unk_284()->sub_79930(sub_17F620, 1.0f, 1.0f);
+#ifdef CODFH_SP // SP expands type_78AC0::sub_6DF40 here (SP 0x11863A: % 4 ring)
+        get_unk_284()->clear_last_unk_08_30();
+#else
         ((type_78AC0 *)get_unk_284())->sub_6DF40();
+#endif
         unused_slot();
     }
 }
 
 // match: ?vf_03C@type_3DE0E0@@UAEXM@Z @ 0x0017FF30
+// sp-match: ?vf_03C@type_3DE0E0@@UAEXM@Z @ 0x00118670
 // The step arg_0: the base's, its guns; then by its move state (unk_638):
 // 1 drives to its goto point (sub_1808D0), sending "IHaveArrived" once
 // there, else stands it on the ground below the point facing ahead; 2
@@ -596,33 +641,6 @@ void type_3DE0E0::vf_038(RwReal arg_0)
 // standing on the ground there facing it.
 void type_3DE0E0::vf_03C(RwReal arg_0)
 {
-    type_3D2E7C *var_8;
-    RwReal var_C;
-    RwV3d *var_10;
-    RwInt32 var_14;
-    RwLine var_2C;
-    RwInt32 var_30;
-    type_4E5D30 *var_34;
-    type_91F40 var_68;
-    RwMatrix *var_70;
-    RwV3d *var_74;
-    RwMatrix var_C0;
-    RwInt32 var_C8;
-    RwInt32 var_CC;
-    RwReal var_D0;
-    RwV3d var_DC;
-    RwV3d var_E8;
-    RwReal var_EC;
-    RwV3d *var_F0;
-    RwInt32 var_F4;
-    RwLine var_10C;
-    RwInt32 var_110;
-    type_4E5D30 *var_114;
-    type_91F40 var_148;
-    RwV3d *var_14C;
-    RwMatrix var_190;
-    RwReal var_198;
-
     type_3D3548::vf_03C(arg_0);
     unk_658.sub_15B510(arg_0);
     if (!unk_638)
@@ -631,6 +649,9 @@ void type_3DE0E0::vf_03C(RwReal arg_0)
     {
         if (sub_1808D0(&unk_644, unk_650, unk_654, 100.0f, arg_0))
         {
+            type_3D2E7C *var_8;
+            RwReal var_C;
+
             var_8 = vf_098();
             if (var_8)
             {
@@ -640,17 +661,27 @@ void type_3DE0E0::vf_03C(RwReal arg_0)
         }
         else
         {
+            RwV3d *var_10;
+            RpIntersection var_2C;
+            RwInt32 var_30;
+            type_4E5D30 *var_34;
+            type_91F40 var_68;
+
             var_10 = &unk_644;
-            var_14 = 1;
-            var_2C.start = *var_10;
-            var_2C.end = *var_10;
-            var_2C.start.y += 100.0f;
-            var_2C.end.y -= 100.0f;
+            var_2C.type = rpINTERSECTLINE;
+            var_2C.t.line.start = *var_10;
+            var_2C.t.line.end = *var_10;
+            var_2C.t.line.start.y += 100.0f;
+            var_2C.t.line.end.y -= 100.0f;
             for (var_30 = 0; var_30 < 4; var_30++)
             {
                 var_34 = &dword_4E5D30[var_30];
-                if (var_34->get_unk_00() && sub_91F40(var_34->get_unk_28(), &var_2C, &var_68, 1, 0x40000, 1)) // not an address: line-test flags
+                if (var_34->get_unk_00() && sub_91F40(var_34->get_unk_28(), &var_2C.t.line, &var_68, 1, 0x40000, 1)) // not an address: line-test flags
                 {
+                    RwMatrix *var_70;
+                    RwV3d *var_74;
+                    RwMatrix var_C0;
+
                     var_70 = RwFrameGetMatrix(get_unk_340());
                     var_74 = (RwV3d *)vf_0C4();
                     var_C0.up = var_68.unk_14;
@@ -670,6 +701,13 @@ void type_3DE0E0::vf_03C(RwReal arg_0)
     }
     else if (unk_638 == 2 && unk_97C && !unk_28_9)
     {
+        RwInt32 var_C8;
+        RwInt32 var_CC;
+        RwReal var_D0;
+        RwV3d var_DC;
+        RwV3d var_E8;
+        RwReal var_EC;
+
         var_C8 = 0;
         var_CC = 0;
         var_D0 = unk_974;
@@ -706,17 +744,26 @@ void type_3DE0E0::vf_03C(RwReal arg_0)
         }
         else
         {
+            RwV3d *var_F0;
+            RpIntersection var_10C;
+            RwInt32 var_110;
+            type_4E5D30 *var_114;
+            type_91F40 var_148;
+
             var_F0 = &var_DC;
-            var_F4 = 1;
-            var_10C.start = *var_F0;
-            var_10C.end = *var_F0;
-            var_10C.start.y += 100.0f;
-            var_10C.end.y -= 100.0f;
+            var_10C.type = rpINTERSECTLINE;
+            var_10C.t.line.start = *var_F0;
+            var_10C.t.line.end = *var_F0;
+            var_10C.t.line.start.y += 100.0f;
+            var_10C.t.line.end.y -= 100.0f;
             for (var_110 = 0; var_110 < 4; var_110++)
             {
                 var_114 = &dword_4E5D30[var_110];
-                if (var_114->get_unk_00() && sub_91F40(var_114->get_unk_28(), &var_10C, &var_148, 1, 0x40000, 1)) // not an address: line-test flags
+                if (var_114->get_unk_00() && sub_91F40(var_114->get_unk_28(), &var_10C.t.line, &var_148, 1, 0x40000, 1)) // not an address: line-test flags
                 {
+                    RwV3d *var_14C;
+                    RwMatrix var_190;
+
                     var_14C = (RwV3d *)vf_0C4();
                     var_190.up = var_148.unk_14;
                     var_190.pos = *var_14C;
@@ -735,6 +782,8 @@ void type_3DE0E0::vf_03C(RwReal arg_0)
         }
         if (var_C8)
         {
+            RwReal var_198;
+
             var_198 = deltaTime;
             sub_6B5F0("IHaveArrived", (type_67620 *)(vf_098()), 0, 0, (RwInt32 *)(&var_198), 1, 1, 0);
             sub_6B5F0("SplinePath_ArrivedATDestination", (type_67620 *)(vf_098()), 0, 0, 0, 0, 1, 0);
@@ -748,6 +797,7 @@ void type_3DE0E0::vf_03C(RwReal arg_0)
 }
 
 // match: ?sub_1808D0@type_3DE0E0@@QAEHPAURwV3d@@MMMM@Z @ 0x001808D0
+// sp-match: ?sub_1808D0@type_3DE0E0@@QAEHPAURwV3d@@MMMM@Z @ 0x001170A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Drives toward the point arg_0 over the step arg_10: whether it is there
 // (within arg_C across the ground, or within twice that and behind it);
@@ -820,6 +870,7 @@ RwInt32 type_3DE0E0::sub_1808D0(RwV3d *arg_0, RwReal arg_4, RwReal arg_8, RwReal
 }
 
 // match: ?vf_0F8@type_3DE0E0@@UAEXM@Z @ 0x00180B90
+// sp-match: ?vf_0F8@type_3DE0E0@@UAEXM@Z @ 0x00117280
 // Puts it at arg_0 along its spline path (as the gimp's).
 void type_3DE0E0::vf_0F8(RwReal arg_0)
 {
@@ -834,12 +885,14 @@ void type_3DE0E0::vf_0F8(RwReal arg_0)
 }
 
 // match: ?vf_04C@type_3DE0E0@@UAEXM@Z @ 0x00180BF0
+// sp-match: ?vf_04C@type_3DE0E0@@UAEXM@Z @ 0x001172C0
 void type_3DE0E0::vf_04C(RwReal arg_0)
 {
     type_3D3548::vf_04C(arg_0);
 }
 
 // match: ?vf_054@type_3DE0E0@@UAEXH@Z @ 0x00180C10
+// sp-match: ?vf_054@type_3DE0E0@@UAEXH@Z @ 0x001172D0
 // The base's, between two debug prints.
 void type_3DE0E0::vf_054(RwInt32 arg_0)
 {
@@ -849,24 +902,28 @@ void type_3DE0E0::vf_054(RwInt32 arg_0)
 }
 
 // match: ?vf_0EC@type_3DE0E0@@UAEXHH@Z @ 0x00180C40
+// sp-match: ?vf_0EC@type_3DE0E0@@UAEXHH@Z @ 0x00117300
 void type_3DE0E0::vf_0EC(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_96C[arg_0] = (RwInt16)arg_4;
 }
 
 // match: ?vf_098@type_3DE0E0@@UAEPAUtype_3D2E7C@@XZ @ 0x00180C60
+// sp-match: ?vf_098@type_3DE0E0@@UAEPAUtype_3D2E7C@@XZ @ 0x00117320
 type_3D2E7C *type_3DE0E0::vf_098()
 {
     return (type_3D2E7C *)sub_67620(unk_964);
 }
 
 // match: ?vf_090@type_3DE0E0@@UAEPAUtype_6D380@@XZ @ 0x00180C80
+// sp-match: ?vf_090@type_3DE0E0@@UAEPAUtype_6D380@@XZ @ 0x00117330
 struct type_6D380 *type_3DE0E0::vf_090()
 {
     return (type_6D380 *)sub_67620(unk_968);
 }
 
 // match: ?sub_180CA0@type_3DE0E0@@QAEXPAUtype_3D3548@@@Z @ 0x00180CA0
+// sp-match: ?sub_180CA0@type_3DE0E0@@QAEXPAUtype_3D3548@@@Z @ 0x00117340
 void type_3DE0E0::sub_180CA0(type_3D3548 *arg_0)
 {
     if (arg_0 != unk_640.sub_D4910())
@@ -881,6 +938,7 @@ void type_3DE0E0::sub_180CA0(type_3D3548 *arg_0)
 // match: ?sub_180CF0@@YAPAUtype_3D3548@@PAVGimpVehicleTrigger@@@Z @ 0x00180CF0
 // match: __ehhandler$?sub_180CF0@@YAPAUtype_3D3548@@PAVGimpVehicleTrigger@@@Z-0x11 @ 0x00302290
 // match: __ehhandler$?sub_180CF0@@YAPAUtype_3D3548@@PAVGimpVehicleTrigger@@@Z @ 0x003022A1
+// sp-match: ?sub_180CF0@@YAPAUtype_3D3548@@PAVGimpVehicleTrigger@@@Z @ 0x00119B10
 // Builds the gimp vehicle of type 1 for the trigger arg_0, or warns that
 // there is no entity memory for it.
 type_3D3548 *sub_180CF0(GimpVehicleTrigger *arg_0)
@@ -894,26 +952,40 @@ type_3D3548 *sub_180CF0(GimpVehicleTrigger *arg_0)
             sub_D5A60(var_10, 0);
             var_10 = 0;
         }
-    } else
+    }
+#ifndef CODFH_SP
+    // Single player compiles the debug print out (SP 0x119B10).
+    else
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
                    "location(%6.2f,%6.2f,%6.2f)",
                    arg_0->unk_90, arg_0->unk_94, arg_0->unk_98);
+#endif
     return var_10;
 }
+
+#ifdef CODFH_SP
+// sp-match: ??0type_3DE0E0@@QAE@PAVGimpVehicleTrigger@@@Z @ 0x00119980
+// (Defined in the class: the constructor for a trigger, which single player
+// calls out of line from sub_17E680 (SP 0x119AD6); multiplayer expands it.)
+#endif
 
 // match: ??0type_3DE350@@QAE@PAVGimpVehicleTrigger@@@Z @ 0x00180E00
 // match: __ehhandler$??0type_3DE350@@QAE@PAVGimpVehicleTrigger@@@Z-0x1E @ 0x003022B0
 // match: __ehhandler$??0type_3DE350@@QAE@PAVGimpVehicleTrigger@@@Z @ 0x003022CE
+// sp-match: ??0type_3DE350@@QAE@PAVGimpVehicleTrigger@@@Z @ 0x001199F0
 // (Defined in the class.)
 
 // match: ??_Gtype_3DE350@@UAEPAXI@Z @ 0x00180EA0
 // match: ??1type_3DE350@@UAE@XZ @ 0x00180ED0
 // match: __ehhandler$??1type_3DE350@@UAE@XZ-0x2C @ 0x003022E0
 // match: __ehhandler$??1type_3DE350@@UAE@XZ @ 0x0030230C
+// sp-match: ??1type_3DE350@@UAE@XZ @ 0x00119A60
+// sp-match: ??_Gtype_3DE350@@UAEPAXI@Z @ 0x00119A40
 // (Defined in the class: its vf_230, called directly as in any destructor,
 // then the base's destructor inline.)
 
 // match: ?sub_180F60@type_3DE350@@QAEHPAVGimpVehicleTrigger@@@Z @ 0x00180F60
+// sp-match: ?sub_180F60@type_3DE350@@QAEHPAVGimpVehicleTrigger@@@Z @ 0x00118CF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its set-up from its trigger arg_0: the base's (sub_17EA70), its side by
 // its data's kind, its track's two bones (2 and 3), and its first three
@@ -964,6 +1036,7 @@ RwInt32 type_3DE350::sub_180F60(GimpVehicleTrigger *arg_0)
 }
 
 // match: ?sub_181140@@YAXPAUtype_7C8D0@@PAUtype_80300@@H_N@Z @ 0x00181140
+// sp-match: ?sub_181140@@YAXPAUtype_7C8D0@@PAUtype_80300@@H_N@Z @ 0x00118E10
 // Its animation's procedural track (vf_038 starts it; arg_8 is the
 // vehicle), as its base's (sub_17F620) but with room for a translation for
 // every node in its pose key, which it builds again at every start; each
@@ -1057,6 +1130,7 @@ void sub_181140(type_7C8D0 *arg_0, type_80300 *arg_4, RwInt32 arg_8, bool arg_C)
 }
 
 // match: ?vf_038@type_3DE350@@UAEXM@Z @ 0x001815A0
+// sp-match: ?vf_038@type_3DE350@@UAEXM@Z @ 0x001190C0
 // Its animation's procedural track (sub_181140) started once.
 void type_3DE350::vf_038(RwReal arg_0)
 {
@@ -1064,12 +1138,17 @@ void type_3DE350::vf_038(RwReal arg_0)
     {
         get_unk_284()->sub_794C0(0);
         unk_62C = get_unk_284()->sub_79930(sub_181140, 1.0f, 1.0f);
+#ifdef CODFH_SP // SP expands type_78AC0::sub_6DF40 here (SP 0x1190FA: % 4 ring)
+        get_unk_284()->clear_last_unk_08_30();
+#else
         ((type_78AC0 *)get_unk_284())->sub_6DF40();
+#endif
         unused_slot();
     }
 }
 
 // match: ?vf_03C@type_3DE350@@UAEXM@Z @ 0x00181620
+// sp-match: ?vf_03C@type_3DE350@@UAEXM@Z @ 0x00119130
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The step arg_0: its base's; its guns fire continuously while it is told
 // to (vf_254 with its guns' unk_300); in fire state 1 with a target it
@@ -1080,8 +1159,10 @@ void type_3DE350::vf_038(RwReal arg_0)
 // turret within its arc (vf_248 to vf_250) when it has one (vf_244).
 void type_3DE350::vf_03C(RwReal arg_0)
 {
+#ifndef CODFH_SP
     RwReal v48;
     RwReal var_44;
+#endif
     RwReal ebp_40;
     RwReal local_3C;
     RwReal v38;
@@ -1145,14 +1226,28 @@ void type_3DE350::vf_03C(RwReal arg_0)
     }
     if (unk_9A4 != 0.0f)
     {
+#ifdef CODFH_SP
+        // shape: the step in frames in a local (SP 0x119370 multiplies by 1/60, then by
+        // 40), and the barrel's bounds local to this block (frame 0x30).
+        RwReal frames = arg_0 / 60.0f;
+        unk_99C += frames * 40.0f * unk_9A4;
+        RwReal var_44;
+        RwReal v48;
+#else
         unk_99C += arg_0 / 60.0f * 40.0f * unk_9A4;
+#endif
         var_44 = 45.0f;
         v48 = -45.0f;
         unk_99C = sub_22C20(unk_99C, v48, var_44);
     }
     if (unk_9A0 != 0.0f)
     {
+#ifdef CODFH_SP
+        RwReal frames = arg_0 / 60.0f;
+        unk_998 += frames * 40.0f * unk_9A0;
+#else
         unk_998 += arg_0 / 60.0f * 40.0f * unk_9A0;
+#endif
         if (unk_998 < 0.0f)
             unk_998 = 360.0f + unk_998;
         if (unk_998 > 360.0f)
@@ -1169,12 +1264,17 @@ void type_3DE350::vf_03C(RwReal arg_0)
 }
 
 // match: ?sub_181A90@@YAHPAUtype_3DE350@@PAURwV3d@@M1PAM22@Z @ 0x00181A90
+// sp-match: ?sub_181A90@@YAHPAUtype_3DE350@@PAURwV3d@@M1PAM22@Z @ 0x00117380
 // How its turret and barrel bear on the point arg_4 (arg_8 unused): from
 // its main gun's tag, the turn toward it across the ground (the cross
 // product arg_C), how nearly it faces it (arg_10: the dot product, eased up
 // within 400 and from 0.99 scaled to 0 to 1), the point's pitch (arg_14)
 // and the barrel's (arg_18). 0 without the tag or looking straight up or
 // down.
+#ifdef CODFH_SP
+// shape: internal linkage in single player, which passes arg_0 in ecx (SP 0x117380).
+static
+#endif
 RwInt32 sub_181A90(type_3DE350 *arg_0, RwV3d *arg_4, RwReal arg_8, RwV3d *arg_C, RwReal *arg_10, RwReal *arg_14,
                    RwReal *arg_18)
 {
@@ -1212,7 +1312,14 @@ RwInt32 sub_181A90(type_3DE350 *arg_0, RwV3d *arg_4, RwReal arg_8, RwV3d *arg_C,
     {
         if (var_64 > 200.0f)
         {
+#ifdef CODFH_SP
+            // shape: the closeness in a local, by a two-hundredth (SP 0x11753C multiplies by
+            // 0.005, then by the factor).
+            RwReal closeness = (400.0f - var_64) * 0.005f;
+            *arg_10 *= closeness * 0.034074172f + 1.0f;
+#else
             *arg_10 *= (400.0f - var_64) / 200.0f * 0.034074172f + 1.0f;
+#endif
             if (*arg_10 < 0.0f)
                 *arg_10 *= -1.0f;
             if (*arg_10 > 1.0f)
@@ -1229,8 +1336,13 @@ RwInt32 sub_181A90(type_3DE350 *arg_0, RwV3d *arg_4, RwReal arg_8, RwV3d *arg_C,
 }
 
 // match: ?sub_181D20@@YAHPAUtype_3DE350@@PAURwV3d@@1PAM@Z @ 0x00181D20
+// sp-match: ?sub_181D20@@YAHPAUtype_3DE350@@PAURwV3d@@1PAM@Z @ 0x001175C0
 // Likewise for its third gun's tag: the turn toward the point arg_4 (arg_8)
 // and how nearly the gun faces it (arg_C, from 0.8 scaled by 5).
+#ifdef CODFH_SP
+// shape: internal linkage in single player, which passes arg_0 in ecx (SP 0x1175C0).
+static
+#endif
 RwInt32 sub_181D20(type_3DE350 *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal *arg_C)
 {
     RpClump *var_4;
@@ -1265,6 +1377,7 @@ RwInt32 sub_181D20(type_3DE350 *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal *arg_C
 }
 
 // match: ?vf_258@type_3DE350@@UAEXMM@Z @ 0x00181EC0
+// sp-match: ?vf_258@type_3DE350@@UAEXMM@Z @ 0x00117730
 // Sets unk_9A0 while its set-up has run (unk_624; arg_4 unused).
 void type_3DE350::vf_258(RwReal arg_0, RwReal arg_4)
 {
@@ -1274,6 +1387,7 @@ void type_3DE350::vf_258(RwReal arg_0, RwReal arg_4)
 }
 
 // match: ?vf_25C@type_3DE350@@UAEXMM@Z @ 0x00181EF0
+// sp-match: ?vf_25C@type_3DE350@@UAEXMM@Z @ 0x00117750
 // Likewise unk_9A4.
 void type_3DE350::vf_25C(RwReal arg_0, RwReal arg_4)
 {
@@ -1283,18 +1397,21 @@ void type_3DE350::vf_25C(RwReal arg_0, RwReal arg_4)
 }
 
 // match: ?vf_054@type_3DE350@@UAEXH@Z @ 0x00181F20
+// sp-match: ?vf_054@type_3DE350@@UAEXH@Z @ 0x00117770
 void type_3DE350::vf_054(RwInt32 arg_0)
 {
     type_3DE0E0::vf_054(arg_0);
 }
 
 // match: ?vf_058@type_3DE350@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x00181F40
+// sp-match: ?vf_058@type_3DE350@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x00117780
 RwInt32 type_3DE350::vf_058(type_3DF8D8_04 *arg_0)
 {
     return type_3DE0E0::vf_058(arg_0);
 }
 
 // match: ?vf_254@type_3DE350@@UAEHHPAURwV3d@@@Z @ 0x00181F60
+// sp-match: ?vf_254@type_3DE350@@UAEHHPAURwV3d@@@Z @ 0x001194D0
 // Fires its gun arg_0 (as the tank's vf_2A8): once it has rounds (vf_238),
 // a round spent (a full magazine starting again); gun 0 is its main gun
 // (sub_182990); guns 1 and 2, once set up, fire from their tags at the point
@@ -1336,11 +1453,11 @@ RwInt32 type_3DE350::vf_254(RwInt32 arg_0, RwV3d *arg_4)
             RwV3dCrossProductMacro(&var_50.up, &var_50.right, &var_50.at);
             RwV3dCrossProductMacro(&var_50.right, &var_50.at, &var_50.up);
         }
-        var_80 = frand_range(-vf_164() * (dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f),
-                             vf_164() * (dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f));
+        var_80 = frand_range(-vf_164() * difficulty_4F2890(),
+                             vf_164() * difficulty_4F2890());
         RwMatrixRotate(&var_50, &var_50.up, var_80, rwCOMBINEPRECONCAT);
-        var_80 = frand_range(-vf_168() * (dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f),
-                             vf_168() * (dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f));
+        var_80 = frand_range(-vf_168() * difficulty_4F2890(),
+                             vf_168() * difficulty_4F2890());
         RwMatrixRotate(&var_50, &var_50.right, var_80, rwCOMBINEPRECONCAT);
         RwV3dScale(&var_A8, &var_50.at, unk_658.unk_00[arg_0].unk_0C);
         var_AC = sub_119B70(30);
@@ -1375,11 +1492,11 @@ RwInt32 type_3DE350::vf_254(RwInt32 arg_0, RwV3d *arg_4)
 
         if (!sub_EC2D0(get_unk_264(), (RwInt32)&var_110, unk_658.unk_00[arg_0].unk_38, 0, 0))
             return 0;
-        var_130 = frand_range(-vf_164() * (dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f),
-                              vf_164() * (dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f));
+        var_130 = frand_range(-vf_164() * difficulty_4F2890(),
+                              vf_164() * difficulty_4F2890());
         RwMatrixRotate(&var_110, &var_110.up, var_130, rwCOMBINEPRECONCAT);
-        var_130 = frand_range(-vf_168() * (dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f),
-                              vf_168() * (dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f));
+        var_130 = frand_range(-vf_168() * difficulty_4F2890(),
+                              vf_168() * difficulty_4F2890());
         RwMatrixRotate(&var_110, &var_110.right, var_130, rwCOMBINEPRECONCAT);
         RwV3dScale(&var_A8, &var_110.at, unk_658.unk_00[arg_0].unk_0C);
         var_AC = sub_119B70(30);
@@ -1411,6 +1528,7 @@ RwInt32 type_3DE350::vf_254(RwInt32 arg_0, RwV3d *arg_4)
 }
 
 // match: ?vf_238@type_3DE350@@UAEHH@Z @ 0x00182960
+// sp-match: ?vf_238@type_3DE350@@UAEHH@Z @ 0x00117790
 RwInt32 type_3DE350::vf_238(RwInt32 arg_0)
 {
     if (unk_658.unk_00[arg_0].unk_20 <= 0)
@@ -1419,6 +1537,7 @@ RwInt32 type_3DE350::vf_238(RwInt32 arg_0)
 }
 
 // match: ?sub_182990@type_3DE350@@QAEHH@Z @ 0x00182990
+// sp-match: ?sub_182990@type_3DE350@@QAEHH@Z @ 0x001177B0
 // Its main gun's shot (gun arg_0, from vf_254; as the tank's vf_300): from
 // its tag, spread by a quarter of the difficulty's spread, with the shell
 // settings of weapon 29.
@@ -1432,11 +1551,11 @@ RwInt32 type_3DE350::sub_182990(RwInt32 arg_0)
 
     if (!sub_EC2D0(get_unk_264(), (RwInt32)&var_50, unk_658.unk_00[arg_0].unk_38, 0, 0))
         return 0;
-    var_70 = frand_range(-vf_164() * (dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f),
-                         vf_164() * (dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f));
+    var_70 = frand_range(-vf_164() * difficulty_4F2890(),
+                         vf_164() * difficulty_4F2890());
     RwMatrixRotate(&var_50, &var_50.up, var_70 * 0.25f, rwCOMBINEPRECONCAT);
-    var_70 = frand_range(-vf_168() * (dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f),
-                         vf_168() * (dword_42B714 > -1 && dword_42B714 < 3 ? flt_4F2890[dword_42B714] : 1.0f));
+    var_70 = frand_range(-vf_168() * difficulty_4F2890(),
+                         vf_168() * difficulty_4F2890());
     RwMatrixRotate(&var_50, &var_50.right, var_70 * 0.25f, rwCOMBINEPRECONCAT);
     RwV3dScale(&var_98, &var_50.at, unk_658.unk_00[arg_0].unk_0C);
     var_9C = sub_119B70(29);
@@ -1472,6 +1591,7 @@ RwInt32 type_3DE350::sub_182990(RwInt32 arg_0)
 }
 
 // match: ?vf_064@type_3DE0E0@@UAEHPAUtype_75600@@@Z @ 0x00182F60
+// sp-match: ?vf_064@type_3DE0E0@@UAEHPAUtype_75600@@@Z @ 0x00117B10
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A hit arg_0 (as the tank's): a player's weapon of type 0x17 does a fifth of
 // its damage as a hit of kind 4; hits of kinds 3, 4 and 6 wear its armour
@@ -1539,14 +1659,22 @@ void type_3DE350::vf_230()
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ??3type_3DE0E0@@SAXPAX@Z (folded into 0x19A750)
+#ifndef CODFH_SP
+// Single player keeps the deleting destructor's call (SP 0x117DF0), so the empty body is
+// not in this file there.
 void type_3DE0E0::operator delete(void * arg_0)
 {
 }
+#endif
 
 // ??3type_3DE350@@SAXPAX@Z (folded into 0x19A750)
+#ifndef CODFH_SP
+// Single player keeps the deleting destructor's call (SP 0x119A50), so the empty body is
+// not in this file there.
 void type_3DE350::operator delete(void * arg_0)
 {
 }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

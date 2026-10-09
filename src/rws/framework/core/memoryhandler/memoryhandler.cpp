@@ -40,6 +40,7 @@ void BaseMemClose(void);
 // match: __ehhandler$?GetRef@CMemHandler@@SAAAV1@XZ>1 @ 0x0041D844
 
 // match: ?BaseMemInit@@YAXXZ @ 0x0012ECF0
+// sp-match: ?BaseMemInit@@YAXXZ @ 0x000E0C40
 
 void BaseMemInit(void)
 {
@@ -52,6 +53,7 @@ void BaseMemInit(void)
 }
 
 // match: ?BaseMemAlloc@@YAPAXII@Z @ 0x0012ED20
+// sp-match: ?BaseMemAlloc@@YAPAXII@Z @ 0x000E0C70
 void *BaseMemAlloc(size_t size, RwUInt32 userTypeNum)
 {
    dword_4CF888 = 1;
@@ -72,6 +74,7 @@ void *BaseMemAlloc(size_t size, RwUInt32 userTypeNum)
 }
 
 // match: ?BaseMemFree@@YAXPAX@Z @ 0x0012ED70
+// sp-match: ?BaseMemFree@@YAXPAX@Z @ 0x000E0CB0
 void BaseMemFree(void *pMem)
 {
    dword_4CF888 = 1;
@@ -88,6 +91,7 @@ void BaseMemFree(void *pMem)
 }
 
 // match: ?BaseMemReAlloc@@YAPAXPAXII@Z @ 0x0012EDB0
+// sp-match: ?BaseMemReAlloc@@YAPAXPAXII@Z @ 0x000E0CF0
 void *BaseMemReAlloc(void *pMem, size_t size, RwUInt32 userTypeNum)
 {
    dword_4CF888 = 1;
@@ -106,6 +110,7 @@ void *BaseMemReAlloc(void *pMem, size_t size, RwUInt32 userTypeNum)
 }
 
 // match: ?BaseMemCalloc@@YAPAXIII@Z @ 0x0012EE00
+// sp-match: ?BaseMemCalloc@@YAPAXIII@Z @ 0x000E0D40
 void *BaseMemCalloc(size_t num, size_t size, RwUInt32 userTypeNum)
 {
    dword_4CF888 = 1;
@@ -124,6 +129,7 @@ void *BaseMemCalloc(size_t num, size_t size, RwUInt32 userTypeNum)
 }
 
 // match: ??0CMemHandler@@AAE@XZ @ 0x0012EE50
+// sp-match: ??0CMemHandler@@AAE@XZ @ 0x000E0D90
 CMemHandler::CMemHandler(void) :
       m_doingMsg(false)
 {
@@ -137,6 +143,11 @@ CMemHandler::~CMemHandler(void)
 }
 
 // The leak check for a region (the game's; its checks are compiled out).
+#ifdef CODFH_SP
+// Single player folds this empty check into another `return false` (SP
+// 0xD5A00) and keeps the calls to it, so it is only declared here.
+bool sub_12EE80(RwInt32 arg_0);
+#else
 // match: ?sub_12EE80@@YA_NH@Z @ 0x0012EE80
 bool sub_12EE80(RwInt32 arg_0)
 {
@@ -144,6 +155,7 @@ bool sub_12EE80(RwInt32 arg_0)
 
    return (leaked);
 }
+#endif
 
 // The singleton (GetRef, inline in rws/cmemhandler.h, emitted here with its
 // function-local static and the guard's unwind funclet).
@@ -152,8 +164,11 @@ bool sub_12EE80(RwInt32 arg_0)
 // match: ?GetRef@CMemHandler@@SAAAV1@XZ @ 0x0012EE90
 // match: __ehhandler$?GetRef@CMemHandler@@SAAAV1@XZ-0xE @ 0x003016F0
 // match: __ehhandler$?GetRef@CMemHandler@@SAAAV1@XZ @ 0x003016FE
+// sp-match: ?GetRef@CMemHandler@@SAAAV1@XZ @ 0x000E0E70
+// sp-match: ?memHandler@?1??GetRef@CMemHandler@@SAAAV1@XZ@$AV1@A @ 0x0021EA30
 
 // match: ?GetExtraSize@CMemHandler@@AAEIXZ @ 0x0012EF00
+// sp-match: ?GetExtraSize@CMemHandler@@AAEIXZ @ 0x000E0EB0
 RwUInt32 CMemHandler::GetExtraSize(void)
 {
    RwUInt32 extraHeader = GetAlignedHeaderSize(),
@@ -172,6 +187,7 @@ RwUInt32 CMemHandler::GetRawHeaderSize(void)
 }
 
 // match: ?GetAlignedHeaderSize@CMemHandler@@CAIXZ @ 0x0012EF30
+// sp-match: ?GetAlignedHeaderSize@CMemHandler@@CAIXZ @ 0x000E0E60
 RwUInt32 CMemHandler::GetAlignedHeaderSize(void)
 {
    RwUInt32 headerSize = GetRawHeaderSize();
@@ -182,6 +198,7 @@ RwUInt32 CMemHandler::GetAlignedHeaderSize(void)
 }
 
 // match: ?Alloc@CMemHandler@@SAPAXIW4mem_type@1@II@Z @ 0x0012EF50
+// sp-match: ?Alloc@CMemHandler@@SAPAXIW4mem_type@1@II@Z @ 0x000E0EC0
 void *CMemHandler::Alloc(size_t userSize, mem_type type, RwUInt32 hint, const RwUInt32 userTypeNum)
 {
    void *pAllocMem,
@@ -201,6 +218,7 @@ void *CMemHandler::Alloc(size_t userSize, mem_type type, RwUInt32 hint, const Rw
 }
 
 // match: ?ReAlloc@CMemHandler@@SAPAXPAXIW4mem_type@1@II@Z @ 0x0012EF90
+// sp-match: ?ReAlloc@CMemHandler@@SAPAXPAXIW4mem_type@1@II@Z @ 0x000E0EE0
 void *CMemHandler::ReAlloc(void *pUserMem, size_t userSize, mem_type type, RwUInt32 hint, RwUInt32 userTypeNum)
 {
    void *pAllocMem,
@@ -228,6 +246,7 @@ void *CMemHandler::ReAlloc(void *pUserMem, size_t userSize, mem_type type, RwUIn
 }
 
 // match: ?Calloc@CMemHandler@@SAPAXIIW4mem_type@1@II@Z @ 0x0012F000
+// sp-match: ?Calloc@CMemHandler@@SAPAXIIW4mem_type@1@II@Z @ 0x000E0DA0
 void *CMemHandler::Calloc(size_t num, size_t size, mem_type type, RwUInt32 hint, RwUInt32 userTypeNum)
 {
    void *pAllocMem,
@@ -248,6 +267,7 @@ void *CMemHandler::Calloc(size_t num, size_t size, mem_type type, RwUInt32 hint,
 }
 
 // match: ?Free@CMemHandler@@SAXPAX@Z @ 0x0012F040
+// sp-match: ?Free@CMemHandler@@SAXPAX@Z @ 0x000E0DC0
 void CMemHandler::Free(void *pUserMem)
 {
    void *pAllocMem;
@@ -259,6 +279,7 @@ void CMemHandler::Free(void *pUserMem)
 
 // Reports the leaks of region arg_0 (the game's).
 // match: ?sub_12F060@@YAXH@Z @ 0x0012F060
+// sp-match: ?sub_12F060@@YAXH@Z @ 0x000E0DD0
 void sub_12F060(RwInt32 arg_0)
 {
    sub_12EE80(arg_0);
@@ -266,6 +287,7 @@ void sub_12F060(RwInt32 arg_0)
 
 // Whether region arg_0 leaked (the game's; always false in this build).
 // match: ?sub_12F080@@YA_NH@Z @ 0x0012F080
+// sp-match: ?sub_12F080@@YA_NH@Z @ 0x000D5A00
 bool sub_12F080(RwInt32 arg_0)
 {
    return false;
@@ -273,6 +295,7 @@ bool sub_12F080(RwInt32 arg_0)
 
 // Clears the hook's flag (the game loop's restart).
 // match: ?sub_12F090@@YAXXZ @ 0x0012F090
+// sp-match: ?sub_12F090@@YAXXZ @ 0x000E0DE0
 void sub_12F090()
 {
    byte_4CF88C = false;
@@ -281,6 +304,7 @@ void sub_12F090()
 // The game's hook in RenderWare Studio's entity messages: sets the flag
 // while dword_4B8710 is set.
 // match: ?sub_12F0A0@@YAXXZ @ 0x0012F0A0
+// sp-match: ?sub_12F0A0@@YAXXZ @ 0x000E0DF0
 void sub_12F0A0()
 {
    if (dword_4B8710)
@@ -290,12 +314,14 @@ void sub_12F0A0()
 }
 
 // match: ??2@YAPAXI@Z @ 0x0012F0C0
+// sp-match: ??2@YAPAXI@Z @ 0x000E0F30
 void *operator new(size_t size)
 {
    return(CMemHandler::Alloc(size, CMemHandler::MHMT_STD, rwMEMHINTDUR_GLOBAL, RWS::RWS_MEMORY_TYPE_STD));
 }
 
 // match: ??2@YAPAXII@Z @ 0x0012F0E0
+// sp-match: ??2@YAPAXII@Z @ 0x000E0F50
 void *operator new(size_t size, RwUInt32 userTypeNum)
 {
    return(CMemHandler::Alloc(size, CMemHandler::MHMT_RWS, rwMEMHINTDUR_GLOBAL, userTypeNum));
@@ -303,6 +329,7 @@ void *operator new(size_t size, RwUInt32 userTypeNum)
 
 // The database's AllocBuffer.
 // match: ?RWSMalloc@@YAPAXII@Z @ 0x0012F100
+// sp-match: ?RWSMalloc@@YAPAXII@Z @ 0x000E0F70
 void *RWSMalloc(size_t size, RwUInt32 hint)
 {
    void *pMem = CMemHandler::Alloc(size, CMemHandler::MHMT_RW, rwMEMHINTDUR_GLOBAL, RWS::RWS_MEMORY_TYPE_RW);
@@ -311,6 +338,7 @@ void *RWSMalloc(size_t size, RwUInt32 hint)
 }
 
 // match: ??3@YAXPAX@Z @ 0x0012F130
+// sp-match: ??3@YAXPAX@Z @ 0x000E0E10
 void operator delete(void *pMem)
 {
    if (pMem)
@@ -320,12 +348,14 @@ void operator delete(void *pMem)
 }
 
 // match: ?RWSReAlloc@@YAPAXPAXII@Z @ 0x0012F150
+// sp-match: ?RWSReAlloc@@YAPAXPAXII@Z @ 0x000E0F90
 void *RWSReAlloc(void *pMem, size_t newSize, RwUInt32 hint)
 {
    return(CMemHandler::ReAlloc(pMem, newSize, CMemHandler::MHMT_RW, rwMEMHINTDUR_GLOBAL, RWS::RWS_MEMORY_TYPE_RW));
 }
 
 // match: ?RWSCalloc@@YAPAXIII@Z @ 0x0012F170
+// sp-match: ?RWSCalloc@@YAPAXIII@Z @ 0x000E0E40
 void *RWSCalloc(size_t num, size_t size, RwUInt32 hint)
 {
    return(CMemHandler::Calloc(num, size, CMemHandler::MHMT_RW, rwMEMHINTDUR_GLOBAL, RWS::RWS_MEMORY_TYPE_RW));
@@ -349,6 +379,8 @@ void BaseMemClose()
 // (the match of operator new's typed form; the XDK's stand-ins and the
 // weapon copies' factory unwind through it).
 // ??3@YAXPAXI@Z (folded into 0x12F130)
+// (single player keeps it apart: its plain delete tail-jumps, SP 0xE0E10)
+// sp-match: ??3@YAXPAXI@Z @ 0x000E0E30
 void operator delete(void *pMem, RwUInt32 type)
 {
    if (pMem)

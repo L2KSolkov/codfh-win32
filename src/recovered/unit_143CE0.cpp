@@ -70,6 +70,7 @@ RwTexDictionary *object;
 // match: __ehhandler$?sub_1441A0@type_143DC0@@QAEPAUtype_143D90@@PAURpMaterial@@H@Z>1 @ 0x0041DC98
 
 // match: sub_143CE0 @ 0x00143CE0
+// sp-match: sub_143CE0 @ 0x000EF570
 
 void sub_143CE0()
 {
@@ -83,6 +84,7 @@ void sub_143CE0()
 }
 
 // match: sub_143D40 @ 0x00143D40
+// sp-match: sub_143D40 @ 0x000EF5A0
 void sub_143D40()
 {
     if (dword_4CFE18)
@@ -90,6 +92,7 @@ void sub_143D40()
 }
 
 // match: sub_143D60 @ 0x00143D60
+// sp-match: sub_143D60 @ 0x000EF5C0
 RwUInt32 sub_143D60(SplinePath *arg_0)
 {
     dword_4CFA18[dword_4CFE1C] = arg_0;
@@ -98,6 +101,7 @@ RwUInt32 sub_143D60(SplinePath *arg_0)
 }
 
 // match: ??0type_143D90@@QAE@PAURpMaterial@@H@Z @ 0x00143D90
+// sp-match: ??0type_143D90@@QAE@PAURpMaterial@@H@Z @ 0x000EF5E0
 type_143D90::type_143D90(RpMaterial *arg_0, RwInt32 arg_4)
 {
     unk_08 = arg_0;
@@ -107,6 +111,7 @@ type_143D90::type_143D90(RpMaterial *arg_0, RwInt32 arg_4)
 // match: ??0type_143DC0@@QAE@XZ @ 0x00143DC0
 // match: __ehhandler$??0type_143DC0@@QAE@XZ-0x13 @ 0x003019D0
 // match: __ehhandler$??0type_143DC0@@QAE@XZ @ 0x003019E3
+// sp-match: ??0type_143DC0@@QAE@XZ @ 0x000EF8F0
 type_143DC0::type_143DC0() : unk_28(0), unk_2C(0x3C)
 {
     sub_143F10();
@@ -115,6 +120,7 @@ type_143DC0::type_143DC0() : unk_28(0), unk_2C(0x3C)
 // match: ??1type_143DC0@@QAE@XZ @ 0x00143E30
 // match: __ehhandler$??1type_143DC0@@QAE@XZ-0x1B @ 0x003019F0
 // match: __ehhandler$??1type_143DC0@@QAE@XZ @ 0x00301A0B
+// sp-match: ??1type_143DC0@@QAE@XZ @ 0x000EF950
 // Deletes the material entries.
 type_143DC0::~type_143DC0()
 {
@@ -123,6 +129,7 @@ type_143DC0::~type_143DC0()
 }
 
 // match: ?sub_143F10@type_143DC0@@QAEXXZ @ 0x00143F10
+// sp-match: ?sub_143F10@type_143DC0@@QAEXXZ @ 0x000EF600
 // Empties it: no textures, steps or materials, one step a second.
 void type_143DC0::sub_143F10()
 {
@@ -137,6 +144,7 @@ void type_143DC0::sub_143F10()
 // match: ?sub_143F60@type_143DC0@@QAEXXZ @ 0x00143F60
 // match: __ehhandler$?sub_143F60@type_143DC0@@QAEXXZ-0x8 @ 0x00301A20
 // match: __ehhandler$?sub_143F60@type_143DC0@@QAEXXZ @ 0x00301A28
+// sp-match: ?sub_143F60@type_143DC0@@QAEXXZ @ 0x000EF630
 // Each frame: every 60 / unk_2C frames the next step's texture goes on each
 // material still referenced.
 void type_143DC0::sub_143F60()
@@ -160,6 +168,7 @@ void type_143DC0::sub_143F60()
 }
 
 // match: ?sub_144070@type_143DC0@@QAEXPAURwTexture@@@Z @ 0x00144070
+// sp-match: ?sub_144070@type_143DC0@@QAEXPAURwTexture@@@Z @ 0x000EF720
 void type_143DC0::sub_144070(RwTexture *arg_0)
 {
     if (unk_80 < 0x10)
@@ -170,6 +179,7 @@ void type_143DC0::sub_144070(RwTexture *arg_0)
 }
 
 // match: ?sub_1440C0@type_143DC0@@QAEXH@Z @ 0x001440C0
+// sp-match: ?sub_1440C0@type_143DC0@@QAEXH@Z @ 0x000EF740
 void type_143DC0::sub_1440C0(RwInt32 arg_0)
 {
     if (unk_104 < 0x20 && arg_0 < 0x10)
@@ -182,6 +192,7 @@ void type_143DC0::sub_1440C0(RwInt32 arg_0)
 // match: ?sub_144110@type_143DC0@@QAEXPAURpMaterial@@H@Z @ 0x00144110
 // match: __ehhandler$?sub_144110@type_143DC0@@QAEXPAURpMaterial@@H@Z-0xB @ 0x00301A40
 // match: __ehhandler$?sub_144110@type_143DC0@@QAEXPAURpMaterial@@H@Z @ 0x00301A4B
+// sp-match: ?sub_144110@type_143DC0@@QAEXPAURpMaterial@@H@Z @ 0x000EF770
 void type_143DC0::sub_144110(RpMaterial *arg_0, RwInt32 arg_4)
 {
     type_143D90 *var_10;
@@ -192,6 +203,7 @@ void type_143DC0::sub_144110(RpMaterial *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_1441A0@type_143DC0@@QAEPAUtype_143D90@@PAURpMaterial@@H@Z @ 0x001441A0
+// sp-match: ?sub_1441A0@type_143DC0@@QAEPAUtype_143D90@@PAURpMaterial@@H@Z @ 0x000EF7E0
 type_143D90 *type_143DC0::sub_1441A0(RpMaterial *arg_0, RwInt32 arg_4)
 {
     for (type_16B900 var_14(&unk_34); var_14.sub_16B9D0(); var_14.sub_16BA10(0))
@@ -206,6 +218,7 @@ type_143D90 *type_143DC0::sub_1441A0(RpMaterial *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_144260@type_143DC0@@QAEXPBD@Z @ 0x00144260
+// sp-match: ?sub_144260@type_143DC0@@QAEXPBD@Z @ 0x000EF8C0
 void type_143DC0::sub_144260(const RwChar *arg_0)
 {
     RwInt32 var_4;
@@ -243,7 +256,11 @@ RwInt32 type_143D90::sub_6CB40()
 }
 
 // ?sub_FB710@type_143D90@@QAEPAURpMaterial@@XZ (folded into 0xFB710)
+#ifndef CODFH_SP
+// Single player calls it as another file's (SP 0xEF7E0 reloads ecx after
+// the call): the body is multiplayer-only here.
 struct RpMaterial * type_143D90::sub_FB710()
 {
     return unk_08;
 }
+#endif

@@ -48,6 +48,7 @@ inline RwReal get_4F2884()
 // match: ?unk_429B48@@3PAIA @ 0x00429B48
 
 // match: ?sub_1154A0@type_10F710_21B4@@QAEHXZ @ 0x001154A0
+// sp-match: ?sub_1154A0@type_10F710_21B4@@QAEHXZ @ 0x000D04D0
 
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_10F710_21B4::sub_1154A0()
@@ -67,6 +68,7 @@ RwInt32 type_10F710_21B4::sub_1154A0()
 }
 
 // match: ?sub_115500@type_10F710_21B4@@QAEHXZ @ 0x00115500
+// sp-match: ?sub_115500@type_10F710_21B4@@QAEHXZ @ 0x002168E0
 RwInt32 type_10F710_21B4::sub_115500()
 {
     RwInt32 var_4;
@@ -76,6 +78,7 @@ RwInt32 type_10F710_21B4::sub_115500()
 }
 
 // match: ?sub_115520@type_10F710_21B4@@QAEXM@Z @ 0x00115520
+// sp-match: ?sub_115520@type_10F710_21B4@@QAEXM@Z @ 0x000D0520
 void type_10F710_21B4::sub_115520(RwReal arg_0)
 {
     RwChar var_48[0x40];
@@ -103,6 +106,7 @@ void type_10F710_21B4::sub_115520(RwReal arg_0)
 }
 
 // match: ?sub_115620@type_10F710_21B4@@QAEHXZ @ 0x00115620
+// sp-match: ?sub_115620@type_10F710_21B4@@QAEHXZ @ 0x000D0840
 RwInt32 type_10F710_21B4::sub_115620()
 {
     if (sub_116270())
@@ -128,10 +132,13 @@ RwInt32 type_10F710_21B4::sub_115620()
 }
 
 // match: ?sub_115690@type_10F710_21B4@@QAEXMH@Z @ 0x00115690
+// sp-match: ?sub_115690@type_10F710_21B4@@QAEXMH@Z @ 0x000D0880
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_10F710_21B4::sub_115690(RwReal arg_0, RwInt32 arg_4)
 {
+#ifndef CODFH_SP
     RwChar slot_28[0x20];
+#endif
     type_10F710 *bp_4;
 
     if (arg_4 == -1)
@@ -151,6 +158,9 @@ void type_10F710_21B4::sub_115690(RwReal arg_0, RwInt32 arg_4)
     {
     case 1:
     {
+#ifdef CODFH_SP // shape: the text buffer is the case's own (it shares its slot with the other case's)
+        RwChar slot_28[0x20];
+#endif
         type_3DF8D8_04 *stk_2C;
         RwReal frm_30;
 
@@ -226,6 +236,7 @@ void type_10F710_21B4::sub_115690(RwReal arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_115980@type_10F710_21B4@@QAEXH@Z @ 0x00115980
+// sp-match: ?sub_115980@type_10F710_21B4@@QAEXH@Z @ 0x000D0610
 void type_10F710_21B4::sub_115980(RwInt32 arg_0)
 {
     unk_34 = arg_0;
@@ -236,6 +247,7 @@ void type_10F710_21B4::sub_115980(RwInt32 arg_0)
 }
 
 // match: ?sub_1159C0@type_10F710_21B4@@QAEHPAUtype_3D94B8@@@Z @ 0x001159C0
+// sp-match: ?sub_1159C0@type_10F710_21B4@@QAEHPAUtype_3D94B8@@@Z @ 0x000D0AB0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_10F710_21B4::sub_1159C0(type_3D94B8 *arg_0)
 {
@@ -509,6 +521,7 @@ RwInt32 type_10F710_21B4::sub_1159C0(type_3D94B8 *arg_0)
 }
 
 // match: ?sub_116080@type_10F710_21B4@@QAEHHH@Z @ 0x00116080
+// sp-match: ?sub_116080@type_10F710_21B4@@QAEHHH@Z @ 0x000D0630
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_10F710_21B4::sub_116080(RwInt32 arg_0, RwInt32 arg_4)
 {
@@ -577,6 +590,7 @@ RwInt32 type_10F710_21B4::sub_116080(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_116270@type_10F710_21B4@@QAEHXZ @ 0x00116270
+// sp-match: ?sub_116270@type_10F710_21B4@@QAEHXZ @ 0x000D07F0
 RwInt32 type_10F710_21B4::sub_116270()
 {
     RwInt32 var_4;
@@ -592,6 +606,7 @@ RwInt32 type_10F710_21B4::sub_116270()
 }
 
 // match: ?sub_1162C0@type_10F710_21B4@@QAEXPAUtype_D90B0_18@@@Z @ 0x001162C0
+// sp-match: ?sub_1162C0@type_10F710_21B4@@QAEXPAUtype_D90B0_18@@@Z @ 0x000D0810
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_10F710_21B4::sub_1162C0(type_D90B0_18 *arg_0)
 {
@@ -624,6 +639,7 @@ type_10F710_21B4::~type_10F710_21B4()
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ?sub_1E3BF0@type_10F710_21B4@@QAEHH@Z (folded into 0x1E3BF0)
+// sp-match: ?sub_1E3BF0@type_10F710_21B4@@QAEHH@Z @ 0x000D0600
 RwInt32 type_10F710_21B4::sub_1E3BF0(RwInt32 arg_0)
 {
     return unk_00[arg_0];

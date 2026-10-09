@@ -10,6 +10,7 @@ seg0 SEGMENT PARA PUBLIC ALIAS('BINK') 'CODE'
 
 
 ; // match: _readlossy @ 0x0034D7D0
+; // sp-match: _readlossy @ 0x0025D7D0
 _readlossy PROC PUBLIC
 $L_34d7d0:
         db 081h, 0ECh, 0E4h, 000h, 000h, 000h   ; sub esp, 0xe4

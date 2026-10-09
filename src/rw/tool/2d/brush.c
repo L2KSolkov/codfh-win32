@@ -137,6 +137,7 @@ BrushPrint2d(Rt2dBrush *brush)
 // match: __rt2dBrushFreeListPreallocBlocks @ 0x004310A8
 
 // match: __rt2dBrushClose @ 0x00255D20
+// sp-match: __rt2dBrushClose @ 0x0016B110
 
 void
 _rt2dBrushClose(void)
@@ -174,6 +175,7 @@ static RwFreeList _rt2dBrushFreeList;
  *
  */
 // match: _Rt2dBrushSetFreeListCreateParams @ 0x00255D50
+// sp-match: _Rt2dBrushSetFreeListCreateParams @ 0x0016B140
 void
 Rt2dBrushSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc )
 {
@@ -192,6 +194,7 @@ Rt2dBrushSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc
 
 
 // match: __rt2dBrushOpen @ 0x00255D70
+// sp-match: __rt2dBrushOpen @ 0x0016B160
 RwBool
 _rt2dBrushOpen(void)
 {
@@ -261,6 +264,7 @@ _rt2dBrushOpen(void)
  * \see Rt2dBrushSetTexture
  */
 // match: _Rt2dBrushCreate @ 0x002560F0
+// sp-match: _Rt2dBrushCreate @ 0x0016B9C0
 Rt2dBrush          *
 Rt2dBrushCreate(void)
 {
@@ -316,6 +320,7 @@ Rt2dBrushCreate(void)
  * \see Rt2dClose
  */
 // match: _Rt2dBrushDestroy @ 0x00255DC0
+// sp-match: _Rt2dBrushDestroy @ 0x0016B1B0
 RwBool
 Rt2dBrushDestroy(Rt2dBrush * brush)
 {
@@ -340,6 +345,7 @@ Rt2dBrushDestroy(Rt2dBrush * brush)
 
 #ifndef SKY
 // match: __rt2dBrushCheckFlatRGBA @ 0x00255E00
+// sp-match: __rt2dBrushCheckFlatRGBA @ 0x0016B1F0
 static void
 _rt2dBrushCheckFlatRGBA(Rt2dBrush * brush)
 {
@@ -379,6 +385,7 @@ _rt2dBrushCheckFlatRGBA(Rt2dBrush * brush)
  *   offset  - Offset RwRGBAReal in the range 0.0f to 255.0f
  */
 Rt2dBrush *
+// sp-match: __rt2dBrushTransformRGBARealDirect @ 0x0016B2C0
 _rt2dBrushTransformRGBARealDirect(Rt2dBrush *brush,
                                   RwRGBAReal *col0, RwRGBAReal *col1,
                                   RwRGBAReal *col2, RwRGBAReal *col3,
@@ -449,6 +456,7 @@ _rt2dBrushTransformRGBARealDirect(Rt2dBrush *brush,
  * \see Rt2dPathFill
  */
 // match: _Rt2dBrushSetRGBA @ 0x00255ED0
+// sp-match: _Rt2dBrushSetRGBA @ 0x0016B5D0
 Rt2dBrush          *
 Rt2dBrushSetRGBA(Rt2dBrush * brush, RwRGBA * col0, RwRGBA * col1,
                  RwRGBA * col2, RwRGBA * col3)
@@ -506,6 +514,7 @@ Rt2dBrushSetRGBA(Rt2dBrush * brush, RwRGBA * col0, RwRGBA * col1,
  * \see Rt2dBrushCreate
  */
 // match: _Rt2dBrushSetUV @ 0x00256040
+// sp-match: _Rt2dBrushSetUV @ 0x0016B740
 Rt2dBrush          *
 Rt2dBrushSetUV(Rt2dBrush * brush, RwV2d * uv0, RwV2d * uv1, RwV2d * uv2,
                RwV2d * uv3)
@@ -751,6 +760,7 @@ Rt2dBrushStreamWrite(Rt2dBrush *brush, RwStream *stream)
 }
 
 static Rt2dBrush *
+// sp-match: _rt2dBrushStreamRead_V0x01 @ 0x0016B7F0
 rt2dBrushStreamRead_V0x01( Rt2dBrush *brush, _rt2dStreamBrush *sBrush, RwStream *stream)
 {
     RWFUNCTION(RWSTRING("rt2dBrushStreamRead_V0x01"));
@@ -826,6 +836,7 @@ rt2dBrushStreamRead_V0x01( Rt2dBrush *brush, _rt2dStreamBrush *sBrush, RwStream 
 }
 
 Rt2dBrush *
+// sp-match: __rt2dBrushStreamReadTo @ 0x0016B940
 _rt2dBrushStreamReadTo(Rt2dBrush *brush,RwStream *stream)
 {
     _rt2dStreamBrush sBrush;

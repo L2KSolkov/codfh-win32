@@ -44,11 +44,13 @@ RWS_REGISTERCLASS(CAnimBankInfo);
 // match: ?MakeNew@CAnimBankInfo@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A02D0
 // match: __ehhandler$?MakeNew@CAnimBankInfo@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFC30
 // match: __ehhandler$?MakeNew@CAnimBankInfo@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFC3F
+// sp-match: ?MakeNew@CAnimBankInfo@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007DB20
 RWS_DEFINE_MAKENEW(CAnimBankInfo)
 
 // match: ??0CAnimBankInfo@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A0350
 // match: __ehhandler$??0CAnimBankInfo@@QAE@ABVCAttributePacket@RWS@@@Z-0x13 @ 0x002FFC50
 // match: __ehhandler$??0CAnimBankInfo@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x002FFC63
+// sp-match: ??0CAnimBankInfo@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007DA20
 CAnimBankInfo::CAnimBankInfo(const RWS::CAttributePacket &attr)
 {
     RwInt32 var_10;
@@ -63,16 +65,19 @@ CAnimBankInfo::CAnimBankInfo(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_GCAnimBankInfo@@UAEPAXI@Z @ 0x000A0480
+// sp-match: ??_GCAnimBankInfo@@UAEPAXI@Z @ 0x0007DAD0
 
 // match: ??1CAnimBankInfo@@UAE@XZ @ 0x000A04A0
 // match: __ehhandler$??1CAnimBankInfo@@UAE@XZ-0x2F @ 0x002FFC70
 // match: __ehhandler$??1CAnimBankInfo@@UAE@XZ @ 0x002FFC9F
+// sp-match: ??1CAnimBankInfo@@UAE@XZ @ 0x0007D6C0
 CAnimBankInfo::~CAnimBankInfo()
 {
     UnLinkMsg(RWS::iMsgStartSystem);
 }
 
 // match: ?sub_A0530@CAnimBankInfo@@QAEII@Z @ 0x000A0530
+// sp-match: ?sub_A0530@CAnimBankInfo@@QAEII@Z @ 0x0007D730
 RwUInt32 CAnimBankInfo::sub_A0530(RwUInt32 arg_0)
 {
     RwUInt32 var_4;
@@ -87,6 +92,7 @@ RwUInt32 CAnimBankInfo::sub_A0530(RwUInt32 arg_0)
 
 // Commands 0 to 17: the eighteen sizes, each rounded up to 4.
 // match: ?HandleAttributes@CAnimBankInfo@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A0570
+// sp-match: ?HandleAttributes@CAnimBankInfo@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007D750
 void CAnimBankInfo::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     RWS::CAttributeHandler::HandleAttributes(attr);
@@ -157,6 +163,7 @@ void CAnimBankInfo::HandleAttributes(const RWS::CAttributePacket &attr)
 // Once the system starts: hands the sizes to the animation banks and stops
 // listening.
 // match: ?HandleEvents@CAnimBankInfo@@UAEXAAVCMsg@RWS@@@Z @ 0x000A09D0
+// sp-match: ?HandleEvents@CAnimBankInfo@@UAEXAAVCMsg@RWS@@@Z @ 0x0007DAE0
 void CAnimBankInfo::HandleEvents(RWS::CMsg &pMsg)
 {
     if (pMsg.Id.p_msgrec == RWS::iMsgStartSystem.p_msgrec)
@@ -167,8 +174,15 @@ void CAnimBankInfo::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?sub_A0A20@CAnimBankInfo@@QAEPAIXZ @ 0x000A0A20
+// sp-match: ?sub_A0A20@CAnimBankInfo@@QAEPAIXZ @ 0x0007DA00
 RwUInt32 *CAnimBankInfo::sub_A0A20()
 {
+#ifdef CODFH_SP
+    // Single player hands the banks the first six sizes (SP 0x7DA00: lea eax, [ecx + 0x20]).
+    return unk_20;
+#else
     return unk_38;
+#endif
 }
 // match: ??_ECAnimBankInfo@@WBI@AEPAXI@Z @ 0x000A0A40
+// sp-match: ??_ECAnimBankInfo@@WBI@AEPAXI@Z @ 0x0007DA10

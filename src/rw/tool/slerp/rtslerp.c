@@ -141,6 +141,7 @@ long                rtSlerpStackDepth = 0;
 // match: _rcsid @ 0x00419940
 
 // match: _RtSlerpCreate @ 0x002E5900
+// sp-match: _RtSlerpCreate @ 0x002003D0
 RtSlerp            *
 RtSlerpCreate(RwInt32 nMatRefMask)
 {
@@ -198,6 +199,7 @@ RtSlerpCreate(RwInt32 nMatRefMask)
  * \see RtSlerpSetLerp
  */
 // match: _RtSlerpInitialize @ 0x002E5990
+// sp-match: _RtSlerpInitialize @ 0x00200460
 RtSlerp            *
 RtSlerpInitialize(RtSlerp * spSlerp,
                   RwMatrix * mpMat1, RwMatrix * mpMat2)
@@ -259,6 +261,7 @@ RtSlerpInitialize(RtSlerp * spSlerp,
  * \see RtSlerpSetLerp
  */
 // match: _RtSlerpDestroy @ 0x002E5AA0
+// sp-match: _RtSlerpDestroy @ 0x00200570
 void
 RtSlerpDestroy(RtSlerp * spSlerp)
 {
@@ -306,6 +309,7 @@ RtSlerpDestroy(RtSlerp * spSlerp)
  * \see RtSlerpSetLerp
  */
 // match: _RtSlerpGetMatrix @ 0x002E5AE0
+// sp-match: _RtSlerpGetMatrix @ 0x002005B0
 RwMatrix           *
 RtSlerpGetMatrix(RtSlerp * spSlerp,
                  RwMatrix * mpResultMat, RwReal nDelta)

@@ -9,8 +9,10 @@
 #include <string.h>
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: single player has no unreferenced 16.666666f here: "/" follows sp_fendlang's texts (SP 0x2E4134)
 // 0x003D8CA4
 extern const RwReal flt_3D8CA4 = 16.666666f;
+#endif
 // End of its data definitions.
 
 // Its data (PLAN M5): literals, constants and tables where the image has them.

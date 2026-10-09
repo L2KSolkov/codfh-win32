@@ -26,6 +26,7 @@ extern RwBool sub_243950(RwUInt32 size, RwUInt32 count, RwUInt32 align, RwInt32 
                          void *freeList, RwUInt32 hint);
 
 // match: _sub_23F770 @ 0x0023F770
+// sp-match: _sub_23F770 @ 0x00152300
 RwBool
 sub_23F770(void)
 {
@@ -44,6 +45,7 @@ sub_23F770(void)
 }
 
 // match: _sub_23F7B0 @ 0x0023F7B0
+// sp-match: _sub_23F7B0 @ 0x00152340
 static RwaObjHandle *
 sub_23F7B0(rwaHandleParams *params)
 {
@@ -63,6 +65,7 @@ sub_23F7B0(rwaHandleParams *params)
 }
 
 // match: _sub_23F7E0 @ 0x0023F7E0
+// sp-match: _sub_23F7E0 @ 0x00152370
 static void
 sub_23F7E0(RwaObjHandle *handle)
 {
@@ -73,6 +76,7 @@ sub_23F7E0(RwaObjHandle *handle)
 }
 
 // match: _DSPResource_Release @ 0x0023F800
+// sp-match: _DSPResource_Release @ 0x00152390
 void
 DSPResource_Release(RwaObjHandle *handle, rwaReleaseParams *params)
 {
@@ -115,6 +119,7 @@ DSPResource_Release(RwaObjHandle *handle, rwaReleaseParams *params)
 }
 
 // match: _Behavior_DispatchCallback @ 0x0023F8B0
+// sp-match: _Behavior_DispatchCallback @ 0x00152440
 RwaObjHandle *
 Behavior_DispatchCallback(RwaObjHandle *handle, RwUInt32 index, RwInt32 type, void *data)
 {
@@ -126,6 +131,7 @@ Behavior_DispatchCallback(RwaObjHandle *handle, RwUInt32 index, RwInt32 type, vo
 }
 
 // match: _sub_23F8E0 @ 0x0023F8E0
+// sp-match: _sub_23F8E0 @ 0x00152470
 RwaObjHandle *
 sub_23F8E0(RwaObjHandle *handle, RwUInt32 index, RwInt32 type, void *data)
 {
@@ -136,6 +142,7 @@ sub_23F8E0(RwaObjHandle *handle, RwUInt32 index, RwInt32 type, void *data)
 }
 
 // match: _RwaObjHandleSetParamUInt8 @ 0x0023F910
+// sp-match: _RwaObjHandleSetParamUInt8 @ 0x001524A0
 RwaObjHandle *
 RwaObjHandleSetParamUInt8(RwaObjHandle *handle, RwUInt32 index, RwInt32 type, ...)
 {
@@ -148,6 +155,7 @@ RwaObjHandleSetParamUInt8(RwaObjHandle *handle, RwUInt32 index, RwInt32 type, ..
 }
 
 // match: _sub_23F940 @ 0x0023F940
+// sp-match: _sub_23F940 @ 0x001524D0
 RwaObjHandle *
 sub_23F940(RwaObjHandle *handle, RwUInt32 index, RwInt32 type, void *data)
 {
@@ -160,6 +168,7 @@ sub_23F940(RwaObjHandle *handle, RwUInt32 index, RwInt32 type, void *data)
 }
 
 // match: _sub_23F960 @ 0x0023F960
+// sp-match: _sub_23F960 @ 0x001524F0
 RwUInt32
 sub_23F960(RwaObjHandle *handle, RwUInt32 index, RwInt32 type, RwBool *success)
 {
@@ -174,6 +183,7 @@ sub_23F960(RwaObjHandle *handle, RwUInt32 index, RwInt32 type, RwBool *success)
 }
 
 // match: _sub_23F9A0 @ 0x0023F9A0
+// sp-match: _sub_23F9A0 @ 0x00152530
 void
 sub_23F9A0(void)
 {
@@ -187,6 +197,7 @@ sub_23F9A0(void)
 }
 
 // match: _sub_23F9F0 @ 0x0023F9F0
+// sp-match: _sub_23F9F0 @ 0x00152580
 RwaObjHandle *
 sub_23F9F0(rwaInstance *obj, void *objInterface, rwaHandleParams *params)
 {

@@ -39,14 +39,18 @@
 #include "types/alfaobject.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E2914
 extern const RwReal flt_3E2914 = 16.666666f;
+#endif
 // 0x003E2918
 extern const RwV3d stru_3E2918 = { 0.0f, 1.0f, 0.0f };
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E2924
 extern const RwReal flt_3E2924 = 0.01f;
 // 0x003E2928
 extern const RwReal flt_3E2928 = 0.01f;
+#endif
 
 // match: ?flt_3E2914@@3MB @ 0x003E2914
 // match: ?stru_3E2918@@3URwV3d@@B @ 0x003E2918

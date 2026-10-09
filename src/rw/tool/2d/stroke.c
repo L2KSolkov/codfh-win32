@@ -100,6 +100,7 @@ WireRender2d(RwIm3DVertex * vertex, int vcount,
 // match: _rcsid @ 0x003EE480
 
 // match: _DefaultPathStroke2d @ 0x00256E30
+// sp-match: _DefaultPathStroke2d @ 0x0016E2D0
 static Rt2dPath *
 DefaultPathStroke2d(Rt2dPath * path, Rt2dBrush * brush)
 {
@@ -327,6 +328,7 @@ DefaultPathStroke2d(Rt2dPath * path, Rt2dBrush * brush)
  * \see Rt2dBrushSetWidth
  */
 // match: _Rt2dPathStroke @ 0x002573A0
+// sp-match: _Rt2dPathStroke @ 0x0016E840
 Rt2dPath           *
 Rt2dPathStroke(Rt2dPath * path, Rt2dBrush * brush)
 {
@@ -345,6 +347,7 @@ Rt2dPathStroke(Rt2dPath * path, Rt2dBrush * brush)
  * single mesh.
  */
 Rt2dPath *
+// sp-match: __rt2dPathStrokeCreateGeometry @ 0x0016E850
 _rt2dPathStrokeCreateGeometry(Rt2dPath * path, Rt2dBrush * brush,
                               RpGeometry *geom, RwUInt32 *geomVertIdx, RwUInt32 *geomTriIdx)
 {

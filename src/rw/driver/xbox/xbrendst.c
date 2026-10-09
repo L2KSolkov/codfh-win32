@@ -168,6 +168,7 @@ union XbUnionParam
 // match: __RwXbCmpFuncConvTable @ 0x004168AC
 
 // match: __rwXbRenderStateOpen @ 0x002AF390
+// sp-match: __rwXbRenderStateOpen @ 0x001C9B70
 
 void
 _rwXbRenderStateOpen(void)
@@ -203,6 +204,7 @@ _rwXbRenderStateOpen(void)
 }
 
 // match: __rwXbGetRenderState @ 0x002AF450
+// sp-match: __rwXbGetRenderState @ 0x001C9C30
 RwBool
 _rwXbGetRenderState(RwRenderState nState, void *param)
 {
@@ -332,6 +334,7 @@ _rwXbGetRenderState(RwRenderState nState, void *param)
 }
 
 // match: _XbRenderStateFogType @ 0x002AF6C0
+// sp-match: _XbRenderStateFogType @ 0x001C9EA0
 static RwBool
 XbRenderStateFogType(RwFogType fogType)
 {
@@ -354,6 +357,7 @@ XbRenderStateFogType(RwFogType fogType)
 }
 
 // match: _XbRenderStateTextureAddress @ 0x002AF7A0
+// sp-match: _XbRenderStateTextureAddress @ 0x001C9F80
 static RwBool
 XbRenderStateTextureAddress(RwUInt32 stage, RwTextureAddressMode addressMode)
 {
@@ -370,6 +374,7 @@ XbRenderStateTextureAddress(RwUInt32 stage, RwTextureAddressMode addressMode)
 }
 
 // match: _XbRenderStateTextureFilter @ 0x002AF840
+// sp-match: _XbRenderStateTextureFilter @ 0x001CA020
 static RwBool
 XbRenderStateTextureFilter(RwUInt32 stage, RwTextureFilterMode filterMode)
 {
@@ -386,6 +391,7 @@ XbRenderStateTextureFilter(RwUInt32 stage, RwTextureFilterMode filterMode)
 }
 
 // match: _XbRenderStateTextureStageRaster @ 0x002AF910
+// sp-match: _XbRenderStateTextureStageRaster @ 0x001CA0F0
 static void
 XbRenderStateTextureStageRaster(RwRaster *raster, RwUInt32 stage)
 {
@@ -474,6 +480,7 @@ XbRenderStateTextureStageRaster(RwRaster *raster, RwUInt32 stage)
 }
 
 // match: __rwXboxSetTextureAnisotropyOffset @ 0x002AFA90
+// sp-match: __rwXboxSetTextureAnisotropyOffset @ 0x001CA270
 void
 _rwXboxSetTextureAnisotropyOffset(RwInt32 offset)
 {
@@ -481,6 +488,7 @@ _rwXboxSetTextureAnisotropyOffset(RwInt32 offset)
 }
 
 // match: _RwXboxRenderStateSetTexture @ 0x002AFAA0
+// sp-match: _RwXboxRenderStateSetTexture @ 0x001CA280
 void
 RwXboxRenderStateSetTexture(RwTexture *texture, RwUInt32 stage)
 {
@@ -575,6 +583,7 @@ RwXboxRenderStateSetTexture(RwTexture *texture, RwUInt32 stage)
 }
 
 // match: __rwXbRenderStateTextureRaster @ 0x002AFEA0
+// sp-match: __rwXbRenderStateTextureRaster @ 0x001CA680
 RwBool
 _rwXbRenderStateTextureRaster(RwRaster *raster)
 {
@@ -584,6 +593,7 @@ _rwXbRenderStateTextureRaster(RwRaster *raster)
 }
 
 // match: __rwXbRenderStateTextureRasterPurge @ 0x002AFEC0
+// sp-match: __rwXbRenderStateTextureRasterPurge @ 0x001CA6A0
 void
 _rwXbRenderStateTextureRasterPurge(RwRaster *raster)
 {
@@ -609,6 +619,7 @@ _rwXbRenderStateTextureRasterPurge(RwRaster *raster)
 }
 
 // match: _XbRenderStateZTestEnable @ 0x002AFF60
+// sp-match: _XbRenderStateZTestEnable @ 0x001CA740
 static RwBool
 XbRenderStateZTestEnable(RwBool enable)
 {
@@ -645,6 +656,7 @@ XbRenderStateZTestEnable(RwBool enable)
 }
 
 // match: _XbRenderStateZWriteEnable @ 0x002B0060
+// sp-match: _XbRenderStateZWriteEnable @ 0x001CA840
 static RwBool
 XbRenderStateZWriteEnable(RwBool enable)
 {
@@ -681,6 +693,7 @@ XbRenderStateZWriteEnable(RwBool enable)
 }
 
 // match: _XbRenderStateSrcBlend @ 0x002B0150
+// sp-match: _XbRenderStateSrcBlend @ 0x001CA930
 static RwBool
 XbRenderStateSrcBlend(RwBlendFunction srcBlend)
 {
@@ -694,6 +707,7 @@ XbRenderStateSrcBlend(RwBlendFunction srcBlend)
 }
 
 // match: _XbRenderStateDestBlend @ 0x002B01A0
+// sp-match: _XbRenderStateDestBlend @ 0x001CA980
 static RwBool
 XbRenderStateDestBlend(RwBlendFunction dstBlend)
 {
@@ -707,6 +721,7 @@ XbRenderStateDestBlend(RwBlendFunction dstBlend)
 }
 
 // match: _XbRenderStateShadeMode @ 0x002B01F0
+// sp-match: _XbRenderStateShadeMode @ 0x001CA9D0
 static RwBool
 XbRenderStateShadeMode(RwShadeMode shadeMode)
 {
@@ -720,6 +735,7 @@ XbRenderStateShadeMode(RwShadeMode shadeMode)
 }
 
 // match: _XbRenderStateVertexAlphaEnable @ 0x002B0240
+// sp-match: _XbRenderStateVertexAlphaEnable @ 0x001CAA20
 static RwBool
 XbRenderStateVertexAlphaEnable(RwBool enable)
 {
@@ -755,6 +771,7 @@ XbRenderStateVertexAlphaEnable(RwBool enable)
 }
 
 // match: _XbRenderStateCullMode @ 0x002B0330
+// sp-match: _XbRenderStateCullMode @ 0x001CAB10
 static RwBool
 XbRenderStateCullMode(RwCullMode cullMode)
 {
@@ -768,6 +785,7 @@ XbRenderStateCullMode(RwCullMode cullMode)
 }
 
 // match: __rwXbRenderStateStencilFail @ 0x002B0380
+// sp-match: __rwXbRenderStateStencilFail @ 0x001CAB60
 RwBool
 _rwXbRenderStateStencilFail(RwStencilOperation operation)
 {
@@ -781,6 +799,7 @@ _rwXbRenderStateStencilFail(RwStencilOperation operation)
 }
 
 // match: __rwXbRenderStateStencilZFail @ 0x002B03D0
+// sp-match: __rwXbRenderStateStencilZFail @ 0x001CABB0
 RwBool
 _rwXbRenderStateStencilZFail(RwStencilOperation operation)
 {
@@ -794,6 +813,7 @@ _rwXbRenderStateStencilZFail(RwStencilOperation operation)
 }
 
 // match: __rwXbRenderStateStencilPass @ 0x002B0420
+// sp-match: __rwXbRenderStateStencilPass @ 0x001CAC00
 RwBool
 _rwXbRenderStateStencilPass(RwStencilOperation operation)
 {
@@ -807,6 +827,7 @@ _rwXbRenderStateStencilPass(RwStencilOperation operation)
 }
 
 // match: __rwXbRenderStateStencilFunction @ 0x002B0470
+// sp-match: __rwXbRenderStateStencilFunction @ 0x001CAC50
 RwBool
 _rwXbRenderStateStencilFunction(RwStencilFunction function)
 {
@@ -820,6 +841,7 @@ _rwXbRenderStateStencilFunction(RwStencilFunction function)
 }
 
 // match: __rwXbSetRenderState @ 0x002B04C0
+// sp-match: __rwXbSetRenderState @ 0x001CACA0
 RwBool
 _rwXbSetRenderState(RwRenderState nState, void *param)
 {
@@ -984,6 +1006,7 @@ _rwXbSetRenderState(RwRenderState nState, void *param)
 }
 
 // match: _RwXboxSetCurrentVertexShader @ 0x002B0900
+// sp-match: _RwXboxSetCurrentVertexShader @ 0x001CB0E0
 void
 RwXboxSetCurrentVertexShader(DWORD handle)
 {
@@ -995,6 +1018,7 @@ RwXboxSetCurrentVertexShader(DWORD handle)
 }
 
 // match: _RwXboxGetCurrentVertexShader @ 0x002B0920
+// sp-match: _RwXboxGetCurrentVertexShader @ 0x001CB100
 DWORD
 RwXboxGetCurrentVertexShader(void)
 {
@@ -1002,6 +1026,7 @@ RwXboxGetCurrentVertexShader(void)
 }
 
 // match: _RwXboxSetCurrentPixelShader @ 0x002B0930
+// sp-match: _RwXboxSetCurrentPixelShader @ 0x001CB110
 void
 RwXboxSetCurrentPixelShader(DWORD handle)
 {

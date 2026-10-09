@@ -33,9 +33,11 @@ RWS_REGISTERCLASS(HitDeathTestTrigger);
 // match: ?MakeNew@HitDeathTestTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A1CA0
 // match: __ehhandler$?MakeNew@HitDeathTestTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFD90
 // match: __ehhandler$?MakeNew@HitDeathTestTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFD9F
+// sp-match: ?MakeNew@HitDeathTestTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007EB50
 RWS_DEFINE_MAKENEW(HitDeathTestTrigger)
 
 // match: ??0HitDeathTestTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A1D20
+// sp-match: ??0HitDeathTestTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007E850
 HitDeathTestTrigger::HitDeathTestTrigger(const RWS::CAttributePacket &attr) : SoldierTrigger(attr)
 {
     RwInt32 var_4;
@@ -48,13 +50,16 @@ HitDeathTestTrigger::HitDeathTestTrigger(const RWS::CAttributePacket &attr) : So
 }
 
 // match: ??_GHitDeathTestTrigger@@UAEPAXI@Z @ 0x000A1D90
+// sp-match: ??_GHitDeathTestTrigger@@UAEPAXI@Z @ 0x0007EB40
 
 // match: ??1HitDeathTestTrigger@@UAE@XZ @ 0x000A1DB0
+// sp-match: ??1HitDeathTestTrigger@@UAE@XZ @ 0x0007E8A0
 // (Defined in the class, in HitDeathTestTrigger.h.)
 
 // Commands 1 to 6: names whose bytes go to unk_1A0 (the hit-death values);
 // 0: its own handle to the script ("PlayHitDeathReaction").
 // match: ?HandleAttributes@HitDeathTestTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A1DE0
+// sp-match: ?HandleAttributes@HitDeathTestTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007E8C0
 void HitDeathTestTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     SoldierTrigger::HandleAttributes(attr);
@@ -131,3 +136,4 @@ void HitDeathTestTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_EHitDeathTestTrigger@@WBI@AEPAXI@Z @ 0x000A2070
+// sp-match: ??_EHitDeathTestTrigger@@WBI@AEPAXI@Z @ 0x0007EB30

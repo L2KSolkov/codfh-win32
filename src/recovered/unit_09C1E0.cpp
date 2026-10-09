@@ -94,10 +94,32 @@ RwReal flt_429120 = 1.5f;
 // match: ??_C@_09BBGEBPMF@DogEntity?$AA@ @ 0x003D5898
 // match: ??_C@_07GPBECKHN@HitWall?$AA@ @ 0x003D58A4
 // match: ??_C@_09IKNPGHMO@HitGround?$AA@ @ 0x003D58AC
+// sp-match: ?vf_094@type_3D5658@@UAEXI@Z @ 0x0007BF00
+// sp-match: ?vf_0A4@type_3D5658@@UAEXH@Z @ 0x0007BF10
+// sp-match: ?vf_0A8@type_3D5658@@UAEHXZ @ 0x0007BF20
+// sp-match: ?vf_08C@type_3D5658@@UAEPAEHH@Z @ 0x0007BF30
+// sp-match: ?vf_09C@type_3D5658@@UAEHXZ @ 0x0007BF40
+// sp-match: ?vf_0A0@type_3D5658@@UAEXI@Z @ 0x0007BF50
+// sp-match: ?vf_0AC@type_3D5658@@UAEHXZ @ 0x0007BF60
+// sp-match: ?vf_0B4@type_3D5658@@UAEXXZ @ 0x0007BF90
+// sp-match: ?vf_0B8@type_3D5658@@UAEXH@Z @ 0x0007BFA0
+// sp-match: ?vf_0E0@type_3D5658@@UAEPAEXZ @ 0x0007BFB0
+// sp-match: ?vf_0F0@type_3D5658@@UAEPACXZ @ 0x0007BFC0
+// sp-match: ?vf_174@type_3D5658@@UAEHXZ @ 0x0007BFD0
+// sp-match: ?vf_178@type_3D5658@@UAEXH@Z @ 0x0007BFE0
+// sp-match: ?vf_180@type_3D5658@@UAEXH@Z @ 0x0007BFF0
+// sp-match: ?vf_1B0@type_3D5658@@UAEXH@Z @ 0x0007C010
+// sp-match: ?vf_23C@type_3D5658@@UAEHXZ @ 0x0007C020
+// sp-match: ?vf_118@type_3D5658@@UAEPAUtype_3D3548@@XZ @ 0x0007C040
+// sp-match: ?vf_11C@type_3D5658@@UAEXPAUtype_3D3548@@@Z @ 0x0007C050
+// sp-match: ?vf_120@type_3D5658@@UAEPAUAIData@@XZ @ 0x0007C060
+// sp-match: ??_Gtype_3D5658@@UAEPAXI@Z @ 0x0007C070
+// sp-match: ?vf_0B0@type_3D5658@@UAEXHH@Z @ 0x0007BF70
 
 // match: ?sub_9C1E0@@YAPAUtype_3D5658@@PAUtype_712B0@@@Z @ 0x0009C1E0
 // match: __ehhandler$?sub_9C1E0@@YAPAUtype_3D5658@@PAUtype_712B0@@@Z-0x11 @ 0x002FFB10
 // match: __ehhandler$?sub_9C1E0@@YAPAUtype_3D5658@@PAUtype_712B0@@@Z @ 0x002FFB21
+// sp-match: ?sub_9C1E0@@YAPAUtype_3D5658@@PAUtype_712B0@@@Z @ 0x0007C100
 type_3D5658 *sub_9C1E0(type_712B0 *arg_0)
 {
     type_3D5658 *var_10;
@@ -112,17 +134,20 @@ type_3D5658 *sub_9C1E0(type_712B0 *arg_0)
             var_10 = 0;
         }
     }
+#ifndef CODFH_SP
     else
     {
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
                    "location(%6.2f,%6.2f,%6.2f)",
                    arg_0->unk_90, arg_0->unk_94, arg_0->unk_98);
     }
+#endif
     return var_10;
 }
 // match: ??0type_3D5658@@QAE@PAUtype_712B0@@@Z @ 0x0009C2F0
 // match: __ehhandler$??0type_3D5658@@QAE@PAUtype_712B0@@@Z-0x24 @ 0x002FFB30
 // match: __ehhandler$??0type_3D5658@@QAE@PAUtype_712B0@@@Z @ 0x002FFB54
+// sp-match: ??0type_3D5658@@QAE@PAUtype_712B0@@@Z @ 0x0007BE90
 type_3D5658::type_3D5658(type_712B0 *arg_0)
 {
     sub_9C6E0(arg_0);
@@ -130,11 +155,13 @@ type_3D5658::type_3D5658(type_712B0 *arg_0)
 // match: ??1type_3D5658@@UAE@XZ @ 0x0009C660
 // match: __ehhandler$??1type_3D5658@@UAE@XZ-0x24 @ 0x002FFB60
 // match: __ehhandler$??1type_3D5658@@UAE@XZ @ 0x002FFB84
+// sp-match: ??1type_3D5658@@UAE@XZ @ 0x0007C090
 type_3D5658::~type_3D5658()
 {
     vf_230();
 }
 // match: ?sub_9C6E0@type_3D5658@@QAEHPAUtype_712B0@@@Z @ 0x0009C6E0
+// sp-match: ?sub_9C6E0@type_3D5658@@QAEHPAUtype_712B0@@@Z @ 0x0007AF70
 // Sets the dog up from its trigger arg_0: the base's set-up and its kind
 // (by the trigger's unk_114: 1 an ally, 2 or 4 an enemy); its landing and
 // wall points unset; its health and AI parameters from the trigger; its
@@ -172,9 +199,15 @@ RwInt32 type_3D5658::sub_9C6E0(type_712B0 *arg_0)
     set_xyz(&unk_134, -1.0f, -1.0f, -1.0f);
     zero_v3d(&unk_118);
     set_xyz(&unk_124, 1000.0f, 1000.0f, 1000.0f);
+#ifdef CODFH_SP // shape: the timer's store before the two clears
+    unk_108 = dword_42910C;
+    unk_130 = 0;
+    unk_19A4 = 0;
+#else
     unk_130 = 0;
     unk_19A4 = 0;
     unk_108 = dword_42910C;
+#endif
     unk_19A0 = fp_C->unk_108;
     unk_4F0 = fp_C->unk_F0;
     unk_4F4 = fp_C->unk_F4;
@@ -269,6 +302,7 @@ RwInt32 type_3D5658::sub_9C6E0(type_712B0 *arg_0)
 // Takes it down: its AI's registrations, the trigger's AI script's
 // entity, its AI, its animation, and its objects.
 // match: ?vf_230@type_3D5658@@UAEXXZ @ 0x0009CD00
+// sp-match: ?vf_230@type_3D5658@@UAEXXZ @ 0x0007B340
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D5658::vf_230()
 {
@@ -295,11 +329,16 @@ void type_3D5658::vf_230()
         }
         unk_520.sub_16C50();
         vf_228();
+#ifdef CODFH_SP // shape: single player releases it through release_anim (SP 0x7B3E6)
+        if (unk_280)
+            release_anim(unk_280);
+#else
         if (unk_280)
         {
             sub_78870(unk_280);
             unk_280 = 0;
         }
+#endif
         if (vf_090())
         {
             sub_717B0((type_3D2C88 *)vf_090());
@@ -313,6 +352,7 @@ void type_3D5658::vf_230()
     }
 }
 // match: ?vf_038@type_3D5658@@UAEXM@Z @ 0x0009CE70
+// sp-match: ?vf_038@type_3D5658@@UAEXM@Z @ 0x0007B440
 void type_3D5658::vf_038(RwReal arg_0)
 {
     type_3D3548::vf_038(arg_0);
@@ -321,6 +361,7 @@ void type_3D5658::vf_038(RwReal arg_0)
     sub_16D850(0x18);
 }
 // match: ?vf_03C@type_3D5658@@UAEXM@Z @ 0x0009CEB0
+// sp-match: ?vf_03C@type_3D5658@@UAEXM@Z @ 0x0007B480
 void type_3D5658::vf_03C(RwReal arg_0)
 {
     if (unk_19A8 > 0.0f)
@@ -333,6 +374,7 @@ void type_3D5658::vf_03C(RwReal arg_0)
     sub_16D850(0x18);
 }
 // match: ?vf_04C@type_3D5658@@UAEXM@Z @ 0x0009CF20
+// sp-match: ?vf_04C@type_3D5658@@UAEXM@Z @ 0x0007B4E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D5658::vf_04C(RwReal arg_0)
 {
@@ -370,6 +412,7 @@ void type_3D5658::vf_04C(RwReal arg_0)
     sub_16D850(0x18);
 }
 // match: ?vf_210@type_3D5658@@UAEXPAUtype_D05C0@@@Z @ 0x0009D010
+// sp-match: ?vf_210@type_3D5658@@UAEXPAUtype_D05C0@@@Z @ 0x0007B580
 void type_3D5658::vf_210(type_D05C0 *arg_0)
 {
     if (unk_28_3 && unk_28_5 && !unk_28_7)
@@ -385,6 +428,7 @@ void type_3D5658::vf_210(type_D05C0 *arg_0)
     }
 }
 // match: ?vf_224@type_3D5658@@UAE_NPAUtype_3DF8D8@@HPAH@Z @ 0x0009D080
+// sp-match: ?vf_224@type_3D5658@@UAE_NPAUtype_3DF8D8@@HPAH@Z @ 0x0007B5B0
 bool type_3D5658::vf_224(type_3DF8D8 *arg_0, RwInt32 arg_4, RwInt32 *arg_8)
 {
     RpAtomic *var_4;
@@ -395,6 +439,7 @@ bool type_3D5658::vf_224(type_3DF8D8 *arg_0, RwInt32 arg_4, RwInt32 *arg_8)
     return true;
 }
 // match: ?vf_0E4@type_3D5658@@UAEHH@Z @ 0x0009D0C0
+// sp-match: ?vf_0E4@type_3D5658@@UAEHH@Z @ 0x0007B5E0
 RwInt32 type_3D5658::vf_0E4(RwInt32 arg_0)
 {
     type_712B0 *var_4;
@@ -403,6 +448,7 @@ RwInt32 type_3D5658::vf_0E4(RwInt32 arg_0)
     return ((type_3D5658_trigger *)var_4)->unk_C6[arg_0];
 }
 // match: ?vf_0E8@type_3D5658@@UAEHXZ @ 0x0009D0F0
+// sp-match: ?vf_0E8@type_3D5658@@UAEHXZ @ 0x0007B600
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3D5658::vf_0E8()
 {
@@ -420,21 +466,25 @@ RwInt32 type_3D5658::vf_0E8()
     return l4;
 }
 // match: ?vf_0EC@type_3D5658@@UAEXHH@Z @ 0x0009D150
+// sp-match: ?vf_0EC@type_3D5658@@UAEXHH@Z @ 0x0007B620
 void type_3D5658::vf_0EC(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_510[arg_0] = (RwUInt16)arg_4;
 }
 // match: ?vf_0FC@type_3D5658@@UAEMXZ @ 0x0009D170
+// sp-match: ?vf_0FC@type_3D5658@@UAEMXZ @ 0x0007B640
 RwReal type_3D5658::vf_0FC()
 {
     return unk_4F0;
 }
 // match: ?vf_100@type_3D5658@@UAEMXZ @ 0x0009D190
+// sp-match: ?vf_100@type_3D5658@@UAEMXZ @ 0x0007B650
 RwReal type_3D5658::vf_100()
 {
     return unk_4F4;
 }
 // match: ?vf_10C@type_3D5658@@UAEMXZ @ 0x0009D1B0
+// sp-match: ?vf_10C@type_3D5658@@UAEMXZ @ 0x0007B660
 RwReal type_3D5658::vf_10C()
 {
     if (unk_520.unk_520)
@@ -444,11 +494,13 @@ RwReal type_3D5658::vf_10C()
     return unk_4F8;
 }
 // match: ?vf_130@type_3D5658@@UAEMXZ @ 0x0009D1E0
+// sp-match: ?vf_130@type_3D5658@@UAEMXZ @ 0x0007B680
 RwReal type_3D5658::vf_130()
 {
     return unk_504;
 }
 // match: ?vf_114@type_3D5658@@UAEMXZ @ 0x0009D200
+// sp-match: ?vf_114@type_3D5658@@UAEMXZ @ 0x0007B690
 RwReal type_3D5658::vf_114()
 {
     return unk_4FC * unk_500;
@@ -456,6 +508,7 @@ RwReal type_3D5658::vf_114()
 // Sets AI parameter arg_0 to arg_4, a float's bits as the script passes
 // them.
 // match: ?vf_16C@type_3D5658@@UAEHHH@Z @ 0x0009D220
+// sp-match: ?vf_16C@type_3D5658@@UAEHHH@Z @ 0x0007B6A0
 RwInt32 type_3D5658::vf_16C(RwInt32 arg_0, RwInt32 arg_4)
 {
     RwInt32 var_4;
@@ -492,6 +545,7 @@ RwInt32 type_3D5658::vf_16C(RwInt32 arg_0, RwInt32 arg_4)
     return var_4;
 }
 // match: ?vf_238@type_3D5658@@UAEMXZ @ 0x0009D340
+// sp-match: ?vf_238@type_3D5658@@UAEMXZ @ 0x0007B790
 RwReal type_3D5658::vf_238()
 {
     unk_19A8 = 60.0f;
@@ -500,6 +554,7 @@ RwReal type_3D5658::vf_238()
 // Its head's matrix (bone 0x199) while its animation drives it, else 150
 // above its frame.
 // match: ?vf_104@type_3D5658@@UAEXPAURwMatrixTag@@@Z @ 0x0009D370
+// sp-match: ?vf_104@type_3D5658@@UAEXPAURwMatrixTag@@@Z @ 0x0007B7B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D5658::vf_104(RwMatrix *arg_0)
 {
@@ -534,6 +589,7 @@ void type_3D5658::vf_104(RwMatrix *arg_0)
 // Its eye point: its head (bone 0x199) while its animation drives it, else
 // 150 above its frame.
 // match: ?vf_108@type_3D5658@@UAEXPAURwV3d@@@Z @ 0x0009D450
+// sp-match: ?vf_108@type_3D5658@@UAEXPAURwV3d@@@Z @ 0x0007B850
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D5658::vf_108(RwV3d *arg_0)
 {
@@ -563,6 +619,7 @@ void type_3D5658::vf_108(RwV3d *arg_0)
 // Its aim point (bone 0x71) while its animation drives it, else 50 above
 // its frame.
 // match: ?vf_110@type_3D5658@@UAEXPAURwV3d@@PAUtype_3D3548@@H@Z @ 0x0009D520
+// sp-match: ?vf_110@type_3D5658@@UAEXPAURwV3d@@PAUtype_3D3548@@H@Z @ 0x0007B8E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D5658::vf_110(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
 {
@@ -595,6 +652,7 @@ void type_3D5658::vf_110(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
     }
 }
 // match: ?vf_078@type_3D5658@@UAEXXZ @ 0x0009D5F0
+// sp-match: ?vf_078@type_3D5658@@UAEXXZ @ 0x0007B980
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D5658::vf_078()
 {
@@ -608,6 +666,7 @@ void type_3D5658::vf_078()
 // The line of arg_4 against its bone boxes: the first test when arg_0 is
 // 1, else the other; -1 for a miss or while unk_88_1 is clear.
 // match: ?vf_07C@type_3D5658@@UAEHCPAURpIntersection@@PAMH@Z @ 0x0009D620
+// sp-match: ?vf_07C@type_3D5658@@UAEHCPAURpIntersection@@PAMH@Z @ 0x0007B9A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3D5658::vf_07C(RwInt8 arg_0, RpIntersection *arg_4, RwReal *arg_8, RwInt32 arg_C)
 {
@@ -639,6 +698,7 @@ RwInt32 type_3D5658::vf_07C(RwInt8 arg_0, RpIntersection *arg_4, RwReal *arg_8, 
 // A bullet: resets its hit-death values, takes the damage and tells its
 // script.
 // match: ?vf_064@type_3D5658@@UAEHPAUtype_75600@@@Z @ 0x0009D6C0
+// sp-match: ?vf_064@type_3D5658@@UAEHPAUtype_75600@@@Z @ 0x0007BA00
 RwInt32 type_3D5658::vf_064(type_75600 *arg_0)
 {
     RwInt32 var_4;
@@ -664,6 +724,7 @@ RwInt32 type_3D5658::vf_064(type_75600 *arg_0)
 // An explosion that reaches it: resets its hit-death values, takes the
 // damage and tells its script where it came from and whether from behind.
 // match: ?vf_068@type_3D5658@@UAEHPAUtype_758F0@@@Z @ 0x0009D7A0
+// sp-match: ?vf_068@type_3D5658@@UAEHPAUtype_758F0@@@Z @ 0x0007BAA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3D5658::vf_068(type_758F0 *arg_0)
 {
@@ -706,6 +767,7 @@ RwInt32 type_3D5658::vf_068(type_758F0 *arg_0)
 // faster than 0.2: resets its hit-death values with a random one, takes
 // 100 and tells its script as an explosion of 1.
 // match: ?vf_060@type_3D5658@@UAEHPAUtype_3D3548@@@Z @ 0x0009D980
+// sp-match: ?vf_060@type_3D5658@@UAEHPAUtype_3D3548@@@Z @ 0x0007BBF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3D5658::vf_060(type_3D3548 *arg_0)
 {
@@ -749,6 +811,7 @@ RwInt32 type_3D5658::vf_060(type_3D3548 *arg_0)
     return 0;
 }
 // match: ?vf_054@type_3D5658@@UAEXH@Z @ 0x0009DB60
+// sp-match: ?vf_054@type_3D5658@@UAEXH@Z @ 0x0007BD40
 void type_3D5658::vf_054(RwInt32 arg_0)
 {
     RpClump *var_4;
@@ -764,6 +827,7 @@ void type_3D5658::vf_054(RwInt32 arg_0)
 // Lands (arg_0 set) or hits a wall while falling or flying: resets its
 // motion and tells its script.
 // match: ?vf_1C4@type_3D5658@@UAEXH@Z @ 0x0009DBB0
+// sp-match: ?vf_1C4@type_3D5658@@UAEXH@Z @ 0x0007BD70
 void type_3D5658::vf_1C4(RwInt32 arg_0)
 {
     if (!unk_19A4)
@@ -786,17 +850,20 @@ void type_3D5658::vf_1C4(RwInt32 arg_0)
     }
 }
 // match: ?vf_098@type_3D5658@@UAEPAUtype_3D2E7C@@XZ @ 0x0009DCC0
+// sp-match: ?vf_098@type_3D5658@@UAEPAUtype_3D2E7C@@XZ @ 0x0007BE20
 type_3D2E7C *type_3D5658::vf_098()
 {
     return (type_3D2E7C *)sub_67620(unk_4D4);
 }
 // match: ?vf_090@type_3D5658@@UAEPAUtype_6D380@@XZ @ 0x0009DCE0
+// sp-match: ?vf_090@type_3D5658@@UAEPAUtype_6D380@@XZ @ 0x0007BE30
 type_6D380 *type_3D5658::vf_090()
 {
     return (type_6D380 *)sub_67620(unk_4D8);
 }
 // Whether arg_0 is one of its keys (the trigger's AI script and tasks).
 // match: ?vf_058@type_3D5658@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x0009DD00
+// sp-match: ?vf_058@type_3D5658@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x0007BE40
 RwInt32 type_3D5658::vf_058(type_3DF8D8_04 *arg_0)
 {
     type_712B0 *var_4;

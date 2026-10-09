@@ -65,6 +65,7 @@ extern void *sub_2DA220(size_t size, RwUInt32 hint);
 // match: _rcsid @ 0x00419504
 
 // match: __rpMaterialListDeinitialize @ 0x002E0FC0
+// sp-match: __rpMaterialListDeinitialize @ 0x001FBA90
 RpMaterialList     *
 _rpMaterialListDeinitialize(RpMaterialList * matList)
 {
@@ -105,6 +106,7 @@ _rpMaterialListDeinitialize(RpMaterialList * matList)
  */
 
 // match: __rpMaterialListInitialize @ 0x002E1020
+// sp-match: __rpMaterialListInitialize @ 0x001FBAF0
 RpMaterialList     *
 _rpMaterialListInitialize(RpMaterialList * matList)
 {
@@ -208,6 +210,7 @@ _rpMaterialListCopy(RpMaterialList * matListOut,
  */
 
 // match: __rpMaterialListGetMaterial @ 0x002E1030
+// sp-match: __rpMaterialListGetMaterial @ 0x001FBB00
 RpMaterial         *
 _rpMaterialListGetMaterial(const RpMaterialList * matList,
                           RwInt32 matIndex)
@@ -228,6 +231,7 @@ _rpMaterialListGetMaterial(const RpMaterialList * matList,
  */
 
 // match: __rpMaterialListSetSize @ 0x002E1040
+// sp-match: __rpMaterialListSetSize @ 0x001FBB10
 RpMaterialList *
 _rpMaterialListSetSize(RpMaterialList * matList, RwInt32 size)
 {
@@ -298,6 +302,7 @@ _rpMaterialListSetSize(RpMaterialList * matList, RwInt32 size)
  */
 
 // match: __rpMaterialListAppendMaterial @ 0x002E1120
+// sp-match: __rpMaterialListAppendMaterial @ 0x001FBBF0
 RwInt32
 _rpMaterialListAppendMaterial(RpMaterialList * matList,
                              RpMaterial * material)
@@ -386,6 +391,7 @@ _rpMaterialListAppendMaterial(RpMaterialList * matList,
  */
 
 // match: __rpMaterialListFindMaterialIndex @ 0x002E1230
+// sp-match: __rpMaterialListFindMaterialIndex @ 0x001FBD00
 RwInt32
 _rpMaterialListFindMaterialIndex(const RpMaterialList * matList,
                                 const RpMaterial * material)
@@ -436,6 +442,7 @@ MaterialListStreamGetSizeActual(const RpMaterialList * matList)
  */
 
 // match: __rpMaterialListStreamGetSize @ 0x002E1260
+// sp-match: __rpMaterialListStreamGetSize @ 0x001FBD30
 RwUInt32
 _rpMaterialListStreamGetSize(const RpMaterialList * matList)
 {
@@ -480,6 +487,7 @@ _rpMaterialListStreamGetSize(const RpMaterialList * matList)
  On exit    :
  */
 // match: __rpMaterialListStreamWrite @ 0x002E12C0
+// sp-match: __rpMaterialListStreamWrite @ 0x001FBD90
 const RpMaterialList *
 _rpMaterialListStreamWrite(const RpMaterialList * matList,
                           RwStream * stream)
@@ -554,6 +562,7 @@ _rpMaterialListStreamWrite(const RpMaterialList * matList,
  On exit    : MatList created
  */
 // match: __rpMaterialListStreamRead @ 0x002E13E0
+// sp-match: __rpMaterialListStreamRead @ 0x001FBEB0
 RpMaterialList     *
 _rpMaterialListStreamRead(RwStream * stream, RpMaterialList * matList)
 {

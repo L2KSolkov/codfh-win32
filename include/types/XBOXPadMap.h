@@ -23,8 +23,18 @@ public:
     {
     }
 
+#ifdef CODFH_SP
+    // Single player maps the pads' bindings from its attributes (SP 0x81E10; its vtable 0x2E257C has
+    // HandleAttributes in slot 1) through three helpers of its own (SP 0x81D20, 0x81D60, 0x81DC0).
+    virtual void HandleAttributes(const RWS::CAttributePacket &attr);
+    RwInt32 sp_sub_81D20(const RwChar *arg_0);
+    void sp_sub_81D60(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, const RwChar *arg_C);
+    void sp_sub_81DC0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8);
+#endif
+
     RwInt32 unk_18;
 };
+
 typedef RwChar XBOXPadMap_size_check[sizeof(XBOXPadMap) == 0x1C ? 1 : -1];
 
 #endif

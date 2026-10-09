@@ -97,6 +97,7 @@ static const rwIm3DPool *rwXbImmPool = NULL;
 // match: ?nodeXBoxSubmitNoLightCSL@?1??RxNodeDefinitionGetXboxSubmitNoLight@@9@9 @ 0x004357A8
 
 // match: _XbSubmitNode @ 0x002BC460
+// sp-match: _XbSubmitNode @ 0x001D7870
 
 static RwBool
 XbSubmitNode(RxPipelineNodeInstance *self __RWUNUSED__,
@@ -320,6 +321,7 @@ XbSubmitNode(RxPipelineNodeInstance *self __RWUNUSED__,
  XbImmInstanceNode
 */
 // match: _XbImmInstanceNode @ 0x002BC8D0
+// sp-match: _XbImmInstanceNode @ 0x001D7CE0
 static RwBool
 XbImmInstanceNode(RxPipelineNodeInstance *self __RWUNUSED__,
                   const RxPipelineNodeParam *params)
@@ -333,6 +335,7 @@ XbImmInstanceNode(RxPipelineNodeInstance *self __RWUNUSED__,
  RxNodeDefinitionGetXboxImmInstance
 */
 // match: _RxNodeDefinitionGetXboxImmInstance @ 0x002BC8F0
+// sp-match: _RxNodeDefinitionGetXboxImmInstance @ 0x001D7D00
 RxNodeDefinition *
 RxNodeDefinitionGetXboxImmInstance(void)
 {
@@ -369,6 +372,7 @@ RxNodeDefinitionGetXboxImmInstance(void)
  RxNodeDefinitionGetXboxSubmitNoLight
 */
 // match: _RxNodeDefinitionGetXboxSubmitNoLight @ 0x002BC900
+// sp-match: _RxNodeDefinitionGetXboxSubmitNoLight @ 0x001D7D10
 RxNodeDefinition *
 RxNodeDefinitionGetXboxSubmitNoLight(void)
 {

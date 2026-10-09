@@ -47,11 +47,13 @@ RWS_REGISTERCLASS(VehicleTrigger);
 // match: ?MakeNew@VehicleTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000BF960
 // match: __ehhandler$?MakeNew@VehicleTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x003005B0
 // match: __ehhandler$?MakeNew@VehicleTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x003005BF
+// sp-match: ?MakeNew@VehicleTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000937A0
 RWS_DEFINE_MAKENEW(VehicleTrigger)
 
 // match: ??0VehicleTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000BF9E0
 // match: __ehhandler$??0VehicleTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x8 @ 0x003005D0
 // match: __ehhandler$??0VehicleTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x003005D8
+// sp-match: ??0VehicleTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00092A70
 VehicleTrigger::VehicleTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_1FC = 0;
@@ -98,12 +100,15 @@ VehicleTrigger::VehicleTrigger(const RWS::CAttributePacket &attr) : Trigger(attr
 }
 
 // match: ?vf_008@VehicleTrigger@@UAEHXZ @ 0x000BFD70
+// sp-match: ?vf_008@VehicleTrigger@@UAEHXZ @ 0x00122410
 
 // match: ??_GVehicleTrigger@@UAEPAXI@Z @ 0x000BFD80
+// sp-match: ??_GVehicleTrigger@@UAEPAXI@Z @ 0x00092E30
 
 // match: ??1VehicleTrigger@@UAE@XZ @ 0x000BFDA0
 // match: __ehhandler$??1VehicleTrigger@@UAE@XZ-0x8 @ 0x003005F0
 // match: __ehhandler$??1VehicleTrigger@@UAE@XZ @ 0x003005F8
+// sp-match: ??1VehicleTrigger@@UAE@XZ @ 0x00092C70
 VehicleTrigger::~VehicleTrigger()
 {
     if (unk_1FC)
@@ -117,6 +122,7 @@ VehicleTrigger::~VehicleTrigger()
 
 // Commands 4 and 5 first, then the rest.
 // match: ?HandleAttributes@VehicleTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000BFE40
+// sp-match: ?HandleAttributes@VehicleTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00092E40
 void VehicleTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -415,6 +421,7 @@ void VehicleTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 
 // On dword_4B8750 (once) and dword_4B67C0 it creates its child.
 // match: ?HandleEvents@VehicleTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000C0EC0
+// sp-match: ?HandleEvents@VehicleTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x00093750
 void VehicleTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
     Trigger::HandleEvents(pMsg);
@@ -433,6 +440,7 @@ void VehicleTrigger::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?sub_C0F30@VehicleTrigger@@QAEXXZ @ 0x000C0F30
+// sp-match: ?sub_C0F30@VehicleTrigger@@QAEXXZ @ 0x00092D10
 void VehicleTrigger::sub_C0F30()
 {
     RwInt32 var_4;
@@ -445,6 +453,7 @@ void VehicleTrigger::sub_C0F30()
 }
 
 // match: ?vf_020@VehicleTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000C0F80
+// sp-match: ?vf_020@VehicleTrigger@@UAEPAUtype_3D3548@@XZ @ 0x00092D60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_3D3548 *VehicleTrigger::vf_020()
 {
@@ -478,6 +487,7 @@ type_3D3548 *VehicleTrigger::vf_020()
 }
 
 // match: ?sub_C1010@VehicleTrigger@@QAEXPAUtype_3D2E7C@@@Z @ 0x000C1010
+// sp-match: ?sub_C1010@VehicleTrigger@@QAEXPAUtype_3D2E7C@@@Z @ 0x00092DB0
 void VehicleTrigger::sub_C1010(type_3D2E7C *arg_0)
 {
     RwInt32 r10;
@@ -495,11 +505,13 @@ void VehicleTrigger::sub_C1010(type_3D2E7C *arg_0)
 }
 
 // match: ??_EVehicleTrigger@@WBI@AEPAXI@Z @ 0x000C10A0
+// sp-match: ??_EVehicleTrigger@@WBI@AEPAXI@Z @ 0x00092E20
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ?vf_01C@VehicleTrigger@@UAEPAUtype_3DF8D8_04@@XZ (folded into 0x9F4D0)
+// sp-match: ?vf_01C@VehicleTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x00092870
 struct type_3DF8D8_04 *VehicleTrigger::vf_01C()
 {
     return &unk_E0;

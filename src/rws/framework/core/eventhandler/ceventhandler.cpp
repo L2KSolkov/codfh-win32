@@ -46,6 +46,9 @@ extern const RwChar iMsgOnDeleteEntity_name[] = "iMsgOnDeleteEntity";
 // match: _$E7 @ 0x0030B8A0
 // match: _$E8 @ 0x0030E670
 // match: _$E10 @ 0x0030B8C0
+// sp-match: _$E1 @ 0x0021D8A0
+// sp-match: _$E4 @ 0x0021D8C0
+// sp-match: _$E7 @ 0x0021D8E0
 
 namespace
 {
@@ -68,11 +71,13 @@ namespace RWS
 }
 
 // match: ??0CEventId@RWS@@QAE@XZ @ 0x0012DDB0
+// sp-match: ??0CEventId@RWS@@QAE@XZ @ 0x000E0330
 RWS::CEventId::CEventId(void) : p_msgrec(0), m_linked_count(0), m_registered_count(0)
    {
    }
 
 // match: ?Inc_registered_count@CEventId@RWS@@QAEXXZ @ 0x0012DDE0
+// sp-match: ?Inc_registered_count@CEventId@RWS@@QAEXXZ @ 0x000E0340
 void RWS::CEventId::Inc_registered_count(void)
    {
       p_msgrec->Inc_registered_count();
@@ -80,6 +85,7 @@ void RWS::CEventId::Inc_registered_count(void)
    }
 
 // match: ?Dec_registered_count@CEventId@RWS@@QAEXXZ @ 0x0012DE20
+// sp-match: ?Dec_registered_count@CEventId@RWS@@QAEXXZ @ 0x000E0350
 void RWS::CEventId::Dec_registered_count(void)
    {
       p_msgrec->Dec_registered_count();
@@ -92,18 +98,21 @@ void RWS::CEventId::Dec_registered_count(void)
    }
 
 // match: ?Inc_linked_count@CEventId@RWS@@QAEXXZ @ 0x0012DE70
+// sp-match: ?Inc_linked_count@CEventId@RWS@@QAEXXZ @ 0x000E0370
 void RWS::CEventId::Inc_linked_count(void)
    {
       m_linked_count++;
    }
 
 // match: ?Dec_linked_count@CEventId@RWS@@QAEXXZ @ 0x0012DE90
+// sp-match: ?Dec_linked_count@CEventId@RWS@@QAEXXZ @ 0x000E0380
 void RWS::CEventId::Dec_linked_count(void)
    {
       m_linked_count--;
    }
 
 // match: ??4CEventId@RWS@@QAEAAV01@PBVCRegisteredMsgs@1@@Z @ 0x0012DEB0
+// sp-match: ??4CEventId@RWS@@QAEAAV01@PBVCRegisteredMsgs@1@@Z @ 0x000E0390
 RWS::CEventId &RWS::CEventId::operator = (const CRegisteredMsgs *rhs)
    {
       if (p_msgrec != rhs)
@@ -115,6 +124,7 @@ RWS::CEventId &RWS::CEventId::operator = (const CRegisteredMsgs *rhs)
    }
 
 // match: ?Open@CEventHandler@RWS@@SAXII@Z @ 0x0012DEE0
+// sp-match: ?Open@CEventHandler@RWS@@SAXII@Z @ 0x000E09F0
 void RWS::CEventHandler::Open(RwUInt32 linkBlockSize, RwUInt32 regBlockSize)
    {
       CLinkedMsg::InitMemHandler(linkBlockSize);
@@ -126,6 +136,7 @@ void RWS::CEventHandler::Open(RwUInt32 linkBlockSize, RwUInt32 regBlockSize)
    }
 
 // match: ?Close@CEventHandler@RWS@@SAXXZ @ 0x0012DF40
+// sp-match: ?Close@CEventHandler@RWS@@SAXXZ @ 0x000E0A40
 void RWS::CEventHandler::Close(void)
    {
       UnRegisterMsg ( iMsgDeleteEventHandler );
@@ -137,8 +148,13 @@ void RWS::CEventHandler::Close(void)
    }
 
 // match: ?StrIdentical@?A0xb9ca1959@@YAHIIPBD0@Z @ 0x0012E390
+// sp-match: ?StrIdentical@?A0xb9ca1959@@YAHIIPBD0@Z @ 0x000E02F0
 namespace
 {
+#ifdef CODFH_SP
+   // shape: internal linkage; SP passes the arguments in registers (SP 0xE02F0)
+   static
+#endif
    RwBool StrIdentical(const RwUInt32 uiId1, RwUInt32 uiId2, const RwChar *ps1, const RwChar *ps2)
    {
       if (uiId1 != uiId2) return (FALSE);
@@ -160,6 +176,7 @@ namespace
 // match: ?RegisterMsg@CEventHandler@RWS@@SAXAAVCEventId@2@PBD1@Z @ 0x0012DF80
 // match: __ehhandler$?RegisterMsg@CEventHandler@RWS@@SAXAAVCEventId@2@PBD1@Z-0xB @ 0x003016B0
 // match: __ehhandler$?RegisterMsg@CEventHandler@RWS@@SAXAAVCEventId@2@PBD1@Z @ 0x003016BB
+// sp-match: ?RegisterMsg@CEventHandler@RWS@@SAXAAVCEventId@2@PBD1@Z @ 0x000E0590
 void RWS::CEventHandler::RegisterMsg(
                           CEventId &Id,
                           const RwChar *p_msgname,
@@ -269,6 +286,7 @@ void RWS::CEventHandler::RegisterMsg(
    }
 
 // match: ?UnRegisterMsg@CEventHandler@RWS@@SAXAAVCEventId@2@@Z @ 0x0012E400
+// sp-match: ?UnRegisterMsg@CEventHandler@RWS@@SAXAAVCEventId@2@@Z @ 0x000E07C0
 void RWS::CEventHandler::UnRegisterMsg(CEventId &Id)
    {
       if (Id != ERROR_NOT_A_VALID_MESSAGE_ID)
@@ -317,6 +335,7 @@ void RWS::CEventHandler::UnRegisterMsg(CEventId &Id)
    }
 
 // match: ??1CEventHandler@RWS@@UAE@XZ @ 0x0012E4F0
+// sp-match: ??1CEventHandler@RWS@@UAE@XZ @ 0x000E0B00
 RWS::CEventHandler::~CEventHandler(void)
    {
       CMsg Msg(iMsgOnDeleteEntity, static_cast<CEventHandler*>(this));
@@ -327,6 +346,7 @@ RWS::CEventHandler::~CEventHandler(void)
    }
 
 // match: ?LinkMsg@CEventHandler@RWS@@QAEXAAVCEventId@2@PBDG@Z @ 0x0012E550
+// sp-match: ?LinkMsg@CEventHandler@RWS@@QAEXAAVCEventId@2@PBDG@Z @ 0x000E0A70
 void RWS::CEventHandler::LinkMsg(CEventId &Id,
                                const RwChar *p_formatstring,
                                RwUInt16 priority)
@@ -338,6 +358,7 @@ void RWS::CEventHandler::LinkMsg(CEventId &Id,
    }
 
 // match: ?UnLinkMsg@CEventHandler@RWS@@QAEXAAVCEventId@2@@Z @ 0x0012E590
+// sp-match: ?UnLinkMsg@CEventHandler@RWS@@QAEXAAVCEventId@2@@Z @ 0x000E0840
 void RWS::CEventHandler::UnLinkMsg(CEventId &Id)
    {
       if (Id == ERROR_NOT_A_VALID_MESSAGE_ID)
@@ -401,6 +422,7 @@ void RWS::CEventHandler::UnLinkMsg(CEventId &Id)
    }
 
 // match: ?DeleteEventHandlers@CEventHandler@RWS@@SAXPBVCMsg@2@@Z @ 0x0012E680
+// sp-match: ?DeleteEventHandlers@CEventHandler@RWS@@SAXPBVCMsg@2@@Z @ 0x000E03A0
 void RWS::CEventHandler::DeleteEventHandlers(
                               const CMsg *p_Msg)
    {
@@ -420,6 +442,7 @@ void RWS::CEventHandler::DeleteEventHandlers(
    }
 
 // match: ?DeleteEventHandlers@CEventHandler@RWS@@SAXABVCEventId@2@@Z @ 0x0012E6E0
+// sp-match: ?DeleteEventHandlers@CEventHandler@RWS@@SAXABVCEventId@2@@Z @ 0x000E03D0
 void RWS::CEventHandler::DeleteEventHandlers(const CEventId &Id)
    {
       if (Id != ERROR_NOT_A_VALID_MESSAGE_ID)
@@ -431,6 +454,7 @@ void RWS::CEventHandler::DeleteEventHandlers(const CEventId &Id)
    }
 
 // match: ?LinkMsgToEventHandler@CEventHandler@RWS@@SAHPAV12@AAVCEventId@2@PBDG@Z @ 0x0012E720
+// sp-match: ?LinkMsgToEventHandler@CEventHandler@RWS@@SAHPAV12@AAVCEventId@2@PBDG@Z @ 0x000E08C0
 RwBool RWS::CEventHandler::LinkMsgToEventHandler(
                         CEventHandler *pCEventHandler,
                         CEventId &Id,
@@ -513,6 +537,7 @@ RwBool RWS::CEventHandler::LinkMsgToEventHandler(
    }
 
 // match: ?_SendMsg@RWS@@YAHAAVCMsg@1@@Z @ 0x0012E8D0
+// sp-match: ?_SendMsg@RWS@@YAHAAVCMsg@1@@Z @ 0x000E0A90
 RwBool RWS::_SendMsg(CMsg &p_Msg)
    {
       CLinkedMsg *pErm = p_Msg.Id.p_msgrec->Erm.p_next;
@@ -546,6 +571,7 @@ RwBool RWS::_SendMsg(CMsg &p_Msg)
    }
 
 // match: ?ProcessPendingUnlinks@CEventHandler@RWS@@SAXPAVCLinkedMsg@2@@Z @ 0x0012E970
+// sp-match: ?ProcessPendingUnlinks@CEventHandler@RWS@@SAXPAVCLinkedMsg@2@@Z @ 0x000E09B0
 void RWS::CEventHandler::ProcessPendingUnlinks(CLinkedMsg *pErm)
    {
       while (pErm != 0)
@@ -567,6 +593,7 @@ void RWS::CEventHandler::ProcessPendingUnlinks(CLinkedMsg *pErm)
    }
 
 // match: ?InitMemHandler@CLinkedMsg@RWS@@SAXI@Z @ 0x0012E9E0
+// sp-match: ?InitMemHandler@CLinkedMsg@RWS@@SAXI@Z @ 0x000E0400
 void RWS::CLinkedMsg::InitMemHandler(RwUInt32 blockSize)
    {
       if (!blockSize)
@@ -578,6 +605,7 @@ void RWS::CLinkedMsg::InitMemHandler(RwUInt32 blockSize)
    }
 
 // match: ?CloseMemHandler@CLinkedMsg@RWS@@SAXXZ @ 0x0012EA10
+// sp-match: ?CloseMemHandler@CLinkedMsg@RWS@@SAXXZ @ 0x000E0430
 void RWS::CLinkedMsg::CloseMemHandler(void)
    {
       if (pFreeList)
@@ -588,12 +616,14 @@ void RWS::CLinkedMsg::CloseMemHandler(void)
    }
 
 // match: ??2CLinkedMsg@RWS@@SAPAXI@Z @ 0x0012EA40
+// sp-match: ??2CLinkedMsg@RWS@@SAPAXI@Z @ 0x000E0450
 void *RWS::CLinkedMsg::operator new(size_t size)
    {
       return (RwFreeListAlloc(pFreeList, uEVENTHANDLER_MEMHINT));
    }
 
 // match: ??3CLinkedMsg@RWS@@SAXPAX@Z @ 0x0012EA60
+// sp-match: ??3CLinkedMsg@RWS@@SAXPAX@Z @ 0x000E0470
 void RWS::CLinkedMsg::operator delete(void *pObj)
    {
       if (pObj)
@@ -603,6 +633,7 @@ void RWS::CLinkedMsg::operator delete(void *pObj)
    }
 
 // match: ?InitMemHandler@CRegisteredMsgs@RWS@@SAXI@Z @ 0x0012EA80
+// sp-match: ?InitMemHandler@CRegisteredMsgs@RWS@@SAXI@Z @ 0x000E0490
 void RWS::CRegisteredMsgs::InitMemHandler(RwUInt32 blockSize)
    {
       if (!blockSize)
@@ -614,6 +645,7 @@ void RWS::CRegisteredMsgs::InitMemHandler(RwUInt32 blockSize)
    }
 
 // match: ?CloseMemHandler@CRegisteredMsgs@RWS@@SAXXZ @ 0x0012EAB0
+// sp-match: ?CloseMemHandler@CRegisteredMsgs@RWS@@SAXXZ @ 0x000E04C0
 void RWS::CRegisteredMsgs::CloseMemHandler(void)
    {
       if (pFreeList)
@@ -624,12 +656,14 @@ void RWS::CRegisteredMsgs::CloseMemHandler(void)
    }
 
 // match: ??2CRegisteredMsgs@RWS@@SAPAXI@Z @ 0x0012EAE0
+// sp-match: ??2CRegisteredMsgs@RWS@@SAPAXI@Z @ 0x000E04E0
 void *RWS::CRegisteredMsgs::operator new(size_t size)
    {
       return (RwFreeListAlloc(pFreeList, uEVENTHANDLER_MEMHINT));
    }
 
 // match: ??3CRegisteredMsgs@RWS@@SAXPAX@Z @ 0x0012EB00
+// sp-match: ??3CRegisteredMsgs@RWS@@SAXPAX@Z @ 0x000E0500
 void RWS::CRegisteredMsgs::operator delete(void *pObj)
    {
       if (pObj)
@@ -658,6 +692,7 @@ namespace RWS
 }
 
 // match: ?Plugin_Constructor@?A0xb9ca1959@RpAtomicToEventHandler@RWS@@YAPAXPAXHH@Z @ 0x0012EB20
+// sp-match: ?Plugin_Constructor@?A0xb9ca1959@RpAtomicToEventHandler@RWS@@YAPAXPAXHH@Z @ 0x000E0520
 namespace RWS
 {
    namespace RpAtomicToEventHandler
@@ -677,6 +712,7 @@ namespace RWS
 }
 
 // match: ?Plugin_Copy@?A0xb9ca1959@RpAtomicToEventHandler@RWS@@YAPAXPAXPBXHH@Z @ 0x0012EB50
+// sp-match: ?Plugin_Copy@?A0xb9ca1959@RpAtomicToEventHandler@RWS@@YAPAXPAXPBXHH@Z @ 0x000E0540
 namespace RWS
 {
    namespace RpAtomicToEventHandler
@@ -702,6 +738,7 @@ namespace RWS
 // RegisterMsg's new. The static ids' and the registry head's dynamic
 // initializers are left unplaced, like the other units' static initializers.
 // match: ??0CRegisteredMsgs@RWS@@QAE@XZ @ 0x0012E300
+// sp-match: ??0CRegisteredMsgs@RWS@@QAE@XZ @ 0x000E02C0
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
@@ -712,6 +749,7 @@ RWS::CEventId::~CEventId()
 }
 
 // match: ?PluginAttach@RpAtomicToEventHandler@RWS@@YAHXZ @ 0x0012EBA0
+// sp-match: ?PluginAttach@RpAtomicToEventHandler@RWS@@YAHXZ @ 0x000E0560
 RwBool RWS::RpAtomicToEventHandler::PluginAttach(void)
       {
          iPlugin_Offset = RpAtomicRegisterPlugin(

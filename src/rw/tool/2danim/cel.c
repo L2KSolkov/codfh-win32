@@ -193,6 +193,7 @@ _rt2dCelStreamGetSize(Rt2dMaestro *maestro __RWUNUSEDRELEASE__, Rt2dCel *cel)
 }
 
 Rt2dCel *
+// sp-match: __rt2dCelStreamRead @ 0x00173010
 _rt2dCelStreamRead(Rt2dMaestro *maestro __RWUNUSEDRELEASE__, Rt2dCel *cel, RwStream *stream)
 {
     RwInt32         num, *buttonIndices;
@@ -669,6 +670,7 @@ _rt2dCelListInit(Rt2dCelList *celList)
 // match: _rcsid @ 0x003EE708
 
 // match: __rt2dCelListDestruct @ 0x00257910
+// sp-match: __rt2dCelListDestruct @ 0x001730D0
 Rt2dCelList *
 _rt2dCelListDestruct(Rt2dCelList *celList)
 {
@@ -743,6 +745,7 @@ _rt2dCelListStreamGetSize(Rt2dMaestro *maestro, Rt2dCelList *celList)
 }
 
 Rt2dCelList *
+// sp-match: __rt2dCelListStreamRead @ 0x00173260
 _rt2dCelListStreamRead(Rt2dMaestro *maestro, Rt2dCelList *celList, RwStream *stream)
 {
     RwInt32                     i, num;
@@ -846,6 +849,7 @@ _rt2dCelListStreamWrite(Rt2dMaestro *maestro, Rt2dCelList *celList, RwStream *st
 }
 
 Rt2dCel *
+// sp-match: __rt2dCelListGetCelByIndex @ 0x00173150
 _rt2dCelListGetCelByIndex(Rt2dCelList *celList, RwInt32 index)
 {
     Rt2dCel         *cel;
@@ -922,6 +926,7 @@ _rt2dCelListCopy(Rt2dCelList *dstCelList, Rt2dCelList *srcCelList)
  */
 
 Rt2dCelList *
+// sp-match: _Rt2dCelListCreate @ 0x00173170
 Rt2dCelListCreate( void )
 {
     Rt2dCelList             *celList;
@@ -959,6 +964,7 @@ Rt2dCelListCreate( void )
  */
 
 // match: _Rt2dCelListDestroy @ 0x00257990
+// sp-match: _Rt2dCelListDestroy @ 0x001731D0
 RwBool
 Rt2dCelListDestroy(Rt2dCelList *celList)
 {
@@ -1184,6 +1190,7 @@ Rt2dCelListCelGetStringLabelIndex(Rt2dCelList *celList, RwInt32 celIndex, RwInt3
  */
 
 Rt2dCelList *
+// sp-match: _Rt2dCelListCelButtonGetDisplayVersion @ 0x00173200
 Rt2dCelListCelButtonGetDisplayVersion(Rt2dMaestro *maestro, Rt2dCelList * celList,
                                       RwInt32 celIndex, RwInt32 celButtonIndex, RwInt32 *index)
 {

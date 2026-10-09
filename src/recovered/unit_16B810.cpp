@@ -6,12 +6,14 @@
 #include "types/type_143DC0.h"
 
 // match: ??0type_16B810@@QAE@XZ @ 0x0016B810
+// sp-match: ??0type_16B810@@QAE@XZ @ 0x0010A0D0
 type_16B810::type_16B810()
 {
     sub_16B830();
 }
 
 // match: ?sub_16B830@type_16B810@@QAEXXZ @ 0x0016B830
+// sp-match: ?sub_16B830@type_16B810@@QAEXXZ @ 0x0010A080
 // Empties it: the head points at the sentinel's link (0), the tail at the
 // list itself.
 void type_16B810::sub_16B830()
@@ -22,6 +24,7 @@ void type_16B810::sub_16B830()
 }
 
 // match: ?sub_16B860@type_16B810@@QAEXPAUtype_6FCD0@@@Z @ 0x0016B860
+// sp-match: ?sub_16B860@type_16B810@@QAEXPAUtype_6FCD0@@@Z @ 0x0010A090
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Links arg_0 in at the head.
 void type_16B810::sub_16B860(type_6FCD0 *arg_0)
@@ -38,6 +41,7 @@ void type_16B810::sub_16B860(type_6FCD0 *arg_0)
 }
 
 // match: ?sub_16B8B0@type_16B810@@QAEXPAUtype_6FCD0@@@Z @ 0x0016B8B0
+// sp-match: ?sub_16B8B0@type_16B810@@QAEXPAUtype_6FCD0@@@Z @ 0x0010A0B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Links arg_0 in at the tail.
 void type_16B810::sub_16B8B0(type_6FCD0 *arg_0)
@@ -54,6 +58,7 @@ void type_16B810::sub_16B8B0(type_6FCD0 *arg_0)
 }
 
 // match: ??0type_16B900@@QAE@PAUtype_16B810@@@Z @ 0x0016B900
+// sp-match: ??0type_16B900@@QAE@PAUtype_16B810@@@Z @ 0x0010A0E0
 type_16B900::type_16B900(type_16B810 *arg_0)
 {
     type_6FCD0 *var_4;
@@ -64,6 +69,7 @@ type_16B900::type_16B900(type_16B810 *arg_0)
 }
 
 // match: ?sub_16B930@type_16B900@@QAEPAUtype_6FCD0@@XZ @ 0x0016B930
+// sp-match: ?sub_16B930@type_16B900@@QAEPAUtype_6FCD0@@XZ @ 0x0010A0F0
 type_6FCD0 *type_16B900::sub_16B930()
 {
     type_6FCD0 *var_4;
@@ -74,6 +80,7 @@ type_6FCD0 *type_16B900::sub_16B930()
 }
 
 // match: ?sub_16B960@type_16B900@@QAEPAUtype_6FCD0@@XZ @ 0x0016B960
+// sp-match: ?sub_16B960@type_16B900@@QAEPAUtype_6FCD0@@XZ @ 0x0010A100
 type_6FCD0 *type_16B900::sub_16B960()
 {
     type_6FCD0 *var_4;
@@ -84,6 +91,7 @@ type_6FCD0 *type_16B900::sub_16B960()
 }
 
 // match: ?sub_16B990@type_16B900@@QAEPAUtype_6FCD0@@XZ @ 0x0016B990
+// sp-match: ?sub_16B990@type_16B900@@QAEPAUtype_6FCD0@@XZ @ 0x0010A140
 // Unlinks the current node (stepping back first) and returns it; 0 at an
 // end.
 type_6FCD0 *type_16B900::sub_16B990()
@@ -100,6 +108,7 @@ type_6FCD0 *type_16B900::sub_16B990()
 }
 
 // match: ?sub_16B9D0@type_16B900@@QAE_NXZ @ 0x0016B9D0
+// sp-match: ?sub_16B9D0@type_16B900@@QAE_NXZ @ 0x0010A110
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Whether it is on a node (not the head's or the sentinel's link).
 bool type_16B900::sub_16B9D0()
@@ -117,6 +126,7 @@ bool type_16B900::sub_16B9D0()
 }
 
 // match: ?sub_16BA10@type_16B900@@QAEXH@Z @ 0x0016BA10
+// sp-match: ?sub_16BA10@type_16B900@@QAEXH@Z @ 0x0010A130
 // Its postfix step (the argument is operator++'s dummy).
 void type_16B900::sub_16BA10(RwInt32 arg_0)
 {
@@ -124,6 +134,7 @@ void type_16B900::sub_16BA10(RwInt32 arg_0)
 }
 
 // match: ?sub_16BA30@type_6FCD0@@QAEXXZ @ 0x0016BA30
+// sp-match: ?sub_16BA30@type_6FCD0@@QAEXXZ @ 0x0010A170
 void type_6FCD0::sub_16BA30()
 {
     ((type_6FCD0 *)unk_00)->unk_04 = unk_04;

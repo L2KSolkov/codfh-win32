@@ -33,6 +33,7 @@ extern RwBool sub_243950(RwUInt32 size, RwUInt32 count, RwUInt32 align, RwInt32 
                          void *freeList, RwUInt32 hint);
 
 // match: _sub_23EF00 @ 0x0023EF00
+// sp-match: _sub_23EF00 @ 0x00150E80
 static void *
 sub_23EF00(rwaObjDef *def, void *b, void *params, RwUInt32 size)
 {
@@ -40,6 +41,7 @@ sub_23EF00(rwaObjDef *def, void *b, void *params, RwUInt32 size)
 }
 
 // match: _sub_23EF10 @ 0x0023EF10
+// sp-match: _sub_23EF10 @ 0x00150E90
 rwaInstance *
 sub_23EF10(rwaObjDef *def, RwUInt32 *flags, void *params, RwUInt32 size)
 {
@@ -54,6 +56,7 @@ sub_23EF10(rwaObjDef *def, RwUInt32 *flags, void *params, RwUInt32 size)
 }
 
 // match: _sub_23EF50 @ 0x0023EF50
+// sp-match: _sub_23EF50 @ 0x00150ED0
 static RwBool
 sub_23EF50(rwaInstance *obj, rwaInstSearch *search)
 {
@@ -68,6 +71,7 @@ sub_23EF50(rwaInstance *obj, rwaInstSearch *search)
 }
 
 // match: _sub_23EF80 @ 0x0023EF80
+// sp-match: _sub_23EF80 @ 0x00150F00
 static rwaInstParams *
 sub_23EF80(rwaInstance *obj)
 {
@@ -90,6 +94,7 @@ sub_23EF80(rwaInstance *obj)
 }
 
 // match: _sub_23EFC0 @ 0x0023EFC0
+// sp-match: _sub_23EFC0 @ 0x00150F40
 static void
 sub_23EFC0(rwaInstance *obj, rwaObjDef *def, RwUInt32 flags, RwUInt32 stateOffset)
 {
@@ -152,6 +157,7 @@ sub_23EFC0(rwaInstance *obj, rwaObjDef *def, RwUInt32 flags, RwUInt32 stateOffse
 }
 
 // match: _sub_23F070 @ 0x0023F070
+// sp-match: _sub_23F070 @ 0x00150FF0
 RwBool
 sub_23F070(rwaInstance *obj, rwaInstFind *find)
 {
@@ -166,6 +172,7 @@ sub_23F070(rwaInstance *obj, rwaInstFind *find)
 }
 
 // match: _sub_23F090 @ 0x0023F090
+// sp-match: _sub_23F090 @ 0x00151010
 void
 sub_23F090(RwBool (*callback)(rwaInstance *obj, void *data), void *data)
 {
@@ -181,6 +188,7 @@ sub_23F090(RwBool (*callback)(rwaInstance *obj, void *data), void *data)
 }
 
 // match: _sub_23F0D0 @ 0x0023F0D0
+// sp-match: _sub_23F0D0 @ 0x00151050
 rwaInstance *
 sub_23F0D0(rwaInstance *volatile input, RwBool ok)
 {
@@ -234,6 +242,7 @@ sub_23F0D0(rwaInstance *volatile input, RwBool ok)
 
 
 // match: _sub_23F140 @ 0x0023F140
+// sp-match: _sub_23F140 @ 0x001510C0
 rwaInstance *
 sub_23F140(rwaInstance *volatile input, RwBool ok)
 {
@@ -286,6 +295,7 @@ sub_23F140(rwaInstance *volatile input, RwBool ok)
 }
 
 // match: _sub_23F1B0 @ 0x0023F1B0
+// sp-match: _sub_23F1B0 @ 0x00151130
 static rwaLink *
 sub_23F1B0(rwaLink *link, void *def)
 {
@@ -293,6 +303,7 @@ sub_23F1B0(rwaLink *link, void *def)
 }
 
 // match: _sub_23F1D0 @ 0x0023F1D0
+// sp-match: _sub_23F1D0 @ 0x00151150
 void *
 sub_23F1D0(rwaObjDef *def)
 {
@@ -300,6 +311,7 @@ sub_23F1D0(rwaObjDef *def)
 }
 
 // match: _sub_23F1F0 @ 0x0023F1F0
+// sp-match: _sub_23F1F0 @ 0x00151170
 rwaInstance *
 sub_23F1F0(rwaInstance *obj, RwUInt32 index, RwInt32 inputOutput)
 {
@@ -346,6 +358,7 @@ sub_23F1F0(rwaInstance *obj, RwUInt32 index, RwInt32 inputOutput)
 }
 
 // match: _sub_23F2B0 @ 0x0023F2B0
+// sp-match: _sub_23F2B0 @ 0x00151230
 static void
 sub_23F2B0(rwaInstance *obj, RwInt32 inputOutput)
 {
@@ -368,6 +381,7 @@ sub_23F2B0(rwaInstance *obj, RwInt32 inputOutput)
 }
 
 // match: _sub_23F2F0 @ 0x0023F2F0
+// sp-match: _sub_23F2F0 @ 0x00151270
 rwaInstance *
 sub_23F2F0(void)
 {
@@ -375,6 +389,7 @@ sub_23F2F0(void)
 }
 
 // match: _sub_23F300 @ 0x0023F300
+// sp-match: _sub_23F300 @ 0x00151280
 RwUInt32
 sub_23F300(rwaObjDef *def, RwUInt32 flags, RwUInt32 *stateOffset)
 {
@@ -423,6 +438,7 @@ sub_23F300(rwaObjDef *def, RwUInt32 flags, RwUInt32 *stateOffset)
 }
 
 // match: __rwaObjFindFixed @ 0x0023F3B0
+// sp-match: __rwaObjFindFixed @ 0x00151330
 RwUInt32
 _rwaObjFindFixed(rwaObjDef *def)
 {
@@ -436,6 +452,7 @@ _rwaObjFindFixed(rwaObjDef *def)
 }
 
 // match: _DSPHandle_Stop @ 0x0023F3E0
+// sp-match: _DSPHandle_Stop @ 0x00151360
 void
 DSPHandle_Stop(rwaInstance *obj, void *a, void *b)
 {
@@ -477,6 +494,7 @@ DSPHandle_Stop(rwaInstance *obj, void *a, void *b)
 }
 
 // match: __rwaObjCloseModule @ 0x0023F480
+// sp-match: __rwaObjCloseModule @ 0x00151400
 void
 _rwaObjCloseModule(void)
 {
@@ -488,6 +506,7 @@ _rwaObjCloseModule(void)
 }
 
 // match: _sub_23F4C0 @ 0x0023F4C0
+// sp-match: _sub_23F4C0 @ 0x00151440
 rwaInstance *
 sub_23F4C0(rwaObjDef *def, rwaInstance *parent, RwUInt32 flags, void *params,
            void *(*allocFunc)(rwaObjDef *def, void *data, void *params, RwUInt32 size),
@@ -602,6 +621,7 @@ sub_23F4C0(rwaObjDef *def, rwaInstance *parent, RwUInt32 flags, void *params,
 }
 
 // match: _sub_23F6E0 @ 0x0023F6E0
+// sp-match: _sub_23F6E0 @ 0x00151660
 RwBool
 sub_23F6E0(void)
 {

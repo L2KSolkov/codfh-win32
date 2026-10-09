@@ -179,6 +179,7 @@ RwUInt8 unk_5079AC[40];
 // match: _off_42FB3C @ 0x0042FB3C
 
 // match: _sub_245240 @ 0x00245240
+// sp-match: _sub_245240 @ 0x00159190
 
 void *
 sub_245240(void)
@@ -195,6 +196,7 @@ sub_245240(void)
 }
 
 // match: _sub_245290 @ 0x00245290
+// sp-match: _sub_245290 @ 0x001591E0
 RwBool
 sub_245290(void)
 {

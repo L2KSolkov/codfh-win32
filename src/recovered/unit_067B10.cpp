@@ -195,6 +195,7 @@ void sub_6A6F0();
 // match: ?Str2@@3PAPBDA @ 0x00428A34
 
 // match: sub_67B10 @ 0x00067B10
+// sp-match: sub_67B10 @ 0x0005A930
 
 // Fills the opcode table and clears the VM's state.
 void sub_67B10()
@@ -277,6 +278,7 @@ void sub_67B10()
 }
 
 // match: sub_67E00 @ 0x00067E00
+// sp-match: sub_67E00 @ 0x00057F60
 // Frees the loaded image.
 void sub_67E00()
 {
@@ -285,7 +287,12 @@ void sub_67E00()
     byte_4492D8 = 0;
 }
 
+// (SCRIPT_CHECK_SLOTS, type_44350.h's empty inline, kept out of line: the image's one
+// empty body, which the empty functions single player calls fold into)
+// sp-match: ?SCRIPT_CHECK_SLOTS@@YAXXZ @ 0x0005A260
+
 // match: sub_67E30 @ 0x00067E30
+// sp-match: sub_67E30 @ 0x0005A270
 // Loads the image arg_0 (freeing the last): turns its offsets into
 // pointers, binds its commands by name and sorts its tables.
 void sub_67E30(RwChar *arg_0)
@@ -345,6 +352,7 @@ void sub_67E30(RwChar *arg_0)
 }
 
 // match: sub_68190 @ 0x00068190
+// sp-match: sub_68190 @ 0x00057F80
 // Puts each of dword_4492F4's entries at the index its unk_04 gives.
 void sub_68190()
 {
@@ -364,6 +372,7 @@ void sub_68190()
 }
 
 // match: sub_68250 @ 0x00068250
+// sp-match: sub_68250 @ 0x00058040
 // Likewise for dword_4492FC.
 void sub_68250()
 {
@@ -383,6 +392,7 @@ void sub_68250()
 }
 
 // match: sub_68310 @ 0x00068310
+// sp-match: sub_68310 @ 0x0005A4F0
 // Runs the script arg_0 until an opcode halts it, then stores its state
 // back unless it ended; the VM's state is restored around it.
 void sub_68310(type_67620 *arg_0)
@@ -426,6 +436,7 @@ void sub_68310(type_67620 *arg_0)
 }
 
 // match: sub_68450 @ 0x00068450
+// sp-match: sub_68450 @ 0x000580E0
 // Opcode 0: nothing.
 void sub_68450()
 {
@@ -433,6 +444,7 @@ void sub_68450()
 }
 
 // match: sub_68470 @ 0x00068470
+// sp-match: sub_68470 @ 0x000580F0
 // Opcode 1, add: pops one, and adds to the top by it, by the operand types (byte 1):
 // 0 ints, 1 an int and a float, 2 a float and an int, 3 floats.
 void sub_68470()
@@ -459,6 +471,7 @@ void sub_68470()
 }
 
 // match: sub_68530 @ 0x00068530
+// sp-match: sub_68530 @ 0x00058160
 // Opcode 2, subtract: pops one, and subtracts from the top by it, by the operand types (byte 1):
 // 0 ints, 1 an int and a float, 2 a float and an int, 3 floats.
 void sub_68530()
@@ -485,6 +498,7 @@ void sub_68530()
 }
 
 // match: sub_685F0 @ 0x000685F0
+// sp-match: sub_685F0 @ 0x000581D0
 // Opcode 3, multiply: pops one, and multiplies the top by it, by the operand types (byte 1):
 // 0 ints, 1 an int and a float, 2 a float and an int, 3 floats.
 void sub_685F0()
@@ -511,6 +525,7 @@ void sub_685F0()
 }
 
 // match: sub_686B0 @ 0x000686B0
+// sp-match: sub_686B0 @ 0x00058240
 // Opcode 4, divide: pops one and divides the top by it, as the other
 // arithmetic opcodes (0 when dividing by an int zero).
 void sub_686B0()
@@ -540,6 +555,7 @@ void sub_686B0()
 }
 
 // match: sub_68780 @ 0x00068780
+// sp-match: sub_68780 @ 0x000582D0
 // Opcode 5, push: pushes the count (byte 1) of words following the
 // instruction, then moves the stack pointer by the operand (the high half)
 // and skips the words.
@@ -556,6 +572,7 @@ void sub_68780()
 }
 
 // match: sub_68810 @ 0x00068810
+// sp-match: sub_68810 @ 0x00058330
 // Opcode 38, pop: drops the operand's count of words.
 void sub_68810()
 {
@@ -564,6 +581,7 @@ void sub_68810()
 }
 
 // match: sub_68840 @ 0x00068840
+// sp-match: sub_68840 @ 0x00058360
 // Opcode 6, load: pushes the count (byte 1) of words from the frame at the
 // operand.
 void sub_68840()
@@ -579,6 +597,7 @@ void sub_68840()
 }
 
 // match: sub_688D0 @ 0x000688D0
+// sp-match: sub_688D0 @ 0x000583E0
 // Opcode 7, store: pops the count (byte 1) of words into the frame at the
 // operand.
 void sub_688D0()
@@ -594,6 +613,7 @@ void sub_688D0()
 }
 
 // match: sub_68960 @ 0x00068960
+// sp-match: sub_68960 @ 0x00058450
 // Opcode 8, and: pops one and replaces the top with the result, by
 // the operand types (byte 1): 0, 4, 5, 8 and 9 ints, 1 and 7 an int and a
 // float, 2 and 6 a float and an int, 3 floats.
@@ -627,6 +647,7 @@ void sub_68960()
 }
 
 // match: sub_68AD0 @ 0x00068AD0
+// sp-match: sub_68AD0 @ 0x00058560
 // Opcode 9, or: pops one and replaces the top with the result, by
 // the operand types (byte 1): 0, 4, 5, 8 and 9 ints, 1 and 7 an int and a
 // float, 2 and 6 a float and an int, 3 floats.
@@ -660,6 +681,7 @@ void sub_68AD0()
 }
 
 // match: sub_68C40 @ 0x00068C40
+// sp-match: sub_68C40 @ 0x00058660
 // Opcode 10, less than: pops one and replaces the top with the result, by
 // the operand types (byte 1): 0, 4, 5, 8 and 9 ints, 1 and 7 an int and a
 // float, 2 and 6 a float and an int, 3 floats.
@@ -693,6 +715,7 @@ void sub_68C40()
 }
 
 // match: sub_68D70 @ 0x00068D70
+// sp-match: sub_68D70 @ 0x00058720
 // Opcode 11, greater than: pops one and replaces the top with the result, by
 // the operand types (byte 1): 0, 4, 5, 8 and 9 ints, 1 and 7 an int and a
 // float, 2 and 6 a float and an int, 3 floats.
@@ -726,6 +749,7 @@ void sub_68D70()
 }
 
 // match: sub_68EA0 @ 0x00068EA0
+// sp-match: sub_68EA0 @ 0x000587E0
 // Opcode 12, at most: pops one and replaces the top with the result, by
 // the operand types (byte 1): 0, 4, 5, 8 and 9 ints, 1 and 7 an int and a
 // float, 2 and 6 a float and an int, 3 floats.
@@ -759,6 +783,7 @@ void sub_68EA0()
 }
 
 // match: sub_68FD0 @ 0x00068FD0
+// sp-match: sub_68FD0 @ 0x000588A0
 // Opcode 13, at least: pops one and replaces the top with the result, by
 // the operand types (byte 1): 0, 4, 5, 8 and 9 ints, 1 and 7 an int and a
 // float, 2 and 6 a float and an int, 3 floats.
@@ -792,6 +817,7 @@ void sub_68FD0()
 }
 
 // match: sub_69100 @ 0x00069100
+// sp-match: sub_69100 @ 0x00058960
 // Opcode 14, equal: pops one and replaces the top with whether they are
 // equal (as ints).
 void sub_69100()
@@ -805,6 +831,7 @@ void sub_69100()
 }
 
 // match: sub_69150 @ 0x00069150
+// sp-match: sub_69150 @ 0x00058990
 // Opcode 15, not equal: likewise, whether they differ.
 void sub_69150()
 {
@@ -817,6 +844,7 @@ void sub_69150()
 }
 
 // match: sub_691A0 @ 0x000691A0
+// sp-match: sub_691A0 @ 0x000589C0
 // Opcode 16, convert: the top to a float (byte 1 is 1) or to an int (2).
 void sub_691A0()
 {
@@ -832,6 +860,7 @@ void sub_691A0()
 }
 
 // match: sub_69200 @ 0x00069200
+// sp-match: sub_69200 @ 0x00058A10
 // Opcode 17, jump if false: pops one and, when it is 0, jumps by the
 // operand.
 void sub_69200()
@@ -844,6 +873,7 @@ void sub_69200()
 }
 
 // match: sub_69250 @ 0x00069250
+// sp-match: sub_69250 @ 0x00058A40
 // Opcode 18, jump: by the operand.
 void sub_69250()
 {
@@ -851,6 +881,7 @@ void sub_69250()
 }
 
 // match: sub_69270 @ 0x00069270
+// sp-match: sub_69270 @ 0x00058A60
 // Opcode 19, switch: pops one and jumps by the offset paired with it in the
 // (value, offset) pairs following the instruction (byte 1 counts them and
 // the default's offset, which ends them).
@@ -876,6 +907,7 @@ void sub_69270()
 }
 
 // match: sub_69320 @ 0x00069320
+// sp-match: sub_69320 @ 0x00058AD0
 // Opcode 20, halt.
 void sub_69320()
 {
@@ -883,6 +915,7 @@ void sub_69320()
 }
 
 // match: sub_69330 @ 0x00069330
+// sp-match: sub_69330 @ 0x00058AE0
 // Opcode 21, call: the command at the operand's index in Base, when bound,
 // with the running script's handle.
 void sub_69330()
@@ -892,13 +925,22 @@ void sub_69330()
 
     var_4 = (RwInt16)(*dword_449320 >> 16);
     if (Base[var_4].unk_18 != 0) {
+#ifdef CODFH_SP
+        // shape: the handle as its struct through get_unk_04_h()'s return
+        // temporary, loaded before &Base[var_4] is pushed (SP 0x58B01); the
+        // command takes the handle by value.
+        typedef void (*type_4276E0_fn_h)(type_439E78_00 arg_0, type_44350 *arg_4);
+        ((type_4276E0_fn_h)Base[var_4].unk_18)(dword_449328->get_unk_04_h(), &Base[var_4]);
+#else
         local_8 = dword_449328->unk_04;
         Base[var_4].unk_18(local_8, &Base[var_4]);
+#endif
     }
     dword_449320++;
 }
 
 // match: sub_693A0 @ 0x000693A0
+// sp-match: sub_693A0 @ 0x00058B20
 // Opcode 22, play animation: while the top counts down from a positive
 // value, plays the animation the count (byte 1) of words following the
 // instruction describe and halts (for good when it cannot); at 0, pops it
@@ -912,12 +954,18 @@ void sub_693A0()
     var_4 = (RwInt8)((*dword_449320 & 0xFF00) >> 8);
     local_8 = (RwInt16)(*dword_449320 >> 16);
     if (dword_449318[-1] > 0) {
+#ifdef CODFH_SP // single player's sub_6DE40 has no speed (SP 0x5C340 ends ret 0x10)
+        ebp_9 = ((type_3D2CD0 *)dword_449328)->sub_6DE40(var_4 + 1, dword_449320 + 1, local_8, 1);
+#else
         ebp_9 = ((type_3D2CD0 *)dword_449328)->sub_6DE40(var_4 + 1, dword_449320 + 1, local_8, 1, 1.0f);
+#endif
         if (!ebp_9) {
+#ifndef CODFH_SP
             sub_19A750("ERROR Playing animation in script file: %s, line no.: %d\n", dword_449288,
                        dword_449284);
             sub_19A750("Could not play animation.  Look above this messaage for possibly more "
                        "details.\n");
+#endif
             ((type_3D2CD0 *)dword_449328)->sub_6DDF0(1, 0);
             ebp_9 = true;
         }
@@ -930,6 +978,7 @@ void sub_693A0()
 }
 
 // match: sub_69490 @ 0x00069490
+// sp-match: sub_69490 @ 0x00058BA0
 // Opcode 23, start animation: plays the animation the count (byte 1) of
 // words following the instruction describe, without halting.
 void sub_69490()
@@ -939,11 +988,16 @@ void sub_69490()
 
     var_4 = (RwInt8)((*dword_449320 & 0xFF00) >> 8);
     local_8 = (RwInt16)(*dword_449320 >> 16);
+#ifdef CODFH_SP // single player's sub_6DE40 has no speed (SP 0x5C340 ends ret 0x10)
+    ((type_3D2CD0 *)dword_449328)->sub_6DE40(var_4, dword_449320 + 1, local_8, 0);
+#else
     ((type_3D2CD0 *)dword_449328)->sub_6DE40(var_4, dword_449320 + 1, local_8, 0, 1.0f);
+#endif
     dword_449320 += var_4 + 1;
 }
 
 // match: sub_69500 @ 0x00069500
+// sp-match: sub_69500 @ 0x00058BE0
 // Opcode 24, wait: the script waits (the operand) and the VM leaves it
 // without storing its state.
 void sub_69500()
@@ -954,6 +1008,7 @@ void sub_69500()
 }
 
 // match: sub_69540 @ 0x00069540
+// sp-match: sub_69540 @ 0x00058C10
 // Opcode 25: ends the script and halts (byte 1 is 1) or resumes it (2).
 void sub_69540()
 {
@@ -970,6 +1025,7 @@ void sub_69540()
 }
 
 // match: sub_695A0 @ 0x000695A0
+// sp-match: sub_695A0 @ 0x00058C50
 // Opcode 26, event: pops one and jumps to the script's handler for it (by
 // bytes 1 and 2).
 void sub_695A0()
@@ -985,6 +1041,7 @@ void sub_695A0()
 }
 
 // match: sub_69620 @ 0x00069620
+// sp-match: sub_69620 @ 0x0005A600
 // Opcode 27: sets the script's flag (byte 1) to sub_6A7A0 of bytes 2 and 3
 // when clear, then jumps by the next word when it is set, else skips it.
 void sub_69620()
@@ -1004,6 +1061,7 @@ void sub_69620()
 }
 
 // match: sub_696D0 @ 0x000696D0
+// sp-match: sub_696D0 @ 0x0005A680
 // Opcode 28: pushes sub_6A7A0 of bytes 2 and 3.
 void sub_696D0()
 {
@@ -1018,6 +1076,7 @@ void sub_696D0()
 }
 
 // match: sub_69730 @ 0x00069730
+// sp-match: sub_69730 @ 0x00058CA0
 // Opcode 36: replaces the top with sub_72900 of it.
 void sub_69730()
 {
@@ -1029,6 +1088,7 @@ void sub_69730()
 }
 
 // match: sub_69770 @ 0x00069770
+// sp-match: sub_69770 @ 0x00058CD0
 // Opcode 39, call: the running task (kind 3) calls, by the flags (byte 1):
 // 2 a function (sub_6FFD0) or 1 a script (sub_6FF20) with the popped word,
 // bytes 2 and 3 and flag 4; neither, sub_6FF00.
@@ -1062,6 +1122,7 @@ void sub_69770()
 }
 
 // match: sub_698A0 @ 0x000698A0
+// sp-match: sub_698A0 @ 0x00058DD0
 // Opcode 40: sets the running task's call flag (byte 2), continues it at
 // the next instruction and halts.
 void sub_698A0()
@@ -1079,6 +1140,7 @@ void sub_698A0()
 }
 
 // match: sub_69930 @ 0x00069930
+// sp-match: sub_69930 @ 0x00058E60
 // Opcode 47: sets the running task's call flag and byte (bytes 2 and 3),
 // continues it at the halt (opcode 18) that follows, past a pop (38), and
 // pushes its result.
@@ -1107,6 +1169,7 @@ void sub_69930()
 }
 
 // match: sub_69A90 @ 0x00069A90
+// sp-match: sub_69A90 @ 0x0005A6E0
 // Opcode 37, return: from the running task's call (flag 2 of byte 1, with
 // the top word), or from a function (the operand's record), keeping its
 // arguments in byte_449298 (flag 1); halts.
@@ -1137,6 +1200,7 @@ void sub_69A90()
 }
 
 // match: sub_69B70 @ 0x00069B70
+// sp-match: sub_69B70 @ 0x00058FC0
 // Opcode 29, sleep: the running script sleeps (the operand) and halts.
 void sub_69B70()
 {
@@ -1150,6 +1214,7 @@ void sub_69B70()
 }
 
 // match: sub_69BB0 @ 0x00069BB0
+// sp-match: sub_69BB0 @ 0x00058FE0
 // Opcode 34, load global: pushes the count (byte 1) of words from the
 // running script's data (unk_74) at the operand.
 void sub_69BB0()
@@ -1169,6 +1234,7 @@ void sub_69BB0()
 }
 
 // match: sub_69C50 @ 0x00069C50
+// sp-match: sub_69C50 @ 0x00059060
 // Opcode 32, store global: pops the count (byte 1) of words into the
 // running script's data at the operand.
 void sub_69C50()
@@ -1188,6 +1254,7 @@ void sub_69C50()
 }
 
 // match: sub_69CF0 @ 0x00069CF0
+// sp-match: sub_69CF0 @ 0x000590E0
 // Opcode 35: pushes the running script's local at the operand.
 void sub_69CF0()
 {
@@ -1200,6 +1267,7 @@ void sub_69CF0()
 }
 
 // match: sub_69D50 @ 0x00069D50
+// sp-match: sub_69D50 @ 0x00059130
 // Opcode 33: pops into the running script's local at the operand.
 void sub_69D50()
 {
@@ -1212,6 +1280,7 @@ void sub_69D50()
 }
 
 // match: sub_69DB0 @ 0x00069DB0
+// sp-match: sub_69DB0 @ 0x0005A7B0
 // Opcode 31, call function: calls the function record at the operand in
 // the script the popped handle names (flag 1 of byte 1), or in the script
 // of the object it names, passing the arguments on the stack; pops them
@@ -1244,7 +1313,11 @@ void sub_69DB0()
     }
     if (var_4 != 0) {
         if (dword_449328->vf_014() == 2)
+#ifdef CODFH_SP // shape: SP 0x5A7B0 calls type_3D2DB8's copy (0x5CD20); this unit's folded type_67620 stand-in would let /O2 keep edx across the call
+            ((type_3D2DB8 *)dword_449328)->sub_6F460(dword_449318);
+#else
             dword_449328->sub_6F460(dword_449318);
+#endif
         stk_C = ((type_3D2DB8 *)var_4)->sub_6F340(stk_18, dword_449318);
     }
     dword_449318 -= stk_18->unk_08;
@@ -1258,6 +1331,7 @@ void sub_69DB0()
 }
 
 // match: sub_69F40 @ 0x00069F40
+// sp-match: sub_69F40 @ 0x00059170
 // Opcode 41, wake: wakes the task the popped handle names, if it waits.
 void sub_69F40()
 {
@@ -1275,6 +1349,7 @@ void sub_69F40()
 }
 
 // match: sub_69FB0 @ 0x00069FB0
+// sp-match: sub_69FB0 @ 0x000591B0
 // Opcode 43, kill: ends the task of the object the popped handle names
 // (byte 1 set) or of the running script's own; when that is the running
 // task, it ends and the VM leaves it.
@@ -1302,6 +1377,7 @@ void sub_69FB0()
 }
 
 // match: sub_6A080 @ 0x0006A080
+// sp-match: sub_6A080 @ 0x00059230
 // Opcode 44, spawn: replaces the task of the object the popped handle names
 // (byte 1 set) or of the running script's own with a new one at the
 // function the operand gives; as the kill opcode when it is the running
@@ -1338,6 +1414,7 @@ void sub_6A080()
 }
 
 // match: sub_6A1A0 @ 0x0006A1A0
+// sp-match: sub_6A1A0 @ 0x000592F0
 // Opcode 42, thread: starts a new task at the function the operand gives
 // (popped when flag 8 of byte 1 is set, else the next word) on the object
 // the popped handle names (flag 1) or the running script's own, below its
@@ -1427,6 +1504,7 @@ void sub_6A1A0()
 }
 
 // match: sub_6A4F0 @ 0x0006A4F0
+// sp-match: sub_6A4F0 @ 0x00059530
 // Opcode 45, action: queues the action of the script the handle (popped,
 // flag 2 of byte 1, or the next word) names on the object the popped handle
 // names (byte 2 is 0) with the stack's arguments; pops them.
@@ -1464,6 +1542,7 @@ void sub_6A4F0()
 }
 
 // match: sub_6A640 @ 0x0006A640
+// sp-match: sub_6A640 @ 0x00059600
 // Opcode 46, sound: plays the sound under the key in the next two words
 // from the running script's entity (byte 1 is 2) or player 0.
 void sub_6A640()
@@ -1484,6 +1563,7 @@ void sub_6A640()
 }
 
 // match: sub_6A6F0 @ 0x0006A6F0
+// sp-match: sub_6A6F0 @ 0x0005A8B0
 // Opcode 48, line: the running line and file (the next word's halves; the
 // file's name from dword_449290), reported to the debugger when the line
 // changes and to the script.
@@ -1505,6 +1585,7 @@ void sub_6A6F0()
 }
 
 // match: sub_6A7A0 @ 0x0006A7A0
+// sp-match: sub_6A7A0 @ 0x00059680
 // A random number from arg_0 to arg_4.
 RwInt8 sub_6A7A0(RwInt8 arg_0, RwInt8 arg_4)
 {
@@ -1515,12 +1596,14 @@ RwInt8 sub_6A7A0(RwInt8 arg_0, RwInt8 arg_4)
 }
 
 // match: sub_6A7D0 @ 0x0006A7D0
+// sp-match: sub_6A7D0 @ 0x000596A0
 type_42E00_00 *sub_6A7D0(RwInt32 arg_0)
 {
     return &dword_4492F4[arg_0];
 }
 
 // match: sub_6A7F0 @ 0x0006A7F0
+// sp-match: sub_6A7F0 @ 0x000596C0
 // dword_4492F4's record named arg_0 (in any case), or 0.
 type_42E00_00 *sub_6A7F0(const RwChar *arg_0)
 {
@@ -1534,6 +1617,7 @@ type_42E00_00 *sub_6A7F0(const RwChar *arg_0)
 }
 
 // match: sub_6A860 @ 0x0006A860
+// sp-match: sub_6A860 @ 0x00059720
 // The unk_04 of dword_4492F4's record with unk_08 arg_0 and unk_0C arg_4,
 // or -1.
 RwInt32 sub_6A860(RwInt32 arg_0, RwInt32 arg_4)
@@ -1549,6 +1633,7 @@ RwInt32 sub_6A860(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: sub_6A8E0 @ 0x0006A8E0
+// sp-match: sub_6A8E0 @ 0x00059770
 // dword_4492FC's record named arg_0 (in any case), or 0.
 type_4492FC *sub_6A8E0(const RwChar *arg_0)
 {
@@ -1562,6 +1647,7 @@ type_4492FC *sub_6A8E0(const RwChar *arg_0)
 }
 
 // match: sub_6A950 @ 0x0006A950
+// sp-match: sub_6A950 @ 0x000597D0
 type_4492EC *sub_6A950(RwInt32 arg_0)
 {
     return &dword_4492EC[arg_0];
@@ -1571,6 +1657,7 @@ type_4492EC *sub_6A950(RwInt32 arg_0)
 extern const RwChar *Str2[5];
 
 // match: sub_6A970 @ 0x0006A970
+// sp-match: sub_6A970 @ 0x000597F0
 // The debugger's report of the message arg_0 delivered to the registration
 // arg_4 (arg_8 its caption): unless the debugger ignores it (not watching,
 // one of Str2's messages, not the watched object or sender), builds "name,
@@ -1578,6 +1665,18 @@ extern const RwChar *Str2[5];
 // used it is compiled out.
 void sub_6A970(type_42E00 *arg_0, type_6B960 *arg_4, const RwChar *arg_8)
 {
+#ifdef CODFH_SP // shape: SP 0x597F0 formats every part in one 0x80 buffer (sub esp, 0x28C)
+    RwChar part[0x80];
+    RwChar (&t4C8)[0x80] = part;
+    RwChar (&w448)[0x80] = part;
+    RwV3d *bp_3C4;
+    type_67620 *r3C0;
+    type_4CFE30 *lcl_3BC;
+    RwChar (&fp_3B8)[0x80] = part;
+    RwV3d *bp_334;
+    RwChar (&var_330)[0x80] = part;
+    RwChar (&local_2B0)[0x80] = part;
+#else
     RwChar t4C8[0x80];
     RwChar w448[0x80];
     RwV3d *bp_3C4;
@@ -1587,6 +1686,7 @@ void sub_6A970(type_42E00 *arg_0, type_6B960 *arg_4, const RwChar *arg_8)
     RwV3d *bp_334;
     RwChar var_330[0x80];
     RwChar local_2B0[0x80];
+#endif
     type_3DF8D8 *loc22C;
     type_3DF8D8_04 *s228;
     type_3DF8D8 *s224;
@@ -1696,13 +1796,16 @@ void sub_6A970(type_42E00 *arg_0, type_6B960 *arg_4, const RwChar *arg_8)
 }
 
 // match: sub_6B060 @ 0x0006B060
+// sp-match: sub_6B060 @ 0x00059EF0
 // The debugger's report line for the object arg_0 (arg_4 what happened,
 // arg_8 the short form): unless the debugger ignores the object, builds
 // "kind(file line): Name: ..., ID: ..., what at tick: ..." in a buffer (the
 // print is compiled out); whether it would have printed.
 bool sub_6B060(type_67620 *arg_0, const RwChar *arg_4, bool arg_8)
 {
+#ifndef CODFH_SP // shape: SP 0x59EF0 reserves one 0x800 buffer (sub esp, 0x844): both formats print into fp_858
     RwChar m_1058[0x800];
+#endif
     RwChar fp_858[0x800];
     type_3DF8D8 *lv_54;
     type_3DF8D8_04 *ebp_50;
@@ -1758,12 +1861,21 @@ bool sub_6B060(type_67620 *arg_0, const RwChar *arg_4, bool arg_8)
             }
         }
     } else {
+#ifdef CODFH_SP // shape: one buffer (see m_1058)
+        if (arg_8)
+            sprintf(fp_858, "%s - ID: %d, %s at tick: %d\n", q48, arg_0->vf_024()->get_unk_24_d(), arg_4,
+                    dword_4B87D8);
+        else
+            sprintf(fp_858, "%s(%d): %s ID: %d, %s at tick: %d\n", dword_449288, dword_449284, q48,
+                    arg_0->vf_024()->get_unk_24_d(), arg_4, dword_4B87D8);
+#else
         if (arg_8)
             sprintf(m_1058, "%s - ID: %d, %s at tick: %d\n", q48, arg_0->vf_024()->get_unk_24_d(), arg_4,
                     dword_4B87D8);
         else
             sprintf(m_1058, "%s(%d): %s ID: %d, %s at tick: %d\n", dword_449288, dword_449284, q48,
                     arg_0->vf_024()->get_unk_24_d(), arg_4, dword_4B87D8);
+#endif
     }
     return true;
 }
@@ -1777,3 +1889,98 @@ void type_67620::sub_6F460(RwInt32 * arg_0)
     dword_4493F8 = arg_0;
     dword_4493FC = dword_4493F8;
 }
+
+#ifdef CODFH_SP
+// Single player's empty and trivial functions whose own files call them: a body there would
+// let /O2 drop or inline those calls, which default.xbe keeps (each file only declares them,
+// see its comments), and the link folds them into the bodies below. Defined here for the
+// authentic link (PLAN_SP SP6): the M7 link folds each into the row config/sp/aliases.txt
+// gives it (the empty body SCRIPT_CHECK_SLOTS at 0x5A260 is this file's).
+#include "game/astarpathfinder.h"
+#include "game/gameloop.h"
+#include "types/type_10F710.h"
+#include "types/type_141C10.h"
+#include "types/type_143DC0.h"
+#include "types/type_3D32F8.h"
+#include "types/type_3D51C0.h"
+#include "types/type_3D94B8.h"
+#include "types/type_3D96F0.h"
+#include "types/type_3DAC58.h"
+#include "types/type_3DC9B0.h"
+#include "types/type_3DD948.h"
+#include "types/type_3DDB98.h"
+#include "types/type_3DDE70.h"
+#include "types/type_3DE0E0.h"
+#include "types/type_4B83A0.h"
+#include "types/type_4B85F8.h"
+#include "types/type_4E5D30.h"
+#include "types/type_D48D0.h"
+
+// the empty body (SP 0x5A260)
+void sub_19A750() {}
+void sub_19A750(RwReal arg_0) {}
+void sub_19A750(void *arg_0) {}
+void sub_19A750(RwInt16 *arg_0) {}
+void sub_19A750(struct RwStream *arg_0) {}
+void sub_19A750(struct RwStream *arg_0, struct type_141C10 *arg_4) {}
+void sub_19A750(struct type_3D3548 *arg_0, RwInt32 arg_4, struct type_3DF8D8_04 arg_8, RwInt32 arg_C) {}
+void sub_141C10_kind15(struct RwStream *arg_0, struct type_141C10 *arg_4) {}
+void sub_141C10_kind30(struct RwStream *arg_0, struct type_141C10 *arg_4) {}
+void sub_144AD0() {}
+type_4BFED0::~type_4BFED0() {}
+type_4E5D30::~type_4E5D30() {}
+type_FB6E0::~type_FB6E0() {}
+void type_4B85F8::pDtor() {}
+void type_4F2B68::pDtor() {}
+void type_4B83A0::sub_D6550() {}
+void type_10F710::operator delete(void *arg_0, void *arg_4) {}
+void type_10F710::operator delete(void *arg_0) {}
+void type_3D32F8::operator delete(void *arg_0) {}
+void type_3D51C0::operator delete(void *arg_0) {}
+void type_3D94B8::operator delete(void *arg_0) {}
+void type_3D96F0::operator delete(void *arg_0) {}
+void type_3DAC58::operator delete(void *arg_0) {}
+void type_3DC9B0::operator delete(void *arg_0) {}
+void type_3DD948::operator delete(void *arg_0) {}
+void type_3DDB98::operator delete(void *arg_0) {}
+void type_3DDE70::operator delete(void *arg_0) {}
+void type_3DE0E0::operator delete(void *arg_0) {}
+void type_3DE350::operator delete(void *arg_0) {}
+
+// the entities' placement new (SP 0x122FF0)
+void *type_10F710::operator new(RwUInt32 arg_0, void *arg_4)
+{
+    return arg_4;
+}
+
+// `return 0` (SP 0x6CEB0)
+RwInt32 sub_170ED0(RwReal *arg_0)
+{
+    return 0;
+}
+
+// the material getter (SP 0x5BA70)
+struct RpMaterial *type_143D90::sub_FB710()
+{
+    return unk_08;
+}
+
+// the handle table's lookup (SP 0xA0E70, type_D48D0's)
+struct type_3D3548 *type_3D96F0_14::sub_D4910()
+{
+    type_3D3548 *var_4;
+
+    var_4 = 0;
+    if (dword_4B6A00[(RwInt16)unk_00].unk_00 == unk_00)
+    {
+        var_4 = dword_4B6A00[(RwInt16)unk_00].unk_04;
+    }
+    return var_4;
+}
+
+// the leak check's `return false` (SP 0xD5A00, sub_12F080's)
+bool sub_12EE80(RwInt32 arg_0)
+{
+    return false;
+}
+#endif

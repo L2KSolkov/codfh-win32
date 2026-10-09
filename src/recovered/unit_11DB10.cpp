@@ -22,7 +22,13 @@ extern const RwReal flt_3DA650 = 16.666666f;
 
 
 // Sets or clears flag 2 of a projectile's flags: clears it when arg_2 holds.
+#ifdef CODFH_SP // single player's inline member (SP 0xD5B40; expanded for a constant argument)
+#define PG_FLAG2(p, on) ((p)->sp_sub_D5B40(on))
+// (its out-of-line copy, which vf_024 and sub_11E850 call for a random argument)
+// sp-match: ?sp_sub_D5B40@type_3D3548@@QAEXH@Z @ 0x000D5B40
+#else
 #define PG_FLAG2(p, on) ((on) ? ((p)->unk_28 &= ~2) : ((p)->unk_28 |= 2))
+#endif
 
 // Its data (PLAN M5): literals, constants and tables where the image has them.
 // match: ?flt_3DA650@@3MB @ 0x003DA650
@@ -37,6 +43,7 @@ extern const RwReal flt_3DA650 = 16.666666f;
 // match: ??0type_11DB10@@QAE@XZ @ 0x0011DB10
 // match: __ehhandler$??0type_11DB10@@QAE@XZ-0x8 @ 0x00301480
 // match: __ehhandler$??0type_11DB10@@QAE@XZ @ 0x00301488
+// sp-match: ??0type_11DB10@@QAE@XZ @ 0x000D6100
 
 type_11DB10::type_11DB10()
 {
@@ -45,12 +52,15 @@ type_11DB10::type_11DB10()
 // match: ??1type_1227C0@@UAE@XZ @ 0x0011DBA0
 // match: __ehhandler$??1type_1227C0@@UAE@XZ-0x40 @ 0x003014A0
 // match: __ehhandler$??1type_1227C0@@UAE@XZ @ 0x003014E0
+// sp-match: ??1type_1227C0@@UAE@XZ @ 0x000D6060
 // (In the class.)
 
 // match: ??_Gtype_1227C0@@UAEPAXI@Z @ 0x0011DC20
+// sp-match: ??_Gtype_1227C0@@UAEPAXI@Z @ 0x000D60E0
 // (Its scalar deleting destructor, compiler-written.)
 
 // match: ?vf_014@type_11DB10@@UAEXH@Z @ 0x0011DC50
+// sp-match: ?vf_014@type_11DB10@@UAEXH@Z @ 0x000D6190
 // Turns its line-of-sight check on or off.
 void type_11DB10::vf_014(RwInt32 arg_0)
 {
@@ -58,6 +68,7 @@ void type_11DB10::vf_014(RwInt32 arg_0)
 }
 
 // match: ?vf_004@type_11DB10@@UAEXPAVProjectileGeneratorTrigger@@@Z @ 0x0011DC70
+// sp-match: ?vf_004@type_11DB10@@UAEXPAVProjectileGeneratorTrigger@@@Z @ 0x000D5B60
 // Sets it up from its trigger, which then holds it.
 void type_11DB10::vf_004(ProjectileGeneratorTrigger *arg_0)
 {
@@ -68,6 +79,7 @@ void type_11DB10::vf_004(ProjectileGeneratorTrigger *arg_0)
 }
 
 // match: ?vf_008@type_11DB10@@UAEXXZ @ 0x0011DCC0
+// sp-match: ?vf_008@type_11DB10@@UAEXXZ @ 0x000D5B90
 void type_11DB10::vf_008()
 {
     type_1227C0::vf_008();
@@ -81,6 +93,7 @@ void type_11DB10::vf_010(RwReal arg_0)
 }
 
 // match: ?vf_00C@type_11DB10@@UAEXPAVProjectileGeneratorTrigger@@@Z @ 0x0011DCE0
+// sp-match: ?vf_00C@type_11DB10@@UAEXPAVProjectileGeneratorTrigger@@@Z @ 0x000D5BA0
 // Its projectile's settings from its trigger: a bullet (unk_150), or with
 // the trigger's unk_1CC set a projectile (unk_188, kind 3 for 1, else 2)
 // whose object is the trigger's unk_1D0.
@@ -131,6 +144,7 @@ void type_11DB10::vf_00C(ProjectileGeneratorTrigger *arg_0)
 }
 
 // match: ?vf_024@type_11DB10@@UAEHXZ @ 0x0011DF00
+// sp-match: ?vf_024@type_11DB10@@UAEHXZ @ 0x000D5D20
 // Fires a bullet (0x201, or 0x202 for the trigger's unk_DC 2) or a
 // projectile from its barrel, turret or parent at the point it aims at,
 // with its muzzle particle systems, and tells its script
@@ -210,7 +224,11 @@ RwInt32 type_11DB10::vf_024()
         }
         else if (var_C->unk_104 < 100)
         {
+#ifdef CODFH_SP // shape: no copy in var_94 (SP 0xD5D20 computes the argument in edx)
+            PG_FLAG2(var_8C, var_C->unk_104 >= RpRandom() % 101);
+#else
             PG_FLAG2(var_8C, (var_94 = var_C->unk_104 >= RpRandom() % 101));
+#endif
         }
     }
     if (var_C->unk_1E4)
@@ -257,6 +275,7 @@ RwInt32 type_11DB10::vf_024()
 }
 
 // match: ?vf_020@type_11DB10@@UAEHPAURwV3d@@@Z @ 0x0011E3D0
+// sp-match: ?vf_020@type_11DB10@@UAEHPAURwV3d@@@Z @ 0x000D6010
 // With its line-of-sight check on, whether the target can be seen from its
 // trigger's position to arg_0 (sub_42210); 1 otherwise.
 RwInt32 type_11DB10::vf_020(RwV3d *arg_0)

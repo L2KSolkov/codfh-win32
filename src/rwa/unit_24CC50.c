@@ -306,6 +306,7 @@ RwUInt8 dword_507C4C[44];
 // match: _off_4300F8 @ 0x004300F8
 
 // match: _sub_24CC40 @ 0x0024CC40
+// sp-match: _sub_24CC40 @ 0x00160D80
 
 RwBool
 sub_24CC40(void)
@@ -314,6 +315,7 @@ sub_24CC40(void)
 }
 
 // match: _sub_24CC50 @ 0x0024CC50
+// sp-match: _sub_24CC50 @ 0x00160D90
 static void
 sub_24CC50(rwaSplitter *obj, void *a, void *b)
 {
@@ -324,6 +326,7 @@ sub_24CC50(rwaSplitter *obj, void *a, void *b)
 /* Source shape: rwad.dll _RwaStreamFanOutStartExecute, 0x10067D61.
  * Keep the incoming object and typed local separate. */
 // match: _sub_24CC80 @ 0x0024CC80
+// sp-match: _sub_24CC80 @ 0x00160DC0
 rwaSplitter *
 sub_24CC80(rwaSplitter *arg)
 {
@@ -383,6 +386,7 @@ sub_24CC80(rwaSplitter *arg)
 
 /* The default creation parameters. */
 // match: _sub_24CD20 @ 0x0024CD20
+// sp-match: _sub_24CD20 @ 0x00160E60
 static void *
 sub_24CD20(rwaSplitter *obj, rwaSplitterParams *params)
 {
@@ -395,6 +399,7 @@ sub_24CD20(rwaSplitter *obj, rwaSplitterParams *params)
 }
 
 // match: _sub_24CD50 @ 0x0024CD50
+// sp-match: _sub_24CD50 @ 0x00160E90
 rwaQueueItem *
 sub_24CD50(rwaSplitter *obj, RwUInt32 track)
 {
@@ -441,6 +446,7 @@ sub_24CD50(rwaSplitter *obj, RwUInt32 track)
 
 
 // match: _sub_24CE70 @ 0x0024CE70
+// sp-match: _sub_24CE70 @ 0x00160FB0
 void
 sub_24CE70(rwaSplitter *obj, RwInt32 mode)
 {
@@ -450,6 +456,7 @@ sub_24CE70(rwaSplitter *obj, RwInt32 mode)
 }
 
 // match: _sub_24CE90 @ 0x0024CE90
+// sp-match: _sub_24CE90 @ 0x00160FD0
 void
 sub_24CE90(rwaSplitter *obj, rwaStreamConnect *connect)
 {
@@ -459,6 +466,7 @@ sub_24CE90(rwaSplitter *obj, rwaStreamConnect *connect)
 }
 
 // match: _sub_24CEC0 @ 0x0024CEC0
+// sp-match: _sub_24CEC0 @ 0x00161000
 RwInt32
 sub_24CEC0(rwaSplitter *obj)
 {
@@ -466,6 +474,7 @@ sub_24CEC0(rwaSplitter *obj)
 }
 
 // match: _sub_24CED0 @ 0x0024CED0
+// sp-match: _sub_24CED0 @ 0x00161010
 void
 sub_24CED0(rwaSplitter *obj, rwaStreamConnect *connect)
 {
@@ -474,6 +483,7 @@ sub_24CED0(rwaSplitter *obj, rwaStreamConnect *connect)
 
 /* A track item played: the source's item goes back once every track has. */
 // match: _sub_24CEF0 @ 0x0024CEF0
+// sp-match: _sub_24CEF0 @ 0x00161030
 void
 sub_24CEF0(rwaQueueItem *item, rwaSplitterTrack *track)
 {
@@ -495,6 +505,7 @@ sub_24CEF0(rwaQueueItem *item, rwaSplitterTrack *track)
 }
 
 // match: _sub_24CF70 @ 0x0024CF70
+// sp-match: _sub_24CF70 @ 0x001610B0
 rwaSplitter *
 sub_24CF70(rwaSplitter *obj, const void *param, const RwInt32 *value)
 {
@@ -503,6 +514,7 @@ sub_24CF70(rwaSplitter *obj, const void *param, const RwInt32 *value)
 }
 
 // match: _sub_24CF90 @ 0x0024CF90
+// sp-match: _sub_24CF90 @ 0x001610D0
 rwaSplitter *
 sub_24CF90(rwaSplitter *obj, const void *param, rwaStreamConnect *value)
 {
@@ -511,6 +523,7 @@ sub_24CF90(rwaSplitter *obj, const void *param, rwaStreamConnect *value)
 }
 
 // match: _sub_24CFB0 @ 0x0024CFB0
+// sp-match: _sub_24CFB0 @ 0x001610F0
 rwaSplitter *
 sub_24CFB0(rwaSplitter *obj, const void *param, RwInt32 *value)
 {
@@ -519,6 +532,7 @@ sub_24CFB0(rwaSplitter *obj, const void *param, RwInt32 *value)
 }
 
 // match: _sub_24CFD0 @ 0x0024CFD0
+// sp-match: _sub_24CFD0 @ 0x00161110
 rwaSplitter *
 sub_24CFD0(rwaSplitter *obj, const void *param, rwaStreamConnect *value)
 {
@@ -528,6 +542,7 @@ sub_24CFD0(rwaSplitter *obj, const void *param, rwaStreamConnect *value)
 
 /* The update: nothing to do (folded by /OPT:ICF into 0x257AF0). */
 rwaSplitter *
+// sp-match: _rwaSplitterUpdate @ 0x00161130
 rwaSplitterUpdate(rwaSplitter *obj)
 {
     return obj;
@@ -543,6 +558,7 @@ splitAlloc(rwaNodeAllocator *allocator, RwUInt32 size)
 }
 
 // match: _sub_24CFF0 @ 0x0024CFF0
+// sp-match: _sub_24CFF0 @ 0x00161140
 rwaSplitter *
 sub_24CFF0(rwaSplitter *obj, rwaInstance *parent, rwaSplitterParams *params, void *a, void *b)
 {
@@ -603,6 +619,7 @@ sub_24CFF0(rwaSplitter *obj, rwaInstance *parent, rwaSplitterParams *params, voi
 }
 
 // match: _sub_24D1B0 @ 0x0024D1B0
+// sp-match: _sub_24D1B0 @ 0x00161300
 static void
 sub_24D1B0(rwaObjDef *def)
 {
@@ -620,6 +637,7 @@ sub_24D1B0(rwaObjDef *def)
 }
 
 // match: _sub_24D400 @ 0x0024D400
+// sp-match: _sub_24D400 @ 0x00161550
 rwaObjDef *
 sub_24D400(void)
 {
@@ -644,6 +662,7 @@ sub_24D400(void)
 }
 
 // match: _RwaStreamRendererInterfaceRegister @ 0x0024D460
+// sp-match: _RwaStreamRendererInterfaceRegister @ 0x001615B0
 void *
 RwaStreamRendererInterfaceRegister(void)
 {
@@ -659,6 +678,7 @@ RwaStreamRendererInterfaceRegister(void)
 }
 
 // match: _sub_24D4B0 @ 0x0024D4B0
+// sp-match: _sub_24D4B0 @ 0x00161600
 RwBool
 sub_24D4B0(void)
 {

@@ -137,6 +137,7 @@ static const char rcsid[] = "@@@@(#)$Id: //RenderWare/RW36Active/rwsdk/tool/2dan
  ****************************************************************************/
 
 Rt2dMaestro *
+// sp-match: __rt2dMaestroInit @ 0x00170BB0
 _rt2dMaestroInit(Rt2dMaestro *maestro)
 {
     RWFUNCTION(RWSTRING("_rt2dMaestroInit"));
@@ -183,6 +184,7 @@ _rt2dMaestroInit(Rt2dMaestro *maestro)
 // match: _rcsid @ 0x003EE5A8
 
 // match: __rt2dMaestroDestruct @ 0x00257610
+// sp-match: __rt2dMaestroDestruct @ 0x001711D0
 RwBool
 _rt2dMaestroDestruct(Rt2dMaestro *maestro)
 {
@@ -250,6 +252,7 @@ _rt2dMaestroDestruct(Rt2dMaestro *maestro)
  * \see Rt2dMaestroDestroy
  */
 Rt2dMaestro *
+// sp-match: _Rt2dMaestroCreate @ 0x00170C50
 Rt2dMaestroCreate(void)
 {
     Rt2dMaestro *maestro;
@@ -280,6 +283,7 @@ Rt2dMaestroCreate(void)
  * \see Rt2dMaestroCreate
  */
 // match: _Rt2dMaestroDestroy @ 0x002576B0
+// sp-match: _Rt2dMaestroDestroy @ 0x00171270
 RwBool
 Rt2dMaestroDestroy(Rt2dMaestro *maestro)
 {
@@ -422,6 +426,7 @@ Rt2dMaestroStreamWrite(Rt2dMaestro *maestro, RwStream *stream)
 }
 
 static Rt2dMaestro *
+// sp-match: __rt2dMaestroAnimNodeResetCallBack @ 0x00170C80
 _rt2dMaestroAnimNodeResetCallBack(Rt2dMaestro *maestro,
                                       Rt2dAnimNode *animNode,
                                       void *pData __RWUNUSED__)
@@ -522,6 +527,7 @@ _rt2dMaestroAnimNodeResetCallBack(Rt2dMaestro *maestro,
  *
  */
 Rt2dMaestro *
+// sp-match: _Rt2dMaestroStreamRead @ 0x001712A0
 Rt2dMaestroStreamRead(Rt2dMaestro *maestro, RwStream *stream)
 {
     RwInt32                 version;
@@ -634,6 +640,7 @@ _rt2dAnimNodeDestruct(Rt2dAnimNode * animNode)
 }
 
 // match: __rt2dMaestroAnimNodeDestructCallBack @ 0x00257550
+// sp-match: __rt2dMaestroAnimNodeDestructCallBack @ 0x00170750
 static Rt2dMaestro *
 _rt2dMaestroAnimNodeDestructCallBack(Rt2dMaestro *maestro,
                                       Rt2dAnimNode *animNode,
@@ -700,6 +707,7 @@ _rt2dMaestroAnimNodeStreamWriteCallBack(Rt2dMaestro *maestro,
 }
 
 static Rt2dMaestro *
+// sp-match: __rt2dMaestroAnimNodeUpdateCallBack @ 0x001707A0
 _rt2dMaestroAnimNodeUpdateCallBack(Rt2dMaestro *maestro,
                                     Rt2dAnimNode *node,
                                     void *pData __RWUNUSED__)
@@ -780,6 +788,7 @@ _rt2dMaestroAnimationsStreamGetSize(Rt2dMaestro *maestro)
 }
 
 Rt2dMaestro *
+// sp-match: __rt2dMaestroAnimationsStreamRead @ 0x00170DA0
 _rt2dMaestroAnimationsStreamRead(Rt2dMaestro *maestro, RwStream *stream)
 {
     RwChunkHeaderInfo       chunkHeader;
@@ -918,6 +927,7 @@ _rt2dMaestroAnimationsStreamWrite(Rt2dMaestro *maestro, RwStream *stream)
 }
 
 Rt2dAnimNode *
+// sp-match: __rt2dMaestroGetAnimNodeByIndex @ 0x001707C0
 _rt2dMaestroGetAnimNodeByIndex(Rt2dMaestro *maestro, RwInt32 index)
 {
     Rt2dAnimNode        *animNode;
@@ -934,6 +944,7 @@ _rt2dMaestroGetAnimNodeByIndex(Rt2dMaestro *maestro, RwInt32 index)
 
 /****************************************************************************/
 Rt2dMaestro *
+// sp-match: __rt2dMaestroForAllVisibleAnimNode @ 0x001707D0
 _rt2dMaestroForAllVisibleAnimNode(
                             Rt2dMaestro *maestro,
                             Rt2dMaestroAnimNodeCallBack callback,
@@ -1001,6 +1012,7 @@ _rt2dMaestroForAllVisibleAnimNode(
 /****************************************************************************/
 
 // match: __rt2dMaestroForAllAnimNode @ 0x002575A0
+// sp-match: __rt2dMaestroForAllAnimNode @ 0x00170880
 Rt2dMaestro *
 _rt2dMaestroForAllAnimNode(Rt2dMaestro *maestro,
                             Rt2dMaestroAnimNodeCallBack callback,
@@ -1117,6 +1129,7 @@ struct _adaptAnimNodeCallBack
 };
 
 static Rt2dMaestro *
+// sp-match: __rt2dMaestroAnimNodeCallBackAdaptor @ 0x001708F0
 _rt2dMaestroAnimNodeCallBackAdaptor(Rt2dMaestro *maestro,
                                    Rt2dAnimNode *animNode,
                                    void *pData)
@@ -1158,6 +1171,7 @@ _rt2dMaestroAnimNodeCallBackAdaptor(Rt2dMaestro *maestro,
  *
  */
 Rt2dMaestro *
+// sp-match: _Rt2dMaestroForAllVisibleAnimations @ 0x00170910
 Rt2dMaestroForAllVisibleAnimations(
                              Rt2dMaestro *maestro,
                              Rt2dMaestroAnimationsCallBack callBack,
@@ -1294,6 +1308,7 @@ Rt2dMaestroAddAnimations(Rt2dMaestro *maestro,
  * \see Rt2dMaestroGetCelListByIndex
  */
 Rt2dAnim *
+// sp-match: _Rt2dMaestroGetAnimationsByIndex @ 0x00170950
 Rt2dMaestroGetAnimationsByIndex(Rt2dMaestro *maestro, RwInt32 index)
 {
     Rt2dAnimNode        *animNode;
@@ -1322,6 +1337,7 @@ Rt2dMaestroGetAnimationsByIndex(Rt2dMaestro *maestro, RwInt32 index)
  */
 
 Rt2dMaestro *
+// sp-match: _Rt2dMaestroUpdateAnimations @ 0x00170970
 Rt2dMaestroUpdateAnimations(Rt2dMaestro *maestro)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dMaestroUpdateAnimations"));
@@ -1358,6 +1374,7 @@ Rt2dMaestroUpdateAnimations(Rt2dMaestro *maestro)
  * \see Rt2dMaestroGetCelListByIndex
  */
 Rt2dAnimProps *
+// sp-match: _Rt2dMaestroGetAnimPropsByIndex @ 0x001709A0
 Rt2dMaestroGetAnimPropsByIndex(Rt2dMaestro *maestro, RwInt32 index)
 {
     Rt2dAnimNode        *animNode;
@@ -1556,6 +1573,7 @@ _rt2dMaestroSceneStreamGetSize(Rt2dMaestro *maestro)
 }
 
 Rt2dMaestro *
+// sp-match: __rt2dMaestroSceneStreamRead @ 0x001709C0
 _rt2dMaestroSceneStreamRead(Rt2dMaestro *maestro, RwStream *stream)
 {
     RwInt32                 size;
@@ -1621,6 +1639,7 @@ _rt2dMaestroSceneStreamWrite(Rt2dMaestro *maestro, RwStream *stream)
  * \see Rt2dSceneCreate
  */
 Rt2dObject *
+// sp-match: _Rt2dMaestroGetScene @ 0x00170A30
 Rt2dMaestroGetScene(Rt2dMaestro *maestro)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dMaestroGetScene"));
@@ -1659,6 +1678,7 @@ Rt2dMaestroSetScene(Rt2dMaestro *maestro, Rt2dObject *scene)
 /**************************************************************************/
 
 static Rt2dMaestro *
+// sp-match: __rt2dMaestroAnimNodeAddDeltaTimeCallBack @ 0x00170A40
 _rt2dMaestroAnimNodeAddDeltaTimeCallBack(Rt2dMaestro *maestro,
                                           Rt2dAnimNode *animNode,
                                           void *pData)
@@ -1732,6 +1752,7 @@ _rt2dMaestroAnimNodeAddDeltaTimeCallBack(Rt2dMaestro *maestro,
 }
 
 static Rt2dMaestro *
+// sp-match: _EndLooping @ 0x00170F20
 EndLooping(Rt2dMaestro *maestro,
            Rt2dAnimNode *animNode,
            void *pData)
@@ -1796,6 +1817,7 @@ EndLooping(Rt2dMaestro *maestro,
  * \see Rt2dMaestroProcessMessages
  */
 Rt2dMaestro *
+// sp-match: _Rt2dMaestroAddDeltaTime @ 0x00171010
 Rt2dMaestroAddDeltaTime(Rt2dMaestro *maestro, RwReal deltaTime)
 {
     RwReal              currTime=0.0f;
@@ -1955,6 +1977,7 @@ Rt2dMaestroAddDeltaTime(Rt2dMaestro *maestro, RwReal deltaTime)
  * \see Rt2dMaestroGetCelListByIndex
  */
 Rt2dObject *
+// sp-match: _Rt2dMaestroGetAnimSceneByIndex @ 0x00170B20
 Rt2dMaestroGetAnimSceneByIndex(Rt2dMaestro *maestro, RwInt32 index)
 {
     Rt2dAnimNode            *animNode;
@@ -1995,6 +2018,7 @@ Rt2dMaestroGetAnimSceneByIndex(Rt2dMaestro *maestro, RwInt32 index)
  * \see Rt2dMaestroCreate
  */
 Rt2dMaestro *
+// sp-match: _Rt2dMaestroRender @ 0x00170B60
 Rt2dMaestroRender(Rt2dMaestro *maestro)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dMaestroRender"));
@@ -2011,6 +2035,36 @@ Rt2dMaestroRender(Rt2dMaestro *maestro)
 
     RWRETURN(maestro);
 }
+
+#ifdef CODFH_SP
+/* Single player's Rt2d library has a getter and setter for the word after the
+ * state transition table (Rt2dMaestro.unknown, +0x158), between
+ * Rt2dMaestroRender and Rt2dMaestroGetBBox (SP 0x170B80, 0x170B90; the front
+ * end keeps its screen there). Neither is in RenderWare 3.7.2 or in the
+ * multiplayer image; no name survives, so they keep the address names
+ * include/sp/sp_fend.h declares. */
+void *
+// sp-match: _sp_sub_170B80 @ 0x00170B80
+sp_sub_170B80(Rt2dMaestro *maestro)
+{
+    RWAPIFUNCTION(RWSTRING("sp_sub_170B80"));
+    RWASSERT(maestro);
+
+    RWRETURN((void *)maestro->unknown);
+}
+
+Rt2dMaestro *
+// sp-match: _sp_sub_170B90 @ 0x00170B90
+sp_sub_170B90(Rt2dMaestro *maestro, void *data)
+{
+    RWAPIFUNCTION(RWSTRING("sp_sub_170B90"));
+    RWASSERT(maestro);
+
+    maestro->unknown = (RwUInt32)data;
+
+    RWRETURN(maestro);
+}
+#endif /* CODFH_SP */
 
 /**************************************************************************
  *
@@ -2033,6 +2087,7 @@ Rt2dMaestroRender(Rt2dMaestro *maestro)
  */
 
 Rt2dBBox *
+// sp-match: _Rt2dMaestroGetBBox @ 0x00170BA0
 Rt2dMaestroGetBBox(Rt2dMaestro *maestro)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dMaestroGetBBox"));

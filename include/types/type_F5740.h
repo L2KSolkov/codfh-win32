@@ -40,8 +40,16 @@ struct type_F5740
     };
     RwReal unk_40;
     RwReal unk_44;
-    RwInt32 unk_48;
-    RwInt32 unk_4C;
+    union
+    {
+        RwInt32 unk_48;
+        RwReal unk_48_f;        // single player copies reals here (SP 0xBAC00)
+    };
+    union
+    {
+        RwInt32 unk_4C;
+        RwReal unk_4C_f;
+    };
     RwInt32 unk_50;
     type_144940 unk_54;         // its trigger
     RwInt32 unk_60;             // its sound
@@ -81,7 +89,11 @@ struct type_F4890_50
         RwInt32 unk_00;
         RwReal unk_00_r;        // a thrown grenade's (sub_1AE8F0)
     };
-    RwInt32 unk_04;
+    union
+    {
+        RwInt32 unk_04;
+        RwReal unk_04_r;        // the emitter's damage (SP 0xBAFC0)
+    };
     RwReal unk_08;
     RwReal unk_0C;
     RwInt32 unk_10;
@@ -103,6 +115,14 @@ struct type_F4890_50
 // the player's shake take it.
 struct type_F4890_blast : type_67260
 {
+#ifdef CODFH_SP // shape: SP 0xBAFC0 clears these base fields through their float values.
+    type_F4890_blast()
+    {
+        unk_40_r = 0.0f;
+        unk_44_r = 0.0f;
+        *(RwReal *)&unk_48 = 0.0f;
+    }
+#endif
     type_F4890_50 unk_50;
 };
 

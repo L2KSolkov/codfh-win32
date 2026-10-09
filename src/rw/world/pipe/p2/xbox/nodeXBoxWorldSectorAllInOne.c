@@ -36,6 +36,7 @@ static const D3DMATRIX matrix =
 // match: ?nodeXboxWorldSectorAllInOneCSL@?1??RxNodeDefinitionGetXboxWorldSectorAllInOne@@9@9 @ 0x00436D08
 
 // match: __rwXbWorldSectorDefaultLightingCallback @ 0x002E1C40
+// sp-match: __rwXbWorldSectorDefaultLightingCallback @ 0x001FC710
 
 void
 _rwXbWorldSectorDefaultLightingCallback(void *object)
@@ -79,6 +80,7 @@ _rwXbWorldSectorDefaultLightingCallback(void *object)
 }
 
 // match: __rxXBWorldSectorDefaultInstanceCallback @ 0x002E1CE0
+// sp-match: __rxXBWorldSectorDefaultInstanceCallback @ 0x001FC7B0
 RwBool
 _rxXBWorldSectorDefaultInstanceCallback(void *object,
                                         RxXboxResEntryHeader *instancedHeader,
@@ -133,6 +135,7 @@ _rxXBWorldSectorDefaultInstanceCallback(void *object,
 }
 
 // match: _XBWorldSectorAllInOneNode @ 0x002E1D60
+// sp-match: _XBWorldSectorAllInOneNode @ 0x001FC830
 static RwBool
 XBWorldSectorAllInOneNode(RxPipelineNode *self, const RxPipelineNodeParam *params)
 {
@@ -210,6 +213,7 @@ XBWorldSectorAllInOneNode(RxPipelineNode *self, const RxPipelineNodeParam *param
 }
 
 // match: __rxXBWorldSectorAllInOnePipelineInit @ 0x002E1EB0
+// sp-match: __rxXBWorldSectorAllInOnePipelineInit @ 0x001FC980
 RwBool
 _rxXBWorldSectorAllInOnePipelineInit(RxPipelineNode *node)
 {
@@ -224,6 +228,7 @@ _rxXBWorldSectorAllInOnePipelineInit(RxPipelineNode *node)
 }
 
 // match: _RxNodeDefinitionGetXboxWorldSectorAllInOne @ 0x002E1EE0
+// sp-match: _RxNodeDefinitionGetXboxWorldSectorAllInOne @ 0x001FC9B0
 RxNodeDefinition *
 RxNodeDefinitionGetXboxWorldSectorAllInOne(void)
 {

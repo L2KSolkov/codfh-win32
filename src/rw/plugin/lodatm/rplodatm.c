@@ -144,6 +144,7 @@ LODAtomicDefaultLODZero(RpAtomic * atomic,
 // match: __rpLODAtomicCacheFreeListPreallocBlocks @ 0x00436E2C
 
 // match: _LODAtomicCallBackSelectLOD @ 0x002E8780
+// sp-match: _LODAtomicCallBackSelectLOD @ 0x00203220
 
 static              RwInt32
 LODAtomicCallBackSelectLOD(RpAtomic * atomic)
@@ -192,6 +193,7 @@ LODAtomicCallBackSelectLOD(RpAtomic * atomic)
 /************************************************************************
  */
 // match: _LODAtomicSelectLOD @ 0x002E8880
+// sp-match: _LODAtomicSelectLOD @ 0x00203320
 static RpAtomic    *
 LODAtomicSelectLOD(RpAtomic * atomic,
                    RpLODAtomicCache * rpLODAtomicCache)
@@ -234,6 +236,7 @@ LODAtomicSelectLOD(RpAtomic * atomic,
 /************************************************************************
  */
 // match: _LODAtomicCallBackRender @ 0x002E88D0
+// sp-match: _LODAtomicCallBackRender @ 0x00203370
 static RpAtomic    *
 LODAtomicCallBackRender(RpAtomic * atomic)
 {
@@ -352,6 +355,7 @@ LODAtomicInitCache(RpLODAtomicCache * rpLODAtomicCache)
 /************************************************************************
  */
 // match: _LODAtomicNewCache @ 0x002E8900
+// sp-match: _LODAtomicNewCache @ 0x002033A0
 static RpLODAtomicCache *
 LODAtomicNewCache(void)
 {
@@ -372,6 +376,7 @@ LODAtomicNewCache(void)
 /************************************************************************
  */
 // match: _LODAtomicCopyCache @ 0x002E8960
+// sp-match: _LODAtomicCopyCache @ 0x00203400
 static RpLODAtomicCache *
 LODAtomicCopyCache(RpLODAtomicCache * rpDstLODAtomicCache,
                    RpLODAtomicCache * rpSrcLODAtomicCache)
@@ -411,6 +416,7 @@ LODAtomicCopyCache(RpLODAtomicCache * rpDstLODAtomicCache,
 /************************************************************************
  */
 // match: _LODAtomicDestroyCache @ 0x002E89B0
+// sp-match: _LODAtomicDestroyCache @ 0x00203450
 static void
 LODAtomicDestroyCache(RpLODAtomicCache * rpLODAtomicCache)
 {
@@ -437,6 +443,7 @@ LODAtomicDestroyCache(RpLODAtomicCache * rpLODAtomicCache)
 /************************************************************************
  */
 // match: _LODAtomicCallBackReadChunk @ 0x002E8A30
+// sp-match: _LODAtomicCallBackReadChunk @ 0x002034D0
 static RwStream    *
 LODAtomicCallBackReadChunk(RwStream * stream,
                            RwInt32 __RWUNUSED__ len,
@@ -523,6 +530,7 @@ LODAtomicCallBackReadChunk(RwStream * stream,
 /************************************************************************
  */
 // match: _LODAtomicCallBackWriteChunk @ 0x002E8B30
+// sp-match: _LODAtomicCallBackWriteChunk @ 0x002035D0
 static RwStream    *
 LODAtomicCallBackWriteChunk(RwStream * stream,
                             RwInt32 __RWUNUSED__ len,
@@ -563,6 +571,7 @@ LODAtomicCallBackWriteChunk(RwStream * stream,
 /************************************************************************
  */
 // match: _LODAtomicCallBackGetChunkSize @ 0x002E8BA0
+// sp-match: _LODAtomicCallBackGetChunkSize @ 0x00203640
 static              RwInt32
 LODAtomicCallBackGetChunkSize(RpAtomic * atomic,
                               RwInt32 offset, RwInt32 size)
@@ -615,6 +624,7 @@ LODAtomicCallBackConstructor(RpAtomic * atomic,
 /************************************************************************
  */
 // match: _LODAtomicCallBackCopy @ 0x002E8BF0
+// sp-match: _LODAtomicCallBackCopy @ 0x002036A0
 static void        *
 LODAtomicCallBackCopy(RpAtomic * dstAtomic,
                       RpAtomic * srcAtomic,
@@ -651,6 +661,7 @@ LODAtomicCallBackCopy(RpAtomic * dstAtomic,
 /************************************************************************
  */
 // match: _LODAtomicCallBackDestructor @ 0x002E8C30
+// sp-match: _LODAtomicCallBackDestructor @ 0x002036E0
 static void        *
 LODAtomicCallBackDestructor(RpAtomic * atomic,
                             RwInt32 offset, RwInt32 __RWUNUSED__ size)
@@ -716,6 +727,7 @@ RpLODAtomicCacheSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToP
 /************************************************************************
  */
 // match: _LODAtomicCallBackOpen @ 0x002E8C70
+// sp-match: _LODAtomicCallBackOpen @ 0x00203720
 static void        *
 LODAtomicCallBackOpen(void *ptr,
                       RwInt32 __RWUNUSED__ offset,
@@ -741,6 +753,7 @@ LODAtomicCallBackOpen(void *ptr,
 /************************************************************************
  */
 // match: _LODAtomicCallBackClose @ 0x002E8CB0
+// sp-match: _LODAtomicCallBackClose @ 0x00203760
 static void        *
 LODAtomicCallBackClose(void *ptr,
                        RwInt32 __RWUNUSED__ offset,
@@ -797,6 +810,7 @@ LODAtomicCallBackClose(void *ptr,
  * \see RpLODAtomicUnHookRender
  */
 // match: _RpLODAtomicPluginAttach @ 0x002E8CE0
+// sp-match: _RpLODAtomicPluginAttach @ 0x00203790
 RwBool
 RpLODAtomicPluginAttach(void)
 {
@@ -1325,6 +1339,7 @@ RpLODAtomicGetRange(RpAtomic * atomic)
  * \see RpLODAtomicUnHookRender
  */
 // match: _RpLODAtomicSetCamera @ 0x002E8D60
+// sp-match: _RpLODAtomicSetCamera @ 0x00203810
 void
 RpLODAtomicSetCamera(RwCamera * camera)
 {

@@ -48,6 +48,7 @@
  * Must be called by all subclasses, i.e. all custom file systems
  */
 // match: __rtFSInit @ 0x00258240
+// sp-match: __rtFSInit @ 0x001740B0
 RtFileSystemError
 _rtFSInit( RtFileSystem *fs,
            RwInt32       maxNbOpenFiles,
@@ -132,6 +133,7 @@ _rtFSInit( RtFileSystem *fs,
  * return the filename without the device name attached to it.
  */
 // match: __rtGetFileNameFromDeviceName @ 0x002580B0
+// sp-match: __rtGetFileNameFromDeviceName @ 0x00173F20
 const RwChar *
 _rtGetFileNameFromDeviceName( const RwChar *fileName )
 {
@@ -159,6 +161,7 @@ _rtGetFileNameFromDeviceName( const RwChar *fileName )
  * Returns the valid file name.
  */
 // match: __rtFSBuildFileName @ 0x002580F0
+// sp-match: __rtFSBuildFileName @ 0x00173F60
 RwChar *
 _rtFSBuildFileName( RwChar       *buffer,
                     RwInt32       bufferLength,
@@ -227,6 +230,7 @@ _rtFSFileExists( RtFileSystem *fs, const RwChar *fileName )
  * Test for EOF
  */
 // match: __rtFSIsEOF @ 0x00258180
+// sp-match: __rtFSIsEOF @ 0x00173FF0
 RwBool
 _rtFSIsEOF( RtFile *file )
 {
@@ -360,6 +364,7 @@ RtFileSystemGetCallBack( RtFileSystem *fs, RtFileSystemCallBackCode cbCode )
  * Trigger a CallBack
  */
 // match: __rtFileSystemTriggerCallBack @ 0x002581B0
+// sp-match: __rtFileSystemTriggerCallBack @ 0x00174020
 void
 _rtFileSystemTriggerCallBack( RtFileSystem *fs,
                               RtFileSystemCallBackCode cbCode )
@@ -551,6 +556,7 @@ RtFileSystemSetOutstandingOpCallback( RtFile *file,
  * Trigger Callback on operation completion for this file.
  */
 // match: _rtFSTriggerFileOutstandingOpCallback @ 0x002581F0
+// sp-match: _rtFSTriggerFileOutstandingOpCallback @ 0x00174060
 void
 rtFSTriggerFileOutstandingOpCallback( RtFile *file )
 {

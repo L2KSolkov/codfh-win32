@@ -8,12 +8,14 @@
 #include "game/frontend.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003EB048
 extern const RwReal flt_3EB048 = 0.01f;
 // 0x003EB04C
 extern const RwReal flt_3EB04C = 0.01f;
 // 0x003EB050
 extern const RwReal flt_3EB050 = 16.666666f;
+#endif
 
 // match: ?flt_3EB048@@3MB @ 0x003EB048
 // match: ?flt_3EB04C@@3MB @ 0x003EB04C

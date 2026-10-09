@@ -43,6 +43,7 @@ static RwFreeList *PaletteHeaderFreeList = NULL;
 // match: _zRasterConvTab @ 0x004355C8
 
 // match: __rwXbRasterPluginAttach @ 0x002AC710
+// sp-match: __rwXbRasterPluginAttach @ 0x001C7B30
 
 RwBool
 _rwXbRasterPluginAttach(void)
@@ -63,6 +64,7 @@ _rwXbRasterPluginAttach(void)
 }
 
 // match: __rwXbRasterOpen @ 0x002AC740
+// sp-match: __rwXbRasterOpen @ 0x001C7B60
 RwBool
 _rwXbRasterOpen(void)
 {
@@ -89,6 +91,7 @@ _rwXbRasterOpen(void)
 }
 
 // match: __rwXbRasterClose @ 0x002AC7A0
+// sp-match: __rwXbRasterClose @ 0x001C7BC0
 void
 _rwXbRasterClose(void)
 {
@@ -107,6 +110,7 @@ _rwXbRasterClose(void)
 
 /* Locks mip level mipLevel of the (cube) texture of rasExt. */
 // match: _XbRasterLockMipLevel @ 0x002AC7E0
+// sp-match: _XbRasterLockMipLevel @ 0x001C7C00
 static void
 XbRasterLockMipLevel(RwRaster *raster, RwXboxRasterExtension *rasExt,
                      RwUInt8 mipLevel, RwUInt8 **pixels, RwInt32 *pitch,
@@ -131,6 +135,7 @@ XbRasterLockMipLevel(RwRaster *raster, RwXboxRasterExtension *rasExt,
 }
 
 // match: __rwXbRasterLock @ 0x002AC830
+// sp-match: __rwXbRasterLock @ 0x001C7C50
 RwBool
 _rwXbRasterLock(void *pixelsIn, void *rasterIn, RwInt32 accessMode)
 {
@@ -330,6 +335,7 @@ _rwXbRasterLock(void *pixelsIn, void *rasterIn, RwInt32 accessMode)
 }
 
 // match: __rwXbRasterUnlock @ 0x002ACBA0
+// sp-match: __rwXbRasterUnlock @ 0x001C7FC0
 RwBool
 _rwXbRasterUnlock(void *unused1, void *rasterIn, RwInt32 unused3)
 {
@@ -434,6 +440,7 @@ _rwXbRasterUnlock(void *unused1, void *rasterIn, RwInt32 unused3)
 }
 
 // match: __rwXbRasterLockPalette @ 0x002ACD20
+// sp-match: __rwXbRasterLockPalette @ 0x001C8140
 RwBool
 _rwXbRasterLockPalette(void *paletteInOut, void *rasterIn, RwInt32 accessMode)
 {
@@ -480,6 +487,7 @@ _rwXbRasterLockPalette(void *paletteInOut, void *rasterIn, RwInt32 accessMode)
 }
 
 // match: __rwXbRasterUnlockPalette @ 0x002ACDB0
+// sp-match: __rwXbRasterUnlockPalette @ 0x001C81D0
 RwBool
 _rwXbRasterUnlockPalette(void *unused1, void *rasterIn, RwInt32 unused3)
 {
@@ -552,6 +560,7 @@ _rwRasterConvData _rwRasterConvTable[2][11] =
 };
 
 // match: __rwXbGetRasterFormat @ 0x002ACE10
+// sp-match: __rwXbGetRasterFormat @ 0x001C8230
 RwBool
 _rwXbGetRasterFormat(RwRaster *raster, RwInt32 flags)
 {
@@ -693,6 +702,7 @@ _rwXbGetRasterFormat(RwRaster *raster, RwInt32 flags)
 
 /* Creates the D3D texture header of raster and allocates its bits. */
 // match: _XBoxTextureCreate @ 0x002AD150
+// sp-match: _XBoxTextureCreate @ 0x001C8570
 static D3DTexture *
 XBoxTextureCreate(RwRaster *raster, RwXboxRasterExtension *rasExt, D3DFORMAT format)
 {
@@ -796,6 +806,7 @@ XBoxTextureCreate(RwRaster *raster, RwXboxRasterExtension *rasExt, D3DFORMAT for
 
 /* Releases a palette XBoxPaletteCreate made (or one D3D created). */
 // match: _XBoxPaletteRelease @ 0x002AD2A0
+// sp-match: _XBoxPaletteRelease @ 0x001C86C0
 static void
 XBoxPaletteRelease(D3DPalette *palette)
 {
@@ -822,6 +833,7 @@ XBoxPaletteRelease(D3DPalette *palette)
 }
 
 // match: __rwXbRasterNativeCreate @ 0x002AD2F0
+// sp-match: __rwXbRasterNativeCreate @ 0x001C8710
 RwBool
 _rwXbRasterNativeCreate(RwRaster *raster, D3DFORMAT format, RwInt32 mipmapLevels)
 {
@@ -844,6 +856,7 @@ _rwXbRasterNativeCreate(RwRaster *raster, D3DFORMAT format, RwInt32 mipmapLevels
 }
 
 // match: __rwXbCubeRasterNativeCreate @ 0x002AD330
+// sp-match: __rwXbCubeRasterNativeCreate @ 0x001C8750
 RwBool
 _rwXbCubeRasterNativeCreate(RwRaster *raster, D3DFORMAT format, RwInt32 mipmapLevels)
 {
@@ -885,6 +898,7 @@ _rwXbCubeRasterNativeCreate(RwRaster *raster, D3DFORMAT format, RwInt32 mipmapLe
 
 /* Creates the texture (and palette) of a normal or texture raster. */
 // match: _TextureRasterCreate @ 0x002AD3A0
+// sp-match: _TextureRasterCreate @ 0x001C87C0
 static RwBool
 TextureRasterCreate(RwRaster *raster, RwXboxRasterExtension *rasExt, RwInt32 linear)
 {
@@ -961,6 +975,7 @@ static D3DFORMAT zRasterConvTab[11] =
 
 /* Creates the depth stencil surface of a Z raster. */
 // match: _ZRasterCreate @ 0x002AD4F0
+// sp-match: _ZRasterCreate @ 0x001C8910
 static RwBool
 ZRasterCreate(RwRaster *raster, D3DSurface **surface)
 {
@@ -983,6 +998,7 @@ ZRasterCreate(RwRaster *raster, D3DSurface **surface)
 }
 
 // match: __rwXbRasterCreate @ 0x002AD560
+// sp-match: __rwXbRasterCreate @ 0x001C8980
 RwBool
 _rwXbRasterCreate(void *unused1, void *rasterIn, RwInt32 flags)
 {
@@ -1097,6 +1113,7 @@ _rwXbRasterCreate(void *unused1, void *rasterIn, RwInt32 flags)
 }
 
 // match: __rwXbRasterDestroy @ 0x002AD7B0
+// sp-match: __rwXbRasterDestroy @ 0x001C8BD0
 RwBool
 _rwXbRasterDestroy(void *unused1, void *rasterIn, RwInt32 unused3)
 {
@@ -1166,6 +1183,7 @@ _rwXbRasterDestroy(void *unused1, void *rasterIn, RwInt32 unused3)
 }
 
 // match: __rwXbRasterGetMipLevels @ 0x002AD8B0
+// sp-match: __rwXbRasterGetMipLevels @ 0x001C8CD0
 RwBool
 _rwXbRasterGetMipLevels(void *mipLevels, void *ras, RwInt32 unused3)
 {
@@ -1178,6 +1196,7 @@ _rwXbRasterGetMipLevels(void *mipLevels, void *ras, RwInt32 unused3)
 }
 
 // match: __rwXbRasterGetSize @ 0x002AD8D0
+// sp-match: __rwXbRasterGetSize @ 0x001C8CF0
 RwUInt32
 _rwXbRasterGetSize(RwRaster *raster, RwUInt8 mipLevel)
 {
@@ -1220,6 +1239,7 @@ _rwXbRasterGetSize(RwRaster *raster, RwUInt8 mipLevel)
 }
 
 // match: __rwXbTextureSetRaster @ 0x002AD940
+// sp-match: __rwXbTextureSetRaster @ 0x001C8D60
 RwBool
 _rwXbTextureSetRaster(void *tex, void *ras, RwInt32 unused3)
 {
@@ -1232,6 +1252,7 @@ _rwXbTextureSetRaster(void *tex, void *ras, RwInt32 unused3)
 }
 
 // match: __rwXbRasterSubRaster @ 0x002AD950
+// sp-match: __rwXbRasterSubRaster @ 0x001C8D70
 RwBool
 _rwXbRasterSubRaster(void *rasterIn, void *parentRasterIn, RwInt32 unused3)
 {

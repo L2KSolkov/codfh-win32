@@ -110,6 +110,7 @@ MACRO_STOP
 // match: _rcsid @ 0x003EB190
 
 // match: _RpUVAnimLinearKeyFrameApply @ 0x0022C7D0
+// sp-match: _RpUVAnimLinearKeyFrameApply @ 0x001314A0
 void
 RpUVAnimLinearKeyFrameApply(void *pMatrix, void *pVoidIFrame)
 {
@@ -139,6 +140,7 @@ RpUVAnimLinearKeyFrameApply(void *pMatrix, void *pVoidIFrame)
  * \return None
  */
 // match: _RpUVAnimLinearKeyFrameInterpolate @ 0x0022C830
+// sp-match: _RpUVAnimLinearKeyFrameInterpolate @ 0x00131500
 void
 RpUVAnimLinearKeyFrameInterpolate(void * pVoidOut, void * pVoidIn1,
                            void * pVoidIn2, RwReal time,
@@ -189,6 +191,7 @@ RpUVAnimLinearKeyFrameInterpolate(void * pVoidOut, void * pVoidIn1,
  * \return None
  */
 // match: _RpUVAnimLinearKeyFrameBlend @ 0x0022C8F0
+// sp-match: _RpUVAnimLinearKeyFrameBlend @ 0x001315C0
 void
 RpUVAnimLinearKeyFrameBlend(void * pVoidOut,
                      void * pVoidIn1,
@@ -227,6 +230,7 @@ RpUVAnimLinearKeyFrameBlend(void * pVoidOut,
  *
  */
 // match: _RpUVAnimLinearKeyFrameMulRecip @ 0x0022C9A0
+// sp-match: _RpUVAnimLinearKeyFrameMulRecip @ 0x00131670
 void
 RpUVAnimLinearKeyFrameMulRecip(void *pVoidFrame, void *pVoidStart)
 {
@@ -288,6 +292,7 @@ RpUVAnimLinearKeyFrameMulRecip(void *pVoidFrame, void *pVoidStart)
  *
  */
 // match: _RpUVAnimLinearKeyFrameAdd @ 0x0022CA90
+// sp-match: _RpUVAnimLinearKeyFrameAdd @ 0x00131760
 void
 RpUVAnimLinearKeyFrameAdd(void * pVoidOut, void * pVoidIn1,
                       void * pVoidIn2)
@@ -325,6 +330,7 @@ RpUVAnimLinearKeyFrameAdd(void * pVoidOut, void * pVoidIn1,
  *
  */
 // match: _RpUVAnimLinearKeyFrameDataInitFromMatrix @ 0x0022CB30
+// sp-match: _RpUVAnimLinearKeyFrameDataInitFromMatrix @ 0x00131800
 RpUVAnimLinearKeyFrameData *
 RpUVAnimLinearKeyFrameDataInitFromMatrix(
                               RpUVAnimLinearKeyFrameData *data,

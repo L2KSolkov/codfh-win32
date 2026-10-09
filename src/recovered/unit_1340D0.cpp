@@ -104,7 +104,9 @@ RwReal flt_429C8C = 4.0f;
 // 0x00429C90
 RwReal flt_429C90 = 2.0f;
 // 0x00429C94
+#ifndef CODFH_SP // single player lacks it: flt_429C98 follows flt_429C90 (SP 0x3221D8-0x3221DC)
 RwInt32 dword_429C94 = 1;
+#endif
 // 0x00429C98
 RwReal flt_429C98 = 45.0f;
 // 0x00429C9C
@@ -182,7 +184,12 @@ RwReal flt_429CCC = 50.0f;
 // match: ?flt_429CCC@@3MA @ 0x00429CCC
 // match: ?flt_429C90@@3MA @ 0x00429C90
 
+// An inline single player calls out of line (type_7C8D0::sub_76E00, called by sub_134160 at
+// SP 0xE4960); this file emits the copy, just before sub_1340D0:
+// sp-match: ?sub_76E00@type_7C8D0@@QAE_NH@Z @ 0x000E43E0
+
 // match: ?sub_1340D0@type_3DAFC8@@QAEX_N0M@Z @ 0x001340D0
+// sp-match: ?sub_1340D0@type_3DAFC8@@QAEX_N0M@Z @ 0x000E4430
 
 void type_3DAFC8::sub_1340D0(bool arg_0, bool arg_4, RwReal arg_8)
 {
@@ -200,6 +207,7 @@ void type_3DAFC8::sub_1340D0(bool arg_0, bool arg_4, RwReal arg_8)
 }
 
 // match: ?sub_134160@type_3DAFC8@@QAEXXZ @ 0x00134160
+// sp-match: ?sub_134160@type_3DAFC8@@QAEXXZ @ 0x000E4960
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DAFC8::sub_134160()
 {
@@ -253,6 +261,7 @@ void type_3DAFC8::sub_134160()
 type_7CBD0_hdr dword_4CF9B8;
 
 // match: ?sub_134320@@YAXPAUtype_7C8D0@@PAUtype_80300@@H_N@Z @ 0x00134320
+// sp-match: ?sub_134320@@YAXPAUtype_7C8D0@@PAUtype_80300@@H_N@Z @ 0x000E4490
 // Head tracking's procedural track: when it starts (arg_C), its keys are the
 // neck's rotation alone; after that, the neck (bone 453) turns from the
 // head's axis towards the soldier's unk_1DC8, seen from bone 200, with its

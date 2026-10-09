@@ -11,6 +11,10 @@
 #include "types/ParticleEditor.h"
 #include "rws/csystemcommands.h"
 
+#ifdef CODFH_SP // SP only: an unreferenced 16.666666f just before the class name (SP 0x2E58C8)
+// SP 0x002E58C8
+extern const RwReal sp_flt_2E58C8 = 16.666666f;
+#endif
 
 RWS_IMPLEMENT_CLASSID(SparkParticle);
 RWS_REGISTERCLASS(SparkParticle);
@@ -33,19 +37,23 @@ RWS_REGISTERCLASS(SparkParticle);
 // match: ?MakeNew@SparkParticle@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000F4570
 // match: __ehhandler$?MakeNew@SparkParticle@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00301090
 // match: __ehhandler$?MakeNew@SparkParticle@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030109F
+// sp-match: ?MakeNew@SparkParticle@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000BA7F0
 RWS_DEFINE_MAKENEW(SparkParticle)
 
 // match: ??0SparkParticle@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000F45F0
+// sp-match: ??0SparkParticle@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000BA5E0
 SparkParticle::SparkParticle(const RWS::CAttributePacket &attr)
 {
     unk_24 = RwMatrixCreate();
 }
 
 // match: ??_GSparkParticle@@UAEPAXI@Z @ 0x000F4680
+// sp-match: ??_GSparkParticle@@UAEPAXI@Z @ 0x000BA740
 
 // match: ??1SparkParticle@@UAE@XZ @ 0x000F46A0
 // match: __ehhandler$??1SparkParticle@@UAE@XZ-0x8 @ 0x003010B0
 // match: __ehhandler$??1SparkParticle@@UAE@XZ @ 0x003010B8
+// sp-match: ??1SparkParticle@@UAE@XZ @ 0x000BA620
 SparkParticle::~SparkParticle()
 {
     if (unk_24)
@@ -56,6 +64,7 @@ SparkParticle::~SparkParticle()
 }
 
 // match: ?HandleAttributes@SparkParticle@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000F4740
+// sp-match: ?HandleAttributes@SparkParticle@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000BA750
 void SparkParticle::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     RWS::CAttributeHandler::HandleAttributes(attr);
@@ -77,6 +86,7 @@ void SparkParticle::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_ESparkParticle@@WBI@AEPAXI@Z @ 0x000F47E0
+// sp-match: ??_ESparkParticle@@WBI@AEPAXI@Z @ 0x000BA730
 
 // Members /OPT:ICF folded into shared trivial bodies (config/aliases.txt): defined here for
 // the authentic link (PLAN M7); the placement link takes the shared bodies.

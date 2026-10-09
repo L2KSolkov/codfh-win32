@@ -12,16 +12,29 @@
 #include "game/clumpdata.h"
 #include "rw/bavector.h"
 
+#ifdef CODFH_SP // Compiler ordering for the root-motion function at 0x64690.
+extern "C" void _WriteBarrier();
+#pragma intrinsic(_WriteBarrier)
+#endif
+
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D3CB0
 extern const RwReal flt_3D3CB0 = 16.666666f;
 
 // match: ?flt_3D3CB0@@3MB @ 0x003D3CB0
 
+#ifdef CODFH_SP
+// Single player's deleting destructor (SP 0x64330) drops the call to this empty
+// operator delete, so single player defines it in this unit (not unit_078AF0).
+void type_7C8D0::operator delete(void *arg_0)
+{
+}
+#endif
 
 // match: ??0type_7C8D0@@QAE@H@Z @ 0x00078D60
 // match: ??_7type_7C8D0@@6B@ @ 0x003D3CB4
 // match: __real@47c35000 @ 0x003D3CB8
+// sp-match: ??0type_7C8D0@@QAE@H@Z @ 0x00063390
 type_7C8D0::type_7C8D0(RwInt32 arg_0)
 {
     RwUInt32 var_4;
@@ -50,7 +63,7 @@ type_7C8D0::type_7C8D0(RwInt32 arg_0)
         unk_30[var_4].unk_24 = 1.0f;
         unk_30[var_4].unk_28 = 0;
     }
-    for (var_4 = 0; var_4 < 12; var_4++) {
+    for (var_4 = 0; var_4 < type_7C8D0_ring_size; var_4++) {
         unk_34[var_4].unk_04 = 0;
         unk_34[var_4].unk_00 = 0;
         unk_34[var_4].unk_08_0 = 0;
@@ -74,6 +87,8 @@ type_7C8D0::type_7C8D0(RwInt32 arg_0)
 }
 // match: ??_Gtype_7C8D0@@UAEPAXI@Z @ 0x00079190
 // match: ??1type_7C8D0@@UAE@XZ @ 0x000791C0
+// sp-match: ??1type_7C8D0@@UAE@XZ @ 0x00063590
+// sp-match: ??_Gtype_7C8D0@@UAEPAXI@Z @ 0x00064330
 type_7C8D0::~type_7C8D0()
 {
     RwUInt32 var_4;
@@ -90,12 +105,14 @@ type_7C8D0::~type_7C8D0()
     }
 }
 // match: ?sub_79260@@YAXXZ @ 0x00079260
+// sp-match: ?sub_79260@@YAXXZ @ 0x00064340
 void sub_79260()
 {
     sub_7A4A0();
     sub_7A540();
 }
 // match: ?sub_79270@@YA_NPAURpClump@@PAURpHAnimHierarchy@@@Z @ 0x00079270
+// sp-match: ?sub_79270@@YA_NPAURpClump@@PAURpHAnimHierarchy@@@Z @ 0x00064350
 // Without a hierarchy arg_4, gives the clump's hierarchy a fresh interpolator (freeing
 // the old) with the clump's node vectors, and with a skin, each bone's
 // matrix the inverse of its skin-to-bone matrix (in the clump frame's
@@ -153,6 +170,7 @@ bool sub_79270(RpClump *arg_0, RpHAnimHierarchy *arg_4)
     return true;
 }
 // match: ?sub_79470@type_7C8D0@@QAEXPAURpHAnimHierarchy@@@Z @ 0x00079470
+// sp-match: ?sub_79470@type_7C8D0@@QAEXPAURpHAnimHierarchy@@@Z @ 0x00063600
 void type_7C8D0::sub_79470(RpHAnimHierarchy *arg_0)
 {
     unk_18 = arg_0;
@@ -160,6 +178,7 @@ void type_7C8D0::sub_79470(RpHAnimHierarchy *arg_0)
     sub_80740(unk_1B0, 0x1142);
 }
 // match: ?sub_794C0@type_7C8D0@@QAE_NM@Z @ 0x000794C0
+// sp-match: ?sub_794C0@type_7C8D0@@QAE_NM@Z @ 0x00063640
 // Queues a new animation record blending over arg_0 seconds, first
 // dropping the oldest (and its tracks) when the ring is full.
 bool type_7C8D0::sub_794C0(RwReal arg_0)
@@ -167,7 +186,8 @@ bool type_7C8D0::sub_794C0(RwReal arg_0)
     RwUInt32 var_4;
     RwInt32 local_8;
 
-    if (unk_24 >= 12) {
+#ifndef CODFH_SP // single player never drops the oldest record (SP 0x63649: a full ring returns false)
+    if (unk_24 >= type_7C8D0_ring_size) {
         for (var_4 = 0; var_4 < unk_2C; var_4++) {
             if (unk_30[var_4].unk_04 == unk_20) {
                 unk_30[var_4].unk_00 = -1;
@@ -180,9 +200,10 @@ bool type_7C8D0::sub_794C0(RwReal arg_0)
         }
         unk_24--;
     }
-    if (unk_24 < 12) {
+#endif
+    if (unk_24 < type_7C8D0_ring_size) {
         unk_24++;
-        local_8 = (unk_20 + unk_24 - 1) % 12;
+        local_8 = (unk_20 + unk_24 - 1) % type_7C8D0_ring_size;
         unk_34[local_8].unk_00 = unk_14;
         unk_34[local_8].unk_04 = (RwInt32)(arg_0 * 100000.0f);
         unk_34[local_8].unk_08_0 = 0;
@@ -199,6 +220,7 @@ bool type_7C8D0::sub_794C0(RwReal arg_0)
     return false;
 }
 // match: ?sub_796A0@type_7C8D0@@QAEHPAURtAnimAnimation@@HHPAUtype_783F0@@MMM@Z @ 0x000796A0
+// sp-match: ?sub_796A0@type_7C8D0@@QAEHPAURtAnimAnimation@@HHPAUtype_783F0@@MMM@Z @ 0x000636E0
 // Starts the animation arg_0 (id arg_4, with the events arg_C) on a free
 // track at the time arg_10, with arg_14 and the weight arg_18; returns the
 // track's serial, or -2 with no track free.
@@ -210,7 +232,7 @@ RwInt32 type_7C8D0::sub_796A0(RtAnimAnimation *arg_0, RwInt32 arg_4, RwInt32 arg
     type_783F0_04 *stk_C;
     RwInt32 var_10;
 
-    var_10 = (unk_20 + unk_24 - 1) % 12;
+    var_10 = (unk_20 + unk_24 - 1) % type_7C8D0_ring_size;
     for (var_4 = 0; var_4 < unk_2C; var_4++) {
         if (unk_30[var_4].unk_04 == -1)
             break;
@@ -243,6 +265,7 @@ RwInt32 type_7C8D0::sub_796A0(RtAnimAnimation *arg_0, RwInt32 arg_4, RwInt32 arg
     return v8;
 }
 // match: ?sub_79930@type_7C8D0@@QAEHP6AXPAU1@PAUtype_80300@@H_N@ZMM@Z @ 0x00079930
+// sp-match: ?sub_79930@type_7C8D0@@QAEHP6AXPAU1@PAUtype_80300@@H_N@ZMM@Z @ 0x00063880
 RwInt32 type_7C8D0::sub_79930(void (*arg_0)(type_7C8D0 *, type_80300 *, RwInt32, bool),
                               RwReal arg_4, RwReal arg_8)
 {
@@ -250,7 +273,7 @@ RwInt32 type_7C8D0::sub_79930(void (*arg_0)(type_7C8D0 *, type_80300 *, RwInt32,
     RwInt32 v8;
     RwInt32 varC;
 
-    varC = (unk_20 + unk_24 - 1) % 12;
+    varC = (unk_20 + unk_24 - 1) % type_7C8D0_ring_size;
     for (var_4 = 0; var_4 < unk_2C; var_4++) {
         if (unk_30[var_4].unk_04 == -1)
             break;
@@ -280,6 +303,7 @@ RwInt32 type_7C8D0::sub_79930(void (*arg_0)(type_7C8D0 *, type_80300 *, RwInt32,
     return v8;
 }
 // match: ?sub_79BC0@type_7C8D0@@QAE_NH@Z @ 0x00079BC0
+// sp-match: ?sub_79BC0@type_7C8D0@@QAE_NH@Z @ 0x000639F0
 bool type_7C8D0::sub_79BC0(RwInt32 arg_0)
 {
     bool var_1;
@@ -296,6 +320,7 @@ bool type_7C8D0::sub_79BC0(RwInt32 arg_0)
     return var_1;
 }
 // match: ?sub_79C90@type_7C8D0@@QAE_NHM@Z @ 0x00079C90
+// sp-match: ?sub_79C90@type_7C8D0@@QAE_NHM@Z @ 0x00063A60
 bool type_7C8D0::sub_79C90(RwInt32 arg_0, RwReal arg_4)
 {
     bool var_1;
@@ -310,6 +335,7 @@ bool type_7C8D0::sub_79C90(RwInt32 arg_0, RwReal arg_4)
     return var_1;
 }
 // match: ?sub_79CE0@type_7C8D0@@QAE_NH_N@Z @ 0x00079CE0
+// sp-match: ?sub_79CE0@type_7C8D0@@QAE_NH_N@Z @ 0x00063A90
 bool type_7C8D0::sub_79CE0(RwInt32 arg_0, bool arg_4)
 {
     bool var_1;
@@ -325,6 +351,7 @@ bool type_7C8D0::sub_79CE0(RwInt32 arg_0, bool arg_4)
 }
 RwInt32 sub_170ED0(RwReal arg_0);
 // match: ?sub_79D50@type_7C8D0@@QAE_NPAURwV3d@@0@Z @ 0x00079D50
+// sp-match: ?sub_79D50@type_7C8D0@@QAE_NPAURwV3d@@0@Z @ 0x00063AD0
 bool type_7C8D0::sub_79D50(RwV3d *arg_0, RwV3d *arg_4)
 {
     RwReal var_14;
@@ -353,6 +380,7 @@ bool type_7C8D0::sub_79D50(RwV3d *arg_0, RwV3d *arg_4)
     return true;
 }
 // match: ?sub_7A0A0@type_7C8D0@@QAE_NPAURwV3d@@@Z @ 0x0007A0A0
+// sp-match: ?sub_7A0A0@type_7C8D0@@QAE_NPAURwV3d@@@Z @ 0x00063CF0
 bool type_7C8D0::sub_7A0A0(RwV3d *arg_0)
 {
     RwMatrix var_50;
@@ -362,8 +390,60 @@ bool type_7C8D0::sub_7A0A0(RwV3d *arg_0)
     return true;
 }
 // match: ?sub_7A100@type_7C8D0@@QAE_NXZ @ 0x0007A100
+// sp-match: ?sub_7A100@type_7C8D0@@QAE_NXZ @ 0x00064690
 // Takes this frame's root motion: scales unk_190 by how far the root moved
 // along it and turns it, and adds the root's rotation to unk_19C.
+#ifdef CODFH_SP
+bool type_7C8D0::sub_7A100()
+{
+    // shape: SP 0x64690 lays the box out as two vectors (12 bytes each, below the quaternions)
+    RwReal var_68;
+    RwReal loc64;
+    RtQuat bp_60;
+    RwV3d v_sup;
+    RwV3d v_inf;
+    RtQuat slot_38;
+    RwReal loc28;
+    RwReal slot_24;
+    bool var_1D;
+    RtQuat l1C;
+    RwV3d var_C;
+
+    var_1D = false;
+    unk_1AC = 0;
+    loc64 = sub_7C1A0((RwBBox *)&v_sup, &slot_38);
+    if (loc64 == 0)
+        return false;
+    slot_24 = RwV3dLength(&v_sup);
+    loc28 = RwV3dLength((RwV3d *)&unk_190);
+    var_68 = RwV3dDotProductMacro(&unk_190, &v_sup);
+    if (slot_24 * loc28 != 0)
+        unk_18C = var_68 / (slot_24 * loc28);
+    else
+        unk_18C = 0;
+    RwV3dScaleMacro(&var_C, &v_sup, unk_18C);
+    RwV3dSubMacro(&v_inf, &unk_190, &var_C);
+    RtQuatReciprocalMacro(&bp_60, &slot_38);
+    // shape: SP 0x64690 keeps these stores ordered and separates the final product
+    // from its sum. The ordering intrinsics emit no instructions.
+    _WriteBarrier();
+    l1C.real = unk_19C_q.real * bp_60.real - RwV3dDotProductMacro(&unk_19C_q.imag, &bp_60.imag);
+    _WriteBarrier();
+    RwV3dCrossProductMacro(&l1C.imag, &bp_60.imag, &unk_19C_q.imag);
+    RwV3dIncrementScaledMacro(&l1C.imag, &unk_19C_q.imag, bp_60.real);
+    l1C.imag.x = l1C.imag.x + bp_60.imag.x * unk_19C_q.real;
+    l1C.imag.y = l1C.imag.y + bp_60.imag.y * unk_19C_q.real;
+    {
+        RwReal z = bp_60.imag.z * unk_19C_q.real;
+        l1C.imag.z += z;
+    }
+    sub_19B650(&v_inf);
+    unk_190 = v_inf;
+    unk_19C_q = l1C;
+    unk_1AC = 1;
+    return var_1D;
+}
+#else
 bool type_7C8D0::sub_7A100()
 {
     RwReal var_68;
@@ -399,7 +479,9 @@ bool type_7C8D0::sub_7A100()
     unk_1AC = 1;
     return var_1D;
 }
+#endif
 // match: ?sub_7A410@@YA_NHP6AXHPAXPAUtype_3D3548@@PAUtype_7C8D0_30@@PAUtype_7C8D0@@@Z@Z @ 0x0007A410
+// sp-match: ?sub_7A410@@YA_NHP6AXHPAXPAUtype_3D3548@@PAUtype_7C8D0_30@@PAUtype_7C8D0@@@Z@Z @ 0x00063D40
 // Registers the event callback arg_4 for the event id arg_0 (-1 takes the
 // last slot); whether there was a slot.
 bool sub_7A410(RwInt32 arg_0, type_7A410_cb arg_4)
@@ -421,6 +503,7 @@ bool sub_7A410(RwInt32 arg_0, type_7A410_cb arg_4)
     return true;
 }
 // match: ?sub_7A4A0@@YA_NXZ @ 0x0007A4A0
+// sp-match: ?sub_7A4A0@@YA_NXZ @ 0x00063E00
 bool sub_7A4A0()
 {
     RwInt32 var_4;
@@ -432,6 +515,7 @@ bool sub_7A4A0()
     return true;
 }
 // match: ?sub_7A4E0@@YAHP6AXPAUtype_7C8D0@@PAUtype_80300@@H_N@Z@Z @ 0x0007A4E0
+// sp-match: ?sub_7A4E0@@YAHP6AXPAUtype_7C8D0@@PAUtype_80300@@H_N@Z@Z @ 0x00063E40
 // Adds the update hook arg_0 in the last free slot; its slot, or -1.
 RwInt32 sub_7A4E0(void (*arg_0)(type_7C8D0 *, type_80300 *, RwInt32, bool))
 {
@@ -458,6 +542,7 @@ bool sub_7A540()
     return true;
 }
 // match: ?sub_7A580@type_7C8D0@@QAEXMPAURwV3d@@_N@Z @ 0x0007A580
+// sp-match: ?sub_7A580@type_7C8D0@@QAEXMPAURwV3d@@_N@Z @ 0x00064910
 // Advances the player by arg_0 seconds (arg_8: decode the keys): drops the
 // queue records that have finished blending in, runs every record's tracks
 // (starting their interpolators, advancing them, taking the root node's
@@ -509,16 +594,10 @@ void type_7C8D0::sub_7A580(RwReal arg_0, RwV3d *arg_4, bool arg_8)
     RwInt32 lv_15c;
     type_7CBD0_hdr *lv_160;
     RtQuat *lv_164;
-    RtQuat lv_174;
-    RtQuat lv_184;
-    RtQuat lv_194;
     RwInt32 lv_1d0;
-    RwV3d lv_1e4;
-    RwV3d lv_1f0;
     RwMatrix lv_230;
     RwFrame *lv_234;
     RwMatrix *lv_238;
-    RwV3d lv_244;
     RwMatrix lv_290;
     RwFrame *lv_294;
     type_80300 *lv_298;
@@ -554,12 +633,12 @@ void type_7C8D0::sub_7A580(RwReal arg_0, RwV3d *arg_4, bool arg_8)
     unk_14 += (RwInt32)(arg_0 * 100000.0f);
     lv_68 = unk_14;
     for (lv_6c = lv_40; lv_6c > lv_3c; lv_6c--) {
-        lv_70 = lv_6c % 12;
+        lv_70 = lv_6c % type_7C8D0_ring_size;
         if (lv_68 - (unk_34[lv_70].unk_00 + unk_34[lv_70].unk_04) > 0) {
             unk_20 = lv_70;
             unk_24 = lv_40 - lv_6c + 1;
             for (lv_74 = 0; lv_74 < (RwInt32)unk_2C; lv_74++) {
-                if (unk_30[lv_74].unk_04 != -1 && (unk_30[lv_74].unk_04 - unk_20 + 12) % 12 >= unk_24) {
+                if (unk_30[lv_74].unk_04 != -1 && (unk_30[lv_74].unk_04 - unk_20 + type_7C8D0_ring_size) % type_7C8D0_ring_size >= unk_24) {
                     unk_30[lv_74].unk_00 = -1;
                     unk_30[lv_74].unk_04 = -1;
                 }
@@ -575,7 +654,7 @@ void type_7C8D0::sub_7A580(RwReal arg_0, RwV3d *arg_4, bool arg_8)
     lv_40 = unk_20 + unk_24 - 1;
     for (lv_6c = lv_3c; lv_6c <= lv_40; lv_6c++) {
         lv_78 = 0;
-        lv_7c = lv_6c % 12;
+        lv_7c = lv_6c % type_7C8D0_ring_size;
         if (unk_34[lv_7c].unk_08_30)
             unk_34[lv_7c].unk_08_30 = 0;
         lv_80 = sub_7C350(lv_7c, 0);
@@ -585,7 +664,7 @@ void type_7C8D0::sub_7A580(RwReal arg_0, RwV3d *arg_4, bool arg_8)
                 lv_14 = lv_80;
             if (unk_34[lv_7c].unk_0C != 0 && (lv_80->unk_0C & 4)) {
                 unk_34[lv_7c].unk_0C = 0;
-                if (lv_7c == lv_40 % 12)
+                if (lv_7c == lv_40 % type_7C8D0_ring_size)
                     sub_7A100();
             }
             if (lv_80->unk_1C == 0) {
@@ -730,10 +809,17 @@ void type_7C8D0::sub_7A580(RwReal arg_0, RwV3d *arg_4, bool arg_8)
         lv_158 = 1;
         lv_15c = 1;
         // The root motion's frame update, disabled (`if (0)`, still emitted).
+#ifdef CODFH_SP // single player moves the root unless unk_12's bit 0 is set or the hierarchy has no bone 100 (SP 0x654B0)
+        if (!(lv_44 & 1) && lv_c != -1) {
+#else
         if (0) {
+#endif
             lv_160 = (type_7CBD0_hdr *)((type_80300 *)unk_18->currentAnim)->unk_128;
             lv_64 = (type_7CBD0 *)((type_80300 *)unk_18->currentAnim)->unk_144;
             if (lv_15c) {
+                RtQuat lv_174;
+                RtQuat lv_184;
+                RtQuat lv_194;
                 lv_164 = &lv_64->unk_10[lv_c];
                 lv_174 = *lv_164;
                 if (lv_154 > 0.0f) {
@@ -748,6 +834,8 @@ void type_7C8D0::sub_7A580(RwReal arg_0, RwV3d *arg_4, bool arg_8)
             }
             if (lv_158) {
                 if (lv_160->unk_10) {
+                    RwV3d lv_1e4;
+                    RwV3d lv_1f0;
                     lv_9c = (type_7CBD0_t *)&lv_64->unk_10[lv_160->unk_00];
                     lv_1d0 = 0;
                     for (lv_a4 = 0; lv_a4 < lv_160->unk_02; lv_a4++) {
@@ -768,6 +856,7 @@ void type_7C8D0::sub_7A580(RwReal arg_0, RwV3d *arg_4, bool arg_8)
                 }
             }
             if (arg_4 != 0) {
+                RwV3d lv_244;
                 RwMatrixSetIdentity(&lv_230);
                 lv_234 = RwFrameGetParent(unk_18->parentFrame);
                 lv_238 = RwFrameGetMatrix(lv_234);
@@ -812,6 +901,7 @@ void type_7C8D0::sub_7A580(RwReal arg_0, RwV3d *arg_4, bool arg_8)
     }
 }
 // match: ?sub_7C090@type_7C8D0@@QAEXM_N@Z @ 0x0007C090
+// sp-match: ?sub_7C090@type_7C8D0@@QAEXM_N@Z @ 0x00063F00
 void type_7C8D0::sub_7C090(RwReal arg_0, bool arg_4)
 {
     RwUInt32 var_4;
@@ -842,6 +932,7 @@ void type_7C8D0::sub_7C090(RwReal arg_0, bool arg_4)
     }
 }
 // match: ?sub_7C1A0@type_7C8D0@@QAEMPAURwBBox@@PAURtQuat@@@Z @ 0x0007C1A0
+// sp-match: ?sub_7C1A0@type_7C8D0@@QAEMPAURwBBox@@PAURtQuat@@@Z @ 0x000644E0
 // The root's position (into arg_0's first corner) and rotation (arg_4) of
 // the newest queue record, blended over its tracks; the longest weighted
 // duration.
@@ -860,7 +951,7 @@ RwReal type_7C8D0::sub_7C1A0(RwBBox *arg_0, RtQuat *arg_4)
 
     l24 = 0;
     local_5 = true;
-    var_4 = (unk_20 + unk_24 - 1) % 12;
+    var_4 = (unk_20 + unk_24 - 1) % type_7C8D0_ring_size;
     ebp_34 = sub_7C350(var_4, 0);
     while (ebp_34 != 0) {
         if (ebp_34->unk_0C & 1) {
@@ -889,6 +980,7 @@ RwReal type_7C8D0::sub_7C1A0(RwBBox *arg_0, RtQuat *arg_4)
     return l24;
 }
 // match: ?sub_7C350@type_7C8D0@@QAEPAUtype_7C8D0_30@@HPAU2@@Z @ 0x0007C350
+// sp-match: ?sub_7C350@type_7C8D0@@QAEPAUtype_7C8D0_30@@HPAU2@@Z @ 0x00063F90
 type_7C8D0_30 *type_7C8D0::sub_7C350(RwInt32 arg_0, type_7C8D0_30 *arg_4)
 {
     RwUInt32 var_4;
@@ -908,13 +1000,14 @@ type_7C8D0_30 *type_7C8D0::sub_7C350(RwInt32 arg_0, type_7C8D0_30 *arg_4)
     return 0;
 }
 // match: ?sub_7C3E0@type_7C8D0@@QAEHHH@Z @ 0x0007C3E0
+// sp-match: ?sub_7C3E0@type_7C8D0@@QAEHHH@Z @ 0x00063FF0
 RwInt32 type_7C8D0::sub_7C3E0(RwInt32 arg_0, RwInt32 arg_4)
 {
     RwInt32 var_4;
     RwInt32 v8;
     RwInt32 varC;
 
-    v8 = (unk_20 + unk_24 - (arg_0 + 1)) % 12;
+    v8 = (unk_20 + unk_24 - (arg_0 + 1)) % type_7C8D0_ring_size;
     var_4 = 0;
     if (arg_4 != 0) {
         var_4 = arg_4 & 0xFF;
@@ -927,6 +1020,7 @@ RwInt32 type_7C8D0::sub_7C3E0(RwInt32 arg_0, RwInt32 arg_4)
     return 0;
 }
 // match: ?sub_7C480@type_7C8D0@@QAEPAUtype_783F0_04@@HMH@Z @ 0x0007C480
+// sp-match: ?sub_7C480@type_7C8D0@@QAEPAUtype_783F0_04@@HMH@Z @ 0x00064060
 type_783F0_04 *type_7C8D0::sub_7C480(RwInt32 arg_0, RwReal arg_4, RwInt32 arg_8)
 {
     type_783F0_04 *var_4;
@@ -942,6 +1036,7 @@ type_783F0_04 *type_7C8D0::sub_7C480(RwInt32 arg_0, RwReal arg_4, RwInt32 arg_8)
     return var_4;
 }
 // match: ?sub_7C4E0@@YAPAUtype_80300@@PAU1@PAX@Z @ 0x0007C4E0
+// sp-match: ?sub_7C4E0@@YAPAUtype_80300@@PAU1@PAX@Z @ 0x000640A0
 // Runs the event callbacks for the events the interpolator arg_0 has passed
 // on its track of the player arg_4 (for the newest record, or event 0x898),
 // and sets itself up again for the next event.
@@ -971,7 +1066,7 @@ type_80300 *sub_7C4E0(type_80300 *arg_0, void *arg_4)
     while (stk_14 != 0) {
         RwInt32 var_1C;
 
-        var_1C = (var_8->unk_20 + var_8->unk_24 - 1) % 12;
+        var_1C = (var_8->unk_20 + var_8->unk_24 - 1) % type_7C8D0_ring_size;
         if (loc18->unk_04 == var_1C && (loc18->unk_0C & 4)) {
             for (l4 = 0; l4 < 4; l4++) {
                 if (dword_44A5A0[l4].unk_04 != 0
@@ -982,6 +1077,7 @@ type_80300 *sub_7C4E0(type_80300 *arg_0, void *arg_4)
                 }
             }
         }
+#ifndef CODFH_SP // single player has no event 0x898 pass (SP 0x64179 follows the first)
         if (loc18->unk_04 == var_1C && stk_14->unk_00 == 0x898) {
             for (l4 = 0; l4 < 4; l4++) {
                 if (dword_44A5A0[l4].unk_04 != 0
@@ -992,6 +1088,7 @@ type_80300 *sub_7C4E0(type_80300 *arg_0, void *arg_4)
                 }
             }
         }
+#endif
         loc18->unk_18 = loc18->unk_14->sub_785C0(loc18->unk_18, -1);
         stk_14 = loc18->unk_18;
         if (stk_14 != 0 && stk_14->unk_04 > fp_C) {
@@ -1006,6 +1103,7 @@ type_80300 *sub_7C4E0(type_80300 *arg_0, void *arg_4)
     return 0;
 }
 // match: ?sub_7C740@@YAPAUtype_80300@@PAU1@PAX@Z @ 0x0007C740
+// sp-match: ?sub_7C740@@YAPAUtype_80300@@PAU1@PAX@Z @ 0x000641E0
 type_80300 *sub_7C740(type_80300 *arg_0, void *arg_4)
 {
     RwInt32 var_4;
@@ -1028,18 +1126,20 @@ type_80300 *sub_7C740(type_80300 *arg_0, void *arg_4)
     return arg_0;
 }
 // match: ?sub_7C830@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0007C830
+// sp-match: ?sub_7C830@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x00064280
 RpAtomic *sub_7C830(RpAtomic *atomic, void *data)
 {
     RpSkinAtomicSetHAnimHierarchy(atomic, data);
     return atomic;
 }
 // match: ?sub_7C850@type_7C8D0@@QAEHXZ @ 0x0007C850
+// sp-match: ?sub_7C850@type_7C8D0@@QAEHXZ @ 0x000642A0
 RwInt32 type_7C8D0::sub_7C850()
 {
     RwInt32 var_4;
     RwInt32 local_8;
 
-    var_4 = (unk_20 + unk_24 - 1) % 12;
+    var_4 = (unk_20 + unk_24 - 1) % type_7C8D0_ring_size;
     for (local_8 = 0; local_8 < (RwInt32)unk_2C; local_8++) {
         if (unk_30[local_8].unk_04 == var_4)
             return unk_30[local_8].unk_08;
@@ -1047,6 +1147,7 @@ RwInt32 type_7C8D0::sub_7C850()
     return 0;
 }
 // match: ?sub_7C8D0@type_7C8D0@@QAEMXZ @ 0x0007C8D0
+// sp-match: ?sub_7C8D0@type_7C8D0@@QAEMXZ @ 0x000642F0
 // The duration of the first track with flag 4, or 0.
 RwReal type_7C8D0::sub_7C8D0()
 {

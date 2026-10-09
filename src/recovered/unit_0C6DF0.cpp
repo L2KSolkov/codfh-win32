@@ -45,11 +45,13 @@ RWS_REGISTERCLASS(GimpTrigger);
 // match: ?MakeNew@GimpTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C6DF0
 // match: __ehhandler$?MakeNew@GimpTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x003008A0
 // match: __ehhandler$?MakeNew@GimpTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x003008AF
+// sp-match: ?MakeNew@GimpTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00097EF0
 RWS_DEFINE_MAKENEW(GimpTrigger)
 
 // match: ??0GimpTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C6E70
 // match: __ehhandler$??0GimpTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x16 @ 0x003008C0
 // match: __ehhandler$??0GimpTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x003008D6
+// sp-match: ??0GimpTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00097600
 GimpTrigger::GimpTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     RwInt32 r10;
@@ -92,14 +94,18 @@ GimpTrigger::GimpTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 }
 
 // match: ?vf_00C@GimpTrigger@@UAEHXZ @ 0x000C7190
+// sp-match: ?vf_00C@GimpTrigger@@UAEHXZ @ 0x000977C0
 
 // match: ?vf_014@GimpTrigger@@UAEHXZ @ 0x000C71B0
+// sp-match: ?vf_014@GimpTrigger@@UAEHXZ @ 0x000977D0
 
 // match: ??_GGimpTrigger@@UAEPAXI@Z @ 0x000C71D0
+// sp-match: ??_GGimpTrigger@@UAEPAXI@Z @ 0x00097EE0
 
 // match: ??1GimpTrigger@@UAE@XZ @ 0x000C71F0
 // match: __ehhandler$??1GimpTrigger@@UAE@XZ-0x16 @ 0x003008E0
 // match: __ehhandler$??1GimpTrigger@@UAE@XZ @ 0x003008F6
+// sp-match: ??1GimpTrigger@@UAE@XZ @ 0x000977E0
 GimpTrigger::~GimpTrigger()
 {
     UnLinkMsg(RWS::iMsgStartSystem);
@@ -109,22 +115,25 @@ GimpTrigger::~GimpTrigger()
 
 // Commands 3 and 4 first, then the rest.
 // match: ?HandleAttributes@GimpTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C7280
+// sp-match: ?HandleAttributes@GimpTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00097860
 void GimpTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
-    RWS::CAttributeCommandIterator stk_14(attr, RWS_CLASSID_OF(GimpTrigger));
-    while (!stk_14.IsFinished())
     {
-        switch (stk_14->GetCommandId())
+        RWS::CAttributeCommandIterator stk_14(attr, RWS_CLASSID_OF(GimpTrigger));
+        while (!stk_14.IsFinished())
         {
-        case 3:
-            unk_110 = stk_14->GetAs_RwInt32();
-            break;
-        case 4:
-            unk_114 = stk_14->GetAs_RwInt32();
-            break;
+            switch (stk_14->GetCommandId())
+            {
+            case 3:
+                unk_110 = stk_14->GetAs_RwInt32();
+                break;
+            case 4:
+                unk_114 = stk_14->GetAs_RwInt32();
+                break;
+            }
+            ++stk_14;
         }
-        ++stk_14;
     }
     RWS::CAttributeCommandIterator var8(attr, RWS_CLASSID_OF(GimpTrigger));
     RwInt32 local_C;
@@ -280,6 +289,7 @@ void GimpTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?HandleEvents@GimpTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000C7A60
+// sp-match: ?HandleEvents@GimpTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x00097D50
 void GimpTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
     type_4D53F8 *var_4;
@@ -304,6 +314,7 @@ void GimpTrigger::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?vf_020@GimpTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000C7B00
+// sp-match: ?vf_020@GimpTrigger@@UAEPAUtype_3D3548@@XZ @ 0x00097DC0
 type_3D3548 *GimpTrigger::vf_020()
 {
     RwInt32 var_18;
@@ -339,6 +350,7 @@ type_3D3548 *GimpTrigger::vf_020()
 }
 
 // match: ?vf_018@GimpTrigger@@UAEHXZ @ 0x000C7BE0
+// sp-match: ?vf_018@GimpTrigger@@UAEHXZ @ 0x00097E30
 RwInt32 GimpTrigger::vf_018()
 {
     RwInt32 var_8;
@@ -366,6 +378,7 @@ RwInt32 GimpTrigger::vf_018()
 }
 
 // match: ?vf_010@GimpTrigger@@UAEXHH@Z @ 0x000C7C70
+// sp-match: ?vf_010@GimpTrigger@@UAEXHH@Z @ 0x00097E90
 void GimpTrigger::vf_010(RwInt32 arg_0, RwInt32 arg_4)
 {
     if (arg_0)
@@ -386,6 +399,7 @@ void GimpTrigger::vf_010(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ??_EGimpTrigger@@WBI@AEPAXI@Z @ 0x000C7CD0
+// sp-match: ??_EGimpTrigger@@WBI@AEPAXI@Z @ 0x00097ED0
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

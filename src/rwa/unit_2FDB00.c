@@ -189,6 +189,7 @@ rwaObjDef unk_512658;
 // match: _off_438C28 @ 0x00438C28
 
 // match: _sub_2FDB00 @ 0x002FDB00
+// sp-match: _sub_2FDB00 @ 0x00217DC0
 
 RwBool
 sub_2FDB00(void)
@@ -199,6 +200,7 @@ sub_2FDB00(void)
 /* The embedded voice's allocation: its place in the stream voice's state
  * unless the caller's allocation callback gives another. */
 // match: _sub_2FDB10 @ 0x002FDB10
+// sp-match: _sub_2FDB10 @ 0x00217DD0
 static void *
 sub_2FDB10(rwaObjDef *def, rwaStreamVoiceAlloc *alloc, rwaXboxVoiceParams *params, void *data)
 {
@@ -226,6 +228,7 @@ sub_2FDB10(rwaObjDef *def, rwaStreamVoiceAlloc *alloc, rwaXboxVoiceParams *param
 /* Its release: the caller's callback, else filled in debug fashion (its
  * own place) or released. */
 // match: _sub_2FDB70 @ 0x002FDB70
+// sp-match: _sub_2FDB70 @ 0x00217E30
 static void
 sub_2FDB70(rwaInstance *obj, rwaStreamVoiceAlloc *alloc)
 {
@@ -243,6 +246,7 @@ sub_2FDB70(rwaInstance *obj, rwaStreamVoiceAlloc *alloc)
 }
 
 // match: _sub_2FDBD0 @ 0x002FDBD0
+// sp-match: _sub_2FDBD0 @ 0x00217E90
 static rwaDecoder *
 sub_2FDBD0(rwaDecoder *obj, rwaInstance *parent, rwaStreamVoiceParams *params, void *a, void *b)
 {
@@ -371,6 +375,7 @@ sub_2FDBD0(rwaDecoder *obj, rwaInstance *parent, rwaStreamVoiceParams *params, v
 
 /* Starts or stops the voice, from the start (rewind) or where it stopped. */
 // match: _sub_2FDF80 @ 0x002FDF80
+// sp-match: _sub_2FDF80 @ 0x00218240
 static void
 sub_2FDF80(rwaDecoder *obj, RwBool play, RwBool rewind)
 {
@@ -393,6 +398,7 @@ sub_2FDF80(rwaDecoder *obj, RwBool play, RwBool rewind)
 }
 
 // match: _sub_2FDFE0 @ 0x002FDFE0
+// sp-match: _sub_2FDFE0 @ 0x002182A0
 static rwaDecoder *
 sub_2FDFE0(rwaDecoder *obj)
 {
@@ -403,6 +409,7 @@ sub_2FDFE0(rwaDecoder *obj)
 
 /* The default creation parameters. */
 // match: _sub_2FE000 @ 0x002FE000
+// sp-match: _sub_2FE000 @ 0x002182C0
 static rwaDecoder *
 sub_2FE000(rwaDecoder *obj, rwaStreamVoiceParams *params)
 {
@@ -420,6 +427,7 @@ sub_2FE000(rwaDecoder *obj, rwaStreamVoiceParams *params)
 }
 
 // match: _sub_2FE040 @ 0x002FE040
+// sp-match: _sub_2FE040 @ 0x00218300
 void
 sub_2FE040(rwaDecoder *obj, RwUInt32 rate)
 {
@@ -427,6 +435,7 @@ sub_2FE040(rwaDecoder *obj, RwUInt32 rate)
 }
 
 // match: _sub_2FE070 @ 0x002FE070
+// sp-match: _sub_2FE070 @ 0x00218330
 RwUInt32
 sub_2FE070(rwaDecoder *obj)
 {
@@ -438,6 +447,7 @@ sub_2FE070(rwaDecoder *obj)
 /* Sets one channel's level (both for mono), keeping the other: the voice's
  * volume is the louder and its pan their difference over it. */
 // match: _sub_2FE090 @ 0x002FE090
+// sp-match: _sub_2FE090 @ 0x00218350
 void
 sub_2FE090(rwaDecoder *obj, const rwaChannelLevel *value)
 {
@@ -494,6 +504,7 @@ sub_2FE090(rwaDecoder *obj, const rwaChannelLevel *value)
 }
 
 // match: _sub_2FE1D0 @ 0x002FE1D0
+// sp-match: _sub_2FE1D0 @ 0x00218490
 rwaStreamPosition *
 sub_2FE1D0(rwaDecoder *obj)
 {
@@ -501,6 +512,7 @@ sub_2FE1D0(rwaDecoder *obj)
 }
 
 // match: _sub_2FE1E0 @ 0x002FE1E0
+// sp-match: _sub_2FE1E0 @ 0x002184A0
 static void
 sub_2FE1E0(rwaStreamVoiceState *state)
 {
@@ -511,6 +523,7 @@ sub_2FE1E0(rwaStreamVoiceState *state)
 }
 
 // match: _sub_2FE210 @ 0x002FE210
+// sp-match: _sub_2FE210 @ 0x002184D0
 rwaDecoder *
 sub_2FE210(rwaDecoder *obj, const void *param, const RwUInt32 *value)
 {
@@ -519,6 +532,7 @@ sub_2FE210(rwaDecoder *obj, const void *param, const RwUInt32 *value)
 }
 
 // match: _sub_2FE230 @ 0x002FE230
+// sp-match: _sub_2FE230 @ 0x002184F0
 rwaDecoder *
 sub_2FE230(rwaDecoder *obj, const void *param, RwUInt32 *value)
 {
@@ -527,6 +541,7 @@ sub_2FE230(rwaDecoder *obj, const void *param, RwUInt32 *value)
 }
 
 // match: _sub_2FE250 @ 0x002FE250
+// sp-match: _sub_2FE250 @ 0x00218510
 rwaDecoder *
 sub_2FE250(rwaDecoder *obj, const void *param, const rwaChannelLevel *value)
 {
@@ -535,6 +550,7 @@ sub_2FE250(rwaDecoder *obj, const void *param, const rwaChannelLevel *value)
 }
 
 // match: _sub_2FE270 @ 0x002FE270
+// sp-match: _sub_2FE270 @ 0x00218530
 rwaDecoder *
 sub_2FE270(rwaDecoder *obj, const void *param, rwaStreamPosition **value)
 {
@@ -546,6 +562,7 @@ sub_2FE270(rwaDecoder *obj, const void *param, rwaStreamPosition **value)
  * reporting where it plays), then by mode uploads the next queue item (or
  * silence) into the free entry, or stops. */
 // match: _sub_2FE290 @ 0x002FE290
+// sp-match: _sub_2FE290 @ 0x00218550
 static rwaDecoder *
 sub_2FE290(rwaInstance *base)
 {
@@ -791,6 +808,7 @@ sub_2FE290(rwaInstance *base)
 /* Resets the entries (flush: returns the item being uploaded, stops the
  * voice and forgets what played). */
 // match: _sub_2FE780 @ 0x002FE780
+// sp-match: _sub_2FE780 @ 0x00218A40
 void
 sub_2FE780(rwaDecoder *obj, RwBool flush)
 {
@@ -818,6 +836,7 @@ sub_2FE780(rwaDecoder *obj, RwBool flush)
 }
 
 // match: _sub_2FE800 @ 0x002FE800
+// sp-match: _sub_2FE800 @ 0x00218AC0
 rwaDecoder *
 sub_2FE800(rwaDecoder *obj, const void *param, const RwBool *value)
 {
@@ -826,6 +845,7 @@ sub_2FE800(rwaDecoder *obj, const void *param, const RwBool *value)
 }
 
 // match: _sub_2FE820 @ 0x002FE820
+// sp-match: _sub_2FE820 @ 0x00218AE0
 static void
 sub_2FE820(rwaDecoder *obj, void *a, void *b)
 {
@@ -849,6 +869,7 @@ sub_2FE820(rwaDecoder *obj, void *a, void *b)
 }
 
 // match: _sub_2FE8C0 @ 0x002FE8C0
+// sp-match: _sub_2FE8C0 @ 0x00218B80
 static void
 sub_2FE8C0(rwaObjDef *def)
 {
@@ -867,6 +888,7 @@ sub_2FE8C0(rwaObjDef *def)
 }
 
 // match: _sub_2FEB10 @ 0x002FEB10
+// sp-match: _sub_2FEB10 @ 0x00218DD0
 rwaObjDef *
 sub_2FEB10(void)
 {
@@ -894,6 +916,7 @@ sub_2FEB10(void)
 
 /* The voices it mutes: unmutes the old ones and takes the new list. */
 // match: _sub_2FEB90 @ 0x002FEB90
+// sp-match: _sub_2FEB90 @ 0x00219380
 void *
 sub_2FEB90(void *obj, const void *param, const rwaHandleList *value)
 {
@@ -922,6 +945,7 @@ sub_2FEB90(void *obj, const void *param, const rwaHandleList *value)
 
 /* The first of them not muted (0: all are). */
 // match: _sub_2FEC00 @ 0x002FEC00
+// sp-match: _sub_2FEC00 @ 0x002193F0
 void *
 sub_2FEC00(void *obj, const void *param, RwaObjHandle **value)
 {

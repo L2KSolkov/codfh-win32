@@ -67,6 +67,18 @@ type_16C2A0 dword_449334;
 // match: _$E15 @ 0x0030DD60
 // match: _$E17 @ 0x00309A20
 // match: _$E18 @ 0x0030DD70
+// sp-match: _$E18 @ 0x0021E1A0
+// sp-match: _$E2 @ 0x0021C410
+// sp-match: _$E5 @ 0x0021C430
+// sp-match: _$E8 @ 0x0021C450
+// sp-match: _$E11 @ 0x0021C470
+// sp-match: _$E14 @ 0x0021C490
+// sp-match: _$E17 @ 0x0021C4B0
+// sp-match: _$E3 @ 0x0021E150
+// sp-match: _$E6 @ 0x0021E160
+// sp-match: _$E9 @ 0x0021E170
+// sp-match: _$E12 @ 0x0021E180
+// sp-match: _$E15 @ 0x0021E190
 
 RwInt32 *sub_6B8E0(RwInt32 arg_0);
 void sub_6B920(RwInt32 *arg_0);
@@ -96,6 +108,7 @@ void sub_42E00(type_67620 *arg_0, RwInt32 arg_4);
 extern RTL_CRITICAL_SECTION dword_44C048;
 
 // match: sub_6B3B0 @ 0x0006B3B0
+// sp-match: sub_6B3B0 @ 0x0005ABB0
 // Sets the pools and the registration array up.
 void sub_6B3B0()
 {
@@ -111,6 +124,7 @@ void sub_6B3B0()
 }
 
 // match: sub_6B490 @ 0x0006B490
+// sp-match: sub_6B490 @ 0x0005B2E0
 // Restart.
 void sub_6B490()
 {
@@ -119,6 +133,7 @@ void sub_6B490()
 }
 
 // match: sub_6B4A0 @ 0x0006B4A0
+// sp-match: sub_6B4A0 @ 0x0005B2F0
 // Shutdown: as a restart, then frees the array and shuts the pools down.
 void sub_6B4A0()
 {
@@ -134,9 +149,12 @@ void sub_6B4A0()
 }
 
 // match: sub_6B510 @ 0x0006B510
+// sp-match: sub_6B510 @ 0x0005AC80
 // Warns of messages, registrations and arguments still out.
 void sub_6B510()
 {
+#ifndef CODFH_SP
+    // Single player compiles the debug prints out (SP 0x5AC80 only resets the count).
     RwInt32 var_4;
 
     if (dword_4493D4.in_use())
@@ -152,10 +170,12 @@ void sub_6B510()
             sub_19A750("Messages were not unregistered in m_registrationArray during "
                        "restart/shutdown!");
     }
+#endif
     dword_44932C = -1;
 }
 
 // match: sub_6B5F0 @ 0x0006B5F0
+// sp-match: sub_6B5F0 @ 0x0005B740
 // Sends the message named arg_0 to the script arg_4 (all when 0) from
 // arg_8, with the arg_C words at arg_10; queued (arg_18, arg_1C as
 // sub_42AF0's).
@@ -175,6 +195,7 @@ void sub_6B5F0(const RwChar *arg_0, type_67620 *arg_4, type_42E00_10 *arg_8, typ
 }
 
 // match: sub_6B680 @ 0x0006B680
+// sp-match: sub_6B680 @ 0x0005B7B0
 // Likewise for the message at index arg_0.
 void sub_6B680(RwInt32 arg_0, type_67620 *arg_4, type_42E00_10 *arg_8, type_3D2E7C *arg_C,
                RwInt32 *arg_10, RwInt32 arg_14, bool arg_18, bool arg_1C)
@@ -192,6 +213,7 @@ void sub_6B680(RwInt32 arg_0, type_67620 *arg_4, type_42E00_10 *arg_8, type_3D2E
 }
 
 // match: sub_6B710 @ 0x0006B710
+// sp-match: sub_6B710 @ 0x0005B360
 // A new message of kind arg_0 (m_messagePool, handle kind 6) for the script
 // arg_4 (all when 0), from arg_8, with arg_C's unk_3C, arg_10 and arg_14;
 // its arguments are the words ending at arg_18, in order when arg_1C is
@@ -228,6 +250,7 @@ type_439E78_00 sub_6B710(RwInt32 arg_0, type_67620 *arg_4, type_3D2E7C *arg_8,
 }
 
 // match: sub_6B890 @ 0x0006B890
+// sp-match: sub_6B890 @ 0x0005B450
 // Deletes the message with the handle arg_0.
 void sub_6B890(RwUInt32 arg_0)
 {
@@ -241,6 +264,7 @@ void sub_6B890(RwUInt32 arg_0)
 }
 
 // match: sub_6B8E0 @ 0x0006B8E0
+// sp-match: sub_6B8E0 @ 0x0005AC90
 // Arguments for arg_0 words: from m_messageArgsSmallPool when they fit and
 // it has room, else from m_messageArgsLargePool.
 RwInt32 *sub_6B8E0(RwInt32 arg_0)
@@ -251,6 +275,7 @@ RwInt32 *sub_6B8E0(RwInt32 arg_0)
 }
 
 // match: sub_6B920 @ 0x0006B920
+// sp-match: sub_6B920 @ 0x0005ACC0
 // Frees the arguments arg_0 to their pool.
 void sub_6B920(RwInt32 *arg_0)
 {
@@ -261,6 +286,7 @@ void sub_6B920(RwInt32 *arg_0)
 }
 
 // match: sub_6B960 @ 0x0006B960
+// sp-match: sub_6B960 @ 0x0005ACF0
 // A new registration.
 type_6B960 *sub_6B960()
 {
@@ -271,6 +297,7 @@ type_6B960 *sub_6B960()
 }
 
 // match: sub_6B980 @ 0x0006B980
+// sp-match: sub_6B980 @ 0x0005AD00
 // Frees the registration arg_0.
 void sub_6B980(type_6B960 *arg_0)
 {
@@ -278,6 +305,7 @@ void sub_6B980(type_6B960 *arg_0)
 }
 
 // match: sub_6B9A0 @ 0x0006B9A0
+// sp-match: sub_6B9A0 @ 0x0005B490
 // Registers the script arg_0 (with arg_4, arg_8, arg_10 the message kind
 // and the flags arg_14 and arg_18) as kind 1; drops its queued messages of
 // that kind when arg_8's flag is set.
@@ -306,6 +334,7 @@ type_6B960 *sub_6B9A0(type_67620 *arg_0, RwInt32 arg_4, type_6B9A0_08 *arg_8, Rw
 }
 
 // match: sub_6BA60 @ 0x0006BA60
+// sp-match: sub_6BA60 @ 0x0005B510
 // Registers arg_0 as kind 3 (arg_8 the message kind, flags arg_C and
 // arg_10).
 type_6B960 *sub_6BA60(type_67620 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt8 arg_C,
@@ -329,10 +358,16 @@ type_6B960 *sub_6BA60(type_67620 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt8 ar
 }
 
 // match: sub_6BAE0 @ 0x0006BAE0
+// sp-match: sub_6BAE0 @ 0x0005B560
 // Registers the handle arg_4 with arg_0 as kind 2 (arg_C the message kind,
 // flags arg_10 and arg_14).
+#ifdef CODFH_SP // arg_10 unsigned (its callers zero-extend it: SP 0x92410, 0x7CB31)
+type_6B960 *sub_6BAE0(RwInt32 arg_0, RwUInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C, RwUInt8 arg_10,
+                      RwInt8 arg_14)
+#else
 type_6B960 *sub_6BAE0(RwInt32 arg_0, RwUInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C, RwInt8 arg_10,
                       RwInt8 arg_14)
+#endif
 {
     type_6B960 *var_4;
 
@@ -349,6 +384,7 @@ type_6B960 *sub_6BAE0(RwInt32 arg_0, RwUInt32 arg_4, RwInt32 arg_8, RwInt32 arg_
 }
 
 // match: sub_6BB40 @ 0x0006BB40
+// sp-match: sub_6BB40 @ 0x0005AD10
 // Puts the registration at the pool index arg_0 at the head of its
 // message kind's list.
 void sub_6BB40(RwInt16 arg_0)
@@ -369,6 +405,7 @@ void sub_6BB40(RwInt16 arg_0)
 }
 
 // match: sub_6BC00 @ 0x0006BC00
+// sp-match: sub_6BC00 @ 0x0005AD80
 // Puts the registration arg_0 at the head of its message kind's list.
 void sub_6BC00(type_6B960 *arg_0)
 {
@@ -382,6 +419,7 @@ void sub_6BC00(type_6B960 *arg_0)
 }
 
 // match: sub_6BC40 @ 0x0006BC40
+// sp-match: sub_6BC40 @ 0x0005ADB0
 // Unlinks and frees the registration arg_0; while its kind is being sent,
 // only marks it.
 void sub_6BC40(type_6B960 *arg_0)
@@ -408,6 +446,7 @@ void sub_6BC40(type_6B960 *arg_0)
 }
 
 // match: sub_6BD30 @ 0x0006BD30
+// sp-match: sub_6BD30 @ 0x0005AE30
 // Unregisters everything.
 void sub_6BD30()
 {
@@ -430,6 +469,7 @@ void sub_6BD30()
 }
 
 // match: sub_6BDC0 @ 0x0006BDC0
+// sp-match: sub_6BDC0 @ 0x0005B9F0
 // Delivers the message arg_0: to its script, or to every registration of
 // its kind.
 void sub_6BDC0(type_42E00 *arg_0)
@@ -444,6 +484,7 @@ void sub_6BDC0(type_42E00 *arg_0)
 }
 
 // match: sub_6BE10 @ 0x0006BE10
+// sp-match: sub_6BE10 @ 0x0005B5A0
 // Delivers the message arg_0 to its script's object, and to the handlers
 // registered for its kind by that object's scripts; whether any took it.
 RwInt32 sub_6BE10(type_42E00 *arg_0)
@@ -485,6 +526,7 @@ RwInt32 sub_6BE10(type_42E00 *arg_0)
 }
 
 // match: sub_6BF60 @ 0x0006BF60
+// sp-match: sub_6BF60 @ 0x0005B900
 // Delivers the message arg_0 to every registration of its kind that
 // accepts it (sub_6C0A0); whether any took it.
 RwInt32 sub_6BF60(type_42E00 *arg_0)
@@ -520,6 +562,7 @@ RwInt32 sub_6BF60(type_42E00 *arg_0)
 }
 
 // match: sub_6C0A0 @ 0x0006C0A0
+// sp-match: sub_6C0A0 @ 0x0005B820
 // Whether the registration arg_C accepts a message from arg_0 at arg_4 for
 // arg_8, by its filter (the low nibble of unk_19): 1 all, 2 by filter
 // lists, 3 and 4 by trigger, 5 by recipient, 6 by entity.
@@ -548,6 +591,7 @@ bool sub_6C0A0(type_67620 *arg_0, type_4CFE30 *arg_4, type_67620 *arg_8, type_6B
 }
 
 // match: sub_6C1A0 @ 0x0006C1A0
+// sp-match: sub_6C1A0 @ 0x0005AE90
 // Filter 3: whether the registered object's trigger is the sender's (or
 // arg_4), inverted when the high nibble of arg_10 is 2.
 bool sub_6C1A0(type_3D2E7C *arg_0, type_4CFE30 *arg_4, type_6B960 *arg_8, RwInt8 arg_C,
@@ -582,6 +626,7 @@ bool sub_6C1A0(type_3D2E7C *arg_0, type_4CFE30 *arg_4, type_6B960 *arg_8, RwInt8
 }
 
 // match: sub_6C2D0 @ 0x0006C2D0
+// sp-match: sub_6C2D0 @ 0x0005AF40
 // Filter 4: likewise, for kind-2 registrations by their unk_04.
 bool sub_6C2D0(type_3D2E7C *arg_0, type_4CFE30 *arg_4, type_6B960 *arg_8, RwInt8 arg_C,
                RwInt8 arg_10)
@@ -614,6 +659,7 @@ bool sub_6C2D0(type_3D2E7C *arg_0, type_4CFE30 *arg_4, type_6B960 *arg_8, RwInt8
 }
 
 // match: sub_6C410 @ 0x0006C410
+// sp-match: sub_6C410 @ 0x0005AFF0
 // Filter 5: whether the registered object is the message's recipient
 // arg_0.
 bool sub_6C410(type_3D2E7C *arg_0, type_6B960 *arg_4, RwInt8 arg_8, RwInt8 arg_C)
@@ -643,6 +689,7 @@ bool sub_6C410(type_3D2E7C *arg_0, type_6B960 *arg_4, RwInt8 arg_8, RwInt8 arg_C
 }
 
 // match: sub_6C4E0 @ 0x0006C4E0
+// sp-match: sub_6C4E0 @ 0x0005B050
 // Filter 6: whether the registered object is the sender, or its entity is
 // arg_4.
 bool sub_6C4E0(type_3D2E7C *arg_0, type_4CFE30 *arg_4, type_6B960 *arg_8, RwInt8 arg_C,
@@ -666,6 +713,7 @@ bool sub_6C4E0(type_3D2E7C *arg_0, type_4CFE30 *arg_4, type_6B960 *arg_8, RwInt8
 }
 
 // match: sub_6C5A0 @ 0x0006C5A0
+// sp-match: sub_6C5A0 @ 0x0005B690
 // Filter 2: compares the sender's (or arg_4's) filter list with the
 // registered object's (sub_6C6D0).
 bool sub_6C5A0(type_3D2E7C *arg_0, type_4CFE30 *arg_4, type_6B960 *arg_8, RwInt8 arg_C,
@@ -697,6 +745,7 @@ bool sub_6C5A0(type_3D2E7C *arg_0, type_4CFE30 *arg_4, type_6B960 *arg_8, RwInt8
 }
 
 // match: sub_6C6D0 @ 0x0006C6D0
+// sp-match: sub_6C6D0 @ 0x0005B0C0
 // Whether the filter lists arg_0 and arg_4 both hold the channel arg_8 with
 // the same rank (inverted when the high nibble of arg_C is 2).
 bool sub_6C6D0(type_71250 *arg_0, type_71250 *arg_4, RwUInt8 arg_8, RwInt8 arg_C)
@@ -738,6 +787,7 @@ bool sub_6C6D0(type_71250 *arg_0, type_71250 *arg_4, RwUInt8 arg_8, RwInt8 arg_C
 }
 
 // match: sub_6C810 @ 0x0006C810
+// sp-match: sub_6C810 @ 0x0005B160
 // After a send of the message kind arg_0: frees the registrations
 // unregistered meanwhile and flips the pending ones' flags.
 void sub_6C810(RwInt32 arg_0)
@@ -761,6 +811,7 @@ void sub_6C810(RwInt32 arg_0)
 }
 
 // match: sub_6C8B0 @ 0x0006C8B0
+// sp-match: sub_6C8B0 @ 0x0005B1C0
 // Delivers the message arg_0 through the registration arg_4: to its script
 // (kind 1), waking its task with the first argument as its return register
 // (kind 3), or to its callback (kind 2, unregistered when that returns 0).
@@ -798,6 +849,7 @@ void sub_6C8B0(type_42E00 *arg_0, type_6B960 *arg_4)
 }
 
 // match: sub_6C9D0 @ 0x0006C9D0
+// sp-match: sub_6C9D0 @ 0x0005B280
 // A filter list for arg_0 entries: from m_filterListSmallPool when they fit
 // and it has room, else from m_filterListLargePool.
 type_71250 *sub_6C9D0(RwInt32 arg_0)
@@ -813,6 +865,7 @@ type_71250 *sub_6C9D0(RwInt32 arg_0)
 }
 
 // match: sub_6CA20 @ 0x0006CA20
+// sp-match: sub_6CA20 @ 0x0005B2B0
 // Frees the filter list arg_0 to its pool.
 void sub_6CA20(type_71250 *arg_0)
 {

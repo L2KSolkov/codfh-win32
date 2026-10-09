@@ -101,6 +101,7 @@ static RwModuleInfo lightModule;
 // match: __rpLightFreeListPreallocBlocks @ 0x00436B5C
 
 // match: _LightTidyDestroyLight @ 0x002D7520
+// sp-match: _LightTidyDestroyLight @ 0x001F1E80
 
 static void
 LightTidyDestroyLight( void *object,
@@ -217,6 +218,7 @@ RpLightGetRadius(const RpLight *light)
  *
  */
 // match: _RpLightSetRadius @ 0x002D6FB0
+// sp-match: _RpLightSetRadius @ 0x001F1910
 RpLight            *
 RpLightSetRadius(RpLight * light, RwReal radius)
 {
@@ -303,6 +305,7 @@ RpLightGetColor(const RpLight *light)
  *
  */
 // match: _RpLightSetColor @ 0x002D6FE0
+// sp-match: _RpLightSetColor @ 0x001F1940
 RpLight            *
 RpLightSetColor(RpLight * light, const RwRGBAReal * color)
 {
@@ -353,6 +356,7 @@ RpLightSetColor(RpLight * light, const RwRGBAReal * color)
  *
  */
 // match: _RpLightGetConeAngle @ 0x002D7030
+// sp-match: _RpLightGetConeAngle @ 0x001F1990
 RwReal
 RpLightGetConeAngle(const RpLight * light)
 {
@@ -396,6 +400,7 @@ RpLightGetConeAngle(const RpLight * light)
  *
  */
 // match: _RpLightSetConeAngle @ 0x002D7360
+// sp-match: _RpLightSetConeAngle @ 0x001F1CC0
 RpLight            *
 RpLightSetConeAngle(RpLight * light, RwReal angle)
 {
@@ -452,6 +457,7 @@ RpLightSetConeAngle(RpLight * light, RwReal angle)
  *
  */
 // match: _RpLightRegisterPlugin @ 0x002D7390
+// sp-match: _RpLightRegisterPlugin @ 0x001F1CF0
 RwInt32
 RpLightRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
                       RwPluginObjectConstructor constructCB,
@@ -497,6 +503,7 @@ RpLightRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
  *
  */
 // match: _RpLightRegisterPluginStream @ 0x002D73C0
+// sp-match: _RpLightRegisterPluginStream @ 0x001F1D20
 RwInt32
 RpLightRegisterPluginStream(RwUInt32 pluginID,
                             RwPluginDataChunkReadCallBack readCB,
@@ -787,6 +794,7 @@ RpLightStreamWrite(const RpLight * light, RwStream * stream)
  * \see RpWorldPluginAttach
  */
 // match: _RpLightStreamRead @ 0x002D7550
+// sp-match: _RpLightStreamRead @ 0x001F1EB0
 RpLight            *
 RpLightStreamRead(RwStream * stream)
 {
@@ -1162,6 +1170,7 @@ RpLightGetFlags(const RpLight *light)
  *
  */
 // match: _RpLightDestroy @ 0x002D73F0
+// sp-match: _RpLightDestroy @ 0x001F1D50
 RwBool
 RpLightDestroy(RpLight * light)
 {
@@ -1235,6 +1244,7 @@ RpLightDestroy(RpLight * light)
  *
  */
 // match: _RpLightCreate @ 0x002D7430
+// sp-match: _RpLightCreate @ 0x001F1D90
 RpLight            *
 RpLightCreate(RwInt32 type)
 {
@@ -1295,6 +1305,7 @@ RpLightCreate(RwInt32 type)
  */
 
 // match: __rpLightClose @ 0x002D76E0
+// sp-match: __rpLightClose @ 0x001F2040
 void               *
 _rpLightClose(void *instance,
               RwInt32 offset __RWUNUSED__,
@@ -1360,6 +1371,7 @@ RpLightSetFreeListCreateParams(RwInt32 blockSize, RwInt32 numBlocksToPrealloc)
  */
 
 // match: __rpLightOpen @ 0x002D74D0
+// sp-match: __rpLightOpen @ 0x001F1E30
 void               *
 _rpLightOpen( void *instance,
               RwInt32 offset,

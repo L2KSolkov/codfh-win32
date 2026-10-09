@@ -44,6 +44,10 @@ type_16C2A0 dword_439284;
 // match: _$E3 @ 0x0030DC80
 // match: _$E5 @ 0x00309810
 // match: _$E6 @ 0x0030DC90
+// sp-match: _$E6 @ 0x0021E0C0
+// sp-match: _$E2 @ 0x0021C270
+// sp-match: _$E5 @ 0x0021C290
+// sp-match: _$E3 @ 0x0021E0B0
 
 void sub_3C290();
 void sub_3C540(type_3D3548 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwV3d *arg_C, RwInt32 arg_10,
@@ -53,6 +57,7 @@ void sub_3C7D0(type_3C720 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwV3d *arg_
 RwInt32 sub_3C980(type_3D3548 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwInt32 arg_C);
 
 // match: sub_3C1D0 @ 0x0003C1D0
+// sp-match: sub_3C1D0 @ 0x0002DBF0
 void sub_3C1D0()
 {
     dword_439264.sub_16C2C0(0x19, 0xC, "m_freeHearingParams", 4, 0);
@@ -62,6 +67,7 @@ void sub_3C1D0()
 }
 
 // match: sub_3C220 @ 0x0003C220
+// sp-match: sub_3C220 @ 0x0002DD60
 // Frees the lasting sounds, warning first unless every listener was
 // unregistered.
 void sub_3C220()
@@ -80,6 +86,7 @@ void sub_3C220()
 }
 
 // match: sub_3C270 @ 0x0003C270
+// sp-match: sub_3C270 @ 0x0002DC40
 void sub_3C270()
 {
     dword_439264.sub_16C4D0(1);
@@ -89,10 +96,13 @@ void sub_3C270()
 // match: sub_3C290 @ 0x0003C290
 void sub_3C290()
 {
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x2DD60 drops the call)
     sub_19A750("Somebody forgot to unregister in the AIHearing Class!");
+#endif
 }
 
 // match: sub_3C2B0 @ 0x0003C2B0
+// sp-match: sub_3C2B0 @ 0x0002DEF0
 // The update, with the time step arg_0: loud sounds reach every listener
 // first, then timed ones run down and untimed ones end (sub_8A950), and the
 // rest reach the listeners that have not heard a loud one.
@@ -139,6 +149,7 @@ void sub_3C2B0(RwReal arg_0)
 }
 
 // match: sub_3C4B0 @ 0x0003C4B0
+// sp-match: sub_3C4B0 @ 0x0002E190
 // Makes a sound: a lasting one (sub_3C540) when arg_14 (loud) is set, else
 // heard by the listeners at once.
 void sub_3C4B0(type_3D3548 *arg_0, RwInt32 arg_4, RwV3d *arg_8, RwInt32 arg_C, RwReal arg_10,
@@ -157,6 +168,7 @@ void sub_3C4B0(type_3D3548 *arg_0, RwInt32 arg_4, RwV3d *arg_8, RwInt32 arg_C, R
 }
 
 // match: sub_3C540 @ 0x0003C540
+// sp-match: sub_3C540 @ 0x0002E070
 // Registers a lasting sound (id arg_8), after the listeners hear it once.
 void sub_3C540(type_3D3548 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwV3d *arg_C, RwInt32 arg_10,
                RwReal arg_14, RwInt32 arg_18, RwReal arg_1C)
@@ -199,6 +211,7 @@ void sub_3C540(type_3D3548 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwV3d *arg_C, R
 }
 
 // match: sub_3C6C0 @ 0x0003C6C0
+// sp-match: sub_3C6C0 @ 0x0002DC60
 // Ends the lasting sound with id arg_0.
 void sub_3C6C0(RwInt32 arg_0)
 {
@@ -219,6 +232,7 @@ void sub_3C6C0(RwInt32 arg_0)
 }
 
 // match: sub_3C720 @ 0x0003C720
+// sp-match: sub_3C720 @ 0x0002DCA0
 // Registers the entity arg_0 as a listener.
 void sub_3C720(type_3D3548 *arg_0)
 {
@@ -231,6 +245,7 @@ void sub_3C720(type_3D3548 *arg_0)
 }
 
 // match: sub_3C760 @ 0x0003C760
+// sp-match: sub_3C760 @ 0x0002DCD0
 // Unregisters the listener entity arg_0.
 void sub_3C760(type_3D3548 *arg_0)
 {
@@ -252,6 +267,7 @@ void sub_3C760(type_3D3548 *arg_0)
 }
 
 // match: sub_3C7D0 @ 0x0003C7D0
+// sp-match: sub_3C7D0 @ 0x0002DD90
 // The listener arg_0 hears the sound (source arg_4, kind arg_8, point
 // arg_C, class arg_10, range arg_14) when it listens for it (sub_3C980) and
 // is within its range plus its own hearing radius; arg_18 (loud) marks it as
@@ -297,6 +313,7 @@ void sub_3C7D0(type_3C720 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwV3d *arg_
 }
 
 // match: sub_3C980 @ 0x0003C980
+// sp-match: sub_3C980 @ 0x0002DD10
 // Whether the entity arg_0 listens for a sound of class arg_C and kind arg_8
 // from arg_4 (its AI object's masks unk_538, unk_53C and sides unk_540).
 RwInt32 sub_3C980(type_3D3548 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwInt32 arg_C)

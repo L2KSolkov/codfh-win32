@@ -11,6 +11,7 @@
 #include "game/debugtext.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E24C0
 extern const RwReal flt_3E24C0 = 16.666666f;
 // 0x003E24C4
@@ -31,6 +32,7 @@ extern const RwReal flt_3E24DC = 0.01f;
 extern const RwReal flt_3E24E0 = 0.01f;
 // 0x003E24E4
 extern const RwReal flt_3E24E4 = 0.0f;
+#endif
 // End of its data definitions.
 
 // Its data (PLAN M5): literals, constants and tables where the image has them.

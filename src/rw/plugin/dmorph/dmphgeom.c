@@ -102,6 +102,7 @@ MACRO_STOP
 // match: _rcsid @ 0x0041A020
 
 // match: _DMorphGeometryCtor @ 0x002F4A10
+// sp-match: _DMorphGeometryCtor @ 0x0020F4C0
 static void *
 DMorphGeometryCtor( void *object,
                     RwInt32 offset __RWUNUSED__,
@@ -118,6 +119,7 @@ DMorphGeometryCtor( void *object,
 /*--- DMorphGeometryDtor ---------------------------------------------------
  */
 // match: _DMorphGeometryDtor @ 0x002F50E0
+// sp-match: _DMorphGeometryDtor @ 0x0020FB90
 static void *
 DMorphGeometryDtor( void *object,
                     RwInt32 offset __RWUNUSED__,
@@ -167,6 +169,7 @@ DMorphGeometryCopy( void *dstObject,
 /*--- DMorphGeometryStreamRead ---------------------------------------------
  */
 // match: _DMorphGeometryStreamRead @ 0x002F4D50
+// sp-match: _DMorphGeometryStreamRead @ 0x0020F800
 static RwStream *
 DMorphGeometryStreamRead( RwStream *stream,
                           RwInt32 binaryLength   __RWUNUSED__,
@@ -340,6 +343,7 @@ DMorphGeometryStreamRead( RwStream *stream,
 /*--- DMorphGeometryStreamWrite ---------------------------------------------
  */
 // match: _DMorphGeometryStreamWrite @ 0x002F4A30
+// sp-match: _DMorphGeometryStreamWrite @ 0x0020F4E0
 static RwStream *
 DMorphGeometryStreamWrite( RwStream *stream,
                            RwInt32 binaryLength   __RWUNUSED__,
@@ -449,6 +453,7 @@ DMorphGeometryStreamWrite( RwStream *stream,
 /*--- DMorphGeometryStreamSize ---------------------------------------------
  */
 // match: _DMorphGeometryStreamSize @ 0x002F4BE0
+// sp-match: _DMorphGeometryStreamSize @ 0x0020F690
 static RwInt32
 DMorphGeometryStreamSize( const void *object,
                           RwInt32 offsetInObject __RWUNUSED__,
@@ -726,6 +731,7 @@ DMorphRLEGenerate( const RwV3d          *baseVertices,
  *===========================================================================*/
 
 // match: __rpDMorphGeometryPluginAttach @ 0x002F5130
+// sp-match: __rpDMorphGeometryPluginAttach @ 0x0020FBE0
 RwBool
 _rpDMorphGeometryPluginAttach(void)
 {
@@ -797,6 +803,7 @@ _rpDMorphGeometryPluginAttach(void)
  * \see RpDMorphGeometryRemoveDMorphTarget
  */
 // match: _RpDMorphGeometryCreateDMorphTargets @ 0x002F4C90
+// sp-match: _RpDMorphGeometryCreateDMorphTargets @ 0x0020F740
 RpGeometry *
 RpDMorphGeometryCreateDMorphTargets( RpGeometry *geometry,
                                      RwUInt32 number )
@@ -872,6 +879,7 @@ RpDMorphGeometryCreateDMorphTargets( RpGeometry *geometry,
  * \see RpDMorphGeometryRemoveDMorphTarget
  */
 // match: _RpDMorphGeometryDestroyDMorphTargets @ 0x002F5030
+// sp-match: _RpDMorphGeometryDestroyDMorphTargets @ 0x0020FAE0
 RpGeometry *
 RpDMorphGeometryDestroyDMorphTargets( RpGeometry *geometry )
 {
@@ -1253,6 +1261,7 @@ RpDMorphGeometryGetDMorphTarget( const RpGeometry *geometry,
  * \see RpDMorphGeometryGetDMorphTarget
  */
 // match: _RpDMorphGeometryGetNumDMorphTargets @ 0x002F4D30
+// sp-match: _RpDMorphGeometryGetNumDMorphTargets @ 0x0020F7E0
 RwUInt32
 RpDMorphGeometryGetNumDMorphTargets( const RpGeometry *geometry )
 {

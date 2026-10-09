@@ -373,6 +373,7 @@ RwUInt32 dword_507BA4;
 // match: _unk_42FDF0 @ 0x0042FDF0
 
 // match: _sub_249490 @ 0x00249490
+// sp-match: _sub_249490 @ 0x0015D5D0
 
 static const rwaWaveFormatDesc *
 sub_249490(const RwaWaveFormat *format, RwBool from)
@@ -400,6 +401,7 @@ sub_249490(const RwaWaveFormat *format, RwBool from)
 /* Debug _RwaWaveConvFindPath, rwad.dll 0x100AABAD: separate cache counter,
  * validity local and recursive depth updates preserve the original lifetimes. */
 // match: _sub_2494F0 @ 0x002494F0
+// sp-match: _sub_2494F0 @ 0x0015D630
 RwUInt32
 sub_2494F0(const rwaWaveFormatDesc *from, RwUInt32 fromRate, const rwaWaveFormatDesc *to,
            RwUInt32 toRate, const rwaConverter **path, const rwaConverter **steps,
@@ -514,6 +516,7 @@ sub_2494F0(const rwaWaveFormatDesc *from, RwUInt32 fromRate, const rwaWaveFormat
 /* The size of srcSize bytes of format from converted to format to (through
  * a chain of converters), and the source bytes used in *used. */
 // match: _sub_2497A0 @ 0x002497A0
+// sp-match: _sub_2497A0 @ 0x0015D8E0
 RwUInt32
 sub_2497A0(const RwaWaveFormat *from, const void *src, const RwaWaveFormat *to,
            RwUInt32 srcSize, RwUInt32 *used)
@@ -574,6 +577,7 @@ sub_2497A0(const RwaWaveFormat *from, const void *src, const RwaWaveFormat *to,
 }
 
 // match: _sub_2498D0 @ 0x002498D0
+// sp-match: _sub_2498D0 @ 0x0015DA10
 RwUInt32
 sub_2498D0(const RwaWaveFormat *from, const void *src, RwUInt32 srcSize, const RwaWaveFormat *to)
 {
@@ -584,6 +588,7 @@ sub_2498D0(const RwaWaveFormat *from, const void *src, RwUInt32 srcSize, const R
 }
 
 // match: _sub_249900 @ 0x00249900
+// sp-match: _sub_249900 @ 0x0015DA40
 RwUInt32
 sub_249900(const RwaWaveFormat *from, const void *src, const RwaWaveFormat *to)
 {
@@ -591,6 +596,7 @@ sub_249900(const RwaWaveFormat *from, const void *src, const RwaWaveFormat *to)
 }
 
 // match: _sub_249920 @ 0x00249920
+// sp-match: _sub_249920 @ 0x0015DA60
 RwUInt32
 sub_249920(const RwaWaveFormat *from, const void *src, RwUInt32 srcSize,
            RwaWaveFormat *to, void *dest)
@@ -711,6 +717,7 @@ failed:
 }
 
 // match: _sub_249BF0 @ 0x00249BF0
+// sp-match: _sub_249BF0 @ 0x0015DD30
 static RwUInt32
 sub_249BF0(const RwaWaveFormat *from, const RwaWaveFormat *to)
 {
@@ -727,6 +734,7 @@ sub_249BF0(const RwaWaveFormat *from, const RwaWaveFormat *to)
 /* The converted size of srcSize bytes (whole samples, rounded to nearest). */
 
 // match: _sub_249C90 @ 0x00249C90
+// sp-match: _sub_249C90 @ 0x0015DDD0
 static RwUInt32
 sub_249C90(const RwaWaveFormat *from, RwUInt32 srcSize, const RwaWaveFormat *to)
 {
@@ -747,6 +755,7 @@ sub_249C90(const RwaWaveFormat *from, RwUInt32 srcSize, const RwaWaveFormat *to)
 
 /* Debug reference: rwad.dll _RwaWaveConvChannelPCM, core at 0x100AC076. */
 // match: _sub_249D00 @ 0x00249D00
+// sp-match: _sub_249D00 @ 0x0015DE40
 RwUInt32
 sub_249D00(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize,
            const RwaWaveFormat *to, RwUInt8 *dest, RwUInt32 *used)
@@ -820,6 +829,7 @@ extern RwUInt32 sub_249EF0(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt
 
 /* Debug reference: rwad.dll 0x100AC936 (_RwaWaveConvResamplePCM). */
 // match: _sub_249EF0 @ 0x00249EF0
+// sp-match: _sub_249EF0 @ 0x0015E030
 RwUInt32
 sub_249EF0(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize,
            const RwaWaveFormat *to, RwUInt8 *dest, RwUInt32 *used)
@@ -929,6 +939,7 @@ sub_249EF0(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize,
  * signed to unsigned and back at the same depth (unsigned when flags & 1);
  * the same format is copied. */
 // match: _sub_24A260 @ 0x0024A260
+// sp-match: _sub_24A260 @ 0x0015E3A0
 static RwUInt32
 sub_24A260(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize, const RwaWaveFormat *to,
            RwUInt8 *dest, RwUInt32 *used)
@@ -1144,6 +1155,7 @@ sub_24A260(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize, cons
 
 
 // match: _sub_24A660 @ 0x0024A660
+// sp-match: _sub_24A660 @ 0x0015E7A0
 RwUInt32
 sub_24A660(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize, const RwaWaveFormat *to,
            RwUInt8 *dest, RwUInt32 *used)
@@ -1200,6 +1212,7 @@ sub_24A660(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize, cons
 /* PCM conversion: the bit depth and signedness first (into a buffer when
  * the sample rate changes too), then the sample rate. */
 // match: _sub_24A740 @ 0x0024A740
+// sp-match: _sub_24A740 @ 0x0015E880
 RwUInt32
 sub_24A740(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize, const RwaWaveFormat *to,
            RwUInt8 *dest, RwUInt32 *used)
@@ -1269,6 +1282,7 @@ sub_24A740(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize, cons
  * data: the sample count, the nibble count, the 16 coefficients and the
  * two history samples; returns its size. */
 // match: _sub_24A880 @ 0x0024A880
+// sp-match: _sub_24A880 @ 0x0015E9C0
 static RwUInt32
 sub_24A880(RwaWaveFormat *format, const RwInt16 *history, RwUInt32 size, const RwaWaveFormat *from)
 {
@@ -1348,6 +1362,7 @@ sub_24A880(RwaWaveFormat *format, const RwInt16 *history, RwUInt32 size, const R
 /* _RwaWaveConvGCNADPCMEncode, rwad.dll 0x100AF723: staged residuals,
  * signed histories and the 32767.0f residual scale match the Xbox encoder. */
 // match: _sub_24AB90 @ 0x0024AB90
+// sp-match: _sub_24AB90 @ 0x0015ECD0
 static RwUInt32
 sub_24AB90(const RwInt16 *src, RwUInt32 srcSize, RwUInt8 *dest,
           RwInt8 channels, RwInt8 channel, RwUInt32 destSize)
@@ -1508,6 +1523,7 @@ sub_24AB90(const RwInt16 *src, RwUInt32 srcSize, RwUInt8 *dest,
 
 /* Debug reference: rwad.dll _RwaWaveConvGCNADPCMDecode at 0x100B007E. */
 // match: _sub_24B260 @ 0x0024B260
+// sp-match: _sub_24B260 @ 0x0015F3A0
 void
 sub_24B260(const RwaWaveFormat *format, const RwUInt8 *src, RwInt16 *dest)
 {
@@ -1599,6 +1615,7 @@ sub_24B260(const RwaWaveFormat *format, const RwUInt8 *src, RwInt16 *dest)
 
 
 // match: _sub_24B430 @ 0x0024B430
+// sp-match: _sub_24B430 @ 0x0015F570
 RwUInt32
 sub_24B430(const RwUInt8 *src, RwInt32 size, RwUInt8 *dest)
 {
@@ -1633,6 +1650,7 @@ sub_24B430(const RwUInt8 *src, RwInt32 size, RwUInt8 *dest)
 /* PCM to the big-endian ADPCM format: the header into the output format's
  * extra data, then the samples repacked. */
 // match: _sub_24B510 @ 0x0024B510
+// sp-match: _sub_24B510 @ 0x0015F650
 static void
 sub_24B510(const RwInt16 *src, RwUInt8 *dest, RwInt32 *history1,
           RwInt32 *history2, RwReal *error1, RwReal *error2)
@@ -1742,6 +1760,7 @@ sub_24B510(const RwInt16 *src, RwUInt8 *dest, RwInt32 *history1,
 }
 
 // match: _sub_24BB00 @ 0x0024BB00
+// sp-match: _sub_24BB00 @ 0x0015FC40
 static RwUInt32
 sub_24BB00(const RwInt16 *src, RwUInt32 srcSize, RwUInt8 *dest,
           RwInt8 channels, RwInt8 channel, RwInt32 destSize)
@@ -1781,6 +1800,7 @@ sub_24BB00(const RwInt16 *src, RwUInt32 srcSize, RwUInt8 *dest,
 
 /* Debug reference: rwad.dll _RwaWaveConvVAGDecode at 0x100B13BB. */
 // match: _sub_24BC50 @ 0x0024BC50
+// sp-match: _sub_24BC50 @ 0x0015FD90
 void
 sub_24BC50(const RwUInt8 *src, RwInt16 *dest, RwUInt32 blocks)
 {
@@ -1836,6 +1856,7 @@ sub_24BC50(const RwUInt8 *src, RwInt16 *dest, RwUInt32 blocks)
  * _rwaWaveConvXADPCMEncodeSample at 0x100B24BC: three locals, and
  * the final step shift inside each predictor expression. */
 // match: _sub_24BD30 @ 0x0024BD30
+// sp-match: _sub_24BD30 @ 0x0015FE70
 RwUInt8
 sub_24BD30(RwInt16 sample, RwInt32 *predicted, RwInt32 *index)
 {
@@ -1906,6 +1927,7 @@ sub_247130(const RwInt16 *src, RwUInt32 *dest, RwInt32 count)
 }
 
 // match: _sub_24BDE0 @ 0x0024BDE0
+// sp-match: _sub_24BDE0 @ 0x0015FF20
 void
 sub_24BDE0(RwUInt32 code, RwInt32 *predicted, RwInt32 *index)
 {
@@ -1942,6 +1964,7 @@ sub_24BDE0(RwUInt32 code, RwInt32 *predicted, RwInt32 *index)
 }
 
 // match: _sub_24BE60 @ 0x0024BE60
+// sp-match: _sub_24BE60 @ 0x0015FFA0
 RwUInt32
 sub_24BE60(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize, RwaWaveFormat *to,
            RwUInt8 *dest, RwUInt32 *used)
@@ -1973,6 +1996,7 @@ sub_24BE60(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize, RwaW
 }
 
 // match: _sub_24BEF0 @ 0x0024BEF0
+// sp-match: _sub_24BEF0 @ 0x00160030
 RwUInt32
 sub_24BEF0(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize,
           RwaWaveFormat *to, RwUInt8 *dest, RwUInt32 *used)
@@ -2085,6 +2109,7 @@ sub_24BEF0(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize,
 #undef RwaDspSwap32Macro
 
 // match: _sub_24C230 @ 0x0024C230
+// sp-match: _sub_24C230 @ 0x00160370
 RwUInt32
 sub_24C230(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize,
           const RwaWaveFormat *to, RwUInt8 *dest, RwUInt32 *used)
@@ -2185,6 +2210,7 @@ sub_24C230(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize,
 }
 
 // match: _sub_24C560 @ 0x0024C560
+// sp-match: _sub_24C560 @ 0x001606A0
 RwBool
 sub_24C560(const RwUInt32 *src, RwInt16 *dest, RwUInt32 blocks)
 {
@@ -2227,6 +2253,7 @@ sub_24C560(const RwUInt32 *src, RwInt16 *dest, RwUInt32 blocks)
 
 
 // match: _sub_24C620 @ 0x0024C620
+// sp-match: _sub_24C620 @ 0x00160760
 RwUInt32
 sub_24C620(const RwInt16 *src, RwUInt32 *dest, RwInt32 count)
 {
@@ -2287,6 +2314,7 @@ sub_24C620(const RwInt16 *src, RwUInt32 *dest, RwInt32 count)
 /* IMA ADPCM decode, stereo: per block, each channel's header (first
  * sample and step index), then eight pairs of nibble words. */
 // match: _sub_24C700 @ 0x0024C700
+// sp-match: _sub_24C700 @ 0x00160840
 RwBool
 sub_24C700(const RwUInt32 *src, RwInt16 *dest, RwUInt32 blocks)
 {
@@ -2340,6 +2368,7 @@ sub_24C700(const RwUInt32 *src, RwInt16 *dest, RwUInt32 blocks)
 /* The encoders by channel count (one channel at a time: stereo is not
  * encoded). */
 // match: _sub_24C840 @ 0x0024C840
+// sp-match: _sub_24C840 @ 0x00160980
 static RwUInt32
 sub_24C840(const RwInt16 *src, RwInt32 size, RwInt8 channels, void *unused, RwUInt32 *dest,
            RwUInt32 destSize)
@@ -2361,6 +2390,7 @@ sub_24C840(const RwInt16 *src, RwInt32 size, RwInt8 channels, void *unused, RwUI
 
 /* The decoders by channel count. */
 // match: _sub_24C880 @ 0x0024C880
+// sp-match: _sub_24C880 @ 0x001609C0
 static void
 sub_24C880(const RwaWaveFormat *format, const RwUInt32 *src, RwInt16 *dest)
 {
@@ -2381,6 +2411,7 @@ sub_24C880(const RwaWaveFormat *format, const RwUInt32 *src, RwInt16 *dest)
  * and merged back into the interleaved data through a buffer), or
  * decoded. */
 // match: _sub_24C8C0 @ 0x0024C8C0
+// sp-match: _sub_24C8C0 @ 0x00160A00
 RwUInt32
 sub_24C8C0(const RwaWaveFormat *from, const RwUInt8 *src, RwUInt32 srcSize, const RwaWaveFormat *to,
            RwUInt8 *dest, RwUInt32 *used)

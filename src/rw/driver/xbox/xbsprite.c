@@ -57,6 +57,7 @@ static RwRaster *RwXbCurrentRasterTarget = NULL;
 // match: ??_C@_0CG@KAKONOEN@Only?5the?5entire?5raster?5can?5be?5cl@ @ 0x004173A4
 
 // match: _XbRasterRenderQuad @ 0x002BA550
+// sp-match: _XbRasterRenderQuad @ 0x001D5960
 
 static void
 XbRasterRenderQuad(RwRaster *raster, RwRect *rect, RwBool scaled, RwBool alpha)
@@ -277,6 +278,7 @@ XbRasterRenderQuad(RwRaster *raster, RwRect *rect, RwBool scaled, RwBool alpha)
  On exit    : TRUE on success
  */
 // match: _XbRasterCopyQuad @ 0x002BAB60
+// sp-match: _XbRasterCopyQuad @ 0x001D5F70
 static RwBool
 XbRasterCopyQuad(RwRaster *raster, RwRect *rect)
 {
@@ -378,6 +380,7 @@ XbRasterCopyQuad(RwRaster *raster, RwRect *rect)
  On exit    : TRUE on success
  */
 // match: _XbRasterRenderGeneric @ 0x002BAC90
+// sp-match: _XbRasterRenderGeneric @ 0x001D60A0
 static RwBool
 XbRasterRenderGeneric(RwRaster *raster, RwRect *rect, RwBool scaled, RwBool alpha)
 {
@@ -444,6 +447,7 @@ XbRasterRenderGeneric(RwRaster *raster, RwRect *rect, RwBool scaled, RwBool alph
 }
 
 // match: __rwXbRasterRender @ 0x002BADD0
+// sp-match: __rwXbRasterRender @ 0x001D61E0
 RwBool
 _rwXbRasterRender(void *rasterIn, void *rectIn, RwInt32 flags __RWUNUSED__)
 {
@@ -451,6 +455,7 @@ _rwXbRasterRender(void *rasterIn, void *rectIn, RwInt32 flags __RWUNUSED__)
 }
 
 // match: __rwXbRasterRenderFast @ 0x002BADF0
+// sp-match: __rwXbRasterRenderFast @ 0x001D6200
 RwBool
 _rwXbRasterRenderFast(void *rasterIn, void *rectIn, RwInt32 flags __RWUNUSED__)
 {
@@ -458,6 +463,7 @@ _rwXbRasterRenderFast(void *rasterIn, void *rectIn, RwInt32 flags __RWUNUSED__)
 }
 
 // match: __rwXbRasterRenderScaled @ 0x002BAE10
+// sp-match: __rwXbRasterRenderScaled @ 0x001D6220
 RwBool
 _rwXbRasterRenderScaled(void *rasterIn, void *rectIn, RwInt32 flags __RWUNUSED__)
 {
@@ -473,6 +479,7 @@ _rwXbRasterRenderScaled(void *rasterIn, void *rectIn, RwInt32 flags __RWUNUSED__
  On exit    : TRUE on success
  */
 // match: __rwXbRasterClearGeneric @ 0x002BAE30
+// sp-match: __rwXbRasterClearGeneric @ 0x001D6240
 RwBool
 _rwXbRasterClearGeneric(RwRect *rect, RwInt32 packedColor)
 {
@@ -613,6 +620,7 @@ _rwXbRasterClearGeneric(RwRect *rect, RwInt32 packedColor)
 }
 
 // match: __rwXbRasterClearRect @ 0x002BB150
+// sp-match: __rwXbRasterClearRect @ 0x001D6560
 RwBool
 _rwXbRasterClearRect(void *unused1 __RWUNUSED__, void *rectIn, RwInt32 packedColor)
 {
@@ -620,6 +628,7 @@ _rwXbRasterClearRect(void *unused1 __RWUNUSED__, void *rectIn, RwInt32 packedCol
 }
 
 // match: __rwXbRasterClear @ 0x002BB170
+// sp-match: __rwXbRasterClear @ 0x001D6580
 RwBool
 _rwXbRasterClear(void *unused1 __RWUNUSED__, void *unused2 __RWUNUSED__, RwInt32 packedColor)
 {
@@ -634,6 +643,7 @@ _rwXbRasterClear(void *unused1 __RWUNUSED__, void *unused2 __RWUNUSED__, RwInt32
 }
 
 // match: __rwXbSetRasterContext @ 0x002BB1B0
+// sp-match: __rwXbSetRasterContext @ 0x001D65C0
 RwBool
 _rwXbSetRasterContext(void *unused1 __RWUNUSED__, void *rasIn, RwInt32 unused3 __RWUNUSED__)
 {

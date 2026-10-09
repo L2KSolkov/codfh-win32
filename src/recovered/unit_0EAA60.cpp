@@ -103,6 +103,9 @@ type_16C2A0 dword_4B92B0;
 // match: _$E2 @ 0x0030B520
 // match: _$E3 @ 0x0030E4B0
 // match: ?sub_EAA60@@YA_NXZ @ 0x000EAA60
+// sp-match: ?sub_EAA60@@YA_NXZ @ 0x000B4310
+// sp-match: _$E2 @ 0x0021D5A0
+// sp-match: _$E3 @ 0x0021E840
 
 bool sub_EAA60()
 {
@@ -123,6 +126,7 @@ bool sub_EAA60()
 }
 
 // match: ?sub_EAAE0@@YAXM@Z @ 0x000EAAE0
+// sp-match: ?sub_EAAE0@@YAXM@Z @ 0x000B4C20
 void sub_EAAE0(RwReal arg_0)
 {
     if (byte_4B92AC)
@@ -132,12 +136,14 @@ void sub_EAAE0(RwReal arg_0)
 }
 
 // match: ?sub_EAB00@@YAXXZ @ 0x000EAB00
+// sp-match: ?sub_EAB00@@YAXXZ @ 0x000B48B0
 void sub_EAB00()
 {
     sub_EB0D0();
 }
 
 // match: ?sub_EAB10@@YAXXZ @ 0x000EAB10
+// sp-match: ?sub_EAB10@@YAXXZ @ 0x000B48C0
 void sub_EAB10()
 {
     sub_EB190();
@@ -149,6 +155,7 @@ void sub_EAB10()
 }
 
 // match: ?sub_EAB80@@YAXPBDHM@Z @ 0x000EAB80
+// sp-match: ?sub_EAB80@@YAXPBDHM@Z @ 0x000B38F0
 void sub_EAB80(const RwChar *arg_0, RwInt32 arg_4, RwReal arg_8)
 {
     if (dword_4B9190)
@@ -171,7 +178,11 @@ void sub_EAB80(const RwChar *arg_0, RwInt32 arg_4, RwReal arg_8)
             dword_4B9190->sub_E7380(2, arg_0);
             break;
         case 6:
+#ifdef CODFH_SP // single player numbers this entry 0x52 (SP 0xB3950 push 0x52)
+            dword_4B9190->sub_E7380(0x52, arg_0);
+#else
             dword_4B9190->sub_E7380(0x81, arg_0);
+#endif
             break;
         case 7:
             dword_4B9190->sub_E7380(9, arg_0);
@@ -181,6 +192,7 @@ void sub_EAB80(const RwChar *arg_0, RwInt32 arg_4, RwReal arg_8)
 }
 
 // match: ?sub_EAC60@@YAXXZ @ 0x000EAC60
+// sp-match: ?sub_EAC60@@YAXXZ @ 0x000B3990
 void sub_EAC60()
 {
     dword_4E23A8 = 1;
@@ -191,7 +203,153 @@ void sub_EAC60()
     dword_4E23A8 = 0;
 }
 
+#ifdef CODFH_SP
+#include <stdlib.h>
+
+typedef struct Rt2dObject Rt2dObject;
+extern "C" RwChar *Rt2dObjectStringGetText(Rt2dObject *object);
+extern "C" Rt2dObject *Rt2dObjectStringSetText(Rt2dObject *object, const RwChar *text);
+
+// Single player only: the offset of the line after the one holding arg_4 in
+// the arg_8 bytes of arg_0, or 0 when it is the last.
+// sp-match: ?sp_sub_B39C0@@YAHPADHH@Z @ 0x000B39C0
+RwInt32 sp_sub_B39C0(RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8)
+{
+    for (; arg_4 < arg_8; arg_4++)
+    {
+        if (arg_0[arg_4] == '\n' && arg_4 < arg_8 - 1)
+        {
+            return arg_4 + 1;
+        }
+    }
+    return 0;
+}
+#endif
+
+#ifdef CODFH_SP
+// Single player only: localizes the arg_4 string objects arg_0 from the text
+// table arg_8 (a level path, sub_D7F20): after its header line, each line is
+// a key and a column per language (sub_19B0A0); an object whose text is a key
+// takes its column, and the first object reading "$builddate" a blank. false
+// when the file does not open. Its callers are single player's own (SP
+// 0xAD94B, 0xAFC75, 0xB2955).
+// sp-match: ?sp_sub_B39F0@@YA_NPAPAURt2dObject@@IPBD@Z @ 0x000B39F0
+bool sp_sub_B39F0(Rt2dObject **arg_0, RwUInt32 arg_4, const RwChar *arg_8)
+{
+    RwChar key[0x40];       // 0x40 bytes in the frame, 0x20 cleared per line
+    RwChar path[0x200];
+    RwChar value[0x400];
+    RwInt32 i;
+    RwInt32 j;
+    RwInt32 commas;
+    RwUInt32 k;
+    RwFileFunctions *fileFunctions;
+    void *fp;
+    RwInt32 size;
+    RwChar *buffer;
+    RwChar *line;
+    RwInt32 column;
+    RwInt32 offset;
+
+    switch (sub_19B0A0())
+    {
+    case 0:
+        column = 0;
+        break;
+    case 1:
+        column = 1;
+        break;
+    case 2:
+        column = 2;
+        break;
+    case 5:
+        column = 3;
+        break;
+    case 6:
+        column = 4;
+        break;
+    default:
+        column = 0;
+        break;
+    }
+    memset(path, 0, sizeof(path));
+    sub_D7F20(path, arg_8);
+    fileFunctions = RwOsGetFileInterface();
+    if (fileFunctions && fileFunctions->rwfopen)
+    {
+        fp = fileFunctions->rwfopen(path, "r");
+        if (fp)
+        {
+            size = sub_16D200(fp);
+            buffer = (RwChar *)calloc(size, 1);
+            fileFunctions->rwfread(buffer, 1, size, fp);
+            offset = sp_sub_B39C0(buffer, 0, size);
+            while (offset)
+            {
+                line = buffer + offset;
+                memset(value, 0, sizeof(value));
+                memset(key, 0, 0x20);
+                commas = 0;
+                for (i = 0; line[i] != ',' && line[i] != '\n' && i < size; i++)
+                {
+                    key[i] = line[i];
+                }
+                i++;
+                for (; commas < column; i++)
+                {
+                    if (line[i] == ',')
+                    {
+                        commas++;
+                    }
+                    else if (line[i] == '\n')
+                    {
+                        goto next;
+                    }
+                }
+                j = 0;
+                while (line[i] != ',' && line[i] != '\n')
+                {
+                    if (j >= 0x400)
+                    {
+                        line[0x3FF] = 0; // the line, not the value (SP 0xB3B93)
+                        break;
+                    }
+                    value[j++] = line[i++];
+                }
+                for (k = 0; k < arg_4; k++)
+                {
+                    const RwChar *text = Rt2dObjectStringGetText(arg_0[k]);
+
+                    if (!strcmp(text, key))
+                    {
+                        Rt2dObjectStringSetText(arg_0[k], value);
+                    }
+                }
+        next:
+                offset = sp_sub_B39C0(buffer, offset, size);
+            }
+            fileFunctions->rwfclose(fp);
+            free(buffer);
+            for (k = 0; k < arg_4; k++)
+            {
+                const RwChar *text = Rt2dObjectStringGetText(arg_0[k]);
+
+                if (!strcmp(text, "$builddate"))
+                {
+                    sprintf(key, " ");
+                    Rt2dObjectStringSetText(arg_0[k], key);
+                    break;
+                }
+            }
+            return true;
+        }
+    }
+    return false;
+}
+#endif
+
 // match: ?sub_EACA0@@YAXPBDHH@Z @ 0x000EACA0
+// sp-match: ?sub_EACA0@@YAXPBDHH@Z @ 0x000B43B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_EACA0(const RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
@@ -294,6 +452,7 @@ void dropped_3D8E9C()
 }
 
 // match: ?sub_EAF10@@YAXPAURwCamera@@@Z @ 0x000EAF10
+// sp-match: ?sub_EAF10@@YAXPAURwCamera@@@Z @ 0x000B45D0
 void sub_EAF10(RwCamera *arg_0)
 {
     if (!sub_17C630())
@@ -303,6 +462,7 @@ void sub_EAF10(RwCamera *arg_0)
 }
 
 // match: ?sub_EAF30@@YAXXZ @ 0x000EAF30
+// sp-match: ?sub_EAF30@@YAXXZ @ 0x000B45E0
 void sub_EAF30()
 {
     RwInt32 var_4;
@@ -337,6 +497,7 @@ void sub_EAF30()
 }
 
 // match: ?sub_EB030@@YAXXZ @ 0x000EB030
+// sp-match: ?sub_EB030@@YAXXZ @ 0x000B3CF0
 void sub_EB030()
 {
     dword_4B9298 = 0;
@@ -351,6 +512,7 @@ void sub_EB030()
 }
 
 // match: ?sub_EB0A0@@YAXPAUtype_EB0A0@@@Z @ 0x000EB0A0
+// sp-match: ?sub_EB0A0@@YAXPAUtype_EB0A0@@@Z @ 0x000B3D30
 void sub_EB0A0(type_EB0A0 *arg_0)
 {
     arg_0->unk_0E[0] = 0;
@@ -360,6 +522,7 @@ void sub_EB0A0(type_EB0A0 *arg_0)
 }
 
 // match: ?sub_EB0D0@@YAXXZ @ 0x000EB0D0
+// sp-match: ?sub_EB0D0@@YAXXZ @ 0x000B4710
 void sub_EB0D0()
 {
     RwInt32 var_4;
@@ -383,6 +546,7 @@ void sub_EB0D0()
 }
 
 // match: ?sub_EB190@@YAXXZ @ 0x000EB190
+// sp-match: ?sub_EB190@@YAXXZ @ 0x000B4780
 void sub_EB190()
 {
     RwInt32 var_4;
@@ -419,6 +583,7 @@ void sub_EB190()
 }
 
 // match: ?sub_EB2D0@@YAXM@Z @ 0x000EB2D0
+// sp-match: ?sub_EB2D0@@YAXM@Z @ 0x000B48F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_EB2D0(RwReal arg_0)
 {
@@ -427,10 +592,12 @@ void sub_EB2D0(RwReal arg_0)
     RwInt32 bp_8;
     RwInt32 bp_4;
 
+#ifndef CODFH_SP // single player has no Live check (SP 0xB48F0 starts with the update)
     if (sub_1FF250() && sub_1FF250()->sub_200740())
     {
         return;
     }
+#endif
     unk_4B9264 = unk_4B8EF4;
     dword_4B9238 = flt_4B8F08 * 1000.0f;
     dword_4B929C += arg_0 * flt_3D8E8C;
@@ -522,6 +689,7 @@ void sub_EB2D0(RwReal arg_0)
 }
 
 // match: ?sub_EB770@@YAXPAURwCamera@@@Z @ 0x000EB770
+// sp-match: ?sub_EB770@@YAXPAURwCamera@@@Z @ 0x000B3D50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_EB770(RwCamera *arg_0)
 {
@@ -536,6 +704,7 @@ void sub_EB770(RwCamera *arg_0)
     RwReal bp_8;
     void *bp_4;
 
+#ifndef CODFH_SP // single player has neither the Live check nor the dword_42926C test (SP 0xB3D50)
     if (sub_1FF250() && sub_1FF250()->sub_200740())
     {
         return;
@@ -544,6 +713,7 @@ void sub_EB770(RwCamera *arg_0)
     {
         return;
     }
+#endif
     if (byte_4B92AC)
     {
         if (!dword_4B9228)
@@ -564,11 +734,17 @@ void sub_EB770(RwCamera *arg_0)
         Rt2dCTMPush();
         Rt2dCTMSetIdentity();
         Rt2dCTMScale(1.0f / (RwReal)(RwUInt32)Height * dword_4B8970, 1.0f / (RwReal)(RwUInt32)Height);
+#ifdef CODFH_SP // single player keeps the aspect-corrected start, not the plain one (SP 0xB3E12)
+        unk_4B9230.x = (RwReal)(RwUInt32)Height * unk_4B9264.x / (RwReal)(RwUInt32)Width * bp_8;
+        unk_4B9230.y = unk_4B9264.y;
+        unk_4B9230.x = unk_4B9230.x * dword_4B8970;
+#else
         unk_4B9230.x = (RwReal)(RwUInt32)Height * unk_4B9264.x / (RwReal)(RwUInt32)Width * bp_8;
         unk_4B9230.y = unk_4B9264.y;
         unk_4B9230.x = unk_4B9264.x * bp_8;
         unk_4B9230.y = unk_4B9264.y;
         unk_4B9230.x = unk_4B9230.x * dword_4B8970;
+#endif
         for (lv_10 = 0; lv_10 < 8; lv_10++)
         {
             if (dword_4B926C[lv_10])
@@ -595,8 +771,13 @@ void sub_EB770(RwCamera *arg_0)
                     l19 = frm_24[l18];
                     frm_24[l18] = 0;
                     dword_4B9228->sub_DAB00(frm_24 + loc20, &unk_4B9230, dword_4B926C[lv_10]->unk_08, 0.0f, 0);
+#ifdef CODFH_SP // single player keeps the aspect-corrected start, not the plain one (SP 0xB3F2E)
+                    unk_4B9230.x = (RwReal)(RwUInt32)Height * unk_4B9264.x / (RwReal)(RwUInt32)Width * bp_8;
+                    unk_4B9230.x = unk_4B9230.x * dword_4B8970;
+#else
                     unk_4B9230.x = (RwReal)(RwUInt32)Height * unk_4B9264.x / (RwReal)(RwUInt32)Width * bp_8;
                     unk_4B9230.x = (unk_4B9230.x = unk_4B9264.x * bp_8) * dword_4B8970;
+#endif
                     unk_4B9230.y -= dword_4B9228->sub_DA790();
                     frm_24[l18] = l19;
                     loc20 = l18;
@@ -615,6 +796,7 @@ void sub_EB770(RwCamera *arg_0)
 }
 
 // match: ?sub_EBAE0@@YAXPAURwCamera@@PBDPAURwV2d@@PAUtype_DA580@@MMM@Z @ 0x000EBAE0
+// sp-match: ?sub_EBAE0@@YAXPAURwCamera@@PBDPAURwV2d@@PAUtype_DA580@@MMM@Z @ 0x000B3FF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_EBAE0(RwCamera *arg_0, const RwChar *arg_4, RwV2d *arg_8, type_DA580 *arg_C, RwReal arg_10,
                RwReal arg_14, RwReal arg_18)
@@ -671,6 +853,7 @@ void sub_EBAE0(RwCamera *arg_0, const RwChar *arg_4, RwV2d *arg_8, type_DA580 *a
 }
 
 // match: ?sub_EBCD0@@YA_NPAUtype_EB0A0@@@Z @ 0x000EBCD0
+// sp-match: ?sub_EBCD0@@YA_NPAUtype_EB0A0@@@Z @ 0x000B41D0
 bool sub_EBCD0(type_EB0A0 *arg_0)
 {
     if (dword_4B92A8 != 8)
@@ -683,6 +866,7 @@ bool sub_EBCD0(type_EB0A0 *arg_0)
 }
 
 // match: ?sub_EBD20@@YAXH@Z @ 0x000EBD20
+// sp-match: ?sub_EBD20@@YAXH@Z @ 0x000B4830
 void sub_EBD20(RwInt32 arg_0)
 {
     if (dword_4B92A8 > 0)
@@ -703,6 +887,7 @@ void sub_EBD20(RwInt32 arg_0)
 }
 
 // match: ?sub_EBDB0@@YAXPAUtype_EB0A0@@@Z @ 0x000EBDB0
+// sp-match: ?sub_EBDB0@@YAXPAUtype_EB0A0@@@Z @ 0x000B4210
 void sub_EBDB0(type_EB0A0 *arg_0)
 {
     arg_0->unk_0C = false;
@@ -724,12 +909,14 @@ void sub_EBDB0(type_EB0A0 *arg_0)
 }
 
 // match: ?sub_EBE20@@YAXPAUtype_EB0A0@@@Z @ 0x000EBE20
+// sp-match: ?sub_EBE20@@YAXPAUtype_EB0A0@@@Z @ 0x000B4260
 void sub_EBE20(type_EB0A0 *arg_0)
 {
     sub_EB0A0(arg_0);
 }
 
 // match: ?sub_EBE40@@YAXH@Z @ 0x000EBE40
+// sp-match: ?sub_EBE40@@YAXH@Z @ 0x000B4270
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_EBE40(RwInt32 arg_0)
 {

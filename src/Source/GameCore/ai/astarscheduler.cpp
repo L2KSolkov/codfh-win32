@@ -60,6 +60,7 @@ void sub_32F50();
 // match: ?off_4275F4@@3PAPBDA @ 0x004275F4
 
 // match: sub_32E50 @ 0x00032E50
+// sp-match: sub_32E50 @ 0x000281E0
 
 void sub_32E50()
 {
@@ -71,6 +72,7 @@ void sub_32E50()
 }
 
 // match: sub_32EB0 @ 0x00032EB0
+// sp-match: sub_32EB0 @ 0x00028240
 void sub_32EB0()
 {
     RwInt32 var_4;
@@ -85,6 +87,7 @@ void sub_32EB0()
 }
 
 // match: sub_32F00 @ 0x00032F00
+// sp-match: sub_32F00 @ 0x00028260
 void sub_32F00()
 {
     RwInt32 var_4;
@@ -101,10 +104,13 @@ void sub_32F00()
 // match: sub_32F50 @ 0x00032F50
 void sub_32F50()
 {
+#ifndef CODFH_SP
     sub_19A750("Somebody forgot to unregister in the AStar Scheduler!");
+#endif
 }
 
 // match: sub_32F70 @ 0x00032F70
+// sp-match: sub_32F70 @ 0x00027D60
 RwInt32 sub_32F70(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 {
     RwInt32 l10;
@@ -136,6 +142,7 @@ RwInt32 sub_32F70(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 }
 
 // match: sub_330E0 @ 0x000330E0
+// sp-match: sub_330E0 @ 0x00027E90
 void sub_330E0(type_67620 *arg_0, RwInt32 arg_4)
 {
     type_3D3548 *l20C;
@@ -154,6 +161,7 @@ void sub_330E0(type_67620 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_33190 @ 0x00033190
+// sp-match: sub_33190 @ 0x00028280
 void sub_33190(RwInt32 arg_0)
 {
     dword_438DD8 = 1;
@@ -166,6 +174,7 @@ void sub_33190(RwInt32 arg_0)
 }
 
 // match: sub_331F0 @ 0x000331F0
+// sp-match: sub_331F0 @ 0x00027F40
 void sub_331F0(RwReal arg_0)
 {
     RwInt32 var_4;
@@ -195,6 +204,7 @@ void sub_331F0(RwReal arg_0)
 }
 
 // match: sub_332D0 @ 0x000332D0
+// sp-match: sub_332D0 @ 0x00028010
 RwInt32 sub_332D0(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 {
     RwInt32 local_28;
@@ -218,8 +228,12 @@ RwInt32 sub_332D0(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
     if (sub_F6200(arg_C) != 0)
         return 1;
     if (local_C != 0 && lv_8 != 0) {
+#ifdef CODFH_SP // shape: the bits copied as an integer (SP 0x28010 keeps the copy in ebx and pushes it)
+        *(RwInt32 *)&local_20 = *(RwInt32 *)&arg_8;
+#else
         var_1C = &local_20;
         *var_1C = arg_8;
+#endif
         local_24 = arg_C;
         switch (var_4) {
         case 10:
@@ -262,14 +276,27 @@ RwInt32 sub_332D0(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 }
 
 // match: sub_334D0 @ 0x000334D0
+// sp-match: sub_334D0 @ 0x00028180
 RwInt32 sub_334D0(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 {
+#ifdef CODFH_SP
+    // shape: each path has its own return 1 (SP 0x281A4, 0x281AB)
+    if (dword_438DD8 != 0) {
+        if (sub_F6200(arg_C) != 0) {
+            sub_F6270(arg_C);
+            return 1;
+        }
+        return 1;
+    }
+#else
     if (dword_438DD8 != 0 && sub_F6200(arg_C) != 0)
         sub_F6270(arg_C);
+#endif
     return 1;
 }
 
 // match: sub_33500 @ 0x00033500
+// sp-match: sub_33500 @ 0x000281C0
 RwInt32 sub_33500(type_67620 *arg_0, RwInt32 arg_4, RwReal arg_8, RwInt32 arg_C)
 {
     return dword_438DE0 != arg_C;

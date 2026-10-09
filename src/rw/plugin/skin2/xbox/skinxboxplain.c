@@ -24,6 +24,7 @@ static const char rcsid[] = "@@@@(#)$Id: //RenderWare/RW36Active/rwsdk/plugin/sk
 // match: _rcsid @ 0x00418F30
 
 // match: __rpSkinXboxPlainMaterialSetUp @ 0x002D4020
+// sp-match: __rpSkinXboxPlainMaterialSetUp @ 0x001EE970
 RwInt32
 _rpSkinXboxPlainMaterialSetUp(const RpAtomic *atomic __RWUNUSED__,
                               const RxXboxInstanceData *mesh __RWUNUSED__,
@@ -57,6 +58,7 @@ _rpSkinXboxPlainMaterialSetUp(const RpAtomic *atomic __RWUNUSED__,
 }
 
 // match: _rpSkinXboxRenderCallback @ 0x002D4220
+// sp-match: _rpSkinXboxRenderCallback @ 0x001EEB70
 void
 rpSkinXboxRenderCallback(RxXboxResEntryHeader *resEntryHeader,
                           RxXboxInstanceData *mesh,
@@ -97,6 +99,7 @@ rpSkinXboxRenderCallback(RxXboxResEntryHeader *resEntryHeader,
 }
 
 // match: __rpSkinXboxCreatePlainPipe @ 0x002D42A0
+// sp-match: __rpSkinXboxCreatePlainPipe @ 0x001EEBF0
 RxPipeline *
 _rpSkinXboxCreatePlainPipe(void)
 {
@@ -125,6 +128,7 @@ _rpSkinXboxCreatePlainPipe(void)
 }
 
 // match: __rpSkinXboxDestroyPlainPipe @ 0x002D42F0
+// sp-match: __rpSkinXboxDestroyPlainPipe @ 0x001EEC40
 void
 _rpSkinXboxDestroyPlainPipe(void)
 {

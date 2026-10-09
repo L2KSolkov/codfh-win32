@@ -218,6 +218,7 @@ RwImageFormatSetFreeListCreateParams(RwInt32 blockSize, RwInt32 numBlocksToPreal
 // match: __rwImageFormatFreeListPreallocBlocks @ 0x0043563C
 
 // match: __rwImageOpen @ 0x002B1FE0
+// sp-match: __rwImageOpen @ 0x001CD400
 
 void               *
 _rwImageOpen(void *instance, RwInt32 offset, RwInt32 __RWUNUSED__ size)
@@ -303,6 +304,7 @@ _rwImageOpen(void *instance, RwInt32 offset, RwInt32 __RWUNUSED__ size)
  */
 
 // match: __rwImageClose @ 0x002B1390
+// sp-match: __rwImageClose @ 0x001CC7B0
 void               *
 _rwImageClose(void *instance,
               RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size )
@@ -364,6 +366,7 @@ _rwImageClose(void *instance,
  */
 
 // match: _ImageGetScratchMem @ 0x002B1470
+// sp-match: _ImageGetScratchMem @ 0x001CC890
 static RwUInt8     *
 ImageGetScratchMem(RwInt32 size)
 {
@@ -413,6 +416,7 @@ ImageGetScratchMem(RwInt32 size)
  On exit    :
  */
 // match: __rwImageGammaUnCorrectArrayOfRGBA @ 0x002B1500
+// sp-match: __rwImageGammaUnCorrectArrayOfRGBA @ 0x001CC920
 void
 _rwImageGammaUnCorrectArrayOfRGBA(RwRGBA * rgbaOut,
                                   RwRGBA * rgbaIn, RwInt32 numEls)
@@ -508,6 +512,7 @@ _rwImageGammaCorrectArrayOfRGBA(RwRGBA * rgbaOut,
  *
  */
 // match: _RwImageCreate @ 0x002B1560
+// sp-match: _RwImageCreate @ 0x001CC980
 RwImage            *
 RwImageCreate(RwInt32 width, RwInt32 height, RwInt32 depth)
 {
@@ -554,6 +559,7 @@ RwImageCreate(RwInt32 width, RwInt32 height, RwInt32 depth)
  *
  */
 // match: _RwImageDestroy @ 0x002B2190
+// sp-match: _RwImageDestroy @ 0x001CD5B0
 RwBool
 RwImageDestroy(RwImage * image)
 {
@@ -925,6 +931,7 @@ RwImageGetPalette(const RwImage *image)
  *
  */
 // match: _RwImageAllocatePixels @ 0x002B15C0
+// sp-match: _RwImageAllocatePixels @ 0x001CC9E0
 RwImage            *
 RwImageAllocatePixels(RwImage * image)
 {
@@ -996,6 +1003,7 @@ RwImageAllocatePixels(RwImage * image)
  *
  */
 // match: _RwImageFreePixels @ 0x002B1680
+// sp-match: _RwImageFreePixels @ 0x001CCAA0
 RwImage            *
 RwImageFreePixels(RwImage * image)
 {
@@ -1148,6 +1156,7 @@ RwImageResize(RwImage * image, RwInt32 width, RwInt32 height)
  *
  */
 // match: _RwImageMakeMask @ 0x002B16B0
+// sp-match: _RwImageMakeMask @ 0x001CCAD0
 RwImage            *
 RwImageMakeMask(RwImage * image)
 {
@@ -1251,6 +1260,7 @@ RwImageMakeMask(RwImage * image)
  *
  */
 // match: _RwImageApplyMask @ 0x002B21E0
+// sp-match: _RwImageApplyMask @ 0x001CD600
 RwImage            *
 RwImageApplyMask(RwImage * image, const RwImage * mask)
 {
@@ -1428,6 +1438,7 @@ RwImageApplyMask(RwImage * image, const RwImage * mask)
  *
  */
 // match: _RwImageSetPath @ 0x002B1770
+// sp-match: _RwImageSetPath @ 0x001CCB90
 const RwChar       *
 RwImageSetPath(const RwChar * path)
 {
@@ -1490,6 +1501,7 @@ RwImageSetPath(const RwChar * path)
  *
  */
 // match: _RwImageGetPath @ 0x002B1810
+// sp-match: _RwImageGetPath @ 0x001CCC30
 RwChar             *
 RwImageGetPath(void)
 {
@@ -1535,6 +1547,7 @@ _rwImageSwapPath(RwChar **path, RwInt32 *size)
  */
 
 // match: _ImagePathForAllFullNames @ 0x002B1820
+// sp-match: _ImagePathForAllFullNames @ 0x001CCC40
 static const RwChar *
 ImagePathForAllFullNames(const RwChar * filename, RwInt32 extraBytes,
                          rwPathCallBack callBack, void *data)
@@ -1638,6 +1651,7 @@ ImagePathForAllFullNames(const RwChar * filename, RwInt32 extraBytes,
  */
 
 // match: _ImageAttempRead @ 0x002B1950
+// sp-match: _ImageAttempRead @ 0x001CCD70
 static RwChar      *
 ImageAttempRead(RwChar * pathname, void *data)
 {
@@ -1692,6 +1706,7 @@ ImageAttempRead(RwChar * pathname, void *data)
  *
  */
 // match: _RwImageRead @ 0x002B1980
+// sp-match: _RwImageRead @ 0x001CCDA0
 RwImage            *
 RwImageRead(const RwChar * imageName)
 {
@@ -1772,6 +1787,7 @@ RwImageRead(const RwChar * imageName)
  */
 
 // match: _ImageDetermineExtender @ 0x002B1A50
+// sp-match: _ImageDetermineExtender @ 0x001CCE70
 static RwChar      *
 ImageDetermineExtender(RwChar * pathname, void *data)
 {
@@ -1842,6 +1858,7 @@ ImageDetermineExtender(RwChar * pathname, void *data)
  *
  */
 // match: _RwImageFindFileType @ 0x002B1AD0
+// sp-match: _RwImageFindFileType @ 0x001CCEF0
 const RwChar       *
 RwImageFindFileType(const RwChar * imageName)
 {
@@ -2123,6 +2140,7 @@ RwImageWrite(RwImage * image, const RwChar * imageName)
  *
  */
 // match: _RwImageReadMaskedImage @ 0x002B23A0
+// sp-match: _RwImageReadMaskedImage @ 0x001CD7C0
 RwImage            *
 RwImageReadMaskedImage(const RwChar * imageName,
                        const RwChar * maskName)
@@ -2267,6 +2285,7 @@ RwRGBASetFromPixel(RwRGBA * rgbOut, RwUInt32 pixelValue,
  */
 
 // match: _ImageStraightCopy @ 0x002B1B00
+// sp-match: _ImageStraightCopy @ 0x001CCF20
 static              RwBool
 ImageStraightCopy(RwImage * ipDestin, const RwImage * ipSource)
 {
@@ -2312,6 +2331,7 @@ ImageStraightCopy(RwImage * ipDestin, const RwImage * ipSource)
     (((srcDepth) << 8) | (destDepth))
 
 // match: _ImageConvertDepth @ 0x002B1BB0
+// sp-match: _ImageConvertDepth @ 0x001CCFD0
 static              RwBool
 ImageConvertDepth(RwImage * ipDestin, const RwImage * ipSource)
 {
@@ -2427,6 +2447,7 @@ ImageConvertDepth(RwImage * ipDestin, const RwImage * ipSource)
  *
  */
 // match: _RwImageCopy @ 0x002B1CD0
+// sp-match: _RwImageCopy @ 0x001CD0F0
 RwImage            *
 RwImageCopy(RwImage * destImage, const RwImage * sourceImage)
 {
@@ -2649,6 +2670,7 @@ RwImageStreamGetSize(const RwImage * image)
  *
  */
 // match: _RwImageStreamRead @ 0x002B1D20
+// sp-match: _RwImageStreamRead @ 0x001CD140
 RwImage            *
 RwImageStreamRead(RwStream * stream)
 {
@@ -2818,6 +2840,7 @@ RwRGBAGammaCorrect(RwRGBA * rgb)
  *
  */
 // match: _RwImageGammaCorrect @ 0x002B1E20
+// sp-match: _RwImageGammaCorrect @ 0x001CD240
 RwImage            *
 RwImageGammaCorrect(RwImage * image)
 {
@@ -2923,6 +2946,7 @@ RwImageGetGamma(void)
  *
  */
 // match: _RwImageSetGamma @ 0x002B1F30
+// sp-match: _RwImageSetGamma @ 0x001CD350
 RwBool
 RwImageSetGamma(RwReal gammaValue)
 {

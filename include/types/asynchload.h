@@ -16,6 +16,17 @@
 #include "rw/bamemory.h"
 #include "types/soundbank.h"
 
+#ifdef CODFH_SP
+// SP 0x692D0 reads the existing kernel import pointer at 0x2DB148 as data,
+// so its compiler barriers also order that read before publishing ready.
+typedef void (__stdcall *sp_queue_initialize_function)(RTL_CRITICAL_SECTION *);
+extern "C" sp_queue_initialize_function sp_RtlInitializeCriticalSection_import;
+extern "C" void _ReadWriteBarrier();
+#pragma intrinsic(_ReadWriteBarrier)
+extern "C" void _WriteBarrier();
+#pragma intrinsic(_WriteBarrier)
+#endif
+
 // A load request (0x4C bytes): what to load (its file name), its kind (the
 // loading thread's names for them: 0 "eSection", 1 "eLoadSoundBank", 2
 // "eAnimGroup", 3 "eClumpBank", any other "None"), its section or bank, and

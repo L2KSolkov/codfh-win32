@@ -19,6 +19,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/plugin/skin
 // match: _rcsid @ 0x00418518
 
 // match: __rpSkinPipelinesCreate @ 0x002D1800
+// sp-match: __rpSkinPipelinesCreate @ 0x001EC150
 RwBool
 _rpSkinPipelinesCreate(RwUInt32 pipes)
 {
@@ -36,6 +37,7 @@ _rpSkinPipelinesCreate(RwUInt32 pipes)
 }
 
 // match: __rpSkinPipelinesDestroy @ 0x002D1820
+// sp-match: __rpSkinPipelinesDestroy @ 0x001EC170
 RwBool
 _rpSkinPipelinesDestroy(void)
 {
@@ -45,6 +47,7 @@ _rpSkinPipelinesDestroy(void)
 }
 
 // match: __rpSkinPipelinesAttach @ 0x002D1830
+// sp-match: __rpSkinPipelinesAttach @ 0x001EC180
 RpAtomic *
 _rpSkinPipelinesAttach(RpAtomic *atomic, RpSkinType type __RWUNUSED__)
 {

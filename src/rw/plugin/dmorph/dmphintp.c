@@ -42,6 +42,7 @@ RwInt32 rpDMorphAtomicDataOffset   = 0;
 // match: _rcsid @ 0x00419FD8
 
 // match: _DMorphAtomicLinearBuild @ 0x002F42E0
+// sp-match: _DMorphAtomicLinearBuild @ 0x0020ED90
 static RpAtomic *
 DMorphAtomicLinearBuild(RpAtomic *atomic)
 {
@@ -244,6 +245,7 @@ DMorphAtomicLinearBuild(RpAtomic *atomic)
 /*--- DMorphAtomicCreateDMorphValues ------------------------------------
  */
 // match: _DMorphAtomicCreateDMorphValues @ 0x002F47D0
+// sp-match: _DMorphAtomicCreateDMorphValues @ 0x0020F280
 static RpAtomic *
 DMorphAtomicCreateDMorphValues(RpAtomic *atomic)
 {
@@ -313,6 +315,7 @@ DMorphAtomicCreateInterpolator(RpAtomic *atomic)
 /*--- DMorphAtomicCtor -----------------------------------------------------
  */
 // match: _DMorphAtomicCtor @ 0x002F4850
+// sp-match: _DMorphAtomicCtor @ 0x0020F300
 static void *
 DMorphAtomicCtor(void *object,
                  RwInt32 offset __RWUNUSED__,
@@ -338,6 +341,7 @@ DMorphAtomicCtor(void *object,
 /*--- DMorphAtomicDtor -----------------------------------------------------
  */
 // match: _DMorphAtomicDtor @ 0x002F4870
+// sp-match: _DMorphAtomicDtor @ 0x0020F320
 static void *
 DMorphAtomicDtor(void *object,
                  RwInt32 offset __RWUNUSED__,
@@ -375,6 +379,7 @@ DMorphAtomicDtor(void *object,
 /*--- DMorphAtomicCopy -----------------------------------------------------
  */
 // match: _DMorphAtomicCopy @ 0x002F48C0
+// sp-match: _DMorphAtomicCopy @ 0x0020F370
 static void *
 DMorphAtomicCopy(void *dstObject,
                  const void *srcObject,
@@ -435,6 +440,7 @@ DMorphAtomicCopy(void *dstObject,
 /*--- DMorphAtomicAlways ---------------------------------------------------
  */
 // match: _DMorphAtomicAlways @ 0x002F4950
+// sp-match: _DMorphAtomicAlways @ 0x0020F400
 static RwBool
 DMorphAtomicAlways( void *object,
                     RwInt32 offset __RWUNUSED__,
@@ -468,6 +474,7 @@ DMorphAtomicAlways( void *object,
 /*--- DMorphAtomicRights ---------------------------------------------------
  */
 // match: _DMorphAtomicRights @ 0x002F4980
+// sp-match: _DMorphAtomicRights @ 0x0020F430
 static RwBool
 DMorphAtomicRights(void *object,
                    RwInt32 offset __RWUNUSED__,
@@ -497,6 +504,7 @@ DMorphAtomicRights(void *object,
 /*--- _rpDMorphAtomicPluginAttach -------------------------------------------
  */
 // match: __rpDMorphAtomicPluginAttach @ 0x002F49B0
+// sp-match: __rpDMorphAtomicPluginAttach @ 0x0020F460
 RwBool
 _rpDMorphAtomicPluginAttach(void)
 {

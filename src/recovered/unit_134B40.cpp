@@ -4,6 +4,11 @@
 // its own constants (the frame time, three axes, two offset tables, 0.0) before its
 // vtable (PLAN M7).
 
+#ifdef CODFH_SP // shape: AIData declared first (before the RenderWare headers): only then does
+                // type_3DAFC8::vf_1CC (SP 0xE6A40) load [esp+0x48] before [esp+0x38] after
+                // RwFrameUpdateObjects as the image does
+#include "types/AIData.h"
+#endif
 #include <math.h>
 #include "rw/ostypes.h"
 #include "rw/bavector.h"
@@ -132,10 +137,54 @@
 // match: __real@3ea8f5c3 @ 0x003DB3A8
 // match: __real@3f2b851f @ 0x003DB3AC
 // match: __real@41300000 @ 0x003DB3B0
+// sp-match: ?vf_0A4@type_3DAFC8@@UAEXH@Z @ 0x000EBE10
+// sp-match: ?vf_0A8@type_3DAFC8@@UAEHXZ @ 0x000EBE20
+// sp-match: ?vf_0F0@type_3DAFC8@@UAEPACXZ @ 0x000EBEA0
+// sp-match: ?vf_1AC@type_3DAFC8@@UAEXH@Z @ 0x000EBEB0
+// sp-match: ?vf_138@type_3DAFC8@@UAEHXZ @ 0x000EBF10
+// sp-match: ?vf_174@type_3DAFC8@@UAEHXZ @ 0x000EBF20
+// sp-match: ?vf_178@type_3DAFC8@@UAEXH@Z @ 0x000EBF30
+// sp-match: ?vf_180@type_3DAFC8@@UAEXH@Z @ 0x000EBF40
+// sp-match: ?vf_254@type_3DAFC8@@UAEHXZ @ 0x000EBF70
+// sp-match: ?vf_258@type_3DAFC8@@UAEHXZ @ 0x000EBF90
+// sp-match: ?vf_25C@type_3DAFC8@@UAEXH@Z @ 0x000EBFA0
+// sp-match: ?vf_118@type_3DAFC8@@UAEPAUtype_3D3548@@XZ @ 0x000EBFB0
+// sp-match: ?vf_11C@type_3DAFC8@@UAEXPAUtype_3D3548@@@Z @ 0x000EBFC0
+// sp-match: ?vf_120@type_3DAFC8@@UAEPAUAIData@@XZ @ 0x000EBFD0
+// sp-match: ?vf_17C@type_3DAFC8@@UAEMXZ @ 0x000EBFE0
+// sp-match: ?vf_260@type_3DAFC8@@UAEXM@Z @ 0x000EBFF0
+// sp-match: ?vf_13C@type_3DAFC8@@UAEHXZ @ 0x000EC090
+// sp-match: ?vf_140@type_3DAFC8@@UAEXXZ @ 0x000EC0A0
+// sp-match: ?vf_1C8@type_3DAFC8@@UAEPAUtype_3DAFC8_1DDC@@XZ @ 0x000EC110
+// sp-match: ??_Gtype_3DAFC8@@UAEPAXI@Z @ 0x000EC120
+// sp-match: ??0type_3DAFC8@@QAE@PAVSoldierTrigger@@@Z @ 0x000EBD40
+// sp-match: ?vf_094@type_3DAFC8@@UAEXI@Z @ 0x000EBE00
+// sp-match: ?vf_088@type_3DAFC8@@UAEXH@Z @ 0x000EBE30
+// sp-match: ?vf_09C@type_3DAFC8@@UAEHXZ @ 0x000EBE40
+// sp-match: ?vf_0A0@type_3DAFC8@@UAEXI@Z @ 0x000EBE50
+// sp-match: ?vf_0AC@type_3DAFC8@@UAEHXZ @ 0x000EBE60
+// sp-match: ?vf_0B4@type_3DAFC8@@UAEXXZ @ 0x000EBE70
+// sp-match: ?vf_0B8@type_3DAFC8@@UAEXH@Z @ 0x000EBE80
+// sp-match: ?vf_0E0@type_3DAFC8@@UAEPAEXZ @ 0x000EBE90
+// sp-match: ?vf_234@type_3DAFC8@@UAEMXZ @ 0x000EBED0
+// sp-match: ?vf_23C@type_3DAFC8@@UAEHXZ @ 0x000EBEF0
+// sp-match: ??1type_3DAFC8@@UAE@XZ @ 0x000EC140
+// sp-match: ?vf_238@type_3DAFC8@@UAEXM@Z @ 0x000EBEE0
+// sp-match: ?vf_240@type_3DAFC8@@UAEXH@Z @ 0x000EBF00
+// sp-match: ?vf_1F4@type_3DAFC8@@UAEMXZ @ 0x000EC100
+// sp-match: ?vf_144@type_3DAFC8@@UAEMXZ @ 0x000EC010
+// sp-match: ?vf_148@type_3DAFC8@@UAEMXZ @ 0x000EC020
+// sp-match: ?vf_14C@type_3DAFC8@@UAEMXZ @ 0x000EC030
+// sp-match: ?vf_150@type_3DAFC8@@UAEMXZ @ 0x000EC040
+// sp-match: ?vf_154@type_3DAFC8@@UAEMXZ @ 0x000EC050
+// sp-match: ?vf_158@type_3DAFC8@@UAEMXZ @ 0x000EC060
+// sp-match: ?vf_15C@type_3DAFC8@@UAEHXZ @ 0x000EC070
+
 
 // match: ?sub_134B40@@YAPAUtype_3D3548@@PAU1@@Z @ 0x00134B40
 // match: __ehhandler$?sub_134B40@@YAPAUtype_3D3548@@PAU1@@Z-0x11 @ 0x00301860
 // match: __ehhandler$?sub_134B40@@YAPAUtype_3D3548@@PAU1@@Z @ 0x00301871
+// sp-match: ?sub_134B40@@YAPAUtype_3D3548@@PAU1@@Z @ 0x000EC200
 // Spawns the soldier of the trigger arg_0 in entity memory, or warns that
 // there is none for it.
 type_3D3548 *sub_134B40(type_3D3548 *arg_0)
@@ -153,6 +202,7 @@ type_3D3548 *sub_134B40(type_3D3548 *arg_0)
             var_10 = 0;
         }
     }
+#ifndef CODFH_SP // MP only: single player has no warning (SP 0xEC200)
     else
     {
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
@@ -160,6 +210,7 @@ type_3D3548 *sub_134B40(type_3D3548 *arg_0)
                    ((SoldierTrigger *)arg_0)->unk_90, ((SoldierTrigger *)arg_0)->unk_94,
                    ((SoldierTrigger *)arg_0)->unk_98);
     }
+#endif
     return var_10;
 }
 extern type_7CBD0_t flt_428A50[];
@@ -170,6 +221,7 @@ extern type_42A0B8 dword_42A0B8[];
 extern RwUInt32 dword_42A1C0;
 extern RwReal dword_429C3C;
 // match: ?sub_135430@type_3DAFC8@@QAEHPAVSoldierTrigger@@@Z @ 0x00135430
+// sp-match: ?sub_135430@type_3DAFC8@@QAEHPAVSoldierTrigger@@@Z @ 0x000E9B00
 // Its set-up from its trigger arg_0: its trigger's object points at it, its
 // name, the base's set-up, its flags, fields and timers; its definition's
 // body and head (without all three it is left inert, flagged 0x400000, and
@@ -249,9 +301,15 @@ RwInt32 type_3DAFC8::sub_135430(SoldierTrigger *arg_0)
     set_xyz(&unk_134, -1.0f, -1.0f, -1.0f);
     zero_v3d(&unk_118);
     set_xyz(&unk_124, 1000.0f, 1000.0f, 1000.0f);
+#ifdef CODFH_SP // shape: single player stores unk_108 first (SP 0xE9B00)
+    unk_108 = dword_429C3C;
+    unk_130 = 0;
+    unk_1D28 = 0;
+#else
     unk_130 = 0;
     unk_1D28 = 0;
     unk_108 = dword_429C3C;
+#endif
     for (var_24 = 0; var_24 < 4; var_24++)
     {
         unk_2144[var_24].unk_00 = 1.0f;
@@ -461,9 +519,15 @@ RwInt32 type_3DAFC8::sub_135430(SoldierTrigger *arg_0)
                 var_100.z += unk_650[var_104].unk_00.z;
                 var_104 = dword_42A050[var_104];
             }
+#ifdef CODFH_SP // shape: plain assignments schedule the loop's stores as SP 0xE9B00 does
+            unk_650[var_E0].unk_00.x = unk_650[var_E0].unk_00.x - (var_100.x + flt_428A50[var_E0].unk_00.x);
+            unk_650[var_E0].unk_00.y = unk_650[var_E0].unk_00.y - (var_100.y + flt_428A50[var_E0].unk_00.y);
+            unk_650[var_E0].unk_00.z = unk_650[var_E0].unk_00.z - (var_100.z + flt_428A50[var_E0].unk_00.z);
+#else
             unk_650[var_E0].unk_00.x -= var_100.x + flt_428A50[var_E0].unk_00.x;
             unk_650[var_E0].unk_00.y -= var_100.y + flt_428A50[var_E0].unk_00.y;
             unk_650[var_E0].unk_00.z -= var_100.z + flt_428A50[var_E0].unk_00.z;
+#endif
         }
     }
     else
@@ -474,9 +538,11 @@ RwInt32 type_3DAFC8::sub_135430(SoldierTrigger *arg_0)
             unk_650[var_108].unk_00.x = 0.0f;
             unk_650[var_108].unk_00.y = 0.0f;
             unk_650[var_108].unk_00.z = 0.0f;
+#ifndef CODFH_SP // MP only: single player has no debug print (SP 0xE9B00)
             sub_19A750("%2d %4d { %9.6f, %9.6f, %9.6f }, \n", var_108,
                        unk_28C->get_unk_18()->pNodeInfo[var_108].nodeID, var_DC[var_108].pos.x,
                        var_DC[var_108].pos.y, var_DC[var_108].pos.z);
+#endif
         }
     }
     strncpy(var_150, "FA_QO1A2K_IdleMask", 0x1F);
@@ -491,7 +557,9 @@ RwInt32 type_3DAFC8::sub_135430(SoldierTrigger *arg_0)
     else
     {
         unk_298 = 0;
+#ifndef CODFH_SP // MP only: single player has no debug print (SP 0xE9B00)
         sub_19A750("WARNING: No idle face anim loaded for level!\n");
+#endif
     }
     memset(unk_84C, 0, 0xC);
     memset(unk_858, 0, 0xC);
@@ -545,7 +613,9 @@ RwInt32 type_3DAFC8::sub_135430(SoldierTrigger *arg_0)
                     "***ERROR: Cannot create soldier entity from trigger loc: %f,%f,%f because it could not "
                     "find a starting coverpoint",
                     var_18C->x, var_18C->y, var_18C->z);
+#ifndef CODFH_SP // MP only: single player has no debug print (SP 0xE9B00)
             sub_19A750(var_390);
+#endif
             unk_8A0.unk_51C = 0;
             unk_28 |= 0x200;
             unk_28 |= 0x400000; // not an address: a flag
@@ -588,12 +658,15 @@ RwInt32 type_3DAFC8::sub_135430(SoldierTrigger *arg_0)
     }
     var_3A8 = var_C->unk_11C;
     sub_6B5F0("SetDeletionDelay", (type_67620 *)(vf_098()), 0, 0, &var_3A8, 1, 1, 0);
+#ifndef CODFH_SP // MP 0x135430 only: single player's soldier (SP 0xE9B00) has no unk_818
     unk_820 = 0;
     unk_81C = 0;
     unk_818 = 0;
+#endif
     return 1;
 }
 // match: ?vf_230@type_3DAFC8@@UAEXXZ @ 0x00136B10
+// sp-match: ?vf_230@type_3DAFC8@@UAEXXZ @ 0x000EA840
 // Takes it down: its weapon and mounted weapon, its AI's registrations and
 // its listener, its AI, its clumps, its render parts, its animations, its
 // performance player and AI object, and the trigger's AI script's entity.
@@ -606,7 +679,9 @@ void type_3DAFC8::vf_230()
     if (unk_2164)
     {
         unk_2164 = 0;
+#ifndef CODFH_SP // MP only: single player does not put its weapon away here (SP 0xEA840)
         sub_136D40();
+#endif
         sub_13F590(0);
         v8 = vf_098();
         if (v8)
@@ -621,6 +696,16 @@ void type_3DAFC8::vf_230()
         unk_828.sub_129940(0);
         unk_834.sub_129940(0);
         vf_228();
+#ifdef CODFH_SP // shape: single player releases them through release_anim (SP 0xEA840)
+        if (unk_280)
+        {
+            release_anim(unk_280);
+        }
+        if (unk_288)
+        {
+            release_anim(unk_288);
+        }
+#else
         if (unk_280)
         {
             sub_78870(unk_280);
@@ -631,6 +716,7 @@ void type_3DAFC8::vf_230()
             sub_78870(unk_288);
             unk_288 = 0;
         }
+#endif
         sub_8B840(this);
         if (vf_090())
         {
@@ -651,6 +737,7 @@ void type_3DAFC8::vf_230()
     }
 }
 // match: ?vf_038@type_3DAFC8@@UAEXM@Z @ 0x00136CF0
+// sp-match: ?vf_038@type_3DAFC8@@UAEXM@Z @ 0x000E4B10
 // Its update: the base's, its AI's (timed as profile section 0x18) and its
 // head tracking.
 void type_3DAFC8::vf_038(RwReal arg_0)
@@ -684,7 +771,198 @@ void type_3DAFC8::sub_136DA0(RwInt32 arg_0)
     unk_3E0.sub_15D010(this, arg_0);
     unk_3E0.sub_15D3E0();
 }
+#ifdef CODFH_SP
+// Single player's grenade throw (message 0x76C of vf_170, SP 0xEB880): multiplayer has
+// none (its tunables flt_429C40..flt_429C84 stay unreferenced there).
+extern RwReal flt_429C40;
+extern RwReal flt_429C44;
+extern RwReal flt_429C48;
+extern RwReal flt_429C4C;
+extern RwReal flt_429C50;
+extern RwReal flt_429C54;
+extern RwReal flt_429C58;
+extern RwReal flt_429C5C;
+extern RwReal flt_429C68;
+extern RwReal flt_429C6C;
+extern RwReal flt_429C70;
+extern RwReal flt_429C74;
+extern RwReal flt_429C78;
+extern RwReal flt_429C7C;
+extern RwReal flt_429C80;
+extern RwReal flt_429C84;
+
+// sp-match: ?sp_sub_E4B50@type_3DAFC8@@QAEXXZ @ 0x000E4B50
+// Single player only (SP 0xE4B50): readies the grenade (unk_4E0's sub_15D3E0).
+void type_3DAFC8::sp_sub_E4B50()
+{
+    unk_4E0.sub_15D3E0();
+}
+#endif
+
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_E4B60@type_3DAFC8@@QAEXPAURwV3d@@MMMM@Z @ 0x000E4B60
+// Single player only (SP 0xE4B60): throws the grenade in hand at *arg_0 (arg_4 and arg_8
+// whole, then arg_C and arg_10, with the timer override unk_5FC) and restarts the
+// throw timer unk_5E4.
+void type_3DAFC8::sp_sub_E4B60(RwV3d *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C, RwReal arg_10)
+{
+    unk_5E4 = 0.0f;
+    unk_4E0.sub_15D8A0(arg_0, (RwInt32)arg_4, (RwInt32)arg_8, arg_C, arg_10, unk_5FC);
+    unk_4E0.sub_15D420();
+}
+#endif
+
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_E4BB0@type_3DAFC8@@QAEXXZ @ 0x000E4BB0
+// Single player only (SP 0xE4BB0): throws a grenade at its target (or at the throw
+// point unk_5EC when one is set, else 1100 ahead): at the target's record position
+// (lowered by its height when vf_00C has one), its share of the way there (flt_429C40,
+// more above, less below) varied by the trigger's grenade mode unless the target's AI
+// (sp_sub_16540) takes the point as it is; then two line tests from the hand (to the
+// arc's top and on) pick the throw's arguments. A missing record goes straight to the
+// point ahead (the image jumps there).
+void type_3DAFC8::sp_sub_E4BB0()
+{
+    RwReal var_arc;
+    RwReal var_spin;
+    SoldierTrigger *var_trigger;
+    RwInt32 var_seen;
+    RwV3d var_at;
+    RwV3d var_d;
+    RwV3d var_hand;
+    type_3D3548 *var_target;
+    type_154C0_80 *var_rec;
+    RwV3d *var_me;
+    RwMatrix *var_m;
+    RwInt32 var_clear1;
+    RwInt32 var_clear2;
+    RwReal var_4;
+    RwReal var_8;
+
+    if (!unk_4E0.get_unk_00())
+    {
+        sp_sub_E4B50();
+    }
+    var_trigger = (SoldierTrigger *)unk_344.unk_08;
+    var_spin = 0.0f;
+    var_seen = 0;
+    var_target = unk_8A0.unk_1374.sub_D4910();
+    if (var_target && !unk_5F8)
+    {
+        var_rec = unk_8A0.sub_16ED0(var_target, 0);
+        if (!var_rec)
+        {
+            goto ahead;
+        }
+        var_me = sub_CD550();
+        var_arc = flt_429C40;
+        var_at = var_rec->unk_14;
+        if (var_target->vf_120()->sp_sub_16540(this, &var_at))
+        {
+            var_seen = 1;
+        }
+        else
+        {
+            if (var_target->vf_00C())
+            {
+                var_at.y -= var_target->unk_48;
+            }
+            if (var_me->y + 200.0f < var_at.y)
+            {
+                var_arc = flt_429C44;
+            }
+            else if (var_me->y - 200.0f > var_at.y)
+            {
+                var_arc = flt_429C48;
+            }
+        }
+        switch (var_trigger->unk_138)
+        {
+        case 0:
+            var_arc += frand_range(-flt_429C7C, flt_429C7C);
+            if (var_rec->unk_04_0)
+            {
+                var_spin = flt_429C70;
+            }
+            break;
+        case 2:
+            var_arc += frand_range(-flt_429C84, flt_429C84);
+            if (var_rec->unk_04_0)
+            {
+                var_spin = flt_429C78;
+            }
+            break;
+        default:
+            var_arc += frand_range(-flt_429C80, flt_429C80);
+            if (var_rec->unk_04_0)
+            {
+                var_spin = flt_429C74;
+            }
+            break;
+        }
+        if (!var_seen)
+        {
+            RwV3d var_lead;
+
+            RwV3dSub(&var_lead, &var_at, sub_CD550());
+            RwV3dScale(&var_lead, &var_lead, var_arc);
+            RwV3dAdd(&var_at, &var_lead, sub_CD550());
+        }
+    }
+    else if (unk_5F8)
+    {
+        var_at = unk_5EC;
+    }
+    else
+    {
+    ahead:
+        var_m = RwFrameGetMatrix(get_unk_340());
+        var_at = *RwMatrixGetPos(var_m);
+        RwV3dIncrementScaledMacro(&var_at, RwMatrixGetAt(var_m), 1100.0f);
+    }
+    var_hand = *RwMatrixGetPos(RwFrameGetMatrix(RpClumpGetFrame(unk_4E0.get_unk_18())));
+    RwV3dSub(&var_d, &var_at, sub_CD550());
+    var_d.x *= flt_429C5C;
+    var_d.y = 0.0f;
+    var_d.z *= flt_429C5C;
+    var_d.y = RwV3dLength(&var_d) * flt_429C68;
+    RwV3dAdd(&var_d, &var_hand, &var_d);
+    var_clear1 = 0;
+    var_clear2 = 0;
+    if (sub_D2FC0(&var_hand, &var_d, 0, 0, 0, 0, 1, 1, 0x180000 /* not an address: line-test flags */, 1, 0))
+    {
+        var_clear1 = 1;
+    }
+    var_d.y *= flt_429C6C / flt_429C68;
+    RwV3dScale(&var_d, &var_d, 1.5f);
+    if (sub_D2FC0(&var_hand, &var_d, 0, 0, 0, 0, 1, 1, 0x180000 /* not an address: line-test flags */, 1, 0))
+    {
+        var_clear2 = 1;
+    }
+    var_8 = var_clear1 ? flt_429C54 : flt_429C58;
+    var_4 = var_clear2 ? flt_429C50 : flt_429C4C;
+    if (unk_5F8)
+    {
+        var_spin = 0.0f;
+        var_4 = flt_429C4C;
+        var_8 = flt_429C54;
+    }
+    else if (var_clear1 && var_clear2)
+    {
+        var_8 = flt_429C58;
+        var_4 = flt_429C58 - 5.0f;
+    }
+    else if (var_seen && !var_clear1 && !var_clear2)
+    {
+        var_4 = flt_429C4C;
+        var_8 = flt_429C54;
+    }
+    sp_sub_E4B60(&var_at, var_4, var_8, 3000.0f, var_spin);
+}
+#endif
+
 // match: ?sub_136E00@type_3DAFC8@@QAEXXZ @ 0x00136E00
+// sp-match: ?sub_136E00@type_3DAFC8@@QAEXXZ @ 0x000E5070
 // "DropGrenade": drops the grenade in hand 20 units above its clump's
 // origin, and clears the timer override.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -707,6 +985,7 @@ void type_3DAFC8::sub_136E00()
     unk_4E0.sub_15D420();
 }
 extern RwReal flt_4F28D8[3];
+// sp-match: ?get_grenade_multiplier@@YAMXZ @ 0x000E4AD0
 inline RwReal get_grenade_multiplier()
 {
     if (dword_42B714 > -1 && dword_42B714 < 3)
@@ -716,6 +995,7 @@ inline RwReal get_grenade_multiplier()
     return 1.0f;
 }
 // match: ?sub_136EC0@type_3DAFC8@@QAEHH@Z @ 0x00136EC0
+// sp-match: ?sub_136EC0@type_3DAFC8@@QAEHH@Z @ 0x000E5100
 // "ShouldIThrowAGrenade": never without a grenade, before unk_5E4 reaches
 // 120, or unless its target is 700 to 3000 away; otherwise by a chance (in
 // 10000) by the trigger's grenade mode and arg_0, scaled by the difficulty
@@ -826,6 +1106,7 @@ RwInt32 type_3DAFC8::sub_136EC0(RwInt32 arg_0)
     return 1;
 }
 // match: ?sub_137200@type_3DAFC8@@QAEHH@Z @ 0x00137200
+// sp-match: ?sub_137200@type_3DAFC8@@QAEHH@Z @ 0x000E5320
 // "ShouldIMeleeAttack": whether its target is within 120 above or below it
 // (a player's by its eye height), unless the target is flagged out (bits 7
 // and 18 of unk_2C) or has a vf_200 entity.
@@ -855,6 +1136,7 @@ RwInt32 type_3DAFC8::sub_137200(RwInt32 arg_0)
     return var_4;
 }
 // match: ?sub_137340@@YAHPAURwV3d@@0@Z @ 0x00137340
+// sp-match: ?sub_137340@@YAHPAURwV3d@@0@Z @ 0x000E5400
 // Whether *arg_0 and *arg_4 are equal.
 RwInt32 sub_137340(RwV3d *arg_0, RwV3d *arg_4)
 {
@@ -863,6 +1145,7 @@ RwInt32 sub_137340(RwV3d *arg_0, RwV3d *arg_4)
     return 0;
 }
 // match: ?sub_137390@@YAHPAURwMatrixTag@@0@Z @ 0x00137390
+// sp-match: ?sub_137390@@YAHPAURwMatrixTag@@0@Z @ 0x000E5440
 // Whether the matrices *arg_0 and *arg_4 are equal (position first).
 RwInt32 sub_137390(RwMatrix *arg_0, RwMatrix *arg_4)
 {
@@ -872,6 +1155,7 @@ RwInt32 sub_137390(RwMatrix *arg_0, RwMatrix *arg_4)
     return 0;
 }
 // match: ?vf_03C@type_3DAFC8@@UAEXM@Z @ 0x00137400
+// sp-match: ?vf_03C@type_3DAFC8@@UAEXM@Z @ 0x000E54B0
 // Its logic for the time arg_0: its timers; a hit by the entity it rides
 // when that one breaks (flag 0 or 9); the base's; its second animation's
 // translations offset by unk_650 and two of its bones copied from the
@@ -883,7 +1167,9 @@ void type_3DAFC8::vf_03C(RwReal arg_0)
 {
     RwInt32 var_8;
     type_3D3548 *var_C;
+#ifndef CODFH_SP // single player declares these in the blocks that use them (SP 0xE54B0)
     type_75600 var_3C;
+#endif
     RpHAnimHierarchy *var_40;
     type_7CBD0 *var_44;
     RpHAnimHierarchy *var_48;
@@ -904,12 +1190,15 @@ void type_3DAFC8::vf_03C(RwReal arg_0)
     RtQuat *var_94;
     RtQuat *var_98;
     RpHAnimHierarchy *var_9C;
+#ifndef CODFH_SP
     type_129940 *var_A0;
     RpClump *var_A4;
     RwMatrix var_F0;
+#endif
     RwFrame *var_F4;
     RwFrame *var_F8;
     SoldierTrigger *var_FC;
+#ifndef CODFH_SP
     RwFrame *var_100;
     RpClump *var_104;
     RwFrame *var_108;
@@ -918,13 +1207,16 @@ void type_3DAFC8::vf_03C(RwReal arg_0)
     RwLine var_128;
     RwV3d var_134;
     RwReal var_138;
+#endif
     RwInt32 var_13C;
     type_4E5D30 *var_140;
+#ifndef CODFH_SP
     RwReal var_150;
     RpIntersection var_16C;
     type_91F40 var_198;
     RwInt32 var_19C;
     type_4E5D30 *var_1A0;
+#endif
 
     if (unk_1D2C > 0.0f)
         unk_1D2C -= arg_0;
@@ -945,6 +1237,9 @@ void type_3DAFC8::vf_03C(RwReal arg_0)
         var_C = unk_624.sub_D4910();
         if (var_C->unk_28_0 || var_C->unk_28_9)
         {
+#ifdef CODFH_SP // shape: block-scoped
+            type_75600 var_3C;
+#endif
             var_3C.unk_00_w = 0;
             if ((unk_2C & 7) == 2)
                 var_3C.unk_08 = 0x202;
@@ -999,6 +1294,11 @@ void type_3DAFC8::vf_03C(RwReal arg_0)
     }
     if (unk_620 && unk_624.sub_D4910())
     {
+#ifdef CODFH_SP // shape: block-scoped
+        type_129940 *var_A0;
+        RpClump *var_A4;
+        RwMatrix var_F0;
+#endif
         var_A0 = &unk_624.sub_D4910()->unk_25C;
         var_A4 = var_A0->unk_08;
         if (sub_EC2D0(var_A4, (RwInt32)&var_F0, unk_628, 0, 1))
@@ -1017,6 +1317,16 @@ void type_3DAFC8::vf_03C(RwReal arg_0)
         if ((var_FC && var_FC->unk_150 && var_FC->unk_14C != -1)
             || (unk_810 != -1 && unk_814))
         {
+#ifdef CODFH_SP // shape: block-scoped
+            RwFrame *var_100;
+            RpClump *var_104;
+            RwFrame *var_108;
+            RwMatrix *var_10C;
+            RwInt32 var_110;
+            RwLine var_128;
+            RwV3d var_134;
+            RwReal var_138;
+#endif
             var_100 = 0;
             var_104 = unk_3E0.unk_10.unk_08;
             if (var_104)
@@ -1056,6 +1366,13 @@ void type_3DAFC8::vf_03C(RwReal arg_0)
                 }
                 if (!var_110)
                 {
+#ifdef CODFH_SP // shape: block-scoped
+                    RwReal var_150;
+                    RpIntersection var_16C;
+                    type_91F40 var_198;
+                    RwInt32 var_19C;
+                    type_4E5D30 *var_1A0;
+#endif
                     var_150 = 1e37f;
                     var_16C.type = rpINTERSECTLINE;
                     var_16C.t.line.start = var_128.start;
@@ -1109,6 +1426,7 @@ const RwV3d v3d_3DAEC4 = {1.0f, 0.0f, 0.0f};
 const RwV3d v3d_3DAED0 = {0.0f, 1.0f, 0.0f};
 const RwV3d v3d_3DAEDC = {0.0f, 0.0f, 1.0f};
 // match: ?vf_04C@type_3DAFC8@@UAEXM@Z @ 0x00137EF0
+// sp-match: ?vf_04C@type_3DAFC8@@UAEXM@Z @ 0x000EA990
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // After the base's update for the time arg_0: its props (unk_35C) and its
 // held clump (unk_828, bone 0x1C4) follow its frame or bones; its second
@@ -1337,6 +1655,7 @@ void type_3DAFC8::vf_04C(RwReal arg_0)
     type_3D3548::vf_1D0();
 }
 // match: ?vf_21C@type_3DAFC8@@UAEXM@Z @ 0x00138710
+// sp-match: ?vf_21C@type_3DAFC8@@UAEXM@Z @ 0x000EC2A0
 // Its five-way blends (while their flags are set), then the base's.
 void type_3DAFC8::vf_21C(RwReal arg_0)
 {
@@ -1379,6 +1698,7 @@ extern const RwReal flt_3DAFC4 = 0.0f;
 // match: _flt_3DAF58 @ 0x003DAF58
 // match: _flt_3DAEE8 @ 0x003DAEE8
 // match: ?sub_138760@type_3DAFC8@@QAEXPAUtype_15CCE0@@HH@Z @ 0x00138760
+// sp-match: ?sub_138760@type_3DAFC8@@QAEXPAUtype_15CCE0@@HH@Z @ 0x000E5BF0
 // Puts the weapon arg_0's model in its hand: at the bone arg_4 while its
 // animation drives it, else at its cover node (its AI object in state 6,
 // 0x26 or 0x2A with a node that is not of kind 0xE) or at its frame raised
@@ -1395,16 +1715,20 @@ void type_3DAFC8::sub_138760(type_15CCE0 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
     RwMatrix *var_24;
     type_F8350 *var_28;
     RwInt32 var_2C;
+#ifndef CODFH_SP // single player declares these in the blocks that use them (SP 0xE5BF0)
     RwV3d var_38;
     RwMatrix var_80;
     RwV3d var_C0;
+#endif
     RpClump *var_C4;
     RwFrame *var_C8;
     RwMatrix *var_CC;
     RwInt32 var_D0;
     RwInt32 var_D4;
     RwInt32 var_D8;
+#ifndef CODFH_SP
     RwV3d var_EC;
+#endif
 
     var_8 = arg_0->unk_10.unk_08;
     var_C = RpClumpGetFrame(var_8);
@@ -1426,6 +1750,11 @@ void type_3DAFC8::sub_138760(type_15CCE0 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
             var_2C = sub_F8FC0(var_28);
         if (var_28 && var_2C != 0xE && unk_8A0.sub_238E0(0))
         {
+#ifdef CODFH_SP // shape: block-scoped
+            RwV3d var_38;
+            RwMatrix var_80;
+            RwV3d var_C0;
+#endif
             var_38.x = 0.0f;
             var_38.y = 0.0f;
             var_38.z = 0.0f;
@@ -1462,6 +1791,9 @@ void type_3DAFC8::sub_138760(type_15CCE0 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
             }
             if (flt_3DAEE8[var_D4][var_D0] != -1.0f)
             {
+#ifdef CODFH_SP // shape: block-scoped
+                RwV3d var_EC;
+#endif
                 var_EC.x = 0.0f;
                 var_EC.y = 0.0f;
                 var_EC.z = 0.0f;
@@ -1495,6 +1827,7 @@ inline RwReal get_aim_spread_multiplier()
     return 1.0f;
 }
 // match: ?sub_138D00@type_3DAFC8@@QAEHH@Z @ 0x00138D00
+// sp-match: ?sub_138D00@type_3DAFC8@@QAEHH@Z @ 0x000E5F20
 // "SetAdvancedShotLocation": with arg_0 and a target, picks where to shoot:
 // from its muzzle (or its cover node's point), towards the target's centre
 // at up to 0.7 of the distance (at least its weapon's range), spread at
@@ -1508,7 +1841,9 @@ RwInt32 type_3DAFC8::sub_138D00(RwInt32 arg_0)
     RwV3d var_18;
     AIData *var_1C;
     type_F8350 *var_20;
+#ifndef CODFH_SP // single player declares these in the blocks that use them (SP 0xE5F20)
     RwMatrix var_A0;
+#endif
     RwV3d var_AC;
     RwV3d var_B8;
     RwReal var_BC;
@@ -1517,9 +1852,11 @@ RwInt32 type_3DAFC8::sub_138D00(RwInt32 arg_0)
     RwReal var_114;
     RwInt32 var_118;
     RwInt32 var_11C;
+#ifndef CODFH_SP
     RwMatrix var_160;
     RwReal var_180;
     RwV3d var_1A8;
+#endif
 
     var_8 = 1;
     var_C = unk_8A0.unk_1374.sub_D4910();
@@ -1530,6 +1867,9 @@ RwInt32 type_3DAFC8::sub_138D00(RwInt32 arg_0)
         var_20 = var_1C->unk_F60;
         if (var_1C->sub_238E0(0) && var_20)
         {
+#ifdef CODFH_SP // shape: block-scoped
+            RwMatrix var_A0;
+#endif
             RtQuatConvertToMatrix(&var_20->unk_1C, &var_A0);
             var_A0.pos = var_20->unk_10;
             sub_F8FE0(var_20, &var_AC, 0);
@@ -1552,6 +1892,11 @@ RwInt32 type_3DAFC8::sub_138D00(RwInt32 arg_0)
         var_11C = 0;
         while (!var_118)
         {
+#ifdef CODFH_SP // shape: block-scoped
+            RwMatrix var_160;
+            RwReal var_180;
+            RwV3d var_1A8;
+#endif
             var_160 = var_100;
             var_180 = frand_range(-vf_164() * get_aim_spread_multiplier(),
                                   vf_164() * get_aim_spread_multiplier());
@@ -1585,6 +1930,7 @@ RwInt32 type_3DAFC8::sub_138D00(RwInt32 arg_0)
     return var_8;
 }
 // match: ?vf_190@type_3DAFC8@@UAEXH@Z @ 0x00139450
+// sp-match: ?vf_190@type_3DAFC8@@UAEXH@Z @ 0x000E6430
 // The base's, then its search records cleared unless unk_28_5 is set.
 void type_3DAFC8::vf_190(RwInt32 arg_0)
 {
@@ -1593,6 +1939,7 @@ void type_3DAFC8::vf_190(RwInt32 arg_0)
         memset(&unk_1DDC, 0, sizeof(unk_1DDC));
 }
 // match: ?vf_1A0@type_3DAFC8@@UAEXH@Z @ 0x00139490
+// sp-match: ?vf_1A0@type_3DAFC8@@UAEXH@Z @ 0x000E6460
 // Likewise.
 void type_3DAFC8::vf_1A0(RwInt32 arg_0)
 {
@@ -1602,6 +1949,7 @@ void type_3DAFC8::vf_1A0(RwInt32 arg_0)
 }
 extern RwReal flt_429C88;
 // match: ?vf_210@type_3DAFC8@@UAEXPAUtype_D05C0@@@Z @ 0x001394D0
+// sp-match: ?vf_210@type_3DAFC8@@UAEXPAUtype_D05C0@@@Z @ 0x000E6490
 // Raises the step (a quarter of it in mode 1 of unk_1D28) with flags 3 and
 // 5 set and 1 and 7 clear.
 void type_3DAFC8::vf_210(type_D05C0 *arg_0)
@@ -1620,6 +1968,7 @@ void type_3DAFC8::vf_210(type_D05C0 *arg_0)
     }
 }
 // match: ?sub_139550@type_3DAFC8@@QAEX_N@Z @ 0x00139550
+// sp-match: ?sub_139550@type_3DAFC8@@QAEX_N@Z @ 0x000E64D0
 // "SetFiveWayBlend" mode 0: its flag, cleared blend weights, and the
 // animation queued before the newest when turned on.
 void type_3DAFC8::sub_139550(bool arg_0)
@@ -1636,6 +1985,7 @@ void type_3DAFC8::sub_139550(bool arg_0)
         unk_1D4C = unk_284->get_unk_34_id(0);
 }
 // match: ?sub_139620@type_3DAFC8@@QAEXXZ @ 0x00139620
+// sp-match: ?sub_139620@type_3DAFC8@@QAEXXZ @ 0x000EAE80
 // Five-way blend mode 0 (flag 1 of unk_824): ends when its first animation
 // has ended; starts its five animations after unk_1D4C when none run,
 // taking the origin (event 5) and the directions (event 6) from their
@@ -1652,8 +2002,6 @@ void type_3DAFC8::sub_139620()
     RwMatrix var_60;
     RwMatrix var_A0;
     RwInt32 var_A4;
-    RwV3d var_B0;
-    RwReal var_B4;
     RwV3d var_C0;
     type_140490 var_D0;
     RwInt32 var_D4;
@@ -1664,6 +2012,14 @@ void type_3DAFC8::sub_139620()
     type_140490 var_120;
     type_140490 var_130;
     type_140490 var_170;
+#ifdef CODFH_SP // the aim's locals (vf_244's in multiplayer), at the top for single player's frame
+    RwMatrix aim_frame;
+    RwMatrix ltm;
+    RwV3d line[2];              // the frame's origin and the aim point, one array (slot order)
+    RwReal scale;
+    type_3DC9B0 *mounted;
+    RwFrame *frame;             // read first, as vf_244 does (the LTM copy's schedule)
+#endif
 
     if (!(unk_824 & 1))
         return;
@@ -1674,6 +2030,13 @@ void type_3DAFC8::sub_139620()
             unk_1D50[var_8] = 0;
         return;
     }
+#ifdef CODFH_SP // single player also ends unless the newest queued animation is 5 (SP 0xEAEF6)
+    if (unk_284->unk_34[(unk_284->unk_20 + unk_284->unk_24 - 1) % type_7C8D0_ring_size].unk_08_0 != 5)
+    {
+        unk_824 &= ~1;
+        return;
+    }
+#endif
     if (!unk_1D50[0])
     {
         var_C = 0;
@@ -1687,6 +2050,17 @@ void type_3DAFC8::sub_139620()
                 if (var_C == unk_1D4C)
                 {
                     var_14 = unk_284->sub_7C480(var_10, 0, 5);
+#ifdef CODFH_SP // single player stops the blend (sub_139550) when an event is missing (SP 0xEAFA7)
+                    if (!var_14)
+                    {
+                        sub_139550(false);
+                        return;
+                    }
+                    var_20 = var_14->unk_08_v;
+                    unk_1D64 = var_20;
+                    if (unk_284->unk_12 & 4)
+                        unk_1D64.x *= -1.0f;
+#else
                     if (var_14)
                     {
                         var_20 = var_14->unk_08_v;
@@ -1694,14 +2068,26 @@ void type_3DAFC8::sub_139620()
                         if (unk_284->unk_12 & 4)
                             unk_1D64.x *= -1.0f;
                     }
+#endif
                 }
                 var_14 = unk_284->sub_7C480(var_10, 0, 6);
+#ifdef CODFH_SP // and stores the direction at var_C itself (SP 0xEAFFC, 0xEB00B)
+                if (!var_14)
+                {
+                    sub_139550(false);
+                    return;
+                }
+                unk_1D70[var_C] = var_14->unk_08_v;
+                if (unk_284->unk_12 & 4)
+                    unk_1D70[var_C].x *= -1.0f;
+#else
                 if (var_14)
                 {
                     unk_1D70[var_C - unk_1D4C] = var_14->unk_08_v;
                     if (unk_284->unk_12 & 4)
                         unk_1D70[var_C].x *= -1.0f;
                 }
+#endif
             }
             var_C++;
         }
@@ -1715,6 +2101,9 @@ void type_3DAFC8::sub_139620()
         RwMatrixInvert(&var_A0, &var_60);
         for (var_A4 = 1; var_A4 < 5; var_A4++)
         {
+            RwV3d var_B0;
+            RwReal var_B4;
+
             RwV3dTransformVector(&var_B0, &unk_1D70[var_A4], &var_A0);
             var_B4 = 1.0f / var_B0.z;
             var_B0.x *= var_B4;
@@ -1723,11 +2112,51 @@ void type_3DAFC8::sub_139620()
             unk_1D70[var_A4] = var_B0;
         }
     }
+#ifdef CODFH_SP // single player has no vf_244: it aims here, in the first direction's frame
+                // moved by unk_1D64, and carries the line to z 1 (SP 0xEB1BA)
+    {
+        aim_frame.at = unk_1D70[0];
+        aim_frame.up = v3d_3DAED0;
+        RwV3dCrossProductMacro(&aim_frame.right, &aim_frame.up, &aim_frame.at);
+        aim_frame.pos.x = 0.0f;
+        aim_frame.pos.y = 0.0f;
+        aim_frame.pos.z = 0.0f;
+        RwMatrixOptimize(&aim_frame, 0);
+        frame = unk_338.unk_08;
+        ltm = *RwFrameGetLTM(frame);
+        RwMatrixTranslate(&ltm, &unk_1D64, rwCOMBINEPRECONCAT);
+        RwMatrixTransform(&ltm, &aim_frame, rwCOMBINEPRECONCAT);
+        RwMatrixInvert(&aim_frame, &ltm);
+        if (get_unk_61C())
+        {
+            mounted = (type_3DC9B0 *)unk_618.sub_D4910();
+            if (mounted)
+                mounted->sub_16A580(&line[1]);
+        }
+        else if (unk_3E0.unk_00)
+            unk_3E0.sub_15E9E0(&line[1]);
+        else
+            return;
+        var_D0 = *(type_140490 *)&unk_1D70[0];
+        line[0] = ltm.pos;
+        unk_1DC8 = line[1];
+        sub_1414C0(&line[0], &line[0], &aim_frame);
+        sub_1414C0(&line[1], &line[1], &aim_frame);
+        if (line[1].z > 0.0f)
+        {
+            scale = 1.0f / line[1].z;
+            var_D0.z = 1.0f;
+            var_D0.x = (line[1].x - line[0].x) * scale + line[0].x;
+            var_D0.y = (line[1].y - line[0].y) * scale + line[0].y;
+        }
+    }
+#else
     vf_244(&var_C0);
     var_D0.x = var_C0.x;
     var_D0.y = var_C0.y;
     var_D0.z = var_C0.z;
     var_D0.w = 1.0f;
+#endif
     var_D4 = 0;
     var_D8 = 0;
     for (var_DC = 0; var_DC < 5; var_DC++)
@@ -1774,7 +2203,11 @@ void type_3DAFC8::sub_139620()
     var_F0[0] = var_170.x;
     var_F0[var_D4] = var_170.y;
     var_F0[var_D8] = var_170.z;
+#ifdef CODFH_SP // single player's sub_13A070 takes no blend (SP 0xE6580 ends ret 8)
+    sub_13A070(unk_1D50, var_F0);
+#else
     sub_13A070(unk_1D50, var_F0, 1.0f);
+#endif
 }
 // match: ?vf_244@type_3DAFC8@@UAEPAURwV3d@@PAU2@@Z @ 0x00139E50
 // Where its weapon (or mounted weapon) aims, for the five-way blend: the
@@ -1823,10 +2256,15 @@ RwV3d *type_3DAFC8::vf_244(RwV3d *arg_0)
     return arg_0;
 }
 // match: ?sub_13A070@type_3DAFC8@@QAEXPAHPAMM@Z @ 0x0013A070
+// sp-match: ?sub_13A070@type_3DAFC8@@QAEXPAHPAMM@Z @ 0x000E6580
 // Blends the five animations arg_0 towards the layered weights arg_4 (the
 // last on top) by arg_8, as type_3D32F8::sub_76E70 does but without its
 // cut-off for small weights.
+#ifdef CODFH_SP // single player's sub_13A070 takes no blend (SP 0xE6580 ends ret 8)
+void type_3DAFC8::sub_13A070(RwInt32 *arg_0, RwReal *arg_4)
+#else
 void type_3DAFC8::sub_13A070(RwInt32 *arg_0, RwReal *arg_4, RwReal arg_8)
+#endif
 {
     RwReal var_4;
     RwInt32 v8;
@@ -1855,12 +2293,18 @@ void type_3DAFC8::sub_13A070(RwInt32 *arg_0, RwReal *arg_4, RwReal arg_8)
             }
         }
     }
+#ifdef CODFH_SP // single player's sub_13A070 takes no blend (SP 0xE6580 ends ret 8)
+    for (v8 = 0; v8 < 5; v8++)
+        unk_284->sub_79C90(arg_0[v8], fp_1C[v8]);
+#else
     for (v8 = 0; v8 < 5; v8++) {
         fp_1C[v8] = arg_8 * fp_1C[v8] + unk_284->sub_7C9A0(arg_0[v8]) * (1.0f - arg_8);
         unk_284->sub_79C90(arg_0[v8], fp_1C[v8]);
     }
+#endif
 }
 // match: ?sub_13A1F0@type_3DAFC8@@QAEHPAURwV3d@@0@Z @ 0x0013A1F0
+// sp-match: ?sub_13A1F0@type_3DAFC8@@QAEHPAURwV3d@@0@Z @ 0x000E66B0
 // The last of the four directions arg_4[1] to arg_4[4] at which the turn
 // towards *arg_0 changes sides (by the z of their cross products), from 0.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -1890,6 +2334,7 @@ RwInt32 type_3DAFC8::sub_13A1F0(RwV3d *arg_0, RwV3d *arg_4)
     return local_14;
 }
 // match: ?sub_13A340@type_3DAFC8@@QAEX_N@Z @ 0x0013A340
+// sp-match: ?sub_13A340@type_3DAFC8@@QAEX_N@Z @ 0x000E6800
 // "SetFiveWayBlend" mode 1: likewise with flag 2, unk_1D4E and unk_1DAC.
 void type_3DAFC8::sub_13A340(bool arg_0)
 {
@@ -1905,6 +2350,7 @@ void type_3DAFC8::sub_13A340(bool arg_0)
         unk_1D4E = unk_284->get_unk_34_id(0);
 }
 // match: ?sub_13A410@type_3DAFC8@@QAEXXZ @ 0x0013A410
+// sp-match: ?sub_13A410@type_3DAFC8@@QAEXXZ @ 0x000E68B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Five-way blend mode 1 (flag 2 of unk_824): ends when its first animation
 // has ended; starts its five animations after unk_1D4E when none run (then
@@ -1982,9 +2428,14 @@ void type_3DAFC8::sub_13A410()
     fp_2C[bp_4] = slot_C * 0.70710677f;
     fp_2C[m_18] = bp_8 * 0.70710677f;
     fp_2C[0] = 1.0f - fp_2C[bp_4] - fp_2C[m_18];
+#ifdef CODFH_SP // single player's sub_13A070 takes no blend (SP 0xE6580 ends ret 8)
+    sub_13A070(unk_1DAC, fp_2C);
+#else
     sub_13A070(unk_1DAC, fp_2C, ebp_14);
+#endif
 }
 // match: ?vf_1CC@type_3DAFC8@@UAEXH@Z @ 0x0013A680
+// sp-match: ?vf_1CC@type_3DAFC8@@UAEXH@Z @ 0x000E6A40
 // Drops its pickup once (unk_1D48): its trigger's (unk_14C, unk_150), or
 // its own when set (unk_810, unk_814), at its weapon's model levelled to the
 // ground ahead (its heading and the slope 100 ahead), or at its frame; kinds
@@ -2002,7 +2453,9 @@ void type_3DAFC8::vf_1CC(RwInt32 arg_0)
     RwReal bp_64;
     RwReal v60;
     RwReal bp_5C;
+#ifndef CODFH_SP // single player declares these in the blocks that use them (SP 0xE6A40)
     RwV3d frm_58;
+#endif
     RwReal lv_4C;
     RwV3d stk_48;
     RwV3d var3C;
@@ -2024,6 +2477,9 @@ void type_3DAFC8::vf_1CC(RwInt32 arg_0)
             local_C = unk_3E0.unk_10.unk_08;
             if (local_C)
             {
+#ifdef CODFH_SP // shape: block-scoped
+                RwV3d frm_58;
+#endif
                 v60 = 0.0f;
                 lv_4C = 0.0f;
                 frm_58.x = 0.0f;
@@ -2089,6 +2545,7 @@ void type_3DAFC8::vf_1CC(RwInt32 arg_0)
     }
 }
 // match: ?vf_224@type_3DAFC8@@UAE_NPAUtype_3DF8D8@@HPAH@Z @ 0x0013AC60
+// sp-match: ?vf_224@type_3DAFC8@@UAE_NPAUtype_3DF8D8@@HPAH@Z @ 0x000E6DA0
 // The base's set-up of its model from the definition arg_0, then its
 // atomic's bounding radius (150) and flags, and its weapon class.
 bool type_3DAFC8::vf_224(type_3DF8D8 *arg_0, RwInt32 arg_4, RwInt32 *arg_8)
@@ -2105,12 +2562,14 @@ bool type_3DAFC8::vf_224(type_3DF8D8 *arg_0, RwInt32 arg_4, RwInt32 *arg_8)
     return true;
 }
 // match: ?vf_228@type_3DAFC8@@UAE_NXZ @ 0x0013ACC0
+// sp-match: ?vf_228@type_3DAFC8@@UAE_NXZ @ 0x0007B5D0
 bool type_3DAFC8::vf_228()
 {
     type_3D3548::vf_228();
     return true;
 }
 // match: ?sub_13ACE0@type_3DAFC8@@QAEXPAURpClump@@@Z @ 0x0013ACE0
+// sp-match: ?sub_13ACE0@type_3DAFC8@@QAEXPAURpClump@@@Z @ 0x000E6DE0
 // Holds a copy of the clump arg_0 in unk_828 (none for 0), its hierarchy
 // updating its modelling matrices.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -2137,6 +2596,7 @@ void type_3DAFC8::sub_13ACE0(RpClump *arg_0)
     }
 }
 // match: ?sub_13ADA0@type_3DAFC8@@QAEXPAURpClump@@@Z @ 0x0013ADA0
+// sp-match: ?sub_13ADA0@type_3DAFC8@@QAEXPAURpClump@@@Z @ 0x000E6E50
 // Holds a copy of the clump arg_0 in unk_834 at the identity (none for 0).
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DAFC8::sub_13ADA0(RpClump *arg_0)
@@ -2164,6 +2624,7 @@ void type_3DAFC8::sub_13ADA0(RpClump *arg_0)
     }
 }
 // match: ?vf_170@type_3DAFC8@@UAEXHHHH@Z @ 0x0013AE40
+// sp-match: ?vf_170@type_3DAFC8@@UAEXHHHH@Z @ 0x000EB680
 // Its handler for the message arg_0 with the data arg_4 (unless its
 // flag 13 of unk_88 is set): 1 (arg_8 the animation that ended, arg_C its
 // player) replays its own animation unk_298 when the player loops; 0xB54
@@ -2175,11 +2636,7 @@ void type_3DAFC8::sub_13ADA0(RpClump *arg_0)
 // vision; the rest go to the base with no player.
 void type_3DAFC8::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C)
 {
-    RwInt32 var_C;
-    RwInt32 var_10;
     type_13AE40_msg *var_14;
-    RwInt32 var_18;
-    RwInt32 var_1C;
     type_13AE40_msg *var_20;
     RpHAnimHierarchy *var_24;
     RpClump *var_28;
@@ -2219,6 +2676,9 @@ void type_3DAFC8::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
     case 1:
         if (((type_7C8D0 *)arg_C)->unk_12 & 2)
         {
+            RwInt32 var_C;
+            RwInt32 var_10;
+
             if (unk_298 && unk_298 != arg_8 && sub_77B70(unk_298, (void **)(&var_10), (void **)(&var_C)))
             {
                 unk_28C->sub_794C0(0.1f);
@@ -2233,6 +2693,10 @@ void type_3DAFC8::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
         }
         break;
     case 0xB54:
+    {
+        RwInt32 var_18;
+        RwInt32 var_1C;
+
         var_14 = (type_13AE40_msg *)arg_4;
         if (sub_77B70(var_14->unk_00, (void **)(&var_1C), (void **)(&var_18)))
         {
@@ -2242,6 +2706,7 @@ void type_3DAFC8::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
             unk_805 = 8;
         }
         break;
+    }
     case 0x516:
         var_20 = (type_13AE40_msg *)arg_4;
         if (unk_28_13)
@@ -2296,6 +2761,30 @@ void type_3DAFC8::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
         }
         break;
     case 0x76C:
+#ifdef CODFH_SP
+        // Single player handles it (SP 0xEB87D): 0 calls sp_sub_E4BB0; 1
+        // calls sp_sub_E4B50 and sets the grenade bone unk_5E8 from unk_04.
+        var_8C = (type_13AE40_msg *)arg_4;
+        switch (var_8C->unk_00)
+        {
+        case 0:
+            sp_sub_E4BB0();
+            break;
+        case 1:
+            sp_sub_E4B50();
+            switch (var_8C->unk_04)
+            {
+            case 1:
+                unk_5E8 = 0x9B;
+                break;
+            default:
+                unk_5E8 = 0xFF;
+                break;
+            }
+            break;
+        }
+        break;
+#else
         break;
         // Unreachable: the image has no code here, but its three slots
         // (-0x8C..-0x94) and the registers the next case uses need four
@@ -2304,6 +2793,7 @@ void type_3DAFC8::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
         var_90 = var_8C->unk_00;
         var_94 = (type_13AE40_msg *)arg_4;
         break;
+#endif
     case 0x960:
         var_98 = (type_13AE40_msg *)arg_4;
         switch (var_98->unk_00)
@@ -2430,12 +2920,14 @@ void type_3DAFC8::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
     }
 }
 // match: ?vf_0EC@type_3DAFC8@@UAEXHH@Z @ 0x0013B7A0
+// sp-match: ?vf_0EC@type_3DAFC8@@UAEXHH@Z @ 0x000E6EC0
 // Sets its scene value arg_0 to arg_4 ("SetSceneValue").
 void type_3DAFC8::vf_0EC(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_898[arg_0] = (RwInt16)arg_4;
 }
 // match: ?vf_208@type_3DAFC8@@UAEHHHHMMMH@Z @ 0x0013B7C0
+// sp-match: ?vf_208@type_3DAFC8@@UAEHHHHMMMH@Z @ 0x000E6EE0
 // Before the base plays an animation (unless arg_8 is clear while one is
 // queued): each five-way blend that is on takes the new animation (0) or,
 // already holding one, turns off.
@@ -2464,6 +2956,7 @@ RwInt32 type_3DAFC8::vf_208(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwReal 
     return type_3D3548::vf_208(arg_0, arg_4, arg_8, arg_C, arg_10, arg_14, arg_18);
 }
 // match: ?vf_0FC@type_3DAFC8@@UAEMXZ @ 0x0013B8A0
+// sp-match: ?vf_0FC@type_3DAFC8@@UAEMXZ @ 0x000E6F90
 RwReal type_3DAFC8::vf_0FC()
 {
     if (unk_874)
@@ -2471,6 +2964,7 @@ RwReal type_3DAFC8::vf_0FC()
     return unk_86C;
 }
 // match: ?vf_100@type_3DAFC8@@UAEMXZ @ 0x0013B8D0
+// sp-match: ?vf_100@type_3DAFC8@@UAEMXZ @ 0x000E6FB0
 RwReal type_3DAFC8::vf_100()
 {
     if (unk_874)
@@ -2478,6 +2972,7 @@ RwReal type_3DAFC8::vf_100()
     return unk_870;
 }
 // match: ?vf_10C@type_3DAFC8@@UAEMXZ @ 0x0013B900
+// sp-match: ?vf_10C@type_3DAFC8@@UAEMXZ @ 0x000E6FD0
 // Its view range (the alerted one while its AI object is alerted) times its
 // vision multiplier.
 RwReal type_3DAFC8::vf_10C()
@@ -2487,11 +2982,13 @@ RwReal type_3DAFC8::vf_10C()
     return unk_878 * unk_880;
 }
 // match: ?vf_130@type_3DAFC8@@UAEMXZ @ 0x0013B940
+// sp-match: ?vf_130@type_3DAFC8@@UAEMXZ @ 0x000E6FF0
 RwReal type_3DAFC8::vf_130()
 {
     return unk_888;
 }
 // match: ?vf_114@type_3DAFC8@@UAEMXZ @ 0x0013B960
+// sp-match: ?vf_114@type_3DAFC8@@UAEMXZ @ 0x000E7000
 // Its preferred attack range: its alerted view range times its vision
 // multiplier, and times unk_884 unless bit 13 of its AI object's unk_49C is
 // set.
@@ -2503,6 +3000,7 @@ RwReal type_3DAFC8::vf_114()
 }
 extern RwReal flt_429C8C;
 // match: ?vf_250@type_3DAFC8@@UAEMXZ @ 0x0013B9B0
+// sp-match: ?vf_250@type_3DAFC8@@UAEMXZ @ 0x000E7030
 // Suppresses it: when its suppression time has run out, 60 frames of
 // suppression (unk_1D2C) and a new time (unk_1D30), telling its scripts it
 // starts; then that it continues. Returns the suppression.
@@ -2518,6 +3016,7 @@ RwReal type_3DAFC8::vf_250()
     return unk_1D2C;
 }
 // match: ?vf_104@type_3DAFC8@@UAEXPAURwMatrixTag@@@Z @ 0x0013BA50
+// sp-match: ?vf_104@type_3DAFC8@@UAEXPAURwMatrixTag@@@Z @ 0x000E70B0
 // Its head's matrix (bone 0xCA) while its animation drives it, else its
 // frame's raised by its height by its posture's class (vf_0BC): twice it,
 // or once for class 1, or half for class 2.
@@ -2555,6 +3054,7 @@ void type_3DAFC8::vf_104(RwMatrix *arg_0)
     }
 }
 // match: ?vf_108@type_3DAFC8@@UAEXPAURwV3d@@@Z @ 0x0013BB80
+// sp-match: ?vf_108@type_3DAFC8@@UAEXPAURwV3d@@@Z @ 0x000E7190
 // Its eye point: its head (bone 0xCA) while its animation drives it, else
 // its frame's position raised as vf_104 raises it.
 void type_3DAFC8::vf_108(RwV3d *arg_0)
@@ -2590,6 +3090,7 @@ void type_3DAFC8::vf_108(RwV3d *arg_0)
     }
 }
 // match: ?vf_110@type_3DAFC8@@UAEXPAURwV3d@@PAUtype_3D3548@@H@Z @ 0x0013BCD0
+// sp-match: ?vf_110@type_3DAFC8@@UAEXPAURwV3d@@PAUtype_3D3548@@H@Z @ 0x000E7270
 // Its aim point: at a cover node (its AI object in state 6, 0x26 or 0x2A
 // with a current node, and arg_8 set), the node's point in the node's frame
 // unless arg_4 is behind the node; else bone 0x1C5 at such a node or 0x71
@@ -2600,7 +3101,9 @@ void type_3DAFC8::vf_110(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
     AIData *var_8;
     type_F8350 *var_C;
     RwInt32 var_10;
+#ifndef CODFH_SP // single player scopes it to a block below (SP 0xE7270)
     RwMatrix var_90;
+#endif
     RwV3d var_9C;
     RpHAnimHierarchy *var_A0;
     RwMatrix *var_A4;
@@ -2613,6 +3116,9 @@ void type_3DAFC8::vf_110(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
     var_C = var_8->unk_F60;
     if (var_8->sub_238E0(0) && var_C && arg_8)
     {
+#ifdef CODFH_SP // shape: block-scoped
+        RwMatrix var_90;
+#endif
         var_10 = 1;
         RtQuatConvertToMatrix(&var_C->unk_1C, &var_90);
         var_90.pos = var_C->unk_10;
@@ -2653,6 +3159,7 @@ void type_3DAFC8::vf_110(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
     }
 }
 // match: ?vf_0BC@type_3DAFC8@@UAEHXZ @ 0x0013C120
+// sp-match: ?vf_0BC@type_3DAFC8@@UAEHXZ @ 0x00112CA0
 // The class (1, 2 or 0) of its posture (vf_0AC).
 RwInt32 type_3DAFC8::vf_0BC()
 {
@@ -2692,6 +3199,7 @@ RwInt32 type_3DAFC8::vf_0BC()
     }
 }
 // match: ?vf_07C@type_3DAFC8@@UAEHCPAURpIntersection@@PAMH@Z @ 0x0013C1C0
+// sp-match: ?vf_07C@type_3DAFC8@@UAEHCPAURpIntersection@@PAMH@Z @ 0x000E7560
 // The line (arg_0 1) or sphere of arg_4 against its bone boxes (13 of
 // them while its animation drives it, else one box around it, its radius
 // across and as high as vf_104 raises its head); -1 for a miss or while
@@ -2772,6 +3280,7 @@ RwInt32 type_3DAFC8::vf_07C(RwInt8 arg_0, RpIntersection *arg_4, RwReal *arg_8, 
     return var_8;
 }
 // match: ?sub_13C490@type_3DAFC8@@QAEXH@Z @ 0x0013C490
+// sp-match: ?sub_13C490@type_3DAFC8@@QAEXH@Z @ 0x000E7770
 // Takes arg_0 damage: unless already hurt (1) or dying (2), it dies (unless
 // bit 14 of its AI object's unk_49C holds it) or is hurt, through its
 // second animation; with cheat flag 4 it shrinks with its hit points (to a
@@ -2802,6 +3311,7 @@ void type_3DAFC8::sub_13C490(RwInt32 arg_0)
 extern RwReal flt_429C90;
 extern RwReal dword_4CF9D0;
 // match: ?vf_064@type_3DAFC8@@UAEHPAUtype_75600@@@Z @ 0x0013C5B0
+// sp-match: ?vf_064@type_3DAFC8@@UAEHPAUtype_75600@@@Z @ 0x000E7830
 // A bullet: its hit-death values (with a performance value from the
 // shooter's distance), the damage (unless from a friend, or while its AI
 // object is not hurt by bullets; all or nothing with cheat flags 5 and 2),
@@ -2897,6 +3407,7 @@ RwInt32 type_3DAFC8::vf_064(type_75600 *arg_0)
     return 0;
 }
 // match: ?vf_068@type_3DAFC8@@UAEHPAUtype_758F0@@@Z @ 0x0013CAA0
+// sp-match: ?vf_068@type_3DAFC8@@UAEHPAUtype_758F0@@@Z @ 0x000E7BA0
 // An explosion that reaches it: while bit 3 of its AI object's unk_49C is
 // set, the damage by its zones (as the player's vf_068 reckons it, but for
 // its own posture class; 1 when out of range), then its hit-death values
@@ -2909,7 +3420,9 @@ RwInt32 type_3DAFC8::vf_068(type_758F0 *arg_0)
     RwReal stk_5C;
     type_114F90_50 *local_58;
     RwReal local_54;
+#ifndef CODFH_SP // single player scopes it to the block below (SP 0xE7BA0 reuses its slot)
     RwV3d local_50;
+#endif
     RwReal slot_44;
     RwV3d *l40;
     RwFrame *var_3C;
@@ -2924,6 +3437,10 @@ RwInt32 type_3DAFC8::vf_068(type_758F0 *arg_0)
     {
         if (unk_8A0.unk_49C_3)
         {
+#ifdef CODFH_SP // shape: block-scoped, its slot shared with a later temporary
+            RwV3d local_50;
+
+#endif
             RwV3dSubMacro(&local_50, &arg_0->unk_0C->pos, sub_CD550());
             slot_44 = RwV3dLength((RwV3d *)&local_50);
             if (slot_44 > arg_0->unk_10)
@@ -3005,11 +3522,13 @@ RwInt32 type_3DAFC8::vf_068(type_758F0 *arg_0)
 // named for what it computes. Evidence: vf_060 stores an expression argument
 // into a parameter slot, compares it with 0 and copies it or its negation
 // into a result temporary, with no call to the C library's fabs.
+// sp-match: ?real_abs@@YAMM@Z @ 0x000E4AF0
 inline RwReal real_abs(RwReal arg_0)
 {
     return arg_0 >= 0.0f ? arg_0 : -arg_0;
 }
 // match: ?vf_060@type_3DAFC8@@UAEHPAUtype_3D3548@@@Z @ 0x0013CF90
+// sp-match: ?vf_060@type_3DAFC8@@UAEHPAUtype_3D3548@@@Z @ 0x000E7F10
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A touch by the entity arg_0 (none while it rides or is dead: flags 9 and
 // 0). A vehicle (kind bits 0x40080) of another side, or one a player rides,
@@ -3022,12 +3541,15 @@ inline RwReal real_abs(RwReal arg_0)
 // (not blocked by bit 14) knocks it down the same way.
 RwInt32 type_3DAFC8::vf_060(type_3D3548 *arg_0)
 {
+#ifndef CODFH_SP // single player declares these in the blocks that use them (SP 0xE7F10)
     RwInt32 varB8;
     RwV3d *var_B4;
     RwV3d *vB0;
     RwV3d qAC;
     RwReal frm_A0;
+#endif
     type_3DA6C0 *local_9C;
+#ifndef CODFH_SP
     RwV3d var98;
     RwV3d l8C;
     RwReal *ebp_80;
@@ -3045,6 +3567,7 @@ RwInt32 type_3DAFC8::vf_060(type_3D3548 *arg_0)
     RwV3d *local_30;
     RwV3d stk_2C;
     RwV3d var_20;
+#endif
     RwReal ebp_14;
     type_3DBC78 *lv_10;
     RwInt32 var_C;
@@ -3065,6 +3588,17 @@ RwInt32 type_3DAFC8::vf_060(type_3D3548 *arg_0)
                 bp_8 = 1;
             if (var_C || (!var_C && bp_8))
             {
+#ifdef CODFH_SP // shape: block-scoped
+                RwV3d var50;
+                RwReal l54;
+                RwV3d *var_40;
+                RwV3d l3C;
+                RwV3d *local_30;
+                RwV3d stk_2C;
+                RwV3d var_20;
+                RwReal loc44;
+                RwInt32 z70;
+#endif
                 var50 = lv_10->unk_450.unk_124;
                 var50.y = 0.0f;
                 l54 = RwV3dLength((RwV3d *)&var50);
@@ -3084,6 +3618,10 @@ RwInt32 type_3DAFC8::vf_060(type_3D3548 *arg_0)
                     return 0;
                 if (!bp_8)
                 {
+#ifdef CODFH_SP // shape: block-scoped
+                    RwV3d lv_6C;
+                    RwV3d l60;
+#endif
                     l60 = lv_10->unk_450.unk_124;
                     RwV3dNormalize(&l60, &l60);
                     RwV3dSubMacro(&lv_6C, local_30, var_40);
@@ -3097,7 +3635,11 @@ RwInt32 type_3DAFC8::vf_060(type_3D3548 *arg_0)
                 RwV3dNormalize(&l3C, &l3C);
                 RwV3dSubMacro(&var_20, local_30, var_40);
                 loc44 = RwV3dDotProductMacro(&l3C, &var_20);
+#ifdef CODFH_SP // shape: single player evaluates the call first (SP 0xE7F10)
+                if (real_abs(loc44) > lv_10->unk_4C + 100.0f)
+#else
                 if (lv_10->unk_4C + 100.0f < real_abs(loc44))
+#endif
                     return 0;
                 RwV3dSubMacro(&stk_2C, var_40, local_30);
                 RwV3dNormalize(&stk_2C, &stk_2C);
@@ -3130,6 +3672,14 @@ RwInt32 type_3DAFC8::vf_060(type_3D3548 *arg_0)
         }
         else if (arg_0->unk_2C_5 || arg_0->unk_2C_17 || arg_0->unk_2C_21 || arg_0->unk_2C_4)
         {
+#ifdef CODFH_SP // shape: block-scoped
+            RwReal *ebp_80;
+            RwReal v7C;
+            RwReal var78;
+            RwReal *lv_74;
+            RwV3d var98;
+            RwV3d l8C;
+#endif
             ebp_80 = arg_0->vf_0C4();
             lv_74 = vf_0C4();
             RwV3dSubMacro(&var98, (RwV3d *)ebp_80, (RwV3d *)lv_74);
@@ -3159,6 +3709,13 @@ RwInt32 type_3DAFC8::vf_060(type_3D3548 *arg_0)
             local_9C = (type_3DA6C0 *)arg_0;
             if (local_9C->vf_244() == 1 && !unk_8A0.unk_49C_14)
             {
+#ifdef CODFH_SP // shape: block-scoped
+                RwV3d *var_B4;
+                RwV3d *vB0;
+                RwV3d qAC;
+                RwReal frm_A0;
+                RwInt32 varB8;
+#endif
                 vB0 = sub_CD550();
                 var_B4 = arg_0->sub_CD550();
                 RwV3dSubMacro(&qAC, var_B4, vB0);
@@ -3186,6 +3743,7 @@ RwInt32 type_3DAFC8::vf_060(type_3D3548 *arg_0)
     return 0;
 }
 // match: ?vf_06C@type_3DAFC8@@UAEHPAUtype_3D3548@@@Z @ 0x0013DA50
+// sp-match: ?vf_06C@type_3DAFC8@@UAEHPAUtype_3D3548@@@Z @ 0x000E8540
 // A collision with the entity arg_0: from a type_3DA6C0 whose vf_244 is 1,
 // its hit-death values (0x49 or 0x4A by whether it faces the entity), 1000
 // damage while its AI object is hurt by hits, its collision off, and its
@@ -3232,6 +3790,7 @@ RwInt32 type_3DAFC8::vf_06C(type_3D3548 *arg_0)
     return 0;
 }
 // match: ?vf_054@type_3DAFC8@@UAEXH@Z @ 0x0013DC60
+// sp-match: ?vf_054@type_3DAFC8@@UAEXH@Z @ 0x000E86E0
 // Its render (unless its trigger hides it by bit 11 of unk_24): its clump
 // and its two held clumps as the base renders its clump (faded while
 // unk_28_18 is set), with the cull mode flipped while its second animation
@@ -3327,6 +3886,7 @@ extern RwReal flt_429C9C;
 extern RwReal flt_429CA8;
 extern RwReal flt_429CA4;
 // match: ?sub_13DF40@type_3DAFC8@@QAEXPAURwV3d@@M@Z @ 0x0013DF40
+// sp-match: ?sub_13DF40@type_3DAFC8@@QAEXPAURwV3d@@M@Z @ 0x000E8900
 // "SendFlying": unless it flies already, it flies (unk_1D28 1, gravity on)
 // away from the point *arg_0, launched at an angle and a speed from the
 // strength arg_4 (200 to 1000) and the distance, in its own frame.
@@ -3364,7 +3924,11 @@ void type_3DAFC8::sub_13DF40(RwV3d *arg_0, RwReal arg_4)
         var_1C = RwV3dLength((RwV3d *)&var_14);
         if (var_1C > 0.001f)
         {
+#ifdef CODFH_SP // shape: single player evaluates the left factor first (SP 0xE8900)
+            var_20 = (flt_429CA0 / flt_429C9C) * ((arg_4 * flt_429C9C - var_1C) / arg_4);
+#else
             var_20 = (arg_4 * flt_429C9C - var_1C) / arg_4 * (flt_429CA0 / flt_429C9C);
+#endif
             var_24 = flt_429C98 + var_20;
             var_2C = tan(var_24 * rwPI / 180.0f);
             var_30 = var_2C * var_1C;
@@ -3392,6 +3956,7 @@ void type_3DAFC8::sub_13DF40(RwV3d *arg_0, RwReal arg_4)
     unk_130 = 1;
 }
 // match: ?vf_1C4@type_3DAFC8@@UAEXH@Z @ 0x0013E200
+// sp-match: ?vf_1C4@type_3DAFC8@@UAEXH@Z @ 0x000E8B00
 // Landing from a flight (unk_1D28): on the ground (arg_0) it stops, or
 // against a wall it drops; its scripts are told.
 void type_3DAFC8::vf_1C4(RwInt32 arg_0)
@@ -3416,16 +3981,19 @@ void type_3DAFC8::vf_1C4(RwInt32 arg_0)
     }
 }
 // match: ?vf_164@type_3DAFC8@@UAEMXZ @ 0x0013E310
+// sp-match: ?vf_164@type_3DAFC8@@UAEMXZ @ 0x000E8BB0
 RwReal type_3DAFC8::vf_164()
 {
     return unk_88C;
 }
 // match: ?vf_168@type_3DAFC8@@UAEMXZ @ 0x0013E330
+// sp-match: ?vf_168@type_3DAFC8@@UAEMXZ @ 0x000E8BC0
 RwReal type_3DAFC8::vf_168()
 {
     return unk_890;
 }
 // match: ?vf_16C@type_3DAFC8@@UAEHHH@Z @ 0x0013E350
+// sp-match: ?vf_16C@type_3DAFC8@@UAEHHH@Z @ 0x000E8BD0
 // Sets AI parameter arg_0 to arg_4, a float's bits as the script passes
 // them ("SetAIParam"), as type_3D5658::vf_16C does for its own fields.
 RwInt32 type_3DAFC8::vf_16C(RwInt32 arg_0, RwInt32 arg_4)
@@ -3464,6 +4032,7 @@ RwInt32 type_3DAFC8::vf_16C(RwInt32 arg_0, RwInt32 arg_4)
     return var_4;
 }
 // match: ?vf_1B0@type_3DAFC8@@UAEXH@Z @ 0x0013E470
+// sp-match: ?vf_1B0@type_3DAFC8@@UAEXH@Z @ 0x000E8CC0
 // Sets its AI object's unk_524 and hands it to its weapon.
 void type_3DAFC8::vf_1B0(RwInt32 arg_0)
 {
@@ -3471,6 +4040,7 @@ void type_3DAFC8::vf_1B0(RwInt32 arg_0)
     unk_3E0.sub_15D510(arg_0, 0);
 }
 // match: ?vf_1B4@type_3DAFC8@@UAEXH@Z @ 0x0013E4A0
+// sp-match: ?vf_1B4@type_3DAFC8@@UAEXH@Z @ 0x000E8CE0
 // Fires (arg_0 1) or stops: its mounted weapon while it is mounted, else
 // its own weapon (stopping it at 0).
 void type_3DAFC8::vf_1B4(RwInt32 arg_0)
@@ -3491,11 +4061,13 @@ void type_3DAFC8::vf_1B4(RwInt32 arg_0)
     }
 }
 // match: ?vf_248@type_3DAFC8@@UAEXH@Z @ 0x0013E510
+// sp-match: ?vf_248@type_3DAFC8@@UAEXH@Z @ 0x000E8D20
 void type_3DAFC8::vf_248(RwInt32 arg_0)
 {
     unk_3E0.unk_20 = arg_0;
 }
 // match: ?vf_24C@type_3DAFC8@@UAEXH@Z @ 0x0013E530
+// sp-match: ?vf_24C@type_3DAFC8@@UAEXH@Z @ 0x000E8D30
 // "SetFireAtNoTarget": its weapon's flags, then it fires.
 void type_3DAFC8::vf_24C(RwInt32 arg_0)
 {
@@ -3505,6 +4077,7 @@ void type_3DAFC8::vf_24C(RwInt32 arg_0)
     unk_600 = 1;
 }
 // match: ?sub_13E580@type_3DAFC8@@QAEHHHH@Z @ 0x0013E580
+// sp-match: ?sub_13E580@type_3DAFC8@@QAEHHHH@Z @ 0x000E8D70
 // "GetDodgeDirection": whether it can dodge in direction arg_0 (0 left, 1
 // right, 2 forward, 3 back) from the posture arg_4 (distances by posture:
 // kinds 8, 43, 64; 7, 18, 42, 59, 63; the others): never while flag 7 of
@@ -3637,6 +4210,7 @@ RwInt32 type_3DAFC8::sub_13E580(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
     return 0;
 }
 // match: ?sub_13E9A0@type_3DAFC8@@QAEHPAURwV3d@@PAUtype_3D3548@@H@Z @ 0x0013E9A0
+// sp-match: ?sub_13E9A0@type_3DAFC8@@QAEHPAURwV3d@@PAUtype_3D3548@@H@Z @ 0x000E9110
 // Whether it can dive along *arg_0: a nonzero direction, with nothing (but
 // arg_4) in the way from 100 above its position to that point plus the
 // direction.
@@ -3666,6 +4240,7 @@ extern RwReal flt_429CC8;
 extern RwReal flt_429CC4;
 extern RwReal flt_429CC0;
 // match: ?vf_134@type_3DAFC8@@UAEHPAURwV3d@@PAUtype_3D3548@@HHPAH2H@Z @ 0x0013EAD0
+// sp-match: ?vf_134@type_3DAFC8@@UAEHPAURwV3d@@PAUtype_3D3548@@HHPAH2H@Z @ 0x000E9200
 // Whether it can shoot arg_4 from the offset arg_0 in the posture arg_18
 // (-1: its own, vf_0BC): not where its weapon has no place (the tables
 // above); the muzzle point raised by the weapon's height and moved aside,
@@ -3692,16 +4267,20 @@ RwInt32 type_3DAFC8::vf_134(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwI
     RwReal var_5C;
     RwReal var_60;
     RwReal var_64;
+#ifndef CODFH_SP // single player declares these in the blocks that use them (SP 0xE9200)
     RwV3d var_70;
     RwV3d var_7C;
     RwV3d var_88;
     RwReal var_8C;
+#endif
     RwInt32 var_90;
+#ifndef CODFH_SP
     RwV3d var_B4;
     RwReal var_B8;
     RwReal var_114;
     RwV3d var_12C;
     RwReal var_130;
+#endif
 
     if (!arg_4)
         return 0;
@@ -3760,6 +4339,12 @@ RwInt32 type_3DAFC8::vf_134(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwI
     }
     if (arg_8)
     {
+#ifdef CODFH_SP // shape: block-scoped
+        RwV3d var_70;
+        RwV3d var_7C;
+        RwV3d var_88;
+        RwReal var_8C;
+#endif
         var_70.x = 0.0f;
         var_70.y = 1.0f;
         var_70.z = 0.0f;
@@ -3781,6 +4366,10 @@ RwInt32 type_3DAFC8::vf_134(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwI
         }
         else if (arg_14)
         {
+#ifdef CODFH_SP // shape: block-scoped
+            RwV3d var_B4;
+            RwReal var_B8;
+#endif
             RwV3dSubMacro(&var_B4, &var_38, &var_44);
             RwV3dScaleMacro(&var_B4, &var_B4, var_8C);
             var_B8 = RwV3dDotProductMacro(&var_B4, &var_B4);
@@ -3801,11 +4390,18 @@ RwInt32 type_3DAFC8::vf_134(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwI
     }
     else
     {
+#ifdef CODFH_SP // shape: block-scoped
+        RwReal var_114;
+#endif
         var_90 = !sub_D2FC0(&var_38, &var_44, arg_4, &var_114, 1, unk_30, 1, 1,
                             0x180000, 1, 0); // not an address: collision flags
         unk_8A0.set_unk_139C(var_114);
         if (!var_90 && arg_14)
         {
+#ifdef CODFH_SP // shape: block-scoped
+            RwV3d var_12C;
+            RwReal var_130;
+#endif
             RwV3dSubMacro(&var_12C, &var_38, &var_44);
             RwV3dScaleMacro(&var_12C, &var_12C, var_114);
             var_130 = RwV3dDotProductMacro(&var_12C, &var_12C);
@@ -3829,6 +4425,7 @@ RwInt32 type_3DAFC8::vf_134(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwI
     return var_90;
 }
 // match: ?sub_13F350@type_3DAFC8@@QAEXM@Z @ 0x0013F350
+// sp-match: ?sub_13F350@type_3DAFC8@@QAEXM@Z @ 0x000E9700
 // Aims its mounted weapon from bone 0x190 while its animation drives it,
 // else from its frame raised by its height by its posture's class; the
 // argument is unused.
@@ -3878,11 +4475,13 @@ void type_3DAFC8::sub_13F350(RwReal arg_0)
     }
 }
 // match: ?sub_13F4D0@type_3DAFC8@@QAEXPAUtype_3D3548@@@Z @ 0x0013F4D0
+// sp-match: ?sub_13F4D0@type_3DAFC8@@QAEXPAUtype_3D3548@@@Z @ 0x000E9800
 void type_3DAFC8::sub_13F4D0(type_3D3548 *arg_0)
 {
     unk_618.sub_D48D0(arg_0);
 }
 // match: ?sub_13F4F0@type_3DAFC8@@QAEXXZ @ 0x0013F4F0
+// sp-match: ?sub_13F4F0@type_3DAFC8@@QAEXXZ @ 0x000E9810
 void type_3DAFC8::sub_13F4F0()
 {
     if (unk_600)
@@ -3894,6 +4493,7 @@ void type_3DAFC8::sub_13F4F0()
     }
 }
 // match: ?vf_08C@type_3DAFC8@@UAEPAEHH@Z @ 0x0013F540
+// sp-match: ?vf_08C@type_3DAFC8@@UAEPAEHH@Z @ 0x000E9850
 // Its performance values (arg_4 1: the special idle ones), or for arg_0 set
 // those of its performance kind.
 RwUInt8 *type_3DAFC8::vf_08C(RwInt32 arg_0, RwInt32 arg_4)
@@ -3910,6 +4510,7 @@ RwUInt8 *type_3DAFC8::vf_08C(RwInt32 arg_0, RwInt32 arg_4)
     }
 }
 // match: ?sub_13F590@type_3DAFC8@@QAEHH@Z @ 0x0013F590
+// sp-match: ?sub_13F590@type_3DAFC8@@QAEHH@Z @ 0x000E9880
 // Mounts (arg_0 1) or dismounts the weapon unk_618 holds; 0 when it may not
 // be mounted.
 RwInt32 type_3DAFC8::sub_13F590(RwInt32 arg_0)
@@ -3938,16 +4539,19 @@ RwInt32 type_3DAFC8::sub_13F590(RwInt32 arg_0)
     return 1;
 }
 // match: ?vf_098@type_3DAFC8@@UAEPAUtype_3D2E7C@@XZ @ 0x0013F620
+// sp-match: ?vf_098@type_3DAFC8@@UAEPAUtype_3D2E7C@@XZ @ 0x000E98F0
 type_3D2E7C *type_3DAFC8::vf_098()
 {
     return (type_3D2E7C *)sub_67620(unk_840);
 }
 // match: ?vf_090@type_3DAFC8@@UAEPAUtype_6D380@@XZ @ 0x0013F640
+// sp-match: ?vf_090@type_3DAFC8@@UAEPAUtype_6D380@@XZ @ 0x000E9900
 struct type_6D380 *type_3DAFC8::vf_090()
 {
     return (type_6D380 *)sub_67620(unk_844);
 }
 // match: ?sub_13F660@type_3DAFC8@@QAEXHH@Z @ 0x0013F660
+// sp-match: ?sub_13F660@type_3DAFC8@@QAEXHH@Z @ 0x000E9910
 // "EnableWeaponRender": shows (arg_4 set) or hides the model of its weapon
 // (arg_0 0) or of its grenade (1).
 void type_3DAFC8::sub_13F660(RwInt32 arg_0, RwInt32 arg_4)
@@ -3968,6 +4572,7 @@ void type_3DAFC8::sub_13F660(RwInt32 arg_0, RwInt32 arg_4)
     }
 }
 // match: ?vf_058@type_3DAFC8@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x0013F720
+// sp-match: ?vf_058@type_3DAFC8@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x000E9960
 // Whether arg_0 is one of the keys (0 to 2) of its definition's model
 // objects (sub_1917A0, sub_1917F0 and, when it has one, sub_191840).
 RwInt32 type_3DAFC8::vf_058(type_3DF8D8_04 *arg_0)
@@ -4017,6 +4622,7 @@ RwInt32 type_3DAFC8::vf_058(type_3DF8D8_04 *arg_0)
     return 0;
 }
 // match: ?sub_13F940@type_3DAFC8@@QAEXM@Z @ 0x0013F940
+// sp-match: ?sub_13F940@type_3DAFC8@@QAEXM@Z @ 0x000E9A90
 // Adds arg_0 of its full hit points to its hit points (0 to full).
 void type_3DAFC8::sub_13F940(RwReal arg_0)
 {
@@ -4027,6 +4633,7 @@ void type_3DAFC8::sub_13F940(RwReal arg_0)
         unk_1D20 = unk_1D24;
 }
 // match: ?vf_0B0@type_3DAFC8@@UAEXHH@Z @ 0x0013F9B0
+// sp-match: ?vf_0B0@type_3DAFC8@@UAEXHH@Z @ 0x000E9AE0
 // Sets its posture ("SetPosture") and derives vf_0B4's value.
 void type_3DAFC8::vf_0B0(RwInt32 arg_0, RwInt32 arg_4)
 {

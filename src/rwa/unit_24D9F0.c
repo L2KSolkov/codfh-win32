@@ -20,6 +20,7 @@ extern const RwaUUID unk_3ED65C;
 /* _rwaStreamFormatCreateFromPack, rwad.dll 0x10069E30: shared header
  * and marker ID locals; cue loops retain their own index and ID locals. */
 // match: _sub_24D670 @ 0x0024D670
+// sp-match: _sub_24D670 @ 0x001617C0
 rwaStreamInfo *
 sub_24D670(rwaStreamInfo *info)
 {
@@ -155,6 +156,7 @@ sub_24D670(rwaStreamInfo *info)
 }
 
 // match: _sub_24D9F0 @ 0x0024D9F0
+// sp-match: _sub_24D9F0 @ 0x00161B40
 RwInt32
 sub_24D9F0(rwaStreamMarker *marker)
 {
@@ -168,6 +170,7 @@ sub_24D9F0(rwaStreamMarker *marker)
 }
 
 // match: _sub_24DA10 @ 0x0024DA10
+// sp-match: _sub_24DA10 @ 0x00161B60
 RwInt32
 sub_24DA10(rwaStreamTrack *track)
 {
@@ -184,6 +187,7 @@ sub_24DA10(rwaStreamTrack *track)
 }
 
 // match: _sub_24DA40 @ 0x0024DA40
+// sp-match: _sub_24DA40 @ 0x00161B90
 RwInt32
 sub_24DA40(rwaStreamInfo *info)
 {

@@ -139,7 +139,9 @@ struct type_14A5E0
     RwInt32 unk_60;
     RwInt32 unk_64;             // set when an atomic's triangle pushed it,
     RwV3d unk_68;               // and where, from the atomic, doubled
+#ifndef CODFH_SP // single player's is 0x74 bytes (SP 0xF4230's frame is 0x90, MP's 0x94)
     RwInt32 unk_74;             // (no byte arrays: they add a /GS cookie)
+#endif
 };
 
 struct type_3DBC78_450
@@ -286,7 +288,9 @@ extern RwReal flt_4D50FC;
 // The largest contact turn seen (sub_14A250).
 extern RwReal flt_4D5104;
 // sub_14A5E0's result; nothing here sets it.
+#ifndef CODFH_SP // single player's is unit_147080's own (static: SP 0xF42F3 loads unk_2A0 before clearing it)
 extern RwInt32 dword_4D31B0;
+#endif
 // sub_14A5E0's triangle callback.
 struct RpCollisionTriangle *sub_14A870(struct RpIntersection *arg_0, struct RpWorldSector *arg_4,
                                        struct RpCollisionTriangle *arg_8, RwReal arg_C, void *arg_10);

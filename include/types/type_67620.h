@@ -134,7 +134,11 @@ struct type_67620
     // sub_6D380 waits (the wait opcode, sub_69500), sub_6E390 resumes;
     // sub_6E490 picks the event handler (a code offset), and sub_6E400,
     // sub_6E430 and sub_6E450 test, set and test the flag arg_0.
+#ifdef CODFH_SP // single player's sub_6DE40 has no speed (SP 0x5C340 ends ret 0x10)
+    bool sub_6DE40(RwInt32 arg_0, RwInt32 *arg_4, RwInt32 arg_8, RwInt8 arg_C);
+#else
     bool sub_6DE40(RwInt32 arg_0, RwInt32 *arg_4, RwInt32 arg_8, RwInt8 arg_C, RwReal arg_10);
+#endif
     void sub_6DDF0(RwInt8 arg_0, RwUInt8 arg_4);
     void sub_6D380(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 *arg_C, RwInt32 *arg_10,
                    RwInt32 arg_14, RwInt32 arg_18, RwInt32 arg_1C);

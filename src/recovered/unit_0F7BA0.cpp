@@ -46,8 +46,10 @@ extern const RwReal flt_3D9480 = 2000.0f;
 extern const RwReal flt_3D9484 = 1000.0f;
 // 0x003D9488 (AIData reads it too, unit_022C80: external)
 extern const RwReal flt_3D9488 = 500.0f;
+#ifndef CODFH_SP // single player writes the literal (an immediate, SP 0xBE19A): 500.0f is followed by the x axis (SP 0x2E5940)
 // 0x003D948C
 extern const RwReal flt_3D948C = 7984.2104f;
+#endif
 // 0x003D9490
 extern const RwV3d unk_3D9490 = { 1.0f, 0.0f, 0.0f };
 // 0x003D949C
@@ -89,6 +91,10 @@ alfahash dword_4C0164;
 // match: _$E5 @ 0x0030E590
 // match: _$E7 @ 0x0030B710
 // match: _$E8 @ 0x0030E5A0
+// sp-match: _$E8 @ 0x0021E930
+// sp-match: _$E4 @ 0x0021D760
+// sp-match: _$E7 @ 0x0021D780
+// sp-match: _$E5 @ 0x0021E920
 
 // The occupied alarm nodes (their dynamic initializer builds them with the
 // out-of-line copy of the constructor; its exit function destroys them).
@@ -97,6 +103,7 @@ type_4C01A0 dword_4C01A0[0x80];
 // match: ?sub_F7BA0@@YAHPAUAIData@@PAUtype_F8350@@_N@Z @ 0x000F7BA0
 // match: __ehhandler$?sub_F7BA0@@YAHPAUAIData@@PAUtype_F8350@@_N@Z-0x8 @ 0x00301110
 // match: __ehhandler$?sub_F7BA0@@YAHPAUAIData@@PAUtype_F8350@@_N@Z @ 0x00301118
+// sp-match: ?sub_F7BA0@@YAHPAUAIData@@PAUtype_F8350@@_N@Z @ 0x000BDAB0
 // Local names state their slots.
 RwInt32 sub_F7BA0(AIData *arg_0, type_F8350 *arg_4, bool arg_8)
 {
@@ -172,6 +179,7 @@ RwInt32 sub_F7BA0(AIData *arg_0, type_F8350 *arg_4, bool arg_8)
 }
 
 // match: ?sub_F7DC0@@YAXXZ @ 0x000F7DC0
+// sp-match: ?sub_F7DC0@@YAXXZ @ 0x000BCA20
 void sub_F7DC0()
 {
     RwInt32 var_4;
@@ -188,18 +196,21 @@ void sub_F7DC0()
 }
 
 // match: ?sub_F7E50@@YAIPAX@Z @ 0x000F7E50
+// sp-match: ?sub_F7E50@@YAIPAX@Z @ 0x000BC9F0
 RwUInt32 sub_F7E50(void *arg_0)
 {
     return ((type_4C01A0 *)arg_0)->unk_00;
 }
 
 // match: ?sub_F7E60@@YA_NPAX0@Z @ 0x000F7E60
+// sp-match: ?sub_F7E60@@YA_NPAX0@Z @ 0x000BCA00
 bool sub_F7E60(void *arg_0, void *arg_4)
 {
     return ((type_4C01A0 *)arg_0)->unk_00 == ((type_4C01A0 *)arg_4)->unk_00;
 }
 
 // match: ?sub_F7E80@@YAP6AHPAUtype_F8350@@HPAUtype_154C0_1048@@M@ZH@Z @ 0x000F7E80
+// sp-match: ?sub_F7E80@@YAP6AHPAUtype_F8350@@HPAUtype_154C0_1048@@M@ZH@Z @ 0x000BE2D0
 type_F93D0 sub_F7E80(RwInt32 arg_0)
 {
     switch (arg_0)
@@ -243,6 +254,7 @@ type_F93D0 sub_F7E80(RwInt32 arg_0)
 }
 
 // match: ?sub_F7F60@@YAXXZ @ 0x000F7F60
+// sp-match: ?sub_F7F60@@YAXXZ @ 0x000BE390
 void sub_F7F60()
 {
     RwInt32 var_4;
@@ -264,6 +276,7 @@ void sub_F7F60()
 }
 
 // match: ?sub_F8010@@YAXXZ @ 0x000F8010
+// sp-match: ?sub_F8010@@YAXXZ @ 0x000BCA80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_F8010()
 {
@@ -299,6 +312,7 @@ void sub_F8010()
 }
 
 // match: ?sub_F8120@@YAXXZ @ 0x000F8120
+// sp-match: ?sub_F8120@@YAXXZ @ 0x000BDC20
 void sub_F8120()
 {
     if (unk_4C00E8.unk_60)
@@ -312,6 +326,7 @@ void sub_F8120()
 }
 
 // match: ?sub_F8160@@YAXXZ @ 0x000F8160
+// sp-match: ?sub_F8160@@YAXXZ @ 0x000BDC60
 void sub_F8160()
 {
     sub_F8180();
@@ -319,6 +334,7 @@ void sub_F8160()
 }
 
 // match: ?sub_F8180@@YAXXZ @ 0x000F8180
+// sp-match: ?sub_F8180@@YAXXZ @ 0x000BCB30
 void sub_F8180()
 {
     unk_4C00E8.unk_04 = 0;
@@ -347,6 +363,7 @@ void sub_F8180()
 }
 
 // match: ?sub_F8270@@YAXXZ @ 0x000F8270
+// sp-match: ?sub_F8270@@YAXXZ @ 0x000BCBB0
 void sub_F8270()
 {
     if (unk_4C00E8.unk_2C)
@@ -384,6 +401,7 @@ void sub_F8270()
 }
 
 // match: ?sub_F8350@@YAXPAURwStream@@@Z @ 0x000F8350
+// sp-match: ?sub_F8350@@YAXPAURwStream@@@Z @ 0x000BDC70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_F8350(RwStream *arg_0)
 {
@@ -511,7 +529,13 @@ void sub_F8350(RwStream *arg_0)
         r34 = 0xC;
         for (lcl_38 = 0; lcl_38 < unk_4C00E8.unk_5C; lcl_38 += r34)
         {
+#ifdef CODFH_SP
+            // shape: the record copied into a loop-scoped local, so /O2 loads both
+            // halves before storing them (SP 0xBDF35)
+            type_73050 loc44 = *(type_73050 *)lv_30;
+#else
             loc44 = *(type_73050 *)lv_30;
+#endif
             lv_30 += 8;
             ebp_3C = *(RwInt32 *)lv_30;
             lv_30 += 4;
@@ -523,6 +547,7 @@ void sub_F8350(RwStream *arg_0)
 }
 
 // match: ?sub_F8770@@YAHPAURwV3d@@PAH1@Z @ 0x000F8770
+// sp-match: ?sub_F8770@@YAHPAURwV3d@@PAH1@Z @ 0x000BCC50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_F8770(RwV3d *arg_0, RwInt32 *arg_4, RwInt32 *arg_8)
 {
@@ -553,6 +578,7 @@ RwInt32 sub_F8770(RwV3d *arg_0, RwInt32 *arg_4, RwInt32 *arg_8)
 }
 
 // match: ?sub_F8820@@YAHPAURwV3d@@MPAHH@Z @ 0x000F8820
+// sp-match: ?sub_F8820@@YAHPAURwV3d@@MPAHH@Z @ 0x000BCCC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_F8820(RwV3d *arg_0, RwReal arg_4, RwInt32 *arg_8, RwInt32 arg_C)
 {
@@ -618,6 +644,7 @@ RwInt32 sub_F8820(RwV3d *arg_0, RwReal arg_4, RwInt32 *arg_8, RwInt32 arg_C)
 }
 
 // match: ?sub_F8970@@YAPAUtype_F8350@@PAUtype_154C0_1048@@HH@Z @ 0x000F8970
+// sp-match: ?sub_F8970@@YAPAUtype_F8350@@PAUtype_154C0_1048@@HH@Z @ 0x000BE400
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_F8350 *sub_F8970(type_154C0_1048 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
@@ -749,6 +776,7 @@ type_F8350 *sub_F8970(type_154C0_1048 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 // match: ?sub_F8D30@@YAHHHPAUtype_154C0_1048@@HH@Z @ 0x000F8D30
 // match: __ehhandler$?sub_F8D30@@YAHHHPAUtype_154C0_1048@@HH@Z-0x8 @ 0x00301130
 // match: __ehhandler$?sub_F8D30@@YAHHHPAUtype_154C0_1048@@HH@Z @ 0x00301138
+// sp-match: ?sub_F8D30@@YAHHHPAUtype_154C0_1048@@HH@Z @ 0x000BDFA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_F8D30(RwInt32 arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwInt32 arg_C, RwInt32 arg_10)
 {
@@ -776,7 +804,11 @@ RwInt32 sub_F8D30(RwInt32 arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwInt32 
             {
                 w48 = 1;
                 RwV3dSub(&frm_24, &arg_8->unk_04, &loc44->unk_10);
+#ifdef CODFH_SP // shape: the squared distance summed from z down to x
+                m_18 = frm_24.z * frm_24.z + frm_24.y * frm_24.y + frm_24.x * frm_24.x;
+#else
                 m_18 = RwV3dDotProduct(&frm_24, &frm_24);
+#endif
                 if (arg_8->unk_18)
                 {
                     w48 = arg_8->unk_18(loc44, lcl_38.unk_0C, arg_8, m_18);
@@ -819,6 +851,7 @@ RwInt32 sub_F8D30(RwInt32 arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwInt32 
 }
 
 // match: ?sub_F8FA0@@YAHPAUtype_F8350@@@Z @ 0x000F8FA0
+// sp-match: ?sub_F8FA0@@YAHPAUtype_F8350@@@Z @ 0x000BCDD0
 RwInt32 sub_F8FA0(type_F8350 *arg_0)
 {
     RwInt32 var_4 = arg_0->unk_00_w & 0xF42;
@@ -827,6 +860,7 @@ RwInt32 sub_F8FA0(type_F8350 *arg_0)
 }
 
 // match: ?sub_F8FC0@@YAHPAUtype_F8350@@@Z @ 0x000F8FC0
+// sp-match: ?sub_F8FC0@@YAHPAUtype_F8350@@@Z @ 0x000BCDE0
 RwInt32 sub_F8FC0(type_F8350 *arg_0)
 {
     RwInt32 var_4 = arg_0->unk_04;
@@ -835,6 +869,7 @@ RwInt32 sub_F8FC0(type_F8350 *arg_0)
 }
 
 // match: ?sub_F8FE0@@YAXPAUtype_F8350@@PAURwV3d@@1@Z @ 0x000F8FE0
+// sp-match: ?sub_F8FE0@@YAXPAUtype_F8350@@PAURwV3d@@1@Z @ 0x000BCDF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_F8FE0(type_F8350 *arg_0, RwV3d *arg_4, RwV3d *arg_8)
 {
@@ -1013,6 +1048,7 @@ void sub_F8FE0(type_F8350 *arg_0, RwV3d *arg_4, RwV3d *arg_8)
 }
 
 // match: ?sub_F93D0@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000F93D0
+// sp-match: ?sub_F93D0@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD030
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_F93D0(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
@@ -1030,13 +1066,24 @@ RwInt32 sub_F93D0(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_F9440@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000F9440
+// sp-match: ?sub_F9440@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD070
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_F9440(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     RwReal var_4C;
     type_4E5D30 *frm_48;
+#ifdef CODFH_SP // shape: the line test's line and the flag after it are one object (the flag's store stays)
+    struct
+    {
+        RwLine line;
+        RwInt32 flag;
+    } line_flag;
+    RwLine &w44 = line_flag.line;
+    RwInt32 &ebp_2C = line_flag.flag;
+#else
     RwLine w44;
     RwInt32 ebp_2C;
+#endif
     RwInt32 l28;
     type_3D3548 *ebp_24;
     RwV3d w20;
@@ -1053,7 +1100,7 @@ RwInt32 sub_F9440(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
     {
         return 0;
     }
-    if (bp_4 * bp_4 > arg_C)
+    if (arg_C < bp_4 * bp_4)
     {
         return 0;
     }
@@ -1096,6 +1143,7 @@ RwInt32 sub_F9440(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_F9710@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000F9710
+// sp-match: ?sub_F9710@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD260
 RwInt32 sub_F9710(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     if (arg_0->unk_04 != 0x10 && arg_0->unk_04 != 0xF)
@@ -1110,6 +1158,7 @@ RwInt32 sub_F9710(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_F9750@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000F9750
+// sp-match: ?sub_F9750@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD290
 RwInt32 sub_F9750(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     if (arg_C > arg_8->unk_5C)
@@ -1124,6 +1173,7 @@ RwInt32 sub_F9750(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_F9780@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000F9780
+// sp-match: ?sub_F9780@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD2C0
 RwInt32 sub_F9780(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     if (arg_C > arg_8->unk_5C)
@@ -1146,6 +1196,7 @@ RwInt32 sub_F9780(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_F97F0@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000F97F0
+// sp-match: ?sub_F97F0@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BE150
 RwInt32 sub_F97F0(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     if (!arg_0->unk_00_4)
@@ -1156,6 +1207,7 @@ RwInt32 sub_F97F0(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_F9820@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000F9820
+// sp-match: ?sub_F9820@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD300
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_F9820(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
@@ -1170,8 +1222,18 @@ RwInt32 sub_F9820(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
     RwInt32 fp_2C;
     RwInt32 q28;
     RwInt32 frm_24;
+#ifdef CODFH_SP // shape: the line test's line and the flag after it are one object (the flag's store stays)
+    struct
+    {
+        RwLine line;
+        RwInt32 flag;
+    } line_flag;
+    RwLine &loc20 = line_flag.line;
+    RwInt32 &bp_8 = line_flag.flag;
+#else
     RwLine loc20;
     RwInt32 bp_8;
+#endif
     RwInt32 bp_4;
 
     if (!within_height(loc54 = (RwReal)fabs(arg_0->unk_10.y - arg_8->unk_04.y)))
@@ -1231,6 +1293,7 @@ RwInt32 sub_F9820(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_F9A70@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000F9A70
+// sp-match: ?sub_F9A70@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BE170
 RwInt32 sub_F9A70(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     if (!arg_0->unk_00_4)
@@ -1241,6 +1304,7 @@ RwInt32 sub_F9A70(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_F9AA0@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000F9AA0
+// sp-match: ?sub_F9AA0@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD460
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_F9AA0(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
@@ -1253,8 +1317,18 @@ RwInt32 sub_F9AA0(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
     RwInt32 fp_2C;
     RwInt32 q28;
     RwInt32 frm_24;
+#ifdef CODFH_SP // shape: the line test's line and the flag after it are one object (the flag's store stays)
+    struct
+    {
+        RwLine line;
+        RwInt32 flag;
+    } line_flag;
+    RwLine &loc20 = line_flag.line;
+    RwInt32 &bp_8 = line_flag.flag;
+#else
     RwLine loc20;
     RwInt32 bp_8;
+#endif
     RwInt32 bp_4;
 
     if (!within_height(loc44 = (RwReal)fabs(arg_0->unk_10.y - arg_8->unk_04.y)))
@@ -1305,6 +1379,7 @@ RwInt32 sub_F9AA0(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_F9C80@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000F9C80
+// sp-match: ?sub_F9C80@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD5A0
 RwInt32 sub_F9C80(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     if (arg_C > arg_8->unk_5C)
@@ -1337,10 +1412,21 @@ RwInt32 sub_F9C80(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 // from its point (raised by 50) to the node's door-offset point (sub_F8FE0,
 // turned by the node's orientation) crosses none of the collision worlds.
 // match: ?sub_F9DA0@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000F9DA0
+// sp-match: ?sub_F9DA0@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD5D0
 RwInt32 sub_F9DA0(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
+#ifdef CODFH_SP // shape: the line test's line and the flag after it are one object (the flag's store stays)
+    struct
+    {
+        RwLine line;
+        RwInt32 flag;
+    } line_flag;
+    RwInt32 &var_4 = line_flag.flag;
+    RwLine &var_1C = line_flag.line;
+#else
     RwInt32 var_4;
     RwLine var_1C;
+#endif
     type_F8350 *var_20;
     RwV3d var_2C;
     RwMatrix var_70;
@@ -1403,6 +1489,7 @@ RwInt32 sub_F9DA0(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_FA260@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000FA260
+// sp-match: ?sub_FA260@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD840
 RwInt32 sub_FA260(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     if (arg_C > arg_8->unk_5C)
@@ -1423,6 +1510,7 @@ RwInt32 sub_FA260(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_FA330@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000FA330
+// sp-match: ?sub_FA330@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD870
 RwInt32 sub_FA330(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     if (arg_C > arg_8->unk_5C)
@@ -1447,7 +1535,7 @@ RwInt32 sub_FA330(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
     {
         return 0;
     }
-    if (flt_3D9484 * flt_3D9484 > arg_C)
+    if (arg_C < flt_3D9484 * flt_3D9484)
     {
         return 0;
     }
@@ -1455,6 +1543,7 @@ RwInt32 sub_FA330(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_FA440@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000FA440
+// sp-match: ?sub_FA440@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD8B0
 RwInt32 sub_FA440(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     if (arg_C > arg_8->unk_5C)
@@ -1469,12 +1558,23 @@ RwInt32 sub_FA440(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_FA470@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000FA470
+// sp-match: ?sub_FA470@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD8E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_FA470(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     type_4E5D30 *frm_24;
+#ifdef CODFH_SP // shape: the line test's line and the flag after it are one object (the flag's store stays)
+    struct
+    {
+        RwLine line;
+        RwInt32 flag;
+    } line_flag;
+    RwLine &loc20 = line_flag.line;
+    RwInt32 &bp_8 = line_flag.flag;
+#else
     RwLine loc20;
     RwInt32 bp_8;
+#endif
     RwInt32 bp_4;
 
     if (!sub_FA440(arg_0, arg_4, arg_8, arg_C))
@@ -1499,6 +1599,7 @@ RwInt32 sub_FA470(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_FA570@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000FA570
+// sp-match: ?sub_FA570@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD9B0
 RwInt32 sub_FA570(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     if (arg_C > arg_8->unk_5C)
@@ -1521,6 +1622,7 @@ RwInt32 sub_FA570(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_FA5D0@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000FA5D0
+// sp-match: ?sub_FA5D0@@YAHPAUtype_F8350@@HPAUtype_154C0_1048@@M@Z @ 0x000BD9F0
 RwInt32 sub_FA5D0(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwReal arg_C)
 {
     if (arg_C > arg_8->unk_5C)
@@ -1539,6 +1641,7 @@ RwInt32 sub_FA5D0(type_F8350 *arg_0, RwInt32 arg_4, type_154C0_1048 *arg_8, RwRe
 }
 
 // match: ?sub_FA620@@YAHHHH@Z @ 0x000FA620
+// sp-match: ?sub_FA620@@YAHHHH@Z @ 0x000BDA30
 RwInt32 sub_FA620(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_FA620 *var_4 = (type_FA620 *)arg_0;
@@ -1550,7 +1653,9 @@ RwInt32 sub_FA620(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 
 // flt_3D948C (7984.2, .rdata): the square of a cover corner's expected
 // diagonal size (its root, about 89.4, is taken).
+#ifndef CODFH_SP
 extern const RwReal flt_3D948C;
+#endif
 
 // The corner connected to the cover point arg_0: the first linked node of the
 // same kind and flags (bits 2 and 6 aside) on the other side (bit 6), whose
@@ -1559,6 +1664,7 @@ extern const RwReal flt_3D948C;
 // match: ?sub_FA650@@YAPAUtype_F8350@@PAU1@@Z @ 0x000FA650
 // match: __ehhandler$?sub_FA650@@YAPAUtype_F8350@@PAU1@@Z-0xB @ 0x00301150
 // match: __ehhandler$?sub_FA650@@YAPAUtype_F8350@@PAU1@@Z @ 0x0030115B
+// sp-match: ?sub_FA650@@YAPAUtype_F8350@@PAU1@@Z @ 0x000BE190
 type_F8350 *sub_FA650(type_F8350 *arg_0)
 {
     RwUInt32 *var_14;
@@ -1576,7 +1682,11 @@ type_F8350 *sub_FA650(type_F8350 *arg_0)
     var_14 = 0;
     do
     {
+#ifdef CODFH_SP // a literal: default.xbe has no flt_3D948C (SP 0xBE19A stores 0x45F981AF)
+        __m128 var_30 = _mm_set_ss(7984.2104f);
+#else
         __m128 var_30 = _mm_set_ss(flt_3D948C);
+#endif
         __m128 var_60 = _mm_sqrt_ss(var_30);
         _mm_store_ss(&var_74, var_60);
     } while (0);
@@ -1619,6 +1729,7 @@ type_F8350 *sub_FA650(type_F8350 *arg_0)
 }
 
 // match: ?sub_FA920@@YAHPAUtype_F8350@@@Z @ 0x000FA920
+// sp-match: ?sub_FA920@@YAHPAUtype_F8350@@@Z @ 0x000BDA50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_FA920(type_F8350 *arg_0)
 {
@@ -1641,6 +1752,7 @@ RwInt32 sub_FA920(type_F8350 *arg_0)
 }
 
 // match: ?sub_FA980@@YAPAUtype_F8350@@H@Z @ 0x000FA980
+// sp-match: ?sub_FA980@@YAPAUtype_F8350@@H@Z @ 0x000BDA90
 type_F8350 *sub_FA980(RwInt32 arg_0)
 {
     if (arg_0 >= 0 && arg_0 < unk_4C00E8.unk_08)
@@ -1651,6 +1763,7 @@ type_F8350 *sub_FA980(RwInt32 arg_0)
 }
 
 // match: ??0type_4C01A0@@QAE@XZ @ 0x000FA9B0
+// sp-match: ??0type_4C01A0@@QAE@XZ @ 0x000BC9E0
 // (Defined in the class, in game/pathnodes.h.)
 
 

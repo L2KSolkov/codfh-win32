@@ -63,6 +63,7 @@ static const RwInt8 anisotDefault = 1;  /* 1 does just isotropic sampling */
 // match: _anisotDefault @ 0x0041A98F
 
 // match: _anisotOpen @ 0x002FC950
+// sp-match: _anisotOpen @ 0x002170E0
 static void        *
 anisotOpen(void *instance, RwInt32 __RWUNUSED__ offset,
              RwInt32 __RWUNUSED__ size)
@@ -76,6 +77,7 @@ anisotOpen(void *instance, RwInt32 __RWUNUSED__ offset,
 }
 
 // match: _anisotClose @ 0x002FC960
+// sp-match: _anisotClose @ 0x002170F0
 static void        *
 anisotClose(void *instance, RwInt32 __RWUNUSED__ offset,
               RwInt32 __RWUNUSED__ size)
@@ -91,6 +93,7 @@ anisotClose(void *instance, RwInt32 __RWUNUSED__ offset,
 /*--- Plugin Texture Functions ---*/
 
 // match: _anisotConstruct @ 0x002FC970
+// sp-match: _anisotConstruct @ 0x00217100
 static void        *
 anisotConstruct(void *object, RwInt32 __RWUNUSED__ offset,
                   RwInt32 __RWUNUSED__ size)
@@ -119,6 +122,7 @@ anisotDestruct(void *object, RwInt32 __RWUNUSED__ offset,
 }
 
 // match: _anisotCopy @ 0x002FC980
+// sp-match: _anisotCopy @ 0x00217110
 static void        *
 anisotCopy(void *destinationObject, const void *sourceObject,
              RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -145,6 +149,7 @@ anisotCopy(void *destinationObject, const void *sourceObject,
 /*--- Plugin Texture Stream Functions ---*/
 
 // match: _anisotRead @ 0x002FCA10
+// sp-match: _anisotRead @ 0x002171A0
 static RwStream    *
 anisotRead(RwStream * stream, RwInt32 __RWUNUSED__ binaryLength,
              void *object, RwInt32 __RWUNUSED__ offset,
@@ -168,6 +173,7 @@ anisotRead(RwStream * stream, RwInt32 __RWUNUSED__ binaryLength,
 }
 
 // match: _anisotWrite @ 0x002FC9A0
+// sp-match: _anisotWrite @ 0x00217130
 static RwStream    *
 anisotWrite(RwStream * stream, RwInt32 __RWUNUSED__ binaryLength,
               const void *object, RwInt32 __RWUNUSED__ offset,
@@ -191,6 +197,7 @@ anisotWrite(RwStream * stream, RwInt32 __RWUNUSED__ binaryLength,
 }
 
 // match: _anisotGetSize @ 0x002FC9E0
+// sp-match: _anisotGetSize @ 0x00217170
 static RwInt32
 anisotGetSize(const void * object,
               RwInt32 __RWUNUSED__ offsetInObject,
@@ -376,6 +383,7 @@ RpAnisotTextureGetMaxAnisotropy(RwTexture * tex)
  *
  */
 // match: _RpAnisotPluginAttach @ 0x002FCA60
+// sp-match: _RpAnisotPluginAttach @ 0x002171F0
 RwBool
 RpAnisotPluginAttach(void)
 {
