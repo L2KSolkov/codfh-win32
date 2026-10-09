@@ -593,6 +593,7 @@ void type_19D580::sub_19D810(RwCamera *arg_0, RwInt32 arg_4)
     D3DDevice_GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &var_10);
     var_10->LockRect(&var_C, 0, D3DLOCK_TILED);
     bp_4 = BinkCopyToBuffer(unk_84, var_C.pBits, var_C.Pitch, unk_84->Height, 0, 0, 0x80000003);
+    var_10->UnlockRect();
     var_10->Release();
 }
 // match: ?sub_19D890@type_19D580@@QAEX_N@Z @ 0x0019D890
