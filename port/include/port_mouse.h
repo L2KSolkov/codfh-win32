@@ -13,6 +13,7 @@ enum
     PORT_MENU_MOUSE_ACCEPT = 16
 };
 void port_menu_mouse_reset(void);
+void port_menu_mouse_hide(void);
 int port_menu_mouse_poll(void);
 #ifdef __cplusplus
 }

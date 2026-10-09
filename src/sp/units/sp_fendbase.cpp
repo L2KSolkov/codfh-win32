@@ -157,6 +157,9 @@ bool type_sp_AD970::sp_sub_AD990(RwCamera *arg_0)
 // sp-match: ?sp_sub_ADA70@type_sp_AD970@@QAEXXZ @ 0x000ADA70
 void type_sp_AD970::sp_sub_ADA70()
 {
+#ifdef CODFH_WIN32
+    port_menu_mouse_hide();
+#endif
     unk_06 = false;
     if (unk_180)
     {

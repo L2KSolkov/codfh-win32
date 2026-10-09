@@ -20,6 +20,7 @@ extern "C" void port_crash_handler_install(void);
    stick). */
 volatile LONG port_mouse_dx, port_mouse_dy;
 static volatile LONG port_menu_mouse_clicks;
+static volatile LONG port_menu_cursor_visible;
 
 /* Consume menu-only mouse input. A modest movement moves one menu item; accumulated movement
    is drained one item per frame so a quick sweep cannot skip an entire menu. */
@@ -29,9 +30,15 @@ static int port_menu_have_cursor;
 
 extern "C" void port_menu_mouse_reset(void)
 {
+    InterlockedExchange(&port_menu_cursor_visible, 1);
     port_menu_pending_x = port_menu_pending_y = 0;
     port_menu_have_cursor = 0;
     InterlockedExchange(&port_menu_mouse_clicks, 0);
+}
+
+extern "C" void port_menu_mouse_hide(void)
+{
+    InterlockedExchange(&port_menu_cursor_visible, 0);
 }
 
 extern "C" int port_menu_mouse_poll(void)
@@ -148,6 +155,13 @@ static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         return 0;
     case WM_SIZE:
         pdev_window_resized();
+        break;
+    case WM_SETCURSOR:
+        if (LOWORD(lp) == HTCLIENT && !InterlockedCompareExchange(&port_menu_cursor_visible, 0, 0))
+        {
+            SetCursor(NULL);
+            return TRUE;
+        }
         break;
     case WM_SYSKEYDOWN:
         /* Alt+Enter: windowed and fullscreen (a borderless window over the monitor) */
