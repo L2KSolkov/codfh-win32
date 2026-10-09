@@ -30,6 +30,11 @@
 #include "gstate.h"
 #include "brush.h"
 
+#if defined(CODFH_WIN32)
+#include <windows.h>
+extern void plog(const char *fmt, ...);
+#endif
+
 /* RenderWare 3.6's RCS id string, which the image keeps (the 3.7.2 tree has none) */
 static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/tool/2d/font.c#8 $";
 
@@ -342,8 +347,49 @@ rt2dFontShowBitmap(Rt2dFont * font,
     const RwUInt8       *tmpstring;
     RwUInt8              charMask;
     rt2dCharRect        *charMap;
+#if defined(CODFH_WIN32)
+    static RwInt32 trace = -1;
+    static RwInt32 traceCount;
+#endif
 
     RWFUNCTION(RWSTRING("rt2dFontShowBitmap"));
+
+#if defined(CODFH_WIN32)
+    {
+        if (trace < 0)
+        {
+            RwChar enabled[2];
+            trace = GetEnvironmentVariableA("CODFH_FONTTRACE", enabled, sizeof(enabled)) ? 1 : 0;
+        }
+        if (trace && traceCount < 8 && string && strstr(string, "Single Player"))
+        {
+            RwInt32 i;
+            rt2dCharRect *traceMap = font ? (rt2dCharRect *)rwSListGetArray(font->charMap) : NULL;
+            traceCount++;
+            plog("font bitmap[%d] font=%p outline=%d flag=%x height=%g baseline=%g chars=%d map=%p callback=%p text='%s' anchor=%g,%g scale=%g", traceCount,
+                font, font ? font->isOutline : -1, font ? font->flag : 0, font ? font->height : 0,
+                font ? font->baseline : 0, font ? font->charCount : 0, traceMap,
+                font ? font->fontshowCB : NULL, string, anchor->x, anchor->y, height);
+            for (i = 0; i < (RwInt32)strlen(string) && i < 32; i++)
+            {
+                RwInt32 code;
+                FontCharGetCode(code, (RwUInt8)string[i], font);
+                if (code >= 0)
+                {
+                    rt2dCharRect *cr = &traceMap[code];
+                    plog("font glyph[%d] char=%u code=%d rect=%p tex=%p raster=%p width=%g uv=%g,%g-%g,%g", i,
+                        (RwUInt8)string[i], code, cr, cr->tex,
+                        cr->tex ? RwTextureGetRaster(cr->tex) : NULL, cr->width,
+                        cr->uv[0].x, cr->uv[0].y, cr->uv[1].x, cr->uv[1].y);
+                }
+                else
+                {
+                    plog("font glyph[%d] char=%u unmapped", i, (RwUInt8)string[i]);
+                }
+            }
+        }
+    }
+#endif
 
     layerDepth = Rt2dGlobals.layerDepth;
 
@@ -422,6 +468,10 @@ rt2dFontShowBitmap(Rt2dFont * font,
                             vdst - Rt2dGlobals.brushVertexCache,
                             ctm, rwIM3D_VERTEXUV | rwIM3D_NOCLIP))
                         {
+#if defined(CODFH_WIN32)
+                            if (trace && traceCount <= 8 && string && strstr(string, "Single Player"))
+                                plog("font submit mid vertices=%d indices=%d tex=%p raster=%p", (int)(vdst - Rt2dGlobals.brushVertexCache), vindex, currTex, currTex ? RwTextureGetRaster(currTex) : NULL);
+#endif
                             RwIm3DRenderIndexedPrimitive
                                 (rwPRIMTYPETRILIST, Rt2dGlobals.fonttopo, vindex);
                             RwIm3DEnd();
@@ -575,6 +625,10 @@ rt2dFontShowBitmap(Rt2dFont * font,
             if (RwIm3DTransform(Rt2dGlobals.brushVertexCache,
                     vdst - Rt2dGlobals.brushVertexCache, ctm, rwIM3D_VERTEXUV | rwIM3D_NOCLIP))
             {
+#if defined(CODFH_WIN32)
+                if (trace && traceCount <= 8 && string && strstr(string, "Single Player"))
+                    plog("font submit end vertices=%d indices=%d tex=%p raster=%p", (int)(vdst - Rt2dGlobals.brushVertexCache), vindex, currTex, currTex ? RwTextureGetRaster(currTex) : NULL);
+#endif
                 RwIm3DRenderIndexedPrimitive(rwPRIMTYPETRILIST, Rt2dGlobals.fonttopo, vindex);
                 RwIm3DEnd();
 
