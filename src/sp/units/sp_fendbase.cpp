@@ -675,6 +675,14 @@ void type_sp_AD970::sp_sub_AE0D0(RwReal arg_0)
         }
         if (mouseMessageCount)
             Rt2dMaestroPostMessages(unk_17C, mouseMessages, mouseMessageCount);
+        /* The title's Press Start prompt has no pick region in its animation. Preserve its
+           controller Start transition as a mouse fallback on screens that expose btnStart. */
+        if ((mouse & PORT_MENU_MOUSE_BUTTON) && mouseButton && (RwUInt32)unk_168 != 0xFFFFFFFFu)
+        {
+            data[0] = dword_4F3130.sp_sub_12AAD0() ? 0 : unk_168;
+            data[1] = 0x40;
+            Rt2dMaestroForAllVisibleAnimations(unk_17C, sp_sub_ADDF0, data);
+        }
 #endif
     }
     Rt2dFontTexDictionarySet(unk_184);
