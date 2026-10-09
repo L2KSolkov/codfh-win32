@@ -42,7 +42,9 @@ extern const RwV3d stru_3D3280 = { 0.0f, 0.0f, 1.0f };
 // 0x003D328C
 extern const RwReal flt_3D328C = 16.666666f;
 // 0x00428BE0
+#ifndef CODFH_SP // MP only: the five-way blend's (sub_76960; single player has none, and default.xbe has no { 0.2f, 0.03f, 0 })
 type_428BE0 unk_428BE0 = { 0.2f, 0.03f, 0 };
+#endif
 // 0x00449B68
 RwReal flt_449B68[5];
 // 0x00449B7C
@@ -117,6 +119,9 @@ inline RwReal absf(RwReal x)
 // match: ?sub_73710@@YAPAUtype_3D32F8@@PAUtype_712B0@@@Z @ 0x00073710
 // match: __ehhandler$?sub_73710@@YAPAUtype_3D32F8@@PAUtype_712B0@@@Z-0x27 @ 0x002FF8C0
 // match: __ehhandler$?sub_73710@@YAPAUtype_3D32F8@@PAUtype_712B0@@@Z @ 0x002FF8E7
+// sp-match: ?sub_73710@@YAPAUtype_3D32F8@@PAUtype_712B0@@@Z @ 0x000620E0
+// (its constructor, defined in the class: single player calls its out-of-line copy)
+// sp-match: ??0type_3D32F8@@QAE@PAUtype_712B0@@@Z @ 0x00061EE0
 
 // Builds the entity for the trigger arg_0, or warns that there is no
 // entity memory for it.
@@ -124,23 +129,31 @@ type_3D32F8 *sub_73710(type_712B0 *arg_0)
 {
     type_3D32F8 *var_10;
 
+#ifdef CODFH_SP // single player's entity is 0x460 bytes (SP 0x620E0)
+    var_10 = (type_3D32F8 *)sub_D56D0(0x460, arg_0->unk_24_18, arg_0->vf_008());
+#else
     var_10 = (type_3D32F8 *)sub_D56D0(0x490, arg_0->unk_24_18, arg_0->vf_008());
+#endif
     if (var_10 != 0) {
         var_10 = new (var_10) type_3D32F8(arg_0);
         if (var_10->unk_28 & 0x400000) { // not an address: entity flag
             sub_D5A60(var_10, 0);
             var_10 = 0;
         }
-    } else
+    }
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0x620E0)
+    else
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
                    "location(%6.2f,%6.2f,%6.2f)",
                    arg_0->unk_90, arg_0->unk_94, arg_0->unk_98);
+#endif
     return var_10;
 }
 
 // match: ??1type_3D3548@@UAE@XZ @ 0x00073850
 // match: __ehhandler$??1type_3D3548@@UAE@XZ-0xA2 @ 0x002FF900
 // match: __ehhandler$??1type_3D3548@@UAE@XZ @ 0x002FF9A2
+// sp-match: ??1type_3D3548@@UAE@XZ @ 0x00061C40
 // (Defined in the class, in type_3D3548.h: vf_230, called directly as in
 // any destructor, then the members' destructors from unk_35C down to
 // unk_1C0; out of line here for type_3D32F8's unwinding.)
@@ -151,6 +164,7 @@ type_3D32F8 *sub_73710(type_712B0 *arg_0)
 // match: ??1type_129940@@QAE@XZ @ 0x00073A70
 // match: ??1type_1294D0@@QAE@XZ @ 0x00073AD0
 // match: ??1type_144940@@QAE@XZ @ 0x00073B30
+// sp-match: ??1type_129940@@QAE@XZ @ 0x00061BF0
 // (The holders' destructors, defined in their structs in type_129_base.h;
 // out of line here for the destructor's unwinding. The three with an empty
 // base share one handler, folded by /OPT:ICF.)
@@ -160,24 +174,28 @@ type_3D32F8 *sub_73710(type_712B0 *arg_0)
 // ones into one body, so one definition stands for each).
 
 // match: ?vf_07C@type_3D3548@@UAEHCPAURpIntersection@@PAMH@Z @ 0x00073B50
+// sp-match: ?vf_07C@type_3D3548@@UAEHCPAURpIntersection@@PAMH@Z @ 0x00061D50
 RwInt32 type_3D3548::vf_07C(RwInt8 arg_0, RpIntersection *arg_4, RwReal *arg_8, RwInt32 arg_C)
 {
     return 0;
 }
 
 // match: ?vf_08C@type_3D3548@@UAEPAEHH@Z @ 0x00073B60
+// sp-match: ?vf_08C@type_3D3548@@UAEPAEHH@Z @ 0x0012AE50
 RwUInt8 *type_3D3548::vf_08C(RwInt32 arg_0, RwInt32 arg_4)
 {
     return 0;
 }
 
 // match: ?vf_0E4@type_3D3548@@UAEHH@Z @ 0x00073B70
+// sp-match: ?vf_0E4@type_3D3548@@UAEHH@Z @ 0x00061D60
 RwInt32 type_3D3548::vf_0E4(RwInt32 arg_0)
 {
     return -1;
 }
 
 // match: ?vf_0FC@type_3D3548@@UAEMXZ @ 0x00073B80
+// sp-match: ?vf_0FC@type_3D3548@@UAEMXZ @ 0x00061D80
 // Also vf_100.
 RwReal type_3D3548::vf_0FC()
 {
@@ -185,6 +203,7 @@ RwReal type_3D3548::vf_0FC()
 }
 
 // match: ?vf_134@type_3D3548@@UAEHPAURwV3d@@PAU1@HHPAH2H@Z @ 0x00073BA0
+// sp-match: ?vf_134@type_3D3548@@UAEHPAURwV3d@@PAU1@HHPAH2H@Z @ 0x00061D90
 RwInt32 type_3D3548::vf_134(RwV3d *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwInt32 arg_C,
                             RwInt32 *arg_10, RwInt32 *arg_14, RwInt32 arg_18)
 {
@@ -200,78 +219,91 @@ RwReal type_3D3548::vf_10C()
 }
 
 // match: ?vf_184@type_3D3548@@UAEHXZ @ 0x00073BE0
+// sp-match: ?vf_184@type_3D3548@@UAEHXZ @ 0x00061DB0
 RwInt32 type_3D3548::vf_184()
 {
     return unk_350;
 }
 
 // match: ?vf_188@type_3D3548@@UAEXH@Z @ 0x00073C00
+// sp-match: ?vf_188@type_3D3548@@UAEXH@Z @ 0x00061DC0
 void type_3D3548::vf_188(RwInt32 arg_0)
 {
     unk_350 = arg_0;
 }
 
 // match: ?vf_194@type_3D3548@@UAEXH@Z @ 0x00073C20
+// sp-match: ?vf_194@type_3D3548@@UAEXH@Z @ 0x00061DD0
 void type_3D3548::vf_194(RwInt32 arg_0)
 {
     unk_28_15 = arg_0;
 }
 
 // match: ?vf_198@type_3D3548@@UAEXH@Z @ 0x00073C50
+// sp-match: ?vf_198@type_3D3548@@UAEXH@Z @ 0x00061DF0
 void type_3D3548::vf_198(RwInt32 arg_0)
 {
     unk_28_23 = arg_0;
 }
 
 // match: ?vf_19C@type_3D3548@@UAEXH@Z @ 0x00073C80
+// sp-match: ?vf_19C@type_3D3548@@UAEXH@Z @ 0x00061E10
 void type_3D3548::vf_19C(RwInt32 arg_0)
 {
     unk_28_24 = arg_0;
 }
 
 // match: ?vf_1B8@type_3D3548@@UAEXH@Z @ 0x00073CB0
+// sp-match: ?vf_1B8@type_3D3548@@UAEXH@Z @ 0x00061E30
 void type_3D3548::vf_1B8(RwInt32 arg_0)
 {
     unk_28_6 = arg_0;
 }
 
 // match: ?vf_1BC@type_3D3548@@UAEXH@Z @ 0x00073CE0
+// sp-match: ?vf_1BC@type_3D3548@@UAEXH@Z @ 0x00061E50
 void type_3D3548::vf_1BC(RwInt32 arg_0)
 {
     unk_88_13 = arg_0;
 }
 
 // match: ?vf_1D4@type_3D3548@@UAEHXZ @ 0x00073D10
+// sp-match: ?vf_1D4@type_3D3548@@UAEHXZ @ 0x00061E70
 RwInt32 type_3D3548::vf_1D4()
 {
     return unk_290;
 }
 
 // match: ?vf_1D8@type_3D3548@@UAEXH@Z @ 0x00073D30
+// sp-match: ?vf_1D8@type_3D3548@@UAEXH@Z @ 0x00061E80
 void type_3D3548::vf_1D8(RwInt32 arg_0)
 {
     unk_28_16 = arg_0;
 }
 
 // match: ?vf_1F8@type_3D3548@@UAEPAU1@H@Z @ 0x00073D60
+// sp-match: ?vf_1F8@type_3D3548@@UAEPAU1@H@Z @ 0x00061EA0
 type_3D3548 *type_3D3548::vf_1F8(RwInt32 arg_0)
 {
     return unk_35C[arg_0].sub_D4910();
 }
 
 // match: ?vf_204@type_3D3548@@UAEXHHH@Z @ 0x00073D80
+// sp-match: ?vf_204@type_3D3548@@UAEXHHH@Z @ 0x000FEB20
 // Also vf_218 (the same empty body, folded by /OPT:ICF).
 void type_3D3548::vf_204(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
 }
 
 // match: ?vf_0B0@type_3D3548@@UAEXHH@Z @ 0x00073D90
+// sp-match: ?vf_0B0@type_3D3548@@UAEXHH@Z @ 0x0007C260
 // Also vf_0EC and vf_220.
 void type_3D3548::vf_0B0(RwInt32 arg_0, RwInt32 arg_4)
 {
 }
 
 // match: ??_Gtype_3D3548@@UAEPAXI@Z @ 0x00073DA0
+// sp-match: ??_Gtype_3D3548@@UAEPAXI@Z @ 0x00061EC0
 // (The scalar deleting destructor, compiler-written; its operator delete is
 // the empty sub_19A750. It also fills type_3D32F8's slot +0x254, folded by
 // /OPT:ICF.)
@@ -279,90 +311,105 @@ void type_3D3548::vf_0B0(RwInt32 arg_0, RwInt32 arg_4)
 // type_3D32F8's inline accessors, out of line here.
 
 // match: ?vf_094@type_3D32F8@@UAEXI@Z @ 0x00073DD0
+// sp-match: ?vf_094@type_3D32F8@@UAEXI@Z @ 0x00061F40
 void type_3D32F8::vf_094(RwUInt32 arg_0)
 {
     unk_3DC = arg_0;
 }
 
 // match: ?vf_09C@type_3D32F8@@UAEHXZ @ 0x00073DF0
+// sp-match: ?vf_09C@type_3D32F8@@UAEHXZ @ 0x00061F50
 RwInt32 type_3D32F8::vf_09C()
 {
     return unk_3D8;
 }
 
 // match: ?vf_0A0@type_3D32F8@@UAEXI@Z @ 0x00073E10
+// sp-match: ?vf_0A0@type_3D32F8@@UAEXI@Z @ 0x00061F60
 void type_3D32F8::vf_0A0(RwUInt32 arg_0)
 {
     unk_3D8 = arg_0;
 }
 
 // match: ?vf_0E0@type_3D32F8@@UAEPAEXZ @ 0x00073E30
+// sp-match: ?vf_0E0@type_3D32F8@@UAEPAEXZ @ 0x00061F70
 RwUInt8 *type_3D32F8::vf_0E0()
 {
     return (RwUInt8 *)unk_44C;
 }
 
 // match: ?vf_124@type_3D32F8@@UAEXM@Z @ 0x00073E50
+// sp-match: ?vf_124@type_3D32F8@@UAEXM@Z @ 0x00061F80
 void type_3D32F8::vf_124(RwReal arg_0)
 {
     unk_440 = arg_0;
 }
 
 // match: ?vf_128@type_3D32F8@@UAEMXZ @ 0x00073E70
+// sp-match: ?vf_128@type_3D32F8@@UAEMXZ @ 0x00061F90
 RwReal type_3D32F8::vf_128()
 {
     return unk_440;
 }
 
 // match: ?vf_0F4@type_3D32F8@@UAEPAUSplinePath@@XZ @ 0x00073E90
+// sp-match: ?vf_0F4@type_3D32F8@@UAEPAUSplinePath@@XZ @ 0x00061FA0
 SplinePath *type_3D32F8::vf_0F4()
 {
     return unk_448;
 }
 
 // match: ?vf_234@type_3D32F8@@UAEPAUtype_3D3548@@XZ @ 0x00073EB0
+// sp-match: ?vf_234@type_3D32F8@@UAEPAUtype_3D3548@@XZ @ 0x00061FB0
 type_3D3548 *type_3D32F8::vf_234()
 {
     return unk_454.sub_D4910();
 }
 
 // match: ?vf_240@type_3D32F8@@UAEX_N@Z @ 0x00073ED0
+// sp-match: ?vf_240@type_3D32F8@@UAEX_N@Z @ 0x00061FC0
 void type_3D32F8::vf_240(bool arg_0)
 {
     unk_43C = arg_0;
 }
 
 // match: ?vf_244@type_3D32F8@@UAEHXZ @ 0x00073EF0
+// sp-match: ?vf_244@type_3D32F8@@UAEHXZ @ 0x00061FD0
 RwInt32 type_3D32F8::vf_244()
 {
     return unk_458 != 0 ? unk_458->unk_01 : 0;
 }
 
 // match: ?vf_248@type_3D32F8@@UAEXPAUtype_76290@@@Z @ 0x00073F30
+// sp-match: ?vf_248@type_3D32F8@@UAEXPAUtype_76290@@@Z @ 0x00061FF0
 void type_3D32F8::vf_248(type_76290 *arg_0)
 {
     unk_458 = arg_0;
 }
 
 // match: ?vf_24C@type_3D32F8@@UAEPAUtype_76290@@XZ @ 0x00073F50
+// sp-match: ?vf_24C@type_3D32F8@@UAEPAUtype_76290@@XZ @ 0x00062000
 type_76290 *type_3D32F8::vf_24C()
 {
     return unk_458;
 }
 
 // match: ?vf_174@type_3D32F8@@UAEHXZ @ 0x00073F70
+// sp-match: ?vf_174@type_3D32F8@@UAEHXZ @ 0x00062010
 RwInt32 type_3D32F8::vf_174()
 {
     return unk_430;
 }
 
 // match: ?vf_178@type_3D32F8@@UAEXH@Z @ 0x00073F90
+// sp-match: ?vf_178@type_3D32F8@@UAEXH@Z @ 0x00062020
 void type_3D32F8::vf_178(RwInt32 arg_0)
 {
     unk_430 = arg_0;
 }
 
 // match: ?vf_180@type_3D32F8@@UAEXH@Z @ 0x00073FB0
+// sp-match: ?vf_180@type_3D32F8@@UAEXH@Z @ 0x00062030
 void type_3D32F8::vf_180(RwInt32 arg_0)
 {
     unk_430 += arg_0;
@@ -371,6 +418,7 @@ void type_3D32F8::vf_180(RwInt32 arg_0)
 }
 
 // match: ?vf_17C@type_3D32F8@@UAEMXZ @ 0x00074000
+// sp-match: ?vf_17C@type_3D32F8@@UAEMXZ @ 0x00062060
 RwReal type_3D32F8::vf_17C()
 {
     return (RwReal)unk_430 / unk_434;
@@ -380,10 +428,13 @@ RwReal type_3D32F8::vf_17C()
 // match: ??1type_3D32F8@@UAE@XZ @ 0x00074050
 // match: __ehhandler$??1type_3D32F8@@UAE@XZ-0x16 @ 0x002FF9D0
 // match: __ehhandler$??1type_3D32F8@@UAE@XZ @ 0x002FF9E6
+// sp-match: ??1type_3D32F8@@UAE@XZ @ 0x00062090
+// sp-match: ??_Gtype_3D32F8@@UAEPAXI@Z @ 0x00062070
 // (Its scalar deleting destructor and its destructor, defined in the class
 // in type_3D32F8.h.)
 
 // match: ?sub_740B0@type_3D32F8@@QAEHPAUtype_712B0@@@Z @ 0x000740B0
+// sp-match: ?sub_740B0@type_3D32F8@@QAEHPAUtype_712B0@@@Z @ 0x000600B0
 // The animated background entity's set-up from its trigger arg_0: the base's
 // (sub_CCCD0), its spline object's handle, its physics, its model (kind 3;
 // without one it is left inert, flagged 0x400000, and 0 returned), its
@@ -468,7 +519,11 @@ RwInt32 type_3D32F8::sub_740B0(type_712B0 *arg_0)
     unk_290 = var_2C->get_unk_44();
     vf_224(var_2C, 0, &var_34);
     sub_16E080(get_unk_264(), var_2C->get_unk_54());
+#ifdef CODFH_SP // single player asks for animation object kind 0 (SP 0x600B0: push ebx, ebx = 0)
+    var_40 = sub_78830(0);
+#else
     var_40 = sub_78830(2);
+#endif
     unk_280 = var_40;
     var_44 = (type_7C8D0 *)sub_78AC0(unk_280);
     unk_284 = var_44;
@@ -527,6 +582,7 @@ RwInt32 type_3D32F8::sub_740B0(type_712B0 *arg_0)
     {
         unk_28 |= 0x8000;
     }
+#ifndef CODFH_SP // single player has no five-way blend (SP 0x600B0 ends with the weapon)
     unk_45C = 0;
     unk_460 = -1;
     for (var_CC = 0; var_CC < 5; var_CC++)
@@ -537,10 +593,12 @@ RwInt32 type_3D32F8::sub_740B0(type_712B0 *arg_0)
     unk_484 = 0.0f;
     unk_478 = 0.0f;
     unk_480 = 0.0f;
+#endif
     return 1;
 }
 
 // match: ?vf_230@type_3D32F8@@UAEXXZ @ 0x000748C0
+// sp-match: ?vf_230@type_3D32F8@@UAEXXZ @ 0x00060560
 void type_3D32F8::vf_230()
 {
     type_3D3548 *var_4;
@@ -550,10 +608,15 @@ void type_3D32F8::vf_230()
     if (unk_488 != 0) {
         unk_488 = 0;
         vf_228();
+#ifdef CODFH_SP // shape: single player releases it through release_anim (SP 0x60560)
+        if (unk_280 != 0)
+            release_anim(unk_280);
+#else
         if (unk_280 != 0) {
             sub_78870(unk_280);
             unk_280 = 0;
         }
+#endif
         sub_8B840(this);
         if (vf_090() != 0) {
             sub_717B0((type_3D2C88 *)vf_090());
@@ -579,8 +642,36 @@ void type_3D32F8::vf_230()
 }
 
 // match: ?sub_74A30@type_3D32F8@@QAEXM@Z @ 0x00074A30
+// sp-match: ?sub_74A30@type_3D32F8@@QAEXM@Z @ 0x00060650
 void type_3D32F8::sub_74A30(RwReal arg_0)
 {
+#ifdef CODFH_SP // shape: separate locals, the last argument a plain 0 (SP 0x60650: frame 0x2C)
+    RwFrame *var_4;
+    RwInt32 s2C;
+    RwInt32 s04;
+    RwInt32 s00;
+    RwInt32 s14;
+    RwReal s18;
+    RwV3d pos;
+    RwV3d rad;
+
+    var_4 = unk_338.unk_08;
+    if (var_4 != 0) {
+        pos = RwFrameGetLTM(var_4)->pos;
+        rad.x = unk_4C;
+        rad.y = unk_48;
+        rad.z = unk_4C;
+        s14 = 0;
+        s00 = 0;
+        s04 = 0;
+        s2C = 0;
+        if (ABS(unk_68 - pos.x) > 0.01f || ABS(unk_6C - pos.y) > 0.01f
+            || ABS(unk_70 - pos.z) > 0.01f || ABS(unk_F0) > 0.01f
+            || ABS(unk_F4) > 0.01f || ABS(unk_F8) > 0.01f || !unk_88_2)
+            sub_950C0(this, var_4, (RwV3d *)unk_3C, *(RwReal *)&unk_50, &s14, &rad,
+                      &s18, &s00, &s04, &s2C, 0);
+    }
+#else
     RwFrame *var_4;
     type_74A30 v34;
 
@@ -602,9 +693,11 @@ void type_3D32F8::sub_74A30(RwReal arg_0)
                       (RwReal *)&v34.unk_18, &v34.unk_00, &v34.unk_04, &v34.unk_2C,
                       (type_3DAFC8_1DDC *)v34.unk_1C);
     }
+#endif
 }
 
 // match: ?vf_03C@type_3D32F8@@UAEXM@Z @ 0x00074CA0
+// sp-match: ?vf_03C@type_3D32F8@@UAEXM@Z @ 0x00060800
 void type_3D32F8::vf_03C(RwReal arg_0)
 {
     type_712B0 *var_4;
@@ -624,7 +717,11 @@ void type_3D32F8::vf_03C(RwReal arg_0)
         RwReal var_14 = 0;
 
         if (unk_440 > 1.0f)
+#ifdef CODFH_SP // shape: SP 0x60800 divides first, then scales by arg_0
+            var_14 = arg_0 * (unk_440 / unk_448->unk_24);
+#else
             var_14 = unk_440 / unk_448->unk_24 * arg_0;
+#endif
         else
             var_14 = arg_0 * unk_440 * 0.5f;
         unk_3E0 = var_14 + unk_3E0;
@@ -695,6 +792,7 @@ void type_3D32F8::vf_03C(RwReal arg_0)
 }
 
 // match: ?vf_04C@type_3D32F8@@UAEXM@Z @ 0x000751A0
+// sp-match: ?vf_04C@type_3D32F8@@UAEXM@Z @ 0x00060BC0
 // Its update: the base's, then its mounted weapon (unk_454) placed at its
 // clump's tag "PGN0" plus its trigger's unk_144 mod 10, less the weapon's
 // "ATMT" attach point.
@@ -752,6 +850,7 @@ void type_3D32F8::vf_04C(RwReal arg_0)
 }
 
 // match: ?vf_170@type_3D32F8@@UAEXHHHH@Z @ 0x00075440
+// sp-match: ?vf_170@type_3D32F8@@UAEXHHHH@Z @ 0x00060D90
 void type_3D32F8::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C)
 {
     if (unk_88_13)
@@ -760,6 +859,7 @@ void type_3D32F8::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
 }
 
 // match: ?vf_0E4@type_3D32F8@@UAEHH@Z @ 0x00075480
+// sp-match: ?vf_0E4@type_3D32F8@@UAEHH@Z @ 0x00060DB0
 RwInt32 type_3D32F8::vf_0E4(RwInt32 arg_0)
 {
     type_712B0 *var_4;
@@ -769,6 +869,7 @@ RwInt32 type_3D32F8::vf_0E4(RwInt32 arg_0)
 }
 
 // match: ?vf_0E8@type_3D32F8@@UAEHXZ @ 0x000754B0
+// sp-match: ?vf_0E8@type_3D32F8@@UAEHXZ @ 0x00060DD0
 RwInt32 type_3D32F8::vf_0E8()
 {
     RwInt32 var_4;
@@ -783,12 +884,14 @@ RwInt32 type_3D32F8::vf_0E8()
 }
 
 // match: ?vf_0EC@type_3D32F8@@UAEXHH@Z @ 0x00075510
+// sp-match: ?vf_0EC@type_3D32F8@@UAEXHH@Z @ 0x00060DF0
 void type_3D32F8::vf_0EC(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_44C[arg_0] = (RwInt16)arg_4;
 }
 
 // match: ?sub_75530@type_3D32F8@@QAEXXZ @ 0x00075530
+// sp-match: ?sub_75530@type_3D32F8@@QAEXXZ @ 0x00060E10
 void type_3D32F8::sub_75530()
 {
     type_712B0 *var_4;
@@ -813,6 +916,7 @@ void type_3D32F8::sub_75530()
 }
 
 // match: ?vf_064@type_3D32F8@@UAEHPAUtype_75600@@@Z @ 0x00075600
+// sp-match: ?vf_064@type_3D32F8@@UAEHPAUtype_75600@@@Z @ 0x00060E90
 RwInt32 type_3D32F8::vf_064(type_75600 *arg_0)
 {
     type_712B0 *v8;
@@ -844,6 +948,7 @@ RwInt32 type_3D32F8::vf_064(type_75600 *arg_0)
 }
 
 // match: ?vf_06C@type_3D32F8@@UAEHPAUtype_3D3548@@@Z @ 0x00075770
+// sp-match: ?vf_06C@type_3D32F8@@UAEHPAUtype_3D3548@@@Z @ 0x00060FC0
 RwInt32 type_3D32F8::vf_06C(type_3D3548 *arg_0)
 {
     RwFrame *l24;
@@ -879,6 +984,7 @@ RwInt32 type_3D32F8::vf_06C(type_3D3548 *arg_0)
 }
 
 // match: ?vf_068@type_3D32F8@@UAEHPAUtype_758F0@@@Z @ 0x000758F0
+// sp-match: ?vf_068@type_3D32F8@@UAEHPAUtype_758F0@@@Z @ 0x000610D0
 RwInt32 type_3D32F8::vf_068(type_758F0 *arg_0)
 {
     RwV3d *ebp_34;
@@ -915,6 +1021,7 @@ RwInt32 type_3D32F8::vf_068(type_758F0 *arg_0)
 }
 
 // match: ?sub_75AF0@type_3DA6C0@@QAEXPAUtype_10F710@@HHH@Z @ 0x00075AF0
+// sp-match: ?sub_75AF0@type_3DA6C0@@QAEXPAUtype_10F710@@HHH@Z @ 0x00061260
 void type_3DA6C0::sub_75AF0(type_10F710 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C)
 {
     RpClump *var_8;
@@ -954,6 +1061,7 @@ void type_3DA6C0::sub_75AF0(type_10F710 *arg_0, RwInt32 arg_4, RwInt32 arg_8, Rw
 }
 
 // match: ?sub_75CB0@type_3D32F8@@QAEXXZ @ 0x00075CB0
+// sp-match: ?sub_75CB0@type_3D32F8@@QAEXXZ @ 0x000613B0
 void type_3D32F8::sub_75CB0()
 {
     RwInt32 var_4;
@@ -984,6 +1092,7 @@ void type_3D32F8::sub_75CB0()
 }
 
 // match: ?vf_0F8@type_3D32F8@@UAEXM@Z @ 0x00075DA0
+// sp-match: ?vf_0F8@type_3D32F8@@UAEXM@Z @ 0x00061440
 void type_3D32F8::vf_0F8(RwReal arg_0)
 {
     RwV3d var_C;
@@ -996,18 +1105,21 @@ void type_3D32F8::vf_0F8(RwReal arg_0)
 }
 
 // match: ?vf_098@type_3D32F8@@UAEPAUtype_3D2E7C@@XZ @ 0x00075E00
+// sp-match: ?vf_098@type_3D32F8@@UAEPAUtype_3D2E7C@@XZ @ 0x00061490
 type_3D2E7C *type_3D32F8::vf_098()
 {
     return (type_3D2E7C *)sub_67620(unk_3D8);
 }
 
 // match: ?vf_090@type_3D32F8@@UAEPAUtype_6D380@@XZ @ 0x00075E20
+// sp-match: ?vf_090@type_3D32F8@@UAEPAUtype_6D380@@XZ @ 0x000614A0
 type_6D380 *type_3D32F8::vf_090()
 {
     return (type_6D380 *)sub_67620(unk_3DC);
 }
 
 // match: ?vf_058@type_3D32F8@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x00075E40
+// sp-match: ?vf_058@type_3D32F8@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x000614B0
 RwInt32 type_3D32F8::vf_058(type_3DF8D8_04 *arg_0)
 {
     type_712B0 *var_4;
@@ -1021,6 +1133,7 @@ RwInt32 type_3D32F8::vf_058(type_3DF8D8_04 *arg_0)
 }
 
 // match: ?sub_75EC0@@YAXPAUtype_3D3548@@@Z @ 0x00075EC0
+// sp-match: ?sub_75EC0@@YAXPAUtype_3D3548@@@Z @ 0x00061500
 // The debris callback (type_3D32F8's vf_204 installs it): tips the entity
 // over, bouncing it on the ground until it has no bounces left.
 void sub_75EC0(type_3D3548 *arg_0)
@@ -1037,7 +1150,14 @@ void sub_75EC0(type_3D3548 *arg_0)
     type_76290 *stk_4C = l38->vf_24C();
 
     stk_4C->unk_20 += stk_4C->unk_24;
+#ifdef CODFH_SP // shape: SP 0x61500 multiplies by 0.05 and adds (no folding into 1.05)
+    {
+        RwReal grow = stk_4C->unk_24 * 0.05f;
+        stk_4C->unk_24 += grow;
+    }
+#else
     stk_4C->unk_24 += stk_4C->unk_24 * 0.05f;
+#endif
     if (stk_4C->unk_20 >= 8.0f)
         stk_4C->unk_20 = 8.0f;
     stk_4C->unk_1C += stk_4C->unk_20;
@@ -1084,6 +1204,7 @@ void sub_75EC0(type_3D3548 *arg_0)
     l38->vf_0C0(&local_20);
 }
 
+#ifndef CODFH_SP // single player has it inline (include/types/type_3D32F8.h)
 // match: ?sub_761F0@type_76290@@QAEXXZ @ 0x000761F0
 void type_76290::sub_761F0()
 {
@@ -1103,8 +1224,10 @@ void type_76290::sub_761F0()
     unk_24 = 0;
     unk_20 = 0;
 }
+#endif
 
 // match: ?vf_204@type_3D32F8@@UAEXHHH@Z @ 0x00076290
+// sp-match: ?vf_204@type_3D32F8@@UAEXHHH@Z @ 0x00061790
 void type_3D32F8::vf_204(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     switch (arg_0) {
@@ -1192,6 +1315,7 @@ void type_3D32F8::vf_204(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?vf_238@type_3D32F8@@UAEXPAUtype_10F710@@@Z @ 0x00076750
+// sp-match: ?vf_238@type_3D32F8@@UAEXPAUtype_10F710@@@Z @ 0x00061B10
 void type_3D32F8::vf_238(type_10F710 *arg_0)
 {
     type_3DC9B0 *var_4;
@@ -1209,6 +1333,7 @@ void type_3D32F8::vf_238(type_10F710 *arg_0)
 }
 
 // match: ?vf_23C@type_3D32F8@@UAEXXZ @ 0x000767D0
+// sp-match: ?vf_23C@type_3D32F8@@UAEXXZ @ 0x00061B70
 void type_3D32F8::vf_23C()
 {
     type_3DC9B0 *var_4;
@@ -1228,6 +1353,7 @@ void type_3D32F8::vf_23C()
     }
 }
 
+#ifndef CODFH_SP // single player has no five-way blend (type_3D32F8 is 0x460 bytes there; no twin)
 // match: ?sub_76860@type_3D32F8@@QAEX_N@Z @ 0x00076860
 void type_3D32F8::sub_76860(bool arg_0)
 {
@@ -1241,16 +1367,20 @@ void type_3D32F8::sub_76860(bool arg_0)
     if (arg_0 && unk_284->sub_76920())
         unk_460 = unk_284->get_unk_34_id(0);
 }
+#endif
 
+#ifndef CODFH_SP // single player has it inline (include/types/type_3D3548.h)
 // match: ?sub_76920@type_7C8D0@@QAE_NXZ @ 0x00076920
 bool type_7C8D0::sub_76920()
 {
     RwInt32 var_4;
 
-    var_4 = (unk_20 + unk_24 - 1) % 12;
+    var_4 = (unk_20 + unk_24 - 1) % type_7C8D0_ring_size;
     return (bool)unk_34[var_4].unk_08_30;
 }
+#endif
 
+#ifndef CODFH_SP // single player has no five-way blend (type_3D32F8 is 0x460 bytes there; no twin)
 // match: ?sub_76960@type_3D32F8@@QAEXXZ @ 0x00076960
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D32F8::sub_76960()
@@ -1358,7 +1488,9 @@ void type_3D32F8::sub_76960()
     flt_449B88 = unk_480;
     sub_76E70(unk_464, qC8, unk_428BE0.unk_00);
 }
+#endif
 
+#ifndef CODFH_SP // single player defines it in the class (include/types/type_3D3548.h)
 // match: ?sub_76E00@type_7C8D0@@QAE_NH@Z @ 0x00076E00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 bool type_7C8D0::sub_76E00(RwInt32 arg_0)
@@ -1367,12 +1499,14 @@ bool type_7C8D0::sub_76E00(RwInt32 arg_0)
     RwInt32 local_8;
 
     local_8 = arg_0 & 0xFF;
-    var_4 = (unk_20 + unk_24 - 1) % 12;
+    var_4 = (unk_20 + unk_24 - 1) % type_7C8D0_ring_size;
     if (unk_30[local_8].unk_00 == arg_0)
         return unk_30[local_8].unk_04 == var_4;
     return false;
 }
+#endif
 
+#ifndef CODFH_SP // single player has no five-way blend (type_3D32F8 is 0x460 bytes there; no twin)
 // match: ?sub_76E70@type_3D32F8@@QAEXPAHPAMM@Z @ 0x00076E70
 void type_3D32F8::sub_76E70(RwInt32 *arg_0, RwReal *arg_4, RwReal arg_8)
 {
@@ -1427,6 +1561,7 @@ RwInt32 type_3D32F8::vf_208(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwReal 
     }
     return type_3D3548::vf_208(arg_0, arg_4, arg_8, arg_C, arg_10, arg_14, arg_18);
 }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
@@ -1474,9 +1609,11 @@ void type_3DA6C0::sub_75CB0()
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ??3type_3D32F8@@SAXPAX@Z (folded into 0x19A750)
+#ifndef CODFH_SP // single player keeps the call to the empty operator delete (SP 0x62070 calls SP nullsub_1): defined elsewhere there
 void type_3D32F8::operator delete(void * arg_0)
 {
 }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

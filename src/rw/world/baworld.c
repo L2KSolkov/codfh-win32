@@ -168,6 +168,7 @@ static RwModuleInfo worldModule;
 // match: _worldTKList @ 0x00436B28
 
 // match: _WorldFindSector @ 0x002D6150
+// sp-match: _WorldFindSector @ 0x001F0AB0
 
 static RpWorldSector *
 WorldFindSector(RpWorldSector * sector, void *data)
@@ -284,6 +285,7 @@ WorldSectorRender( RpWorldSector * sector,
 }
 
 // match: _WorldBuildMeshAtomicSector @ 0x002D6170
+// sp-match: _WorldBuildMeshAtomicSector @ 0x001F0AD0
 static RpWorld     *
 WorldBuildMeshAtomicSector(RpWorld * world,
                       RpBuildMesh * buildMesh,
@@ -429,6 +431,7 @@ WorldBuildMeshAtomicSector(RpWorld * world,
  */
 
 // match: __rpWorldSectorDeinstanceAll @ 0x002D6370
+// sp-match: __rpWorldSectorDeinstanceAll @ 0x001F0CD0
 void
 _rpWorldSectorDeinstanceAll(RpSector * sector)
 {
@@ -520,6 +523,7 @@ _rpWorldSectorDeinstanceAll(RpSector * sector)
  */
 
 // match: __rpWorldSectorDestroyRecurse @ 0x002D6420
+// sp-match: __rpWorldSectorDestroyRecurse @ 0x001F0D80
 void
 _rpWorldSectorDestroyRecurse(RpSector * sector)
 {
@@ -707,6 +711,7 @@ WorldRemoveClump(RpClump * clump, void *data)
  */
 
 // match: _WorldClose @ 0x002D6570
+// sp-match: _WorldClose @ 0x001F0ED0
 static void        *
 WorldClose( void *instance,
             RwInt32 offset __RWUNUSED__,
@@ -741,6 +746,7 @@ static RwFreeList _rpWorldListFreeList;
  */
 
 // match: _WorldOpen @ 0x002D65B0
+// sp-match: _WorldOpen @ 0x001F0F10
 static void        *
 WorldOpen( void *instance,
            RwInt32 offset,
@@ -784,6 +790,7 @@ WorldOpen( void *instance,
  */
 
 // match: __rpSectorDefaultRenderCallBack @ 0x002D6610
+// sp-match: __rpSectorDefaultRenderCallBack @ 0x001F0F70
 RpWorldSector *
 _rpSectorDefaultRenderCallBack(RpWorldSector *sector)
 {
@@ -938,6 +945,7 @@ _rpWorldSectorForAllLocalLights(RpWorldSector * sector,
  */
 
 // match: __rpWorldFindBBox @ 0x002D6660
+// sp-match: __rpWorldFindBBox @ 0x001F0FC0
 RwBool
 _rpWorldFindBBox(RpWorld * world, RwBBox * boundingBox)
 {
@@ -1010,6 +1018,7 @@ _rpWorldFindBBox(RpWorld * world, RwBBox * boundingBox)
  On exit    : TRUE on success
  */
 // match: __rpWorldSetupSectorBoundingBoxes @ 0x002D66E0
+// sp-match: __rpWorldSetupSectorBoundingBoxes @ 0x001F1040
 RpWorld *
 _rpWorldSetupSectorBoundingBoxes(RpWorld *world)
 {
@@ -1071,6 +1080,7 @@ _rpWorldSetupSectorBoundingBoxes(RpWorld *world)
  On exit    : None
  */
 // match: __rpWorldRegisterWorld @ 0x002D6800
+// sp-match: __rpWorldRegisterWorld @ 0x001F1160
 void
 _rpWorldRegisterWorld(RpWorld * world, RwUInt32 memorySize)
 {
@@ -1108,6 +1118,7 @@ _rpWorldRegisterWorld(RpWorld * world, RwUInt32 memorySize)
  On exit    : None
  */
 // match: __rpWorldUnregisterWorld @ 0x002D6850
+// sp-match: __rpWorldUnregisterWorld @ 0x001F11B0
 void
 _rpWorldUnregisterWorld(RpWorld * world)
 {
@@ -1184,6 +1195,7 @@ _rpWorldUnregisterWorld(RpWorld * world)
  *
  */
 // match: _RpWorldLock @ 0x002D68B0
+// sp-match: _RpWorldLock @ 0x001F1210
 RpWorld            *
 RpWorldLock(RpWorld * world)
 {
@@ -1261,6 +1273,7 @@ RpWorldLock(RpWorld * world)
  *
  */
 // match: _RpWorldUnlock @ 0x002D6920
+// sp-match: _RpWorldUnlock @ 0x001F1280
 RpWorld            *
 RpWorldUnlock(RpWorld * world)
 {
@@ -1358,6 +1371,7 @@ RpWorldUnlock(RpWorld * world)
  *
  */
 // match: _RpWorldSectorGetWorld @ 0x002D6F30
+// sp-match: _RpWorldSectorGetWorld @ 0x001F1890
 RpWorld            *
 RpWorldSectorGetWorld(const RpWorldSector * sector)
 {
@@ -1770,6 +1784,7 @@ RpWorldRender(RpWorld *world)
  *
  */
 // match: _RpWorldDestroy @ 0x002D69C0
+// sp-match: _RpWorldDestroy @ 0x001F1320
 RwBool
 RpWorldDestroy(RpWorld * world)
 {
@@ -1831,6 +1846,7 @@ RpWorldDestroy(RpWorld * world)
 /* codfh-match: the database's j__RpWorldDestroy, which RpWorldStreamRead
  * calls when it fails to load into the world arena */
 // match: _j__RpWorldDestroy @ 0x002D6A20
+// sp-match: _j__RpWorldDestroy @ 0x001F1380
 RwBool
 j__RpWorldDestroy(RpWorld * world)
 {
@@ -1869,6 +1885,7 @@ j__RpWorldDestroy(RpWorld * world)
  *
  */
 // match: _RpWorldSetSectorRenderCallBack @ 0x002D6A30
+// sp-match: _RpWorldSetSectorRenderCallBack @ 0x001F1390
 RpWorld            *
 RpWorldSetSectorRenderCallBack(RpWorld * world,
                                RpWorldSectorCallBackRender fpCallBack)
@@ -1952,6 +1969,7 @@ RpWorldGetSectorRenderCallBack(const RpWorld * world)
  *
  */
 // match: _RpWorldCreate @ 0x002D6A50
+// sp-match: _RpWorldCreate @ 0x001F13B0
 RpWorld            *
 RpWorldCreate(RwBBox * boundingBox)
 {
@@ -2245,6 +2263,7 @@ RpWorldInstance(RpWorld *world)
  *
  */
 // match: _RpWorldForAllClumps @ 0x002D6C80
+// sp-match: _RpWorldForAllClumps @ 0x001F15E0
 RpWorld            *
 RpWorldForAllClumps(RpWorld * world, RpClumpCallBack fpCallBack,
                     void *pData)
@@ -2319,6 +2338,7 @@ RpWorldForAllClumps(RpWorld * world, RpClumpCallBack fpCallBack,
  *
  */
 // match: _RpWorldForAllMaterials @ 0x002D6CC0
+// sp-match: _RpWorldForAllMaterials @ 0x001F1620
 RpWorld            *
 RpWorldForAllMaterials(RpWorld * world, RpMaterialCallBack fpCallBack,
                        void *pData)
@@ -2380,6 +2400,7 @@ RpWorldForAllMaterials(RpWorld * world, RpMaterialCallBack fpCallBack,
  *
  */
 // match: _RpWorldForAllLights @ 0x002D6D10
+// sp-match: _RpWorldForAllLights @ 0x001F1670
 RpWorld            *
 RpWorldForAllLights(RpWorld * world, RpLightCallBack fpCallBack,
                     void *pData)
@@ -2473,6 +2494,7 @@ RpWorldForAllLights(RpWorld * world, RpLightCallBack fpCallBack,
  *
  */
 // match: _RpWorldForAllWorldSectors @ 0x002D6D80
+// sp-match: _RpWorldForAllWorldSectors @ 0x001F16E0
 RpWorld            *
 RpWorldForAllWorldSectors(RpWorld * world,
                           RpWorldSectorCallBack fpCallBack, void *pData)
@@ -2637,6 +2659,7 @@ RpWorldGetFlags(const RpWorld *world)
  *
  */
 // match: _RpWorldRegisterPlugin @ 0x002D6DE0
+// sp-match: _RpWorldRegisterPlugin @ 0x001F1740
 RwInt32
 RpWorldRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
                       RwPluginObjectConstructor constructCB,
@@ -2688,6 +2711,7 @@ RpWorldRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
  *
  */
 // match: _RpWorldRegisterPluginStream @ 0x002D6E10
+// sp-match: _RpWorldRegisterPluginStream @ 0x001F1770
 RwInt32
 RpWorldRegisterPluginStream(RwUInt32 pluginID,
                             RwPluginDataChunkReadCallBack readCB,
@@ -2899,6 +2923,7 @@ RpWorldValidatePlugins(RpWorld * world __RWUNUSEDRELEASE__)
  *
  */
 // match: _RpWorldPluginAttach @ 0x002D6E40
+// sp-match: _RpWorldPluginAttach @ 0x001F17A0
 RwBool
 RpWorldPluginAttach(void)
 {

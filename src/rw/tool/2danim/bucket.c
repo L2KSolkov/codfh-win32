@@ -55,6 +55,7 @@ static const char rcsid[] = "@@@@(#)$Id: //RenderWare/RW36Active/rwsdk/tool/2dan
  */
 
 RwSList *
+// sp-match: __rt2dByteBucketCreate @ 0x00173880
 _rt2dByteBucketCreate(void)
 {
     RwSList    *result;
@@ -81,6 +82,7 @@ _rt2dByteBucketCreate(void)
 // match: _rcsid @ 0x003EE7D0
 
 // match: __rt2dByteBucketDestroy @ 0x00257A20
+// sp-match: __rt2dByteBucketDestroy @ 0x00173890
 RwBool
 _rt2dByteBucketDestroy(RwSList * ByteBucket)
 {
@@ -94,6 +96,7 @@ _rt2dByteBucketDestroy(RwSList * ByteBucket)
 }
 
 RwInt32
+// sp-match: __rt2dByteBucketAddData @ 0x001738B0
 _rt2dByteBucketAddData(RwSList * ByteBucket, const void * data, RwInt32 length)
 {
     RwInt32             newIdx;
@@ -123,6 +126,7 @@ _rt2dByteBucketAddData(RwSList * ByteBucket, const void * data, RwInt32 length)
 }
 
 void *
+// sp-match: __rt2dByteBucketGetDataByIndex @ 0x00173900
 _rt2dByteBucketGetDataByIndex(RwSList * ByteBucket, RwInt32 idx)
 {
     RwChar        *newData;

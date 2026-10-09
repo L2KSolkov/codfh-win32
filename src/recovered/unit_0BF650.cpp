@@ -36,25 +36,33 @@ RWS_REGISTERCLASS(FlakTrigger);
 // match: ?MakeNew@FlakTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000BF650
 // match: __ehhandler$?MakeNew@FlakTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300590
 // match: __ehhandler$?MakeNew@FlakTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030059F
+// sp-match: ?MakeNew@FlakTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00092A00
 RWS_DEFINE_MAKENEW(FlakTrigger)
 
 // match: ??0FlakTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000BF6D0
+// sp-match: ??0FlakTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00092820
 FlakTrigger::FlakTrigger(const RWS::CAttributePacket &attr) : VehicleTrigger(attr)
 {
 }
 
 // match: ?vf_030@VehicleTrigger@@UAEHXZ @ 0x000BF700
+// sp-match: ?vf_030@VehicleTrigger@@UAEHXZ @ 0x00092840
 
 // match: ?vf_034@VehicleTrigger@@UAEHXZ @ 0x000BF720
+// sp-match: ?vf_034@VehicleTrigger@@UAEHXZ @ 0x00092850
 
 // match: ?vf_038@VehicleTrigger@@UAEHXZ @ 0x000BF740
+// sp-match: ?vf_038@VehicleTrigger@@UAEHXZ @ 0x00092860
 
 // match: ??_GFlakTrigger@@UAEPAXI@Z @ 0x000BF760
+// sp-match: ??_GFlakTrigger@@UAEPAXI@Z @ 0x000929F0
 
 // match: ??1FlakTrigger@@UAE@XZ @ 0x000BF780
+// sp-match: ??1FlakTrigger@@UAE@XZ @ 0x00092880
 // (Defined in the class, in FlakTrigger.h.)
 
 // match: ?HandleAttributes@FlakTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000BF7B0
+// sp-match: ?HandleAttributes@FlakTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000928A0
 void FlakTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     VehicleTrigger::HandleAttributes(attr);
@@ -81,12 +89,14 @@ void FlakTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?HandleEvents@FlakTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000BF8C0
+// sp-match: ?HandleEvents@FlakTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x00092980
 void FlakTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
     VehicleTrigger::HandleEvents(pMsg);
 }
 
 // match: ?vf_020@FlakTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000BF8E0
+// sp-match: ?vf_020@FlakTrigger@@UAEPAUtype_3D3548@@XZ @ 0x00092990
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_3D3548 *FlakTrigger::vf_020()
 {
@@ -112,3 +122,4 @@ type_3D3548 *FlakTrigger::vf_020()
 }
 
 // match: ??_EFlakTrigger@@WBI@AEPAXI@Z @ 0x000BF950
+// sp-match: ??_EFlakTrigger@@WBI@AEPAXI@Z @ 0x000929E0

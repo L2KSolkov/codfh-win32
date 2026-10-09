@@ -28,7 +28,11 @@ public:
     // Inline: the constructor's vtable emits them after it, before ??_G (the image's order).
     virtual RwInt32 vf_008()
     {
+#ifdef CODFH_SP // single player numbers it 0x26 (SP 0x1244A0)
+        return 0x26;
+#else
         return 0x27;
+#endif
     }
 
     // Entered and left (unk_C0; arg_0 unused).

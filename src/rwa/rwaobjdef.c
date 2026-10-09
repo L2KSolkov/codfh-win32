@@ -52,6 +52,7 @@ RwUInt8 unk_516C50[12];
 // match: _unk_42E6F8 @ 0x0042E6F8
 
 // match: __rwaWaveDefUnregister @ 0x0023D710
+// sp-match: __rwaWaveDefUnregister @ 0x00154010
 
 RwBool
 _rwaWaveDefUnregister(rwaVoidFunc *funcs, RwUInt32 count)
@@ -72,6 +73,7 @@ _rwaWaveDefUnregister(rwaVoidFunc *funcs, RwUInt32 count)
 extern RwBool sub_243BC0(void *iface, rwaObjDef *def, RwInt32 index);
 
 // match: _sub_23D740 @ 0x0023D740
+// sp-match: _sub_23D740 @ 0x00154040
 rwaObjDef *
 sub_23D740(rwaObjDef *def, void *iface)
 {
@@ -89,6 +91,7 @@ extern void sub_240BF0(rwaObjDef *def, const void *textID);
 extern void sub_240C10(rwaObjDef *def, const void *uuid);
 
 // match: _RwaObjDefAssignID @ 0x0023D770
+// sp-match: _RwaObjDefAssignID @ 0x00154070
 rwaObjDef *
 RwaObjDefAssignID(rwaObjDef *def, const void *uuid, const void *textID)
 {
@@ -99,6 +102,7 @@ RwaObjDefAssignID(rwaObjDef *def, const void *uuid, const void *textID)
 }
 
 // match: _RwaObjDefGetDefaultCreationParams @ 0x0023D7A0
+// sp-match: _RwaObjDefGetDefaultCreationParams @ 0x001540A0
 rwaObjDef *
 RwaObjDefGetDefaultCreationParams(rwaObjDef *def, void *params)
 {
@@ -116,6 +120,7 @@ extern void *sub_243950(RwUInt32 size, RwUInt32 count, RwUInt32 align, RwInt32 a
 extern void *sub_244550(RwUInt32 size, RwUInt32 count, RwUInt32 align, RwInt32 a, RwInt32 b);
 
 // match: _sub_23D7C0 @ 0x0023D7C0
+// sp-match: _sub_23D7C0 @ 0x001540C0
 rwaObjDef *
 sub_23D7C0(rwaObjDef *def, RwUInt32 size, RwBool freeList)
 {
@@ -151,6 +156,7 @@ extern void *sub_244440(void *pool, RwUInt32 size);
 extern void *sub_242170(RwUInt32 size, RwUInt32 hint);
 
 // match: _sub_23D860 @ 0x0023D860
+// sp-match: _sub_23D860 @ 0x00154160
 void *
 sub_23D860(rwaObjDef *def, RwUInt32 size)
 {
@@ -173,6 +179,7 @@ extern void sub_2444A0(void *pool, void *entry);
 extern void sub_2421B0(void *entry);
 
 // match: _sub_23D8B0 @ 0x0023D8B0
+// sp-match: _sub_23D8B0 @ 0x001541B0
 void
 sub_23D8B0(rwaInstance *input, void *callback, void *data)
 {
@@ -217,6 +224,7 @@ sub_23D8B0(rwaInstance *input, void *callback, void *data)
 }
 
 // match: _sub_23D940 @ 0x0023D940
+// sp-match: _sub_23D940 @ 0x00154240
 rwaObjDef *
 sub_23D940(rwaObjDef *def, void *obj)
 {
@@ -253,6 +261,7 @@ extern void sub_2435D0(void *list);
  * after the callback and on its successful child path. Original
  * declaration qualifiers are unknown. */
 // match: _sub_23D970 @ 0x0023D970
+// sp-match: _sub_23D970 @ 0x00154270
 rwaObjDef *
 sub_23D970(rwaObjDef *def, rwaObjDef **parent, rwaObjDefSearchFunc callback, void *data,
            RwInt32 self)
@@ -310,6 +319,7 @@ sub_23D970(rwaObjDef *def, rwaObjDef **parent, rwaObjDefSearchFunc callback, voi
 
 
 // match: _sub_23DA20 @ 0x0023DA20
+// sp-match: _sub_23DA20 @ 0x00154320
 RwInt32
 sub_23DA20(rwaObjDef *parent, rwaObjDef *child, rwaIfaceSearch *search)
 {
@@ -326,6 +336,7 @@ sub_23DA20(rwaObjDef *parent, rwaObjDef *child, rwaIfaceSearch *search)
 extern RwInt32 RwaUUIDCompare(const RwaUUID *a, const RwaUUID *b);
 
 // match: _sub_23DA80 @ 0x0023DA80
+// sp-match: _sub_23DA80 @ 0x00154380
 RwInt32
 sub_23DA80(rwaObjDef *parent, rwaObjDef *child, const RwaUUID *uuid)
 {
@@ -335,6 +346,7 @@ sub_23DA80(rwaObjDef *parent, rwaObjDef *child, const RwaUUID *uuid)
 /* Qualified parameter-table pointer reads preserve their loads before
  * the count tests. Original qualifiers are unknown. */
 // match: _sub_23DAA0 @ 0x0023DAA0
+// sp-match: _sub_23DAA0 @ 0x001543A0
 static rwaObjDef *
 sub_23DAA0(rwaObjDef *def)
 {
@@ -391,6 +403,7 @@ sub_23DAA0(rwaObjDef *def)
 }
 
 // match: _sub_23DB30 @ 0x0023DB30
+// sp-match: _sub_23DB30 @ 0x00154430
 static void
 sub_23DB30(rwaObjDef *def)
 {
@@ -414,6 +427,7 @@ sub_23DB30(rwaObjDef *def)
 }
 
 // match: _sub_23DB90 @ 0x0023DB90
+// sp-match: _sub_23DB90 @ 0x00154490
 RwBool
 sub_23DB90(rwaObjDef *def)
 {
@@ -487,6 +501,7 @@ sub_23DB90(rwaObjDef *def)
 
 
 // match: _sub_23DC60 @ 0x0023DC60
+// sp-match: _sub_23DC60 @ 0x00154560
 RwBool
 sub_23DC60(rwaObjDef *root, void *iface, void *list)
 {
@@ -500,6 +515,7 @@ sub_23DC60(rwaObjDef *root, void *iface, void *list)
 }
 
 // match: _sub_23DCA0 @ 0x0023DCA0
+// sp-match: _sub_23DCA0 @ 0x001545A0
 rwaObjDef *
 sub_23DCA0(rwaObjDef *root, const RwaUUID *uuid, rwaObjDef **parentOut)
 {
@@ -521,6 +537,7 @@ extern RwBool sub_23DB90(rwaObjDef *def);
 
 /* The allocation and existing-table paths share the success return. */
 // match: __rwaObjDefSetupParams @ 0x0023DD00
+// sp-match: __rwaObjDefSetupParams @ 0x00154600
 rwaObjDef *
 _rwaObjDefSetupParams(rwaObjDef *def, rwaParamDef *inputs, RwUInt16 noInputs,
                       rwaParamDef *outputs, RwUInt16 noOutputs)
@@ -584,6 +601,7 @@ _rwaObjDefSetupParams(rwaObjDef *def, rwaParamDef *inputs, RwUInt16 noInputs,
 }
 
 // match: _sub_23DE20 @ 0x0023DE20
+// sp-match: _sub_23DE20 @ 0x00154720
 static void
 sub_23DE20(rwaObjDef *input, RwInt32 io)
 {
@@ -629,6 +647,7 @@ sub_23DE20(rwaObjDef *input, RwInt32 io)
 }
 
 // match: __rwaObjDefCloseModule @ 0x0023DEC0
+// sp-match: __rwaObjDefCloseModule @ 0x001547C0
 void
 _rwaObjDefCloseModule(void)
 {
@@ -646,6 +665,7 @@ extern rwaObjDef *sub_23DFB0(rwaObjDef *parent, RwUInt32 flags, rwaObjDef *def, 
 /* Clear the packed size and alignment separately. These stores and the
  * alignment macro retain the original OR with the zeroed flag word. */
 // match: _sub_23DF00 @ 0x0023DF00
+// sp-match: _sub_23DF00 @ 0x00154800
 static void
 sub_23DF00(rwaObjDef *def)
 {
@@ -702,6 +722,7 @@ sub_23DF00(rwaObjDef *def)
 }
 
 // match: _sub_23DFB0 @ 0x0023DFB0
+// sp-match: _sub_23DFB0 @ 0x001548B0
 rwaObjDef *
 sub_23DFB0(rwaObjDef *parent, RwUInt32 flags, rwaObjDef *def, void *tables, void *list,
            RwUInt32 hint)
@@ -786,6 +807,7 @@ sub_23DFB0(rwaObjDef *parent, RwUInt32 flags, rwaObjDef *def, void *tables, void
 }
 
 // match: _sub_23E0C0 @ 0x0023E0C0
+// sp-match: _sub_23E0C0 @ 0x001549C0
 RwBool
 sub_23E0C0(void)
 {

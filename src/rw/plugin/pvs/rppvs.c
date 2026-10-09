@@ -2201,6 +2201,7 @@ PVSCopyAndTag(RpWorldSector * sector, void * data __RWUNUSED__)
 // match: ?nodePVSWorldSectorCSL@?1??RxNodeDefinitionGetPVSWorldSectorCSL@@9@9 @ 0x00436DE8
 
 // match: _PVSDivideBox @ 0x002E76A0
+// sp-match: _PVSDivideBox @ 0x00202140
 
 static void
 PVSDivideBox(const RwBBox * box, RwReal value,
@@ -2260,6 +2261,7 @@ PVSFindDiagonalSizeOfBBox(RwBBox *boundingBox)
 }
 
 // match: _PVSCalculateSectorBounds @ 0x002E7730
+// sp-match: _PVSCalculateSectorBounds @ 0x002021D0
 static RpSector *
 PVSCalculateSectorBounds(RpSector * spSector, const RwBBox * box)
 {
@@ -2313,6 +2315,7 @@ PVSCalculateSectorBounds(RpSector * spSector, const RwBBox * box)
 }
 
 // match: _PVSCopyAndTagSectors @ 0x002E7820
+// sp-match: _PVSCopyAndTagSectors @ 0x002022C0
 static RpWorldSector *
 PVSCopyAndTagSectors(RpWorldSector * sector, void * data __RWUNUSED__)
 {
@@ -2511,6 +2514,7 @@ PVSInitialize(void)
 }
 
 // match: _PVSInitializeSectors @ 0x002E7980
+// sp-match: _PVSInitializeSectors @ 0x00202420
 static void
 PVSInitializeSectors(void)
 {
@@ -2536,6 +2540,7 @@ PVSInitializeSectors(void)
 }
 
 // match: _PVSDeinitialize @ 0x002E7A10
+// sp-match: _PVSDeinitialize @ 0x002024B0
 static void
 PVSDeinitialize(RpWorld * wpWorld)
 {
@@ -3352,6 +3357,7 @@ RpPVSSetViewSector(RpWorld * wpWorld, RpWorldSector * spSect)
  * \see RpPVSUnhook
  */
 // match: _RpPVSWorldSectorVisible @ 0x002E7A60
+// sp-match: _RpPVSWorldSectorVisible @ 0x00202500
 RwBool
 RpPVSWorldSectorVisible(RpWorldSector * spSect)
 {
@@ -3913,6 +3919,7 @@ RpPVSDestroy(RpWorld * wpWorld)
 }
 
 // match: _PVSWorldConstructor @ 0x002E7A90
+// sp-match: _PVSWorldConstructor @ 0x00202530
 static void *
 PVSWorldConstructor(RpWorld * wpWorld,
                     RwInt32 offset __RWUNUSED__,
@@ -3953,6 +3960,7 @@ PVSWorldConstructor(RpWorld * wpWorld,
 }
 
 // match: _PVSWorldDestructor @ 0x002E7DF0
+// sp-match: _PVSWorldDestructor @ 0x00202890
 static void *
 PVSWorldDestructor(RpWorld * wpWorld,
                    RwInt32 offset __RWUNUSED__,
@@ -3970,6 +3978,7 @@ PVSWorldDestructor(RpWorld * wpWorld,
 }
 
 // match: _PVSSectorConstructor @ 0x002E7AF0
+// sp-match: _PVSSectorConstructor @ 0x00202590
 static void *
 PVSSectorConstructor(RpWorldSector * sector,
                      RwInt32 offset __RWUNUSED__,
@@ -3991,6 +4000,7 @@ PVSSectorConstructor(RpWorldSector * sector,
 }
 
 // match: _PVSSectorDestructor @ 0x002E7B20
+// sp-match: _PVSSectorDestructor @ 0x002025C0
 static void *
 PVSSectorDestructor(RpWorldSector * sector,
                     RwInt32 offset __RWUNUSED__,
@@ -4224,6 +4234,7 @@ RpPVSSetProgressCallBack(RpWorld * wpWorld,
 
 /* Serialization for the sectors...*/
 // match: _PVSSectorGetChunkSize @ 0x002E7B60
+// sp-match: _PVSSectorGetChunkSize @ 0x00202600
 static RwInt32
 PVSSectorGetChunkSize(const RpWorldSector * spSect,
                       RwInt32 offset __RWUNUSED__,
@@ -4250,6 +4261,7 @@ PVSSectorGetChunkSize(const RpWorldSector * spSect,
 }
 
 // match: _PVSSectorWriteChunk @ 0x002E7B80
+// sp-match: _PVSSectorWriteChunk @ 0x00202620
 static RwStream *
 PVSSectorWriteChunk(RwStream * s,
                     RwInt32 len __RWUNUSED__,
@@ -4278,6 +4290,7 @@ PVSSectorWriteChunk(RwStream * s,
 }
 
 // match: _PVSSectorReadChunk @ 0x002E7BE0
+// sp-match: _PVSSectorReadChunk @ 0x00202680
 static RwStream *
 PVSSectorReadChunk(RwStream * s,
                    RwInt32 len __RWUNUSED__,
@@ -4309,6 +4322,7 @@ PVSSectorReadChunk(RwStream * s,
 
 /* Serialization for the world/cache ...*/
 // match: _PVSWorldGetChunkSize @ 0x002E7C50
+// sp-match: _PVSWorldGetChunkSize @ 0x002026F0
 static RwInt32
 PVSWorldGetChunkSize(const RpWorld * wpWorld,
                      RwInt32 offset __RWUNUSED__,
@@ -4323,6 +4337,7 @@ PVSWorldGetChunkSize(const RpWorld * wpWorld,
 }
 
 // match: _PVSWorldWriteChunk @ 0x002E7C70
+// sp-match: _PVSWorldWriteChunk @ 0x00202710
 static RwStream *
 PVSWorldWriteChunk(RwStream * s,
                    RwInt32 len __RWUNUSED__,
@@ -4345,6 +4360,7 @@ PVSWorldWriteChunk(RwStream * s,
 }
 
 // match: _PVSWorldReadChunk @ 0x002E7CB0
+// sp-match: _PVSWorldReadChunk @ 0x00202750
 static RwStream *
 PVSWorldReadChunk(RwStream * s,
                   RwInt32 len __RWUNUSED__,
@@ -4404,6 +4420,7 @@ PVSWorldReadChunk(RwStream * s,
  * \see RwEngineStart
  */
 // match: _RpPVSPluginAttach @ 0x002E7E40
+// sp-match: _RpPVSPluginAttach @ 0x002028E0
 RwBool
 RpPVSPluginAttach(void)
 {
@@ -4489,6 +4506,7 @@ RpPVSPluginAttach(void)
  * \see RpPVSWorldSectorVisible
  */
 // match: _RpPVSQuery @ 0x002E7D00
+// sp-match: _RpPVSQuery @ 0x002027A0
 RwBool
 RpPVSQuery(RpWorld * wpWorld)
 {
@@ -4622,6 +4640,7 @@ RpPVSStatisticsGet(RpWorld * wpWorld, RwInt32 * ptotal,
  local (static) prototypes
  */
 // match: _PVSWorldSectorNodeFn @ 0x002E7D20
+// sp-match: _PVSWorldSectorNodeFn @ 0x002027C0
 static RwInt32
 PVSWorldSectorNodeFn(RxPipelineNodeInstance * self __RWUNUSED__,
                      const RxPipelineNodeParam * params)

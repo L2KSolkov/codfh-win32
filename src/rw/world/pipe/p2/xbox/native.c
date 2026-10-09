@@ -42,6 +42,7 @@ NativeSize(RwUInt32 flags, RwResEntry *resEntry)
 // match: ?id@?1??NativeWrite@@9@9 @ 0x004195E4
 
 // match: _NativeWrite @ 0x002E1760
+// sp-match: _NativeWrite @ 0x001FC230
 
 static RwStream *
 NativeWrite(RwStream *stream, RwUInt32 flags, RwResEntry *resEntry)
@@ -102,6 +103,7 @@ NativeWrite(RwStream *stream, RwUInt32 flags, RwResEntry *resEntry)
 }
 
 // match: _NativeRead @ 0x002E1820
+// sp-match: _NativeRead @ 0x001FC2F0
 static RwResEntry *
 NativeRead(RwStream *stream, RwResEntry **resEntryPointer, RpMesh *mesh)
 {
@@ -200,6 +202,7 @@ NativeRead(RwStream *stream, RwResEntry **resEntryPointer, RpMesh *mesh)
 }
 
 // match: __rpGeometryNativeWrite @ 0x002E19B0
+// sp-match: __rpGeometryNativeWrite @ 0x001FC480
 RwStream *
 _rpGeometryNativeWrite(RwStream *stream, const RpGeometry *geometry)
 {
@@ -209,6 +212,7 @@ _rpGeometryNativeWrite(RwStream *stream, const RpGeometry *geometry)
 }
 
 // match: __rpGeometryNativeRead @ 0x002E19D0
+// sp-match: __rpGeometryNativeRead @ 0x001FC4A0
 RpGeometry *
 _rpGeometryNativeRead(RwStream *stream, RpGeometry *geometry)
 {
@@ -222,6 +226,7 @@ _rpGeometryNativeRead(RwStream *stream, RpGeometry *geometry)
 }
 
 // match: __rpGeometryNativeSize @ 0x002E1A00
+// sp-match: __rpGeometryNativeSize @ 0x001FC4D0
 RwInt32
 _rpGeometryNativeSize(const RpGeometry *geometry)
 {
@@ -229,6 +234,7 @@ _rpGeometryNativeSize(const RpGeometry *geometry)
 }
 
 // match: __rpWorldSectorNativeWrite @ 0x002E1A30
+// sp-match: __rpWorldSectorNativeWrite @ 0x001FC500
 RwStream *
 _rpWorldSectorNativeWrite(RwStream *stream, const RpWorldSector *sector)
 {
@@ -238,6 +244,7 @@ _rpWorldSectorNativeWrite(RwStream *stream, const RpWorldSector *sector)
 }
 
 // match: __rpWorldSectorNativeRead @ 0x002E1A60
+// sp-match: __rpWorldSectorNativeRead @ 0x001FC530
 RpWorldSector *
 _rpWorldSectorNativeRead(RwStream *stream, RpWorldSector *sector)
 {
@@ -251,6 +258,7 @@ _rpWorldSectorNativeRead(RwStream *stream, RpWorldSector *sector)
 }
 
 // match: __rpWorldSectorNativeSize @ 0x002E1A90
+// sp-match: __rpWorldSectorNativeSize @ 0x001FC560
 RwInt32
 _rpWorldSectorNativeSize(const RpWorldSector *sector)
 {

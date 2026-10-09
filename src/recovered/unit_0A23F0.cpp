@@ -26,9 +26,11 @@ RWS_REGISTERCLASS(CCESSPoolTrigger);
 // match: ?MakeNew@CCESSPoolTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A23F0
 // match: __ehhandler$?MakeNew@CCESSPoolTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFDD0
 // match: __ehhandler$?MakeNew@CCESSPoolTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFDDF
+// sp-match: ?MakeNew@CCESSPoolTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007F2E0
 RWS_DEFINE_MAKENEW(CCESSPoolTrigger)
 
 // match: ??0CCESSPoolTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A2470
+// sp-match: ??0CCESSPoolTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007EE90
 CCESSPoolTrigger::CCESSPoolTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     RwInt32 var_4;
@@ -46,6 +48,7 @@ CCESSPoolTrigger::CCESSPoolTrigger(const RWS::CAttributePacket &attr) : Trigger(
 }
 
 // match: ?vf_008@CCESSPoolTrigger@@UAEHXZ @ 0x000A2530
+// sp-match: ?vf_008@CCESSPoolTrigger@@UAEHXZ @ 0x00123B50
 
 // Its settings: commands 0 to 8, the most trackers for each index (the second
 // kind's in the odd ones); 9, 10, 13, 14, 17, 18, 21, 22 and 25, the delays,
@@ -53,6 +56,7 @@ CCESSPoolTrigger::CCESSPoolTrigger(const RWS::CAttributePacket &attr) : Trigger(
 // whether the last index's delay is random. Setting the first kind's last
 // index clears the second kind's.
 // match: ?HandleAttributes@CCESSPoolTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A2590
+// sp-match: ?HandleAttributes@CCESSPoolTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007EF10
 void CCESSPoolTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -157,14 +161,18 @@ void CCESSPoolTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 // It passes its events to Trigger's. /OPT:ICF folds the other triggers' like
 // it (AnimPackTrigger's, ConfinedAreaTrigger's and more) into this one.
 // match: ?HandleEvents@CCESSPoolTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000A2BF0
+// sp-match: ?HandleEvents@CCESSPoolTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x00080E00
 void CCESSPoolTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
     Trigger::HandleEvents(pMsg);
 }
 
 // match: ??_ECCESSPoolTrigger@@WBI@AEPAXI@Z @ 0x000A2C10
+// sp-match: ??_ECCESSPoolTrigger@@WBI@AEPAXI@Z @ 0x0007F2C0
 
 // match: ??_GCCESSPoolTrigger@@UAEPAXI@Z @ 0x000A2540
+// sp-match: ??_GCCESSPoolTrigger@@UAEPAXI@Z @ 0x0007F2D0
 
 // match: ??1CCESSPoolTrigger@@UAE@XZ @ 0x000A2560
+// sp-match: ??1CCESSPoolTrigger@@UAE@XZ @ 0x0007EEF0
 // (Defined in the class, in CCESSPoolTrigger.h.)

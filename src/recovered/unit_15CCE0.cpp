@@ -56,6 +56,7 @@ RwReal dword_4D53F4;
 // match: ??0type_15CCE0@@QAE@XZ @ 0x0015CCE0
 // match: __ehhandler$??0type_15CCE0@@QAE@XZ-0x16 @ 0x00301E10
 // match: __ehhandler$??0type_15CCE0@@QAE@XZ @ 0x00301E26
+// sp-match: ??0type_15CCE0@@QAE@XZ @ 0x001004D0
 
 type_15CCE0::type_15CCE0()
 {
@@ -88,6 +89,7 @@ type_15CCE0::type_15CCE0()
 // match: ??1type_15CCE0@@QAE@XZ @ 0x0015CF60
 // match: __ehhandler$??1type_15CCE0@@QAE@XZ-0x36 @ 0x00301E30
 // match: __ehhandler$??1type_15CCE0@@QAE@XZ @ 0x00301E66
+// sp-match: ??1type_15CCE0@@QAE@XZ @ 0x00100600
 type_15CCE0::~type_15CCE0()
 {
     if (unk_08)
@@ -95,6 +97,7 @@ type_15CCE0::~type_15CCE0()
 }
 
 // match: ?sub_15D010@type_15CCE0@@QAEXPAUtype_3DAFC8@@H@Z @ 0x0015D010
+// sp-match: ?sub_15D010@type_15CCE0@@QAEXPAUtype_3DAFC8@@H@Z @ 0x00101250
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Takes up the NPC weapon arg_4 for the soldier arg_0 (unless it holds a
 // model or a type already): its definition (the settings' named kind-26
@@ -190,6 +193,7 @@ void type_15CCE0::sub_15D010(type_3DAFC8 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_15D360@type_15CCE0@@QAEXXZ @ 0x0015D360
+// sp-match: ?sub_15D360@type_15CCE0@@QAEXXZ @ 0x000FFD20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Puts it away: its particle systems destroyed, its model released.
 void type_15CCE0::sub_15D360()
@@ -210,6 +214,7 @@ void type_15CCE0::sub_15D360()
 }
 
 // match: ?sub_15D3E0@type_15CCE0@@QAEXXZ @ 0x0015D3E0
+// sp-match: ?sub_15D3E0@type_15CCE0@@QAEXXZ @ 0x000FFD70
 // Shows its model (once).
 void type_15CCE0::sub_15D3E0()
 {
@@ -220,6 +225,7 @@ void type_15CCE0::sub_15D3E0()
 }
 
 // match: ?sub_15D420@type_15CCE0@@QAEXXZ @ 0x0015D420
+// sp-match: ?sub_15D420@type_15CCE0@@QAEXXZ @ 0x00100690
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Hides its model: its owner told "AllBurstsFinished" and to stop, the
 // firing stopped and its particle systems destroyed.
@@ -248,6 +254,7 @@ void type_15CCE0::sub_15D420()
 }
 
 // match: ?sub_15D510@type_15CCE0@@QAEXHH@Z @ 0x0015D510
+// sp-match: ?sub_15D510@type_15CCE0@@QAEXHH@Z @ 0x00100730
 void type_15CCE0::sub_15D510(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_8C = arg_0;
@@ -260,6 +267,7 @@ void type_15CCE0::sub_15D510(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_15D570@@YAHPAUtype_F2FF0@@@Z @ 0x0015D570
+// sp-match: ?sub_15D570@@YAHPAUtype_F2FF0@@@Z @ 0x000FFD90
 RwInt32 sub_15D570(type_F2FF0 *arg_0)
 {
     type_15CCE0 *var_4;
@@ -270,6 +278,7 @@ RwInt32 sub_15D570(type_F2FF0 *arg_0)
 }
 
 // match: ?sub_15D5B0@type_15CCE0@@QAEXHPAUtype_F2FF0@@@Z @ 0x0015D5B0
+// sp-match: ?sub_15D5B0@type_15CCE0@@QAEXHPAUtype_F2FF0@@@Z @ 0x000FFDC0
 void type_15CCE0::sub_15D5B0(RwInt32 arg_0, type_F2FF0 *arg_4)
 {
     unk_DC[arg_0].sub_F2880(arg_4);
@@ -281,6 +290,7 @@ void type_15CCE0::sub_15D5B0(RwInt32 arg_0, type_F2FF0 *arg_4)
 }
 
 // match: ?sub_15D600@type_15CCE0@@QAEXM@Z @ 0x0015D600
+// sp-match: ?sub_15D600@type_15CCE0@@QAEXM@Z @ 0x00101490
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its step by arg_0: while not firing, its spread and recoil recover (to
 // the settings' bounds); while firing, they grow, and with the settings'
@@ -312,6 +322,49 @@ void type_15CCE0::sub_15D600(RwReal arg_0)
             unk_A8 = arg_0 * bp_4->unk_164_r + unk_A8;
         else
             unk_A4 = unk_A4 - arg_0;
+#ifdef CODFH_SP // single player fires through the timer on its own, counts shots and reports "SingleShotFinished" (SP 0x101490)
+        if (bp_4->unk_124)
+        {
+            unk_88 -= arg_0;
+            if (unk_88 > 0.0f)
+                return;
+            if (unk_C4)
+            {
+                unk_1C = unk_1C + 1;
+                unk_84 = 1;
+            }
+            if (unk_80 > 0)
+            {
+                sub_15DE60(0);
+                unk_80 = unk_80 - 1;
+            }
+            if (unk_80 == 0)
+                sub_15D900(1);
+            return;
+        }
+        unk_88 -= arg_0;
+        if (unk_88 <= 0.0f && unk_7C)
+        {
+            RwReal m_C;
+
+            sub_15DE60(0);
+            unk_80 = unk_80 - 1;
+            if (unk_80 == 0)
+            {
+                sub_15D900(1);
+                unk_7C = 0;
+                return;
+            }
+            bp_8 = unk_78.sub_D4910();
+            m_C = unk_88 * (1.0f / 60.0f);
+            if (bp_8->vf_098())
+                sub_6B5F0("SingleShotFinished", (type_67620 *)(bp_8->vf_098()), 0, 0, (RwInt32 *)(&m_C), 1, 1, 0);
+            unk_88 = 0;
+            unk_8C = 0;
+            bp_8->vf_1B0(0);
+        }
+        unk_7C = 0;
+#else
         if (bp_4->unk_124)
         {
             unk_88 = unk_88 - arg_0;
@@ -334,10 +387,12 @@ void type_15CCE0::sub_15D600(RwReal arg_0)
             bp_8->vf_1B0(0);
         }
         unk_7C = 0;
+#endif
     }
 }
 
 // match: ?sub_15D8A0@type_15CCE0@@QAEXPAURwV3d@@HHMMM@Z @ 0x0015D8A0
+// sp-match: ?sub_15D8A0@type_15CCE0@@QAEXPAURwV3d@@HHMMM@Z @ 0x001016A0
 void type_15CCE0::sub_15D8A0(RwV3d *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwReal arg_C, RwReal arg_10,
                              RwReal arg_14)
 {
@@ -351,6 +406,7 @@ void type_15CCE0::sub_15D8A0(RwV3d *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwReal 
 }
 
 // match: ?sub_15D900@type_15CCE0@@QAEXH@Z @ 0x0015D900
+// sp-match: ?sub_15D900@type_15CCE0@@QAEXH@Z @ 0x00100780
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A burst ends: with bursts left, the time to the next (its settings'
 // ranges, plus a pause and shots by how far the owner's target is, as its
@@ -412,12 +468,23 @@ void type_15CCE0::sub_15D900(RwInt32 arg_0)
         unk_80 = unk_80 + var_C;
         if (unk_80 <= 0)
             unk_80 = 1;
+#ifdef CODFH_SP // shape: the time is block-scoped, so it reuses the dead arg_0 slot (SP 0x100780 has no frame)
+        if (arg_0)
+        {
+            RwReal m_18;
+
+            m_18 = unk_88 / 60.0f;
+            if (bp_8->vf_098())
+                sub_6B5F0("SingleBurstFinished", (type_67620 *)(bp_8->vf_098()), 0, 0, (RwInt32 *)(&m_18), 1, 1, 0);
+        }
+#else
         if (arg_0)
         {
             m_18 = unk_88 / 60.0f;
             if (bp_8->vf_098())
                 sub_6B5F0("SingleBurstFinished", (type_67620 *)(bp_8->vf_098()), 0, 0, (RwInt32 *)(&m_18), 1, 1, 0);
         }
+#endif
         sub_15EB50();
         unk_88 = 0;
     }
@@ -466,6 +533,7 @@ void type_15CCE0::sub_15D900(RwInt32 arg_0)
 }
 
 // match: ?sub_15DE60@type_15CCE0@@QAEXPAURwV3d@@@Z @ 0x0015DE60
+// sp-match: ?sub_15DE60@type_15CCE0@@QAEXPAURwV3d@@@Z @ 0x00100AE0
 // Fires at *arg_0 (or where it aims) from its model's "FIRE" point: a
 // grenade (kind 8) along the arc its drop settings allow (the speed stored
 // in the settings' unk_7C_r, the launch angle raised within the drop's
@@ -509,6 +577,18 @@ void type_15CCE0::sub_15DE60(RwV3d *arg_0)
         return;
     var_8 = sub_15CB10(unk_04);
     var_C = unk_78.sub_D4910();
+#ifdef CODFH_SP // single player (SP 0x100B14): with no rounds left and no infinite clip it reports "OutOfAmmo", stops the trigger and the owner's firing instead of shooting
+    if (unk_1C <= 0 && unk_20 == 0)
+    {
+        if (var_C->vf_098())
+            sub_6B5F0("OutOfAmmo", (type_67620 *)(var_C->vf_098()), 0, 0, 0, 0, true, false);
+        sub_15E9B0(0);
+        unk_8C = 0;
+        var_C->vf_1B0(0);
+        sub_15EB50();
+        return;
+    }
+#endif
     var_14 = RpClumpGetFrame(get_unk_18());
     var_18 = RwFrameGetMatrix(var_14);
     var_20 = definition_model((type_3DF8D8 *)unk_0C);
@@ -521,7 +601,11 @@ void type_15CCE0::sub_15DE60(RwV3d *arg_0)
         sub_1414C0(&var_7C, &var_60.pos, var_18);
     else
         sub_1414C0(&var_7C, &var_8->unk_88_v, var_18);
+#ifdef CODFH_SP // single player (SP 0x100C21: fsub before RwV3dNormalize) aims along the muzzle-to-target difference, not the target point
+    RwV3dSub(&var_88, &var_70, &var_7C);
+#else
     var_88 = var_70;
+#endif
     RwV3dNormalize(&var_88, &var_88);
     if (var_8->unk_94.unk_40_r != 0.0f)
     {
@@ -540,7 +624,7 @@ void type_15CCE0::sub_15DE60(RwV3d *arg_0)
                 if (var_A8 > dword_4D53E8)
                     var_A8 = dword_4D53E8;
                 if (var_A8 < 0.0f)
-                    var_B4 = (RwReal)atan((RwDouble)(var_A4 / -var_A8)) * 180.0f / 3.14159f;
+                    var_B4 = (RwReal)atan((RwDouble)(var_A4 / (-var_A8))) * 180.0f / 3.14159f;
                 else
                     var_B4 = (RwReal)atan((RwDouble)(var_A4 / var_A8)) * 180.0f / 3.14159f;
             }
@@ -628,6 +712,7 @@ void type_15CCE0::sub_15DE60(RwV3d *arg_0)
 }
 
 // match: ?sub_15E890@type_15CCE0@@QAEXPAURwV3d@@@Z @ 0x0015E890
+// sp-match: ?sub_15E890@type_15CCE0@@QAEXPAURwV3d@@@Z @ 0x000FFE00
 void type_15CCE0::sub_15E890(RwV3d *arg_0)
 {
     RwFrame *var_C;
@@ -653,6 +738,7 @@ void type_15CCE0::sub_15E890(RwV3d *arg_0)
 }
 
 // match: ?sub_15E950@type_15CCE0@@QAEXH@Z @ 0x0015E950
+// sp-match: ?sub_15E950@type_15CCE0@@QAEXH@Z @ 0x000FFE80
 // Resets the time to its next shot: none with arg_0, else its settings'.
 void type_15CCE0::sub_15E950(RwInt32 arg_0)
 {
@@ -672,6 +758,7 @@ void type_15CCE0::sub_15E950(RwInt32 arg_0)
 }
 
 // match: ?sub_15E9B0@type_15CCE0@@QAEXH@Z @ 0x0015E9B0
+// sp-match: ?sub_15E9B0@type_15CCE0@@QAEXH@Z @ 0x000FFEC0
 // Refills it (its settings' unk_80); arg_0 is unused.
 void type_15CCE0::sub_15E9B0(RwInt32 arg_0)
 {
@@ -681,6 +768,7 @@ void type_15CCE0::sub_15E9B0(RwInt32 arg_0)
 }
 
 // match: ?sub_15E9E0@type_15CCE0@@QAEXPAURwV3d@@@Z @ 0x0015E9E0
+// sp-match: ?sub_15E9E0@type_15CCE0@@QAEXPAURwV3d@@@Z @ 0x000FFEE0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Where it aims: the point it was given, else (firing) at its owner's AI
 // target (vf_110), else 1000 ahead of its model; raised by unk_A8.
@@ -716,6 +804,7 @@ void type_15CCE0::sub_15E9E0(RwV3d *arg_0)
 }
 
 // match: ?sub_15EB50@type_15CCE0@@QAEXXZ @ 0x0015EB50
+// sp-match: ?sub_15EB50@type_15CCE0@@QAEXXZ @ 0x000FFFF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Stops its firing sound, and plays its settings' unk_68 sound (with their
 // unk_70) in its place.
@@ -738,6 +827,7 @@ void type_15CCE0::sub_15EB50()
 }
 
 // match: ?sub_15EBF0@type_15CCE0@@QAEMXZ @ 0x0015EBF0
+// sp-match: ?sub_15EBF0@type_15CCE0@@QAEMXZ @ 0x00100060
 RwReal type_15CCE0::sub_15EBF0()
 {
     type_4D53F8 *var_4;
@@ -749,6 +839,7 @@ RwReal type_15CCE0::sub_15EBF0()
 }
 
 // match: ?sub_15EC30@type_15CCE0@@QAEMXZ @ 0x0015EC30
+// sp-match: ?sub_15EC30@type_15CCE0@@QAEMXZ @ 0x00100080
 RwReal type_15CCE0::sub_15EC30()
 {
     type_4D53F8 *var_4;
@@ -760,6 +851,7 @@ RwReal type_15CCE0::sub_15EC30()
 }
 
 // match: ?sub_15EC70@type_15CCE0@@QAEHXZ @ 0x0015EC70
+// sp-match: ?sub_15EC70@type_15CCE0@@QAEHXZ @ 0x001000A0
 RwInt32 type_15CCE0::sub_15EC70()
 {
     type_4D53F8 *var_4;
@@ -771,6 +863,7 @@ RwInt32 type_15CCE0::sub_15EC70()
 }
 
 // match: ?sub_15ECB0@type_15CCE0@@QAEMXZ @ 0x0015ECB0
+// sp-match: ?sub_15ECB0@type_15CCE0@@QAEMXZ @ 0x001011F0
 RwReal type_15CCE0::sub_15ECB0()
 {
     type_4D53F8 *var_4;
@@ -784,6 +877,7 @@ RwReal type_15CCE0::sub_15ECB0()
 }
 
 // match: ?sub_15ED20@type_15CCE0@@QAEMXZ @ 0x0015ED20
+// sp-match: ?sub_15ED20@type_15CCE0@@QAEMXZ @ 0x001000C0
 RwReal type_15CCE0::sub_15ED20()
 {
     type_4D53F8 *var_4;
@@ -795,6 +889,7 @@ RwReal type_15CCE0::sub_15ED20()
 }
 
 // match: ?sub_15ED60@type_15CCE0@@QAEMXZ @ 0x0015ED60
+// sp-match: ?sub_15ED60@type_15CCE0@@QAEMXZ @ 0x001000E0
 RwReal type_15CCE0::sub_15ED60()
 {
     type_4D53F8 *var_4;
@@ -806,6 +901,7 @@ RwReal type_15CCE0::sub_15ED60()
 }
 
 // match: ?sub_15EDA0@type_15CCE0@@QAEMXZ @ 0x0015EDA0
+// sp-match: ?sub_15EDA0@type_15CCE0@@QAEMXZ @ 0x00100100
 RwReal type_15CCE0::sub_15EDA0()
 {
     type_4D53F8 *var_4;
@@ -817,6 +913,7 @@ RwReal type_15CCE0::sub_15EDA0()
 }
 
 // match: ?sub_15EDE0@type_15CCE0@@QAEMXZ @ 0x0015EDE0
+// sp-match: ?sub_15EDE0@type_15CCE0@@QAEMXZ @ 0x00100120
 RwReal type_15CCE0::sub_15EDE0()
 {
     type_4D53F8 *var_4;
@@ -839,6 +936,7 @@ RwReal type_15CCE0::sub_15EE20()
 }
 
 // match: ?sub_15EE60@type_15CCE0@@QAEHXZ @ 0x0015EE60
+// sp-match: ?sub_15EE60@type_15CCE0@@QAEHXZ @ 0x00101240
 // Whether its class (sub_15EF80) is 0.
 RwInt32 type_15CCE0::sub_15EE60()
 {
@@ -849,6 +947,7 @@ RwInt32 type_15CCE0::sub_15EE60()
 }
 
 // match: ?sub_15EE90@type_15CCE0@@QAEHXZ @ 0x0015EE90
+// sp-match: ?sub_15EE90@type_15CCE0@@QAEHXZ @ 0x00100160
 RwInt32 type_15CCE0::sub_15EE90()
 {
     RwInt32 var_4;
@@ -977,12 +1076,14 @@ RwInt32 type_15CCE0::sub_15EE90()
 }
 
 // match: ?sub_15EF80@type_15CCE0@@QAEHXZ @ 0x0015EF80
+// sp-match: ?sub_15EF80@type_15CCE0@@QAEHXZ @ 0x00100AD0
 RwInt32 type_15CCE0::sub_15EF80()
 {
     return sub_15EFA0(unk_04);
 }
 
 // match: ?sub_15EFA0@@YAHH@Z @ 0x0015EFA0
+// sp-match: ?sub_15EFA0@@YAHH@Z @ 0x00100230
 // The class of the weapon type arg_0: 0 to 4, 8 for grenades, -1 outside
 // 0 to 0x7F.
 RwInt32 sub_15EFA0(RwInt32 arg_0)
@@ -1137,6 +1238,7 @@ RwInt32 sub_15EFA0(RwInt32 arg_0)
 }
 
 // match: ?sub_15F0A0@type_15CCE0@@QAEHXZ @ 0x0015F0A0
+// sp-match: ?sub_15F0A0@type_15CCE0@@QAEHXZ @ 0x00100310
 RwInt32 type_15CCE0::sub_15F0A0()
 {
     RwInt32 var_4;
@@ -1209,7 +1311,11 @@ RwInt32 type_15CCE0::sub_15F0A0()
     case 0x5B:
     case 0x5C:
     case 0x5D:
+#ifdef CODFH_SP // single player gives this group its own class 5 (SP 0x100332)
+        var_4 = 5;
+#else
         var_4 = 1;
+#endif
         break;
     case 0x2:
     case 0x5:

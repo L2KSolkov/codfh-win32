@@ -29,9 +29,11 @@ RWS_REGISTERCLASS(MeshSwapDestructableObjectTrigger);
 // match: ?MakeNew@MeshSwapDestructableObjectTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A3A40
 // match: __ehhandler$?MakeNew@MeshSwapDestructableObjectTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFE90
 // match: __ehhandler$?MakeNew@MeshSwapDestructableObjectTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFE9F
+// sp-match: ?MakeNew@MeshSwapDestructableObjectTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007FF70
 RWS_DEFINE_MAKENEW(MeshSwapDestructableObjectTrigger)
 
 // match: ??0MeshSwapDestructableObjectTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A3AC0
+// sp-match: ??0MeshSwapDestructableObjectTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007FCF0
 MeshSwapDestructableObjectTrigger::MeshSwapDestructableObjectTrigger(const RWS::CAttributePacket &attr)
     : DestructableObjectTrigger(attr)
 {
@@ -44,15 +46,19 @@ MeshSwapDestructableObjectTrigger::MeshSwapDestructableObjectTrigger(const RWS::
 }
 
 // match: ?vf_008@MeshSwapDestructableObjectTrigger@@UAEHXZ @ 0x000A3B80
+// sp-match: ?vf_008@MeshSwapDestructableObjectTrigger@@UAEHXZ @ 0x0007FD50
 
 // match: ??_GMeshSwapDestructableObjectTrigger@@UAEPAXI@Z @ 0x000A3B90
+// sp-match: ??_GMeshSwapDestructableObjectTrigger@@UAEPAXI@Z @ 0x0007FF60
 
 // match: ??1MeshSwapDestructableObjectTrigger@@UAE@XZ @ 0x000A3BB0
+// sp-match: ??1MeshSwapDestructableObjectTrigger@@UAE@XZ @ 0x0007FD60
 // (Defined in the class, in MeshSwapDestructableObjectTrigger.h.)
 
 // Commands 2 and 3 first (the kind of names unk_110 picks), then 0 and 1,
 // its meshes' names.
 // match: ?HandleAttributes@MeshSwapDestructableObjectTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A3BE0
+// sp-match: ?HandleAttributes@MeshSwapDestructableObjectTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007FD80
 void MeshSwapDestructableObjectTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     DestructableObjectTrigger::HandleAttributes(attr);
@@ -111,12 +117,14 @@ void MeshSwapDestructableObjectTrigger::HandleAttributes(const RWS::CAttributePa
 }
 
 // match: ?HandleEvents@MeshSwapDestructableObjectTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000A3DF0
+// sp-match: ?HandleEvents@MeshSwapDestructableObjectTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x0007FF00
 void MeshSwapDestructableObjectTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
     DestructableObjectTrigger::HandleEvents(pMsg);
 }
 
 // match: ?vf_020@MeshSwapDestructableObjectTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000A3E10
+// sp-match: ?vf_020@MeshSwapDestructableObjectTrigger@@UAEPAUtype_3D3548@@XZ @ 0x0007FF10
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_3D3548 *MeshSwapDestructableObjectTrigger::vf_020()
 {
@@ -138,3 +146,4 @@ type_3D3548 *MeshSwapDestructableObjectTrigger::vf_020()
 }
 
 // match: ??_EMeshSwapDestructableObjectTrigger@@WBI@AEPAXI@Z @ 0x000A3E70
+// sp-match: ??_EMeshSwapDestructableObjectTrigger@@WBI@AEPAXI@Z @ 0x0007FF50

@@ -56,6 +56,7 @@ void *dword_506830;
 // match: _dword_42E484 @ 0x0042E484
 
 // match: _sub_23BFE0 @ 0x0023BFE0
+// sp-match: _sub_23BFE0 @ 0x001516F0
 
 rwaVoiceState *
 sub_23BFE0(rwaVoiceState *state)
@@ -92,6 +93,7 @@ sub_23C020(rwaVoiceState *state)
 extern void sub_242460(RwInt32 a, RwInt32 b, RwInt32 c, RwInt32 d, RwUInt32 flags, rwaVoiceState *state);
 
 // match: _sub_23C040 @ 0x0023C040
+// sp-match: _sub_23C040 @ 0x00151730
 void
 sub_23C040(rwaVoiceState *state, const rwaVoiceParams *params)
 {
@@ -112,6 +114,7 @@ extern rwaVoiceState *sub_242170(RwInt32 size, RwUInt32 hint);
 extern void sub_2409B0(RwaUUID *uuid);
 extern void sub_241FD0(RwUInt8 **cursor, const void *src, RwInt32 size);
 // match: _sub_23C080 @ 0x0023C080
+// sp-match: _sub_23C080 @ 0x00151770
 void
 sub_23C080(rwaWaveHeader *header)
 {
@@ -144,6 +147,7 @@ extern const RwaUUID unk_3ED5FC;
 extern const RwaUUID unk_3ED5EC;
 extern const RwaUUID unk_3ED5BC;
 // match: _sub_23C170 @ 0x0023C170
+// sp-match: _sub_23C170 @ 0x00151860
 rwaStreamObj *
 sub_23C170(rwaStreamObj *obj, const rwaReadParams *params)
 {
@@ -209,6 +213,7 @@ sub_23C170(rwaStreamObj *obj, const rwaReadParams *params)
 }
 
 // match: _sub_23C290 @ 0x0023C290
+// sp-match: _sub_23C290 @ 0x00151980
 rwaObj *
 sub_23C290(rwaObj *obj)
 {
@@ -216,6 +221,7 @@ sub_23C290(rwaObj *obj)
 }
 
 // match: _sub_23C2B0 @ 0x0023C2B0
+// sp-match: _sub_23C2B0 @ 0x001519A0
 rwaObj *
 sub_23C2B0(rwaObj *obj)
 {
@@ -227,6 +233,7 @@ sub_23C2B0(rwaObj *obj)
 extern void sub_242550(rwaObj *obj, RwInt32 a);
 
 // match: _sub_23C2D0 @ 0x0023C2D0
+// sp-match: _sub_23C2D0 @ 0x001519C0
 rwaObj *
 sub_23C2D0(rwaObj *obj, void *data)
 {
@@ -239,6 +246,7 @@ sub_23C2D0(rwaObj *obj, void *data)
 extern void sub_23C840(rwaObj *obj, rwaObj *(*callback)(rwaObj *, void *), void *list);
 
 // match: _sub_23C300 @ 0x0023C300
+// sp-match: _sub_23C300 @ 0x001519F0
 void
 sub_23C300(rwaObj *obj)
 {
@@ -257,6 +265,7 @@ extern RwUInt32 sub_242E20(RwUInt32 value);
     }
 
 // match: _sub_23C320 @ 0x0023C320
+// sp-match: _sub_23C320 @ 0x00151A10
 void
 sub_23C320(rwaDict *dict, RwUInt32 base, RwBool swap)
 {
@@ -323,6 +332,7 @@ extern rwaStreamObj *sub_242810(rwaStreamObj *obj, RwUInt32 offset, void *buffer
 extern RwBool sub_242570(rwaStreamObj *obj);
 
 // match: _sub_23C450 @ 0x0023C450
+// sp-match: _sub_23C450 @ 0x00151B40
 rwaVoiceState *
 sub_23C450(rwaVoiceState *state)
 {
@@ -345,6 +355,7 @@ extern rwaWaveDict *sub_243670(void *freeList, RwUInt32 hint);
 extern void sub_240B40(rwaWaveDict *dict);
 
 // match: _sub_23C490 @ 0x0023C490
+// sp-match: _sub_23C490 @ 0x00151B80
 rwaVoiceState *
 sub_23C490(void *file, RwUInt8 *buffer, RwUInt32 bufferSize, RwUInt32 flags,
            rwaVoiceState *state)
@@ -480,6 +491,7 @@ sub_23C490(void *file, RwUInt8 *buffer, RwUInt32 bufferSize, RwUInt32 flags,
 
 rwaObj * RwaWaveDictFindWaveByIndex(rwaWaveDict *dict, RwInt32 index);
 // match: _sub_23C700 @ 0x0023C700
+// sp-match: _sub_23C700 @ 0x00151DF0
 void
 sub_23C700(rwaWaveDict *dict)
 {
@@ -508,6 +520,7 @@ sub_23C700(rwaWaveDict *dict)
 extern rwaObj *RwaWaveDictFindWaveByIndex(rwaWaveDict *dict, RwInt32 index);
 
 // match: _sub_23C770 @ 0x0023C770
+// sp-match: _sub_23C770 @ 0x00151E60
 rwaWaveDict *
 sub_23C770(rwaWaveDict *dict)
 {
@@ -550,6 +563,7 @@ sub_23C770(rwaWaveDict *dict)
 #define rwaDictFromLink(_link) ((rwaWaveDict *)((RwUInt8 *)(_link) - 0x1C))
 
 // match: _RwaWaveDictFindByIndex @ 0x0023C7F0
+// sp-match: _RwaWaveDictFindByIndex @ 0x00151EE0
 rwaWaveDict *
 RwaWaveDictFindByIndex(RwInt32 index)
 {
@@ -572,6 +586,7 @@ RwaWaveDictFindByIndex(RwInt32 index)
 }
 
 // match: _RwaWaveDictGetCount @ 0x0023C820
+// sp-match: _RwaWaveDictGetCount @ 0x00151F10
 RwInt32
 RwaWaveDictGetCount(void)
 {
@@ -587,6 +602,7 @@ RwaWaveDictGetCount(void)
 }
 
 // match: _sub_23C840 @ 0x0023C840
+// sp-match: _sub_23C840 @ 0x00151F30
 void
 sub_23C840(rwaObj *obj, rwaObj *(*callback)(rwaObj *, void *), void *data)
 {
@@ -612,6 +628,7 @@ sub_23C840(rwaObj *obj, rwaObj *(*callback)(rwaObj *, void *), void *data)
 extern RwInt32 sub_243540(rwaLink *list, void *item);
 
 // match: _RwaWaveDictContainsWave @ 0x0023C880
+// sp-match: _RwaWaveDictContainsWave @ 0x00151F70
 rwaWaveDict *
 RwaWaveDictContainsWave(rwaWaveDict *dict, void *item)
 {
@@ -619,6 +636,7 @@ RwaWaveDictContainsWave(rwaWaveDict *dict, void *item)
 }
 
 // match: _RwaWaveDictUsingAllWaveDef @ 0x0023C8A0
+// sp-match: _RwaWaveDictUsingAllWaveDef @ 0x00151F90
 RwUInt32
 RwaWaveDictUsingAllWaveDef(RwUInt32 id)
 {
@@ -648,6 +666,7 @@ RwaWaveDictUsingAllWaveDef(RwUInt32 id)
 extern rwaObj *sub_243570(rwaLink *list, RwInt32 index);
 
 // match: _RwaWaveDictFindWaveByIndex @ 0x0023C8E0
+// sp-match: _RwaWaveDictFindWaveByIndex @ 0x00151FD0
 rwaObj *
 RwaWaveDictFindWaveByIndex(rwaWaveDict *dict, RwInt32 index)
 {
@@ -657,6 +676,7 @@ RwaWaveDictFindWaveByIndex(rwaWaveDict *dict, RwInt32 index)
 extern RwBool sub_2434E0(rwaLink *list, void *item);
 
 // match: _RwaWaveDictAddWave @ 0x0023C8F0
+// sp-match: _RwaWaveDictAddWave @ 0x00151FE0
 rwaWaveDict *
 RwaWaveDictAddWave(rwaWaveDict *dict, void *item)
 {
@@ -670,6 +690,7 @@ RwaWaveDictAddWave(rwaWaveDict *dict, void *item)
 
 
 // match: _RwaWaveDictGetWorking @ 0x0023C930
+// sp-match: _RwaWaveDictGetWorking @ 0x00152020
 rwaWaveDict *
 RwaWaveDictGetWorking(void)
 {
@@ -679,6 +700,7 @@ RwaWaveDictGetWorking(void)
 extern void sub_243640(rwaLink *list, void *data);
 
 // match: _RwaWaveDictRemoveAllWave @ 0x0023C940
+// sp-match: _RwaWaveDictRemoveAllWave @ 0x00152030
 void
 RwaWaveDictRemoveAllWave(void *data)
 {
@@ -694,6 +716,7 @@ extern void sub_240C30(rwaWaveDict *dict);
 extern void sub_2437A0(void *freeList, rwaWaveDict *dict);
 
 // match: _sub_23C970 @ 0x0023C970
+// sp-match: _sub_23C970 @ 0x00152060
 static void
 sub_23C970(rwaWaveDict *dict)
 {
@@ -710,6 +733,7 @@ sub_23C970(rwaWaveDict *dict)
 }
 
 // match: _sub_23C9A0 @ 0x0023C9A0
+// sp-match: _sub_23C9A0 @ 0x00152090
 void
 sub_23C9A0(RwUInt32 size)
 {
@@ -728,6 +752,7 @@ sub_23C9A0(RwUInt32 size)
 }
 
 // match: _sub_23C9E0 @ 0x0023C9E0
+// sp-match: _sub_23C9E0 @ 0x001520D0
 void
 sub_23C9E0(void)
 {
@@ -741,6 +766,7 @@ extern void sub_2438E0(void *freeList);
 extern void RwaWaveDictAssignID(rwaWaveDict *dict, const void *id, void *name);
 
 // match: _sub_23CA00 @ 0x0023CA00
+// sp-match: _sub_23CA00 @ 0x001520F0
 RwBool
 sub_23CA00(void)
 {
@@ -777,6 +803,7 @@ extern void sub_242510(void *item);
 extern void sub_2435D0(rwaLink *list);
 
 // match: _RwaWaveDictDestroy @ 0x0023CAA0
+// sp-match: _RwaWaveDictDestroy @ 0x00152190
 void
 RwaWaveDictDestroy(rwaWaveDict *dict)
 {
@@ -848,6 +875,7 @@ RwaWaveDictDestroy(rwaWaveDict *dict)
 
 
 // match: _sub_23CB80 @ 0x0023CB80
+// sp-match: _sub_23CB80 @ 0x00152270
 void
 sub_23CB80(void)
 {

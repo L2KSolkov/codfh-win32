@@ -75,6 +75,7 @@ static void add_sorted(RADCBNODE **head, RADCBNODE *n)
 }
 
 // match: _my_wait_for_2 @ 0x00344160
+// sp-match: _my_wait_for_2 @ 0x00254160
 static void my_wait_for_2(HANDLE a, HANDLE b)
 {
   HANDLE h[2];
@@ -105,6 +106,7 @@ static void my_wait_for_2(HANDLE a, HANDLE b)
 }
 
 // match: _call_callbacks @ 0x003441B0
+// sp-match: _call_callbacks @ 0x002541B0
 static void call_callbacks(RADCBHANDLER *h)
 {
   HANDLE mutexes[16];
@@ -149,6 +151,7 @@ static void call_callbacks(RADCBHANDLER *h)
 }
 
 // match: _RAD_callback_thread@4 @ 0x003442B0
+// sp-match: _RAD_callback_thread@4 @ 0x002542B0
 static U32 __stdcall RAD_callback_thread(void *param)
 {
   RADCBHANDLER *h = (RADCBHANDLER *)param;
@@ -172,6 +175,7 @@ static U32 __stdcall RAD_callback_thread(void *param)
 }
 
 // match: _RADCB_allocate_handler@4 @ 0x00344320
+// sp-match: _RADCB_allocate_handler@4 @ 0x00254320
 RADEXPFUNC U32 RADEXPLINK RADCB_allocate_handler(S32 rate)
 {
   RADCBHANDLER *h = (RADCBHANDLER *)radmalloc(sizeof(RADCBHANDLER));
@@ -211,6 +215,7 @@ RADEXPFUNC U32 RADEXPLINK RADCB_allocate_handler(S32 rate)
 }
 
 // match: _RADCB_register_callback@16 @ 0x003443D0
+// sp-match: _RADCB_register_callback@16 @ 0x002543D0
 RADEXPFUNC void RADEXPLINK RADCB_register_callback(U32 handle, void PTR4 *data,
   S32 (RADLINK *priority)(void *data, U32 count), void (RADLINK *callback)(void *data, U32 count))
 {
@@ -226,6 +231,7 @@ RADEXPFUNC void RADEXPLINK RADCB_register_callback(U32 handle, void PTR4 *data,
 }
 
 // match: _request_free @ 0x00344410
+// sp-match: _request_free @ 0x00254410
 static void request_free(RADCBHANDLER *h)
 {
   S32 old = h->state;
@@ -245,6 +251,7 @@ static void request_free(RADCBHANDLER *h)
 }
 
 // match: _do_free @ 0x00344450
+// sp-match: _do_free @ 0x00254450
 static void do_free(RADCBHANDLER *h)
 {
   CloseHandle(h->mutex);
@@ -254,6 +261,7 @@ static void do_free(RADCBHANDLER *h)
 }
 
 // match: _RADCB_suspend_2_handlers@8 @ 0x00344480
+// sp-match: _RADCB_suspend_2_handlers@8 @ 0x00254480
 RADEXPFUNC void RADEXPLINK RADCB_suspend_2_handlers(U32 handle1, U32 handle2)
 {
   RADCBHANDLER *h1 = (RADCBHANDLER *)handle1;
@@ -282,6 +290,7 @@ RADEXPFUNC void RADEXPLINK RADCB_suspend_2_handlers(U32 handle1, U32 handle2)
 }
 
 // match: _RADCB_resume_handler@4 @ 0x00344500
+// sp-match: _RADCB_resume_handler@4 @ 0x00254500
 RADEXPFUNC void RADEXPLINK RADCB_resume_handler(U32 handle)
 {
   RADCBHANDLER *h = (RADCBHANDLER *)handle;
@@ -299,6 +308,7 @@ RADEXPFUNC void RADEXPLINK RADCB_resume_handler(U32 handle)
 }
 
 // match: _RADCB_free_handler@4 @ 0x00344530
+// sp-match: _RADCB_free_handler@4 @ 0x00254530
 RADEXPFUNC void RADEXPLINK RADCB_free_handler(U32 handle)
 {
   RADCBHANDLER *h = (RADCBHANDLER *)handle;
@@ -309,6 +319,7 @@ RADEXPFUNC void RADEXPLINK RADCB_free_handler(U32 handle)
 }
 
 // match: _RADCB_try_to_suspend_callback@8 @ 0x003445B0
+// sp-match: _RADCB_try_to_suspend_callback@8 @ 0x002545B0
 RADEXPFUNC S32 RADEXPLINK RADCB_try_to_suspend_callback(U32 handle, void PTR4 *data)
 {
   RADCBNODE *n = (RADCBNODE *)data;
@@ -319,6 +330,7 @@ RADEXPFUNC S32 RADEXPLINK RADCB_try_to_suspend_callback(U32 handle, void PTR4 *d
 }
 
 // match: _RADCB_suspend_callback@8 @ 0x003445E0
+// sp-match: _RADCB_suspend_callback@8 @ 0x002545E0
 RADEXPFUNC void RADEXPLINK RADCB_suspend_callback(U32 handle, void PTR4 *data)
 {
   RADCBNODE *n = (RADCBNODE *)data;
@@ -328,6 +340,7 @@ RADEXPFUNC void RADEXPLINK RADCB_suspend_callback(U32 handle, void PTR4 *data)
 }
 
 // match: _RADCB_suspend_2_callbacks@16 @ 0x00344610
+// sp-match: _RADCB_suspend_2_callbacks@16 @ 0x00254610
 RADEXPFUNC void RADEXPLINK RADCB_suspend_2_callbacks(U32 handle1, void PTR4 *data1, U32 handle2,
   void PTR4 *data2)
 {
@@ -335,6 +348,7 @@ RADEXPFUNC void RADEXPLINK RADCB_suspend_2_callbacks(U32 handle1, void PTR4 *dat
 }
 
 // match: _RADCB_resume_callback@8 @ 0x00344670
+// sp-match: _RADCB_resume_callback@8 @ 0x00254670
 RADEXPFUNC void RADEXPLINK RADCB_resume_callback(U32 handle, void PTR4 *data)
 {
   RADCBNODE *n = (RADCBNODE *)data;
@@ -344,6 +358,7 @@ RADEXPFUNC void RADEXPLINK RADCB_resume_callback(U32 handle, void PTR4 *data)
 }
 
 // match: _RADCB_free_2_handlers@8 @ 0x00344690
+// sp-match: _RADCB_free_2_handlers@8 @ 0x00254690
 RADEXPFUNC void RADEXPLINK RADCB_free_2_handlers(U32 handle1, U32 handle2)
 {
   RADCBHANDLER *h1 = (RADCBHANDLER *)handle1;
@@ -369,12 +384,14 @@ RADEXPFUNC void RADEXPLINK RADCB_free_2_handlers(U32 handle1, U32 handle2)
 }
 
 // match: _RADCB_idle_on_callbacks@0 @ 0x00344730
+// sp-match: _RADCB_idle_on_callbacks@0 @ 0x00254730
 RADEXPFUNC void RADEXPLINK RADCB_idle_on_callbacks(void)
 {
   Sleep(0);
 }
 
 // match: _do_unregister @ 0x00344740
+// sp-match: _do_unregister @ 0x00254740
 static S32 do_unregister(RADCBHANDLER *h, RADCBNODE *n, S32 wait)
 {
   S32 ret;
@@ -400,6 +417,7 @@ static S32 do_unregister(RADCBHANDLER *h, RADCBNODE *n, S32 wait)
 }
 
 // match: _RADCB_unregister_2_callbacks@20 @ 0x003447B0
+// sp-match: _RADCB_unregister_2_callbacks@20 @ 0x002547B0
 RADEXPFUNC S32 RADEXPLINK RADCB_unregister_2_callbacks(U32 handle1, void PTR4 *data1, U32 handle2,
   void PTR4 *data2, S32 wait)
 {

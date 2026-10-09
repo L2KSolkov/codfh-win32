@@ -23,6 +23,7 @@
 #include "rw/bavector.h"
 #include "types/type_3D3548.h"
 #include "rws/csystemcommands.h"
+#if !defined(CODFH_SP) || CODFH_SP_PART != 2 // single player compiles the rest in another file (src/sp/units/sp_unit_08AB60_2.cpp)
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D50D8
@@ -79,10 +80,12 @@ RwInt32 dword_4B2180;
 RwInt32 dword_4B2184;
 // 0x004B21D0
 type_4B21D0 dword_4B21D0;
+#ifndef CODFH_SP // file-static in single player (unit_08E670)
 // 0x004B25A0
 RwV3d dword_4B25A0;
 // 0x004B25AC
 RwReal flt_4B25AC;
+#endif
 // 0x004B25B0
 RwInt32 dword_4B25B0;
 // 0x004B25B8
@@ -128,9 +131,16 @@ type_4B2560 dword_4B2560;
 // match: _$E8 @ 0x0030A420
 // match: _$E9 @ 0x0030DF00
 // match: _$E11 @ 0x0030A440
+// sp-match: _$E2 @ 0x0021C780
+// sp-match: _$E5 @ 0x0021C7A0
+// sp-match: _$E8 @ 0x0021C7C0
+// sp-match: _$E3 @ 0x0021E310
+// sp-match: _$E6 @ 0x0021E320
+// sp-match: _$E9 @ 0x0021E330
 
 // Sets the two pools up and resets.
 // match: ?sub_8AB60@@YAXXZ @ 0x0008AB60
+// sp-match: ?sub_8AB60@@YAXXZ @ 0x0006F8F0
 void sub_8AB60()
 {
     dword_4B2188.sub_16C2C0(100, 16, "m_freeTriggerTracker", 4, 0);
@@ -140,6 +150,7 @@ void sub_8AB60()
 
 // Forgets the lists and the settings and empties the slots.
 // match: ?sub_8ABA0@@YAXXZ @ 0x0008ABA0
+// sp-match: ?sub_8ABA0@@YAXXZ @ 0x0006F240
 void sub_8ABA0()
 {
     RwInt32 var_4;
@@ -170,6 +181,7 @@ void sub_8ABA0()
 }
 
 // match: ?sub_8ACE0@@YAXXZ @ 0x0008ACE0
+// sp-match: ?sub_8ACE0@@YAXXZ @ 0x0006F930
 void sub_8ACE0()
 {
     sub_8AD20();
@@ -177,6 +189,7 @@ void sub_8ACE0()
 
 // Frees the trackers and shuts the pools down.
 // match: ?sub_8ACF0@@YAXXZ @ 0x0008ACF0
+// sp-match: ?sub_8ACF0@@YAXXZ @ 0x0006F940
 void sub_8ACF0()
 {
     sub_8AD20();
@@ -186,6 +199,7 @@ void sub_8ACF0()
 
 // Frees every tracker and resets.
 // match: ?sub_8AD20@@YAXXZ @ 0x0008AD20
+// sp-match: ?sub_8AD20@@YAXXZ @ 0x0006F3F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_8AD20()
 {
@@ -224,6 +238,7 @@ void sub_8AD20()
 // A round of arg_0 seconds: clears the trackers' marks and lets each slot
 // pick.
 // match: ?sub_8ADD0@@YAXM@Z @ 0x0008ADD0
+// sp-match: ?sub_8ADD0@@YAXM@Z @ 0x0006FBA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_8ADD0(RwReal arg_0)
 {
@@ -253,6 +268,7 @@ void sub_8ADD0(RwReal arg_0)
 // The slot arg_0's round: when its time runs out (and arg_4 trackers are
 // there), a new delay, then up to its picks from the list arg_8.
 // match: ?sub_8AEB0@@YAXPAUtype_8AEB0@@HPAUtype_8AFF0_node@@M@Z @ 0x0008AEB0
+// sp-match: ?sub_8AEB0@@YAXPAUtype_8AEB0@@HPAUtype_8AFF0_node@@M@Z @ 0x0006F960
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_8AEB0(type_8AEB0 *arg_0, RwInt32 arg_4, type_8AFF0_node *arg_8, RwReal arg_C)
 {
@@ -293,6 +309,7 @@ void sub_8AEB0(type_8AEB0 *arg_0, RwInt32 arg_4, type_8AFF0_node *arg_8, RwReal 
 }
 
 // match: ?sub_8AFF0@@YAHHPAUtype_8AFF0_node@@PAUtype_8AEB0@@@Z @ 0x0008AFF0
+// sp-match: ?sub_8AFF0@@YAHHPAUtype_8AFF0_node@@PAUtype_8AEB0@@@Z @ 0x0006F460
 // The pick of the slot arg_8 (answering the slot kind arg_0) among the
 // trackers from arg_4: a random free one with room, or else the one it last
 // picked if that has room; takes it (a round's use), marks its child entity
@@ -358,6 +375,7 @@ RwInt32 sub_8AFF0(RwInt32 arg_0, type_8AFF0_node *arg_4, type_8AEB0 *arg_8)
 // Adds a tracker for arg_0 to its kind's list (none twice); returns it, or
 // 0.
 // match: ?sub_8B180@@YAPAUtype_8AFF0_node@@PAUtype_712B0@@@Z @ 0x0008B180
+// sp-match: ?sub_8B180@@YAPAUtype_8AFF0_node@@PAUtype_712B0@@@Z @ 0x0006F540
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_8AFF0_node *sub_8B180(type_712B0 *arg_0)
 {
@@ -400,6 +418,7 @@ type_8AFF0_node *sub_8B180(type_712B0 *arg_0)
 // Removes the tracker of arg_0, and arg_0 from the slots that last picked
 // it.
 // match: ?sub_8B250@@YAXPAUtype_712B0@@@Z @ 0x0008B250
+// sp-match: ?sub_8B250@@YAXPAUtype_712B0@@@Z @ 0x0006F5C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_8B250(type_712B0 *arg_0)
 {
@@ -462,6 +481,7 @@ void sub_8B250(type_712B0 *arg_0)
 // Removes the trackers of the objects answering slot arg_0 (all when it
 // is negative) from both lists.
 // match: ?sub_8B380@@YAXH@Z @ 0x0008B380
+// sp-match: ?sub_8B380@@YAXH@Z @ 0x0006FA30
 void sub_8B380(RwInt32 arg_0)
 {
     sub_8B3C0(arg_0, &dword_4B2168, &dword_4B217C);
@@ -470,6 +490,7 @@ void sub_8B380(RwInt32 arg_0)
 
 // The same for the list arg_4, counted in arg_8.
 // match: ?sub_8B3C0@@YAXHPAPAUtype_8AFF0_node@@PAH@Z @ 0x0008B3C0
+// sp-match: ?sub_8B3C0@@YAXHPAPAUtype_8AFF0_node@@PAH@Z @ 0x0006F660
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_8B3C0(RwInt32 arg_0, type_8AFF0_node **arg_4, RwInt32 *arg_8)
 {
@@ -518,6 +539,7 @@ void sub_8B3C0(RwInt32 arg_0, type_8AFF0_node **arg_4, RwInt32 *arg_8)
 // Adds a special tracker for arg_0, if its slot has room; with arg_4, hands
 // back the entity of arg_0 (and gives up without one).
 // match: ?sub_8B4C0@@YAPAUtype_8B4C0_node@@PAUtype_712B0@@PAPAUtype_3D3548@@@Z @ 0x0008B4C0
+// sp-match: ?sub_8B4C0@@YAPAUtype_8B4C0_node@@PAUtype_712B0@@PAPAUtype_3D3548@@@Z @ 0x0006FA60
 type_8B4C0_node *sub_8B4C0(type_712B0 *arg_0, type_3D3548 **arg_4)
 {
     type_8B4C0_node *var_4;
@@ -586,6 +608,7 @@ type_8B4C0_node *sub_8B4C0(type_712B0 *arg_0, type_3D3548 **arg_4)
 
 // Removes the special tracker of arg_0.
 // match: ?sub_8B6B0@@YAXPAUtype_712B0@@@Z @ 0x0008B6B0
+// sp-match: ?sub_8B6B0@@YAXPAUtype_712B0@@@Z @ 0x0006F700
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_8B6B0(type_712B0 *arg_0)
 {
@@ -632,6 +655,7 @@ void sub_8B6B0(type_712B0 *arg_0)
 
 // Takes the settings arg_0 (arg_4 set) or lets them go.
 // match: ?sub_8B770@@YAXPAUtype_712B0@@H@Z @ 0x0008B770
+// sp-match: ?sub_8B770@@YAXPAUtype_712B0@@H@Z @ 0x0006F780
 void sub_8B770(type_712B0 *arg_0, RwInt32 arg_4)
 {
     RwInt32 var_4;
@@ -659,6 +683,7 @@ void sub_8B770(type_712B0 *arg_0, RwInt32 arg_4)
 
 // Sets the most trackers for the index arg_0 of the kind arg_4.
 // match: ?sub_8B810@@YAXHHH@Z @ 0x0008B810
+// sp-match: ?sub_8B810@@YAXHHH@Z @ 0x0006F870
 void sub_8B810(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_4B2174_C0 *var_4;
@@ -670,6 +695,7 @@ void sub_8B810(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 // The entity arg_0 leaves the CCESS: a picked one frees its place in the
 // slot its trigger answers, any other drops its trigger's special tracker.
 // match: ?sub_8B840@@YAXPAUtype_3D3548@@@Z @ 0x0008B840
+// sp-match: ?sub_8B840@@YAXPAUtype_3D3548@@@Z @ 0x0006F890
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_8B840(type_3D3548 *arg_0)
 {
@@ -703,18 +729,20 @@ void sub_8B840(type_3D3548 *arg_0)
 }
 
 // match: ?sub_8B920@@YA?AUtype_8BEC0@@PAU1@0@Z @ 0x0008B920
+// sp-match: ?sub_8B920@@YA?AUtype_8BEC0@@PAU1@0@Z @ 0x0006FC30
 type_8BEC0 sub_8B920(type_8BEC0 *arg_0, type_8BEC0 *arg_4)
 {
     __declspec(align(16)) type_8BEC0 var_10;
 
-    var_10.unk_00 = arg_0->unk_04 * arg_4->unk_08 - arg_0->unk_08 * arg_4->unk_04;
-    var_10.unk_04 = arg_0->unk_08 * arg_4->unk_00 - arg_0->unk_00 * arg_4->unk_08;
-    var_10.unk_08 = arg_0->unk_00 * arg_4->unk_04 - arg_0->unk_04 * arg_4->unk_00;
+    var_10.unk_00 = (arg_0->unk_04 * arg_4->unk_08) - (arg_0->unk_08 * arg_4->unk_04);
+    var_10.unk_04 = (arg_0->unk_08 * arg_4->unk_00) - (arg_0->unk_00 * arg_4->unk_08);
+    var_10.unk_08 = (arg_0->unk_00 * arg_4->unk_04) - (arg_0->unk_04 * arg_4->unk_00);
     var_10.unk_0C = arg_0->unk_0C;
     return var_10;
 }
 
 // match: ?sub_8B9C0@@YA?AUtype_8BEC0@@PAU1@PAM@Z @ 0x0008B9C0
+// sp-match: ?sub_8B9C0@@YA?AUtype_8BEC0@@PAU1@PAM@Z @ 0x0006FCA0
 type_8BEC0 sub_8B9C0(type_8BEC0 *arg_0, RwReal *arg_4)
 {
     __declspec(align(16)) type_8BEC0 var_10;
@@ -727,6 +755,7 @@ type_8BEC0 sub_8B9C0(type_8BEC0 *arg_0, RwReal *arg_4)
 }
 
 // match: ?sub_8BA30@@YA?AUtype_8BEC0@@PAMPAU1@@Z @ 0x0008BA30
+// sp-match: ?sub_8BA30@@YA?AUtype_8BEC0@@PAMPAU1@@Z @ 0x0006FD00
 type_8BEC0 sub_8BA30(RwReal *arg_0, type_8BEC0 *arg_4)
 {
     __declspec(align(16)) type_8BEC0 var_10;
@@ -739,6 +768,7 @@ type_8BEC0 sub_8BA30(RwReal *arg_0, type_8BEC0 *arg_4)
 }
 
 // match: ?sub_8BAA0@@YA?AUtype_8BEC0@@PAU1@0@Z @ 0x0008BAA0
+// sp-match: ?sub_8BAA0@@YA?AUtype_8BEC0@@PAU1@0@Z @ 0x0006FD60
 type_8BEC0 sub_8BAA0(type_8BEC0 *arg_0, type_8BEC0 *arg_4)
 {
     __declspec(align(16)) type_8BEC0 var_10;
@@ -751,6 +781,7 @@ type_8BEC0 sub_8BAA0(type_8BEC0 *arg_0, type_8BEC0 *arg_4)
 }
 
 // match: ?sub_8BB10@@YA?AUtype_8BEC0@@PAU1@0@Z @ 0x0008BB10
+// sp-match: ?sub_8BB10@@YA?AUtype_8BEC0@@PAU1@0@Z @ 0x0006FDC0
 type_8BEC0 sub_8BB10(type_8BEC0 *arg_0, type_8BEC0 *arg_4)
 {
     __declspec(align(16)) type_8BEC0 var_10;
@@ -763,6 +794,7 @@ type_8BEC0 sub_8BB10(type_8BEC0 *arg_0, type_8BEC0 *arg_4)
 }
 
 // match: ?sub_8BB80@@YA?AUtype_8BEC0@@PAURwV3d@@@Z @ 0x0008BB80
+// sp-match: ?sub_8BB80@@YA?AUtype_8BEC0@@PAURwV3d@@@Z @ 0x0006FE20
 type_8BEC0 sub_8BB80(RwV3d *arg_0)
 {
     __declspec(align(16)) type_8BEC0 var_10;
@@ -775,6 +807,7 @@ type_8BEC0 sub_8BB80(RwV3d *arg_0)
 }
 
 // match: ?sub_8BBE0@@YA?AUtype_8BEC0@@MMMM@Z @ 0x0008BBE0
+// sp-match: ?sub_8BBE0@@YA?AUtype_8BEC0@@MMMM@Z @ 0x0006FE70
 type_8BEC0 sub_8BBE0(RwReal arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C)
 {
     __declspec(align(16)) type_8BEC0 var_10;
@@ -787,6 +820,7 @@ type_8BEC0 sub_8BBE0(RwReal arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C)
 }
 
 // match: ?sub_8BC40@@YAMPAUtype_8BEC0@@0@Z @ 0x0008BC40
+// sp-match: ?sub_8BC40@@YAMPAUtype_8BEC0@@0@Z @ 0x0006FEC0
 RwReal sub_8BC40(type_8BEC0 *arg_0, type_8BEC0 *arg_4)
 {
     __declspec(align(16)) RwReal var_10;
@@ -795,6 +829,7 @@ RwReal sub_8BC40(type_8BEC0 *arg_0, type_8BEC0 *arg_4)
 }
 
 // match: ?sub_8BC90@@YA?AUtype_8BFA0@@PAMPAU1@@Z @ 0x0008BC90
+// sp-match: ?sub_8BC90@@YA?AUtype_8BFA0@@PAMPAU1@@Z @ 0x0006FEF0
 type_8BFA0 sub_8BC90(RwReal *arg_0, type_8BFA0 *arg_4)
 {
     __declspec(align(16)) type_8BFA0 var_60;
@@ -807,6 +842,7 @@ type_8BFA0 sub_8BC90(RwReal *arg_0, type_8BFA0 *arg_4)
 }
 
 // match: ?sub_8BE10@@YA?AUtype_8BEC0@@PAU1@@Z @ 0x0008BE10
+// sp-match: ?sub_8BE10@@YA?AUtype_8BEC0@@PAU1@@Z @ 0x0006FFD0
 type_8BEC0 sub_8BE10(type_8BEC0 *arg_0)
 {
     RwReal var_C;
@@ -821,32 +857,54 @@ type_8BEC0 sub_8BE10(type_8BEC0 *arg_0)
 }
 
 // match: ?sub_8BEC0@@YA?AUtype_8BEC0@@PAURwMatrixTag@@PAU1@@Z @ 0x0008BEC0
+// sp-match: ?sub_8BEC0@@YA?AUtype_8BEC0@@PAURwMatrixTag@@PAU1@@Z @ 0x00070050
 type_8BEC0 sub_8BEC0(RwMatrix *arg_0, type_8BEC0 *arg_4)
 {
     __declspec(align(16)) type_8BEC0 var_10;
 
+#ifdef CODFH_SP // shape: up and at terms grouped (SP 0x7005F sums at, up, then right)
+    var_10.unk_00 = arg_0->right.x * arg_4->unk_00 + (arg_0->up.x * arg_4->unk_04 + arg_0->at.x * arg_4->unk_08) + arg_0->pos.x;
+    var_10.unk_04 = arg_0->right.y * arg_4->unk_00 + (arg_0->up.y * arg_4->unk_04 + arg_0->at.y * arg_4->unk_08) + arg_0->pos.y;
+    var_10.unk_08 = arg_0->right.z * arg_4->unk_00 + (arg_0->up.z * arg_4->unk_04 + arg_0->at.z * arg_4->unk_08) + arg_0->pos.z;
+#else
     var_10.unk_00 = arg_0->right.x * arg_4->unk_00 + arg_0->up.x * arg_4->unk_04 + arg_0->at.x * arg_4->unk_08
                     + arg_0->pos.x;
     var_10.unk_04 = arg_0->right.y * arg_4->unk_00 + arg_0->up.y * arg_4->unk_04 + arg_0->at.y * arg_4->unk_08
                     + arg_0->pos.y;
     var_10.unk_08 = arg_0->right.z * arg_4->unk_00 + arg_0->up.z * arg_4->unk_04 + arg_0->at.z * arg_4->unk_08
                     + arg_0->pos.z;
+#endif
     var_10.unk_0C = 0.0f;
     return var_10;
 }
 
+#ifdef CODFH_SP // SP 0x700E0
+// shape: this reference-bound negation keeps the reciprocal after the matrix argument setup.
+static inline RwReal sp_negate_matrix_cofactor(const RwDouble &value)
+{
+    return -value;
+}
+#endif
+
 // match: ?sub_8BFA0@@YA?AUtype_8BFA0@@PAURwMatrixTag@@@Z @ 0x0008BFA0
+// sp-match: ?sub_8BFA0@@YA?AUtype_8BFA0@@PAURwMatrixTag@@@Z @ 0x000700E0
 type_8BFA0 sub_8BFA0(RwMatrix *arg_0)
 {
     RwReal var_4;
     __declspec(align(16)) type_8BFA0 var_50;
     RwReal var_54;
 
-    var_4 = (arg_0->up.y * arg_0->at.z - arg_0->up.z * arg_0->at.y) * arg_0->right.x
+    var_4 = (arg_0->up.y * arg_0->at.z - (arg_0->up.z * arg_0->at.y)) * arg_0->right.x
             - (arg_0->right.y * arg_0->at.z - arg_0->right.z * arg_0->at.y) * arg_0->up.x
             + (arg_0->right.y * arg_0->up.z - arg_0->right.z * arg_0->up.y) * arg_0->at.x;
-    var_50.unk_00[0].unk_00 = arg_0->up.y * arg_0->at.z - arg_0->up.z * arg_0->at.y;
+    var_50.unk_00[0].unk_00 = arg_0->up.y * arg_0->at.z - (arg_0->up.z * arg_0->at.y);
+#ifdef CODFH_SP // SP 0x700E0
+    // shape: the two additional negations cancel without adding x87 operations.
+    var_50.unk_00[1].unk_00 = -sp_negate_matrix_cofactor(
+        (-(arg_0->up.x * arg_0->at.z - arg_0->up.z * arg_0->at.x)));
+#else // MP 0x8BFA0
     var_50.unk_00[1].unk_00 = -(arg_0->up.x * arg_0->at.z - arg_0->up.z * arg_0->at.x);
+#endif
     var_50.unk_00[2].unk_00 = arg_0->up.x * arg_0->at.y - arg_0->up.y * arg_0->at.x;
     var_50.unk_00[3].unk_00 = 0.0f;
     var_50.unk_00[0].unk_04 = -(arg_0->right.y * arg_0->at.z - arg_0->right.z * arg_0->at.y);
@@ -863,17 +921,36 @@ type_8BFA0 sub_8BFA0(RwMatrix *arg_0)
     var_50.unk_00[3].unk_0C = 1.0f;
     var_54 = 1.0f / var_4;
     var_50 = sub_8BC90(&var_54, &var_50);
+#ifdef CODFH_SP // SP 0x700E0
+    // shape: equivalent branches and a separate result preserve the image's x87
+    // and return-copy order. The compiled code contains no branch here.
+    {
+        RwDouble sum = var_50.unk_00[2].unk_00 * arg_0->pos.z;
+        if (arg_0 != 0)
+        {
+            sum += (const RwDouble &)(var_50.unk_00[0].unk_00 * arg_0->pos.x);
+        }
+        else
+        {
+            sum += var_50.unk_00[0].unk_00 * arg_0->pos.x;
+        }
+        RwReal result = sum + (var_50.unk_00[1].unk_00 * arg_0->pos.y);
+        var_50.unk_00[3].unk_00 = -result;
+    }
+#else // MP 0x8BFA0
     var_50.unk_00[3].unk_00 = -(var_50.unk_00[0].unk_00 * arg_0->pos.x + var_50.unk_00[1].unk_00 * arg_0->pos.y
-                                + var_50.unk_00[2].unk_00 * arg_0->pos.z);
+                                + (var_50.unk_00[2].unk_00 * arg_0->pos.z));
+#endif
     var_50.unk_00[3].unk_04 = -(var_50.unk_00[0].unk_04 * arg_0->pos.x + var_50.unk_00[1].unk_04 * arg_0->pos.y
-                                + var_50.unk_00[2].unk_04 * arg_0->pos.z);
+                                + (var_50.unk_00[2].unk_04 * arg_0->pos.z));
     var_50.unk_00[3].unk_08 = -(var_50.unk_00[0].unk_08 * arg_0->pos.x + var_50.unk_00[1].unk_08 * arg_0->pos.y
-                                + var_50.unk_00[2].unk_08 * arg_0->pos.z);
+                                + (var_50.unk_00[2].unk_08 * arg_0->pos.z));
     var_50.unk_00[3].unk_0C = 1.0f;
     return var_50;
 }
 
 // match: ?sub_8C230@@YAXPAUtype_8BEC0@@PAURwMatrixTag@@0@Z @ 0x0008C230
+// sp-match: ?sub_8C230@@YAXPAUtype_8BEC0@@PAURwMatrixTag@@0@Z @ 0x00070280
 void sub_8C230(type_8BEC0 *arg_0, RwMatrix *arg_4, type_8BEC0 *arg_8)
 {
     RwInt32 var_4;
@@ -917,6 +994,7 @@ void sub_8C230(type_8BEC0 *arg_0, RwMatrix *arg_4, type_8BEC0 *arg_8)
 }
 
 // match: ?sub_8C410@@YA?AUtype_8C410@@PAURwMatrixTag@@PAUtype_8BEC0@@@Z @ 0x0008C410
+// sp-match: ?sub_8C410@@YA?AUtype_8C410@@PAURwMatrixTag@@PAUtype_8BEC0@@@Z @ 0x00070380
 type_8C410 sub_8C410(RwMatrix *arg_0, type_8BEC0 *arg_4)
 {
     type_8BEC0 var_80[8];
@@ -956,7 +1034,11 @@ type_8C410 sub_8C410(RwMatrix *arg_0, type_8BEC0 *arg_4)
     return var_C0;
 }
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART != 1 // single player: sp_unit_08AB60_2.cpp, the second file
+
 // match: ?sub_8C690@@YAXHPAURpHAnimHierarchy@@@Z @ 0x0008C690
+// sp-match: ?sub_8C690@@YAXHPAURpHAnimHierarchy@@@Z @ 0x00070990
 // Sets up the six axis directions, then for each entry of the kind arg_0's
 // table (0 and 1: 13 boxes, the first scaled by 0.75 or 1.1; else 11) the
 // box between its two bones of the hierarchy arg_4: a frame along the bone
@@ -976,7 +1058,9 @@ void sub_8C690(RwInt32 arg_0, RpHAnimHierarchy *arg_4)
     RwMatrix *lv_ec;
     RwMatrix *lv_f0;
     type_8BFA0 lv_150;
+#ifndef CODFH_SP // single player: in the loop
     RwV3d lv_17c;
+#endif
     RwReal lv_1a4;
     RwReal lv_1a8;
     RwReal lv_1b0;
@@ -1002,7 +1086,9 @@ void sub_8C690(RwInt32 arg_0, RpHAnimHierarchy *arg_4)
         lv_4 = dword_428E80;
         lv_c = 13;
         lv_8 = dword_4B21D0.unk_60;
+#ifndef CODFH_SP // single player does not grow kind 1's first bone (SP 0x70B42)
         lv_18 = 1.1f;
+#endif
     } else {
         lv_4 = dword_428FB8;
         lv_c = 11;
@@ -1017,6 +1103,34 @@ void sub_8C690(RwInt32 arg_0, RpHAnimHierarchy *arg_4)
         lv_150.unk_00[1] = sub_8BB80(&lv_f0->pos);
         lv_150.unk_00[1] = sub_8BAA0(&lv_150.unk_00[1], (type_8BEC0 *)&lv_ec->pos);
         lv_150.unk_00[1].unk_0C = 0.0f;
+#ifdef CODFH_SP // single player always builds the frame across the bone and sizes the box from the entry's unk_08 and unk_0C before the bone's length replaces its height (SP 0x70C7F, 0x70DEB)
+        lv_150.unk_00[1] = sub_8BE10(&lv_150.unk_00[1]);
+        lv_150.unk_00[2] = sub_8BBE0(0.0f, 0.0f, 1.0f, 0.0f);
+        lv_150.unk_00[0] = sub_8B920(&lv_150.unk_00[2], &lv_150.unk_00[1]);
+        lv_150.unk_00[0] = sub_8BE10(&lv_150.unk_00[0]);
+        lv_150.unk_00[2] = sub_8B920(&lv_150.unk_00[0], &lv_150.unk_00[1]);
+        lv_150.unk_00[2] = sub_8BE10(&lv_150.unk_00[2]);
+        lv_150.unk_00[2] = sub_8BBE0(-lv_150.unk_00[2].unk_00, -lv_150.unk_00[2].unk_04,
+                                     -lv_150.unk_00[2].unk_08, 0.0f);
+        lv_150.unk_00[3] = sub_8BBE0(0.0f, 0.0f, 0.0f, 1.0f);
+        lv_dc = (lv_e0 == 0) ? lv_18 : lv_14;
+        lv_8[lv_e0].unk_00 = -(lv_dc * lv_4[lv_e0].unk_08);
+        lv_8[lv_e0].unk_04 = -(lv_dc * lv_4[lv_e0].unk_0C);
+        lv_8[lv_e0].unk_08 = -(lv_dc * lv_4[lv_e0].unk_08);
+        lv_8[lv_e0].unk_0C = 1.0f;
+        lv_8[lv_e0].unk_10 = lv_dc * lv_4[lv_e0].unk_08;
+        lv_8[lv_e0].unk_14 = lv_dc * lv_4[lv_e0].unk_0C;
+        lv_8[lv_e0].unk_18 = lv_dc * lv_4[lv_e0].unk_08;
+        lv_8[lv_e0].unk_1C = 1.0f;
+        RwV3d lv_17c;
+        RwV3dSub(&lv_17c, &lv_ec->pos, &lv_f0->pos);
+        lv_8[lv_e0].unk_04 = 0.0f;
+        lv_8[lv_e0].unk_14 = RwV3dLength((RwV3d *)&lv_17c);
+        *(type_8C410 *)&lv_8[lv_e0] = sub_8C410((RwMatrix *)&lv_150, (type_8BEC0 *)&lv_8[lv_e0]);
+        lv_8[lv_e0].unk_0C = (RwReal)lv_e4;
+        lv_8[lv_e0].unk_1C = (RwReal)lv_e8;
+    }
+#else
         RwV3dSub(&lv_17c, &lv_ec->pos, &lv_f0->pos);
         lv_150.unk_00[1] = sub_8BE10(&lv_150.unk_00[1]);
         lv_1a4 = lv_150.unk_00[1].unk_08;
@@ -1068,15 +1182,18 @@ void sub_8C690(RwInt32 arg_0, RpHAnimHierarchy *arg_4)
         }
         lv_dc = lv_14;
     }
+#endif
 }
 
 // match: ?sub_8D580@@YAXPAURpHAnimHierarchy@@H@Z @ 0x0008D580
+// sp-match: ?sub_8D580@@YAXPAURpHAnimHierarchy@@H@Z @ 0x00070ED0
 void sub_8D580(RpHAnimHierarchy *arg_0, RwInt32 arg_4)
 {
     sub_8C690(arg_4, arg_0);
 }
 
 // match: ?sub_8D5A0@@YAHPAUtype_8BEC0@@0@Z @ 0x0008D5A0
+// sp-match: ?sub_8D5A0@@YAHPAUtype_8BEC0@@0@Z @ 0x00070EF0
 RwInt32 sub_8D5A0(type_8BEC0 *arg_0, type_8BEC0 *arg_4)
 {
     RwInt32 var_4;
@@ -1110,6 +1227,7 @@ RwInt32 sub_8D5A0(type_8BEC0 *arg_0, type_8BEC0 *arg_4)
 }
 
 // match: ?sub_8D660@@YAHHPAURpHAnimHierarchy@@PAURpIntersection@@HPAUtype_4B21D0_60@@@Z @ 0x0008D660
+// sp-match: ?sub_8D660@@YAHHPAURpHAnimHierarchy@@PAURpIntersection@@HPAUtype_4B21D0_60@@@Z @ 0x00071560
 // The line variant: arg_8 is read as an RwLine. Each of the first arg_0 bone
 // boxes (as sub_8E330 picks them) goes into its bone's space (sub_8C410,
 // into dword_4B21D0's unk_360); a line wholly inside one gives that box's
@@ -1145,7 +1263,9 @@ RwInt32 sub_8D660(RwInt32 arg_0, RpHAnimHierarchy *arg_4, RpIntersection *arg_8,
     var_C = RpHAnimHierarchyGetMatrixArray(arg_4);
     var_10 = 1.0f;
     var_14 = 1.0f;
+#ifndef CODFH_SP // single player compiles the empty debug call out (SP 0x71588)
     sub_19A750();
+#endif
     var_18 = &dword_4B21D0;
     if (arg_10)
     {
@@ -1162,7 +1282,9 @@ RwInt32 sub_8D660(RwInt32 arg_0, RpHAnimHierarchy *arg_4, RpIntersection *arg_8,
     {
         var_1C = var_18->unk_60;
         var_20 = dword_428E80;
+#ifndef CODFH_SP // single player does not grow kind 1's first bone (SP 0x715B9)
         var_14 = 1.1f;
+#endif
     }
     else
     {
@@ -1303,7 +1425,17 @@ RwInt32 sub_8D660(RwInt32 arg_0, RpHAnimHierarchy *arg_4, RpIntersection *arg_8,
     return -1;
 }
 
+#ifdef CODFH_SP // SP 0x71EE0
+// shape: the two inline negations in sub_8E330 cancel, while retaining the
+// image's load of the sphere pointer before the plane-distance addition.
+static inline RwReal sp_negate_plane_distance(RwReal value)
+{
+    return -value;
+}
+#endif
+
 // match: ?sub_8E330@@YAHHPAURpHAnimHierarchy@@PAURpIntersection@@HPAUtype_4B21D0_60@@@Z @ 0x0008E330
+// sp-match: ?sub_8E330@@YAHHPAURpHAnimHierarchy@@PAURpIntersection@@HPAUtype_4B21D0_60@@@Z @ 0x00071EE0
 // The sphere variant: for each of the first arg_0 bones' boxes (the table
 // arg_10, else the kind arg_C's in dword_4B21D0, kind 0 shrunk to 0.75 and
 // kind 1 grown to 1.1 at the first bone), the sphere's centre (arg_8 is read
@@ -1335,7 +1467,9 @@ RwInt32 sub_8E330(RwInt32 arg_0, RpHAnimHierarchy *arg_4, RpIntersection *arg_8,
     var_C = -1;
     var_10 = 1.0f;
     var_14 = 1.0f;
+#ifndef CODFH_SP // single player compiles the empty debug call out (SP 0x71EF8)
     sub_19A750();
+#endif
     var_18 = &dword_4B21D0;
     var_1C = var_18->unk_00;
     if (arg_10)
@@ -1350,7 +1484,9 @@ RwInt32 sub_8E330(RwInt32 arg_0, RpHAnimHierarchy *arg_4, RpIntersection *arg_8,
     else if (arg_C == 1)
     {
         var_20 = var_18->unk_60;
+#ifndef CODFH_SP // single player does not grow kind 1's first bone (SP 0x71F36)
         var_14 = 1.1f;
+#endif
     }
     else
     {
@@ -1384,7 +1520,13 @@ RwInt32 sub_8E330(RwInt32 arg_0, RpHAnimHierarchy *arg_4, RpIntersection *arg_8,
         var_1C[5].unk_0C = var_184 * var_20->unk_08;
         for (var_188 = 0; var_188 < 6; var_188++)
         {
+#ifdef CODFH_SP // SP 0x71EE0
+            // shape: preserve VC7.1's pointer-load order without changing the sum.
+            var_18C = sp_negate_plane_distance(sp_negate_plane_distance(
+                (sub_8BC40(&var_1C[var_188], &var_160)))) + var_1C[var_188].unk_0C;
+#else // MP 0x8E330
             var_18C = sub_8BC40(&var_1C[var_188], &var_160) + var_1C[var_188].unk_0C;
+#endif
             if (var_18C <= ((RwSphere *)arg_8)->radius && var_18C < var_8)
             {
                 var_8 = var_18C;
@@ -1448,3 +1590,4 @@ RwInt32 sub_8E330(RwInt32 arg_0, RpHAnimHierarchy *arg_4, RpIntersection *arg_8,
 
 
 
+#endif

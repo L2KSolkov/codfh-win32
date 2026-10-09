@@ -13,6 +13,9 @@
 #include "game/gameloop.h"
 #include <string.h>
 
+extern "C" void _WriteBarrier();
+#pragma intrinsic(_WriteBarrier)
+
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x004CFA00
 RwInt32 dword_4CFA00;
@@ -24,6 +27,7 @@ RwInt32 dword_4CFA00;
 // match: __real@bf7fbe77 @ 0x003DB3C0
 
 // match: sub_13F9E0 @ 0x0013F9E0
+// sp-match: sub_13F9E0 @ 0x000EC2E0
 
 RwReal sub_13F9E0(RwReal arg_0)
 {
@@ -38,6 +42,7 @@ RwReal sub_13F9E0(RwReal arg_0)
 }
 
 // match: sub_13FA50 @ 0x0013FA50
+// sp-match: sub_13FA50 @ 0x000EC320
 // Normalises *arg_0 in place and returns its length (0 for a zero vector,
 // which it leaves as it is).
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -65,6 +70,7 @@ RwReal sub_13FA50(RwV3d *arg_0)
 }
 
 // match: sub_13FB00 @ 0x0013FB00
+// sp-match: sub_13FB00 @ 0x000EC390
 void sub_13FB00(RtQuat *arg_0, RtQuat *arg_4)
 {
     RwDouble var_8;
@@ -83,6 +89,7 @@ void sub_13FB00(RtQuat *arg_0, RtQuat *arg_4)
 }
 
 // match: sub_13FBC0 @ 0x0013FBC0
+// sp-match: sub_13FBC0 @ 0x000EC400
 // The rotation arg_4 slerped towards arg_8 by arg_C, into *arg_0 (arg_8
 // negated when they are more than 90 degrees apart; a straight blend when
 // they are within about 2.5 degrees).
@@ -118,6 +125,7 @@ void sub_13FBC0(RtQuat *arg_0, RtQuat *arg_4, RtQuat *arg_8, RwReal arg_C)
 }
 
 // match: sub_13FDA0 @ 0x0013FDA0
+// sp-match: sub_13FDA0 @ 0x000EC530
 // The rotation by the vector *arg_0 (its length the angle, in radians, about
 // its direction) as the unit quaternion *arg_4; none for a zero vector.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -140,20 +148,48 @@ void sub_13FDA0(RwV3d *arg_0, RtQuat *arg_4)
         varC = 0.5f * var_4;
         v8 = sin(varC);
         var_4 = 1.0f / var_4;
+#ifdef CODFH_SP // shape: the scale applied to the component first
+        arg_4->imag.x = v8 * (var_4 * arg_0->x);
+        arg_4->imag.y = v8 * (var_4 * arg_0->y);
+        arg_4->imag.z = v8 * (var_4 * arg_0->z);
+#else
         arg_4->imag.x = var_4 * arg_0->x * v8;
         arg_4->imag.y = var_4 * arg_0->y * v8;
         arg_4->imag.z = var_4 * arg_0->z * v8;
+#endif
         arg_4->real = cos(varC);
         sub_13FB00(arg_4, arg_4);
     }
 }
 
 // match: sub_13FE90 @ 0x0013FE90
+// sp-match: sub_13FE90 @ 0x000EC5C0
 // The product of the quaternions arg_8 and arg_4 (arg_8 applied after
 // arg_4), into *arg_0.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_13FE90(RtQuat *arg_0, RtQuat *arg_4, RtQuat *arg_8)
 {
+#ifdef CODFH_SP
+    // shape: SP 0xEC5C0 computes into a quaternion on the frame and loads the first operand of each
+    // product as written; volatile reads (SP_FRESH, nine) give those loads and the dot's order
+#define SP_FRESH(x) (*(volatile RwReal *)&(x))
+    RtQuat q;
+
+    q.real = SP_FRESH(arg_8->real) * arg_4->real
+             - (SP_FRESH(arg_4->imag.x) * SP_FRESH(arg_8->imag.x) + SP_FRESH(arg_8->imag.z) * arg_4->imag.z
+                + arg_8->imag.y * arg_4->imag.y);
+    q.imag.x = SP_FRESH(arg_8->real) * arg_4->imag.x + SP_FRESH(arg_8->imag.y) * arg_4->imag.z
+               + arg_8->imag.x * arg_4->real - arg_8->imag.z * arg_4->imag.y;
+    q.imag.y = SP_FRESH(arg_8->imag.z) * arg_4->imag.x + arg_8->real * arg_4->imag.y
+               + arg_8->imag.y * arg_4->real - SP_FRESH(arg_8->imag.x) * arg_4->imag.z;
+    q.imag.z = SP_FRESH(arg_8->real) * arg_4->imag.z + arg_8->imag.z * arg_4->real
+               + arg_8->imag.x * arg_4->imag.y - arg_8->imag.y * arg_4->imag.x;
+    arg_0->real = q.real;
+    arg_0->imag.x = q.imag.x;
+    arg_0->imag.y = q.imag.y;
+    arg_0->imag.z = q.imag.z;
+#undef SP_FRESH
+#else
     RwReal var_4;
     RwReal v8;
     RwReal stk_C;
@@ -172,11 +208,13 @@ void sub_13FE90(RtQuat *arg_0, RtQuat *arg_4, RtQuat *arg_8)
     arg_0->imag.x = var_10;
     arg_0->imag.y = stk_C;
     arg_0->imag.z = v8;
+#endif
 }
 
 #pragma warning(push)
 #pragma warning(disable : 4716)
 // match: sub_13FFA0 @ 0x0013FFA0
+// sp-match: sub_13FFA0 @ 0x000EC660
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwV3d *sub_13FFA0(RwV3d *arg_0, RwV3d *arg_4, RwReal arg_8)
 {
@@ -188,11 +226,30 @@ RwV3d *sub_13FFA0(RwV3d *arg_0, RwV3d *arg_4, RwReal arg_8)
 
     local_10 = cos(arg_8);
     l24 = sin(arg_8);
+#ifdef CODFH_SP
+    // shape: SP 0xEC660 scales component by component and loads the first operand of each product
+    // below fresh (volatile reads), where VC would make an operand it has read the memory one
+#define SP_FRESH(x) (*(volatile RwReal *)&(x))
+    var_C.x = arg_0->x * local_10;
+    var_C.y = arg_0->y * local_10;
+    var_C.z = arg_0->z * local_10;
+    stk_14 = (1.0f - local_10)
+             * (SP_FRESH(arg_0->x) * arg_4->x + SP_FRESH(arg_0->y) * arg_4->y + SP_FRESH(arg_4->z) * arg_0->z);
+    local_20.x = arg_4->x * stk_14;
+    local_20.y = arg_4->y * stk_14;
+    local_20.z = arg_4->z * stk_14;
+    RwV3dAddMacro(&var_C, &var_C, &local_20);
+    local_20.x = arg_4->y * arg_0->z - arg_0->y * arg_4->z;
+    local_20.y = SP_FRESH(arg_4->z) * arg_0->x - arg_4->x * arg_0->z;
+    local_20.z = SP_FRESH(arg_0->y) * arg_4->x - SP_FRESH(arg_0->x) * arg_4->y;
+#undef SP_FRESH
+#else
     RwV3dScaleMacro(&var_C, arg_0, local_10);
     stk_14 = (1.0f - local_10) * RwV3dDotProductMacro(arg_4, arg_0);
     RwV3dScaleMacro(&local_20, arg_4, stk_14);
     RwV3dAddMacro(&var_C, &var_C, &local_20);
     RwV3dCrossProductMacro(&local_20, arg_4, arg_0);
+#endif
     RwV3dScaleMacro(&local_20, &local_20, l24);
     RwV3dAddMacro(&var_C, &var_C, &local_20);
     *arg_0 = var_C;
@@ -236,6 +293,7 @@ void sub_1401B0(type_140490 *arg_0, type_140490 *arg_4, type_8BFA0 *arg_8)
     *arg_0 = var_50;
 }
 // match: sub_1402B0 @ 0x001402B0
+// sp-match: sub_1402B0 @ 0x000ED890
 // Turns the line *arg_0 about the vertical through its start by arg_4
 // degrees.
 void sub_1402B0(RwLine *arg_0, RwReal arg_4)
@@ -258,6 +316,7 @@ void sub_1402B0(RwLine *arg_0, RwReal arg_4)
     arg_0->end.z = var_18.z + arg_0->start.z;
 }
 // match: sub_1403D0 @ 0x001403D0
+// sp-match: sub_1403D0 @ 0x000EC760
 // Sets the line *arg_0's end arg_4 from its start, keeping its direction
 // in x and y (z is left as it is).
 void sub_1403D0(RwLine *arg_0, RwReal arg_4)
@@ -274,6 +333,7 @@ void sub_1403D0(RwLine *arg_0, RwReal arg_4)
 }
 
 // match: sub_140440 @ 0x00140440
+// sp-match: sub_140440 @ 0x000EC7B0
 void sub_140440(RwMatrix *arg_0, RwV3d *arg_4, RwReal arg_8)
 {
     sub_13FFA0(&arg_0->up, arg_4, arg_8);
@@ -282,6 +342,7 @@ void sub_140440(RwMatrix *arg_0, RwV3d *arg_4, RwReal arg_8)
 }
 
 // match: sub_140490 @ 0x00140490
+// sp-match: sub_140490 @ 0x000EC7F0
 // The weights of the point arg_0 against the triangle arg_4, arg_8, arg_C
 // (the areas of the triangles it makes with each edge, projected on the
 // triangle's normal) into *arg_10; negative weights are clamped to 0 and
@@ -368,6 +429,7 @@ bool sub_140490(type_140490 *arg_0, type_140490 *arg_4, type_140490 *arg_8, type
 }
 
 // match: sub_140910 @ 0x00140910
+// sp-match: sub_140910 @ 0x000ECB10
 // Copies the matrix *arg_4 into *arg_0, transposing its rotation and
 // negating its position (the inverse of a rotation, but the position is not
 // rotated back).
@@ -389,6 +451,7 @@ void sub_140910(RwMatrix *arg_0, RwMatrix *arg_4)
 }
 
 // match: sub_1409C0 @ 0x001409C0
+// sp-match: sub_1409C0 @ 0x000ECB70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_1409C0(RwV3d *arg_0, RwMatrix *arg_4, RwReal arg_8, RwReal arg_C)
 {
@@ -406,7 +469,7 @@ RwInt32 sub_1409C0(RwV3d *arg_0, RwMatrix *arg_4, RwReal arg_8, RwReal arg_C)
     var_18 = &arg_4->pos;
     RwV3dSubMacro(&l2C, arg_0, var_18);
     RwV3dScaleMacro(&v38, var_8, RwV3dDotProductMacro(&l2C, var_8));
-    RwV3dScaleMacro(&fp_14, v20, RwV3dDotProductMacro(&l2C, v20));
+    RwV3dScaleMacro(&fp_14, v20, (RwV3dDotProductMacro(&l2C, v20)));
     RwV3dAddMacro(&v38, &v38, &fp_14);
     RwV3dNormalize(&v38, &v38);
     slot_1C = RwV3dDotProductMacro(&v38, v20);
@@ -424,6 +487,7 @@ RwInt32 sub_1409C0(RwV3d *arg_0, RwMatrix *arg_4, RwReal arg_8, RwReal arg_C)
 }
 
 // match: sub_140C90 @ 0x00140C90
+// sp-match: sub_140C90 @ 0x000ECD10
 RwReal sub_140C90(RwV3d *arg_0, RwV3d *arg_4)
 {
     RwV3d var_C;
@@ -433,6 +497,7 @@ RwReal sub_140C90(RwV3d *arg_0, RwV3d *arg_4)
 }
 
 // match: sub_140CE0 @ 0x00140CE0
+// sp-match: sub_140CE0 @ 0x000ECD40
 void sub_140CE0(RwMatrix *arg_0, RwV3d *arg_4, RwV3d *arg_8)
 {
     RwReal var_4;
@@ -459,6 +524,7 @@ void sub_140CE0(RwMatrix *arg_0, RwV3d *arg_4, RwV3d *arg_8)
 }
 
 // match: sub_140F00 @ 0x00140F00
+// sp-match: sub_140F00 @ 0x000ECE90
 void sub_140F00(RwMatrix *arg_0, RwV3d *arg_4, RwV3d *arg_8)
 {
     RwReal var_4;
@@ -483,6 +549,7 @@ void sub_140F00(RwMatrix *arg_0, RwV3d *arg_4, RwV3d *arg_8)
 }
 
 // match: sub_141080 @ 0x00141080
+// sp-match: sub_141080 @ 0x000ECF90
 // The rotation by the angles *arg_4 (about x, then y, then z) at the
 // position *arg_8 (none for 0), written into *arg_0 as a 4x4 matrix (its
 // flags and pads 0, the last 1).
@@ -518,6 +585,9 @@ void sub_141080(RwMatrix *arg_0, RwV3d *arg_4, RwV3d *arg_8)
     local_10->unk_00[2].unk_00 = l4 * lcl_18 * stk_14 + fp_C * fp_1C;
     local_10->unk_00[2].unk_04 = fp_C * lcl_18 * stk_14 - l4 * fp_1C;
     local_10->unk_00[2].unk_08 = var_8 * stk_14;
+    // Keep the completed rotation stores before the translation test (SP 0xECF90).
+    // This compiler ordering intrinsic emits no instructions in either build.
+    _WriteBarrier();
     local_10->unk_00[2].unk_0C = 0.0f;
     if (arg_8)
     {
@@ -535,6 +605,7 @@ void sub_141080(RwMatrix *arg_0, RwV3d *arg_4, RwV3d *arg_8)
 }
 
 // match: sub_141240 @ 0x00141240
+// sp-match: sub_141240 @ 0x000ED070
 // The signed angle in degrees from *arg_4 to *arg_0 in the ground (x, z)
 // plane; the vectors are taken as unit ones.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -555,6 +626,7 @@ RwReal sub_141240(RwV3d *arg_0, RwV3d *arg_4)
 }
 
 // match: sub_141320 @ 0x00141320
+// sp-match: sub_141320 @ 0x000ED0F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwV3d *sub_141320(RwV3d *arg_0, RwV3d *arg_4, RwMatrix *arg_8)
 {
@@ -565,21 +637,22 @@ RwV3d *sub_141320(RwV3d *arg_0, RwV3d *arg_4, RwMatrix *arg_8)
 
     dword_4CFA00++;
     v8 = arg_4->x;
-    var_4 = v8 * arg_8->right.x;
-    var_10 = (arg_8->right.y) * v8;
-    stk_C = (arg_8->right.z) * v8;
+    var_4 = ((v8) * (arg_8->right.x));
+    var_10 = ((v8) * (arg_8->right.y));
+    stk_C = ((v8) * (arg_8->right.z));
     v8 = arg_4->y;
-    var_4 = (arg_8->up.x) * v8 + var_4;
-    var_10 = (arg_8->up.y) * v8 + var_10;
-    stk_C = (arg_8->up.z) * v8 + stk_C;
+    var_4 = ((var_4) + (((v8) * (arg_8->up.x))));
+    var_10 = ((var_10) + (((v8) * (arg_8->up.y))));
+    stk_C = ((stk_C) + (((v8) * (arg_8->up.z))));
     v8 = arg_4->z;
-    arg_0->x = (arg_8->at.x) * v8 + var_4;
-    arg_0->y = (arg_8->at.y) * v8 + var_10;
-    arg_0->z = (arg_8->at.z) * v8 + stk_C;
+    arg_0->x = ((((v8) * (arg_8->at.x))) + (var_4));
+    arg_0->y = ((((v8) * (arg_8->at.y))) + (var_10));
+    arg_0->z = ((((v8) * (arg_8->at.z))) + (stk_C));
     return arg_0;
 }
 
 // match: sub_1413E0 @ 0x001413E0
+// sp-match: sub_1413E0 @ 0x000ED180
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwV3d *sub_1413E0(RwV3d *arg_0, RwV3d *arg_4, RwInt32 arg_8, RwMatrix *arg_C)
 {
@@ -593,17 +666,17 @@ RwV3d *sub_1413E0(RwV3d *arg_0, RwV3d *arg_4, RwInt32 arg_8, RwMatrix *arg_C)
     while (--arg_8 >= 0)
     {
         stk_C = arg_4->x;
-        v8 = stk_C * arg_C->right.x;
-        lv_14 = (arg_C->right.y) * stk_C;
-        var_10 = (arg_C->right.z) * stk_C;
+        v8 = ((stk_C) * (arg_C->right.x));
+        lv_14 = ((stk_C) * (arg_C->right.y));
+        var_10 = ((stk_C) * (arg_C->right.z));
         stk_C = arg_4->y;
-        v8 = (arg_C->up.x) * stk_C + v8;
-        lv_14 = (arg_C->up.y) * stk_C + lv_14;
-        var_10 = (arg_C->up.z) * stk_C + var_10;
+        v8 = ((v8) + (((stk_C) * (arg_C->up.x))));
+        lv_14 = ((lv_14) + (((stk_C) * (arg_C->up.y))));
+        var_10 = ((var_10) + (((stk_C) * (arg_C->up.z))));
         stk_C = arg_4->z;
-        arg_0->x = (arg_C->at.x) * stk_C + v8;
-        arg_0->y = (arg_C->at.y) * stk_C + lv_14;
-        arg_0->z = (arg_C->at.z) * stk_C + var_10;
+        arg_0->x = ((((stk_C) * (arg_C->at.x))) + (v8));
+        arg_0->y = ((((stk_C) * (arg_C->at.y))) + (lv_14));
+        arg_0->z = ((((stk_C) * (arg_C->at.z))) + (var_10));
         arg_4++;
         arg_0++;
     }
@@ -611,6 +684,7 @@ RwV3d *sub_1413E0(RwV3d *arg_0, RwV3d *arg_4, RwInt32 arg_8, RwMatrix *arg_C)
 }
 
 // match: sub_1414C0 @ 0x001414C0
+// sp-match: sub_1414C0 @ 0x000ED440
 RwV3d *sub_1414C0(RwV3d *arg_0, RwV3d *arg_4, RwMatrix *arg_8)
 {
     RwReal var_4;
@@ -619,24 +693,25 @@ RwV3d *sub_1414C0(RwV3d *arg_0, RwV3d *arg_4, RwMatrix *arg_8)
     RwReal var_10;
 
     v8 = arg_4->x;
-    var_4 = v8 * arg_8->right.x;
-    var_10 = (arg_8->right.y) * v8;
-    stk_C = (arg_8->right.z) * v8;
+    var_4 = ((v8) * (arg_8->right.x));
+    var_10 = ((v8) * (arg_8->right.y));
+    stk_C = ((v8) * (arg_8->right.z));
     v8 = arg_4->y;
-    var_4 = (arg_8->up.x) * v8 + var_4;
-    var_10 = (arg_8->up.y) * v8 + var_10;
-    stk_C = (arg_8->up.z) * v8 + stk_C;
+    var_4 = ((var_4) + (((v8) * (arg_8->up.x))));
+    var_10 = ((var_10) + (((v8) * (arg_8->up.y))));
+    stk_C = ((stk_C) + (((v8) * (arg_8->up.z))));
     v8 = arg_4->z;
-    var_4 = (arg_8->at.x) * v8 + var_4;
-    var_10 = (arg_8->at.y) * v8 + var_10;
-    stk_C = (arg_8->at.z) * v8 + stk_C;
-    arg_0->x = (arg_8->pos.x) + var_4;
-    arg_0->y = (arg_8->pos.y) + var_10;
-    arg_0->z = (arg_8->pos.z) + stk_C;
+    var_4 = ((var_4) + (((v8) * (arg_8->at.x))));
+    var_10 = ((var_10) + (((v8) * (arg_8->at.y))));
+    stk_C = ((stk_C) + (((v8) * (arg_8->at.z))));
+    arg_0->x = ((var_4) + (arg_8->pos.x));
+    arg_0->y = ((var_10) + (arg_8->pos.y));
+    arg_0->z = ((stk_C) + (arg_8->pos.z));
     return arg_0;
 }
 
 // match: sub_141590 @ 0x00141590
+// sp-match: sub_141590 @ 0x000ED4D0
 RwV3d *sub_141590(RwV3d *arg_0, RwV3d *arg_4, RwInt32 arg_8, RwMatrix *arg_C)
 {
     RwV3d *var_4;
@@ -649,20 +724,20 @@ RwV3d *sub_141590(RwV3d *arg_0, RwV3d *arg_4, RwInt32 arg_8, RwMatrix *arg_C)
     while (--arg_8 >= 0)
     {
         stk_C = arg_4->x;
-        v8 = stk_C * arg_C->right.x;
-        lv_14 = (arg_C->right.y) * stk_C;
-        var_10 = (arg_C->right.z) * stk_C;
+        v8 = ((stk_C) * (arg_C->right.x));
+        lv_14 = ((stk_C) * (arg_C->right.y));
+        var_10 = ((stk_C) * (arg_C->right.z));
         stk_C = arg_4->y;
-        v8 = (arg_C->up.x) * stk_C + v8;
-        lv_14 = (arg_C->up.y) * stk_C + lv_14;
-        var_10 = (arg_C->up.z) * stk_C + var_10;
+        v8 = ((v8) + (((stk_C) * (arg_C->up.x))));
+        lv_14 = ((lv_14) + (((stk_C) * (arg_C->up.y))));
+        var_10 = ((var_10) + (((stk_C) * (arg_C->up.z))));
         stk_C = arg_4->z;
-        v8 = (arg_C->at.x) * stk_C + v8;
-        lv_14 = (arg_C->at.y) * stk_C + lv_14;
-        var_10 = (arg_C->at.z) * stk_C + var_10;
-        arg_0->x = (arg_C->pos.x) + v8;
-        arg_0->y = (arg_C->pos.y) + lv_14;
-        arg_0->z = (arg_C->pos.z) + var_10;
+        v8 = ((v8) + (((stk_C) * (arg_C->at.x))));
+        lv_14 = ((lv_14) + (((stk_C) * (arg_C->at.y))));
+        var_10 = ((var_10) + (((stk_C) * (arg_C->at.z))));
+        arg_0->x = ((v8) + (arg_C->pos.x));
+        arg_0->y = ((lv_14) + (arg_C->pos.y));
+        arg_0->z = ((var_10) + (arg_C->pos.z));
         arg_4++;
         arg_0++;
     }
@@ -670,6 +745,7 @@ RwV3d *sub_141590(RwV3d *arg_0, RwV3d *arg_4, RwInt32 arg_8, RwMatrix *arg_C)
 }
 
 // match: sub_141690 @ 0x00141690
+// sp-match: sub_141690 @ 0x000ED7D0
 // *arg_0 = the identity as a 4x4 matrix (its last pad 1) at the position
 // *arg_4, when given.
 void sub_141690(RwMatrix *arg_0, RwV3d *arg_4)
@@ -687,6 +763,7 @@ void sub_141690(RwMatrix *arg_0, RwV3d *arg_4)
 }
 
 // match: sub_141700 @ 0x00141700
+// sp-match: sub_141700 @ 0x000ED990
 // Moves along a trapezoidal speed profile for the time arg_18: the speed
 // *arg_0 (updated) is first brought into [0, arg_C] (decelerating at
 // arg_14), then accelerates at arg_10 to arg_C (or less when the distance
@@ -760,7 +837,11 @@ RwReal sub_141700(RwReal *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C, RwRea
         else
         {
             local_14 = arg_4 * 4.0f * arg_10 * arg_14 + v20 * v20 * 2.0f * arg_14;
+#ifdef CODFH_SP // shape: the doubled rates kept apart
+            local_14 = local_14 / ((arg_14 + arg_14) + (arg_10 + arg_10));
+#else
             local_14 = local_14 / (2.0f * arg_14 + 2.0f * arg_10);
+#endif
             if (local_14 != 0.0f)
                 local_14 = sqrt(local_14);
             else
@@ -813,6 +894,7 @@ RwReal sub_141700(RwReal *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C, RwRea
 }
 
 // match: sub_141B10 @ 0x00141B10
+// sp-match: sub_141B10 @ 0x000ED810
 // One stage of sub_141700's profile: the speed *arg_0 moving linearly to
 // arg_4 over arg_8 seconds covering arg_C, within the time left *arg_10
 // (all of it when the stage is longer); returns the distance covered.
@@ -832,7 +914,12 @@ RwReal sub_141B10(RwReal *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C, RwRea
         *arg_10 -= arg_8;
         return arg_C;
     }
+#ifdef CODFH_SP // shape: the product kept before the division
+    varC = (arg_4 - *arg_0) * *arg_10;
+    varC = varC / arg_8 + *arg_0;
+#else
     varC = (arg_4 - *arg_0) * *arg_10 / arg_8 + *arg_0;
+#endif
     v8 = (varC + *arg_0) * var_4 * *arg_10;
     *arg_10 = 0.0f;
     *arg_0 = varC;

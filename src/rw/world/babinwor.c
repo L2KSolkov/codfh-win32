@@ -93,6 +93,7 @@ static RwUInt32 lastSeenWorldExtraData;
 // match: _rcsid @ 0x004192B8
 
 // match: __rpReadWorldRights @ 0x002DA100
+// sp-match: __rpReadWorldRights @ 0x001F4BC0
 RwStream*
 _rpReadWorldRights(RwStream *s,
                    RwInt32 len,
@@ -176,6 +177,7 @@ static RwUInt32 lastSeenSectRightsPluginId;
 static RwUInt32 lastSeenSectExtraData;
 
 // match: __rpReadSectRights @ 0x002DA160
+// sp-match: __rpReadSectRights @ 0x001F4C00
 RwStream*
 _rpReadSectRights(RwStream *s,
                   RwInt32 len,
@@ -204,6 +206,7 @@ _rpReadSectRights(RwStream *s,
 }
 
 // match: __rpWriteSectRights @ 0x002DA1A0
+// sp-match: __rpWriteSectRights @ 0x001F4C40
 RwStream*
 _rpWriteSectRights(RwStream *s,
                    RwInt32 len __RWUNUSED__,
@@ -235,6 +238,7 @@ _rpWriteSectRights(RwStream *s,
 }
 
 // match: __rpSizeSectRights @ 0x002DA1E0
+// sp-match: __rpSizeSectRights @ 0x001F4C80
 RwInt32
 _rpSizeSectRights(const void *obj,
                   RwInt32 off __RWUNUSED__,
@@ -626,6 +630,7 @@ WorldSectorIsCorrectlySorted(const RpWorldSector * sector, RwBool * result)
  On exit    : worldSector created
  */
 // match: _WorldSectorStreamRead @ 0x002DA380
+// sp-match: _WorldSectorStreamRead @ 0x001F4E20
 static RpWorldSector *
 WorldSectorStreamRead(RwStream * stream,
                       RwUInt8 ** binaryWorldMallocAddr,
@@ -1087,6 +1092,7 @@ PlaneSectorStreamWrite(const RpPlaneSector * planeSector, RwStream
  On exit    : PlaneSector created
  */
 // match: _PlaneSectorStreamRead @ 0x002DA780
+// sp-match: _PlaneSectorStreamRead @ 0x001F5220
 static RpPlaneSector *
 PlaneSectorStreamRead(RwStream * stream, RwUInt8 **
                       binaryWorldMallocAddr, RpWorld * world,
@@ -1599,6 +1605,7 @@ MACRO_START                                                         \
 MACRO_STOP
 
 // match: _RpWorldStreamRead @ 0x002DAB30
+// sp-match: _RpWorldStreamRead @ 0x001F55D0
 RpWorld            *
 RpWorldStreamRead(RwStream * stream, void *arena)
 {
@@ -2046,6 +2053,7 @@ _rpWorldChunkInfoRead(RwStream * stream,
  */
 
 // match: __rpBinaryWorldClose @ 0x002DA200
+// sp-match: __rpBinaryWorldClose @ 0x001F4CA0
 void               *
 _rpBinaryWorldClose(void *instance,
                     RwInt32 __RWUNUSED__ offset,
@@ -2068,6 +2076,7 @@ _rpBinaryWorldClose(void *instance,
  */
 
 // match: __rpBinaryWorldOpen @ 0x002DA210
+// sp-match: __rpBinaryWorldOpen @ 0x001F4CB0
 void               *
 _rpBinaryWorldOpen(void *instance,
                    RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size )
@@ -2106,6 +2115,7 @@ void               *(*dword_50F260)(size_t numObj, size_t sizeObj, RwUInt32 hint
 void                (*dword_524488)(void *mem);
 
 // match: _sub_2DA220 @ 0x002DA220
+// sp-match: _sub_2DA220 @ 0x001F4CC0
 void               *
 sub_2DA220(size_t size, RwUInt32 hint)
 {
@@ -2134,6 +2144,7 @@ sub_2DA220(size_t size, RwUInt32 hint)
 }
 
 // match: _sub_2DA260 @ 0x002DA260
+// sp-match: _sub_2DA260 @ 0x001F4D00
 void               *
 sub_2DA260(size_t numObj, size_t sizeObj, RwUInt32 hint)
 {
@@ -2167,6 +2178,7 @@ sub_2DA260(size_t numObj, size_t sizeObj, RwUInt32 hint)
 }
 
 // match: _sub_2DA2D0 @ 0x002DA2D0
+// sp-match: _sub_2DA2D0 @ 0x001F4D70
 void
 sub_2DA2D0(void *mem)
 {
@@ -2177,6 +2189,7 @@ sub_2DA2D0(void *mem)
 }
 
 // match: _sub_2DA2F0 @ 0x002DA2F0
+// sp-match: _sub_2DA2F0 @ 0x001F4D90
 void
 sub_2DA2F0(void *start, void *end)
 {
@@ -2194,6 +2207,7 @@ sub_2DA2F0(void *start, void *end)
 }
 
 // match: _sub_2DA340 @ 0x002DA340
+// sp-match: _sub_2DA340 @ 0x001F4DE0
 void
 sub_2DA340(void)
 {
@@ -2209,6 +2223,7 @@ sub_2DA340(void)
 }
 
 // match: _sub_2DAA70 @ 0x002DAA70
+// sp-match: _sub_2DAA70 @ 0x001F5510
 void               *
 sub_2DAA70(void *mem, size_t newSize, RwUInt32 hint)
 {
@@ -2245,6 +2260,7 @@ sub_2DAA70(void *mem, size_t newSize, RwUInt32 hint)
 }
 
 // match: _sub_2DAAF0 @ 0x002DAAF0
+// sp-match: _sub_2DAAF0 @ 0x001F5590
 void
 sub_2DAAF0(type_50F248 *arena)
 {

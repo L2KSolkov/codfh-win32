@@ -219,6 +219,7 @@ _rt2dStringLabelStreamGetSize(Rt2dMaestro *maestro, Rt2dStringLabel *strLabel)
 }
 
 Rt2dStringLabel *
+// sp-match: __rt2dStringLabelStreamRead @ 0x001721F0
 _rt2dStringLabelStreamRead(Rt2dMaestro *maestro, Rt2dStringLabel *strLabel, RwStream *stream)
 {
     RwInt32             size;
@@ -606,6 +607,7 @@ Rt2dStringLabelSetUserData(Rt2dStringLabel *strLabel, void *userData)
  ****************************************************************************/
 
 Rt2dMaestro *
+// sp-match: __rt2dMaestroCreateStringLabels @ 0x001722D0
 _rt2dMaestroCreateStringLabels(Rt2dMaestro *maestro)
 {
     Rt2dMaestro    *result;
@@ -629,6 +631,7 @@ _rt2dMaestroCreateStringLabels(Rt2dMaestro *maestro)
 // match: _rcsid @ 0x003EE6C0
 
 // match: __rt2dMaestroDestroyStringLabels @ 0x002578A0
+// sp-match: __rt2dMaestroDestroyStringLabels @ 0x001722F0
 Rt2dMaestro *
 _rt2dMaestroDestroyStringLabels(Rt2dMaestro *maestro)
 {
@@ -702,6 +705,7 @@ _rt2dMaestroStringLabelsStreamGetSize(Rt2dMaestro *maestro)
 }
 
 Rt2dMaestro *
+// sp-match: __rt2dMaestroStringLabelsStreamRead @ 0x00172360
 _rt2dMaestroStringLabelsStreamRead(Rt2dMaestro *maestro, RwStream *stream)
 {
     RwInt32                 numStrLabels;
@@ -899,6 +903,7 @@ Rt2dMaestroAddStringLabel(Rt2dMaestro *maestro,
  * \see Rt2dMaestroGetStringLabelByIndex
  */
 Rt2dStringLabel *
+// sp-match: _Rt2dMaestroFindStringLabel @ 0x00172410
 Rt2dMaestroFindStringLabel(Rt2dMaestro *maestro,
                             Rt2dStringLabelType entityType, const RwChar *lookupName,
                             RwInt32 *index)
@@ -966,6 +971,7 @@ Rt2dMaestroFindStringLabel(Rt2dMaestro *maestro,
  * \see Rt2dMaestroFindStringLabel
  */
 Rt2dStringLabel *
+// sp-match: _Rt2dMaestroGetStringLabelByIndex @ 0x001724A0
 Rt2dMaestroGetStringLabelByIndex(Rt2dMaestro *maestro, RwInt32 index)
 {
     Rt2dStringLabel     *strLabels = (Rt2dStringLabel *)NULL;

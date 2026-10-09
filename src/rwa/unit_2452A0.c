@@ -54,12 +54,17 @@ extern const RwChar unk_3ED29C[];   /* the default decoder (rwastreamsourceobj.c
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003ED964
+#ifdef CODFH_SP // single player defines it in unit_247430.c, after unit_243AE0's interface IDs (SP 0x2EE7E4)
+extern const RwaUUID unk_3ED964;
+#else
 const RwaUUID unk_3ED964 = { 0x9347B0DD, 0xF26E, 0x40BA, { 0x87, 0x8B, 0x7E, 0xCD, 0x63, 0xA0, 0x30, 0x9D } };
+#endif
 // End of its data definitions.
 
 // match: _unk_3ED964 @ 0x003ED964
 
 // match: _sub_2452A0 @ 0x002452A0
+// sp-match: _sub_2452A0 @ 0x001591F0
 void
 sub_2452A0(rwaDecoder *node, rwaStreamPlayer *player)
 {
@@ -74,6 +79,7 @@ sub_2452A0(rwaDecoder *node, rwaStreamPlayer *player)
  * func on the nodes before it; returns the last chain's stop node (the walk
  * stops after the first chain without a func). */
 // match: _sub_2452D0 @ 0x002452D0
+// sp-match: _sub_2452D0 @ 0x00159220
 rwaDecoder *
 sub_2452D0(rwaStreamPlayer *player, rwaContainerNodeFunc func, void *data)
 {
@@ -116,6 +122,7 @@ sub_2452D0(rwaStreamPlayer *player, rwaContainerNodeFunc func, void *data)
 
 /* Calls func on node and the nodes chained after it. */
 // match: _sub_245350 @ 0x00245350
+// sp-match: _sub_245350 @ 0x001592A0
 void
 sub_245350(rwaDecoder *node, rwaContainerNodeFunc func, void *data)
 {
@@ -131,6 +138,7 @@ sub_245350(rwaDecoder *node, rwaContainerNodeFunc func, void *data)
 
 /* Calls func on each source. */
 // match: _sub_245380 @ 0x00245380
+// sp-match: _sub_245380 @ 0x001592D0
 void
 sub_245380(rwaStreamPlayer *player, rwaContainerNodeFunc func, void *data)
 {
@@ -146,6 +154,7 @@ sub_245380(rwaStreamPlayer *player, rwaContainerNodeFunc func, void *data)
 }
 
 // match: _sub_2453C0 @ 0x002453C0
+// sp-match: _sub_2453C0 @ 0x00159310
 static void
 sub_2453C0(rwaDecoder *node, rwaStreamPlayer *player)
 {
@@ -156,6 +165,7 @@ sub_2453C0(rwaDecoder *node, rwaStreamPlayer *player)
 
 /* Unlinks and stops every node. */
 // match: _sub_2453F0 @ 0x002453F0
+// sp-match: _sub_2453F0 @ 0x00159340
 static void
 sub_2453F0(rwaStreamPlayer *player)
 {
@@ -171,6 +181,7 @@ sub_2453F0(rwaStreamPlayer *player)
 
 /* The decoders' combined state. */
 // match: _sub_245430 @ 0x00245430
+// sp-match: _sub_245430 @ 0x00159380
 static RwInt32
 sub_245430(rwaStreamPlayer *player)
 {
@@ -259,6 +270,7 @@ done:
 
 /* The output node's state. */
 // match: _sub_245560 @ 0x00245560
+// sp-match: _sub_245560 @ 0x001594B0
 static RwInt32
 sub_245560(rwaStreamPlayer *player)
 {
@@ -287,6 +299,7 @@ sub_245560(rwaStreamPlayer *player)
 
 /* The container's state from its decoders' and output's. */
 // match: _sub_2455A0 @ 0x002455A0
+// sp-match: _sub_2455A0 @ 0x001594F0
 static RwInt32
 sub_2455A0(rwaStreamPlayer *player, void *unused)
 {
@@ -345,6 +358,7 @@ sub_2455A0(rwaStreamPlayer *player, void *unused)
 }
 
 // match: _sub_245630 @ 0x00245630
+// sp-match: _sub_245630 @ 0x00159580
 void
 sub_245630(rwaStreamPlayer *player, void *unused, RwInt32 *states)
 {
@@ -354,6 +368,7 @@ sub_245630(rwaStreamPlayer *player, void *unused, RwInt32 *states)
 }
 
 // match: _sub_245670 @ 0x00245670
+// sp-match: _sub_245670 @ 0x001595C0
 void
 sub_245670(rwaDecoder *node, RwInt32 value)
 {
@@ -362,6 +377,7 @@ sub_245670(rwaDecoder *node, RwInt32 value)
 
 /* The index-th node, walked from the nearer end. */
 // match: _sub_245690 @ 0x00245690
+// sp-match: _sub_245690 @ 0x001595E0
 static rwaDecoder *
 sub_245690(rwaStreamPlayer *player, const rwaNodeSet *set, RwUInt32 index)
 {
@@ -389,6 +405,7 @@ sub_245690(rwaStreamPlayer *player, const rwaNodeSet *set, RwUInt32 index)
 }
 
 // match: _sub_2456D0 @ 0x002456D0
+// sp-match: _sub_2456D0 @ 0x00159620
 static void
 sub_2456D0(rwaDecoder *node, RwInt32 value)
 {
@@ -396,6 +413,7 @@ sub_2456D0(rwaDecoder *node, RwInt32 value)
 }
 
 // match: _sub_2456F0 @ 0x002456F0
+// sp-match: _sub_2456F0 @ 0x00159640
 static void
 sub_2456F0(rwaStreamPlayer *player, const rwaNodeSet *set, RwInt32 type)
 {
@@ -410,6 +428,7 @@ sub_2456F0(rwaStreamPlayer *player, const rwaNodeSet *set, RwInt32 type)
 }
 
 // match: _sub_245720 @ 0x00245720
+// sp-match: _sub_245720 @ 0x00159670
 static void
 sub_245720(rwaStreamPlayer *player, rwaContainerCommand *command)
 {
@@ -420,6 +439,7 @@ sub_245720(rwaStreamPlayer *player, rwaContainerCommand *command)
 /* Sets the playback rate: each node plays its track at the rate's share of
  * the track's sample rate. */
 // match: _sub_245740 @ 0x00245740
+// sp-match: _sub_245740 @ 0x00159690
 static void
 sub_245740(rwaContainerCommand *command, rwaStreamPlayer *player, const rwaNodeSet *set)
 {
@@ -441,6 +461,7 @@ sub_245740(rwaContainerCommand *command, rwaStreamPlayer *player, const rwaNodeS
  * for the file's extension (type 1) or the format (type 2), or the default
  * (type 3). */
 // match: _sub_2457A0 @ 0x002457A0
+// sp-match: _sub_2457A0 @ 0x001596F0
 static RwBool
 sub_2457A0(const rwaContainerSource *source, rwaStreamPlayer *player)
 {
@@ -599,6 +620,7 @@ sub_2457A0(const rwaContainerSource *source, rwaStreamPlayer *player)
 
 /* The decoder definition among defs that reads format. */
 // match: _sub_245A60 @ 0x00245A60
+// sp-match: _sub_245A60 @ 0x001599B0
 static rwaObjDef *
 sub_245A60(const RwaWaveFormat *format, RwaLLNode *defs)
 {
@@ -633,6 +655,7 @@ sub_245A60(const RwaWaveFormat *format, RwaLLNode *defs)
 
 /* The definition among defs with the smallest capacity of at least size. */
 // match: _sub_245B20 @ 0x00245B20
+// sp-match: _sub_245B20 @ 0x00159A70
 static rwaObjDef *
 sub_245B20(RwUInt32 size, RwaLLNode *defs)
 {
@@ -658,6 +681,7 @@ sub_245B20(RwUInt32 size, RwaLLNode *defs)
 /* Creates a conversion node from format from to format to for the track
  * index. */
 // match: _sub_245B60 @ 0x00245B60
+// sp-match: _sub_245B60 @ 0x00159AB0
 rwaDecoder *
 sub_245B60(rwaObjDef *def, const RwaWaveFormat *from, const RwaWaveFormat *to, RwUInt32 index,
            rwaStreamPlayer *player)
@@ -675,6 +699,7 @@ sub_245B60(rwaObjDef *def, const RwaWaveFormat *from, const RwaWaveFormat *to, R
 
 /* Rounds each decoder's rate to the output's granularity. */
 // match: _sub_245BF0 @ 0x00245BF0
+// sp-match: _sub_245BF0 @ 0x00159B40
 static void
 sub_245BF0(rwaStreamPlayer *player, const rwaNodeSet *set)
 {
@@ -722,6 +747,7 @@ sub_245BF0(rwaStreamPlayer *player, const rwaNodeSet *set)
 /* A decoder became idle: one fewer busy, and the container plays on when
  * none is. */
 // match: _sub_245CA0 @ 0x00245CA0
+// sp-match: _sub_245CA0 @ 0x00159BF0
 void
 sub_245CA0(rwaDecoder *node, rwaStreamPlayer *player)
 {
@@ -734,6 +760,7 @@ sub_245CA0(rwaDecoder *node, rwaStreamPlayer *player)
 
 /* A new conversion step in list. */
 // match: _sub_245CC0 @ 0x00245CC0
+// sp-match: _sub_245CC0 @ 0x00159C10
 static rwaConversion *
 sub_245CC0(rwaLink *list, const RwaWaveFormat *from, const RwaWaveFormat *to, rwaObjDef *def,
            void *key, RwUInt32 index, rwaConversion *next)
@@ -766,6 +793,7 @@ sub_245CC0(rwaLink *list, const RwaWaveFormat *from, const RwaWaveFormat *to, rw
 }
 
 // match: _sub_245D30 @ 0x00245D30
+// sp-match: _sub_245D30 @ 0x00159C80
 static void
 sub_245D30(rwaConversion *conversion)
 {
@@ -778,6 +806,7 @@ sub_245D30(rwaConversion *conversion)
 }
 
 // match: _sub_245D50 @ 0x00245D50
+// sp-match: _sub_245D50 @ 0x00159CA0
 static void
 sub_245D50(rwaLink *list)
 {
@@ -788,6 +817,7 @@ sub_245D50(rwaLink *list)
 }
 
 // match: _sub_245D70 @ 0x00245D70
+// sp-match: _sub_245D70 @ 0x00159CC0
 static rwaConversion *
 sub_245D70(rwaLink *list, void *key)
 {
@@ -807,6 +837,7 @@ sub_245D70(rwaLink *list, void *key)
 }
 
 // match: _sub_245D90 @ 0x00245D90
+// sp-match: _sub_245D90 @ 0x00159CE0
 RwUInt32
 sub_245D90(rwaStreamPlayer *player, const rwaNodeSet *set)
 {
@@ -822,6 +853,7 @@ sub_245D90(rwaStreamPlayer *player, const rwaNodeSet *set)
 
 /* Sets up a stream container. */
 // match: _sub_245DC0 @ 0x00245DC0
+// sp-match: _sub_245DC0 @ 0x00159D10
 rwaStreamPlayer *
 sub_245DC0(rwaStreamPlayer *player, rwaNodeSet *set, rwaContainerCommand *command, RwUInt32 a4,
            RwUInt32 a5, void *a6, void *a7, void *a8)
@@ -862,6 +894,7 @@ sub_245DC0(rwaStreamPlayer *player, rwaNodeSet *set, rwaContainerCommand *comman
 }
 
 // match: _sub_245E90 @ 0x00245E90
+// sp-match: _sub_245E90 @ 0x00159DE0
 void
 sub_245E90(rwaStreamPlayer *player)
 {
@@ -869,6 +902,7 @@ sub_245E90(rwaStreamPlayer *player)
 }
 
 // match: _sub_245EA0 @ 0x00245EA0
+// sp-match: _sub_245EA0 @ 0x00159DF0
 static void
 sub_245EA0(rwaStreamPlayer *player, rwaContainerCommand *command, rwaNodeSet *set)
 {
@@ -885,6 +919,7 @@ sub_245EA0(rwaStreamPlayer *player, rwaContainerCommand *command, rwaNodeSet *se
 }
 
 // match: _sub_245F10 @ 0x00245F10
+// sp-match: _sub_245F10 @ 0x00159E60
 static void
 sub_245F10(rwaStreamPlayer *player, rwaNodeSetEntry *entries, const rwaNodeSet *set)
 {
@@ -906,6 +941,7 @@ sub_245F10(rwaStreamPlayer *player, rwaNodeSetEntry *entries, const rwaNodeSet *
  * from and whose output is to, or one whose output another chain converts
  * on. The steps are added to list; *out is the first. */
 // match: _sub_245F80 @ 0x00245F80
+// sp-match: _sub_245F80 @ 0x00159ED0
 RwBool
 sub_245F80(const RwaWaveFormat *from, const RwaWaveFormat *to, RwUInt32 index, void *key,
            RwaLLNode *defs, rwaLink *list, rwaStreamPlayer *player, rwaConversion **out)
@@ -1003,6 +1039,7 @@ sub_245F80(const RwaWaveFormat *from, const RwaWaveFormat *to, RwUInt32 index, v
 
 /* A decoder step for each track whose format a decoder of defs reads. */
 // match: _sub_2461B0 @ 0x002461B0
+// sp-match: _sub_2461B0 @ 0x0015A100
 RwBool
 sub_2461B0(rwaStreamPlayer *player, void *key, rwaConversion *next, rwaLink *list, RwaLLNode *defs)
 {
@@ -1029,6 +1066,7 @@ sub_2461B0(rwaStreamPlayer *player, void *key, rwaConversion *next, rwaLink *lis
 /* Debug source-flow evidence: rwad.dll _RwaStreamContainerPreinstanceChains,
  * 0x100A8DCD; conditional converter body and link advancement before insertion. */
 // match: _sub_246240 @ 0x00246240
+// sp-match: _sub_246240 @ 0x0015A190
 RwBool
 sub_246240(rwaStreamPlayer *player, void *key, void *iface, rwaConversion *last, rwaLink *list,
     RwaLLNode *convDefs)
@@ -1146,6 +1184,7 @@ sub_246240(rwaStreamPlayer *player, void *key, void *iface, rwaConversion *last,
 
 /* Creates a step's node. */
 // match: _sub_2464B0 @ 0x002464B0
+// sp-match: _sub_2464B0 @ 0x0015A400
 static rwaDecoder *
 sub_2464B0(rwaStreamPlayer *player, RwUInt32 value, rwaStreamNodeParams *params,
            rwaConversion *step)
@@ -1165,6 +1204,7 @@ sub_2464B0(rwaStreamPlayer *player, RwUInt32 value, rwaStreamNodeParams *params,
 /* Debug source-flow evidence: rwad.dll _RwaStreamContainerInstantiateRenderChains,
  * 0x100A77BD; typed parameter aliases, separate creation result and graph loops. */
 // match: _sub_246500 @ 0x00246500
+// sp-match: _sub_246500 @ 0x0015A450
 RwBool
 sub_246500(rwaStreamPlayer *player, rwaNodeSet *set)
 {
@@ -1452,6 +1492,7 @@ sub_246500(rwaStreamPlayer *player, rwaNodeSet *set)
  * node graph once it has opened (3), the node set once the nodes are ready
  * (4); state 6 when anything fails. */
 // match: _sub_246AD0 @ 0x00246AD0
+// sp-match: _sub_246AD0 @ 0x0015AA20
 static void
 sub_246AD0(rwaStreamPlayer *player, rwaNodeSet *set, rwaContainerCommand *command)
 {
@@ -1525,6 +1566,7 @@ fail:
     }
 }
 // match: _sub_246BD0 @ 0x00246BD0
+// sp-match: _sub_246BD0 @ 0x0015AB20
 rwaStreamContainer *
 sub_246BD0(rwaStreamContainer *container, RwUInt32 a2, RwUInt32 a3, void *a4, void *a5, void *a6)
 {
@@ -1545,6 +1587,7 @@ sub_246BD0(rwaStreamContainer *container, RwUInt32 a2, RwUInt32 a3, void *a4, vo
 
 /* Applies the command's changes; TRUE once the container plays. */
 // match: _sub_246C20 @ 0x00246C20
+// sp-match: _sub_246C20 @ 0x0015AB70
 RwBool
 sub_246C20(rwaStreamPlayer *player, rwaNodeSet *set, rwaContainerCommand *command)
 {
@@ -1602,6 +1645,7 @@ sub_246C20(rwaStreamPlayer *player, rwaNodeSet *set, rwaContainerCommand *comman
 }
 
 // match: _sub_246D20 @ 0x00246D20
+// sp-match: _sub_246D20 @ 0x0015AC70
 RwBool
 sub_246D20(rwaStreamContainer *container)
 {

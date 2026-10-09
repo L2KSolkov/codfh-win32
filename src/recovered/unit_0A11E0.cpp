@@ -34,21 +34,26 @@ RWS_REGISTERCLASS(AnimPackTrigger);
 // match: ?MakeNew@AnimPackTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A11E0
 // match: __ehhandler$?MakeNew@AnimPackTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFD30
 // match: __ehhandler$?MakeNew@AnimPackTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFD3F
+// sp-match: ?MakeNew@AnimPackTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007E310
 RWS_DEFINE_MAKENEW(AnimPackTrigger)
 
 // match: ??0AnimPackTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A1260
 // match: __ehhandler$??0AnimPackTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x8 @ 0x002FFD50
 // match: __ehhandler$??0AnimPackTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x002FFD58
+// sp-match: ??0AnimPackTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007E290
 AnimPackTrigger::AnimPackTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     sub_A1360();
 }
 
 // match: ?vf_008@AnimPackTrigger@@UAEHXZ @ 0x000A1330
+// sp-match: ?vf_008@AnimPackTrigger@@UAEHXZ @ 0x0007E0D0
 
 // match: ??_GAnimPackTrigger@@UAEPAXI@Z @ 0x000A1340
+// sp-match: ??_GAnimPackTrigger@@UAEPAXI@Z @ 0x0007E300
 
 // match: ?sub_A1360@AnimPackTrigger@@QAEXXZ @ 0x000A1360
+// sp-match: ?sub_A1360@AnimPackTrigger@@QAEXXZ @ 0x0007E090
 void AnimPackTrigger::sub_A1360()
 {
     RwInt32 var_4;
@@ -62,10 +67,12 @@ void AnimPackTrigger::sub_A1360()
 }
 
 // match: ??1AnimPackTrigger@@UAE@XZ @ 0x000A13C0
+// sp-match: ??1AnimPackTrigger@@UAE@XZ @ 0x0007E0B0
 // (Defined in the class, in AnimPackTrigger.h.)
 
 // Command 0: its six packs (their names looked up); command 1: its key.
 // match: ?HandleAttributes@AnimPackTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A13F0
+// sp-match: ?HandleAttributes@AnimPackTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007E0E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void AnimPackTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
@@ -103,6 +110,7 @@ void AnimPackTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_030@AnimPackTrigger@@UAEXXZ @ 0x000A1540
+// sp-match: ?vf_030@AnimPackTrigger@@UAEXXZ @ 0x0007E1D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void AnimPackTrigger::vf_030()
 {
@@ -134,3 +142,4 @@ void AnimPackTrigger::vf_030()
 }
 
 // match: ??_EAnimPackTrigger@@WBI@AEPAXI@Z @ 0x000A1680
+// sp-match: ??_EAnimPackTrigger@@WBI@AEPAXI@Z @ 0x0007E280

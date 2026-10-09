@@ -30,21 +30,27 @@ RWS_REGISTERCLASS(StreamTrigger);
 // match: ?MakeNew@StreamTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000BAC50
 // match: __ehhandler$?MakeNew@StreamTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300470
 // match: __ehhandler$?MakeNew@StreamTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030047F
+// sp-match: ?MakeNew@StreamTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0008F8F0
 RWS_DEFINE_MAKENEW(StreamTrigger)
 
 // match: ??0StreamTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000BACD0
+// sp-match: ??0StreamTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0008F0E0
 StreamTrigger::StreamTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
 }
 
 // match: ?vf_008@StreamTrigger@@UAEHXZ @ 0x000BAD20
+// sp-match: ?vf_008@StreamTrigger@@UAEHXZ @ 0x0005BC00
 
 // match: ??_GStreamTrigger@@UAEPAXI@Z @ 0x000BAD30
+// sp-match: ??_GStreamTrigger@@UAEPAXI@Z @ 0x0008F8E0
 
 // match: ??1StreamTrigger@@UAE@XZ @ 0x000BAD50
+// sp-match: ??1StreamTrigger@@UAE@XZ @ 0x0008F110
 // (Defined in the class, in StreamTrigger.h.)
 
 // match: ?HandleAttributes@StreamTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000BAD80
+// sp-match: ?HandleAttributes@StreamTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0008F130
 void StreamTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -128,6 +134,7 @@ void StreamTrigger::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?vf_030@StreamTrigger@@UAEXXZ @ 0x000BB1F0
+// sp-match: ?vf_030@StreamTrigger@@UAEXXZ @ 0x0008F3E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void StreamTrigger::vf_030()
 {
@@ -153,7 +160,13 @@ void StreamTrigger::vf_030()
                 {
                     bp_4 = 0.0f;
                 }
+#ifdef CODFH_SP
+                // shape: the volume converted into a float local first (SP 0x8F471 fild/fmulp, not fimul).
+                RwReal volume = dword_44E8D8[bp_8->unk_20].unk_248->unk_18;
+                bp_4 = volume / 100.0f * bp_4;
+#else
                 bp_4 = dword_44E8D8[bp_8->unk_20].unk_248->unk_18 / 100.0f * bp_4;
+#endif
                 if (bp_4 < 0.0)
                 {
                     bp_4 = 0.0f;
@@ -170,3 +183,4 @@ void StreamTrigger::vf_030()
 }
 
 // match: ??_EStreamTrigger@@WBI@AEPAXI@Z @ 0x000BB370
+// sp-match: ??_EStreamTrigger@@WBI@AEPAXI@Z @ 0x0008F8D0

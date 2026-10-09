@@ -39,6 +39,7 @@ RwReal flt_429260 = 0.5f;
 // match: ?flt_429260@@3MA @ 0x00429260
 
 // match: ?sub_D48D0@type_D48D0@@QAEXPAUtype_3D3548@@@Z @ 0x000D48D0
+// sp-match: ?sub_D48D0@type_D48D0@@QAEXPAUtype_3D3548@@@Z @ 0x000A0E50
 
 void type_D48D0::sub_D48D0(type_3D3548 *arg_0)
 {
@@ -53,6 +54,7 @@ void type_D48D0::sub_D48D0(type_3D3548 *arg_0)
 }
 
 // match: ?sub_D4910@type_D48D0@@QAEPAUtype_3D3548@@XZ @ 0x000D4910
+// sp-match: ?sub_D4910@type_D48D0@@QAEPAUtype_3D3548@@XZ @ 0x000A0E70
 type_3D3548 *type_D48D0::sub_D4910()
 {
     type_3D3548 *var_4;
@@ -66,6 +68,7 @@ type_3D3548 *type_D48D0::sub_D4910()
 }
 
 // match: ?sub_D4950@@YAXPAUtype_3D3548@@@Z @ 0x000D4950
+// sp-match: ?sub_D4950@@YAXPAUtype_3D3548@@@Z @ 0x000A13A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D4950(type_3D3548 *arg_0)
 {
@@ -87,6 +90,7 @@ void sub_D4950(type_3D3548 *arg_0)
 }
 
 // match: ?sub_D49E0@@YAXPAUtype_3D3548@@@Z @ 0x000D49E0
+// sp-match: ?sub_D49E0@@YAXPAUtype_3D3548@@@Z @ 0x000A1260
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D49E0(type_3D3548 *arg_0)
 {
@@ -107,6 +111,7 @@ void sub_D49E0(type_3D3548 *arg_0)
 }
 
 // match: ?sub_D4A60@@YAHPAUtype_3D3548@@@Z @ 0x000D4A60
+// sp-match: ?sub_D4A60@@YAHPAUtype_3D3548@@@Z @ 0x000A0E90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_D4A60(type_3D3548 *arg_0)
 {
@@ -148,6 +153,7 @@ RwInt32 sub_D4A60(type_3D3548 *arg_0)
 }
 
 // match: ?sub_D4B70@@YAPAUtype_D4C80@@PAURwMatrixTag@@MMM@Z @ 0x000D4B70
+// sp-match: ?sub_D4B70@@YAPAUtype_D4C80@@PAURwMatrixTag@@MMM@Z @ 0x000A12B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_D4C80 *sub_D4B70(RwMatrix *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C)
 {
@@ -171,6 +177,7 @@ type_D4C80 *sub_D4B70(RwMatrix *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C)
 }
 
 // match: ?sub_D4C80@@YAPAUtype_D4C80@@PAURwMatrixTag@@PAURwV3d@@MM@Z @ 0x000D4C80
+// sp-match: ?sub_D4C80@@YAPAUtype_D4C80@@PAURwMatrixTag@@PAURwV3d@@MM@Z @ 0x000A0F10
 type_D4C80 *sub_D4C80(RwMatrix *arg_0, RwV3d *arg_4, RwReal arg_8, RwReal arg_C)
 {
     type_D4C80 *var_4;
@@ -185,28 +192,44 @@ type_D4C80 *sub_D4C80(RwMatrix *arg_0, RwV3d *arg_4, RwReal arg_8, RwReal arg_C)
 }
 
 // match: ?sub_D4D00@type_D4C80@@QAEHPAURwMatrixTag@@0@Z @ 0x000D4D00
+// sp-match: ?sub_D4D00@type_D4C80@@QAEHPAURwMatrixTag@@0@Z @ 0x000A0F70
 // Falls under gravity (981 a second squared) and turns; on landing at its
 // height it bounces with some of its speed, a new turning against its tilt
 // (a random one when that is a NaN or over 5) and, once all but upright, is
 // set upright and over (0).
 RwInt32 type_D4C80::sub_D4D00(RwMatrix *arg_0, RwMatrix *arg_4)
 {
+#ifndef CODFH_SP
     RwReal var_8;
+#endif
     RwV3d var_14;
     RwReal var_18;
     RwMatrix var_60;
     RwReal var_68;
 
+#ifdef CODFH_SP
+    // shape: the frames, then by a thousandth (SP 0xA0F70 multiplies by flt_3D7104 and 0.001);
+    // the gravity is a literal (SP 0xA0F70 multiplies by 0x2E3504 = 981.00006, and folds 2/981 into
+    // 0x2E3500 below) and the thousandth is stored as it is used (fst)
+    { RwReal &r = var_18; r = deltaTime * flt_3D7104; }   // shape: through a reference (SP 0xA0F70)
+    var_14 = arg_0->pos;
+    unk_58 -= (var_18 = var_18 * 0.001f) * 981.00006f;
+#else
     var_8 = 981.00006f;
     var_14 = arg_0->pos;
     var_18 = deltaTime * flt_3D7104 / 1000.0f;
     unk_58 -= var_8 * var_18;
+#endif
     unk_40.x += var_18 * unk_4C.x;
     unk_40.y += var_18 * unk_4C.y;
     unk_40.z += var_18 * unk_4C.z;
     sub_141080(&var_60, &unk_40, 0);
     RwMatrixMultiply(arg_4, &var_60, &unk_00);
+#ifdef CODFH_SP // through a reference (SP 0xA0F70: the damping stores)
+    { RwReal &r = unk_4C.x; r = flt_429254 * unk_4C.x; }
+#else
     unk_4C.x = flt_429254 * unk_4C.x;
+#endif
     unk_4C.y = flt_429254 * unk_4C.y;
     unk_4C.z = flt_429254 * unk_4C.z;
     arg_4->pos.x = var_14.x;
@@ -216,14 +239,25 @@ RwInt32 type_D4C80::sub_D4D00(RwMatrix *arg_0, RwMatrix *arg_4)
     {
         arg_4->pos.y = unk_5C;
         unk_58 = (RwReal)fabs((RwDouble)unk_58) * flt_429260;
+#ifdef CODFH_SP
+        var_68 = 2.0f * unk_58 / 981.00006f;
+#else
         var_68 = 2.0f * unk_58 / var_8;
+#endif
         if (var_68 == 0.0f)
         {
             var_68 = 0.1f;
         }
+#ifdef CODFH_SP
+        // shape: the limit on the left of each clamp (SP 0xA109D, 0xA10FF: fld 3.0; fcomp st(1))
+        unk_4C.x = -unk_40.x * (3.0f > flt_42925C / var_68 ? flt_42925C / var_68 : 3.0f);
+        unk_4C.y = RAND_RANGE(-flt_429258, flt_429258);
+        unk_4C.z = -unk_40.z * (3.0f > flt_42925C / var_68 ? flt_42925C / var_68 : 3.0f);
+#else
         unk_4C.x = -unk_40.x * (flt_42925C / var_68 < 3.0f ? flt_42925C / var_68 : 3.0f);
         unk_4C.y = RAND_RANGE(-flt_429258, flt_429258);
         unk_4C.z = -unk_40.z * (flt_42925C / var_68 < 3.0f ? flt_42925C / var_68 : 3.0f);
+#endif
         if (*(RwInt32 *)&unk_4C.x == 0x7FFFFFFF || (RwReal)fabs((RwDouble)unk_4C.x) > 5.0f)
         {
             unk_4C.x = RAND_RANGE(0.0f, -unk_40.x * 0.5f);

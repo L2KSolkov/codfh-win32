@@ -110,6 +110,7 @@ _rpPVSaddendIIp(_rpPVSPolyPtr * end, RwV3d * t)
 // match: _rcsid @ 0x00419A78
 
 // match: __rpPVSDestroyPolyList @ 0x002E7EE0
+// sp-match: __rpPVSDestroyPolyList @ 0x00202980
 void
 _rpPVSDestroyPolyList(_rpPVSPolyListPtr * P)
 {
@@ -129,6 +130,7 @@ _rpPVSDestroyPolyList(_rpPVSPolyListPtr * P)
 }
 
 // match: __rpPVSDestroyPoly @ 0x002E7F10
+// sp-match: __rpPVSDestroyPoly @ 0x002029B0
 void
 _rpPVSDestroyPoly(_rpPVSPolyPtr * P)
 {
@@ -179,6 +181,7 @@ _rpPVSLinkCardinality2(_rpPVSPolyPtr list)
 }
 
 // match: _PVSGetNumSectors @ 0x002E7F40
+// sp-match: _PVSGetNumSectors @ 0x002029E0
 static RpWorldSector *
 PVSGetNumSectors(RpWorldSector * worldSector, void *pData)
 {
@@ -199,6 +202,7 @@ PVSGetNumSectors(RpWorldSector * worldSector, void *pData)
 }
 
 // match: __rpPVSWorldGetNumWorldSectors @ 0x002E7F90
+// sp-match: __rpPVSWorldGetNumWorldSectors @ 0x00202A30
 RwInt32
 _rpPVSWorldGetNumWorldSectors(RpWorld * world)
 {

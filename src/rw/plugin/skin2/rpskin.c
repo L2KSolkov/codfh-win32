@@ -215,6 +215,7 @@ ToonPluginIsAttached(void)
 // match: __rpSkinFreeListPreallocBlocks @ 0x00436740
 
 // match: _SkinAtomicAttachBestPipeForAttachedPlugins @ 0x002D0CA0
+// sp-match: _SkinAtomicAttachBestPipeForAttachedPlugins @ 0x001EB600
 
 static RpAtomic *
 SkinAtomicAttachBestPipeForAttachedPlugins(RpAtomic *atomic,
@@ -275,6 +276,7 @@ SkinAtomicSetup( RpAtomic *atomic,
  SkinFindMaxWeights
  */
 // match: _SkinFindMaxWeights @ 0x002D0CF0
+// sp-match: _SkinFindMaxWeights @ 0x001EB650
 static void
 SkinFindMaxWeights(RpSkin *skin,
                    RwMatrixWeights *matrixWeights,
@@ -319,6 +321,7 @@ SkinFindMaxWeights(RpSkin *skin,
  SkinFindNumUsedBones
  */
 // match: _SkinFindNumUsedBones @ 0x002D0D40
+// sp-match: _SkinFindNumUsedBones @ 0x001EB6A0
 static void
 SkinFindNumUsedBones(RpSkin *skin,
                      RwUInt32 *indices,
@@ -373,6 +376,7 @@ SkinFindNumUsedBones(RpSkin *skin,
  SkinCreateSkinData
  */
 // match: _SkinCreateSkinData @ 0x002D0E00
+// sp-match: _SkinCreateSkinData @ 0x001EB760
 static RwBool
 SkinCreateSkinData(RpSkin *skin,
                    RwUInt32 numBones,
@@ -477,6 +481,7 @@ SkinCreateSkinData(RpSkin *skin,
 }
 
 // match: _SkinCreate @ 0x002D0F10
+// sp-match: _SkinCreate @ 0x001EB870
 static RpSkin *
 SkinCreate(RwUInt32 numVertices,
            RwUInt32 numBones,
@@ -582,6 +587,7 @@ RpSkinSetFreeListCreateParams(RwInt32 blockSize,
 
 
 // match: _SkinOpen @ 0x002D0FF0
+// sp-match: _SkinOpen @ 0x001EB950
 static void *
 SkinOpen( void *instance,
           RwInt32 offset __RWUNUSED__,
@@ -647,6 +653,7 @@ SkinOpen( void *instance,
 }
 
 // match: _SkinClose @ 0x002D10B0
+// sp-match: _SkinClose @ 0x001EBA10
 static void *
 SkinClose( void *instance,
            RwInt32 offset __RWUNUSED__,
@@ -682,6 +689,7 @@ SkinClose( void *instance,
 }
 
 // match: _SkinGeometryConstructor @ 0x002D1100
+// sp-match: _SkinGeometryConstructor @ 0x001EBA60
 static void *
 SkinGeometryConstructor( void *object,
                          RwInt32 offset __RWUNUSED__,
@@ -696,6 +704,7 @@ SkinGeometryConstructor( void *object,
 }
 
 // match: _SkinGeometryDestructor @ 0x002D1350
+// sp-match: _SkinGeometryDestructor @ 0x001EBCA0
 static void *
 SkinGeometryDestructor( void *object,
                         RwInt32 offset __RWUNUSED__,
@@ -744,6 +753,7 @@ SkinGeometryCopy( void *dstObject,
 }
 
 // match: _SkinAtomicConstructor @ 0x002D1120
+// sp-match: _SkinAtomicConstructor @ 0x001EBA80
 static void *
 SkinAtomicConstructor( void *object,
                        RwInt32 offset __RWUNUSED__,
@@ -766,6 +776,7 @@ SkinAtomicConstructor( void *object,
 }
 
 // match: _SkinAtomicDestructor @ 0x002D1140
+// sp-match: _SkinAtomicDestructor @ 0x001EBAA0
 static void *
 SkinAtomicDestructor( void *object,
                       RwInt32 offset __RWUNUSED__,
@@ -790,6 +801,7 @@ SkinAtomicDestructor( void *object,
 }
 
 // match: _SkinAtomicCopy @ 0x002D1160
+// sp-match: _SkinAtomicCopy @ 0x001EBAC0
 static void *
 SkinAtomicCopy( void *dstObject,
                 const void *srcObject,
@@ -832,6 +844,7 @@ SkinAtomicCopy( void *dstObject,
 }
 
 // match: _SkinAtomicAlways @ 0x002D13B0
+// sp-match: _SkinAtomicAlways @ 0x001EBD00
 static RwBool
 SkinAtomicAlways( void *object,
                   RwInt32 offset __RWUNUSED__,
@@ -867,6 +880,7 @@ SkinAtomicAlways( void *object,
 }
 
 // match: _SkinAtomicRights @ 0x002D1410
+// sp-match: _SkinAtomicRights @ 0x001EBD60
 static RwBool
 SkinAtomicRights( void *object,
                   RwInt32 offset __RWUNUSED__,
@@ -890,6 +904,7 @@ SkinAtomicRights( void *object,
 }
 
 // match: _SkinGeometrySize @ 0x002D1180
+// sp-match: _SkinGeometrySize @ 0x001EBAE0
 static RwInt32
 SkinGeometrySize(const void *object,
                  RwInt32 offset __RWUNUSED__,
@@ -946,6 +961,7 @@ SkinGeometrySize(const void *object,
 }
 
 // match: _SkinGeometryWrite @ 0x002D11D0
+// sp-match: _SkinGeometryWrite @ 0x001EBB30
 static RwStream *
 SkinGeometryWrite(RwStream *stream,
                   RwInt32 binaryLength __RWUNUSED__,
@@ -1030,6 +1046,7 @@ SkinGeometryWrite(RwStream *stream,
 }
 
 // match: _SkinGeometryRead @ 0x002D1440
+// sp-match: _SkinGeometryRead @ 0x001EBD90
 static RwStream *
 SkinGeometryRead( RwStream *stream,
                   RwInt32 binaryLength   __RWUNUSED__,
@@ -1185,6 +1202,7 @@ SkinGeometryRead( RwStream *stream,
 }
 
 // match: _SkinAtomicRead @ 0x002D1600
+// sp-match: _SkinAtomicRead @ 0x001EBF50
 static RwStream *
 SkinAtomicRead( RwStream *stream,
                 RwInt32 binaryLength   __RWUNUSED__,
@@ -1304,6 +1322,7 @@ SkinAtomicWrite( RwStream *stream,
 }
 
 // match: _SkinAtomicGetSize @ 0x002D12B0
+// sp-match: _SkinAtomicGetSize @ 0x0006CEB0
 static RwInt32
 SkinAtomicGetSize( const void *object     __RWUNUSED__,
                    RwInt32 offsetInObject __RWUNUSED__,
@@ -1350,6 +1369,7 @@ _rpSkinGetAlignedMatrixCache(void)
  * \return TRUE if successful, FALSE if an error occurs.
  */
 // match: _RpSkinPluginAttach @ 0x002D1740
+// sp-match: _RpSkinPluginAttach @ 0x001EC090
 RwBool
 RpSkinPluginAttach(void)
 {
@@ -1430,6 +1450,7 @@ RpSkinPluginAttach(void)
  * \see RpSkinAtomicGetHAnimHierarchy
  */
 // match: _RpSkinAtomicSetHAnimHierarchy @ 0x002D12C0
+// sp-match: _RpSkinAtomicSetHAnimHierarchy @ 0x001EBC10
 RpAtomic *
 RpSkinAtomicSetHAnimHierarchy( RpAtomic *atomic,
                                RpHAnimHierarchy *hierarchy )
@@ -1488,6 +1509,7 @@ RpSkinAtomicGetHAnimHierarchy(const RpAtomic *atomic)
  * \see RpSkinGeometrySetSkin
  */
 // match: _RpSkinGeometryGetSkin @ 0x002D12E0
+// sp-match: _RpSkinGeometryGetSkin @ 0x001EBC30
 RpSkin *
 RpSkinGeometryGetSkin(RpGeometry *geometry)
 {
@@ -1530,6 +1552,7 @@ RpSkinGeometryGetSkin(RpGeometry *geometry)
  * \see RpSkinGeometryGetSkin
  */
 // match: _RpSkinGeometrySetSkin @ 0x002D12F0
+// sp-match: _RpSkinGeometrySetSkin @ 0x001EBC40
 RpGeometry *
 RpSkinGeometrySetSkin( RpGeometry *geometry, RpSkin *skin )
 {
@@ -1782,6 +1805,7 @@ RpSkinGetVertexBoneIndices( RpSkin *skin )
  * \see RpSkinGetVertexBoneIndices
  */
 // match: _RpSkinGetSkinToBoneMatrices @ 0x002D1340
+// sp-match: _RpSkinGetSkinToBoneMatrices @ 0x001EBC90
 const RwMatrix *
 RpSkinGetSkinToBoneMatrices( RpSkin *skin )
 {

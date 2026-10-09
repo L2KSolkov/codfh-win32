@@ -254,6 +254,7 @@ RwModuleInfo rpDMorphModule = {0, 0};
 // match: _rcsid @ 0x00419F70
 
 // match: _DMorphOpen @ 0x002F27B0
+// sp-match: _DMorphOpen @ 0x0020D260
 static void *
 DMorphOpen( void *instance,
             RwInt32 offset __RWUNUSED__,
@@ -282,6 +283,7 @@ DMorphOpen( void *instance,
 /*--- DMorphClose ----------------------------------------------------------
  */
 // match: _DMorphClose @ 0x002F27D0
+// sp-match: _DMorphClose @ 0x0020D280
 static void *
 DMorphClose( void *instance,
              RwInt32 offset __RWUNUSED__,
@@ -333,6 +335,7 @@ DMorphClose( void *instance,
  * \see RpWorldPluginAttach
  */
 // match: _RpDMorphPluginAttach @ 0x002F27F0
+// sp-match: _RpDMorphPluginAttach @ 0x0020D2A0
 RwBool
 RpDMorphPluginAttach( void )
 {

@@ -35,9 +35,11 @@ RWS_REGISTERCLASS(AnimTestTrigger);
 // match: ?MakeNew@AnimTestTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A1690
 // match: __ehhandler$?MakeNew@AnimTestTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFD70
 // match: __ehhandler$?MakeNew@AnimTestTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFD7F
+// sp-match: ?MakeNew@AnimTestTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007E7E0
 RWS_DEFINE_MAKENEW(AnimTestTrigger)
 
 // match: ??0AnimTestTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A1710
+// sp-match: ??0AnimTestTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007E380
 AnimTestTrigger::AnimTestTrigger(const RWS::CAttributePacket &attr) : SoldierTrigger(attr)
 {
     RwInt32 var_4;
@@ -52,16 +54,22 @@ AnimTestTrigger::AnimTestTrigger(const RWS::CAttributePacket &attr) : SoldierTri
 }
 
 // match: ?vf_008@SoldierTrigger@@UAEHXZ @ 0x000A17A0
+// sp-match: ?vf_008@SoldierTrigger@@UAEHXZ @ 0x0007E3D0
 
 // match: ?vf_00C@SoldierTrigger@@UAEHXZ @ 0x000A17B0
+// sp-match: ?vf_00C@SoldierTrigger@@UAEHXZ @ 0x0007E3E0
 
 // match: ?vf_01C@SoldierTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x000A17D0
+// sp-match: ?vf_01C@SoldierTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x00080100
 
 // match: ?vf_024@SoldierTrigger@@UAEHXZ @ 0x000A17F0
+// sp-match: ?vf_024@SoldierTrigger@@UAEHXZ @ 0x0007E400
 
 // match: ??_GAnimTestTrigger@@UAEPAXI@Z @ 0x000A1810
+// sp-match: ??_GAnimTestTrigger@@UAEPAXI@Z @ 0x0007E7D0
 
 // match: ??1AnimTestTrigger@@UAE@XZ @ 0x000A1830
+// sp-match: ??1AnimTestTrigger@@UAE@XZ @ 0x0007E410
 // (Defined in the class, in AnimTestTrigger.h.)
 
 // Commands 1 to 6: names whose bytes go to unk_1A0 (the hit-death values);
@@ -69,6 +77,7 @@ AnimTestTrigger::AnimTestTrigger(const RWS::CAttributePacket &attr) : SoldierTri
 // 7 and 9: performance map names (kind 0xD) while dword_4B8710 is set, 8 and
 // 10: their ids to the script ("ChangeStateToPerformanceID").
 // match: ?HandleAttributes@AnimTestTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A1860
+// sp-match: ?HandleAttributes@AnimTestTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007E430
 void AnimTestTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     SoldierTrigger::HandleAttributes(attr);
@@ -179,3 +188,4 @@ void AnimTestTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_EAnimTestTrigger@@WBI@AEPAXI@Z @ 0x000A1C90
+// sp-match: ??_EAnimTestTrigger@@WBI@AEPAXI@Z @ 0x0007E7C0

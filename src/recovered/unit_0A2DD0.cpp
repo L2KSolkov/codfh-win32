@@ -34,11 +34,13 @@ RWS_REGISTERCLASS(CustomTrigger);
 // match: ?MakeNew@CustomTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A2DD0
 // match: __ehhandler$?MakeNew@CustomTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFE10
 // match: __ehhandler$?MakeNew@CustomTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFE1F
+// sp-match: ?MakeNew@CustomTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007F8C0
 RWS_DEFINE_MAKENEW(CustomTrigger)
 
 // match: ??0CustomTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A2E50
 // match: __ehhandler$??0CustomTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x8 @ 0x002FFE30
 // match: __ehhandler$??0CustomTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x002FFE38
+// sp-match: ??0CustomTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007F7D0
 CustomTrigger::CustomTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     RwInt32 var_10;
@@ -56,6 +58,7 @@ CustomTrigger::CustomTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 }
 
 // match: ??_GCustomTrigger@@UAEPAXI@Z @ 0x000A2F50
+// sp-match: ??_GCustomTrigger@@UAEPAXI@Z @ 0x0007F8B0
 
 // match: ??0type_A2F70@@QAE@XZ @ 0x000A2F70
 // (Written by the compiler.)
@@ -63,12 +66,14 @@ CustomTrigger::CustomTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 // match: ??1CustomTrigger@@UAE@XZ @ 0x000A3080
 // match: __ehhandler$??1CustomTrigger@@UAE@XZ-0x8 @ 0x002FFE50
 // match: __ehhandler$??1CustomTrigger@@UAE@XZ @ 0x002FFE58
+// sp-match: ??1CustomTrigger@@UAE@XZ @ 0x0007F750
 CustomTrigger::~CustomTrigger()
 {
     sub_A30F0(&unk_C0);
 }
 
 // match: ?sub_A30F0@CustomTrigger@@QAEXPAUtype_A2F70@@@Z @ 0x000A30F0
+// sp-match: ?sub_A30F0@CustomTrigger@@QAEXPAUtype_A2F70@@@Z @ 0x0007F4A0
 void CustomTrigger::sub_A30F0(type_A2F70 *arg_0)
 {
     if (unk_104)
@@ -86,6 +91,7 @@ void CustomTrigger::sub_A30F0(type_A2F70 *arg_0)
 // 2 and 3: its two blocks; 4 to 7: keys of the kind 3, when set; 8 and 9:
 // names whose words go to unk_10C and unk_112.
 // match: ?HandleAttributes@CustomTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A3150
+// sp-match: ?HandleAttributes@CustomTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007F4E0
 void CustomTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -171,6 +177,7 @@ void CustomTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_020@CustomTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000A34E0
+// sp-match: ?vf_020@CustomTrigger@@UAEPAUtype_3D3548@@XZ @ 0x0007F740
 type_3D3548 *CustomTrigger::vf_020()
 {
     type_3D3548 *var_4 = sub_9AD40((type_712B0 *)this);
@@ -179,6 +186,7 @@ type_3D3548 *CustomTrigger::vf_020()
 }
 
 // match: ??_ECustomTrigger@@WBI@AEPAXI@Z @ 0x000A3500
+// sp-match: ??_ECustomTrigger@@WBI@AEPAXI@Z @ 0x0007F7C0
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

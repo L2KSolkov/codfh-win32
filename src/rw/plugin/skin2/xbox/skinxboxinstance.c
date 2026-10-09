@@ -34,6 +34,7 @@ Weight2PackedWeight(RwReal weight)
 // match: __real@3b008081 @ 0x00418EE4
 
 // match: _InstanceWeightsAndIndices @ 0x002D3340
+// sp-match: _InstanceWeightsAndIndices @ 0x001EDC90
 
 static RwBool
 InstanceWeightsAndIndices(const RxXboxResEntryHeader *instancedHeader,
@@ -154,6 +155,7 @@ InstanceWeightsAndIndices(const RxXboxResEntryHeader *instancedHeader,
 }
 
 // match: __rpSkinXboxInstanceAssignFormatShaders @ 0x002D3550
+// sp-match: __rpSkinXboxInstanceAssignFormatShaders @ 0x001EDEA0
 static void
 _rpSkinXboxInstanceAssignFormatShaders(RpGeometry *geometry,
                                        RpSkin *skin,
@@ -192,6 +194,7 @@ _rpSkinXboxInstanceAssignFormatShaders(RpGeometry *geometry,
 }
 
 // match: _rpSkinXboxDefaultInstance @ 0x002D3610
+// sp-match: _rpSkinXboxDefaultInstance @ 0x001EDF60
 static RwBool
 rpSkinXboxDefaultInstance(RxXboxResEntryHeader *instancedHeader,
                           RpXboxVtxFmt *fmt,
@@ -311,6 +314,7 @@ rpSkinXboxDefaultInstance(RxXboxResEntryHeader *instancedHeader,
 }
 
 // match: __rpSkinXboxInstanceCallback @ 0x002D37C0
+// sp-match: __rpSkinXboxInstanceCallback @ 0x001EE110
 RwBool
 _rpSkinXboxInstanceCallback(void *object,
                             RxXboxResEntryHeader *instancedHeader,
@@ -369,6 +373,7 @@ _rpSkinXboxInstanceCallback(void *object,
 }
 
 // match: __rpSkinXboxReInstanceCallback @ 0x002D3870
+// sp-match: __rpSkinXboxReInstanceCallback @ 0x001EE1C0
 RwBool
 _rpSkinXboxReInstanceCallback(void *object, RxXboxResEntryHeader *instancedHeader)
 {
@@ -378,6 +383,7 @@ _rpSkinXboxReInstanceCallback(void *object, RxXboxResEntryHeader *instancedHeade
 #define FLOATASINT(f) (*((const RwInt32 *)&(f)))
 
 // match: __rpSkinInitialize @ 0x002D3890
+// sp-match: __rpSkinInitialize @ 0x001EE1E0
 RpGeometry *
 _rpSkinInitialize(RpGeometry *geometry)
 {
@@ -497,6 +503,7 @@ _rpSkinInitialize(RpGeometry *geometry)
 }
 
 // match: __rpSkinDeinitialize @ 0x002D3A80
+// sp-match: __rpSkinDeinitialize @ 0x001EE3D0
 RpGeometry *
 _rpSkinDeinitialize(RpGeometry *geometry)
 {
@@ -517,6 +524,7 @@ _rpSkinDeinitialize(RpGeometry *geometry)
 }
 
 // match: __rpSkinGeometryNativeSize @ 0x002D3AD0
+// sp-match: __rpSkinGeometryNativeSize @ 0x001EE420
 RwInt32
 _rpSkinGeometryNativeSize(const RpGeometry *geometry)
 {
@@ -534,6 +542,7 @@ _rpSkinGeometryNativeSize(const RpGeometry *geometry)
 }
 
 // match: __rpSkinGeometryNativeWrite @ 0x002D3B00
+// sp-match: __rpSkinGeometryNativeWrite @ 0x001EE450
 RwStream *
 _rpSkinGeometryNativeWrite(RwStream *stream, const RpGeometry *geometry)
 {
@@ -591,6 +600,7 @@ _rpSkinGeometryNativeWrite(RwStream *stream, const RpGeometry *geometry)
 }
 
 // match: __rpSkinGeometryNativeRead @ 0x002D3C00
+// sp-match: __rpSkinGeometryNativeRead @ 0x001EE550
 RwStream *
 _rpSkinGeometryNativeRead(RwStream *stream, RpGeometry *geometry)
 {

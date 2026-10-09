@@ -25,10 +25,12 @@
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003DE0A4
 extern const RwReal flt_3DE0A4 = 16.666666f;
+#ifndef CODFH_SP // MP only: single player has neither unreferenced 0.01f: type_17DB90's vtable follows 16.666666f (SP 0x2E9108)
 // 0x003DE0A8
 extern const RwReal flt_3DE0A8 = 0.01f;
 // 0x003DE0AC
 extern const RwReal flt_3DE0AC = 0.01f;
+#endif
 // 0x0042A4B4
 void (*dword_42A4B4[4])(type_17DB90 *arg_0, RwInt32 arg_4, RwInt32 arg_8) = { sub_17DBD0, sub_17DD00, sub_17E200, 0 };
 // 0x0042A4C4
@@ -61,6 +63,9 @@ type_16C2A0 dword_4E7378;
 // match: _$E2 @ 0x0030BF60
 // match: _$E3 @ 0x0030E990
 // match: ??0type_17DB90@@QAE@XZ @ 0x0017D590
+// sp-match: ??0type_17DB90@@QAE@XZ @ 0x00116670
+// sp-match: _$E2 @ 0x0021DE30
+// sp-match: _$E3 @ 0x0021ED50
 
 type_17DB90::type_17DB90()
 {
@@ -71,11 +76,14 @@ type_17DB90::type_17DB90()
 // match: ??1type_17DB90@@UAE@XZ @ 0x0017D630
 // match: __ehhandler$??1type_17DB90@@UAE@XZ-0x16 @ 0x003021C0
 // match: __ehhandler$??1type_17DB90@@UAE@XZ @ 0x003021D6
+// sp-match: ??1type_17DB90@@UAE@XZ @ 0x001166D0
+// sp-match: ??_Gtype_17DB90@@UAEPAXI@Z @ 0x001166B0
 type_17DB90::~type_17DB90()
 {
 }
 
 // match: ?vf_00C@type_17DB90@@UAEXPAVPulseZoneTrigger@@@Z @ 0x0017D6A0
+// sp-match: ?vf_00C@type_17DB90@@UAEXPAVPulseZoneTrigger@@@Z @ 0x00116730
 void type_17DB90::vf_00C(PulseZoneTrigger *arg_0)
 {
     unk_C8 = arg_0->unk_C8;
@@ -84,6 +92,7 @@ void type_17DB90::vf_00C(PulseZoneTrigger *arg_0)
 }
 
 // match: ?vf_004@type_17DB90@@UAEXPAVPulseZoneTrigger@@@Z @ 0x0017D710
+// sp-match: ?vf_004@type_17DB90@@UAEXPAVPulseZoneTrigger@@@Z @ 0x001161C0
 void type_17DB90::vf_004(PulseZoneTrigger *arg_0)
 {
     unk_50 = 0;
@@ -100,12 +109,14 @@ void type_17DB90::vf_004(PulseZoneTrigger *arg_0)
 }
 
 // match: ?vf_008@type_17DB90@@UAEXXZ @ 0x0017D7C0
+// sp-match: ?vf_008@type_17DB90@@UAEXXZ @ 0x00116230
 void type_17DB90::vf_008()
 {
     unk_5C.sub_144940(0);
 }
 
 // match: ?vf_010@type_17DB90@@UAEHM@Z @ 0x0017D7E0
+// sp-match: ?vf_010@type_17DB90@@UAEHM@Z @ 0x00116780
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_17DB90::vf_010(RwReal arg_0)
 {
@@ -133,6 +144,7 @@ RwInt32 type_17DB90::vf_010(RwReal arg_0)
 }
 
 // match: ?sub_17D8B0@type_17DB90@@QAEHXZ @ 0x0017D8B0
+// sp-match: ?sub_17D8B0@type_17DB90@@QAEHXZ @ 0x00116240
 RwInt32 type_17DB90::sub_17D8B0()
 {
     if (unk_C8 > 0)
@@ -144,12 +156,14 @@ RwInt32 type_17DB90::sub_17D8B0()
 }
 
 // match: ?sub_17D920@type_17DB90@@QAEXH@Z @ 0x0017D920
+// sp-match: ?sub_17D920@type_17DB90@@QAEXH@Z @ 0x00116280
 void type_17DB90::sub_17D920(RwInt32 arg_0)
 {
     unk_B0 = arg_0;
 }
 
 // match: ?sub_17D940@type_17DB90@@QAEXPAUtype_3D3548@@@Z @ 0x0017D940
+// sp-match: ?sub_17D940@type_17DB90@@QAEXPAUtype_3D3548@@@Z @ 0x00116290
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_17DB90::sub_17D940(type_3D3548 *arg_0)
 {
@@ -185,6 +199,7 @@ void type_17DB90::sub_17D940(type_3D3548 *arg_0)
 }
 
 // match: ?sub_17DA20@type_17DB90@@QAEXPAUtype_3D3548@@@Z @ 0x0017DA20
+// sp-match: ?sub_17DA20@type_17DB90@@QAEXPAUtype_3D3548@@@Z @ 0x00116320
 void type_17DB90::sub_17DA20(type_3D3548 *arg_0)
 {
     RwInt32 var_4;
@@ -201,6 +216,7 @@ void type_17DB90::sub_17DA20(type_3D3548 *arg_0)
 }
 
 // match: ?sub_17DA90@type_17DB90@@QAEXHHH@Z @ 0x0017DA90
+// sp-match: ?sub_17DA90@type_17DB90@@QAEXHHH@Z @ 0x00116370
 // Its kind arg_0 (0 to 3) and the effect's arguments; its effect by kind.
 void type_17DB90::sub_17DA90(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
@@ -215,6 +231,7 @@ void type_17DB90::sub_17DA90(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_17DB10@type_17DB90@@QAEXP6AXPAU1@HH@ZHH@Z @ 0x0017DB10
+// sp-match: ?sub_17DB10@type_17DB90@@QAEXP6AXPAU1@HH@ZHH@Z @ 0x001163D0
 void type_17DB90::sub_17DB10(void (*arg_0)(type_17DB90 *, RwInt32, RwInt32), RwInt32 arg_4, RwInt32 arg_8)
 {
     unk_C0 = arg_4;
@@ -223,6 +240,7 @@ void type_17DB90::sub_17DB10(void (*arg_0)(type_17DB90 *, RwInt32, RwInt32), RwI
 }
 
 // match: ?sub_17DB50@type_17DB90@@QAEXHHH@Z @ 0x0017DB50
+// sp-match: ?sub_17DB50@type_17DB90@@QAEXHHH@Z @ 0x00116400
 // Its exit effect by the kind arg_0 (0 to 3).
 void type_17DB90::sub_17DB50(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
@@ -234,6 +252,7 @@ void type_17DB90::sub_17DB50(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_17DB90@type_17DB90@@QAEXH@Z @ 0x0017DB90
+// sp-match: ?sub_17DB90@type_17DB90@@QAEXH@Z @ 0x00116440
 void type_17DB90::sub_17DB90(RwInt32 arg_0)
 {
     if (unk_CC)
@@ -242,6 +261,7 @@ void type_17DB90::sub_17DB90(RwInt32 arg_0)
 }
 
 // match: ?sub_17DBD0@@YAXPAUtype_17DB90@@HH@Z @ 0x0017DBD0
+// sp-match: ?sub_17DBD0@@YAXPAUtype_17DB90@@HH@Z @ 0x00116480
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Kind 0's effect: arg_4 damage to each entity in it, as a blow from the
 // zone; the local player first lets its hit filter see it and, when it
@@ -264,6 +284,7 @@ void sub_17DBD0(type_17DB90 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
         var_8 = arg_0->unk_10[l4].sub_D4910();
         if (var_8 && !var_8->unk_28_9 && !var_8->unk_28_0)
         {
+#ifndef CODFH_SP // single player has no local player check or multiplayer message (SP 0x1164CB)
             if (var_8 == sub_1745A0(0))
             {
                 var_3C = (type_17DBD0_player *)var_8;
@@ -277,19 +298,23 @@ void sub_17DBD0(type_17DB90 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
                     sub_1ACBA0(unk_4F7EB8.sub_1AEC70(), &var_4C);
                 }
             }
+#endif
             var_8->vf_064(&var_38);
         }
     }
 }
 
 // match: ?sub_17DD00@@YAXPAUtype_17DB90@@HH@Z @ 0x0017DD00
+// sp-match: ?sub_17DD00@@YAXPAUtype_17DB90@@HH@Z @ 0x00116500
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Kind 1's effect: once something is in it, it charges for three seconds
 // (its next effect the explosion, sub_17DE90), with the charge's sound, near
 // or far by the local player's distance.
 void sub_17DD00(type_17DB90 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
+#ifndef CODFH_SP
     RwV3d local_28;
+#endif
     RwReal var_1C;
     RwInt32 var_18;
     RwInt32 var_14;
@@ -318,6 +343,11 @@ void sub_17DD00(type_17DB90 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
     if (bp_8)
     {
         type_3DF8D8_04 var_30;
+#ifdef CODFH_SP
+        // shape: the difference is a block local, so /O2 schedules each
+        // vtable load before the component's store (SP 0x116585).
+        RwV3d local_28;
+#endif
 
         RwV3dSubMacro(&local_28, &arg_0->unk_70.pos, (RwV3d *)bp_8->vf_0C4());
         var_1C = RwV3dLength((RwV3d *)&local_28);
@@ -338,6 +368,7 @@ void sub_17DD00(type_17DB90 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 // match: ?sub_17DE90@@YAXPAUtype_17DB90@@HH@Z @ 0x0017DE90
 // match: __ehhandler$?sub_17DE90@@YAXPAUtype_17DB90@@HH@Z-0xB @ 0x003021E0
 // match: __ehhandler$?sub_17DE90@@YAXPAUtype_17DB90@@HH@Z @ 0x003021EB
+// sp-match: ?sub_17DE90@@YAXPAUtype_17DB90@@HH@Z @ 0x001167F0
 // Kind 1's second effect: the charge (sub_17DD00) goes off. With something
 // in it, an explosion's sound, particles and a blast (sub_9A960) on the
 // ground under its trigger, and the local player's view shakes by arg_4
@@ -368,8 +399,15 @@ void sub_17DE90(type_17DB90 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
     }
     if (!var_1C)
         return;
+#ifdef CODFH_SP
+    // shape: the sound key at function scope, between var_38 and the
+    // distance vector (SP 0x116854).
+    type_3DF8D8_04 var_28;
+#endif
     {
+#ifndef CODFH_SP
         type_3DF8D8_04 var_28;
+#endif
 
         var_28.unk_00 = 0xB01B4798; // not an address: a sound's key
         var_28.unk_04 = 0xF75296A0; // not an address: a sound's key
@@ -402,15 +440,24 @@ void sub_17DE90(type_17DB90 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
         var_EC = (type_10F710 *)sub_1745A0(0);
         if (var_EC)
         {
+#ifdef CODFH_SP
+            // shape: a block-local difference and the length compared as it
+            // returns (SP 0x1169F7 fild after the call, fcompp).
+            RwV3d d;
+            RwV3dSubMacro(&d, &var_B0.pos, (RwV3d *)var_EC->vf_0C4());
+            if (RwV3dLength(&d) < (RwReal)arg_8)
+#else
             RwV3dSubMacro(&var_F8, &var_B0.pos, (RwV3d *)var_EC->vf_0C4());
             var_FC = RwV3dLength((RwV3d *)&var_F8);
             if ((RwReal)arg_8 > var_FC)
+#endif
                 var_EC->sub_1109A0((RwReal)arg_4, 1.0f);
         }
     }
 }
 
 // match: ?sub_17E200@@YAXPAUtype_17DB90@@HH@Z @ 0x0017E200
+// sp-match: ?sub_17E200@@YAXPAUtype_17DB90@@HH@Z @ 0x00116610
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Kind 2's effect: holds the players in it.
 void sub_17E200(type_17DB90 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
@@ -428,6 +475,7 @@ void sub_17E200(type_17DB90 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_17E260@@YAXPAUtype_17DB90@@PAUtype_3D3548@@@Z @ 0x0017E260
+// sp-match: ?sub_17E260@@YAXPAUtype_17DB90@@PAUtype_3D3548@@@Z @ 0x00116650
 // Kind 2's exit effect: lets the player arg_4 go.
 void sub_17E260(type_17DB90 *arg_0, type_3D3548 *arg_4)
 {

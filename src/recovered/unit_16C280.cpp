@@ -12,6 +12,7 @@
 // match: ??_C@_0DH@BGDPCBLA@Some?5elements?5were?5not?5freed?5on?5@ @ 0x003DCC88
 
 // match: ??0type_16C2A0@@QAE@XZ @ 0x0016C280
+// sp-match: ??0type_16C2A0@@QAE@XZ @ 0x0010A3A0
 
 type_16C2A0::type_16C2A0()
 {
@@ -19,12 +20,14 @@ type_16C2A0::type_16C2A0()
 }
 
 // match: ??1type_16C2A0@@QAE@XZ @ 0x0016C2A0
+// sp-match: ??1type_16C2A0@@QAE@XZ @ 0x0010A3B0
 type_16C2A0::~type_16C2A0()
 {
     sub_16C4D0(1);
 }
 
 // match: ?sub_16C2C0@type_16C2A0@@QAEXHHPBDH_N@Z @ 0x0016C2C0
+// sp-match: ?sub_16C2C0@type_16C2A0@@QAEXHHPBDH_N@Z @ 0x0010A410
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Allocates room for arg_0 elements of arg_4 bytes (a guard word each
 // unless arg_10), each padded to the alignment arg_C (4, 8, 16 or 32; 4
@@ -53,6 +56,7 @@ void type_16C2A0::sub_16C2C0(RwInt32 arg_0, RwInt32 arg_4, const RwChar *arg_8, 
 }
 
 // match: ?sub_16C390@type_16C2A0@@QAEXHHPAEH@Z @ 0x0016C390
+// sp-match: ?sub_16C390@type_16C2A0@@QAEXHHPAEH@Z @ 0x0010A3C0
 void type_16C2A0::sub_16C390(RwInt32 arg_0, RwInt32 arg_4, RwUInt8 *arg_8, RwInt32 arg_C)
 {
     unk_04 = arg_8;
@@ -64,6 +68,7 @@ void type_16C2A0::sub_16C390(RwInt32 arg_0, RwInt32 arg_4, RwUInt8 *arg_8, RwInt
 }
 
 // match: ?sub_16C3E0@type_16C2A0@@QAEXXZ @ 0x0016C3E0
+// sp-match: ?sub_16C3E0@type_16C2A0@@QAEXXZ @ 0x0010A1E0
 void type_16C2A0::sub_16C3E0()
 {
     unk_00 = 0;
@@ -76,6 +81,7 @@ void type_16C2A0::sub_16C3E0()
 }
 
 // match: ?sub_16C430@type_16C2A0@@QAEXXZ @ 0x0016C430
+// sp-match: ?sub_16C430@type_16C2A0@@QAEXXZ @ 0x0010A200
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_16C2A0::sub_16C430()
 {
@@ -97,12 +103,14 @@ void type_16C2A0::sub_16C430()
 }
 
 // match: ?sub_16C4D0@type_16C2A0@@QAEX_N@Z @ 0x0016C4D0
+// sp-match: ?sub_16C4D0@type_16C2A0@@QAEX_N@Z @ 0x0010A250
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_16C2A0::sub_16C4D0(bool arg_0)
 {
     RwInt32 var_8;
     RwUInt8 *l4;
 
+#ifndef CODFH_SP // single player compiles the debug prints out (and the check that only guards them)
     if (arg_0 && unk_18 != unk_0C)
     {
         if (!(unk_00 & 2))
@@ -117,6 +125,7 @@ void type_16C2A0::sub_16C4D0(bool arg_0)
         }
         sub_19A750("Some elements were not freed on shutdown for freelist!");
     }
+#endif
     if (!(unk_00 & 1) && unk_04)
     {
         RwFree(unk_04);
@@ -126,6 +135,7 @@ void type_16C2A0::sub_16C4D0(bool arg_0)
 }
 
 // match: ?sub_16C5A0@type_16C2A0@@QAEPAXH@Z @ 0x0016C5A0
+// sp-match: ?sub_16C5A0@type_16C2A0@@QAEPAXH@Z @ 0x0010A280
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void *type_16C2A0::sub_16C5A0(RwInt32 arg_0)
 {
@@ -152,6 +162,7 @@ void *type_16C2A0::sub_16C5A0(RwInt32 arg_0)
 }
 
 // match: ?sub_16C650@type_16C2A0@@QAEIPAX@Z @ 0x0016C650
+// sp-match: ?sub_16C650@type_16C2A0@@QAEIPAX@Z @ 0x0010A2E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwUInt32 type_16C2A0::sub_16C650(void *arg_0)
 {
@@ -166,6 +177,7 @@ RwUInt32 type_16C2A0::sub_16C650(void *arg_0)
 }
 
 // match: ?sub_16C6A0@type_16C2A0@@QAEPAXH@Z @ 0x0016C6A0
+// sp-match: ?sub_16C6A0@type_16C2A0@@QAEPAXH@Z @ 0x0010A300
 void *type_16C2A0::sub_16C6A0(RwInt32 arg_0)
 {
     RwInt32 var_4;
@@ -177,12 +189,14 @@ void *type_16C2A0::sub_16C6A0(RwInt32 arg_0)
 }
 
 // match: ?sub_16C6E0@type_16C2A0@@QAEXH@Z @ 0x0016C6E0
+// sp-match: ?sub_16C6E0@type_16C2A0@@QAEXH@Z @ 0x0010A3F0
 void type_16C2A0::sub_16C6E0(RwInt32 arg_0)
 {
     sub_16C710(sub_16C6A0(arg_0));
 }
 
 // match: ?sub_16C710@type_16C2A0@@QAEXPAX@Z @ 0x0016C710
+// sp-match: ?sub_16C710@type_16C2A0@@QAEXPAX@Z @ 0x0010A320
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_16C2A0::sub_16C710(void *arg_0)
 {
@@ -206,6 +220,7 @@ void type_16C2A0::sub_16C710(void *arg_0)
 }
 
 // match: ?sub_16C770@type_16C2A0@@QAE_NPAX@Z @ 0x0016C770
+// sp-match: ?sub_16C770@type_16C2A0@@QAE_NPAX@Z @ 0x0010A350
 bool type_16C2A0::sub_16C770(void *arg_0)
 {
     RwInt32 var_4;
@@ -217,6 +232,7 @@ bool type_16C2A0::sub_16C770(void *arg_0)
 }
 
 // match: ?sub_16C7E0@type_16C2A0@@QAE_NXZ @ 0x0016C7E0
+// sp-match: ?sub_16C7E0@type_16C2A0@@QAE_NXZ @ 0x0010A390
 bool type_16C2A0::sub_16C7E0()
 {
     return unk_08 == 0;

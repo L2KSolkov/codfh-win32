@@ -5,6 +5,7 @@
 #include "rws/maths.h"
 
 // match: ?DegAngDiff@RWS@@YAMMM@Z @ 0x001326C0
+// sp-match: ?DegAngDiff@RWS@@YAMMM@Z @ 0x000E30D0
 RwReal RWS::DegAngDiff(RwReal a0, RwReal a1)
    {
       RwReal a2;

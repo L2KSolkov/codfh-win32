@@ -7,12 +7,14 @@
 #include "game/uiglue.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003EAAB0
 extern const RwReal flt_3EAAB0 = 0.01f;
 // 0x003EAAB4
 extern const RwReal flt_3EAAB4 = 0.01f;
 // 0x003EAAB8
 extern const RwReal flt_3EAAB8 = 16.666666f;
+#endif
 // End of its data definitions.
 
 

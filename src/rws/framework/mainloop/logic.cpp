@@ -77,6 +77,24 @@ extern const RwChar iMsgPausedPostTick_name[] = "iMsgPausedPostTick";
 // match: _$E28 @ 0x0030BA10
 // match: _$E30 @ 0x0030BA20
 // match: _$E32 @ 0x0030BA30
+// sp-match: _$E1 @ 0x0021D920
+// sp-match: _$E4 @ 0x0021D940
+// sp-match: _$E7 @ 0x0021D960
+// sp-match: _$E10 @ 0x0021D980
+// sp-match: _$E13 @ 0x0021D9A0
+// sp-match: _$E16 @ 0x0021D9C0
+// sp-match: _$E19 @ 0x0021D9E0
+// sp-match: _$E22 @ 0x0021DA00
+// sp-match: _$E25 @ 0x0021DA20
+// sp-match: _$E2 @ 0x0021EAC0
+// sp-match: _$E5 @ 0x0021EAD0
+// sp-match: _$E8 @ 0x0021EAE0
+// sp-match: _$E11 @ 0x0021EAF0
+// sp-match: _$E14 @ 0x0021EB00
+// sp-match: _$E17 @ 0x0021EB10
+// sp-match: _$E20 @ 0x0021EB20
+// sp-match: _$E23 @ 0x0021EB30
+// sp-match: _$E26 @ 0x0021EB40
 
 namespace RWS
 {
@@ -107,6 +125,7 @@ namespace RWS
 }
 
 // match: ?Running@Logic@MainLoop@RWS@@YAXXZ @ 0x00131B60
+// sp-match: ?Running@Logic@MainLoop@RWS@@YAXXZ @ 0x000E2780
 void RWS::MainLoop::Logic::Running(void)
          {
             SendMsg(iMsgSetRunningMode);
@@ -117,6 +136,7 @@ void RWS::MainLoop::Logic::Running(void)
          }
 
 // match: ?Frozen@Logic@MainLoop@RWS@@YAXXZ @ 0x00131BC0
+// sp-match: ?Frozen@Logic@MainLoop@RWS@@YAXXZ @ 0x000E27D0
 void RWS::MainLoop::Logic::Frozen(void)
          {
             SendMsg(iMsgSetFrozenMode);
@@ -127,12 +147,14 @@ void RWS::MainLoop::Logic::Frozen(void)
          }
 
 // match: ?SetEnabled@Logic@MainLoop@RWS@@YAXH@Z @ 0x00131C20
+// sp-match: ?SetEnabled@Logic@MainLoop@RWS@@YAXH@Z @ 0x000E2810
 void RWS::MainLoop::Logic::SetEnabled(RwBool benabled)
          {
             gbEnabled = benabled;
          }
 
 // match: ?Poll@Logic@MainLoop@RWS@@YAXXZ @ 0x00131C30
+// sp-match: ?Poll@Logic@MainLoop@RWS@@YAXXZ @ 0x000E2820
 void RWS::MainLoop::Logic::Poll(void)
          {
             if (!gbEnabled) return;
@@ -150,6 +172,7 @@ void RWS::MainLoop::Logic::Poll(void)
          }
 
 // match: ?Open@Logic@MainLoop@RWS@@YAXXZ @ 0x00131CD0
+// sp-match: ?Open@Logic@MainLoop@RWS@@YAXXZ @ 0x000E28A0
 void RWS::MainLoop::Logic::Open(void)
          {
             CEventHandler::RegisterMsg (iMsgSetRunningMode, iMsgSetRunningMode_name, 0);
@@ -164,6 +187,7 @@ void RWS::MainLoop::Logic::Open(void)
          }
 
 // match: ?Close@Logic@MainLoop@RWS@@YAXXZ @ 0x00131D90
+// sp-match: ?Close@Logic@MainLoop@RWS@@YAXXZ @ 0x000E2950
 void RWS::MainLoop::Logic::Close(void)
          {
             CEventHandler::UnRegisterMsg ( iMsgSetRunningMode );
@@ -178,6 +202,7 @@ void RWS::MainLoop::Logic::Close(void)
          }
 
 // match: ?SetFrozenMode@?A0xb63eaa10@Logic@MainLoop@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00131E10
+// sp-match: ?SetFrozenMode@?A0xb63eaa10@Logic@MainLoop@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000E29B0
 namespace RWS
 {
    namespace MainLoop
@@ -196,6 +221,7 @@ namespace RWS
 }
 
 // match: ?SetRunningMode@?A0xb63eaa10@Logic@MainLoop@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00131E20
+// sp-match: ?SetRunningMode@?A0xb63eaa10@Logic@MainLoop@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000E29C0
 namespace RWS
 {
    namespace MainLoop
@@ -214,6 +240,7 @@ namespace RWS
 }
 
 // match: ?RegisterStreamChunkHandlers@Logic@MainLoop@RWS@@YAXXZ @ 0x00131E30
+// sp-match: ?RegisterStreamChunkHandlers@Logic@MainLoop@RWS@@YAXXZ @ 0x000E29D0
 void RWS::MainLoop::Logic::RegisterStreamChunkHandlers(void)
          {
             CStreamHandler::RegisterChunkHandler(MAKECHUNKID (rwVENDORID_CRITERIONRM,
@@ -224,6 +251,7 @@ void RWS::MainLoop::Logic::RegisterStreamChunkHandlers(void)
          }
 
 // match: ?UnRegisterStreamChunkHandlers@Logic@MainLoop@RWS@@YAXXZ @ 0x00131E60
+// sp-match: ?UnRegisterStreamChunkHandlers@Logic@MainLoop@RWS@@YAXXZ @ 0x000E2A00
 void RWS::MainLoop::Logic::UnRegisterStreamChunkHandlers(void)
          {
             CStreamHandler::UnRegisterChunkHandler(MAKECHUNKID (rwVENDORID_CRITERIONRM, strfunc_SetFrozenMode));

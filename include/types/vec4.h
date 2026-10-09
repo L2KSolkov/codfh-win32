@@ -273,7 +273,9 @@ struct type_94060_atomic
 // Finds the smallest zone around the entity arg_0 and fades to it.
 void sub_94060(struct type_3D3548 *arg_0);
 // Whether the boxes arg_0 and arg_4 overlap.
+#ifndef CODFH_SP // static in single player (unit_08E670)
 bool sub_8F770(type_8BEC0 *arg_0, type_8BEC0 *arg_4);
+#endif
 // A world sector's zone list as sub_8F5C0 leaves it: tagged 0xFFFFFF in
 // the top of unk_10 with the count in its low bits, the zones' indices
 // packed four to a word from unk_14.

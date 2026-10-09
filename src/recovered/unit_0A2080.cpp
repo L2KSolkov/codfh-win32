@@ -33,9 +33,11 @@ RWS_REGISTERCLASS(SceneTestTrigger);
 // match: ?MakeNew@SceneTestTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A2080
 // match: __ehhandler$?MakeNew@SceneTestTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFDB0
 // match: __ehhandler$?MakeNew@SceneTestTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFDBF
+// sp-match: ?MakeNew@SceneTestTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007EE20
 RWS_DEFINE_MAKENEW(SceneTestTrigger)
 
 // match: ??0SceneTestTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A2100
+// sp-match: ??0SceneTestTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007EBC0
 SceneTestTrigger::SceneTestTrigger(const RWS::CAttributePacket &attr) : SoldierTrigger(attr)
 {
     RwInt32 var_4;
@@ -49,8 +51,10 @@ SceneTestTrigger::SceneTestTrigger(const RWS::CAttributePacket &attr) : SoldierT
 }
 
 // match: ??_GSceneTestTrigger@@UAEPAXI@Z @ 0x000A2180
+// sp-match: ??_GSceneTestTrigger@@UAEPAXI@Z @ 0x0007EE10
 
 // match: ??1SceneTestTrigger@@UAE@XZ @ 0x000A21A0
+// sp-match: ??1SceneTestTrigger@@UAE@XZ @ 0x0007EC10
 // (Defined in the class, in SceneTestTrigger.h.)
 
 // Commands 1 and 2: names whose words go to unk_1A0 (the scene values); 0:
@@ -58,6 +62,7 @@ SceneTestTrigger::SceneTestTrigger(const RWS::CAttributePacket &attr) : SoldierT
 // map name (kind 0xD) while dword_4B8710 is set, 4: its id to the script
 // ("ChangeStateToPerformanceID").
 // match: ?HandleAttributes@SceneTestTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A21D0
+// sp-match: ?HandleAttributes@SceneTestTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007EC30
 void SceneTestTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     SoldierTrigger::HandleAttributes(attr);
@@ -113,3 +118,4 @@ void SceneTestTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_ESceneTestTrigger@@WBI@AEPAXI@Z @ 0x000A23E0
+// sp-match: ??_ESceneTestTrigger@@WBI@AEPAXI@Z @ 0x0007EE00

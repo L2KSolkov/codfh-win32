@@ -19,6 +19,7 @@
 // match: _$E1 @ 0x0030B8D0
 // match: _$E2 @ 0x0030E6D0
 // match: ?Load@CRwSplineResource@RWS@@UAEPAXPBD00PAURwStream@@IAAI@Z @ 0x001304B0
+// sp-match: ?Load@CRwSplineResource@RWS@@UAEPAXPBD00PAURwStream@@IAAI@Z @ 0x000E1A60
 
 void *RWS::CRwSplineResource::Load(const RwChar *psName,
                                  const RwChar *psType,
@@ -60,6 +61,7 @@ void *RWS::CRwSplineResource::Load(const RwChar *psName,
    }
 
 // match: ?UnLoad@CRwSplineResource@RWS@@UAEHPBDPAX@Z @ 0x00130540
+// sp-match: ?UnLoad@CRwSplineResource@RWS@@UAEHPBDPAX@Z @ 0x000E1AF0
 RwBool RWS::CRwSplineResource::UnLoad(const RwChar *pStrType, void *pResource)
    {
       RwBool ret = FALSE;
@@ -84,6 +86,7 @@ RwBool RWS::CRwSplineResource::UnLoad(const RwChar *pStrType, void *pResource)
    }
 
 // match: ?IsHandled@CRwSplineResource@RWS@@UAEHPBD@Z @ 0x001305B0
+// sp-match: ?IsHandled@CRwSplineResource@RWS@@UAEHPBD@Z @ 0x000E1B50
 RwBool RWS::CRwSplineResource::IsHandled(const RwChar *psType)
    {
       if (!rwstrcmp(psType, "rwID_SPLINE"))
@@ -105,3 +108,5 @@ namespace RWS
 // The compiler's constructor and destructor (the global instance's).
 // match: ??0CRwSplineResource@RWS@@QAE@XZ @ 0x001305E0
 // match: ??1CRwSplineResource@RWS@@UAE@XZ @ 0x00130600
+// sp-match: ??0CRwSplineResource@RWS@@QAE@XZ @ 0x000E1B70
+// sp-match: ??1CRwSplineResource@RWS@@UAE@XZ @ 0x000DD920

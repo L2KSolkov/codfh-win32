@@ -217,9 +217,11 @@ struct type_3DE350 : type_3DE0E0
 };
 // How its turret and barrel, and its third gun, bear on a point
 // (vf_03C).
+#ifndef CODFH_SP // static in single player (unit_17E680)
 RwInt32 sub_181A90(type_3DE350 *arg_0, RwV3d *arg_4, RwReal arg_8, RwV3d *arg_C, RwReal *arg_10, RwReal *arg_14,
                    RwReal *arg_18);
 RwInt32 sub_181D20(type_3DE350 *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal *arg_C);
+#endif
 
 typedef RwChar type_3DE350_size_check[sizeof(type_3DE350) == 0x9B0 ? 1 : -1];
 

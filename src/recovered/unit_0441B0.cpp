@@ -525,6 +525,10 @@ void sub_5FE50(RwUInt32 arg_0, type_44350 *arg_4);
 void sub_5FED0(RwUInt32 arg_0, type_44350 *arg_4);
 void sub_5FF50(RwUInt32 arg_0, type_44350 *arg_4);
 void sub_5FFB0(RwUInt32 arg_0, type_44350 *arg_4);
+#ifdef CODFH_SP
+void sp_sub_4EB80(RwUInt32 arg_0, type_44350 *arg_4);
+void sp_sub_4EBD0(RwUInt32 arg_0, type_44350 *arg_4);
+#endif
 void sub_60030(RwUInt32 arg_0, type_44350 *arg_4);
 void sub_600B0(RwUInt32 arg_0, type_44350 *arg_4);
 void sub_60130(RwUInt32 arg_0, type_44350 *arg_4);
@@ -1132,8 +1136,13 @@ type_4276E0 String1[] = {
     { "SetObjectiveFlags", sub_5FE50 },
     { "ClearObjectiveFlags", sub_5FED0 },
     { "GetObjectiveCounter", sub_5FF50 },
+#ifdef CODFH_SP // single player's counter commands are their own functions (SP .data 0x32066C)
+    { "SetObjectiveCounter", sp_sub_4EB80 },
+    { "ModifyObjectiveCounter", sp_sub_4EBD0 },
+#else
     { "SetObjectiveCounter", sub_5FFB0 },
     { "ModifyObjectiveCounter", sub_5FFB0 },
+#endif
     { "SetActivateMessage", sub_60030 },
     { "SetCompleteMessage", sub_600B0 },
     { "SetFailMessage", sub_60130 },
@@ -1302,9 +1311,17 @@ RwReal flt_428A20 = 75.0f;
 // 0x00428A24
 RwReal flt_428A24 = 250.0f;
 // 0x00428A28
+#ifdef CODFH_SP // file-static in single player: sub_5F950 keeps no store of it before the unk_248 load (SP 0x4E5A0)
+static RwReal dword_428A28 = -1.0f;
+#else
 RwReal dword_428A28 = -1.0f;
+#endif
 // 0x00428A2C
+#ifdef CODFH_SP // file-static in single player: sub_5F950 (SP 0x4E5A0) matches only with it and flt_439E70 static
+static RwInt32 dword_428A2C = -1;
+#else
 RwInt32 dword_428A2C = -1;
+#endif
 // 0x00439940
 RwInt32 dword_439940;
 // 0x00439948
@@ -1312,15 +1329,21 @@ RwChar Buffer[1312];
 // 0x00439E68
 RwInt32 dword_439E68[2];
 // 0x00439E70
+#ifdef CODFH_SP // file-static in single player (as dword_428A2C)
+static RwReal flt_439E70[2];
+#else
 RwReal flt_439E70[2];
+#endif
 // (Defined after the data: VC7.1 emits a unit's data definitions in reverse order, and
 // the image has these constants before the data's texts.)
 // 0x003CE9B0
 extern const RwReal flt_3CE9B0 = 16.666666f;
+#ifndef CODFH_SP // single player has neither unreferenced 0.01f: 0.1f follows 16.666666f (SP 0x2DC480)
 // 0x003CE9B4
 extern const RwReal flt_3CE9B4 = 0.01f;
 // 0x003CE9B8
 extern const RwReal flt_3CE9B8 = 0.01f;
+#endif
 // 0x003CE9BC
 extern const RwReal flt_3CE9BC = 0.1f;
 // End of its data definitions.
@@ -2024,6 +2047,7 @@ type_439A48 dword_439A48[8];
 
 // match: _$E2 @ 0x00309940
 // match: sub_441B0 @ 0x000441B0
+// sp-match: sub_441B0 @ 0x00033050
 
 // The function of the command named arg_0 (any case), 0 for none.
 type_4276E0_fn sub_441B0(const RwChar *arg_0)
@@ -2040,7 +2064,9 @@ type_4276E0_fn sub_441B0(const RwChar *arg_0)
     return 0;
 }
 
+#ifndef CODFH_SP // single player defines it in include/types/type_44350.h
 // match: sub_44220 @ 0x00044220
+// sp-match: sub_44220 @ 0x00032F30
 // The script debugger's hook: with arg_0 clear, looks up what the debugged
 // script's object is running (for a breakpoint to show).
 void sub_44220(bool arg_0)
@@ -2071,8 +2097,13 @@ void sub_44220(bool arg_0)
         }
     }
 }
+#endif
+
+// An inline single player calls out of line (SP 0x77949, 0x9EC5B); this file emits the copy:
+// sp-match: ?is_blocked@AIData@@QAEHXZ @ 0x00032F80
 
 // match: sub_442D0 @ 0x000442D0
+// sp-match: sub_442D0 @ 0x000330E0
 // "AssertValue": reports "Script Assert" when its argument is 0.
 void sub_442D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2089,18 +2120,20 @@ void sub_442D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44350 @ 0x00044350
+// sp-match: sub_44350 @ 0x00032EA0
 // Ends the call arg_0: pops its arguments and pushes its results from arg_4.
 void sub_44350(type_44350 *arg_0, void *arg_4)
 {
     if (arg_4 != 0) {
         dword_449318 -= arg_0->unk_0C - arg_0->unk_14;
-        memcpy(dword_449318 - arg_0->unk_14, arg_4, arg_0->unk_14 * 4);
+        memcpy(dword_449318 - arg_0->unk_14, arg_4, arg_0->unk_14 * sizeof(RwInt32));
     } else {
         dword_449318 -= arg_0->unk_0C;
     }
 }
 
 // match: sub_443C0 @ 0x000443C0
+// sp-match: sub_443C0 @ 0x00033170
 // "PrintInt".
 void sub_443C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2112,6 +2145,7 @@ void sub_443C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44400 @ 0x00044400
+// sp-match: sub_44400 @ 0x000331B0
 // "PrintFloat".
 void sub_44400(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2123,6 +2157,7 @@ void sub_44400(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44440 @ 0x00044440
+// sp-match: sub_44440 @ 0x000331F0
 // "BitAnd".
 void sub_44440(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2137,6 +2172,7 @@ void sub_44440(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_444C0 @ 0x000444C0
+// sp-match: sub_444C0 @ 0x00033250
 // "BitOr".
 void sub_444C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2151,6 +2187,7 @@ void sub_444C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44540 @ 0x00044540
+// sp-match: sub_44540 @ 0x000332B0
 // "BitNot".
 void sub_44540(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2163,6 +2200,7 @@ void sub_44540(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44590 @ 0x00044590
+// sp-match: sub_44590 @ 0x00033310
 // "BitLShift".
 void sub_44590(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2177,6 +2215,7 @@ void sub_44590(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44610 @ 0x00044610
+// sp-match: sub_44610 @ 0x00033370
 // "BitRShift".
 void sub_44610(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2191,6 +2230,7 @@ void sub_44610(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44690 @ 0x00044690
+// sp-match: sub_44690 @ 0x000333D0
 // "Modulo".
 void sub_44690(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2205,6 +2245,7 @@ void sub_44690(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44710 @ 0x00044710
+// sp-match: sub_44710 @ 0x00033430
 // "Fabs".
 void sub_44710(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2217,6 +2258,7 @@ void sub_44710(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44770 @ 0x00044770
+// sp-match: sub_44770 @ 0x00033490
 // "Sqrt".
 void sub_44770(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2229,6 +2271,7 @@ void sub_44770(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_447D0 @ 0x000447D0
+// sp-match: sub_447D0 @ 0x000334F0
 // "Abs".
 void sub_447D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2240,6 +2283,7 @@ void sub_447D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44820 @ 0x00044820
+// sp-match: sub_44820 @ 0x00033550
 // "CreateThread": starts a thread (its two arguments) on the object's thread
 // manager and returns its id.
 void sub_44820(RwUInt32 arg_0, type_44350 *arg_4)
@@ -2265,6 +2309,7 @@ void sub_44820(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44900 @ 0x00044900
+// sp-match: sub_44900 @ 0x00033660
 // "CreateSoldier": unless game flag 21 is set, creates a soldier for the
 // object's entity (sub_134B40); returns 0.
 void sub_44900(RwUInt32 arg_0, type_44350 *arg_4)
@@ -2285,6 +2330,7 @@ void sub_44900(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44970 @ 0x00044970
+// sp-match: sub_44970 @ 0x000336E0
 // "CreateTank": likewise with a tank (sub_155470).
 void sub_44970(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2304,6 +2350,7 @@ void sub_44970(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_449E0 @ 0x000449E0
+// sp-match: sub_449E0 @ 0x00033760
 // "ControllerShake": its last argument in seconds.
 void sub_449E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2321,6 +2368,7 @@ void sub_449E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44AD0 @ 0x00044AD0
+// sp-match: sub_44AD0 @ 0x000337D0
 // "CameraShake": shakes player 0's camera, its second argument in seconds
 // and its third per second.
 void sub_44AD0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -2344,16 +2392,25 @@ void sub_44AD0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44BB0 @ 0x00044BB0
+// sp-match: sub_44BB0 @ 0x00033870
 // "TimeScale": slows time to its second argument (per second) while its
 // first is 0.2f's bit pattern, else restores it.
 void sub_44BB0(RwUInt32 arg_0, type_44350 *arg_4)
 {
     RwReal local_8;
+#ifdef CODFH_SP // single player compares the first argument as a real with 0.2f (SP 0x33870: fucompp)
+    RwReal var_4;
+
+    var_4 = SCRIPT_ARGT<RwReal>(arg_4, 1);
+    local_8 = SCRIPT_ARGT<RwReal>(arg_4, 2) * 60.0f;
+    if (var_4 == 0.2f) {
+#else
     RwInt32 var_4;
 
     var_4 = SCRIPT_ARG(arg_4, 1);
     local_8 = SCRIPT_ARGT<RwReal>(arg_4, 2) * 60.0f;
     if (var_4 == 0x3E4CCCCD) {
+#endif
         if (dword_4B87DC != 3)
             dword_4B87DC = 1;
         if (dword_4B87DC != 3 && dword_4B87DC != 4)
@@ -2365,6 +2422,7 @@ void sub_44BB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44C70 @ 0x00044C70
+// sp-match: sub_44C70 @ 0x00033910
 // "PlayerShock".
 void sub_44C70(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2381,6 +2439,7 @@ void sub_44C70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44D00 @ 0x00044D00
+// sp-match: sub_44D00 @ 0x00033970
 // "RenderFadeOut": fades the screen out over arg 1 seconds, unless one of
 // the game's pause and menu bits (1, 2, 3, 5, 6, 7 of dword_4B86F8) is set.
 void sub_44D00(RwUInt32 arg_0, type_44350 *arg_4)
@@ -2399,6 +2458,7 @@ void sub_44D00(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44DA0 @ 0x00044DA0
+// sp-match: sub_44DA0 @ 0x000339B0
 // "RenderFadeIn": fades the screen in over arg 1 seconds.
 void sub_44DA0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2410,6 +2470,7 @@ void sub_44DA0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44DF0 @ 0x00044DF0
+// sp-match: sub_44DF0 @ 0x000339F0
 // "SetMotionBlur": its second and third arguments in seconds, as frames
 // below 256.
 void sub_44DF0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -2430,6 +2491,7 @@ void sub_44DF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44ED0 @ 0x00044ED0
+// sp-match: sub_44ED0 @ 0x00033A90
 // "TimeToTicks": its argument in seconds as whole frames.
 void sub_44ED0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2442,6 +2504,7 @@ void sub_44ED0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44F30 @ 0x00044F30
+// sp-match: sub_44F30 @ 0x00033B00
 // "SetFogDistance".
 void sub_44F30(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2455,6 +2518,7 @@ void sub_44F30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_44FC0 @ 0x00044FC0
+// sp-match: sub_44FC0 @ 0x00033B60
 // "SetClipDistance".
 void sub_44FC0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2468,6 +2532,7 @@ void sub_44FC0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45050 @ 0x00045050
+// sp-match: sub_45050 @ 0x00033BC0
 // "SetFogType": 1 to 3, else 0.
 void sub_45050(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2493,6 +2558,7 @@ void sub_45050(RwUInt32 arg_0, type_44350 *arg_4)
 type_3D3548 *sub_45170(RwUInt32 arg_0);
 
 // match: sub_450E0 @ 0x000450E0
+// sp-match: sub_450E0 @ 0x00033C50
 // "SetRenderPriority": 0 to 2.
 void sub_450E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2508,6 +2574,7 @@ void sub_450E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45170 @ 0x00045170
+// sp-match: sub_45170 @ 0x00032FA0
 // The entity of the object arg_0 (its type_3D2E7C's sub_71300).
 type_3D3548 *sub_45170(RwUInt32 arg_0)
 {
@@ -2520,6 +2587,7 @@ type_3D3548 *sub_45170(RwUInt32 arg_0)
 }
 
 // match: sub_451E0 @ 0x000451E0
+// sp-match: sub_451E0 @ 0x00033CE0
 // "SetPriorityCollision".
 void sub_451E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2536,6 +2604,7 @@ void sub_451E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45280 @ 0x00045280
+// sp-match: sub_45280 @ 0x00033D80
 // "SetEntityScale": scales the entity, its animations, its size and its
 // atomics' bounding spheres.
 void sub_45280(RwUInt32 arg_0, type_44350 *arg_4)
@@ -2586,6 +2655,7 @@ void sub_45280(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_453F0 @ 0x000453F0
+// sp-match: sub_453F0 @ 0x00033E80
 // "CreateMyChild": unless game flag 21 is set, the handle of the trigger's
 // child entity (0 without one).
 void sub_453F0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -2617,6 +2687,7 @@ void sub_453F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_454A0 @ 0x000454A0
+// sp-match: sub_454A0 @ 0x00033F60
 // "DestroySelf": frees the entity and ends the object with the argument.
 void sub_454A0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2636,6 +2707,7 @@ void sub_454A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45540 @ 0x00045540
+// sp-match: sub_45540 @ 0x00034000
 // "GetPrimaryAnimationDuration": 0 without one.
 void sub_45540(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2653,6 +2725,7 @@ void sub_45540(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_455A0 @ 0x000455A0
+// sp-match: sub_455A0 @ 0x000340B0
 // "SetFadeOut".
 void sub_455A0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2667,9 +2740,19 @@ void sub_455A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45610 @ 0x00045610
+// sp-match: sub_45610 @ 0x00034140
 // "SetFadeLevel".
 void sub_45610(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifdef CODFH_SP // shape: the level read as a real and passed as its bits (SP 0x34140: fld/fstp)
+    RwReal local_8;
+    type_3D3548 *var_4;
+
+    local_8 = SCRIPT_ARGT<RwReal>(arg_4, 1);
+    var_4 = sub_45170(arg_0);
+    SCRIPT_CHECK2(var_4 != 0);
+    var_4->sub_D39F0(*(RwInt32 *)&local_8);
+#else
     RwInt32 local_8;
     type_3D3548 *var_4;
 
@@ -2677,10 +2760,12 @@ void sub_45610(RwUInt32 arg_0, type_44350 *arg_4)
     var_4 = sub_45170(arg_0);
     SCRIPT_CHECK2(var_4 != 0);
     var_4->sub_D39F0(local_8);
+#endif
     sub_44350(arg_4, 0);
 }
 
 // match: sub_45680 @ 0x00045680
+// sp-match: sub_45680 @ 0x000341D0
 // "SetMyWidthHeight".
 void sub_45680(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2698,6 +2783,7 @@ void sub_45680(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45720 @ 0x00045720
+// sp-match: sub_45720 @ 0x00034270
 // "GetMyTriggerPointer".
 void sub_45720(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2714,6 +2800,7 @@ void sub_45720(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_457A0 @ 0x000457A0
+// sp-match: sub_457A0 @ 0x00034360
 // "GetMyTriggerMetric": metric 0 to 2 of the trigger.
 void sub_457A0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2743,6 +2830,7 @@ void sub_457A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_458A0 @ 0x000458A0
+// sp-match: sub_458A0 @ 0x000344D0
 // "GetMyTriggerVectorComponent": component arg 2 (x, y, z) of the row arg 1
 // (at, right, up) of its trigger's matrix, orthonormalised.
 void sub_458A0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -2795,6 +2883,7 @@ void sub_458A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45A50 @ 0x00045A50
+// sp-match: sub_45A50 @ 0x000346E0
 // "SetMyTriggerActionIcon".
 void sub_45A50(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2812,6 +2901,7 @@ void sub_45A50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45AF0 @ 0x00045AF0
+// sp-match: sub_45AF0 @ 0x000347C0
 // "SetMyTriggerPosition": each coordinate is checked nonzero.
 void sub_45AF0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2836,6 +2926,7 @@ void sub_45AF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45C60 @ 0x00045C60
+// sp-match: sub_45C60 @ 0x000349B0
 // "RestoreMyTriggerPosition".
 void sub_45C60(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2851,6 +2942,7 @@ void sub_45C60(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45CD0 @ 0x00045CD0
+// sp-match: sub_45CD0 @ 0x00034A70
 // "DotProductVectors": of its first three arguments and its last three.
 void sub_45CD0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2869,6 +2961,7 @@ void sub_45CD0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45E00 @ 0x00045E00
+// sp-match: sub_45E00 @ 0x00034B10
 // "CrossProductVectorComponent": component 0 to 2 (its seventh argument) of
 // the cross product of its first three arguments and the next three.
 void sub_45E00(RwUInt32 arg_0, type_44350 *arg_4)
@@ -2902,6 +2995,7 @@ void sub_45E00(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45FD0 @ 0x00045FD0
+// sp-match: sub_45FD0 @ 0x00034C50
 // "GetThisStateMachinePointer": the object's handle.
 void sub_45FD0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2912,6 +3006,7 @@ void sub_45FD0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_45FF0 @ 0x00045FF0
+// sp-match: sub_45FF0 @ 0x00034CA0
 // "GetMyAIObjectPointer": the object's type_3D2E7C's handle.
 void sub_45FF0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2926,6 +3021,7 @@ void sub_45FF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46040 @ 0x00046040
+// sp-match: sub_46040 @ 0x00048890
 // "GetEntityHandle": the id of the entity the object under the key (its
 // argument, two slots) holds, for an object with flag 2; 0 when the entity
 // is gone.
@@ -2961,6 +3057,7 @@ void sub_46040(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46120 @ 0x00046120
+// sp-match: sub_46120 @ 0x00034D00
 // "GetTaskReturnRegister".
 void sub_46120(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2976,6 +3073,7 @@ void sub_46120(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46180 @ 0x00046180
+// sp-match: sub_46180 @ 0x00034DA0
 // "GetWakeUpMessageID".
 void sub_46180(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -2991,6 +3089,7 @@ void sub_46180(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_461E0 @ 0x000461E0
+// sp-match: sub_461E0 @ 0x00034E40
 // "SetPerformanceValue": value arg 2 at index arg 1 of the entity's
 // performance values.
 void sub_461E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -3023,6 +3122,7 @@ void sub_461E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46280 @ 0x00046280
+// sp-match: sub_46280 @ 0x00034EA0
 // "SetHitDeathValue".
 void sub_46280(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3054,6 +3154,7 @@ void sub_46280(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46320 @ 0x00046320
+// sp-match: sub_46320 @ 0x00034F00
 // "SetSpecialIdlePerformanceValue".
 void sub_46320(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3085,6 +3186,7 @@ void sub_46320(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_463C0 @ 0x000463C0
+// sp-match: sub_463C0 @ 0x00034F60
 // "SetupAssassinationValues": fills the entity's hit-death values (for an
 // entity of the vf_008 or vf_024 subclass).
 void sub_463C0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -3130,6 +3232,7 @@ void sub_463C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_464F0 @ 0x000464F0
+// sp-match: sub_464F0 @ 0x00035020
 // "GetPerformanceValue": the value at index arg 1.
 void sub_464F0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3161,6 +3264,7 @@ void sub_464F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46570 @ 0x00046570
+// sp-match: sub_46570 @ 0x000350A0
 // "SetPerformanceMap": plays the performance dword_4B92FC finds in the map
 // with the id arg 1.
 void sub_46570(RwUInt32 arg_0, type_44350 *arg_4)
@@ -3195,6 +3299,7 @@ void sub_46570(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46680 @ 0x00046680
+// sp-match: sub_46680 @ 0x00035200
 // "SetPerformanceID": plays the performance with the id arg 1 (none for -1).
 void sub_46680(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3212,6 +3317,7 @@ void sub_46680(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46720 @ 0x00046720
+// sp-match: sub_46720 @ 0x000352B0
 // "PlayHitDeathAnim": plays the hit-death performance of the map with the id
 // arg 1; 1 when there is one.
 void sub_46720(RwUInt32 arg_0, type_44350 *arg_4)
@@ -3257,6 +3363,7 @@ void sub_46720(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46840 @ 0x00046840
+// sp-match: sub_46840 @ 0x000353B0
 // "PlayHitDeathAnimDefaultData": plays the hit-death performance for a
 // soldier's or a type_3DDB98's own hit-death values (with its performance
 // values' bytes 2 and 3 when none matches them), keeping the partner
@@ -3326,6 +3433,7 @@ void sub_46840(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46B50 @ 0x00046B50
+// sp-match: sub_46B50 @ 0x000356D0
 // "GetLastHitLocation": -1 unless the entity is of the vf_008 subclass.
 void sub_46B50(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3357,6 +3465,7 @@ void sub_46B50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46BC0 @ 0x00046BC0
+// sp-match: sub_46BC0 @ 0x00056740
 // "PlayCurrentPerformance".
 void sub_46BC0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3385,6 +3494,7 @@ void sub_46BC0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46C20 @ 0x00046C20
+// sp-match: sub_46C20 @ 0x000567A0
 // "PlaySpecialIdlePerformance".
 void sub_46C20(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3413,6 +3523,7 @@ void sub_46C20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46C80 @ 0x00046C80
+// sp-match: sub_46C80 @ 0x00056800
 // "PlayCoverPointRegistrationPerformance": at the AI object's cover point,
 // facing its direction, when it has one.
 void sub_46C80(RwUInt32 arg_0, type_44350 *arg_4)
@@ -3447,6 +3558,7 @@ void sub_46C80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46D60 @ 0x00046D60
+// sp-match: sub_46D60 @ 0x00035750
 // "SnapToCover": moves and turns the entity onto its AI object's cover point;
 // at a mounted weapon's node (kind 0x11) a soldier also mounts the weapon it
 // holds, with the result.
@@ -3484,6 +3596,7 @@ void sub_46D60(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46E40 @ 0x00046E40
+// sp-match: sub_46E40 @ 0x00035820
 // "AreWeUsingAMountedWeapon": a soldier's flag unk_61C, or 1 for a player
 // in the mounted weapon posture (7).
 void sub_46E40(RwUInt32 arg_0, type_44350 *arg_4)
@@ -3510,6 +3623,7 @@ void sub_46E40(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46EF0 @ 0x00046EF0
+// sp-match: sub_46EF0 @ 0x000358C0
 // "IsPlayerUsingAMountedWeapon": player 0 in the mounted weapon posture.
 void sub_46EF0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3524,6 +3638,7 @@ void sub_46EF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46F40 @ 0x00046F40
+// sp-match: sub_46F40 @ 0x00035930
 // "SetMyMMGToFireEvenIfICantSeeTarget".
 void sub_46F40(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3551,6 +3666,7 @@ void sub_46F40(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_46FE0 @ 0x00046FE0
+// sp-match: sub_46FE0 @ 0x000359A0
 // "SetMyMMGYawAndPitch": sets the yaw (arg 2) and pitch (arg 3) of the
 // mounted weapon of the entity with the handle arg 1 (else of the caller's
 // entity): a soldier's, or the player's through unk_210C.
@@ -3596,6 +3712,7 @@ void sub_46FE0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_47150 @ 0x00047150
+// sp-match: sub_47150 @ 0x00035A90
 // "GetMyMMGMinBurstLength": 0 without a mounted weapon.
 void sub_47150(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3623,6 +3740,7 @@ void sub_47150(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_471D0 @ 0x000471D0
+// sp-match: sub_471D0 @ 0x00035B20
 // "GetMyMMGMaxBurstLength".
 void sub_471D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3650,6 +3768,7 @@ void sub_471D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_47250 @ 0x00047250
+// sp-match: sub_47250 @ 0x00035BB0
 // "GetMyMMGMinPauseLength".
 void sub_47250(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3677,6 +3796,7 @@ void sub_47250(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_472D0 @ 0x000472D0
+// sp-match: sub_472D0 @ 0x00035C40
 // "GetMyMMGMaxPauseLength".
 void sub_472D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3704,6 +3824,7 @@ void sub_472D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_47350 @ 0x00047350
+// sp-match: sub_47350 @ 0x00035CD0
 // "MountedWeaponReloaded": reloads the entity with the handle arg 1 when it
 // is a mounted weapon (flag 0x80000 of unk_2C).
 void sub_47350(RwUInt32 arg_0, type_44350 *arg_4)
@@ -3719,6 +3840,7 @@ void sub_47350(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_473C0 @ 0x000473C0
+// sp-match: sub_473C0 @ 0x00035D20
 // "AttachToMountedWeapon": mounts the soldier on the entity with the handle
 // arg 1, when it has a cover point or its unk_624 entity is of the vf_010
 // subclass.
@@ -3755,6 +3877,7 @@ void sub_473C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_474E0 @ 0x000474E0
+// sp-match: sub_474E0 @ 0x00035DF0
 // "DetachFromMountedWeapon": of a soldier or the player.
 void sub_474E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3783,6 +3906,7 @@ void sub_474E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_47560 @ 0x00047560
+// sp-match: sub_47560 @ 0x00035E60
 // "AttachProp": attaches the entity of the object under the key arg 1 (two
 // slots; a kind 0x2E object with flag 2) to a soldier or the vf_024
 // subclass; with no key, detaches the prop as "DetachProp" does.
@@ -3830,6 +3954,7 @@ void sub_47560(RwUInt32 arg_0, type_44350 *arg_4)
 
 
 // match: sub_47700 @ 0x00047700
+// sp-match: sub_47700 @ 0x000360A0
 // "DetachProp": straightens the prop's frame and detaches it.
 void sub_47700(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -3854,6 +3979,7 @@ void sub_47700(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_477A0 @ 0x000477A0
+// sp-match: sub_477A0 @ 0x00036140
 // "AttachPropEx": "AttachProp" with arg 2 in unk_36C rather than 400 in
 // unk_364.
 void sub_477A0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -3900,6 +4026,7 @@ void sub_477A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_47930 @ 0x00047930
+// sp-match: sub_47930 @ 0x00036330
 // "WillTransitionPlay": whether a set exists for the entity's weapon class,
 // its hit-death byte (vf_0AC) and arg 1 (sub_6D0A0); 0 without a performance
 // player.
@@ -3929,6 +4056,7 @@ void sub_47930(RwUInt32 arg_0, type_44350 *arg_4)
 // ("PlayAlarmCrankPerformance") stay binary (docs/units.md).
 
 // match: sub_47A20 @ 0x00047A20
+// sp-match: sub_47A20 @ 0x000568B0
 // "PlayPickUpMMGPerformance": makes the mounted weapon at its AI object's
 // path node (sub_16A380), else the one on the vehicle it rides (unk_624), its
 // soldier's weapon (sub_13F4D0) and plays the current performance at the
@@ -3976,6 +4104,7 @@ void sub_47A20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_47C20 @ 0x00047C20
+// sp-match: sub_47C20 @ 0x00056AE0
 // "PlayAlarmCrankPerformance": plays the current performance at the nearest
 // kind-15 path node (sub_F7E80) within 2000 units, facing the node's
 // orientation.
@@ -3984,7 +4113,9 @@ void sub_47C20(RwUInt32 arg_0, type_44350 *arg_4)
     type_67620 *var_4;
     type_3D3548 *var_8;
     type_F8350 *var_6C;
+#ifndef CODFH_SP
     RwMatrix var_E0;
+#endif
 
     var_4 = sub_67620(arg_0);
     var_8 = sub_45170(arg_0);
@@ -3999,6 +4130,9 @@ void sub_47C20(RwUInt32 arg_0, type_44350 *arg_4)
     if (var_68.unk_34)
     {
         var_6C = var_68.unk_34;
+#ifdef CODFH_SP // shape: block-scoped, so /O2 schedules the matrix stores as SP 0x56AE0 does
+        RwMatrix var_E0;
+#endif
         RtQuatConvertToMatrix(&var_6C->unk_1C, &var_E0);
         var_8->vf_088(0);
         sub_47F90(var_4, var_8, &var_6C->unk_10, &var_E0.at, 1, 0, 0);
@@ -4007,6 +4141,7 @@ void sub_47C20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_47F00 @ 0x00047F00
+// sp-match: sub_47F00 @ 0x00036440
 // "ResetNPCMountedWeaponAimMatrix": of the soldier's mounted weapon, while
 // it uses one.
 void sub_47F00(RwUInt32 arg_0, type_44350 *arg_4)
@@ -4029,6 +4164,7 @@ void sub_47F00(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_47F90 @ 0x00047F90
+// sp-match: sub_47F90 @ 0x000364E0
 // Plays the object arg_0's entity arg_4's current performance (at the point
 // *arg_8 facing *arg_C when given; "PlayCurrentPerformance" and the like),
 // unless vf_0A8 holds it: the one dword_4B92FC finds for its performance
@@ -4084,6 +4220,7 @@ void sub_47F90(type_67620 *arg_0, type_3D3548 *arg_4, RwV3d *arg_8, RwV3d *arg_C
 }
 
 // match: sub_48170 @ 0x00048170
+// sp-match: sub_48170 @ 0x000366A0
 // "StopCurrentPerformance".
 void sub_48170(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4109,6 +4246,7 @@ void sub_48170(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_481C0 @ 0x000481C0
+// sp-match: sub_481C0 @ 0x000366E0
 // "DisablePerformances".
 void sub_481C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4136,6 +4274,7 @@ void sub_481C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_48230 @ 0x00048230
+// sp-match: sub_48230 @ 0x00036730
 // "SetStarStatus": the entity's first performance selector (sub_47F90).
 void sub_48230(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4158,6 +4297,7 @@ void sub_48230(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_48290 @ 0x00048290
+// sp-match: sub_48290 @ 0x00036780
 // "SetFiveWayBlend": turns blend arg 2 (0 and 1 a soldier's, 2 the
 // entity's type_3DA6C0's) on or off (arg 1); turning it on also sets the
 // object's unk_129 when its kind (vf_014) is 1, with unk_124 for blends 0
@@ -4178,6 +4318,37 @@ void sub_48290(RwUInt32 arg_0, type_44350 *arg_4)
     local_C = sub_45170(arg_0);
     SCRIPT_CHECK(local_C != 0);
     var_4 = local_C->vf_008();
+#ifdef CODFH_SP // single player has only the soldier's two blends, and checks the soldier (SP 0x36780)
+    SCRIPT_CHECK(var_4 != 0);
+    switch (l10) {
+    case 0:
+        if (var_4 != 0) {
+            var_4->sub_139550(lv_8 != 0);
+            if (lv_8 != 0) {
+                var18 = sub_67620(arg_0);
+                SCRIPT_CHECK(var18 != 0);
+                if (var18 != 0 && var18->vf_014() == 1) {
+                    var18->set_unk_129(1);
+                    var18->unk_124 = 0.13333334f;
+                }
+            }
+        }
+        break;
+    case 1:
+        if (var_4 != 0) {
+            var_4->sub_13A340(lv_8 != 0);
+            if (lv_8 != 0) {
+                var_1C = sub_67620(arg_0);
+                SCRIPT_CHECK(var_1C != 0);
+                if (var_1C != 0 && var_1C->vf_014() == 1) {
+                    var_1C->set_unk_129(1);
+                    var_1C->unk_124 = 0.13333334f;
+                }
+            }
+        }
+        break;
+    }
+#else
     stk_14 = local_C->vf_01C();
     switch (l10) {
     case 0:
@@ -4217,6 +4388,7 @@ void sub_48290(RwUInt32 arg_0, type_44350 *arg_4)
             }
         }
     }
+#endif
     {
         // A local the image reserves and never uses.
         RwInt32 unused_0;
@@ -4225,6 +4397,7 @@ void sub_48290(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_484B0 @ 0x000484B0
+// sp-match: sub_484B0 @ 0x000368C0
 // "SetHeadTrack": turns a soldier's head tracking on or off (arg 1) at the
 // rate arg 2.
 void sub_484B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -4254,19 +4427,24 @@ void sub_484B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_48570 @ 0x00048570
+// sp-match: sub_48570 @ 0x000369B0
 // "SetTurnMode": turns the entity's animation level towards its AI object's
 // point unk_500 when flag 30 of unk_49C is set, else towards its target
 // point unk_4F0, led along unk_50C by up to flt_428A08 units (flt_428A0C
 // of that per unit of distance).
 void sub_48570(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifndef CODFH_SP
     RwV3d local_58;
     RwV3d stk_4C;
     RwV3d lv_40;
     RwReal v34;
     RwV3d v30;
+#endif
     RwV3d *slot_24;
+#ifndef CODFH_SP
     RwV3d v20;
+#endif
     RwV3d *stk_14;
     RwV3d *l10;
     AIData *local_C;
@@ -4283,6 +4461,10 @@ void sub_48570(RwUInt32 arg_0, type_44350 *arg_4)
             if ((local_C->unk_49C >> 30) & 1) {
                 stk_14 = &RwFrameGetLTM(lv_8->get_unk_340())->pos;
                 l10 = &local_C->unk_500;
+#ifdef CODFH_SP // shape: block-scoped, so /O2 shares the branches' slots (SP 0x369B0 frame 0x30)
+                RwV3d v20;
+
+#endif
                 RwV3dSub(&v20, l10, stk_14);
                 v20.y = 0.0f;
                 RwV3dNormalize(&v20, &v20);
@@ -4290,6 +4472,14 @@ void sub_48570(RwUInt32 arg_0, type_44350 *arg_4)
             } else {
                 slot_24 = local_C->unk_4F0;
                 if (slot_24 != 0) {
+#ifdef CODFH_SP // shape: block-scoped (SP 0x369B0 frame 0x30)
+                    RwV3d local_58;
+                    RwV3d stk_4C;
+                    RwV3d lv_40;
+                    RwReal v34;
+                    RwV3d v30;
+
+#endif
                     local_58 = RwFrameGetLTM(lv_8->get_unk_340())->pos;
                     RwV3dSub(&stk_4C, slot_24, &local_58);
                     v34 = 0.0f;
@@ -4317,6 +4507,7 @@ void sub_48570(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_48800 @ 0x00048800
+// sp-match: sub_48800 @ 0x00036C20
 // "GetTurnAmount": the angle of the entity's animation's turn, in whole
 // degrees from 0 to 360 (0 without an animation).
 void sub_48800(RwUInt32 arg_0, type_44350 *arg_4)
@@ -4346,6 +4537,7 @@ void sub_48800(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_488D0 @ 0x000488D0
+// sp-match: sub_488D0 @ 0x00036D00
 // "GetTerrainAngle": the slope of the ground under the entity along its
 // facing, in whole degrees from 0 to 359 (from the normal of the triangle
 // found 50 above its position, crossed with its right vector); 0 over no
@@ -4385,6 +4577,7 @@ void sub_488D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_48A10 @ 0x00048A10
+// sp-match: sub_48A10 @ 0x00036E90
 // "SetSceneMap": plays the scene performance dword_4B9300 finds for the map
 // with the id arg 1.
 void sub_48A10(RwUInt32 arg_0, type_44350 *arg_4)
@@ -4419,6 +4612,7 @@ void sub_48A10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_48B10 @ 0x00048B10
+// sp-match: sub_48B10 @ 0x00036FE0
 // "GetSceneActionMsg": the message of the scene action arg 1.
 void sub_48B10(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4447,6 +4641,7 @@ void sub_48B10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_48B80 @ 0x00048B80
+// sp-match: sub_48B80 @ 0x00037060
 // "SetSceneValue": value arg 2 at index arg 1.
 void sub_48B80(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4476,6 +4671,7 @@ void sub_48B80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_48C10 @ 0x00048C10
+// sp-match: sub_48C10 @ 0x00056D40
 // "PlayCurrentScene".
 void sub_48C10(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4499,6 +4695,7 @@ void sub_48C10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_48C70 @ 0x00048C70
+// sp-match: sub_48C70 @ 0x00056DC0
 // "PlayCurrentSceneAtNamedPoint": at the point (vf_00C) of the object under
 // the key arg 1 (two slots; of kind 0x2C to 0x2E), facing its direction
 // (vf_010, else the entity's own facing).
@@ -4549,6 +4746,7 @@ void sub_48C70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_48DA0 @ 0x00048DA0
+// sp-match: sub_48DA0 @ 0x000370C0
 // "GotoPointUsingRegistration": plays the current performance at the AI
 // object's point unk_5B0, set to (arg 1, arg 2, arg 3), facing the entity's
 // own facing.
@@ -4581,6 +4779,7 @@ void sub_48DA0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_48EE0 @ 0x00048EE0
+// sp-match: sub_48EE0 @ 0x000371D0
 // Plays the object arg_0's entity arg_4's current scene performance, the one
 // dword_4B9300 finds for its scene's map entry (vf_0E0), which may also give
 // its performance values' byte 2; bit 0 of its unk_280 object's flags is set
@@ -4620,6 +4819,7 @@ void sub_48EE0(type_67620 *arg_0, type_3D3548 *arg_4, RwV3d *arg_8, RwV3d *arg_C
 }
 
 // match: sub_49040 @ 0x00049040
+// sp-match: sub_49040 @ 0x000373C0
 // "GetSceneActionCount".
 void sub_49040(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4646,6 +4846,7 @@ void sub_49040(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49080 @ 0x00049080
+// sp-match: sub_49080 @ 0x00037420
 // "GetVisionRange": the view range, 0 without an entity.
 void sub_49080(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4674,6 +4875,7 @@ void sub_49080(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_490D0 @ 0x000490D0
+// sp-match: sub_490D0 @ 0x00037490
 // "GetWeaponsMinMediumRange".
 void sub_490D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4702,6 +4904,7 @@ void sub_490D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49120 @ 0x00049120
+// sp-match: sub_49120 @ 0x00037500
 // "GetWeaponsMinLongRange".
 void sub_49120(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4730,6 +4933,7 @@ void sub_49120(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49170 @ 0x00049170
+// sp-match: sub_49170 @ 0x00037570
 // "GetWeaponsTooCloseForComfortRange".
 void sub_49170(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4758,6 +4962,7 @@ void sub_49170(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_491C0 @ 0x000491C0
+// sp-match: sub_491C0 @ 0x000375E0
 // "GetWeaponsStandMeleeRange": the weapon's (vf_150) plus flt_428A10 against
 // a target with flag 4 of its unk_2C, flt_428A14 against another target, the
 // weapon's own without an AI object.
@@ -4797,6 +5002,7 @@ void sub_491C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49270 @ 0x00049270
+// sp-match: sub_49270 @ 0x00037690
 // "GetWeaponsLungeMeleeRange": as "GetWeaponsStandMeleeRange", with vf_154, flt_428A18 and flt_428A1C.
 void sub_49270(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4834,6 +5040,7 @@ void sub_49270(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49320 @ 0x00049320
+// sp-match: sub_49320 @ 0x00037740
 // "GetWeaponsRunMeleeRange": as "GetWeaponsStandMeleeRange", with vf_158, flt_428A20 and flt_428A24.
 void sub_49320(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4871,6 +5078,7 @@ void sub_49320(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_493D0 @ 0x000493D0
+// sp-match: sub_493D0 @ 0x000377F0
 // "GetWeaponIsBoltActionRifle".
 void sub_493D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4899,6 +5107,7 @@ void sub_493D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49420 @ 0x00049420
+// sp-match: sub_49420 @ 0x00037860
 // "GetMyWeaponGroupType": -1 without an entity.
 void sub_49420(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4927,6 +5136,7 @@ void sub_49420(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49470 @ 0x00049470
+// sp-match: sub_49470 @ 0x000378D0
 // "IsMyWeaponOutOfAmmo".
 void sub_49470(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4955,6 +5165,7 @@ void sub_49470(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_494C0 @ 0x000494C0
+// sp-match: sub_494C0 @ 0x00037940
 // "ForceMyWeaponToReload".
 void sub_494C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -4981,6 +5192,7 @@ void sub_494C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49500 @ 0x00049500
+// sp-match: sub_49500 @ 0x00037980
 // "SetAdvancedShotLocation": a soldier's, with its result (0 for others).
 void sub_49500(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5011,6 +5223,7 @@ void sub_49500(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49590 @ 0x00049590
+// sp-match: sub_49590 @ 0x00037A10
 // "DoIHaveGrenades": a soldier's unk_5E0 (0 for other entities).
 void sub_49590(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5034,6 +5247,7 @@ void sub_49590(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_495F0 @ 0x000495F0
+// sp-match: sub_495F0 @ 0x00037A90
 // "DropGrenadeAtLocationXYZ": drops a grenade (a Stielhandgranate for arg 1
 // of 2, else a Mark 2) at (arg 2, arg 3, arg 4), at rest, upright, with the
 // fuse arg 5 and arg 6 (per second) from the next of the eight settings in
@@ -5096,6 +5310,7 @@ void sub_495F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49970 @ 0x00049970
+// sp-match: sub_49970 @ 0x00037D80
 // "DoIHaveAGrenadeInHand": a soldier's; 0 for other entities.
 void sub_49970(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5119,6 +5334,7 @@ void sub_49970(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49A00 @ 0x00049A00
+// sp-match: sub_49A00 @ 0x00037E10
 // "DropGrenade": a soldier's.
 void sub_49A00(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5145,6 +5361,7 @@ void sub_49A00(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49A50 @ 0x00049A50
+// sp-match: sub_49A50 @ 0x00037E60
 // "ShouldIThrowAGrenade": a soldier's answer for arg 1, unless flag 15 of
 // its AI object's unk_49C is set; 0 otherwise.
 void sub_49A50(RwUInt32 arg_0, type_44350 *arg_4)
@@ -5171,6 +5388,7 @@ void sub_49A50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49AF0 @ 0x00049AF0
+// sp-match: sub_49AF0 @ 0x00037F00
 // "ShouldIDoTheAssaultWalk": 1 for a soldier in a group of context 0 whose
 // target is within 1000 of its record distance and not merely possible
 // (bit 1 of its record's flags), with flag 1 of its unk_2C, while the
@@ -5221,6 +5439,7 @@ void sub_49AF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49C90 @ 0x00049C90
+// sp-match: sub_49C90 @ 0x00038070
 // "OverrideNPCGrenadeTimer": a soldier's, arg 1 in seconds.
 void sub_49C90(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5244,6 +5463,7 @@ void sub_49C90(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_49D10 @ 0x00049D10
+// sp-match: sub_49D10 @ 0x000380E0
 // "CancelGrenadeThrowPoint": a soldier's.
 void sub_49D10(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5267,6 +5487,7 @@ void sub_49D10(RwUInt32 arg_0, type_44350 *arg_4)
 // sub_49D70 ("SetGrenadeThrowPoint") stays binary (docs/units.md).
 
 // match: sub_49D70 @ 0x00049D70
+// sp-match: sub_49D70 @ 0x00038130
 // "SetGrenadeThrowPoint": the point (arg 1, arg 2, arg 3) becomes its
 // soldier's grenade throw point (unk_5EC): as given for mode 0 (arg 4), in the
 // entity's frame for mode 1, else in its AI object's path node's.
@@ -5282,7 +5503,9 @@ void sub_49D70(RwUInt32 arg_0, type_44350 *arg_4)
     RwMatrix *var_2C;
     AIData *var_30;
     type_F8350 *var_34;
+#ifndef CODFH_SP
     RwMatrix var_B0;
+#endif
 
     var_4 = sub_45170(arg_0);
     var_8 = SCRIPT_ARGT<RwReal>(arg_4, 1);
@@ -5315,6 +5538,9 @@ void sub_49D70(RwUInt32 arg_0, type_44350 *arg_4)
             var_34 = var_30->unk_F60;
             if (var_34)
             {
+#ifdef CODFH_SP // shape: block-scoped, so /O2 lays out the frame as SP 0x38130 does
+                RwMatrix var_B0;
+#endif
                 RtQuatConvertToMatrix(&var_34->unk_1C, &var_B0);
                 var_B0.pos = var_34->unk_10;
                 sub_1414C0(&var_20, &var_20, &var_B0);
@@ -5326,6 +5552,7 @@ void sub_49D70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4A0F0 @ 0x0004A0F0
+// sp-match: sub_4A0F0 @ 0x00038390
 // "ShouldIMeleeAttack": a soldier's answer for arg 1; 0 for other entities.
 void sub_4A0F0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5351,6 +5578,7 @@ void sub_4A0F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4A180 @ 0x0004A180
+// sp-match: sub_4A180 @ 0x00038420
 // "TurnPlayerWeaponOnorOff".
 void sub_4A180(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5367,6 +5595,7 @@ void sub_4A180(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4A210 @ 0x0004A210
+// sp-match: sub_4A210 @ 0x00038480
 // "TurnCrosshairOnorOff".
 void sub_4A210(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5381,6 +5610,7 @@ void sub_4A210(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4A270 @ 0x0004A270
+// sp-match: sub_4A270 @ 0x000384D0
 // "IsPlayerWeaponStreamed": 0 without a player.
 void sub_4A270(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5397,6 +5627,7 @@ void sub_4A270(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4A2E0 @ 0x0004A2E0
+// sp-match: sub_4A2E0 @ 0x00038550
 // "RequestToStreamPlayerWeapon".
 void sub_4A2E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5413,6 +5644,7 @@ void sub_4A2E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4A350 @ 0x0004A350
+// sp-match: sub_4A350 @ 0x000385B0
 // "RemovePlayerWeapon".
 void sub_4A350(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5433,6 +5665,7 @@ void sub_4A350(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4A420 @ 0x0004A420
+// sp-match: sub_4A420 @ 0x00038630
 // "GivePlayerInventoryItem": adds arg 2 of the item arg 1 to the player's
 // inventory, as the inventory kind its switch gives, and selects it.
 void sub_4A420(RwUInt32 arg_0, type_44350 *arg_4)
@@ -5481,6 +5714,7 @@ void sub_4A420(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4A580 @ 0x0004A580
+// sp-match: sub_4A580 @ 0x00038720
 // "RegisterDistanceCheck": registers the object for the test arg 1 between
 // the distances arg 2 and arg 3 against the target with the handle arg 6;
 // the registration's handle.
@@ -5512,6 +5746,7 @@ void sub_4A580(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4A6F0 @ 0x0004A6F0
+// sp-match: sub_4A6F0 @ 0x000387F0
 // "RegisterDistanceCheckMsg": "RegisterDistanceCheck" with its messages
 // (args 2 and 3) and the rest shifted by two.
 void sub_4A6F0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -5546,6 +5781,7 @@ void sub_4A6F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4A8B0 @ 0x0004A8B0
+// sp-match: sub_4A8B0 @ 0x000388E0
 // "UnregisterDistanceCheck": all of the object's registrations.
 void sub_4A8B0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5557,6 +5793,7 @@ void sub_4A8B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4A8F0 @ 0x0004A8F0
+// sp-match: sub_4A8F0 @ 0x00038910
 // "UnregisterDistanceCheckPtr": the registration with the handle arg 1.
 void sub_4A8F0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5571,12 +5808,15 @@ void sub_4A8F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4A960 @ 0x0004A960
+// sp-match: sub_4A960 @ 0x00038960
 // "DistanceToTarget": the target's record distance (unk_0C of sub_16ED0's
 // record), else the distance between the entity and its target; 50 without
 // a target.
 void sub_4A960(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifndef CODFH_SP
     RwV3d stk_18;
+#endif
     type_154C0_80 *ebp_C;
     RwReal v8;
     type_3D3548 *var_4;
@@ -5588,6 +5828,10 @@ void sub_4A960(RwUInt32 arg_0, type_44350 *arg_4)
         if (ebp_C != 0) {
             v8 = ebp_C->unk_0C;
         } else if (var_4->vf_120()->get_unk_1374() != 0) {
+#ifdef CODFH_SP // shape: block-scoped, so /O2 schedules its stores as SP 0x38960 does
+            RwV3d stk_18;
+
+#endif
             RwV3dSub(&stk_18, var_4->sub_CD550(),
                      var_4->vf_120()->get_unk_1374()->sub_CD550());
             v8 = RwV3dLength(&stk_18);
@@ -5601,6 +5845,7 @@ void sub_4A960(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4AB20 @ 0x0004AB20
+// sp-match: sub_4AB20 @ 0x00038AF0
 // "IHaveATarget".
 void sub_4AB20(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5626,6 +5871,7 @@ void sub_4AB20(RwUInt32 arg_0, type_44350 *arg_4)
 // match: sub_4AB90 @ 0x0004AB90
 // match: __ehhandler$?sub_4AB90@@YAXIPAUtype_44350@@@Z-0xB @ 0x002FF800
 // match: __ehhandler$?sub_4AB90@@YAXIPAUtype_44350@@@Z @ 0x002FF80B
+// sp-match: sub_4AB90 @ 0x00056EF0
 // "PlayParticleSystemAtXYZ": spawns the surface particle list of table arg 1
 // (0 to 3) at (arg 2, arg 3, arg 4), upright; for the shell and anti-tank
 // tables also sets off a blast there (sub_9A960) and, within 500 units of the
@@ -5636,7 +5882,9 @@ void sub_4AB90(RwUInt32 arg_0, type_44350 *arg_4)
     RwV3d *var_54;
     RwInt32 var_58;
     type_10F710 *var_94;
+#ifndef CODFH_SP
     RwV3d var_A0;
+#endif
     RwReal var_A4;
 
     RwMatrixSetIdentityMacro(&var_50);
@@ -5665,6 +5913,9 @@ void sub_4AB90(RwUInt32 arg_0, type_44350 *arg_4)
         var_94 = (type_10F710 *)sub_1745A0(0);
         if (var_94)
         {
+#ifdef CODFH_SP // shape: block-scoped, so /O2 schedules its stores as SP 0x56EF0 does
+            RwV3d var_A0;
+#endif
             RwV3dSubMacro(&var_A0, &var_50.pos, (RwV3d *)var_94->vf_0C4());
             var_A4 = RwV3dLength((RwV3d *)&var_A0);
             if (var_A4 < 500.0f)
@@ -5677,6 +5928,7 @@ void sub_4AB90(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: ??0type_4AE70@@QAE@XZ @ 0x0004AE70
+// sp-match: ??0type_4AE70@@QAE@XZ @ 0x00032F00
 type_4AE70::type_4AE70()
 {
     unk_00 = 0;
@@ -5694,6 +5946,7 @@ type_4AE70::type_4AE70()
 }
 
 // match: sub_4AF10 @ 0x0004AF10
+// sp-match: sub_4AF10 @ 0x00038B80
 // "SpawnParticleSpawner": sets up a free spawner on the entity with the
 // particle systems arg 1 and arg 2 at arg 5 per second (x60 per frame),
 // attached at arg 4.
@@ -5730,6 +5983,7 @@ void sub_4AF10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B0B0 @ 0x0004B0B0
+// sp-match: sub_4B0B0 @ 0x00038C50
 // "KillParticleSpawner": frees the entity.
 void sub_4B0B0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5755,6 +6009,7 @@ void sub_4B0B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B0F0 @ 0x0004B0F0
+// sp-match: sub_4B0F0 @ 0x00038C80
 // "SwitchToDestroyedClump": whether the entity (of the vf_010 subclass) did.
 void sub_4B0F0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5783,6 +6038,7 @@ void sub_4B0F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B150 @ 0x0004B150
+// sp-match: sub_4B150 @ 0x00038D00
 // "EnableWeaponRender": a soldier's or a type_3DDB98's.
 void sub_4B150(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5810,6 +6066,7 @@ void sub_4B150(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B220 @ 0x0004B220
+// sp-match: sub_4B220 @ 0x00038D90
 // "SetRenderPartState": shows (arg 2 set) or hides render part arg 1.
 void sub_4B220(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5837,6 +6094,7 @@ void sub_4B220(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B300 @ 0x0004B300
+// sp-match: sub_4B300 @ 0x00038E10
 // "GetRenderPartState": whether render part arg 1 is shown.
 void sub_4B300(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5866,6 +6124,7 @@ void sub_4B300(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B3A0 @ 0x0004B3A0
+// sp-match: sub_4B3A0 @ 0x00038EA0
 // "SetRenderPartStateByName": shows (arg 2 set) or hides the render part the
 // kind-0x2E object under the key arg 1 (two slots) names (its unk_14).
 void sub_4B3A0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -5893,6 +6152,7 @@ void sub_4B3A0(RwUInt32 arg_0, type_44350 *arg_4)
 // match: sub_4B490 @ 0x0004B490
 // match: __ehhandler$?sub_4B490@@YAXIPAUtype_44350@@@Z-8 @ 0x002FF820
 // match: __ehhandler$?sub_4B490@@YAXIPAUtype_44350@@@Z @ 0x002FF828
+// sp-match: sub_4B490 @ 0x00038FD0
 // "CreateExplosionZone": sets off a blast of kind arg 1 (0x801 for 1, 0x802
 // for 2, else 0x804) with the radius arg 2 (100 when not above 0) and
 // arg 3 (its unk_2C) at (arg 4, arg 5, arg 6), or at the entity when that
@@ -5944,6 +6204,7 @@ void sub_4B490(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B770 @ 0x0004B770
+// sp-match: sub_4B770 @ 0x000391B0
 // "IsLevelSectionLoaded": whether a live collision-world entry holds
 // section arg 1.
 void sub_4B770(RwUInt32 arg_0, type_44350 *arg_4)
@@ -5966,6 +6227,7 @@ void sub_4B770(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B820 @ 0x0004B820
+// sp-match: sub_4B820 @ 0x00039230
 // "RequestClumpBankLoad".
 void sub_4B820(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5974,6 +6236,7 @@ void sub_4B820(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B870 @ 0x0004B870
+// sp-match: sub_4B870 @ 0x00039270
 // "IsClumpBankLoaded".
 void sub_4B870(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5984,6 +6247,7 @@ void sub_4B870(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B8C0 @ 0x0004B8C0
+// sp-match: sub_4B8C0 @ 0x000392E0
 // "SetDefaultClumpBank".
 void sub_4B8C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -5995,6 +6259,7 @@ void sub_4B8C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B910 @ 0x0004B910
+// sp-match: sub_4B910 @ 0x00039310
 // "SetCheckPointRegister": sets the register and records the checkpoint
 // named by the object under the key dword_4B914C.
 void sub_4B910(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6009,6 +6274,7 @@ void sub_4B910(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B990 @ 0x0004B990
+// sp-match: sub_4B990 @ 0x000393B0
 // "GetCheckPointRegister".
 void sub_4B990(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6016,6 +6282,7 @@ void sub_4B990(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4B9B0 @ 0x0004B9B0
+// sp-match: sub_4B9B0 @ 0x000393F0
 // "SetStartingSections": its four arguments.
 void sub_4B9B0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6030,6 +6297,7 @@ void sub_4B9B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4BA80 @ 0x0004BA80
+// sp-match: sub_4BA80 @ 0x00039460
 // "TakeCheckpointSnapshot".
 void sub_4BA80(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6040,6 +6308,7 @@ void sub_4BA80(RwUInt32 arg_0, type_44350 *arg_4)
 // sub_4BAA0 ("SpawnParticleAtPosition") stays binary (docs/units.md).
 
 // match: sub_4BAA0 @ 0x0004BAA0
+// sp-match: sub_4BAA0 @ 0x00039480
 // "SpawnParticleAtPosition": spawns the particle system arg 1 at
 // (arg 2, arg 3, arg 4), unrotated.
 void sub_4BAA0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6055,6 +6324,7 @@ void sub_4BAA0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4BBE0 @ 0x0004BBE0
+// sp-match: sub_4BBE0 @ 0x00039570
 // "SpawnParticle": particle system arg 1 at the trigger entity's frame, or
 // at the trigger's own matrix without an entity.
 void sub_4BBE0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6081,6 +6351,7 @@ void sub_4BBE0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4BCF0 @ 0x0004BCF0
+// sp-match: sub_4BCF0 @ 0x00039650
 // "DestroyParticle": the trigger's (of kind 0x12).
 void sub_4BCF0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6098,6 +6369,7 @@ void sub_4BCF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4BD70 @ 0x0004BD70
+// sp-match: sub_4BD70 @ 0x00039710
 // "SpecialCCESSPoolCreation": the handle of the pool entity's object, 0 when
 // none was created.
 void sub_4BD70(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6127,6 +6399,7 @@ void sub_4BD70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4BE20 @ 0x0004BE20
+// sp-match: sub_4BE20 @ 0x00039820
 // "ClearCCESSPoolTriggers".
 void sub_4BE20(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6138,6 +6411,7 @@ void sub_4BE20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4BE70 @ 0x0004BE70
+// sp-match: sub_4BE70 @ 0x00039860
 // "GetSquadLeader": the handle of its object, 0 without one.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_4BE70(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6169,6 +6443,7 @@ void sub_4BE70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4BEF0 @ 0x0004BEF0
+// sp-match: sub_4BEF0 @ 0x000398E0
 // "SetSquadLeader": makes the entity (arg 1 set) or the player the leader of
 // its group.
 void sub_4BEF0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6200,6 +6475,7 @@ void sub_4BEF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4BFA0 @ 0x0004BFA0
+// sp-match: sub_4BFA0 @ 0x00039990
 // "SetAIMode": the AI object's answer (sub_17BF0) for mode arg 1; 0 without
 // one.
 void sub_4BFA0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6229,6 +6505,7 @@ void sub_4BFA0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C020 @ 0x0004C020
+// sp-match: sub_4C020 @ 0x00039A20
 // "GetAIMode": the AI object's state unk_578, -1 without one.
 void sub_4C020(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6254,6 +6531,7 @@ void sub_4C020(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C080 @ 0x0004C080
+// sp-match: sub_4C080 @ 0x00039A90
 // "SetAIFlag": sets flag arg 1 of the AI object's unk_49C and reports it.
 void sub_4C080(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6286,6 +6564,7 @@ void sub_4C080(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C150 @ 0x0004C150
+// sp-match: sub_4C150 @ 0x00039B30
 // "GetAIFlag": the AI object's unk_49C flags under the mask arg 1.
 void sub_4C150(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6314,6 +6593,7 @@ void sub_4C150(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C1D0 @ 0x0004C1D0
+// sp-match: sub_4C1D0 @ 0x00039BB0
 // "ClearAIFlag": as "SetAIFlag", clearing it.
 void sub_4C1D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6346,6 +6626,7 @@ void sub_4C1D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C2A0 @ 0x0004C2A0
+// sp-match: sub_4C2A0 @ 0x00039C50
 // "SetAIParam".
 void sub_4C2A0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6372,6 +6653,7 @@ void sub_4C2A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C340 @ 0x0004C340
+// sp-match: sub_4C340 @ 0x00039CB0
 // "SetManeuverType": of the entity's group, for the entity.
 void sub_4C340(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6395,6 +6677,7 @@ void sub_4C340(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C3E0 @ 0x0004C3E0
+// sp-match: sub_4C3E0 @ 0x00039D90
 // "GetManeuverType": the kind (vf_030) of the maneuver the AI object's
 // unk_574 names; -1 without one.
 void sub_4C3E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6426,6 +6709,7 @@ void sub_4C3E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C460 @ 0x0004C460
+// sp-match: sub_4C460 @ 0x00039E50
 // "SetManeuverState": the AI object's unk_58.
 void sub_4C460(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6447,6 +6731,7 @@ void sub_4C460(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C4E0 @ 0x0004C4E0
+// sp-match: sub_4C4E0 @ 0x00039EB0
 // "GetMyTarget": the handle of the target's object, 0 without one.
 void sub_4C4E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6478,6 +6763,7 @@ void sub_4C4E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C590 @ 0x0004C590
+// sp-match: sub_4C590 @ 0x00039F90
 // "SetMyTarget": the entity of the object with the handle arg 1, through the
 // AI object or, without one, sub_180CA0.
 void sub_4C590(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6513,6 +6799,7 @@ void sub_4C590(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C670 @ 0x0004C670
+// sp-match: sub_4C670 @ 0x0003A060
 // "ClearMyTarget".
 void sub_4C670(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6536,6 +6823,7 @@ void sub_4C670(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C6D0 @ 0x0004C6D0
+// sp-match: sub_4C6D0 @ 0x0003A0F0
 // "GetEntityToFollow": the handle of its object, 0 without one.
 void sub_4C6D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6575,6 +6863,7 @@ void sub_4C6D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C770 @ 0x0004C770
+// sp-match: sub_4C770 @ 0x0003A180
 // "SetEntityToFollow": the entity of the object with the handle arg 1 (none
 // for 0), at the distance arg 2.
 void sub_4C770(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6607,6 +6896,7 @@ void sub_4C770(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C860 @ 0x0004C860
+// sp-match: sub_4C860 @ 0x0003A250
 // "FireWeaponXTimes": the AI object's unk_494 (arg 1) and shot count unk_498
 // (arg 2).
 void sub_4C860(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6632,6 +6922,7 @@ void sub_4C860(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C930 @ 0x0004C930
+// sp-match: sub_4C930 @ 0x0003A330
 // "FireWeaponContinuous": through a type_3DBC78's vf_2AC or a type_3DE0E0's
 // vf_234.
 void sub_4C930(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6659,6 +6950,7 @@ void sub_4C930(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4C9E0 @ 0x0004C9E0
+// sp-match: sub_4C9E0 @ 0x0003A3E0
 // "RequestAIAction_RetreatFromTarget": the AI object's one-shot unk_68.
 void sub_4C9E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6678,6 +6970,7 @@ void sub_4C9E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4CA50 @ 0x0004CA50
+// sp-match: sub_4CA50 @ 0x0003A4A0
 // "RequestAIAction_PursueTarget": the AI object's unk_6C.
 void sub_4CA50(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6697,6 +6990,7 @@ void sub_4CA50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4CAC0 @ 0x0004CAC0
+// sp-match: sub_4CAC0 @ 0x0003A560
 // "RequestAIAction_AttackFromCover": sub_28F00.
 void sub_4CAC0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6721,6 +7015,7 @@ void sub_4CAC0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4CB20 @ 0x0004CB20
+// sp-match: sub_4CB20 @ 0x0003A620
 // "EnableCanShootCheckMessages".
 void sub_4CB20(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6749,6 +7044,7 @@ void sub_4CB20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4CBE0 @ 0x0004CBE0
+// sp-match: sub_4CBE0 @ 0x0003A700
 // "EnableGrenadeHints": on (sub_1FC40) or off (sub_1FC70).
 void sub_4CBE0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6778,6 +7074,7 @@ void sub_4CBE0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4CC80 @ 0x0004CC80
+// sp-match: sub_4CC80 @ 0x0003A7E0
 // "DisableGoGoGo": the AI object's GoGoGo state to -1.
 void sub_4CC80(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6797,6 +7094,7 @@ void sub_4CC80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4CCF0 @ 0x0004CCF0
+// sp-match: sub_4CCF0 @ 0x0003A8A0
 // "FoundPointPathForGoGoGo": whether the GoGoGo state unk_1430 is 1, moving
 // it on to 2.
 void sub_4CCF0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6822,6 +7120,7 @@ void sub_4CCF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4CD80 @ 0x0004CD80
+// sp-match: sub_4CD80 @ 0x0003A9A0
 // "DidIJustGoGoGo": whether the GoGoGo time unk_1434 is under 60 old.
 void sub_4CD80(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6844,6 +7143,7 @@ void sub_4CD80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4CE10 @ 0x0004CE10
+// sp-match: sub_4CE10 @ 0x0003AAA0
 // "FinishedGoGoGo": stamps the GoGoGo time unk_1434.
 void sub_4CE10(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6863,6 +7163,7 @@ void sub_4CE10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4CE80 @ 0x0004CE80
+// sp-match: sub_4CE80 @ 0x0003AB60
 // "CanIShoot": the entity's line-of-fire test (vf_134) against its target.
 void sub_4CE80(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6885,6 +7186,7 @@ void sub_4CE80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4CF30 @ 0x0004CF30
+// sp-match: sub_4CF30 @ 0x0003AC90
 // "GetTargetsCanShootStatus": the AI object's unk_544.
 void sub_4CF30(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -6908,6 +7210,7 @@ void sub_4CF30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4CFA0 @ 0x0004CFA0
+// sp-match: sub_4CFA0 @ 0x0003AD80
 // "CanIDiveForward": whether a soldier can dive 450 along its facing, making
 // the landing point its unk_604 when it can.
 void sub_4CFA0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6948,6 +7251,7 @@ inline void SCRIPT_RESERVE_1()
 }
 
 // match: sub_4D090 @ 0x0004D090
+// sp-match: sub_4D090 @ 0x0003AEB0
 // "PlayDiveToPoint": plays a soldier's current performance at its AI
 // object's point unk_5B0, for an object of kind 2.
 void sub_4D090(RwUInt32 arg_0, type_44350 *arg_4)
@@ -6972,6 +7276,7 @@ void sub_4D090(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4D170 @ 0x0004D170
+// sp-match: sub_4D170 @ 0x0003AFF0
 // "CanIDiveAwayFromGrenade": whether its soldier can dive to one side of its
 // grenade's path (45 degrees off, then straight across, then the other
 // side, sub_13E9A0), sending its AI object there (unk_604).
@@ -7059,6 +7364,7 @@ void sub_4D170(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4D660 @ 0x0004D660
+// sp-match: sub_4D660 @ 0x0003B400
 // "CanGetCoverFromGrenade": a soldier's AI object's cover search
 // (sub_28640) from its unk_610 point; with no unk_610 it fails the check and
 // returns the result by value (0, a null pointer to the value).
@@ -7091,6 +7397,7 @@ void sub_4D660(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4D720 @ 0x0004D720
+// sp-match: sub_4D720 @ 0x0003B520
 // "CanGetPointFromGrenade": a soldier's AI object's point search (sub_28470)
 // from its unk_610 object's point (vf_05C); 0 with no unk_610.
 void sub_4D720(RwUInt32 arg_0, type_44350 *arg_4)
@@ -7121,6 +7428,7 @@ void sub_4D720(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4D7F0 @ 0x0004D7F0
+// sp-match: sub_4D7F0 @ 0x0003B650
 // "SetMoveOutOfWayFattyPoint": the AI object's answer (sub_21C90) for the
 // entity of the object with the handle arg 1; 0 otherwise.
 void sub_4D7F0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -7158,6 +7466,7 @@ void sub_4D7F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4D8B0 @ 0x0004D8B0
+// sp-match: sub_4D8B0 @ 0x0003B700
 // "GetContactType": a soldier's AI object's sub_22110, unless its side
 // (unk_2C & 7) is 1; 0 otherwise.
 void sub_4D8B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -7191,6 +7500,7 @@ void sub_4D8B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4D930 @ 0x0004D930
+// sp-match: sub_4D930 @ 0x0003B790
 // "EnableColorCodedName": a soldier's unk_64C.
 void sub_4D930(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7215,6 +7525,7 @@ void sub_4D930(RwUInt32 arg_0, type_44350 *arg_4)
 // stay binary (docs/units.md).
 
 // match: sub_4D9B0 @ 0x0004D9B0
+// sp-match: sub_4D9B0 @ 0x0003B7F0
 // "RotateMyOrientation": turns its frame by the angles arg 1, arg 2 and
 // arg 3 about its own up, right and at axes.
 void sub_4D9B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -7249,6 +7560,7 @@ void sub_4D9B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4DB20 @ 0x0004DB20
+// sp-match: sub_4DB20 @ 0x0003B900
 // "CanIDiveAwayFromTank": whether its soldier can dive clear of the tank
 // threatening it (unk_614): 450 units across the tank's heading (sub_CD5A0)
 // on the side away from it, then 45 degrees either way of that (sub_13E9A0,
@@ -7409,6 +7721,7 @@ void sub_4DB20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4E470 @ 0x0004E470
+// sp-match: sub_4E470 @ 0x0003C070
 // "IsThreatenedByTank": whether the soldier's unk_614 tank (flags 0x40080 of
 // its unk_2C) threatens it (vf_2D4).
 void sub_4E470(RwUInt32 arg_0, type_44350 *arg_4)
@@ -7443,6 +7756,7 @@ void sub_4E470(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4E550 @ 0x0004E550
+// sp-match: sub_4E550 @ 0x0003C1B0
 // "GetDistanceFromGrenade": a soldier's distance to its unk_610 point; 0
 // without one.
 void sub_4E550(RwUInt32 arg_0, type_44350 *arg_4)
@@ -7472,6 +7786,7 @@ void sub_4E550(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4E650 @ 0x0004E650
+// sp-match: sub_4E650 @ 0x0003C2D0
 // "GetDistanceFromPoint": the entity's distance to (arg 1, arg 2, arg 3).
 void sub_4E650(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7494,6 +7809,7 @@ void sub_4E650(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4E740 @ 0x0004E740
+// sp-match: sub_4E740 @ 0x0003C3A0
 // "GetPlayerDistanceFromPoint": the player's distance to (arg 1, arg 2,
 // arg 3).
 void sub_4E740(RwUInt32 arg_0, type_44350 *arg_4)
@@ -7513,6 +7829,7 @@ void sub_4E740(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4E830 @ 0x0004E830
+// sp-match: sub_4E830 @ 0x0003C470
 // "GetDistanceFromTank": a soldier's distance to its unk_614 tank; 0
 // without one.
 void sub_4E830(RwUInt32 arg_0, type_44350 *arg_4)
@@ -7544,6 +7861,7 @@ void sub_4E830(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4E930 @ 0x0004E930
+// sp-match: sub_4E930 @ 0x0003C5B0
 // "GetTargetPosture": 0x12 or 8 for the target's postures (vf_0AC) listed,
 // else 0.
 void sub_4E930(RwUInt32 arg_0, type_44350 *arg_4)
@@ -7589,6 +7907,7 @@ void sub_4E930(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4EA40 @ 0x0004EA40
+// sp-match: sub_4EA40 @ 0x0003C6F0
 // "GetTargetType": the target's kind bits 0x600B0 of unk_2C.
 void sub_4EA40(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7617,6 +7936,7 @@ void sub_4EA40(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4EAD0 @ 0x0004EAD0
+// sp-match: sub_4EAD0 @ 0x0003C7C0
 // "FindAStarPathToAIObj": plans a path to the entity of the object with the
 // handle arg 1 (of kind 2), with the options args 2 to 9 (sub_293A0); -1
 // without an AI object.
@@ -7677,6 +7997,7 @@ void sub_4EAD0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4EE30 @ 0x0004EE30
+// sp-match: sub_4EE30 @ 0x0003C9E0
 // "FindAStarPathToPathNode": plans the AI object's path unk_5BC to its node unk_5A8 (sub_29540) with the radius
 // arg 1 and the options args 2 to 8; -1 without an AI object.
 void sub_4EE30(RwUInt32 arg_0, type_44350 *arg_4)
@@ -7726,6 +8047,7 @@ void sub_4EE30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F110 @ 0x0004F110
+// sp-match: sub_4F110 @ 0x0003CBA0
 // "FindAStarPathToPoint": plans the AI object's path unk_5BC to its point unk_5B0 (sub_29870) with the radius
 // arg 1 and the options args 2 to 8; -1 without an AI object.
 void sub_4F110(RwUInt32 arg_0, type_44350 *arg_4)
@@ -7775,6 +8097,7 @@ void sub_4F110(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F3F0 @ 0x0004F3F0
+// sp-match: sub_4F3F0 @ 0x0003CD60
 // "GetAIControl": the AI object's unk_51C.
 void sub_4F3F0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7797,6 +8120,7 @@ void sub_4F3F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F440 @ 0x0004F440
+// sp-match: sub_4F440 @ 0x0003CDD0
 // "SetAIControl".
 void sub_4F440(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7822,6 +8146,7 @@ void sub_4F440(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F4C0 @ 0x0004F4C0
+// sp-match: sub_4F4C0 @ 0x0003CE60
 // "GetHitPoints": of the entity of the object with the handle arg 1.
 void sub_4F4C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7838,6 +8163,7 @@ void sub_4F4C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F530 @ 0x0004F530
+// sp-match: sub_4F530 @ 0x0003CEE0
 // "SetHitPoints": of the entity of the object with the handle arg 1.
 void sub_4F530(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7856,6 +8182,7 @@ void sub_4F530(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F5D0 @ 0x0004F5D0
+// sp-match: sub_4F5D0 @ 0x0003CF40
 // "IncrementHitPoints": of the entity of the object with the handle arg 1.
 void sub_4F5D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7874,6 +8201,7 @@ void sub_4F5D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F670 @ 0x0004F670
+// sp-match: sub_4F670 @ 0x0003CFA0
 // "GetDamageLevel".
 void sub_4F670(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7896,6 +8224,7 @@ void sub_4F670(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F6C0 @ 0x0004F6C0
+// sp-match: sub_4F6C0 @ 0x0003D040
 // "GetDestructionID".
 void sub_4F6C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7918,6 +8247,7 @@ void sub_4F6C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F710 @ 0x0004F710
+// sp-match: sub_4F710 @ 0x0003D0E0
 // "SetDamageLevel".
 void sub_4F710(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7941,6 +8271,7 @@ void sub_4F710(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F790 @ 0x0004F790
+// sp-match: sub_4F790 @ 0x0003D170
 // "SetGravity".
 void sub_4F790(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7963,6 +8294,7 @@ void sub_4F790(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F800 @ 0x0004F800
+// sp-match: sub_4F800 @ 0x0003D1C0
 // "SetNoFallThroughWorld".
 void sub_4F800(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -7985,6 +8317,7 @@ void sub_4F800(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F870 @ 0x0004F870
+// sp-match: sub_4F870 @ 0x0003D210
 // "SetEnvCollisionNotification".
 void sub_4F870(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8007,6 +8340,7 @@ void sub_4F870(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F8E0 @ 0x0004F8E0
+// sp-match: sub_4F8E0 @ 0x0003D260
 // "SetWallCollisionNotification".
 void sub_4F8E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8029,6 +8363,7 @@ void sub_4F8E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F950 @ 0x0004F950
+// sp-match: sub_4F950 @ 0x0003D2B0
 // "SetGroundCollisionNotification".
 void sub_4F950(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8051,6 +8386,7 @@ void sub_4F950(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4F9C0 @ 0x0004F9C0
+// sp-match: sub_4F9C0 @ 0x0003D300
 // "SetCollideWithFlags": ors arg 2 into the collision flags of the entity of
 // the object with the handle arg 1.
 void sub_4F9C0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -8075,6 +8411,7 @@ void sub_4F9C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4FA70 @ 0x0004FA70
+// sp-match: sub_4FA70 @ 0x0003D360
 // "ClearCollideWithFlags": clears them.
 void sub_4FA70(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8098,6 +8435,7 @@ void sub_4FA70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4FB20 @ 0x0004FB20
+// sp-match: sub_4FB20 @ 0x0003D3D0
 // "SetJiggleReactionOnNamedEntity": on (arg 1) or off, for the entity the
 // object under the key arg 2 (two slots) holds.
 void sub_4FB20(RwUInt32 arg_0, type_44350 *arg_4)
@@ -8125,6 +8463,7 @@ void sub_4FB20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4FC10 @ 0x0004FC10
+// sp-match: sub_4FC10 @ 0x0003D4F0
 // "SetJiggleReactionOnEntity": on (arg 1) or off.
 void sub_4FC10(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8150,6 +8489,7 @@ void sub_4FC10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4FC90 @ 0x0004FC90
+// sp-match: sub_4FC90 @ 0x0003D540
 // "SetVelocity": (arg 1, arg 2, arg 3).
 void sub_4FC90(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8176,6 +8516,7 @@ void sub_4FC90(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4FD60 @ 0x0004FD60
+// sp-match: sub_4FD60 @ 0x0003D5F0
 // "ScaleVelocity": by arg 1.
 void sub_4FD60(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8202,6 +8543,7 @@ void sub_4FD60(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4FE10 @ 0x0004FE10
+// sp-match: sub_4FE10 @ 0x0003D6D0
 // "GetVelocityMagnitude".
 void sub_4FE10(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8226,6 +8568,7 @@ void sub_4FE10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4FE80 @ 0x0004FE80
+// sp-match: sub_4FE80 @ 0x0003D790
 // "SetCollision".
 void sub_4FE80(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8249,6 +8592,7 @@ void sub_4FE80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4FF00 @ 0x0004FF00
+// sp-match: sub_4FF00 @ 0x0003D820
 // "SetEnvironmentCollision".
 void sub_4FF00(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8272,6 +8616,7 @@ void sub_4FF00(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_4FF80 @ 0x0004FF80
+// sp-match: sub_4FF80 @ 0x0003D8B0
 // "SetEntityCollision".
 void sub_4FF80(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8295,6 +8640,7 @@ void sub_4FF80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50000 @ 0x00050000
+// sp-match: sub_50000 @ 0x0003D940
 // "SetNoRender".
 void sub_50000(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8318,6 +8664,7 @@ void sub_50000(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50080 @ 0x00050080
+// sp-match: sub_50080 @ 0x0003D9D0
 // "SetFiring".
 void sub_50080(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8341,6 +8688,7 @@ void sub_50080(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50100 @ 0x00050100
+// sp-match: sub_50100 @ 0x0003DA60
 // "InfiniteAmmoClip": a soldier's.
 void sub_50100(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8365,6 +8713,7 @@ void sub_50100(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50170 @ 0x00050170
+// sp-match: sub_50170 @ 0x0003DAB0
 // "AllowFiring".
 void sub_50170(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8388,6 +8737,7 @@ void sub_50170(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_501F0 @ 0x000501F0
+// sp-match: sub_501F0 @ 0x0003DB40
 // "GetSuppressed": a soldier's (kind 0x20); 0 for others.
 void sub_501F0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8412,6 +8762,7 @@ void sub_501F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50260 @ 0x00050260
+// sp-match: sub_50260 @ 0x0003DBF0
 // "GetAttitude": a soldier's (kind 0x20) or a type_3DDB98's (kind
 // 0x200000); 0 for others.
 void sub_50260(RwUInt32 arg_0, type_44350 *arg_4)
@@ -8439,6 +8790,7 @@ void sub_50260(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_502F0 @ 0x000502F0
+// sp-match: sub_502F0 @ 0x0003DCC0
 // "SetEngineAttitude": a soldier's or a type_3DDB98's.
 void sub_502F0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8465,6 +8817,7 @@ void sub_502F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_503A0 @ 0x000503A0
+// sp-match: sub_503A0 @ 0x0003DD70
 // "SetTriggerCollision".
 void sub_503A0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8487,6 +8840,7 @@ void sub_503A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50410 @ 0x00050410
+// sp-match: sub_50410 @ 0x0003DDC0
 // "SetTriggerProximityChecks": on (arg 1 set) or off.
 void sub_50410(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8504,6 +8858,7 @@ void sub_50410(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_504C0 @ 0x000504C0
+// sp-match: sub_504C0 @ 0x0003DEB0
 // "IsNamedEntityInTrigger": whether the kind-0x2E object under the key
 // arg 2 (two slots; flag 1) lies in the trigger volume of the entity of the
 // object with the handle arg 1.
@@ -8543,6 +8898,7 @@ void sub_504C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50620 @ 0x00050620
+// sp-match: sub_50620 @ 0x0003E0E0
 // "GetNumberOfObjectsInTrigger": how many entities of list arg 1
 // (dword_4B8600) hold the kind-0x2E object under the key arg 2 (two slots;
 // flag 1) in their trigger volumes.
@@ -8581,6 +8937,7 @@ void sub_50620(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50760 @ 0x00050760
+// sp-match: sub_50760 @ 0x0003E290
 // "SetAllowTargetLOSLoss": the AI object's unk_52C.
 void sub_50760(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -8606,6 +8963,7 @@ void sub_50760(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_507E0 @ 0x000507E0
+// sp-match: sub_507E0 @ 0x0003E320
 // "VehicleInProximity": the player's test (sub_10F8D0) for the map with the
 // id arg 1 (-1 for any).
 void sub_507E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -8643,6 +9001,7 @@ void sub_507E0(RwUInt32 arg_0, type_44350 *arg_4)
 // match: sub_508A0 @ 0x000508A0
 // match: __ehhandler$?sub_508A0@@YAXIPAUtype_44350@@@Z-8 @ 0x002FF860
 // match: __ehhandler$?sub_508A0@@YAXIPAUtype_44350@@@Z @ 0x002FF868
+// sp-match: sub_508A0 @ 0x0003E410
 // "VehicleAttachEntity": attaches the player the handle arg 1 names (flag 4
 // of its unk_2C) to the vehicle, or detaches it for no entity.
 void sub_508A0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -8676,6 +9035,7 @@ void sub_508A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_509C0 @ 0x000509C0
+// sp-match: sub_509C0 @ 0x0003E530
 // "VehicleAttachEntityToMountedWeapon": as "VehicleAttachEntity", for the
 // vehicle's mounted weapon (vf_26C, vf_274). Its EH handler and unwind
 // funclet are folded into sub_508A0's (0x2FF860).
@@ -8710,6 +9070,7 @@ void sub_509C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50AE0 @ 0x00050AE0
+// sp-match: sub_50AE0 @ 0x0003E650
 // "VehicleAttachPlayerPassenger": attaches the player the handle arg 1 names
 // (flag 4 of its unk_2C) as a passenger with the options args 2 to 5, or
 // detaches the passenger for no entity. Its EH handler and unwind funclet are
@@ -8753,6 +9114,7 @@ void sub_50AE0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50CB0 @ 0x00050CB0
+// sp-match: sub_50CB0 @ 0x0003E8B0
 // "VehicleGetPlayerPosture": the player's unk_4D0 while in a vehicle
 // (posture 5, vf_200's vf_014 set); 0 otherwise.
 void sub_50CB0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -8769,6 +9131,7 @@ void sub_50CB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50D30 @ 0x00050D30
+// sp-match: sub_50D30 @ 0x0003E7B0
 // "VehicleGetPlayerPassenger": the id of the passenger's object, 0 without
 // one.
 void sub_50D30(RwUInt32 arg_0, type_44350 *arg_4)
@@ -8798,6 +9161,7 @@ void sub_50D30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50DD0 @ 0x00050DD0
+// sp-match: sub_50DD0 @ 0x0003E940
 // "VehicleMountedWeaponGetAttachedEntity": the id of the object of the
 // entity attached to the vehicle's mounted weapon, 0 without a weapon.
 void sub_50DD0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -8829,6 +9193,7 @@ void sub_50DD0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50E80 @ 0x00050E80
+// sp-match: sub_50E80 @ 0x0003EA50
 // "VehicleGetMountedWeapon": the id of the mounted weapon of the vehicle a
 // soldier holds (unk_624) or of the entity's own vehicle; 0 otherwise.
 void sub_50E80(RwUInt32 arg_0, type_44350 *arg_4)
@@ -8866,6 +9231,7 @@ void sub_50E80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_50F80 @ 0x00050F80
+// sp-match: sub_50F80 @ 0x0003EB80
 // "VehicleShowMountedWeapon": shows (arg 1 set) or hides the mounted weapon
 // of the vehicle a soldier holds (unk_624) or of the entity's own vehicle.
 void sub_50F80(RwUInt32 arg_0, type_44350 *arg_4)
@@ -8902,6 +9268,7 @@ void sub_50F80(RwUInt32 arg_0, type_44350 *arg_4)
 // ("PlayerEnterVehicleTransition") stay binary (docs/units.md).
 
 // match: sub_510C0 @ 0x000510C0
+// sp-match: sub_510C0 @ 0x0003ECB0
 // "PlayerExitVehicleTransition": the player (entity 0) leaves its vehicle
 // for the point (arg 1, arg 2, arg 3), in the vehicle's frame when arg 4 is
 // set, in state 14 (sub_1090F0).
@@ -8913,7 +9280,9 @@ void sub_510C0(RwUInt32 arg_0, type_44350 *arg_4)
     RwMatrix *var_10;
     RwInt32 var_14;
     RwV3d var_20;
+#ifndef CODFH_SP
     RwMatrix var_60;
+#endif
     type_10F710 *var_64;
 
     var_4 = sub_45170(arg_0);
@@ -8928,6 +9297,9 @@ void sub_510C0(RwUInt32 arg_0, type_44350 *arg_4)
     var_20.z = SCRIPT_ARGT<RwReal>(arg_4, 3);
     if (var_14)
     {
+#ifdef CODFH_SP // shape: block-scoped, so /O2 schedules its matrix work as SP 0x3ECB0 does
+        RwMatrix var_60;
+#endif
         RwMatrixSetIdentityMacro(&var_60);
         var_60.pos = var_20;
         RwMatrixTransform(&var_60, var_10, rwCOMBINEPOSTCONCAT);
@@ -8944,6 +9316,7 @@ void sub_510C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_512E0 @ 0x000512E0
+// sp-match: sub_512E0 @ 0x0003EEA0
 // "PlayerEnterVehicleTransition": the player (entity 0) heads for the point
 // (arg 1, arg 2, arg 3) in the vehicle's frame, for arg 4 times 60, in state
 // 14 (sub_1090F0), and its animation plays its weapon's animation.
@@ -8965,11 +9338,17 @@ void sub_512E0(RwUInt32 arg_0, type_44350 *arg_4)
     SCRIPT_CHECK(var_4 != 0);
     var_8 = var_4->vf_010();
     SCRIPT_CHECK(var_8 != 0);
+#ifndef CODFH_SP
     var_C = var_8->unk_338.unk_08;
     var_10 = RwFrameGetMatrix(var_C);
+#endif
     var_1C.x = SCRIPT_ARGT<RwReal>(arg_4, 1);
     var_1C.y = SCRIPT_ARGT<RwReal>(arg_4, 2);
     var_1C.z = SCRIPT_ARGT<RwReal>(arg_4, 3);
+#ifdef CODFH_SP // shape: the vehicle's matrix after the point (SP 0x3EEA0 loads it among the arguments)
+    var_C = var_8->unk_338.unk_08;
+    var_10 = RwFrameGetMatrix(var_C);
+#endif
     var_20 = SCRIPT_ARGT<RwReal>(arg_4, 4);
     RwMatrixSetIdentityMacro(&var_60);
     var_60.pos = var_1C;
@@ -8995,6 +9374,7 @@ void sub_512E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_515B0 @ 0x000515B0
+// sp-match: sub_515B0 @ 0x0003F110
 // "VehicleSetEngine": a vehicle's (flags 0x40080 of its unk_2C).
 void sub_515B0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9021,19 +9401,30 @@ void sub_515B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_51650 @ 0x00051650
+// sp-match: sub_51650 @ 0x0003F1E0
 // "VehicleSetMaxThrottle": a vehicle's (flags 0x40080 of its unk_2C).
 void sub_51650(RwUInt32 arg_0, type_44350 *arg_4)
 {
     type_3DBC78 *varC;
     type_3D3548 *local_8;
+#ifdef CODFH_SP // single player reads the limit as a real (SP 0x3F1E0: fld/fstp)
+    RwReal var_4;
+
+    var_4 = SCRIPT_ARGT<RwReal>(arg_4, 1);
+#else
     RwInt32 var_4;
 
     var_4 = SCRIPT_ARG(arg_4, 1);
+#endif
     local_8 = sub_45170(arg_0);
     varC = local_8->vf_010();
     SCRIPT_CHECK(varC != 0);
     SCRIPT_CHECK((varC->unk_2C & 0x3FFFFF0 & 0x40080) != 0); // not an address: entity kind bits
+#ifdef CODFH_SP
+    varC->vf_288(*(RwInt32 *)&var_4);
+#else
     varC->vf_288(var_4);
+#endif
     {
         // Six locals the image reserves and never uses.
         RwInt32 unused_5;
@@ -9047,6 +9438,7 @@ void sub_51650(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_516F0 @ 0x000516F0
+// sp-match: sub_516F0 @ 0x0003F2C0
 // "VehicleSetMaxSpeed": the vehicle's top speed unk_450.unk_268 from arg 1
 // (x 1618.4615 x 100 / 216000).
 void sub_516F0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9060,7 +9452,12 @@ void sub_516F0(RwUInt32 arg_0, type_44350 *arg_4)
     var_4 = SCRIPT_ARGT<RwReal>(arg_4, 1);
     SCRIPT_CHECK(v8 != 0);
     if (v8->vf_010() != 0) {
+#ifdef CODFH_SP // shape: SP 0x3F2C0 keeps the division a separate step
+        ebp_C = var_4 * 1618.4615f * 100.0f;
+        ebp_C = ebp_C / 216000.0f;
+#else
         ebp_C = var_4 * 1618.4615f * 100.0f / 216000.0f;
+#endif
         var_10 = (type_3DBC78 *)v8;
         var_10->unk_450.unk_268 = ebp_C;
     }
@@ -9077,6 +9474,7 @@ void sub_516F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_51790 @ 0x00051790
+// sp-match: sub_51790 @ 0x0003F360
 // "VehicleSetCruiseSpeed".
 void sub_51790(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9104,6 +9502,7 @@ void sub_51790(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_51820 @ 0x00051820
+// sp-match: sub_51820 @ 0x0003F400
 // "VehicleGetHatchState": of hatch arg 1.
 void sub_51820(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9131,12 +9530,17 @@ void sub_51820(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_518C0 @ 0x000518C0
+// sp-match: sub_518C0 @ 0x0003F500
 // "VehicleSetHatchState": hatch arg 1 with the options args 2 to 5.
 void sub_518C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
     type_3DC048 *var_1C;
     type_3D3548 *var18;
+#ifdef CODFH_SP // single player reads arg 4 as a real (SP 0x3F500: fld/fstp)
+    RwReal stk_14;
+#else
     RwInt32 stk_14;
+#endif
     RwInt32 l10;
     RwInt32 local_C;
     RwInt32 lv_8;
@@ -9145,13 +9549,21 @@ void sub_518C0(RwUInt32 arg_0, type_44350 *arg_4)
     l10 = SCRIPT_ARG(arg_4, 1);
     local_C = SCRIPT_ARG(arg_4, 2);
     lv_8 = SCRIPT_ARG(arg_4, 3);
+#ifdef CODFH_SP
+    stk_14 = SCRIPT_ARGT<RwReal>(arg_4, 4);
+#else
     stk_14 = SCRIPT_ARG(arg_4, 4);
+#endif
     var_4 = SCRIPT_ARG(arg_4, 5);
     var18 = sub_45170(arg_0);
     var_1C = var18->vf_014();
     SCRIPT_CHECK(var_1C != 0);
     SCRIPT_CHECK(var_1C->unk_2C_18);
+#ifdef CODFH_SP
+    var_1C->sub_15A4A0(l10, local_C, lv_8, *(RwInt32 *)&stk_14, var_4);
+#else
     var_1C->sub_15A4A0(l10, local_C, lv_8, stk_14, var_4);
+#endif
     {
         // Six locals the image reserves and never uses.
         RwInt32 unused_5;
@@ -9165,6 +9577,7 @@ void sub_518C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_51A10 @ 0x00051A10
+// sp-match: sub_51A10 @ 0x0003F620
 // "VehicleSetThrottle": a vehicle's (flags 0x40080 of its unk_2C).
 void sub_51A10(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9191,6 +9604,7 @@ void sub_51A10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_51AB0 @ 0x00051AB0
+// sp-match: sub_51AB0 @ 0x0003F700
 // "VehicleGetVelocity": the length of a vehicle's velocity.
 void sub_51AB0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9216,6 +9630,7 @@ void sub_51AB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_51B30 @ 0x00051B30
+// sp-match: sub_51B30 @ 0x0003F7F0
 // "VehicleSetBrake": and the throttle to 0.
 void sub_51B30(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9238,6 +9653,7 @@ void sub_51B30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_51BE0 @ 0x00051BE0
+// sp-match: sub_51BE0 @ 0x0003F8D0
 // "VehicleEnablePhysics".
 void sub_51BE0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9259,6 +9675,7 @@ void sub_51BE0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_51C80 @ 0x00051C80
+// sp-match: sub_51C80 @ 0x0003F9A0
 // "VehicleTrigger_GetMyName": the name of the object's vehicle trigger
 // (kind 7).
 void sub_51C80(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9276,6 +9693,7 @@ void sub_51C80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_51D00 @ 0x00051D00
+// sp-match: sub_51D00 @ 0x0003FA60
 // "SoldierEntity_GetMyVehiclesName": the name of the vehicle whose trigger
 // (unk_34C) the entity is in: of kind 5 for flag 5 of unk_2C, of kind 0x1F
 // for flag 21.
@@ -9310,6 +9728,7 @@ void sub_51D00(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_51E20 @ 0x00051E20
+// sp-match: sub_51E20 @ 0x0003FBD0
 // "SoldierTrigger_GetMyVehiclesName": the name of the vehicle of the
 // object's trigger (kind 5 or 0x1F).
 void sub_51E20(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9336,6 +9755,7 @@ void sub_51E20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_51F10 @ 0x00051F10
+// sp-match: sub_51F10 @ 0x0003FD00
 // "VehicleSetSteering": a vehicle's (flags 0x40080 of its unk_2C).
 void sub_51F10(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9357,6 +9777,7 @@ void sub_51F10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_51FB0 @ 0x00051FB0
+// sp-match: sub_51FB0 @ 0x0003FDD0
 // "VehicleSecondaryTurn": by arg 1 at rate 1.
 void sub_51FB0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9378,6 +9799,7 @@ void sub_51FB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_52050 @ 0x00052050
+// sp-match: sub_52050 @ 0x0003FEB0
 // "VehicleSecondaryPitch": by arg 1 at rate 1.
 void sub_52050(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9399,6 +9821,7 @@ void sub_52050(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_520F0 @ 0x000520F0
+// sp-match: sub_520F0 @ 0x0003FF90
 // "VehicleFireWeapon": weapon arg 1; the vehicle's result.
 void sub_520F0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9421,6 +9844,7 @@ void sub_520F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_521A0 @ 0x000521A0
+// sp-match: sub_521A0 @ 0x00040090
 // "VehicleEnableTurretTrack": turret tracking of the kind-0x2E object under
 // the key arg 1 (two slots).
 void sub_521A0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9448,6 +9872,7 @@ void sub_521A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_52260 @ 0x00052260
+// sp-match: sub_52260 @ 0x000401B0
 // "VehicleDisableTurretTrack".
 void sub_52260(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9471,6 +9896,7 @@ void sub_52260(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_522B0 @ 0x000522B0
+// sp-match: sub_522B0 @ 0x00040230
 // "VehicleGetDeathTask".
 void sub_522B0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9495,6 +9921,7 @@ void sub_522B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_52310 @ 0x00052310
+// sp-match: sub_52310 @ 0x000402E0
 // "VehicleSetGimpLevel".
 void sub_52310(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9518,6 +9945,7 @@ void sub_52310(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_52390 @ 0x00052390
+// sp-match: sub_52390 @ 0x00040370
 // "SetVehicleWeaponDisabled".
 void sub_52390(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9540,6 +9968,7 @@ void sub_52390(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_52440 @ 0x00052440
+// sp-match: sub_52440 @ 0x00040410
 // "OrientToCoverPoint": the AI object of the object's entity (kind 2) turns
 // to its cover point (sub_26A30).
 void sub_52440(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9560,6 +9989,7 @@ void sub_52440(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_52500 @ 0x00052500
+// sp-match: sub_52500 @ 0x00040560
 // "OrientToCoverPointImmediate": as "OrientToCoverPoint", at once (sub_26A50).
 void sub_52500(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9579,6 +10009,7 @@ void sub_52500(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_525C0 @ 0x000525C0
+// sp-match: sub_525C0 @ 0x000406B0
 // "GetCoverPointPeekFlags": of the AI object's cover point (sub_F8FA0), for the object's entity
 // (kind 2); 0 without one.
 void sub_525C0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9603,6 +10034,7 @@ void sub_525C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_526D0 @ 0x000526D0
+// sp-match: sub_526D0 @ 0x00040880
 // "GetCoverPointType": of the AI object's cover point (sub_F8FC0), for the object's entity
 // (kind 2); 0 without one.
 void sub_526D0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9627,6 +10059,7 @@ void sub_526D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_527E0 @ 0x000527E0
+// sp-match: sub_527E0 @ 0x00040A50
 // "IsConnectedCorner": whether the AI object's cover point has a connected
 // corner (sub_FA650), for the object's entity (kind 2).
 void sub_527E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9655,6 +10088,7 @@ void sub_527E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_52900 @ 0x00052900
+// sp-match: sub_52900 @ 0x00040C20
 // "IsConnectedCornerOccupied": flag 2 of the connected corner, -1 without one.
 void sub_52900(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9684,6 +10118,7 @@ void sub_52900(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_52A30 @ 0x00052A30
+// sp-match: sub_52A30 @ 0x00040E00
 // "SetConnectedCornerOccupied": moves the AI object to the connected corner
 // (sub_23790, sub_236F0, sub_22F70); 1 when there is one.
 void sub_52A30(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9716,6 +10151,7 @@ void sub_52A30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_52B70 @ 0x00052B70
+// sp-match: sub_52B70 @ 0x00040FF0
 // "SetCoverPoint": the AI object of the object's entity (kind 2) takes its cover point (sub_22F70).
 void sub_52B70(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9735,6 +10171,7 @@ void sub_52B70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_52C30 @ 0x00052C30
+// sp-match: sub_52C30 @ 0x00041140
 // "SetCoverPointFromName": makes the node the kind-0x2E object (flags 0x10)
 // under the key arg 1 (two slots) holds the cover point of the AI object of
 // the object's entity (kind 2), and its point unk_5B0; the node must be a
@@ -9781,6 +10218,7 @@ void sub_52C30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_52F30 @ 0x00052F30
+// sp-match: sub_52F30 @ 0x00041410
 // "SetArrivedAtCoverPoint": the AI object of the object's entity (kind 2) marks its cover point reached (sub_235A0).
 void sub_52F30(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9800,6 +10238,7 @@ void sub_52F30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_52FF0 @ 0x00052FF0
+// sp-match: sub_52FF0 @ 0x00041560
 // "ClearCoverPoint": the AI object of the object's entity (kind 2) clears its cover point (sub_23790).
 void sub_52FF0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -9819,6 +10258,7 @@ void sub_52FF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_530B0 @ 0x000530B0
+// sp-match: sub_530B0 @ 0x000416B0
 // "IsCoverSafeFromGrenade": whether a soldier's AI object accepts its cover
 // point (sub_28200) for its unk_610 point; 0 with no unk_610.
 void sub_530B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9849,6 +10289,7 @@ void sub_530B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53170 @ 0x00053170
+// sp-match: sub_53170 @ 0x000417E0
 // "CanSeeTarget": the AI object's sight test (sub_18DF0) of its target with
 // arg 1, for the object's entity (kind 2); 0 without a target.
 void sub_53170(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9877,6 +10318,7 @@ void sub_53170(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53280 @ 0x00053280
+// sp-match: sub_53280 @ 0x00041980
 // "IsFacingTarget": whether the target lies ahead of the object's entity
 // (kind 2), by the dot product with its facing; 0 without a target.
 void sub_53280(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9907,6 +10349,7 @@ void sub_53280(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53420 @ 0x00053420
+// sp-match: sub_53420 @ 0x00041BA0
 // "SetMyDistanceFromTarget": moves the soldier of the kind-2 object arg_0
 // along the line from its target to it (kept at the target's height) to
 // the distance arg 1 from the target: its animation's two matrices and its
@@ -9945,7 +10388,7 @@ void sub_53420(RwUInt32 arg_0, type_44350 *arg_4)
         var_1C = &bp_2C->pos;
         local_28->y = local_20->y;
         RwV3dSubMacro(var_1C, local_20, local_28);
-        RwV3dScaleMacro(var_1C, var_1C, stk_14 / RwV3dLength((RwV3d *)var_1C));
+        RwV3dScaleMacro(var_1C, var_1C, stk_14 / (RwV3dLength((RwV3d *)var_1C)));
         RwV3dAddMacro(var_1C, local_28, var_1C);
         RwMatrixTransform(local_24, bp_2C, rwCOMBINEREPLACE);
         local_24 = &var_4->unk_140;
@@ -9960,6 +10403,7 @@ void sub_53420(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53730 @ 0x00053730
+// sp-match: sub_53730 @ 0x00041E20
 // "GetUniqueNumber": a number from arg 1 to arg 2 picked by the high word of
 // the object's id; arg 1 when the range is empty.
 void sub_53730(RwUInt32 arg_0, type_44350 *arg_4)
@@ -9989,6 +10433,7 @@ void sub_53730(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53800 @ 0x00053800
+// sp-match: sub_53800 @ 0x00041EF0
 // "RandRange": a random number from arg 1 to arg 2.
 void sub_53800(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -10003,6 +10448,7 @@ void sub_53800(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53890 @ 0x00053890
+// sp-match: sub_53890 @ 0x00041F60
 // "RandRangeFloat": a random float from arg 1 to arg 2.
 void sub_53890(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -10019,6 +10465,7 @@ void sub_53890(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53930 @ 0x00053930
+// sp-match: sub_53930 @ 0x00042000
 // "RegisterTimer": timer arg 3 posting message arg 2 after arg 1 seconds;
 // its handle.
 void sub_53930(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10038,6 +10485,7 @@ void sub_53930(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53A00 @ 0x00053A00
+// sp-match: sub_53A00 @ 0x00042090
 // "UnregisterTimerByMessage".
 void sub_53A00(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -10051,6 +10499,7 @@ void sub_53A00(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53A60 @ 0x00053A60
+// sp-match: sub_53A60 @ 0x000420E0
 // "RegisterAStarCheck": replaces the AI object's A* check (unk_55C) with one
 // of kind arg 1 (0 to 12) against the entity of the object with the handle
 // arg 2 (of kind 2) at the distance arg 3; its handle, 0 without an AI
@@ -10101,6 +10550,7 @@ void sub_53A60(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53C10 @ 0x00053C10
+// sp-match: sub_53C10 @ 0x00042230
 // "UnRegisterAStarCheck": the check with the handle arg 1.
 void sub_53C10(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -10131,6 +10581,7 @@ void sub_53C10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53CA0 @ 0x00053CA0
+// sp-match: sub_53CA0 @ 0x000422A0
 // "IsPathBlocked": with flag 2, 23 or 25 of the AI object's unk_49C,
 // whether unk_598 or unk_59C is set; 0 otherwise.
 void sub_53CA0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10146,7 +10597,11 @@ void sub_53CA0(RwUInt32 arg_0, type_44350 *arg_4)
         if (varC != 0) {
             if (((varC->unk_49C >> 2) & 1) || ((varC->unk_49C >> 23) & 1)
                 || ((varC->unk_49C >> 25) & 1))
+#ifdef CODFH_SP // shape: through AIData::is_blocked, whose out-of-line copy this file emits (SP 0x32F80)
+                local_8 = varC->is_blocked();
+#else
                 local_8 = varC->unk_598 != 0 || varC->unk_59C != 0;
+#endif
         }
     }
     {
@@ -10162,6 +10617,7 @@ void sub_53CA0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53D50 @ 0x00053D50
+// sp-match: sub_53D50 @ 0x00042340
 // "IsPathBlockedWhileStrafing": with the same flags, the AI object's
 // unk_5A0.
 void sub_53D50(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10193,6 +10649,7 @@ void sub_53D50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53DF0 @ 0x00053DF0
+// sp-match: sub_53DF0 @ 0x000423D0
 // "SuggestManeuver": maneuver arg 1 to the entity's group.
 void sub_53DF0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -10216,6 +10673,7 @@ void sub_53DF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53E80 @ 0x00053E80
+// sp-match: sub_53E80 @ 0x00042470
 // "ForceManeuver": maneuver arg 1 with arg 2 on the group with the id
 // arg 3.
 void sub_53E80(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10233,6 +10691,7 @@ void sub_53E80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_53F40 @ 0x00053F40
+// sp-match: sub_53F40 @ 0x000424E0
 // "SetFireAndMovementPointFromName": hands the point of the object under the
 // key arg 1 (two slots; kind 0x2E with its flags set, or kind 0x2D) to the
 // group with the id arg 3 (sub_3EA50).
@@ -10266,6 +10725,7 @@ void sub_53F40(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_540A0 @ 0x000540A0
+// sp-match: sub_540A0 @ 0x00042670
 // "ClearFireAndMovementPoint": clears the point of the group with the id
 // arg 1.
 void sub_540A0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10279,6 +10739,7 @@ void sub_540A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_54110 @ 0x00054110
+// sp-match: sub_54110 @ 0x000426C0
 // "DisableFireAndMovement": sets or clears (arg 1) kind 5 of the group with
 // the id arg 2.
 void sub_54110(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10294,6 +10755,7 @@ void sub_54110(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_541B0 @ 0x000541B0
+// sp-match: sub_541B0 @ 0x00042720
 // "SetFireAndMovementExclusionEnemyDistance": the range arg 1 of the group
 // with the id arg 2.
 void sub_541B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10309,6 +10771,7 @@ void sub_541B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_54250 @ 0x00054250
+// sp-match: sub_54250 @ 0x00042780
 // "GetStartState": the start state of the entity's trigger (flag 5), or
 // nothing.
 void sub_54250(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10337,6 +10800,7 @@ void sub_54250(RwUInt32 arg_0, type_44350 *arg_4)
 // match: sub_542E0 @ 0x000542E0
 // match: __ehhandler$?sub_542E0@@YAXIPAUtype_44350@@@Z-8 @ 0x002FF840
 // match: __ehhandler$?sub_542E0@@YAXIPAUtype_44350@@@Z @ 0x002FF848
+// sp-match: sub_542E0 @ 0x00057110
 // "SetDoorPathNodeState": sets the state arg 1 on the door node (filter 5)
 // nearest the entity within 500, and on its linked door nodes (flag 12):
 // kinds 7 and 4 or 8 and 3 for open and closed, and flag 8 while closed.
@@ -10392,6 +10856,7 @@ void sub_542E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_545C0 @ 0x000545C0
+// sp-match: sub_545C0 @ 0x00042850
 // "SetAnimatedBGEntityType": the type arg 1 of the animated background
 // entity.
 void sub_545C0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10413,6 +10878,7 @@ void sub_545C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_54640 @ 0x00054640
+// sp-match: sub_54640 @ 0x000428E0
 // "AttachPlayerToAnimatedBGEntity": attaches the player the handle arg 1
 // names (flag 4 of its unk_2C) to the entity's type_3DA6C0 with arguments 2
 // to 4, or detaches it for no entity. Its EH handler and unwind funclet are
@@ -10454,6 +10920,7 @@ void sub_54640(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_547E0 @ 0x000547E0
+// sp-match: sub_547E0 @ 0x00042A20
 // "AnimatedBGEntityAttachPlayerToMountedWeapon": as
 // "AttachPlayerToAnimatedBGEntity", for the entity's mounted weapon (vf_238,
 // vf_23C). Its EH handler and unwind funclet are folded into sub_508A0's
@@ -10487,6 +10954,7 @@ void sub_547E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_548E0 @ 0x000548E0
+// sp-match: sub_548E0 @ 0x00042AF0
 // "AnimatedBGEntityMountedWeaponGetAttachedPlayer": the handle of the
 // entity attached to the entity's mounted weapon, or nothing without one.
 void sub_548E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10516,6 +10984,7 @@ void sub_548E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_54980 @ 0x00054980
+// sp-match: sub_54980 @ 0x00042BA0
 // "SendFlying": sends a soldier (vf_008) or a type_3DDB98 (vf_024) flying
 // along (arg 1, arg 2, arg 3) with arg 4; any other entity has no wings.
 void sub_54980(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10544,6 +11013,7 @@ void sub_54980(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_54AB0 @ 0x00054AB0
+// sp-match: sub_54AB0 @ 0x00042CA0
 // "SwapToDestroyedVersion": swaps the entity (flag 16) for its destroyed
 // version.
 void sub_54AB0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10568,6 +11038,7 @@ void sub_54AB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_54B00 @ 0x00054B00
+// sp-match: sub_54B00 @ 0x00042D10
 // "PZ_Manipulate": starts (arg 2 = 0: spawning its particle system at its
 // matrix) or stops (1) the zone object of the map entry arg 1.
 void sub_54B00(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10591,8 +11062,12 @@ void sub_54B00(RwUInt32 arg_0, type_44350 *arg_4)
             break;
         }
         case 1: {
+#ifdef CODFH_SP // through the setter (SP 0x42D10 stores straight through edi, no copy of the zone)
+            v8->unk_D8->set_running(0);
+#else
             type_17DB90 *var_14 = v8->unk_D8;
             var_14->unk_54 = 0;
+#endif
             v8->unk_D8->sub_17DB90(0);
             break;
         }
@@ -10602,6 +11077,7 @@ void sub_54B00(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_54C30 @ 0x00054C30
+// sp-match: sub_54C30 @ 0x00042DB0
 // "PZ_SetUserData": the user data (arg 2, arg 3) of the zone object of the
 // map entry arg 1.
 void sub_54C30(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10627,6 +11103,7 @@ void sub_54C30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_54D20 @ 0x00054D20
+// sp-match: sub_54D20 @ 0x00042E30
 // "PG_SetParentAndAttachPoint": parents the projectile generator arg 1 to
 // the entity of the object under the key arg 2 (two slots; with its flag 2)
 // at the attach point arg 3, or detaches it without an object.
@@ -10661,6 +11138,7 @@ void sub_54D20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_54E50 @ 0x00054E50
+// sp-match: sub_54E50 @ 0x00042F50
 // "PG_DetatchFromParent": detaches the projectile generator arg 1.
 void sub_54E50(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -10675,6 +11153,7 @@ void sub_54E50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_54EC0 @ 0x00054EC0
+// sp-match: sub_54EC0 @ 0x00042FD0
 // "PG_SetSplinePathFromName": the path of the projectile generator arg 1:
 // the spline of the object under the key arg 2 (two slots; kind 0x2E with
 // flags 0x80), after its default path for the key (-1, -1).
@@ -10707,6 +11186,7 @@ void sub_54EC0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55020 @ 0x00055020
+// sp-match: sub_55020 @ 0x000431A0
 // "PG_ManipulateProjectileGenerator": on the projectile generator arg 1,
 // by arg 2: 0 creates one for the object's trigger (kind 0x13) and returns
 // its id, 1 stops it (and its sound), 2 starts it, 3 destroys it (and its
@@ -10766,6 +11246,7 @@ void sub_55020(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55210 @ 0x00055210
+// sp-match: sub_55210 @ 0x000433B0
 // "PG_TargetObjectByScript": has the projectile generator of the object's
 // trigger (kind 0x13) target the entity of the object the handle arg 1
 // names (with an id, not flagged 9); returns its result, or 0.
@@ -10795,6 +11276,7 @@ void sub_55210(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55310 @ 0x00055310
+// sp-match: sub_55310 @ 0x00043490
 // "PG_TargetNamedObjectByScript": as "PG_TargetObjectByScript", for the
 // entity of the object under the key arg 1 (two slots; with its flag 2).
 void sub_55310(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10829,11 +11311,16 @@ void sub_55310(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55430 @ 0x00055430
+// sp-match: sub_55430 @ 0x000435C0
 // "PG_TargetPoint": has the projectile generator of the object's trigger
 // (kind 0x13) target the point (arg 1, arg 2, arg 3) with arg 4; returns 1.
 void sub_55430(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifdef CODFH_SP // single player reads arg 4 as a real (SP 0x435C0: fld/fstp)
+    RwReal local_20;
+#else
     RwInt32 local_20;
+#endif
     type_712B0 *var_1C;
     type_67620 *local_18;
     type_3D2E7C *local_14;
@@ -10844,24 +11331,37 @@ void sub_55430(RwUInt32 arg_0, type_44350 *arg_4)
     var_C.x = SCRIPT_ARGT<RwReal>(arg_4, 1);
     var_C.y = SCRIPT_ARGT<RwReal>(arg_4, 2);
     var_C.z = SCRIPT_ARGT<RwReal>(arg_4, 3);
+#ifdef CODFH_SP
+    local_20 = SCRIPT_ARGT<RwReal>(arg_4, 4);
+#else
     local_20 = SCRIPT_ARG(arg_4, 4);
+#endif
     local_10 = 1;
     local_14 = local_18->vf_024();
     SCRIPT_CHECK(local_14 != 0);
     var_1C = local_14->sub_712B0();
     SCRIPT_CHECK(var_1C->vf_008() == 0x13);
     if (var_1C->unk_224 != 0)
+#ifdef CODFH_SP
         var_1C->unk_224->sub_1218A0(&var_C, local_20);
+#else
+        var_1C->unk_224->sub_1218A0(&var_C, local_20);
+#endif
     sub_44350(arg_4, &local_10);
 }
 
 // match: sub_55570 @ 0x00055570
+// sp-match: sub_55570 @ 0x00043710
 // "PG_TargetNamedPoint": has the projectile generator of the object's
 // trigger (kind 0x13) target the object under the key arg 1 (two slots)
 // with arg 2; returns 1.
 void sub_55570(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifdef CODFH_SP // single player reads arg 2 as a real (SP 0x43710: fld/fstp)
+    RwReal stk_18;
+#else
     RwInt32 stk_18;
+#endif
     type_712B0 *l14;
     type_67620 *var_10;
     type_3D2E7C *ebp_C;
@@ -10870,18 +11370,27 @@ void sub_55570(RwUInt32 arg_0, type_44350 *arg_4)
 
     var_10 = sub_67620(arg_0);
     v8 = (type_3DF8D8_04 *)&SCRIPT_ARG(arg_4, 1);
+#ifdef CODFH_SP
+    stk_18 = SCRIPT_ARGT<RwReal>(arg_4, 2);
+#else
     stk_18 = SCRIPT_ARG(arg_4, 2);
+#endif
     var_4 = 1;
     ebp_C = var_10->vf_024();
     SCRIPT_CHECK(ebp_C != 0);
     l14 = ebp_C->sub_712B0();
     SCRIPT_CHECK(l14->vf_008() == 0x13);
     if (l14->unk_224 != 0)
+#ifdef CODFH_SP
         l14->unk_224->sub_121910(v8, stk_18);
+#else
+        l14->unk_224->sub_121910(v8, stk_18);
+#endif
     sub_44350(arg_4, &var_4);
 }
 
 // match: sub_55660 @ 0x00055660
+// sp-match: sub_55660 @ 0x00043840
 // "PG_EnableFiringStages": turns the firing stages of the projectile
 // generator of the object's trigger (kind 0x13) on or off (arg 1).
 void sub_55660(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10903,6 +11412,7 @@ void sub_55660(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55720 @ 0x00055720
+// sp-match: sub_55720 @ 0x00043920
 // "PG_TargetDefault": returns the projectile generator of the object's
 // trigger (kind 0x13) to its default target.
 void sub_55720(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10922,6 +11432,7 @@ void sub_55720(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_557B0 @ 0x000557B0
+// sp-match: sub_557B0 @ 0x000439F0
 // "PG_EnableLOSCheck": turns the line-of-sight check of the projectile
 // generator of the object's trigger (kind 0x13) on or off (arg 1).
 void sub_557B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10943,6 +11454,7 @@ void sub_557B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55870 @ 0x00055870
+// sp-match: sub_55870 @ 0x00043AE0
 // "PG_ForcedFire": fires the projectile generator of the object's trigger
 // (kind 0x13).
 void sub_55870(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10962,6 +11474,7 @@ void sub_55870(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55900 @ 0x00055900
+// sp-match: sub_55900 @ 0x00043BB0
 // "PlaySound": not supported; it only fails its check.
 void sub_55900(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -10970,6 +11483,7 @@ void sub_55900(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55930 @ 0x00055930
+// sp-match: sub_55930 @ 0x00043C00
 // "LockPlayerMovement": locks or unlocks (arg 2) the movement of player
 // arg 1.
 void sub_55930(RwUInt32 arg_0, type_44350 *arg_4)
@@ -10987,6 +11501,7 @@ void sub_55930(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_559D0 @ 0x000559D0
+// sp-match: sub_559D0 @ 0x00043C90
 // "SetPlayerState": the state arg 2 of player arg 1.
 void sub_559D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -11003,6 +11518,7 @@ void sub_559D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55A70 @ 0x00055A70
+// sp-match: sub_55A70 @ 0x00043D20
 // "ToggleCCESSPoolCreation": turns pool creation on or off (arg 1) for the
 // object's trigger.
 void sub_55A70(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11026,6 +11542,7 @@ void sub_55A70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55B20 @ 0x00055B20
+// sp-match: sub_55B20 @ 0x00043E00
 // "SetCCESSPoolManager": makes the object's trigger (kind 0x19) the pool
 // manager with arg 1.
 void sub_55B20(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11046,6 +11563,7 @@ void sub_55B20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55BD0 @ 0x00055BD0
+// sp-match: sub_55BD0 @ 0x00043EE0
 // "SetCCESSPoolManagerState": the pool manager's state arg 1.
 void sub_55BD0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -11057,6 +11575,7 @@ void sub_55BD0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55C20 @ 0x00055C20
+// sp-match: sub_55C20 @ 0x00043F10
 // "ChangeCCESSPoolSize": the size arg 3 of pool arg 1 (below 5) for arg 2
 // (below 2).
 void sub_55C20(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11075,6 +11594,7 @@ void sub_55C20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55D10 @ 0x00055D10
+// sp-match: sub_55D10 @ 0x00043FF0
 // "SetNumSpawnableEntities": the object's trigger may spawn (arg 1, arg 2)
 // entities.
 void sub_55D10(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11096,6 +11616,7 @@ void sub_55D10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55DD0 @ 0x00055DD0
+// sp-match: sub_55DD0 @ 0x00044090
 // "SetDeadFlag": the entity's dead flag arg 1.
 void sub_55DD0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -11119,6 +11640,7 @@ void sub_55DD0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55E40 @ 0x00055E40
+// sp-match: sub_55E40 @ 0x00044120
 // "SetCollisionNotifyFlag": the entity's collision notification arg 1
 // (vf_194).
 void sub_55E40(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11143,10 +11665,19 @@ void sub_55E40(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55EC0 @ 0x00055EC0
+// sp-match: sub_55EC0 @ 0x000441B0
 // "DropPickup": does nothing, not even pop its arguments; it keeps a frame
 // of twelve locals it never uses.
 void sub_55EC0(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifdef CODFH_SP // single player drops the entity's pickup and pops the arguments (SP 0x441B0)
+    type_3D3548 *entity;
+
+    entity = sub_45170(arg_0);
+    SCRIPT_CHECK(entity != 0);
+    entity->vf_1CC(1);
+    sub_44350(arg_4, 0);
+#else
     RwInt32 unused_B;
     RwInt32 unused_A;
     RwInt32 unused_9;
@@ -11159,9 +11690,11 @@ void sub_55EC0(RwUInt32 arg_0, type_44350 *arg_4)
     RwInt32 unused_2;
     RwInt32 unused_1;
     RwInt32 unused_0;
+#endif
 }
 
 // match: sub_55ED0 @ 0x00055ED0
+// sp-match: sub_55ED0 @ 0x00044230
 // "Custom_GetStartMessage": the start message of the object's custom
 // trigger (kind 0x0B).
 void sub_55ED0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11183,6 +11716,7 @@ void sub_55ED0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_55F60 @ 0x00055F60
+// sp-match: sub_55F60 @ 0x00044320
 // "Custom_GetSceneID": the id of scene arg 1 (from 1) of the object's
 // custom trigger (kind 0x0B).
 void sub_55F60(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11206,6 +11740,7 @@ void sub_55F60(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_56020 @ 0x00056020
+// sp-match: sub_56020 @ 0x00044420
 // "Custom_SendMessages": sends the messages of the object's custom trigger
 // (kind 0x0B), each with its data, from the trigger.
 void sub_56020(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11224,13 +11759,20 @@ void sub_56020(RwUInt32 arg_0, type_44350 *arg_4)
     SCRIPT_CHECK(var_10->vf_008() == 0xB);
     var_4 = (type_55ED0 *)var_10;
     for (l14 = 0; l14 < 5 && var_4->unk_108->unk_14[l14] != 0xFFFF; l14++) {
+#ifdef CODFH_SP // shape: SP 0x44420 reads unk_108 once per message
+        RwInt32 data = var_4->unk_108->unk_00[l14];
+
+        sub_6B680(var_4->unk_108->unk_14[l14], 0, (type_42E00_10 *)((RwInt32)var_4), 0, &data, 1, 1, 0);
+#else
         stk_18 = var_4->unk_108->unk_00[l14];
         sub_6B680(var_4->unk_108->unk_14[l14], 0, (type_42E00_10 *)((RwInt32)var_4), 0, &stk_18, 1, 1, 0);
+#endif
     }
     sub_44350(arg_4, 0);
 }
 
 // match: sub_56100 @ 0x00056100
+// sp-match: sub_56100 @ 0x00044530
 // "Custom_SetObject": the entity's custom object arg 1 (from 1).
 void sub_56100(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -11254,6 +11796,7 @@ void sub_56100(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_56170 @ 0x00056170
+// sp-match: sub_56170 @ 0x000445C0
 // "Custom_SetAnimatedObject": the entity's animated object arg 1 (from 1).
 void sub_56170(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -11277,6 +11820,7 @@ void sub_56170(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_561E0 @ 0x000561E0
+// sp-match: sub_561E0 @ 0x00044650
 // "GetAttachPointXFromNamedEntity": the x of the tag arg 2 in the named
 // object's entity's clump.
 void sub_561E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11331,6 +11875,7 @@ void sub_561E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_56350 @ 0x00056350
+// sp-match: sub_56350 @ 0x00044810
 // "GetAttachPointYFromNamedEntity": the y of the tag arg 2 in the named
 // object's entity's clump.
 void sub_56350(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11385,6 +11930,7 @@ void sub_56350(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_564C0 @ 0x000564C0
+// sp-match: sub_564C0 @ 0x000449D0
 // "GetAttachPointZFromNamedEntity": the z of the tag arg 2 in the named
 // object's entity's clump.
 void sub_564C0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11439,6 +11985,7 @@ void sub_564C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_56630 @ 0x00056630
+// sp-match: sub_56630 @ 0x00044B90
 // "GetAttachPointOrientationXFromNamedEntity": the facing x of the tag arg 2 in the named
 // object's entity's clump.
 void sub_56630(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11493,6 +12040,7 @@ void sub_56630(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_567A0 @ 0x000567A0
+// sp-match: sub_567A0 @ 0x00044D50
 // "GetAttachPointOrientationYFromNamedEntity": the facing y of the tag arg 2 in the named
 // object's entity's clump.
 void sub_567A0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11547,6 +12095,7 @@ void sub_567A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_56910 @ 0x00056910
+// sp-match: sub_56910 @ 0x00044F10
 // "GetAttachPointOrientationZFromNamedEntity": the facing z of the tag arg 2 in the named
 // object's entity's clump.
 void sub_56910(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11601,6 +12150,7 @@ void sub_56910(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_56A80 @ 0x00056A80
+// sp-match: sub_56A80 @ 0x000450D0
 // "SetCrewAttachPosition": the entity's crew attach position arg 1
 // (unk_354).
 void sub_56A80(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11620,6 +12170,7 @@ void sub_56A80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_56AF0 @ 0x00056AF0
+// sp-match: sub_56AF0 @ 0x00045150
 // "GetEntityFromName": the handle of the entity (flag 2) or trigger (flag
 // 1) of the kind-0x2E object under the key arg 1 (two slots), or 0.
 void sub_56AF0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11658,6 +12209,7 @@ void sub_56AF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_56C10 @ 0x00056C10
+// sp-match: sub_56C10 @ 0x000452B0
 // "IsNameValid": whether the key arg 1 (two slots) is (-1, -1), names a
 // kind-0x2D object, or names a kind-0x2E object holding its entity (flag
 // 2), trigger (1), spline (0x10 or 0x80).
@@ -11701,6 +12253,7 @@ void sub_56C10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_56DC0 @ 0x00056DC0
+// sp-match: sub_56DC0 @ 0x00045400
 // "GetPositionXFromName": the x of the point of the object under the key
 // arg 1 (two slots; kind 0x2E with its flags set, or kind 0x2D), or 0.
 void sub_56DC0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11735,6 +12288,7 @@ void sub_56DC0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_56F00 @ 0x00056F00
+// sp-match: sub_56F00 @ 0x000455A0
 // "GetPositionYFromName": the y of the point of the object under the key
 // arg 1 (two slots; kind 0x2E with its flags set, or kind 0x2D), or 0.
 void sub_56F00(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11769,6 +12323,7 @@ void sub_56F00(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_57040 @ 0x00057040
+// sp-match: sub_57040 @ 0x00045740
 // "GetPositionZFromName": the z of the point of the object under the key
 // arg 1 (two slots; kind 0x2E with its flags set, or kind 0x2D), or 0.
 void sub_57040(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11803,6 +12358,7 @@ void sub_57040(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_57180 @ 0x00057180
+// sp-match: sub_57180 @ 0x000458E0
 // "SetupGotoPoint": the goto point (arg 1, arg 2, arg 3) of the object's
 // entity: its AI object's target point with the arrival distance arg 4, a
 // type_3DDB98's (sub_17BF10) or a type_3DE0E0's (unk_644).
@@ -11842,6 +12398,7 @@ void sub_57180(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_57320 @ 0x00057320
+// sp-match: sub_57320 @ 0x00045A60
 // "GetOrientationXFromName": the x of the direction (vf_010) of the object
 // under the key arg 1 (two slots; kind 0x2E with its flags set, or kind
 // 0x2D), or 0.
@@ -11877,6 +12434,7 @@ void sub_57320(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_57460 @ 0x00057460
+// sp-match: sub_57460 @ 0x00045C00
 // "GetOrientationYFromName": the y of the direction (vf_010) of the object
 // under the key arg 1 (two slots; kind 0x2E with its flags set, or kind
 // 0x2D), or 0.
@@ -11912,6 +12470,7 @@ void sub_57460(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_575A0 @ 0x000575A0
+// sp-match: sub_575A0 @ 0x00045DA0
 // "GetOrientationZFromName": the z of the direction (vf_010) of the object
 // under the key arg 1 (two slots; kind 0x2E with its flags set, or kind
 // 0x2D), or 0.
@@ -11947,6 +12506,7 @@ void sub_575A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_576E0 @ 0x000576E0
+// sp-match: sub_576E0 @ 0x00045F40
 // "GetOrientationXFromAIObj": the x of the direction (sub_CD5A0) of the
 // entity of the object the handle arg 1 names, or 0.
 void sub_576E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11973,6 +12533,7 @@ void sub_576E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_577A0 @ 0x000577A0
+// sp-match: sub_577A0 @ 0x00046050
 // "GetOrientationYFromAIObj": the y of the direction (sub_CD5A0) of the
 // entity of the object the handle arg 1 names, or 0.
 void sub_577A0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -11999,6 +12560,7 @@ void sub_577A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_57860 @ 0x00057860
+// sp-match: sub_57860 @ 0x00046160
 // "GetOrientationZFromAIObj": the z of the direction (sub_CD5A0) of the
 // entity of the object the handle arg 1 names, or 0.
 void sub_57860(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12025,6 +12587,7 @@ void sub_57860(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_57920 @ 0x00057920
+// sp-match: sub_57920 @ 0x00046270
 // "SetupMatchOrientation": the direction (arg 1, arg 2, arg 3) the AI
 // object of the object's entity turns to (unk_484).
 void sub_57920(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12057,6 +12620,7 @@ void sub_57920(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_57A50 @ 0x00057A50
+// sp-match: sub_57A50 @ 0x000463E0
 // "SetMyPosition": moves the object's entity (kind 2) to (arg 1, arg 2,
 // arg 3) (vf_0C0).
 void sub_57A50(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12080,6 +12644,7 @@ void sub_57A50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_57B70 @ 0x00057B70
+// sp-match: sub_57B70 @ 0x000464F0
 // "TeleportToNamedObject": moves the object's entity (kind 2) to the
 // matrix of the entity or trigger of the object under the key arg 1 (two
 // slots), facing its at vector.
@@ -12124,6 +12689,7 @@ void sub_57B70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_57CF0 @ 0x00057CF0
+// sp-match: sub_57CF0 @ 0x00046680
 // "TeleportNamedObjectToNamedPoint": moves the entity of the object under
 // the key arg 1 to the point of the object under the key arg 2 (kind 0x2E:
 // its entity's volume or its trigger's matrix; kind 0x2D: its matrix),
@@ -12181,6 +12747,7 @@ void sub_57CF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_57EE0 @ 0x00057EE0
+// sp-match: sub_57EE0 @ 0x00046840
 // "SetMyOrientation": moves the object's entity (kind 2) by (arg 1, arg 2,
 // arg 3) from its position (vf_0D0).
 void sub_57EE0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12207,6 +12774,7 @@ void sub_57EE0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_58030 @ 0x00058030
+// sp-match: sub_58030 @ 0x00046990
 // "RideVehicle": the object's entity (kind 2; a soldier or a type_3DDB98)
 // rides the vehicle entity of the object under the key arg 1 (two slots),
 // which learns of it (vf_27C); its AI object notes the ride (unk_4E0).
@@ -12247,6 +12815,7 @@ void sub_58030(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_58210 @ 0x00058210
+// sp-match: sub_58210 @ 0x00046B70
 // "StopRidingVehicle": the object's entity stops riding its vehicle, which
 // learns of it (vf_27C).
 void sub_58210(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12282,6 +12851,7 @@ void sub_58210(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_58360 @ 0x00058360
+// sp-match: sub_58360 @ 0x00046C60
 // "AttachToEntity": attaches its entity to the named object's (an animated
 // entity, a vehicle or one with a spline) at the tag arg 2: rigidly as a
 // child frame with arg 3, else as a soldier's or vehicle's ride; 0 when the
@@ -12356,6 +12926,7 @@ void sub_58360(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_58670 @ 0x00058670
+// sp-match: sub_58670 @ 0x00046F20
 // "DetachFromEntity": undoes "AttachToEntity": its frame leaves its parent,
 // keeping its place in the world, and a ride is cleared.
 void sub_58670(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12394,6 +12965,7 @@ void sub_58670(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_587F0 @ 0x000587F0
+// sp-match: sub_587F0 @ 0x00047020
 // "GetDodgeDirection": of the directions args 1 to 4 (-1 for none), one in
 // random order the soldier (flag 5) can dodge in with args 5 and 6, or -1.
 void sub_587F0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12443,6 +13015,7 @@ void sub_587F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_58A20 @ 0x00058A20
+// sp-match: sub_58A20 @ 0x000471E0
 // "SetPickup": the soldier's (flag 5) pickup arg 1 (below 0x6E) and count
 // arg 2 (at least 1), or none.
 void sub_58A20(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12470,6 +13043,7 @@ void sub_58A20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_58B20 @ 0x00058B20
+// sp-match: sub_58B20 @ 0x000472D0
 // "CheckAttackPostureTransition": whether the soldier (flag 5) can go from
 // posture arg 1 to posture arg 2: 1 within a class (standing 7, 0x12, 0x2A,
 // 0x3B, 0x3F; crouching 8, 0x2B, 0x40; other), else whether it can shoot
@@ -12554,6 +13128,8 @@ void sub_58B20(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_58DD0 @ 0x00058DD0
+// sp-match: sub_58DD0 @ 0x00047560
+// sp-match: sub_58DD0 @ 0x00047560
 // "SetPlayerBuddy": makes the entity of the object the handle arg 1 names
 // player 0's buddy, shown if arg 2; hides the buddy otherwise.
 void sub_58DD0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12572,9 +13148,13 @@ void sub_58DD0(RwUInt32 arg_0, type_44350 *arg_4)
     var_4 = l10->sub_71300();
     local_C = (type_10F710 *)sub_1745A0(0);
     if (local_C != 0 && var_4 != 0) {
+#ifdef CODFH_SP // the handle copied through its getter (SP 0x47560: the pop tail's registers follow)
+        local_C->unk_2104.unk_00_h = var_4->get_unk_384_h();
+#else
         var18 = var_4->unk_384;
         var_1C = var18;
         local_C->unk_2104 = var_1C;
+#endif
         if (lv_8 != 0)
             dword_4B9190->sub_DFEB0(1, var_4);
     }
@@ -12584,6 +13164,7 @@ void sub_58DD0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_58EC0 @ 0x00058EC0
+// sp-match: sub_58EC0 @ 0x000475F0
 // "SetBuddyHealthType": the buddy display's health type arg 1.
 void sub_58EC0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -12595,6 +13176,7 @@ void sub_58EC0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_58F10 @ 0x00058F10
+// sp-match: sub_58F10 @ 0x00047630
 // "SetTaskCommand_GoToAttachPoint": tells its script object to go to the
 // tag arg 2 of the named object's entity ("SetTaskCommand_GoToPoint"), or
 // "TaskCompleted" when there is none.
@@ -12638,9 +13220,13 @@ void sub_58F10(RwUInt32 arg_0, type_44350 *arg_4)
             if (var_30)
             {
                 sub_EC2D0(var_30, (RwInt32)&var_70, var_2C, 0, 1);
+#ifdef CODFH_SP // shape: a struct copy (SP 0x47630: three dword moves)
+                var_28 = var_70.pos;
+#else
                 var_28.x = var_70.pos.x;
                 var_28.y = var_70.pos.y;
                 var_28.z = var_70.pos.z;
+#endif
             }
             else
             {
@@ -12661,6 +13247,7 @@ void sub_58F10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_590F0 @ 0x000590F0
+// sp-match: sub_590F0 @ 0x00047830
 // "SetTaskCommand_GoToAttachPoint": tells its script object to go to the
 // tag arg 2 of the named object's entity ("SetTaskCommand_TurnToPoint"), or
 // "TaskCompleted" when there is none.
@@ -12704,9 +13291,13 @@ void sub_590F0(RwUInt32 arg_0, type_44350 *arg_4)
             if (var_30)
             {
                 sub_EC2D0(var_30, (RwInt32)&var_70, var_2C, 0, 1);
+#ifdef CODFH_SP // shape: a struct copy (SP 0x47830: three dword moves)
+                var_28 = var_70.at;
+#else
                 var_28.x = var_70.at.x;
                 var_28.y = var_70.at.y;
                 var_28.z = var_70.at.z;
+#endif
             }
             else
             {
@@ -12731,6 +13322,7 @@ void sub_590F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_592E0 @ 0x000592E0
+// sp-match: sub_592E0 @ 0x00047A40
 // "SetTaskCommand_TeleportToAttachPoint": as "SetTaskCommand_GoToAttachPoint",
 // teleporting there ("SetTaskCommand_TeleportToPoint").
 void sub_592E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12773,9 +13365,13 @@ void sub_592E0(RwUInt32 arg_0, type_44350 *arg_4)
             if (var_30)
             {
                 sub_EC2D0(var_30, (RwInt32)&var_70, var_2C, 0, 1);
+#ifdef CODFH_SP // shape: a struct copy (SP 0x47A40: three dword moves)
+                var_28 = var_70.pos;
+#else
                 var_28.x = var_70.pos.x;
                 var_28.y = var_70.pos.y;
                 var_28.z = var_70.pos.z;
+#endif
             }
             else
             {
@@ -12795,6 +13391,7 @@ void sub_592E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_594B0 @ 0x000594B0
+// sp-match: sub_594B0 @ 0x00047C30
 // "Vehicle_AllowAttack": whether the vehicle entity of the object under the key arg 1 (two
 // slots) may attack (arg 2).
 void sub_594B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12824,6 +13421,7 @@ void sub_594B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_595A0 @ 0x000595A0
+// sp-match: sub_595A0 @ 0x00047D30
 // "Vehicle_AllowMove": whether the vehicle entity of the object under the key arg 1 (two
 // slots) may move (arg 2).
 void sub_595A0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12853,6 +13451,7 @@ void sub_595A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_59690 @ 0x00059690
+// sp-match: sub_59690 @ 0x00047E30
 // "CompareGodalls": whether the keys arg 1 and arg 2 (two slots each) are
 // equal.
 void sub_59690(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12870,6 +13469,7 @@ void sub_59690(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_59730 @ 0x00059730
+// sp-match: sub_59730 @ 0x00047EB0
 // "ReturnNegGodID": the null key (-1, -1).
 void sub_59730(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -12881,6 +13481,7 @@ void sub_59730(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_59770 @ 0x00059770
+// sp-match: sub_59770 @ 0x00047F10
 // "Vehicle_IncrementRiderCount": counts a rider on the vehicle entity of the object
 // under the key arg 1 (two slots): it may attack, and move with two riders
 // and none incoming.
@@ -12913,6 +13514,7 @@ void sub_59770(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_59880 @ 0x00059880
+// sp-match: sub_59880 @ 0x00048020
 // "Vehicle_IncrementIncomingRiderCount": counts an incoming rider on the vehicle entity of
 // the object under the key arg 1 (two slots), which may not move.
 void sub_59880(RwUInt32 arg_0, type_44350 *arg_4)
@@ -12942,6 +13544,7 @@ void sub_59880(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_59960 @ 0x00059960
+// sp-match: sub_59960 @ 0x00048110
 // "Vehicle_DecrementRiderCount": uncounts a rider on the vehicle entity of the
 // object under the key arg 1 (two slots): without riders it may not attack,
 // below two it may not move.
@@ -12977,6 +13580,7 @@ void sub_59960(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_59A90 @ 0x00059A90
+// sp-match: sub_59A90 @ 0x00048230
 // "FlakVehicle_SetCrewMember": makes the object's entity the crew member of
 // seat arg 1 (0x32 to 0x34) of the flak vehicle with the handle arg 2.
 void sub_59A90(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13014,6 +13618,7 @@ void sub_59A90(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_59BB0 @ 0x00059BB0
+// sp-match: sub_59BB0 @ 0x00048350
 // "FlakVehicle_GetCrewMember": the crew member of seat arg 1 (0x32 to 0x34)
 // of the flak vehicle with the handle arg 2, or 0.
 void sub_59BB0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13048,6 +13653,7 @@ void sub_59BB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_59CB0 @ 0x00059CB0
+// sp-match: sub_59CB0 @ 0x00048440
 // "FlakVehicle_SetCrewMemberStatus": the status arg 3 of seat arg 1 (0x32
 // to 0x34) of the flak vehicle with the handle arg 2.
 void sub_59CB0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13083,6 +13689,7 @@ void sub_59CB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_59DD0 @ 0x00059DD0
+// sp-match: sub_59DD0 @ 0x00048520
 // "FlakVehicle_ClearCrewMember": clears seat arg 1 (0x32 to 0x34) of the
 // flak vehicle with the handle arg 2, with arg 3.
 void sub_59DD0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13117,6 +13724,7 @@ void sub_59DD0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_59EF0 @ 0x00059EF0
+// sp-match: sub_59EF0 @ 0x00048600
 // "Vehicle_DecrementIncomingRiderCount": uncounts an incoming rider on the
 // vehicle entity of the object under the key arg 1 (two slots), after
 // sending "SetIncoming" from the object; with none incoming and two riders
@@ -13159,6 +13767,7 @@ void sub_59EF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5A060 @ 0x0005A060
+// sp-match: sub_5A060 @ 0x000487B0
 // "NamedEntityExists": whether the object under the key arg 1 (two slots)
 // holds a live entity; nothing when there is no object.
 void sub_5A060(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13186,6 +13795,7 @@ void sub_5A060(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5A110 @ 0x0005A110
+// sp-match: sub_5A110 @ 0x000489D0
 // "GetRidingVehicle": whether the object's entity (kind 2) rides a vehicle
 // (its AI object's unk_4E0).
 void sub_5A110(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13210,6 +13820,7 @@ void sub_5A110(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5A1C0 @ 0x0005A1C0
+// sp-match: sub_5A1C0 @ 0x00048B10
 // "SetRestrictedTankTargetZone": restricts the targets of the object's tank
 // (kind 2, vf_014) to the zone (arg 1, arg 2).
 void sub_5A1C0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13234,6 +13845,7 @@ void sub_5A1C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5A2C0 @ 0x0005A2C0
+// sp-match: sub_5A2C0 @ 0x00048C80
 // "ClearRestrictedTankTargetZone": lifts the target restriction of the
 // object's tank (kind 2, vf_014).
 void sub_5A2C0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13254,6 +13866,7 @@ void sub_5A2C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5A370 @ 0x0005A370
+// sp-match: sub_5A370 @ 0x00048DC0
 // "GetTankHFOV": the horizontal field of view of the tank with the handle
 // arg 1, or 0.
 void sub_5A370(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13272,6 +13885,7 @@ void sub_5A370(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5A3E0 @ 0x0005A3E0
+// sp-match: sub_5A3E0 @ 0x00048E40
 // "SetTankHFOV": the horizontal field of view arg 2 (AI parameter 2) of the
 // tank with the handle arg 1.
 void sub_5A3E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13290,6 +13904,7 @@ void sub_5A3E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5A480 @ 0x0005A480
+// sp-match: sub_5A480 @ 0x00048EA0
 // "GetPreferredAttackRange": the preferred attack range (vf_114) of the
 // entity with the handle arg 1, in state 0 or 1.
 void sub_5A480(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13306,6 +13921,7 @@ void sub_5A480(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5A510 @ 0x0005A510
+// sp-match: sub_5A510 @ 0x00048F60
 // "DontWaitForNoRenderToDeleteMe": clears flag 11 of the object's entity.
 void sub_5A510(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -13320,6 +13936,7 @@ void sub_5A510(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5A570 @ 0x0005A570
+// sp-match: sub_5A570 @ 0x00048FE0
 // "RedSquareHax": dword_438E84 = arg 1.
 void sub_5A570(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -13328,6 +13945,7 @@ void sub_5A570(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5A5B0 @ 0x0005A5B0
+// sp-match: sub_5A5B0 @ 0x00049010
 // "BlockFacing": for a soldier (kind 2), whether its AI object's facing is
 // blocked (arg 1).
 void sub_5A5B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13352,6 +13970,7 @@ void sub_5A5B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5A6C0 @ 0x0005A6C0
+// sp-match: sub_5A6C0 @ 0x00049190
 // "AttachRingMountGunToGunner": the soldier of the kind-2 object arg_0
 // takes the ring-mounted gun arg 1 (in list 0 or 1); the gun turns by the
 // angle, in the horizontal plane, between its bone 0x9B's facing and the
@@ -13413,11 +14032,31 @@ void sub_5A6C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5A9D0 @ 0x0005A9D0
+// sp-match: sub_5A9D0 @ 0x000572D0
 // "LoadSoundBank": loads the sound bank under the key arg 1 (two slots);
 // arguments 2 (a word) and 3 (below 5) are only read. Its first check ORs
 // the key's validity into the key's low word, `-1 &&` first, as written.
 void sub_5A9D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifdef CODFH_SP
+    // shape: the key and the two read-only arguments live in one local record
+    // whose address escapes, so /O2 keeps their stores (SP 0x5737B, 0x5738C):
+    // type_825E0's layout (types/soundbank.h, not included by this unit)
+    struct
+    {
+        type_3DF8D8_04 var_10;
+        RwInt32 v8;
+        RwInt16 var_4;
+    } l;
+
+    l.var_10 = *(type_3DF8D8_04 *)&SCRIPT_ARG(arg_4, 1);
+    SCRIPT_CHECK(l.var_10.unk_00 |= (-1 && l.var_10.unk_04 != -1 && l.var_10.unk_00 != 0 && l.var_10.unk_04 != 0));
+    l.var_4 = SCRIPT_ARGT<RwInt16>(arg_4, 2);
+    l.v8 = SCRIPT_ARG(arg_4, 3);
+    SCRIPT_CHECK(l.v8 < 5);
+    sub_84300((type_825E0 *)(&l.var_10));
+    sub_44350(arg_4, 0);
+#else
     type_3DF8D8_04 var_10;
     RwInt32 v8;
     RwInt16 var_4;
@@ -13429,9 +14068,11 @@ void sub_5A9D0(RwUInt32 arg_0, type_44350 *arg_4)
     SCRIPT_CHECK(v8 < 5);
     sub_84300((type_825E0 *)(&var_10));
     sub_44350(arg_4, 0);
+#endif
 }
 
 // match: sub_5AAE0 @ 0x0005AAE0
+// sp-match: sub_5AAE0 @ 0x00049460
 // "LoadAnimGroup": loads animation group arg 2 (1 to 6) of the object under
 // the key arg 1 (two slots), by its name (vf_00C).
 void sub_5AAE0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13450,6 +14091,7 @@ void sub_5AAE0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5ABC0 @ 0x0005ABC0
+// sp-match: sub_5ABC0 @ 0x00049540
 // "SetRestartAnimGroup": animation group arg 2 (from 1) restarts from the
 // key arg 1 (two slots).
 void sub_5ABC0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13466,6 +14108,7 @@ void sub_5ABC0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5AC50 @ 0x0005AC50
+// sp-match: sub_5AC50 @ 0x00049590
 // Plays the facial animation arg_0 on the soldier arg_4 (flagging it in
 // unk_805), or formats its id for a message that is never shown.
 void sub_5AC50(RwInt32 arg_0, type_3DAFC8 *arg_4)
@@ -13484,6 +14127,7 @@ void sub_5AC50(RwInt32 arg_0, type_3DAFC8 *arg_4)
 }
 
 // match: sub_5ACE0 @ 0x0005ACE0
+// sp-match: sub_5ACE0 @ 0x00049630
 // As sub_5AC50, for a type_3DDB98 (unk_694).
 void sub_5ACE0(RwInt32 arg_0, type_3DDB98 *arg_4)
 {
@@ -13501,6 +14145,7 @@ void sub_5ACE0(RwInt32 arg_0, type_3DDB98 *arg_4)
 }
 
 // match: sub_5AD70 @ 0x0005AD70
+// sp-match: sub_5AD70 @ 0x000496D0
 // "PlayFacialAnimation": plays the facial animation arg 1 on the entity (a
 // type_3DDB98 or a soldier).
 void sub_5AD70(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13527,6 +14172,7 @@ void sub_5AD70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5AE10 @ 0x0005AE10
+// sp-match: sub_5AE10 @ 0x00049750
 // "PlayFacialAnimationOnNamedEntity": plays the facial animation arg 1 on
 // the entity of the kind-0x2E object under the key arg 2 (two slots).
 void sub_5AE10(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13555,6 +14201,7 @@ void sub_5AE10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5AF50 @ 0x0005AF50
+// sp-match: sub_5AF50 @ 0x000498E0
 // "HasDefaultSplinePath": whether the object's entity (kind 2) has a default
 // spline path: its AI object's (flag 12 of unk_49C and a spline), else a
 // type_3DDB98's or type_3DA6C0's (vf_0F4).
@@ -13583,6 +14230,7 @@ void sub_5AF50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5B080 @ 0x0005B080
+// sp-match: sub_5B080 @ 0x00049A70
 // "DivorceSplinePath": the object's entity (kind 2) leaves its spline path:
 // its AI object's (sending "SplinePath_ArrivedATDestination"), or a
 // type_3DA6C0's, type_3DDB98's or type_3DAC58's (vf_0F8). It pops nothing.
@@ -13626,6 +14274,7 @@ void sub_5B080(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5B240 @ 0x0005B240
+// sp-match: sub_5B240 @ 0x000573F0
 // "SetSplinePathFromName": puts the object's entity (kind 2) on the spline
 // of the kind-0x2E object (flags 0x80) under the key arg 1 (two slots), or
 // for (-1, -1) on its trigger's default path (unk_F8, unk_F0, unk_E0, unk_E8
@@ -13706,6 +14355,7 @@ void sub_5B240(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5B800 @ 0x0005B800
+// sp-match: sub_5B800 @ 0x000566C0
 void type_3DDB98::sub_5B800(RwReal arg_0)
 {
     unk_738 = arg_0;
@@ -13713,6 +14363,7 @@ void type_3DDB98::sub_5B800(RwReal arg_0)
 }
 
 // match: sub_5B850 @ 0x0005B850
+// sp-match: sub_5B850 @ 0x00056700
 void type_3DAC58::sub_5B850(RwReal arg_0)
 {
     unk_3C0 = arg_0;
@@ -13720,6 +14371,7 @@ void type_3DAC58::sub_5B850(RwReal arg_0)
 }
 
 // match: sub_5B8A0 @ 0x0005B8A0
+// sp-match: sub_5B8A0 @ 0x00057890
 // "SetSplineEndPosition": the end arg 1 (0 to 1) of the spline path of the
 // object's entity (kind 2): its AI object's, or a type_3DA6C0's,
 // type_3DDB98's or type_3DAC58's.
@@ -13756,6 +14408,7 @@ void sub_5B8A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5BAA0 @ 0x0005BAA0
+// sp-match: sub_5BAA0 @ 0x00049C10
 // "GetClosestPositionOnSpline": the position on the spline path of the
 // object's entity (kind 2; its AI object's, else its own) closest to the
 // entity (sub_BA450, with 100 and 1).
@@ -13785,6 +14438,7 @@ void sub_5BAA0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5BBF0 @ 0x0005BBF0
+// sp-match: sub_5BBF0 @ 0x00049E10
 // "GetClosestPositionFromPlayerOnSpline": as "GetClosestPositionOnSpline",
 // closest to player 0 (vf_0CC).
 void sub_5BBF0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13818,6 +14472,7 @@ void sub_5BBF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5BDA0 @ 0x0005BDA0
+// sp-match: sub_5BDA0 @ 0x0004A070
 // "GetSplineLength": the length of the spline path of the object's entity
 // (kind 2; its AI object's, else its own).
 void sub_5BDA0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13847,6 +14502,7 @@ void sub_5BDA0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5BED0 @ 0x0005BED0
+// sp-match: sub_5BED0 @ 0x0004A250
 // "GetSplinePositionX": the x of the point at arg 1 along the spline path of
 // the object's entity (kind 2; its AI object's, else its own).
 void sub_5BED0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13877,6 +14533,7 @@ void sub_5BED0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5C040 @ 0x0005C040
+// sp-match: sub_5C040 @ 0x0004A460
 // "GetSplinePositionY": the y of the point at arg 1 along the spline path of
 // the object's entity (kind 2; its AI object's, else its own).
 void sub_5C040(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13907,6 +14564,7 @@ void sub_5C040(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5C1B0 @ 0x0005C1B0
+// sp-match: sub_5C1B0 @ 0x0004A670
 // "GetSplinePositionZ": the z of the point at arg 1 along the spline path of
 // the object's entity (kind 2; its AI object's, else its own).
 void sub_5C1B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13937,6 +14595,7 @@ void sub_5C1B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5C320 @ 0x0005C320
+// sp-match: sub_5C320 @ 0x0004A880
 // "GetSplinePositionXFromName": as "GetSplinePositionX", for the entity of
 // the kind-0x2E object under the key arg 1 (two slots), at arg 2.
 void sub_5C320(RwUInt32 arg_0, type_44350 *arg_4)
@@ -13976,6 +14635,7 @@ void sub_5C320(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5C4F0 @ 0x0005C4F0
+// sp-match: sub_5C4F0 @ 0x0004AAD0
 // "GetSplinePositionYFromName": as "GetSplinePositionY", for the entity of
 // the kind-0x2E object under the key arg 1 (two slots), at arg 2.
 void sub_5C4F0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14015,6 +14675,7 @@ void sub_5C4F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5C6C0 @ 0x0005C6C0
+// sp-match: sub_5C6C0 @ 0x0004AD20
 // "GetSplinePositionZFromName": as "GetSplinePositionZ", for the entity of
 // the kind-0x2E object under the key arg 1 (two slots), at arg 2.
 void sub_5C6C0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14054,6 +14715,7 @@ void sub_5C6C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5C890 @ 0x0005C890
+// sp-match: sub_5C890 @ 0x0004AF70
 // "SetSplinePosition": the position arg 1 on the spline path of the
 // object's entity (kind 2; its AI object's, else its own, vf_0F8).
 void sub_5C890(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14080,6 +14742,7 @@ void sub_5C890(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5C9B0 @ 0x0005C9B0
+// sp-match: sub_5C9B0 @ 0x0004B0F0
 // "GetSplinePositionFromName": the position on its AI object's spline path
 // of the entity of the kind-0x2E object under the key arg 1 (two slots), or
 // 0.
@@ -14117,6 +14780,7 @@ void sub_5C9B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5CB00 @ 0x0005CB00
+// sp-match: sub_5CB00 @ 0x0004B2C0
 // "SetSplineIncrement": the spline increment arg 1 of the object's entity
 // (kind 2).
 void sub_5CB00(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14136,6 +14800,7 @@ void sub_5CB00(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5CBD0 @ 0x0005CBD0
+// sp-match: sub_5CBD0 @ 0x0004B3E0
 // "GetSplineIncrement": the spline increment of the object's entity (kind
 // 2).
 void sub_5CBD0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14154,6 +14819,7 @@ void sub_5CBD0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5CC80 @ 0x0005CC80
+// sp-match: sub_5CC80 @ 0x0004B510
 // "GetSplineIncrementFromName": the spline increment of the entity (a
 // type_3DA6C0) of the kind-0x2E object under the key arg 1 (two slots).
 void sub_5CC80(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14184,6 +14850,7 @@ void sub_5CC80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5CDC0 @ 0x0005CDC0
+// sp-match: sub_5CDC0 @ 0x0004B6F0
 // "SetSplineMovementByAnimation": whether the object's entity (kind 2)
 // moves along its spline by its animation (arg 1).
 void sub_5CDC0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14203,6 +14870,7 @@ void sub_5CDC0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5CE90 @ 0x0005CE90
+// sp-match: sub_5CE90 @ 0x0004B810
 // "SetSplineGoodToGo": whether the object's entity (kind 2), a type_3DDB98, may go along its spline
 // (arg 1).
 void sub_5CE90(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14223,6 +14891,7 @@ void sub_5CE90(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5CF70 @ 0x0005CF70
+// sp-match: sub_5CF70 @ 0x0004B940
 // "SetPointGoodToGo": whether the object's entity (kind 2), a type_3DDB98, may go to its point
 // (arg 1).
 void sub_5CF70(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14243,6 +14912,7 @@ void sub_5CF70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5D050 @ 0x0005D050
+// sp-match: sub_5D050 @ 0x0004BA70
 // "GetTransitionDistance": how far the soldier's scene transition for the
 // words (arg 2, arg 1) and the key byte arg 3 carries it: the performance
 // set sub_EE360 picks is walked clip by clip, each clip's start offset
@@ -14259,12 +14929,14 @@ void sub_5D050(RwUInt32 arg_0, type_44350 *arg_4)
     RwV3d ebp_9C;
     RtQuat q90;
     RtQuat r80;
+#ifndef CODFH_SP
     RwInt32 s70;
     RwInt32 m_6C;
     RwInt32 q68;
     RwV3d var_64;
     RtQuat slot_58;
     RwInt32 w48;
+#endif
     RwInt8 fp_41;
     type_EDA50_item *fp_40;
     type_3DAFC8 *ebp_3C;
@@ -14309,6 +14981,15 @@ void sub_5D050(RwUInt32 arg_0, type_44350 *arg_4)
         lcl_38 = dword_4B9304;
         fp_40 = (type_EDA50_item *)lcl_38->sub_EE360(m_1D, fp_41, (RwInt8)l1C);
         if (fp_40 != 0) {
+#ifdef CODFH_SP // shape: block-scoped, so /O2 lays out the frame as SP 0x4BA70 does
+            RwInt32 s70;
+            RwInt32 m_6C;
+            RwInt32 q68;
+            RwV3d var_64;
+            RtQuat slot_58;
+            RwInt32 w48;
+
+#endif
             w48 = 1;
             var_64.x = 0.0f;
             var_64.y = 0.0f;
@@ -14341,13 +15022,16 @@ void sub_5D050(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5D4B0 @ 0x0005D4B0
+// sp-match: sub_5D4B0 @ 0x0004BF10
 // "DoesSceneHaveTranstion": whether the scene performance the entity's
 // scene map entry (vf_0E0) finds for the words (arg 2, arg 1) has a
 // transition (sub_6CF50) with the entity's performance values.
 void sub_5D4B0(RwUInt32 arg_0, type_44350 *arg_4)
 {
     type_6D380 *slot_44;
+#ifndef CODFH_SP
     type_46840_30 l40;
+#endif
     RwInt32 ebp_34;
     RwInt8 *var_30;
     type_5D4B0_2C bp_2C;
@@ -14376,7 +15060,11 @@ void sub_5D4B0(RwUInt32 arg_0, type_44350 *arg_4)
     if (l10 != -1) {
         var_30 = (RwInt8 *)stk_14->vf_08C(1, 0);
         if (var_30 != 0) {
+#ifdef CODFH_SP // shape: block-scoped, so /O2 schedules its copy as SP 0x4BF10 does
+            type_46840_30 l40 = *(type_46840_30 *)var_30;
+#else
             l40 = *(type_46840_30 *)var_30;
+#endif
             if (var_1C >= 0)
                 l40.unk_00[2] = (RwInt8)var_1C;
             slot_44 = stk_14->vf_090();
@@ -14394,6 +15082,7 @@ void sub_5D4B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5D650 @ 0x0005D650
+// sp-match: sub_5D650 @ 0x0004C110
 // "DoesNameHaveOrientation": whether the object under the key arg 1 (two
 // slots; kind 0x2C to 0x2E) has a direction (vf_010).
 void sub_5D650(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14419,6 +15108,7 @@ void sub_5D650(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5D710 @ 0x0005D710
+// sp-match: sub_5D710 @ 0x0004C1A0
 // "GetLastPerformanceTypePlayed": the type of the entity's last
 // performance.
 void sub_5D710(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14440,6 +15130,7 @@ void sub_5D710(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5D780 @ 0x0005D780
+// sp-match: sub_5D780 @ 0x0004C280
 // "RestartLevel": sets bit 3 of dword_4B86F8.
 void sub_5D780(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -14448,6 +15139,7 @@ void sub_5D780(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5D7A0 @ 0x0005D7A0
+// sp-match: sub_5D7A0 @ 0x0004C2B0
 // "QuitLevel".
 void sub_5D7A0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -14456,6 +15148,7 @@ void sub_5D7A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5D7C0 @ 0x0005D7C0
+// sp-match: sub_5D7C0 @ 0x0004C2D0
 // "GetGameFrame": the frame number dword_4B87D8.
 void sub_5D7C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -14466,18 +15159,24 @@ void sub_5D7C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5D7E0 @ 0x0005D7E0
+// sp-match: sub_5D7E0 @ 0x0004C320
 // "QuitAndLoadNextLevel": quits and loads level arg 1 (1 to 8).
 void sub_5D7E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
     RwInt32 var_4;
 
     var_4 = SCRIPT_ARG(arg_4, 1);
+#ifdef CODFH_SP // single player has levels 1 to 38 (SP 0x4C320)
+    SCRIPT_CHECK(var_4 > 0 && var_4 < 0x27);
+#else
     SCRIPT_CHECK(var_4 > 0 && var_4 < 9);
+#endif
     sub_D8CC0(var_4);
     sub_44350(arg_4, 0);
 }
 
 // match: sub_5D850 @ 0x0005D850
+// sp-match: sub_5D850 @ 0x0004C3A0
 // "EnableEndLevelTrigger": enables the object's end-level trigger (kind
 // 0x24) with arg 1.
 void sub_5D850(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14501,6 +15200,7 @@ void sub_5D850(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5D920 @ 0x0005D920
+// sp-match: sub_5D920 @ 0x0004C4D0
 // "DisableNamedCoverPoint": disables the cover node of the kind-0x2E object (flags 0x10) under
 // the key arg 1 (two slots), which must be a cover kind (as
 // "SetCoverPointFromName"), through sub_F7BA0.
@@ -14533,6 +15233,7 @@ void sub_5D920(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5DB10 @ 0x0005DB10
+// sp-match: sub_5DB10 @ 0x0004C660
 // "EnableNamedCoverPoint": enables the cover node of the kind-0x2E object (flags 0x10) under
 // the key arg 1 (two slots), which must be a cover kind (as
 // "SetCoverPointFromName"), through sub_F7BA0.
@@ -14565,6 +15266,7 @@ void sub_5DB10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5DD00 @ 0x0005DD00
+// sp-match: sub_5DD00 @ 0x0004C7F0
 // "EnableNamedPathNode": a door node's state (flag 7) of the path node the
 // kind-0x2E object of kind 0x10 under the key arg 1 (two slots) holds: set
 // when arg 2 is 0.
@@ -14587,6 +15289,7 @@ void sub_5DD00(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5DDF0 @ 0x0005DDF0
+// sp-match: sub_5DDF0 @ 0x0004C920
 // "IsWithinDefendArea": whether the entity lies within its AI object's
 // defend area (flag 13; sub_205E0).
 void sub_5DDF0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14611,6 +15314,7 @@ void sub_5DDF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5DE90 @ 0x0005DE90
+// sp-match: sub_5DE90 @ 0x0004CA60
 // "IsPointWithinDefendArea": whether (arg 1, arg 2, arg 3) lies within the
 // entity's AI object's defend area (flag 13; sub_205E0).
 void sub_5DE90(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14639,12 +15343,15 @@ void sub_5DE90(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5DFA0 @ 0x0005DFA0
+// sp-match: sub_5DFA0 @ 0x0004CBE0
 // "IsTargetWithinDefendArea": whether the entity's AI object's tracked
 // entity (a player at its eye height less unk_1A00) lies within its defend
 // area (flag 13) widened by 150 and arg 1 (sub_20670).
 void sub_5DFA0(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifndef CODFH_SP
     RwV3d ebp_20;
+#endif
     RwInt32 l14;
     RwInt32 var_10;
     type_3D3548 *ebp_C;
@@ -14660,7 +15367,11 @@ void sub_5DFA0(RwUInt32 arg_0, type_44350 *arg_4)
     SCRIPT_CHECK((var_4->unk_49C & 0x2000) != 0);
     ebp_C = var_4->unk_1374.sub_D4910();
     if (ebp_C != 0) {
+#ifdef CODFH_SP // shape: block-scoped, so /O2 schedules its copy as SP 0x4CBE0 does
+        RwV3d ebp_20 = *ebp_C->sub_CD550();
+#else
         ebp_20 = *ebp_C->sub_CD550();
+#endif
         if (ebp_C->vf_00C() != 0)
             ebp_20.y -= ebp_C->vf_00C()->unk_1A00;
         if (var_4->sub_20670(&ebp_20, 150.0f, 150.0f, 0.0f, l14))
@@ -14674,6 +15385,7 @@ void sub_5DFA0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5E0D0 @ 0x0005E0D0
+// sp-match: sub_5E0D0 @ 0x0004CD90
 // "SetupDefendAreaGotoPoint": the entity's AI object's defend area (flag 13) centre
 // (unk_13A8) becomes its target point (unk_5B0).
 void sub_5E0D0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14697,6 +15409,7 @@ void sub_5E0D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5E180 @ 0x0005E180
+// sp-match: sub_5E180 @ 0x0004CEE0
 // "SetupDefendAreaAnchorPosGotoPoint": the entity's AI object's defend area (flag 13) anchor position
 // (unk_13D0) becomes its target point (unk_5B0).
 void sub_5E180(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14720,6 +15433,7 @@ void sub_5E180(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5E230 @ 0x0005E230
+// sp-match: sub_5E230 @ 0x0004D030
 // "SetDefendArea": the entity's AI object defends the object under the key
 // arg 1 (two slots) within arg 2 (sub_1FF10).
 void sub_5E230(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14744,6 +15458,7 @@ void sub_5E230(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5E2F0 @ 0x0005E2F0
+// sp-match: sub_5E2F0 @ 0x0004D110
 // "SetDefendAreaCurrentPosition": the entity's AI object defends its
 // current point (vf_0CC) within arg 1 (sub_20370).
 void sub_5E2F0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14768,6 +15483,7 @@ void sub_5E2F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5E3A0 @ 0x0005E3A0
+// sp-match: sub_5E3A0 @ 0x0004D200
 // "SetDefendAreaCylinder": as "SetDefendArea", a cylinder of radius arg 2
 // and heights arg 3 and arg 4.
 void sub_5E3A0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14796,6 +15512,7 @@ void sub_5E3A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5E4B0 @ 0x0005E4B0
+// sp-match: sub_5E4B0 @ 0x0004D2F0
 // "SetDefendAreaCylinderCurrentPosition": as
 // "SetDefendAreaCurrentPosition", a cylinder of radius arg 1 and heights
 // arg 2 and arg 3.
@@ -14825,6 +15542,7 @@ void sub_5E4B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5E5B0 @ 0x0005E5B0
+// sp-match: sub_5E5B0 @ 0x0004D400
 // "ClearDefendArea": clears the entity's AI object's defend area
 // (sub_204E0).
 void sub_5E5B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14850,6 +15568,7 @@ void sub_5E5B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5E610 @ 0x0005E610
+// sp-match: sub_5E610 @ 0x0004D4C0
 // "GetDefendAreaRadius": the radius of the entity's AI object's defend area
 // (flag 13).
 void sub_5E610(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14872,6 +15591,7 @@ void sub_5E610(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5E6A0 @ 0x0005E6A0
+// sp-match: sub_5E6A0 @ 0x0004D5F0
 // "StartPrimedAudioStream": starts the primed stream of voice type arg 1
 // (0 to 2; state 0xC), formatting a complaint no one sees first.
 void sub_5E6A0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -14886,6 +15606,7 @@ void sub_5E6A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5E730 @ 0x0005E730
+// sp-match: sub_5E730 @ 0x0004D690
 // "PrimeAudioStream": primes the stream alias (kind 0x2A) under the key
 // arg 1 (two slots) for its voice type (0 to 2), formatting each complaint
 // no one sees before its check.
@@ -14916,6 +15637,7 @@ void sub_5E730(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5E880 @ 0x0005E880
+// sp-match: sub_5E880 @ 0x0004D840
 // "EfuncPlaySound": plays the sound alias (kind 0x19, 0x1B, 0x1C, 0x1E or
 // 0x2A) under the key arg 1 (two slots) with arg 3, from the entity (arg 2
 // = 0), player 0 (1) or nowhere (2) at its position; returns its id, or 0.
@@ -14974,6 +15696,7 @@ void sub_5E880(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5EB50 @ 0x0005EB50
+// sp-match: sub_5EB50 @ 0x0004DA10
 // "EfuncPlaySoundAndFacialAnim": for a sound from the entity (arg 2 = 0),
 // first plays the facial animation arg 4 on it; then as "EfuncPlaySound".
 void sub_5EB50(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15009,6 +15732,7 @@ void sub_5EB50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5EC30 @ 0x0005EC30
+// sp-match: sub_5EC30 @ 0x0004DAB0
 // "EfuncPlaySoundOnNamedEntity": as "EfuncPlaySound", from the entity of the
 // kind-0x2E object under the key arg 2 (two slots), with arg 3.
 void sub_5EC30(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15057,6 +15781,7 @@ void sub_5EC30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5EE80 @ 0x0005EE80
+// sp-match: sub_5EE80 @ 0x0004DD10
 // "EfuncPlaySoundAndFacialAnimOnNamedEntity": plays the facial animation
 // arg 4 on the entity of the kind-0x2E object under the key arg 2 (two
 // slots); then as "EfuncPlaySoundOnNamedEntity".
@@ -15088,6 +15813,7 @@ void sub_5EE80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5EFC0 @ 0x0005EFC0
+// sp-match: sub_5EFC0 @ 0x0004DEB0
 // "EfuncPlayIndexSound": plays the index sound alias (kind 0x1D) under the
 // key arg 1 (two slots), at the entry the entity's tag selects (arg 3 = 0:
 // the surface's, 1: its own; a tagless entity uses 0 and warns), from the
@@ -15148,7 +15874,9 @@ void sub_5EFC0(RwUInt32 arg_0, type_44350 *arg_4)
                             "self for index has no tag... calling index alias 0x%x, 0x%x! Using "
                             "0 for Index Alias purposes",
                             var_4->unk_00, var_4->unk_04);
+#ifndef CODFH_SP // single player compiles the debug print out
                     sub_19A750(var_240);
+#endif
                 }
                 loc12C->unk_290 = 0;
             }
@@ -15171,7 +15899,9 @@ void sub_5EFC0(RwUInt32 arg_0, type_44350 *arg_4)
                             "EfuncPlayIndexSound: WARNING! Entity on non-tagged surface calling "
                             "index alias 0x%x, 0x%x! Using 0 for Index Alias purposes",
                             var_4->unk_00, var_4->unk_04);
+#ifndef CODFH_SP // single player compiles the debug print out
                     sub_19A750(var_350);
+#endif
                 }
                 loc12C->unk_294 = 0;
             }
@@ -15211,6 +15941,7 @@ void sub_5EFC0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5F4B0 @ 0x0005F4B0
+// sp-match: sub_5F4B0 @ 0x0004E1E0
 // "EfuncPlayIndexSoundOnNamedEntity": as "EfuncPlayIndexSound", from the
 // entity of the kind-0x2E object under the key arg 2 (two slots), with
 // arg 4; nothing without that entity.
@@ -15283,7 +16014,9 @@ void sub_5F4B0(RwUInt32 arg_0, type_44350 *arg_4)
                             "sound using self for index has no tag... calling index alias 0x%x, "
                             "0x%x! Using 0 for Index Alias purposes",
                             var_4->unk_00, var_4->unk_04);
+#ifndef CODFH_SP // single player compiles the debug print out
                     sub_19A750(var_248);
+#endif
                 }
                 stk_130->unk_290 = 0;
             }
@@ -15307,7 +16040,9 @@ void sub_5F4B0(RwUInt32 arg_0, type_44350 *arg_4)
                             "surface calling index alias 0x%x, 0x%x! Using 0 for Index Alias "
                             "purposes",
                             var_4->unk_00, var_4->unk_04);
+#ifndef CODFH_SP // single player compiles the debug print out
                     sub_19A750(var_358);
+#endif
                 }
                 stk_130->unk_294 = 0;
             }
@@ -15320,6 +16055,7 @@ void sub_5F4B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5F950 @ 0x0005F950
+// sp-match: sub_5F950 @ 0x0004E5A0
 // "FadeSubstreamVolume": fades the two substreams of the stream of voice
 // type arg 1 (0 to 2) to the volumes arg 2 and arg 3 (percent, scaled by the
 // stream's sound's volume and clamped to 0 to 1) over the times arg 4 and
@@ -15356,6 +16092,7 @@ void sub_5F950(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5FC30 @ 0x0005FC30
+// sp-match: sub_5FC30 @ 0x0004E880
 // "SoundStillPlaying": whether the sound arg 1 (a handle; 0 and -1 for
 // none) still plays.
 void sub_5FC30(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15371,6 +16108,7 @@ void sub_5FC30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5FCA0 @ 0x0005FCA0
+// sp-match: sub_5FCA0 @ 0x0004E8F0
 // "AddObjective": adds the objective under the key arg 1 (two slots) with
 // arg 2 and arg 3, or formats the key for a message no one sees.
 void sub_5FCA0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15393,6 +16131,7 @@ void sub_5FCA0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5FD90 @ 0x0005FD90
+// sp-match: sub_5FD90 @ 0x0004E990
 // "RemoveObjective": removes the objective under the key arg 1 (two slots),
 // returning sub_170500's result.
 void sub_5FD90(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15406,6 +16145,7 @@ void sub_5FD90(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5FDF0 @ 0x0005FDF0
+// sp-match: sub_5FDF0 @ 0x0004EA00
 // "GetObjectiveFlags": the flags of the objective under the key arg 1.
 void sub_5FDF0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -15418,6 +16158,7 @@ void sub_5FDF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5FE50 @ 0x0005FE50
+// sp-match: sub_5FE50 @ 0x0004EA70
 // "SetObjectiveFlags": sets the flags arg 2 of the objective under the key
 // arg 1.
 void sub_5FE50(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15432,6 +16173,7 @@ void sub_5FE50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5FED0 @ 0x0005FED0
+// sp-match: sub_5FED0 @ 0x0004EAC0
 // "ClearObjectiveFlags": clears the flags arg 2 of the objective under the
 // key arg 1.
 void sub_5FED0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15446,6 +16188,7 @@ void sub_5FED0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5FF50 @ 0x0005FF50
+// sp-match: sub_5FF50 @ 0x0004EB10
 // "GetObjectiveCounter": the counter of the objective under the key arg 1.
 void sub_5FF50(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -15458,6 +16201,7 @@ void sub_5FF50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_5FFB0 @ 0x0005FFB0
+// sp-match: sub_5FFB0 @ 0x000564F0
 // "SetObjectiveCounter" and "ModifyObjectiveCounter" (both entries): hand
 // the key arg 1 and arg 2 to an empty function.
 void sub_5FFB0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15471,7 +16215,32 @@ void sub_5FFB0(RwUInt32 arg_0, type_44350 *arg_4)
     sub_44350(arg_4, 0);
 }
 
+#ifdef CODFH_SP
+void sp_sub_10D060(type_3DF8D8_04 *arg_0, RwInt32 arg_4);
+void sp_sub_10D160(type_3DF8D8_04 *arg_0, RwInt32 arg_4);
+void sp_sub_10D2B0(type_3DF8D8_04 *arg_0);
+
+// sp-match: ?sp_sub_4EB80@@YAXIPAUtype_44350@@@Z @ 0x0004EB80
+// "SetObjectiveCounter": hands the key arg 1 and arg 2 to sp_sub_10D060.
+void sp_sub_4EB80(RwUInt32 arg_0, type_44350 *arg_4)
+{
+    sp_sub_10D060((type_3DF8D8_04 *)&SCRIPT_ARG(arg_4, 1), SCRIPT_ARG(arg_4, 2));
+    sub_44350(arg_4, 0);
+}
+#endif
+
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_4EBD0@@YAXIPAUtype_44350@@@Z @ 0x0004EBD0
+// "ModifyObjectiveCounter": hands the key arg 1 and arg 2 to sp_sub_10D160.
+void sp_sub_4EBD0(RwUInt32 arg_0, type_44350 *arg_4)
+{
+    sp_sub_10D160((type_3DF8D8_04 *)&SCRIPT_ARG(arg_4, 1), SCRIPT_ARG(arg_4, 2));
+    sub_44350(arg_4, 0);
+}
+#endif
+
 // match: sub_60030 @ 0x00060030
+// sp-match: sub_60030 @ 0x0004EC20
 // "SetActivateMessage": the activate message arg 2 of the objective under the key arg 1
 // (two slots); returns sub_170940's result.
 void sub_60030(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15487,6 +16256,7 @@ void sub_60030(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_600B0 @ 0x000600B0
+// sp-match: sub_600B0 @ 0x0004EC90
 // "SetCompleteMessage": the complete message arg 2 of the objective under the key arg 1
 // (two slots); returns sub_170A30's result.
 void sub_600B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15502,6 +16272,7 @@ void sub_600B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60130 @ 0x00060130
+// sp-match: sub_60130 @ 0x0004ED00
 // "SetFailMessage": the fail message arg 2 of the objective under the key arg 1
 // (two slots); returns sub_170B20's result.
 void sub_60130(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15517,6 +16288,7 @@ void sub_60130(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_601B0 @ 0x000601B0
+// sp-match: sub_601B0 @ 0x0004ED70
 // "SetIncrementCounterMessage": the increment-counter message arg 2 of the objective under the key arg 1
 // (two slots); returns sub_170C10's result.
 void sub_601B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15532,6 +16304,7 @@ void sub_601B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60230 @ 0x00060230
+// sp-match: sub_60230 @ 0x0004EDE0
 // "SetDecrementCounterMessage": the decrement-counter message arg 2 of the objective under the key arg 1
 // (two slots); returns sub_170D00's result.
 void sub_60230(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15547,21 +16320,31 @@ void sub_60230(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_602B0 @ 0x000602B0
+// sp-match: sub_602B0 @ 0x0004EE50
 // "SetObjectiveNagTimer": the nag timer arg 2 of the objective under the
 // key arg 1 (two slots); returns sub_170FD0's result.
 void sub_602B0(RwUInt32 arg_0, type_44350 *arg_4)
 {
     RwInt32 varC;
     type_3DF8D8_04 *local_8;
+#ifdef CODFH_SP // shape: the timer read as a real (SP 0x4EE50: fld/fstp)
+    RwReal var_4;
+
+    local_8 = (type_3DF8D8_04 *)&SCRIPT_ARG(arg_4, 1);
+    var_4 = SCRIPT_ARGT<RwReal>(arg_4, 2);
+    varC = sub_170FD0(local_8, var_4);
+#else
     RwInt32 var_4;
 
     local_8 = (type_3DF8D8_04 *)&SCRIPT_ARG(arg_4, 1);
     var_4 = SCRIPT_ARG(arg_4, 2);
     varC = sub_170FD0(local_8, *(RwReal *)&var_4);
+#endif
     sub_44350(arg_4, &varC);
 }
 
 // match: sub_60330 @ 0x00060330
+// sp-match: sub_60330 @ 0x0004EED0
 // "SetObjectiveTarget": the target of the objective under the key arg 1:
 // the entity (flag 2) or trigger (flag 1) of the object under the key arg 2
 // (kind 0x2C to 0x2E).
@@ -15595,17 +16378,23 @@ void sub_60330(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60440 @ 0x00060440
+// sp-match: sub_60440 @ 0x0004EF60
 // "PrintObjective": hands the key arg 1 (two slots) to an empty function.
 void sub_60440(RwUInt32 arg_0, type_44350 *arg_4)
 {
     type_3DF8D8_04 *var_4;
 
     var_4 = (type_3DF8D8_04 *)&SCRIPT_ARG(arg_4, 1);
+#ifdef CODFH_SP // single player prints the objective (SP 0x4EF78 calls sp_sub_10D2B0)
+    sp_sub_10D2B0(var_4);
+#else
     sub_19A750(var_4);
+#endif
     sub_44350(arg_4, 0);
 }
 
 // match: sub_60490 @ 0x00060490
+// sp-match: sub_60490 @ 0x0004EFA0
 // "EnableObjectiveTargetSystem": turns the objective target system on or
 // off (arg 1).
 void sub_60490(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15618,6 +16407,7 @@ void sub_60490(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_604E0 @ 0x000604E0
+// sp-match: sub_604E0 @ 0x0004EFD0
 // "SetObjectiveSplinePath": the spline path of the objective under the key
 // arg 1: none for the key (-1, -1) in arg 2, else the spline of the object
 // under it (kind 0x2C to 0x2E; its test ORs flag 0x80 in rather than
@@ -15656,6 +16446,7 @@ void sub_604E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60630 @ 0x00060630
+// sp-match: sub_60630 @ 0x0004F0A0
 // "SetObjectiveLookaheadDistance": the lookahead distance arg 2 of the
 // objective under the key arg 1.
 void sub_60630(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15670,6 +16461,7 @@ void sub_60630(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_606B0 @ 0x000606B0
+// sp-match: sub_606B0 @ 0x0004F0F0
 // "AddSubObjectiveTarget": adds the entity (flag 2) of the object under the key arg 1
 // (kind 0x2C to 0x2E) as a sub-objective target.
 void sub_606B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15696,6 +16488,7 @@ void sub_606B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60770 @ 0x00060770
+// sp-match: sub_60770 @ 0x0004F160
 // "ClearSubObjectiveTarget": clears the entity (flag 2) of the object under the key arg 1
 // (kind 0x2C to 0x2E) as a sub-objective target.
 void sub_60770(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15722,6 +16515,7 @@ void sub_60770(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60830 @ 0x00060830
+// sp-match: sub_60830 @ 0x0004F1D0
 // "ClearAllSubObjectiveTargets".
 void sub_60830(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -15730,6 +16524,7 @@ void sub_60830(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60850 @ 0x00060850
+// sp-match: sub_60850 @ 0x0004F1F0
 // "DisplayHelpMessage": shows the help message under the key arg 1 (two
 // slots) with arg 2 and arg 3, when help messages may show.
 void sub_60850(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15747,6 +16542,7 @@ void sub_60850(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60910 @ 0x00060910
+// sp-match: sub_60910 @ 0x0004F250
 // "KillHelpMessage": removes the help message under the key arg 1.
 void sub_60910(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -15758,6 +16554,7 @@ void sub_60910(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60960 @ 0x00060960
+// sp-match: sub_60960 @ 0x0004F290
 // "ClearAllHelpMessages": with arg 1.
 void sub_60960(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -15769,6 +16566,7 @@ void sub_60960(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_609B0 @ 0x000609B0
+// sp-match: sub_609B0 @ 0x0004F2D0
 // "GetLocalYawAngleToPathPoint": the heading from the entity to its AI
 // object's path point, in degrees brought into range.
 void sub_609B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15796,6 +16594,7 @@ void sub_609B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60A30 @ 0x00060A30
+// sp-match: sub_60A30 @ 0x0004F3D0
 // "GetWorldYawAngleToTargetFrompPathPoint": the turn, in degrees, from the
 // heading towards the entity's AI object's path point to the heading
 // towards its tracked entity (RWS::DegAngDiff), both from the entity; 1e37
@@ -15822,11 +16621,19 @@ void sub_60A30(RwUInt32 arg_0, type_44350 *arg_4)
         ebp_34 = &var_4->unk_D70;
         RwV3dSubMacro(&var_30, ebp_34, ebp_C->sub_CD550());
         RwV3dNormalize(&var_30, &var_30);
+#ifdef CODFH_SP // sub_2C1E0 expanded inline (SP 0x4F3D0: fpatan)
+        l14 = (RwReal)atan2(var_30.z, var_30.x) * 57.295776f;
+#else
         l14 = sub_2C1E0(&var_30) * 57.295776f;
+#endif
         l14 = sub_13F9E0(l14);
         RwV3dSubMacro(&fp_24, var_10->sub_CD550(), ebp_C->sub_CD550());
         RwV3dNormalize(&fp_24, &fp_24);
+#ifdef CODFH_SP // sub_2C1E0 expanded inline (SP 0x4F3D0: fpatan)
+        stk_18 = (RwReal)atan2(fp_24.z, fp_24.x) * 57.295776f;
+#else
         stk_18 = sub_2C1E0(&fp_24) * 57.295776f;
+#endif
         stk_18 = sub_13F9E0(stk_18);
         v8 = RWS::DegAngDiff(stk_18, l14);
     }
@@ -15842,6 +16649,7 @@ void sub_60A30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60BF0 @ 0x00060BF0
+// sp-match: sub_60BF0 @ 0x0004F5D0
 // "SetVisionMultiplier": the vision multiplier arg 1 and the flag arg 2 of
 // a soldier (vf_008) or vehicle (vf_010); the arguments are copied as
 // dwords either way, and the soldier tests the second as an integer.
@@ -15876,6 +16684,7 @@ void sub_60BF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60D10 @ 0x00060D10
+// sp-match: sub_60D10 @ 0x0004F6C0
 // "GetTeam": the team (the low three bits of unk_2C) of the entity of the
 // object the handle arg 1 names, or 0.
 void sub_60D10(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15897,6 +16706,7 @@ void sub_60D10(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60DB0 @ 0x00060DB0
+// sp-match: sub_60DB0 @ 0x0004F7C0
 // "GetPositionXFromAIObj": the x of the position of the entity of the
 // object the handle arg 1 names.
 void sub_60DB0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15919,6 +16729,7 @@ void sub_60DB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60E50 @ 0x00060E50
+// sp-match: sub_60E50 @ 0x0004F8F0
 // "GetPositionYFromAIObj": the y of the position of the entity of the
 // object the handle arg 1 names.
 void sub_60E50(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15941,6 +16752,7 @@ void sub_60E50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60F00 @ 0x00060F00
+// sp-match: sub_60F00 @ 0x0004FA20
 // "GetPositionZFromAIObj": the z of the position of the entity of the
 // object the handle arg 1 names.
 void sub_60F00(RwUInt32 arg_0, type_44350 *arg_4)
@@ -15963,6 +16775,7 @@ void sub_60F00(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_60FB0 @ 0x00060FB0
+// sp-match: sub_60FB0 @ 0x0004FB50
 // "GetOffsetPositionXFromAIObj": the x of the offset (arg 2, arg 3, arg 4)
 // in the frame of the entity of the object the handle arg 1 names, or of
 // the offset from its volume's point without a frame.
@@ -15998,6 +16811,7 @@ void sub_60FB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_61120 @ 0x00061120
+// sp-match: sub_61120 @ 0x0004FCB0
 // "GetOffsetPositionYFromAIObj": the y of the offset (arg 2, arg 3, arg 4)
 // in the frame of the entity of the object the handle arg 1 names, or of
 // the offset from its volume's point without a frame.
@@ -16033,6 +16847,7 @@ void sub_61120(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_61290 @ 0x00061290
+// sp-match: sub_61290 @ 0x0004FE10
 // "GetOffsetPositionZFromAIObj": the z of the offset (arg 2, arg 3, arg 4)
 // in the frame of the entity of the object the handle arg 1 names, or of
 // the offset from its volume's point without a frame.
@@ -16068,6 +16883,7 @@ void sub_61290(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_61400 @ 0x00061400
+// sp-match: sub_61400 @ 0x0004FF70
 // "GetHierarchyPositionXFromAIObj": the x of the position of bone arg 2 of
 // the entity of the object the handle arg 1 names (its animation's
 // hierarchy).
@@ -16095,6 +16911,7 @@ void sub_61400(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_61500 @ 0x00061500
+// sp-match: sub_61500 @ 0x000500D0
 // "GetHierarchyPositionYFromAIObj": the y of the position of bone arg 2 of
 // the entity of the object the handle arg 1 names (its animation's
 // hierarchy).
@@ -16122,6 +16939,7 @@ void sub_61500(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_61600 @ 0x00061600
+// sp-match: sub_61600 @ 0x00050230
 // "GetHierarchyPositionZFromAIObj": the z of the position of bone arg 2 of
 // the entity of the object the handle arg 1 names (its animation's
 // hierarchy).
@@ -16149,6 +16967,7 @@ void sub_61600(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_61700 @ 0x00061700
+// sp-match: sub_61700 @ 0x00050390
 RwInt32 sub_61700(type_3D3548 *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal *arg_C, RwInt32 arg_10)
 {
     RwV3d bp_2C;
@@ -16170,6 +16989,7 @@ RwInt32 sub_61700(type_3D3548 *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal *arg_C,
 }
 
 // match: sub_617D0 @ 0x000617D0
+// sp-match: sub_617D0 @ 0x00050460
 // "CanTurnToTurnLocation": whether the line from the entity to its AI
 // object's target point is clear, or blocked further than 150 along.
 void sub_617D0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -16195,6 +17015,7 @@ void sub_617D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_61890 @ 0x00061890
+// sp-match: sub_61890 @ 0x000505C0
 // "CanTurnTo": whether the line from the entity to (arg 1, arg 2, arg 3) is
 // clear (with the flag arg 4), or blocked further than 150 along.
 void sub_61890(RwUInt32 arg_0, type_44350 *arg_4)
@@ -16222,6 +17043,7 @@ void sub_61890(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_619B0 @ 0x000619B0
+// sp-match: sub_619B0 @ 0x000506D0
 // "SetTurnLocationTo": the entity's AI object's turn location (arg 1, arg
 // 2, arg 3), which becomes its target point.
 void sub_619B0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -16245,6 +17067,7 @@ void sub_619B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_61AB0 @ 0x00061AB0
+// sp-match: sub_61AB0 @ 0x000507E0
 // "SetTurnLocationOverrideTo": the entity's AI object's turn location
 // override (arg 1, arg 2, arg 3; unk_500).
 void sub_61AB0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -16269,6 +17092,7 @@ void sub_61AB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_61BA0 @ 0x00061BA0
+// sp-match: sub_61BA0 @ 0x000508F0
 RwInt32 sub_61BA0(type_3D3548 *arg_0, RwV3d *arg_4)
 {
     RwFrame *local_20;
@@ -16293,6 +17117,7 @@ RwInt32 sub_61BA0(type_3D3548 *arg_0, RwV3d *arg_4)
 }
 
 // match: sub_61C80 @ 0x00061C80
+// sp-match: sub_61C80 @ 0x000509C0
 // "ShouldITurnToPos": whether the entity should turn to (arg 1, arg 2,
 // arg 3) (sub_61BA0).
 void sub_61C80(RwUInt32 arg_0, type_44350 *arg_4)
@@ -16315,6 +17140,7 @@ void sub_61C80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_61D50 @ 0x00061D50
+// sp-match: sub_61D50 @ 0x00050AA0
 // "ShouldITurnToTurnLocation": for a soldier, whether it should turn to its
 // AI object's target point (sub_61BA0); 0 otherwise.
 void sub_61D50(RwUInt32 arg_0, type_44350 *arg_4)
@@ -16345,6 +17171,7 @@ void sub_61D50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_61DF0 @ 0x00061DF0
+// sp-match: sub_61DF0 @ 0x00050BA0
 // "ShouldITurnToTarget": for a soldier, whether it should turn to its AI
 // object's tracked entity (sub_61BA0); 0 otherwise.
 void sub_61DF0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -16372,15 +17199,20 @@ void sub_61DF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_61E90 @ 0x00061E90
+// sp-match: sub_61E90 @ 0x00050CB0
 // "CanSee": whether the entity sees the entity of the object the handle
 // arg 1 names: by either one's AI memory record of the other, else by the
 // vision tests within its view range; with arg 2, also by the remembered
 // record (sub_18F80).
 void sub_61E90(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifndef CODFH_SP
     RwReal var_3C;
+#endif
     RwReal v38;
+#ifndef CODFH_SP
     RwBool v34;
+#endif
     type_154C0_80 *v30;
     RwInt32 var_2C;
     type_154C0_80 *loc28;
@@ -16414,6 +17246,9 @@ void sub_61E90(RwUInt32 arg_0, type_44350 *arg_4)
                     var_2C = 0;
                     local_18 = loc28->unk_04 & 1;
                 } else {
+#ifdef CODFH_SP // shape: block-scoped, so /O2 shares its slot as SP 0x50CB0 does
+                    RwBool v34;
+#endif
                     v30 = v20->sub_16ED0(fp_C, &v34);
                     if (v30 != 0 && v34 != 0) {
                         var_2C = 0;
@@ -16422,6 +17257,9 @@ void sub_61E90(RwUInt32 arg_0, type_44350 *arg_4)
                 }
             }
             if (var_2C != 0) {
+#ifdef CODFH_SP // shape: block-scoped, so /O2 shares its slot as SP 0x50CB0 does
+                RwReal var_3C;
+#endif
                 (v38 = fp_C->vf_10C()) *= v38;
                 if (sub_414F0(fp_C, local_14, v38, &var_3C)) {
                     if (sub_413E0(fp_C, local_14)) {
@@ -16444,13 +17282,18 @@ void sub_61E90(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_620E0 @ 0x000620E0
+// sp-match: sub_620E0 @ 0x00050F20
 // "CanPotentiallySee": as "CanSee", by the records' bit 1 and without the
 // line check sub_415E0.
 void sub_620E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifndef CODFH_SP
     RwReal var_3C;
+#endif
     RwReal v38;
+#ifndef CODFH_SP
     RwBool v34;
+#endif
     type_154C0_80 *v30;
     RwInt32 var_2C;
     type_154C0_80 *loc28;
@@ -16484,6 +17327,9 @@ void sub_620E0(RwUInt32 arg_0, type_44350 *arg_4)
                         var_2C = 0;
                         local_14 = (loc28->unk_04 >> 1) & 1;
                     } else {
+#ifdef CODFH_SP // shape: block-scoped, so /O2 shares its slot as SP 0x50F20 does
+                        RwBool v34;
+#endif
                         v30 = v20->sub_16ED0(fp_C, &v34);
                         if (v30 != 0 && v34 != 0) {
                             var_2C = 0;
@@ -16492,6 +17338,9 @@ void sub_620E0(RwUInt32 arg_0, type_44350 *arg_4)
                     }
                 }
                 if (var_2C != 0) {
+#ifdef CODFH_SP // shape: block-scoped, so /O2 shares its slot as SP 0x50F20 does
+                    RwReal var_3C;
+#endif
                     (v38 = fp_C->vf_10C()) *= v38;
                     if (sub_414F0(fp_C, local_18, v38, &var_3C)) {
                         if (sub_413E0(fp_C, local_18)) {
@@ -16515,6 +17364,7 @@ void sub_620E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_62310 @ 0x00062310
+// sp-match: sub_62310 @ 0x00051150
 // "GetCollisionDistanceToPoint": how far the line from the entity to
 // (arg 1, arg 2, arg 3) is clear (sub_61700).
 void sub_62310(RwUInt32 arg_0, type_44350 *arg_4)
@@ -16537,6 +17387,7 @@ void sub_62310(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_623E0 @ 0x000623E0
+// sp-match: sub_623E0 @ 0x00051240
 // "SetPlayerPosture": player 0's posture arg 1.
 void sub_623E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -16551,6 +17402,7 @@ void sub_623E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_62450 @ 0x00062450
+// sp-match: sub_62450 @ 0x000512D0
 // "GetPlayerPosture": player 0's posture (vf_0BC).
 void sub_62450(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -16564,6 +17416,7 @@ void sub_62450(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_624A0 @ 0x000624A0
+// sp-match: sub_624A0 @ 0x00051370
 // "SetPosture": the entity's posture arg 1.
 void sub_624A0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -16587,6 +17440,7 @@ void sub_624A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_62520 @ 0x00062520
+// sp-match: sub_62520 @ 0x00051400
 // "GetPosture": the entity's posture.
 void sub_62520(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -16609,6 +17463,7 @@ void sub_62520(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_62570 @ 0x00062570
+// sp-match: sub_62570 @ 0x000514A0
 // "SetAttackStandHoldCount": the entity's AI object's attack stand hold
 // count arg 1.
 void sub_62570(RwUInt32 arg_0, type_44350 *arg_4)
@@ -16629,6 +17484,7 @@ void sub_62570(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_62610 @ 0x00062610
+// sp-match: sub_62610 @ 0x00051580
 // "GetAttackStandPosture": the attack posture for the entity's posture:
 // 0x12 when standing (7, 0x12, 0x18, 0x2A), 8 when crouching (8, 0x17,
 // 0x2B, 0x40), else 4.
@@ -16670,6 +17526,7 @@ void sub_62610(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_626E0 @ 0x000626E0
+// sp-match: sub_626E0 @ 0x000516A0
 // "SetFireAtNoTarget": whether a soldier fires at no target (arg 1), which
 // also refreshes it (vf_1B4).
 void sub_626E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -16693,6 +17550,7 @@ void sub_626E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_627C0 @ 0x000627C0
+// sp-match: sub_627C0 @ 0x00051770
 // "IsValidAIObj": whether the handle arg 1 names an object with an entity.
 void sub_627C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -16715,6 +17573,7 @@ void sub_627C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_62840 @ 0x00062840
+// sp-match: sub_62840 @ 0x00051800
 // "SetThrobbing": whether the entity throbs (arg 1).
 void sub_62840(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -16738,6 +17597,7 @@ void sub_62840(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_628C0 @ 0x000628C0
+// sp-match: sub_628C0 @ 0x00051890
 // "SetActionItem": the entity's action item arg 1.
 void sub_628C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -16761,6 +17621,7 @@ void sub_628C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_62940 @ 0x00062940
+// sp-match: sub_62940 @ 0x00051920
 // "SetAlerted": whether the entity's AI object is alerted (arg 1).
 void sub_62940(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -16786,6 +17647,7 @@ void sub_62940(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_629E0 @ 0x000629E0
+// sp-match: sub_629E0 @ 0x000519F0
 // "IsAlerted": whether the entity's AI object is alerted.
 void sub_629E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -16810,6 +17672,7 @@ void sub_629E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_62A60 @ 0x00062A60
+// sp-match: sub_62A60 @ 0x00051AE0
 // "SetCameraMode": the camera's mode arg 1 (keeping the previous one); its
 // flags become 0x14 for mode 0, else 0x10.
 void sub_62A60(RwUInt32 arg_0, type_44350 *arg_4)
@@ -16839,6 +17702,7 @@ void sub_62A60(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_62B20 @ 0x00062B20
+// sp-match: sub_62B20 @ 0x00051BA0
 // "SetCameraAlignTargetFromNamedPoint": for the camera, the matrix of the
 // object under the key arg 1 (two slots; kind 0x2E: its entity's frame or
 // its trigger's matrix; kind 0x2D: its own): with arg 2 the bits of 1.0f,
@@ -16890,8 +17754,12 @@ void sub_62B20(RwUInt32 arg_0, type_44350 *arg_4)
             sub_44220(lv_8 != 0);
         } else
             sub_44220(0);
+#ifdef CODFH_SP // single player compares arg 2 as a real with 1.0f (SP 0x51BA0: fucompp)
+        if (SCRIPT_ARGT<RwReal>(arg_4, 2) == 1.0f) {
+#else
         local_18 = SCRIPT_ARG(arg_4, 2);
         if (local_18 == 0x3F800000) {     // not an address: the bits of 1.0f
+#endif
             v30 = fp_C->get_unk_340();
             RwFrameTransform(v30, lv_8, rwCOMBINEREPLACE);
             RwFrameUpdateObjects(v30);
@@ -16910,12 +17778,17 @@ void sub_62B20(RwUInt32 arg_0, type_44350 *arg_4)
             // A local the image reserves and never uses.
             RwInt32 unused_0;
         }
+#ifdef CODFH_SP // single player compiles the debug print out
+    }
+#else
     } else
         sub_19A750("Attempting to set the camera align target on a non-camera entity\n");
+#endif
     sub_44350(arg_4, 0);
 }
 
 // match: sub_62DD0 @ 0x00062DD0
+// sp-match: sub_62DD0 @ 0x00051E30
 // "SetCameraSplinePathFromName": the camera's spline path, that of the
 // kind-0x2E object (flags 0x80) under the key arg 1 (two slots).
 void sub_62DD0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -16944,12 +17817,17 @@ void sub_62DD0(RwUInt32 arg_0, type_44350 *arg_4)
             RwInt32 unused_0;
         }
         v8->unk_42C = var_10->get_unk_24();
+#ifdef CODFH_SP // single player compiles the debug print out
+    }
+#else
     } else
         sub_19A750("Attempting to set the camera spline on a non-camera entity");
+#endif
     sub_44350(arg_4, 0);
 }
 
 // match: sub_62EF0 @ 0x00062EF0
+// sp-match: sub_62EF0 @ 0x00052010
 // "ResetCameraZoom": player 0's camera zoom.
 void sub_62EF0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -16962,6 +17840,7 @@ void sub_62EF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_62F30 @ 0x00062F30
+// sp-match: sub_62F30 @ 0x00052040
 // "SetPlayerBumpRadius": the entity's bump radius arg 1.
 void sub_62F30(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -16979,6 +17858,7 @@ void sub_62F30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_62FB0 @ 0x00062FB0
+// sp-match: sub_62FB0 @ 0x000520C0
 // "GetClosestAlarmPoint": the entity's AI object's closest alarm point
 // (sub_28780), or 0.
 void sub_62FB0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17009,6 +17889,7 @@ void sub_62FB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63030 @ 0x00063030
+// sp-match: sub_63030 @ 0x000521B0
 // "SetAlarmPathNodeOccupied": marks the alarm node (filter 0xF) nearest the
 // entity within 2000 occupied or free (arg 1).
 void sub_63030(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17040,6 +17921,7 @@ void sub_63030(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63110 @ 0x00063110
+// sp-match: sub_63110 @ 0x00052270
 // "GetClosestAlarmObject": finds the handle of the AI object of the alarm
 // (an animated background entity of type 1) nearest the entity, if one is
 // within 300, but passes 0 to sub_44350 rather than it, so the command
@@ -17088,6 +17970,7 @@ void sub_63110(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63290 @ 0x00063290
+// sp-match: sub_63290 @ 0x000523A0
 // "GetPlayerEntity": the handle of player arg 1, or 0.
 void sub_63290(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17107,6 +17990,7 @@ void sub_63290(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63310 @ 0x00063310
+// sp-match: sub_63310 @ 0x00052420
 // "GetPlayerAIObject": the handle of player arg 1's object.
 void sub_63310(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17121,6 +18005,7 @@ void sub_63310(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63390 @ 0x00063390
+// sp-match: sub_63390 @ 0x00052490
 // "DisableAnimBlending": the object must blend (vf_014 1); clears its blend
 // flag and weight.
 void sub_63390(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17135,6 +18020,7 @@ void sub_63390(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_633F0 @ 0x000633F0
+// sp-match: sub_633F0 @ 0x00052510
 // "SetHudVisible": shows or hides (arg 1) the HUD's elements 0x61 (or 3),
 // 0x1D and 0x7A, passes its own state to 0x6A to 0x73, and shows 0x90 while
 // that state is set.
@@ -17145,6 +18031,18 @@ void sub_633F0(RwUInt32 arg_0, type_44350 *arg_4)
 
     var_4 = SCRIPT_ARG(arg_4, 1);
     if (dword_4B9190 != 0) {
+#ifdef CODFH_SP // single player's HUD element numbers (SP 0x52510)
+        if (dword_4B9190->unk_08 != 0)
+            dword_4B9190->sub_E09E0(0x38, var_4);
+        else
+            dword_4B9190->sub_E09E0(3, var_4);
+        dword_4B9190->sub_E09E0(0x1D, var_4);
+        dword_4B9190->sub_E09E0(0x4B, var_4);
+        for (local_8 = 0x41; local_8 < 0x4B; local_8++)
+            dword_4B9190->sub_E09E0(local_8, dword_4B9190->unk_00);
+        if (dword_4B9190->unk_00 != 0)
+            dword_4B9190->sub_E09E0(0x61, var_4);
+#else
         if (dword_4B9190->unk_08 != 0)
             dword_4B9190->sub_E09E0(0x61, var_4);
         else
@@ -17155,11 +18053,13 @@ void sub_633F0(RwUInt32 arg_0, type_44350 *arg_4)
             dword_4B9190->sub_E09E0(local_8, dword_4B9190->unk_00);
         if (dword_4B9190->unk_00 != 0)
             dword_4B9190->sub_E09E0(0x90, var_4);
+#endif
     }
     sub_44350(arg_4, 0);
 }
 
 // match: sub_634E0 @ 0x000634E0
+// sp-match: sub_634E0 @ 0x000525B0
 // "Breakpoint": takes the object's entity and fails its check, for a
 // debugger to stop on.
 void sub_634E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17176,6 +18076,7 @@ void sub_634E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63540 @ 0x00063540
+// sp-match: sub_63540 @ 0x00052620
 // "SetVehicleCoverPoint": the entity's AI object takes up its vehicle cover point (sub_231B0).
 void sub_63540(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17200,6 +18101,7 @@ void sub_63540(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_635A0 @ 0x000635A0
+// sp-match: sub_635A0 @ 0x000526E0
 // "ClearVehicleCoverPoint": the entity's AI object leaves its vehicle cover point (sub_23860).
 void sub_635A0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17224,6 +18126,7 @@ void sub_635A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63600 @ 0x00063600
+// sp-match: sub_63600 @ 0x000527A0
 // "GetVehicleAIObjFromVehicleCoverPoint": the handle of the vehicle whose
 // cover point the entity's AI object holds (sub_232F0), or 0.
 void sub_63600(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17256,6 +18159,7 @@ void sub_63600(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_636A0 @ 0x000636A0
+// sp-match: sub_636A0 @ 0x000528A0
 // "SetVehicleToFollow": the entity's AI object follows the vehicle (flags
 // 0x40080) of the object the handle arg 1 names, or nothing.
 void sub_636A0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17294,6 +18198,7 @@ void sub_636A0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_637B0 @ 0x000637B0
+// sp-match: sub_637B0 @ 0x00052A20
 // "SetCurrentEntityFollowed": the entity's AI object follows the entity of
 // the object the handle arg 1 names in mode arg 2 (0 to 4, or -1), or
 // nothing (sub_20C50).
@@ -17337,6 +18242,7 @@ void sub_637B0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63900 @ 0x00063900
+// sp-match: sub_63900 @ 0x00052BE0
 // "SetCurrentEntityFollowedOnSpline": the entity's AI object follows the
 // entity of the object the handle arg 1 names along the spline of the
 // object under the key arg 6 (sub_20DA0: mode arg 2, 0 or 1; follow mode
@@ -17391,6 +18297,7 @@ void sub_63900(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63B40 @ 0x00063B40
+// sp-match: sub_63B40 @ 0x00052E50
 // "RegisterEntityFollowed": the entity's AI object registers the entity of
 // the object the handle arg 1 names as followed (sub_20BA0), or none
 // (sub_20C00).
@@ -17430,6 +18337,7 @@ void sub_63B40(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63C30 @ 0x00063C30
+// sp-match: sub_63C30 @ 0x00052F90
 // "UnRegisterEntityFollowed": the entity's AI object follows no one
 // (sub_20C00).
 void sub_63C30(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17455,6 +18363,7 @@ void sub_63C30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63C90 @ 0x00063C90
+// sp-match: sub_63C90 @ 0x00053050
 // "GetAngularYDiffToObj": the turn, in degrees, from the entity's heading
 // (sub_CD5A0) to the heading towards the entity of the object the handle
 // arg 1 names; 1e37 without one.
@@ -17484,12 +18393,20 @@ void sub_63C90(RwUInt32 arg_0, type_44350 *arg_4)
                 RwV3dSubMacro(&ebp_20, l14->sub_CD550(), v8->sub_CD550());
                 ebp_20.y = 0.0f;
                 RwV3dNormalize(&ebp_20, &ebp_20);
+#ifdef CODFH_SP // sub_2C1E0 expanded inline (SP 0x53050: fpatan)
+                var_30 = (RwReal)atan2(ebp_20.z, ebp_20.x) * 57.295776f;
+#else
                 var_30 = sub_2C1E0(&ebp_20) * 57.295776f;
+#endif
                 var_30 = sub_13F9E0(var_30);
                 bp_2C = *v8->sub_CD5A0();
                 bp_2C.y = 0.0f;
                 RwV3dNormalize(&bp_2C, &bp_2C);
+#ifdef CODFH_SP // sub_2C1E0 expanded inline (SP 0x53050: fpatan)
+                ebp_34 = (RwReal)atan2(bp_2C.z, bp_2C.x) * 57.295776f;
+#else
                 ebp_34 = sub_2C1E0(&bp_2C) * 57.295776f;
+#endif
                 ebp_34 = sub_13F9E0(ebp_34);
                 var_4 = RWS::DegAngDiff(var_30, ebp_34);
             }
@@ -17507,6 +18424,7 @@ void sub_63C90(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63E50 @ 0x00063E50
+// sp-match: sub_63E50 @ 0x00053220
 // "GetAIAction": the entity's AI object's action (unk_5C), or 0.
 void sub_63E50(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17535,6 +18453,7 @@ void sub_63E50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63EC0 @ 0x00063EC0
+// sp-match: sub_63EC0 @ 0x000532D0
 // "SetCoverPointSearch": the entity's AI object's cover point search arg 1 (sub_22EF0).
 void sub_63EC0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17556,6 +18475,7 @@ void sub_63EC0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63F50 @ 0x00063F50
+// sp-match: sub_63F50 @ 0x000533A0
 // "GetCoverPointSearch": the entity's AI object's cover point search
 // (unk_DD4).
 void sub_63F50(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17577,6 +18497,7 @@ void sub_63F50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_63FC0 @ 0x00063FC0
+// sp-match: sub_63FC0 @ 0x00053480
 // "SetVehicleCoverPointSearch": the entity's AI object's vehicle cover point search arg 1 (sub_22F30).
 void sub_63FC0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17598,6 +18519,7 @@ void sub_63FC0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64050 @ 0x00064050
+// sp-match: sub_64050 @ 0x00053550
 // "GetVehicleCoverPointSearch": the entity's AI object's vehicle cover point search (unk_136C).
 void sub_64050(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17618,6 +18540,7 @@ void sub_64050(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_640C0 @ 0x000640C0
+// sp-match: sub_640C0 @ 0x00053630
 // "SetCoverPointSearchType": the entity's AI object's cover point search
 // type arg 1 (0 to 2; sub_23CD0).
 void sub_640C0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17641,6 +18564,7 @@ void sub_640C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64170 @ 0x00064170
+// sp-match: sub_64170 @ 0x00053740
 // "GetCoverPointSearchType": the entity's AI object's cover point search type (unk_DD0).
 void sub_64170(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17661,6 +18585,7 @@ void sub_64170(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_641E0 @ 0x000641E0
+// sp-match: sub_641E0 @ 0x00053820
 // "SetCoverPointSearchRadius": the entity's AI object's cover point search
 // radius arg 1.
 void sub_641E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17683,6 +18608,7 @@ void sub_641E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64270 @ 0x00064270
+// sp-match: sub_64270 @ 0x000538F0
 // "IsDefendAreaSelectedBetter": sub_25A50 of the entity's AI object, or 0.
 void sub_64270(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17710,6 +18636,7 @@ void sub_64270(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_642E0 @ 0x000642E0
+// sp-match: sub_642E0 @ 0x000539A0
 // "GetEntityType": the kind bits (unk_2C & 0x3FFFFF0) of the entity of the
 // object the handle arg 1 names, or 0.
 void sub_642E0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17744,6 +18671,7 @@ void sub_642E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64380 @ 0x00064380
+// sp-match: sub_64380 @ 0x00053A40
 // "OccupyVehicleCoverpointSelected": whether the entity's AI object takes
 // the vehicle cover point it selected (unk_133C; sub_23050).
 void sub_64380(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17777,6 +18705,7 @@ void sub_64380(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64400 @ 0x00064400
+// sp-match: sub_64400 @ 0x00053B00
 // "EnableVehicleCoverPoints": turns the cover points of the vehicle entity
 // of the object the handle arg 1 names on or off (arg 2).
 void sub_64400(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17807,6 +18736,7 @@ void sub_64400(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_644E0 @ 0x000644E0
+// sp-match: sub_644E0 @ 0x00053BB0
 // "OccupyDefendAreaCoverPointSelected": sub_233B0 of the entity's AI object, or 0.
 void sub_644E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17834,6 +18764,7 @@ void sub_644E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64550 @ 0x00064550
+// sp-match: sub_64550 @ 0x00053C60
 // "SetUpdateCallBack": the entity's update callback (arg 1, arg 2, arg 3;
 // vf_204).
 void sub_64550(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17857,6 +18788,7 @@ void sub_64550(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64620 @ 0x00064620
+// sp-match: sub_64620 @ 0x00053CD0
 // "DistanceToDestination": from its entity to its AI object's destination.
 void sub_64620(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17886,6 +18818,7 @@ void sub_64620(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64740 @ 0x00064740
+// sp-match: sub_64740 @ 0x00053DD0
 // "DistanceToEnemy": from its entity to its AI object's target of the kind
 // arg 1 (sub_1FCC0); -1 without one.
 void sub_64740(RwUInt32 arg_0, type_44350 *arg_4)
@@ -17927,6 +18860,7 @@ void sub_64740(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_648C0 @ 0x000648C0
+// sp-match: sub_648C0 @ 0x00053F40
 // "DistanceToEnemyDeadOrAlive": as "DistanceToEnemy", counting dead ones.
 void sub_648C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -17967,6 +18901,7 @@ void sub_648C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64A40 @ 0x00064A40
+// sp-match: sub_64A40 @ 0x000540B0
 // "GetDistanceFromObject": the distance from the entity to the entity of
 // the object the handle arg 1 names.
 void sub_64A40(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18001,6 +18936,7 @@ void sub_64A40(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64B60 @ 0x00064B60
+// sp-match: sub_64B60 @ 0x000541F0
 // "GetDistanceFromCurrentCoverPoint": the distance from the entity to its
 // AI object's cover node (unk_F60), or 0.
 void sub_64B60(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18020,8 +18956,12 @@ void sub_64B60(RwUInt32 arg_0, type_44350 *arg_4)
         if (l10 != 0) {
             RwV3dSubMacro(&var_1C, &l10->unk_10, var_4->sub_CD550());
             lv_8 = RwV3dLength((RwV3d *)&var_1C);
+#ifdef CODFH_SP // single player compiles the debug print out
+        }
+#else
         } else
             sub_19A750("GetDistanceFromCurrentCoverPoint: no current coverpoint to get distance from!\n");
+#endif
     }
     {
         // Six locals the image reserves and never uses.
@@ -18036,12 +18976,15 @@ void sub_64B60(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64C40 @ 0x00064C40
+// sp-match: sub_64C40 @ 0x000542F0
 // "IsWithinRangeOfObject": whether the entity of the object the handle
 // arg 1 names lies within distance arg 2 and height arg 3 of the entity
 // (sub_35D90).
 void sub_64C40(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifndef CODFH_SP
     RwReal local_20;
+#endif
     RwReal var_1C;
     RwReal var18;
     type_3D3548 *stk_14;
@@ -18058,7 +19001,11 @@ void sub_64C40(RwUInt32 arg_0, type_44350 *arg_4)
         if (local_C != 0) {
             stk_14 = local_C->sub_71300();
             if (stk_14 != 0) {
+#ifdef CODFH_SP // shape: block-scoped, so /O2 gives it lv_8's slot (SP 0x542F0's one-slot frame)
+                RwReal local_20 = 0.0f;
+#else
                 local_20 = 0.0f;
+#endif
                 var_1C = SCRIPT_ARGT<RwReal>(arg_4, 2);
                 var18 = SCRIPT_ARGT<RwReal>(arg_4, 3);
                 lv_8 = sub_35D90(var_4, stk_14, var_1C * var_1C, var18 * var18, &local_20);
@@ -18075,6 +19022,7 @@ void sub_64C40(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64D70 @ 0x00064D70
+// sp-match: sub_64D70 @ 0x00054420
 // "PlayerStealthMessageActive": whether player 0's stealth message shows
 // (arg 1).
 void sub_64D70(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18090,6 +19038,7 @@ void sub_64D70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64DF0 @ 0x00064DF0
+// sp-match: sub_64DF0 @ 0x000544B0
 // "SetGimpVehicleMoveState": the gimp vehicle's (vf_02C) unk_638 arg 1.
 void sub_64DF0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18114,6 +19063,7 @@ void sub_64DF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64E70 @ 0x00064E70
+// sp-match: sub_64E70 @ 0x00054540
 // "SetGimpVehicleFireState": the gimp vehicle's (vf_02C) unk_63C arg 1.
 void sub_64E70(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18138,6 +19088,7 @@ void sub_64E70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64EF0 @ 0x00064EF0
+// sp-match: sub_64EF0 @ 0x000545D0
 // "SetGimpVehicleMoveSpeed": the gimp vehicle's (vf_02C) unk_650 arg 1.
 void sub_64EF0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18162,6 +19113,7 @@ void sub_64EF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64F70 @ 0x00064F70
+// sp-match: sub_64F70 @ 0x00054670
 // "SetGimpVehicleRotSpeed": the gimp vehicle's (vf_02C) unk_654 arg 1.
 void sub_64F70(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18186,6 +19138,7 @@ void sub_64F70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_64FF0 @ 0x00064FF0
+// sp-match: sub_64FF0 @ 0x00054710
 // "SetSplineOffsetXYZ": the offset (arg 1, arg 2, arg 3) of the entity from
 // its spline path: its AI object's (unk_D30), or a type_3DAC58's,
 // type_3DDB98's or type_3DA6C0's.
@@ -18217,6 +19170,7 @@ void sub_64FF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_65180 @ 0x00065180
+// sp-match: sub_65180 @ 0x00054820
 // "SetSplineOffsetXYZIJK": the offset of the entity from its spline path at
 // (arg 1, arg 2, arg 3) facing the direction (arg 4, arg 5, arg 6), upright:
 // its AI object's (unk_D30), or a type_3DAC58's, type_3DDB98's or
@@ -18268,6 +19222,7 @@ void sub_65180(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_654C0 @ 0x000654C0
+// sp-match: sub_654C0 @ 0x00054A00
 // "SetSplineOffsetMatrix": the offset matrix arg 1 of the entity from its
 // spline path; only a type_3DA6C0 takes it (with an AI object or as the
 // vf_024 subclass it does nothing).
@@ -18295,6 +19250,7 @@ void sub_654C0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_65580 @ 0x00065580
+// sp-match: sub_65580 @ 0x00054AC0
 // "SetProceduralRollOnSpline": whether the entity (a type_3DA6C0) rolls
 // procedurally on its spline (arg 1).
 void sub_65580(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18320,6 +19276,7 @@ void sub_65580(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_65620 @ 0x00065620
+// sp-match: sub_65620 @ 0x00054B60
 // "GetMatrixFromAIObj": the matrix of the entity of the object the handle
 // arg 1 names.
 void sub_65620(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18341,6 +19298,7 @@ void sub_65620(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_656D0 @ 0x000656D0
+// sp-match: sub_656D0 @ 0x00054C90
 // "GetMatrixFromName": the matrix of the entity the kind-0x2E object under
 // the key arg 1 (two slots) holds.
 void sub_656D0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18367,6 +19325,7 @@ void sub_656D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_657D0 @ 0x000657D0
+// sp-match: sub_657D0 @ 0x00054E40
 // "GetGlobalRegister_AsInt": global script register arg 1 as an int.
 void sub_657D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18382,6 +19341,7 @@ void sub_657D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_65850 @ 0x00065850
+// sp-match: sub_65850 @ 0x00054F30
 // "GetGlobalRegister_AsFloat": global script register arg 1 as a float.
 void sub_65850(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18397,6 +19357,7 @@ void sub_65850(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_658D0 @ 0x000658D0
+// sp-match: sub_658D0 @ 0x00055020
 // "GetGlobalRegister_AsOther": global script register arg 1 as an untyped value.
 void sub_658D0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18412,6 +19373,7 @@ void sub_658D0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_65950 @ 0x00065950
+// sp-match: sub_65950 @ 0x00055110
 // "GetGlobalRegister_AsGodName": global script register arg 1 as a god name
 // (an 8-byte key).
 void sub_65950(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18429,6 +19391,7 @@ void sub_65950(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_659F0 @ 0x000659F0
+// sp-match: sub_659F0 @ 0x00055200
 // "SetGlobalRegister_AsInt": global script register arg 1 to arg 2, as an int.
 void sub_659F0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18444,6 +19407,7 @@ void sub_659F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_65A90 @ 0x00065A90
+// sp-match: sub_65A90 @ 0x000552D0
 // "SetGlobalRegister_AsFloat": global script register arg 1 to arg 2, as a float.
 void sub_65A90(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18459,6 +19423,7 @@ void sub_65A90(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_65B30 @ 0x00065B30
+// sp-match: sub_65B30 @ 0x000553A0
 // "SetGlobalRegister_AsOther": global script register arg 1 to arg 2, as an untyped value.
 void sub_65B30(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18474,6 +19439,7 @@ void sub_65B30(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_65BD0 @ 0x00065BD0
+// sp-match: sub_65BD0 @ 0x00055470
 // "SetGlobalRegister_AsGodName": global script register arg 1 to the god
 // name (an 8-byte key) arg 2 (two slots).
 void sub_65BD0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18490,6 +19456,7 @@ void sub_65BD0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_65C70 @ 0x00065C70
+// sp-match: sub_65C70 @ 0x00055530
 // "RemoveInterrupt": removes the interrupt arg 1 from the script's own
 // task.
 void sub_65C70(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18507,6 +19474,7 @@ void sub_65C70(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_65CF0 @ 0x00065CF0
+// sp-match: sub_65CF0 @ 0x000555C0
 // "SetCanAlliesDamage": sets (arg 2) whether allies may damage the entity
 // of the object the handle arg 1 names (a flag of its trigger, by its kind).
 void sub_65CF0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18548,6 +19516,7 @@ void sub_65CF0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_65EB0 @ 0x00065EB0
+// sp-match: sub_65EB0 @ 0x00055760
 // "SetCanEnemiesDamage": sets (arg 2) whether enemies may damage the entity
 // of the object the handle arg 1 names (a flag of its trigger, by its kind).
 void sub_65EB0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18589,6 +19558,7 @@ void sub_65EB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_66070 @ 0x00066070
+// sp-match: sub_66070 @ 0x00055900
 // "SetCanBulletsDamage": sets (arg 2) whether bullets may damage the entity
 // of the object the handle arg 1 names (a flag of its trigger, by its kind).
 void sub_66070(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18630,6 +19600,7 @@ void sub_66070(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_66230 @ 0x00066230
+// sp-match: sub_66230 @ 0x00055AA0
 // "SetCanExplosionsDamage": sets (arg 2) whether explosions may damage the entity
 // of the object the handle arg 1 names (a flag of its trigger, by its kind).
 void sub_66230(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18671,6 +19642,7 @@ void sub_66230(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_663F0 @ 0x000663F0
+// sp-match: sub_663F0 @ 0x00055C40
 // "GetCanBulletsDamage": gets whether bullets may damage the entity of the
 // object the handle arg 1 names (a flag of its trigger, by its kind). The
 // command table gives "GetCanAlliesDamage" and "GetCanEnemiesDamage" this
@@ -18714,6 +19686,7 @@ void sub_663F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_66590 @ 0x00066590
+// sp-match: sub_66590 @ 0x00055E10
 // "GetCanExplosionsDamage": gets whether explosions may damage the entity of
 // the object the handle arg 1 names (a flag of its trigger, by its kind).
 void sub_66590(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18755,6 +19728,7 @@ void sub_66590(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_66730 @ 0x00066730
+// sp-match: sub_66730 @ 0x00055FE0
 // "GetNumberOfRestarts": dword_4B8720.
 void sub_66730(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18762,6 +19736,7 @@ void sub_66730(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_66750 @ 0x00066750
+// sp-match: sub_66750 @ 0x00056020
 // "GetNumberOfActiveObjects": the number of entities in list arg 1 of
 // dword_4B8600; lists 9 and 10 skip those with flag 9 of unk_28.
 void sub_66750(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18786,6 +19761,7 @@ void sub_66750(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_66810 @ 0x00066810
+// sp-match: sub_66810 @ 0x000560F0
 // "ShouldIContinueLeadingToPoint": whether the entity should go on leading
 // player 0 to the point (arg 1, arg 2, arg 3): when, flattened, the
 // directions from the player and from the entity to the point disagree, or
@@ -18827,6 +19803,7 @@ void sub_66810(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_669F0 @ 0x000669F0
+// sp-match: sub_669F0 @ 0x000562C0
 // "GetCollisionWidth": the radius (unk_4C) of the entity of the object the
 // handle arg 1 names, or 0.
 void sub_669F0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18850,6 +19827,7 @@ void sub_669F0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_66A80 @ 0x00066A80
+// sp-match: sub_66A80 @ 0x00056350
 // "SetPlayerConfined": whether player 0 is confined (unk_1A1C), arg 1.
 void sub_66A80(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18864,6 +19842,7 @@ void sub_66A80(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_66AE0 @ 0x00066AE0
+// sp-match: sub_66AE0 @ 0x000563A0
 // "SetPlayerHealthPercentage": player 0's health, the percentage arg 1
 // (vf_23C).
 void sub_66AE0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18879,6 +19858,7 @@ void sub_66AE0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_66B50 @ 0x00066B50
+// sp-match: sub_66B50 @ 0x000563F0
 // "DisablePlayerDamage": whether player 0's damage is off (unk_19FC), arg 1.
 void sub_66B50(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18893,6 +19873,7 @@ void sub_66B50(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_66BB0 @ 0x00066BB0
+// sp-match: sub_66BB0 @ 0x00056440
 // "IsOnlyLiveOnce": whether the entities of the entity's trigger live only
 // once (vf_014), or 0 outside one.
 void sub_66BB0(RwUInt32 arg_0, type_44350 *arg_4)
@@ -18917,6 +19898,7 @@ void sub_66BB0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_66C20 @ 0x00066C20
+// sp-match: sub_66C20 @ 0x000564B0
 // "CausePlayerPainOnHUD": shows pain on the HUD from the entity.
 void sub_66C20(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -18946,6 +19928,9 @@ void sub_66C20(RwUInt32 arg_0, type_44350 *arg_4)
 // site of performance map arg 1 (-1 or out of range for none; arg 2).
 void sub_66C60(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifdef CODFH_SP // single player's command table gives "SetBombSiteInProximity" the empty command (SP 0x320AC8 points at 0x564F0, the folded empty command): multiplayer's game modes only
+    sub_44350(arg_4, 0);
+#else
     RwInt32 l14;
     type_3D3548 *var_10;
     type_10F710 *ebp_C;
@@ -18979,6 +19964,7 @@ void sub_66C60(RwUInt32 arg_0, type_44350 *arg_4)
     ebp_C = var_10->vf_00C();
     ((type_17DBD0_player *)ebp_C)->sub_1BA910((type_712B0 *)v8, var_4 != 0);
     sub_44350(arg_4, 0);
+#endif
 }
 
 // match: sub_66D30 @ 0x00066D30
@@ -18986,6 +19972,9 @@ void sub_66C60(RwUInt32 arg_0, type_44350 *arg_4)
 // arg 2, arg 3).
 void sub_66D30(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifdef CODFH_SP // single player's command table gives "CreateBomb" the empty command (SP 0x320AD0 points at 0x564F0, the folded empty command): multiplayer's game modes only
+    sub_44350(arg_4, 0);
+#else
     RwReal bp_2C;
     RwV3d local_28;
     RwReal var_1C;
@@ -19014,12 +20003,16 @@ void sub_66D30(RwUInt32 arg_0, type_44350 *arg_4)
         var_4->vf_0C0(&local_28);
     }
     sub_44350(arg_4, 0);
+#endif
 }
 
 // match: sub_66E60 @ 0x00066E60
 // "DeclareBombSite": declares bomb site arg 1 at the script's trigger.
 void sub_66E60(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifdef CODFH_SP // single player's command table gives "DeclareBombSite" the empty command (SP 0x320AD8 points at 0x564F0, the folded empty command): multiplayer's game modes only
+    sub_44350(arg_4, 0);
+#else
     type_712B0 *var_10;
     type_67620 *ebp_C;
     type_3D2E7C *v8;
@@ -19031,6 +20024,7 @@ void sub_66E60(RwUInt32 arg_0, type_44350 *arg_4)
     var_4 = SCRIPT_ARG(arg_4, 1);
     dword_4F6950.sub_1A48B0(var_4, var_10);
     sub_44350(arg_4, 0);
+#endif
 }
 
 // match: sub_66EE0 @ 0x00066EE0
@@ -19038,6 +20032,9 @@ void sub_66E60(RwUInt32 arg_0, type_44350 *arg_4)
 // (arg 1, arg 2).
 void sub_66EE0(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifdef CODFH_SP // single player's command table gives "DeclareBombPlanted" the empty command (SP 0x320B00 points at 0x564F0, the folded empty command): multiplayer's game modes only
+    sub_44350(arg_4, 0);
+#else
     type_67620 *var_10;
     type_3D2E7C *ebp_C;
     RwInt32 v8;
@@ -19049,6 +20046,7 @@ void sub_66EE0(RwUInt32 arg_0, type_44350 *arg_4)
     v8 = SCRIPT_ARG(arg_4, 2);
     dword_4F6950.sub_1A47B0(ebp_C, var_4, v8);
     sub_44350(arg_4, 0);
+#endif
 }
 
 // match: sub_66F80 @ 0x00066F80
@@ -19065,6 +20063,9 @@ void sub_66F80(RwUInt32 arg_0, type_44350 *arg_4)
 // arg 2).
 void sub_66FA0(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifdef CODFH_SP // single player's command table gives "SetCaptureFlagBaseInProximity" the empty command (SP 0x320AF0 points at 0x564F0, the folded empty command): multiplayer's game modes only
+    sub_44350(arg_4, 0);
+#else
     RwInt32 l14;
     type_3D3548 *var_10;
     type_10F710 *ebp_C;
@@ -19098,12 +20099,16 @@ void sub_66FA0(RwUInt32 arg_0, type_44350 *arg_4)
     ebp_C = var_10->vf_00C();
     ((type_17DBD0_player *)ebp_C)->sub_1BA980((Trigger *)v8, var_4 != 0);
     sub_44350(arg_4, 0);
+#endif
 }
 
 // match: sub_67070 @ 0x00067070
 // "FlagRenderTimeOut": times out the rendering of the script's flag entity.
 void sub_67070(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifdef CODFH_SP // single player's command table gives "FlagRenderTimeOut" the empty command (SP 0x320AF8 points at 0x564F0, the folded empty command): multiplayer's game modes only
+    sub_44350(arg_4, 0);
+#else
     type_67620 *varC;
     type_3D2E7C *local_8;
     type_3D3548 *var_4;
@@ -19113,15 +20118,21 @@ void sub_67070(RwUInt32 arg_0, type_44350 *arg_4)
     var_4 = local_8->sub_71300();
     dword_4F6A7C.sub_1A5970(var_4);
     sub_44350(arg_4, 0);
+#endif
 }
 
 // match: sub_670C0 @ 0x000670C0
+// sp-match: sub_670C0 @ 0x00056510
 // "GetGameType": the game type (dword_4FB9E0's unk_08).
 void sub_670C0(RwUInt32 arg_0, type_44350 *arg_4)
 {
     RwInt32 var_4;
 
+#ifdef CODFH_SP // single player has no game type: always 0 (SP 0x56510)
+    var_4 = 0;
+#else
     var_4 = dword_4FB9E0.get_unk_08();
+#endif
     sub_44350(arg_4, &var_4);
 }
 
@@ -19129,11 +20140,16 @@ void sub_670C0(RwUInt32 arg_0, type_44350 *arg_4)
 // "SDObjectivesComplete": completes the search-and-destroy objectives.
 void sub_670F0(RwUInt32 arg_0, type_44350 *arg_4)
 {
+#ifdef CODFH_SP // single player's command table gives "SDObjectivesComplete" the empty command (SP 0x320B10 points at 0x564F0, the folded empty command): multiplayer's game modes only
+    sub_44350(arg_4, 0);
+#else
     dword_4FB9E0.sub_1B6530();
     sub_44350(arg_4, 0);
+#endif
 }
 
 // match: sub_67110 @ 0x00067110
+// sp-match: sub_67110 @ 0x00056560
 // "EnableFrustumCheck": the frustum check on or off (arg 1).
 void sub_67110(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -19145,6 +20161,7 @@ void sub_67110(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_67160 @ 0x00067160
+// sp-match: sub_67160 @ 0x000565A0
 // "SetLadderMovement": the ladder movement arg 1 of the player
 // (dword_429EB0), when on a ladder.
 void sub_67160(RwUInt32 arg_0, type_44350 *arg_4)
@@ -19160,6 +20177,7 @@ void sub_67160(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_671E0 @ 0x000671E0
+// sp-match: sub_671E0 @ 0x00056600
 // "GetGameDifficulty": dword_42B714.
 void sub_671E0(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -19170,6 +20188,7 @@ void sub_671E0(RwUInt32 arg_0, type_44350 *arg_4)
 }
 
 // match: sub_67200 @ 0x00067200
+// sp-match: sub_67200 @ 0x00056650
 // "GetWeaponType": the weapon type of the entity (a soldier, vf_008).
 void sub_67200(RwUInt32 arg_0, type_44350 *arg_4)
 {
@@ -19218,6 +20237,7 @@ type_439A48::type_439A48()
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
+#ifndef CODFH_SP // single player calls these out of line (SP 0x4D840, 0x4EF60): only declared there
 // ?sub_19A750@@YAXPAUtype_3D3548@@HUtype_3DF8D8_04@@H@Z (folded into 0x19A750)
 void sub_19A750(struct type_3D3548 * arg_0, RwInt32 arg_4, struct type_3DF8D8_04 arg_8, RwInt32 arg_C)
 {
@@ -19236,6 +20256,7 @@ void sub_19A750(struct type_3DF8D8_04 * arg_0)
     port_debug_print("objective 0x%X 0x%X", ((const RwUInt32 *)arg_0)[0], ((const RwUInt32 *)arg_0)[1]);
 #endif
 }
+#endif
 
 // ?sub_19A750@@YAXPAUtype_3DF8D8_04@@H@Z (folded into 0x19A750)
 void sub_19A750(struct type_3DF8D8_04 * arg_0, RwInt32 arg_4)

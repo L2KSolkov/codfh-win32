@@ -42,7 +42,11 @@ struct ParticleTrigger_entry
     type_F5740 *unk_28;         // the emitter it runs (sub_F5740)
     RwInt32 unk_2C;
     RwReal unk_30;
-    RwInt32 unk_34;
+    union
+    {
+        RwInt32 unk_34;
+        RwReal unk_34_f;        // single player reads a real (SP 0xBAC00: fld)
+    };
     RwReal unk_38;
     RwReal unk_3C;
     RwInt32 unk_40;

@@ -113,6 +113,7 @@ extern const RwReal flt_3DF2DC = 16.666666f;
 // match: ??_C@_06GBJPAJP@?$CFname?$CF?$AA@ @ 0x003DF860
 // match: ??_C@_0BL@HHILJDNL@ERROR?3?5MC_SelectSlotMenu?$CI?$CJ?$AA@ @ 0x003DF868
 // match: ??_C@_0EM@PCPKKLE@RwaOsOutputSetSpeakerConfig?5?5?$CIAu@ @ 0x003DF888
+// sp-match: ?sub_18AF40@@YAPADPAD@Z @ 0x0011EE40
 // Loads the memory card messages (shell\fend\instance\xbox\mc.csv) into
 // dword_4F2370, into arg_0 when given; the strings. $MCExitFree takes
 // $MCSaveCorrupt's string, and dword_4F249C is not loaded.
@@ -204,6 +205,7 @@ RwChar *sub_18AF40(RwChar *arg_0)
     return sub_18A890("shell\\fend\\instance\\xbox\\mc.csv", var_278, arg_0);
 }
 // match: ?sub_18B540@@YAXPAUtype_4EBE00@@PADH@Z @ 0x0018B540
+// sp-match: ?sub_18B540@@YAXPAUtype_4EBE00@@PADH@Z @ 0x0011F4C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Wraps the text arg_4 into the box arg_0's lines: a new line at each
 // newline, or at a space once a line has arg_8 characters.
@@ -233,6 +235,7 @@ void sub_18B540(type_4EBE00 *arg_0, RwChar *arg_4, RwInt32 arg_8)
     }
 }
 // match: ?sub_18B5F0@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018B5F0
+// sp-match: ?sub_18B5F0@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0011F530
 // The answers' selects: the answer (arg_C, an int's address) set to 1 to
 // 4.
 void sub_18B5F0(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
@@ -243,6 +246,7 @@ void sub_18B5F0(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     *var_4 = 1;
 }
 // match: ?sub_18B610@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018B610
+// sp-match: ?sub_18B610@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0011F540
 void sub_18B610(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
     RwInt32 *var_4;
@@ -251,6 +255,7 @@ void sub_18B610(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     *var_4 = 2;
 }
 // match: ?sub_18B630@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018B630
+// sp-match: ?sub_18B630@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0011F550
 void sub_18B630(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
     RwInt32 *var_4;
@@ -259,6 +264,7 @@ void sub_18B630(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     *var_4 = 3;
 }
 // match: ?sub_18B650@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018B650
+// sp-match: ?sub_18B650@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0011F560
 void sub_18B650(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
     RwInt32 *var_4;
@@ -267,6 +273,7 @@ void sub_18B650(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     *var_4 = 4;
 }
 // match: ?sub_18B670@@YAXPAUtype_4EBE00@@H@Z @ 0x0018B670
+// sp-match: ?sub_18B670@@YAXPAUtype_4EBE00@@H@Z @ 0x0011F570
 // A card message's update (its argument a type_18B670): once a second, the
 // card looked for and its free space kept (-1 without one).
 void sub_18B670(type_4EBE00 *arg_0, RwInt32 arg_4)
@@ -282,12 +289,14 @@ void sub_18B670(type_4EBE00 *arg_0, RwInt32 arg_4)
     }
 }
 // match: ?sub_18B6F0@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018B6F0
+// sp-match: ?sub_18B6F0@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0011F5C0
 // A select that closes the box.
 void sub_18B6F0(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
     sub_1870D0();
 }
 // match: ?sub_18B700@@YAXPAUtype_4EBE00@@H@Z @ 0x0018B700
+// sp-match: ?sub_18B700@@YAXPAUtype_4EBE00@@H@Z @ 0x0011F5D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCDupProfilesNotAllowed (the record's name for %name%) as a yes
 // or cancel question; the answer (1 or 3) into the int at arg_4.
@@ -312,7 +321,15 @@ void sub_18B700(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, var_108, 0x19);
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     local_10C = l4->sub_18A190(dword_4F2370[53]);
     local_10C->unk_24 = sub_18B5F0;
@@ -327,6 +344,7 @@ void sub_18B700(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18B8C0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018B8C0
+// sp-match: ?sub_18B8C0@@YAXPAUtype_4EBE00@@H@Z @ 0x0011F730
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCDupProfileNameEntered (the record's name for %name%) with an OK
 // (1 into the int at arg_4).
@@ -351,7 +369,15 @@ void sub_18B8C0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, var_108, 0x19);
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     local_10C = l4->sub_18A190(dword_4F2370[46]);
     local_10C->unk_24 = sub_18B5F0;
@@ -361,6 +387,7 @@ void sub_18B8C0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18BA40@@YAXPAUtype_4EBE00@@H@Z @ 0x0018BA40
+// sp-match: ?sub_18BA40@@YAXPAUtype_4EBE00@@H@Z @ 0x0011F870
 // Opens $MCSaving, or $MCOverwriting when arg_4 is set.
 void sub_18BA40(type_4EBE00 *arg_0, RwInt32 arg_4)
 {
@@ -372,6 +399,7 @@ void sub_18BA40(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18BA90@@YAXPAUtype_4EBE00@@H@Z @ 0x0018BA90
+// sp-match: ?sub_18BA90@@YAXPAUtype_4EBE00@@H@Z @ 0x0011F8B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCResetDataWarning as a yes or no question, no selected; the
 // answer (1 or 2) into the int at arg_4.
@@ -385,7 +413,15 @@ void sub_18BA90(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[71], 0x19);
     bp_4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_4->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_4->unk_00, "");
+#endif
     bp_4 = arg_0->sub_188970();
     bp_8 = bp_4->sub_18A190(dword_4F2370[53]);
     bp_8->unk_24 = sub_18B5F0;
@@ -403,6 +439,7 @@ void sub_18BA90(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18BBB0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018BBB0
+// sp-match: ?sub_18BBB0@@YAXPAUtype_4EBE00@@H@Z @ 0x0011F970
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCLoadProfileWarning as a yes or no question, no selected; the
 // answer (1 or 2) into the int at arg_4.
@@ -416,7 +453,15 @@ void sub_18BBB0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[72], 0x19);
     bp_4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_4->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_4->unk_00, "");
+#endif
     bp_4 = arg_0->sub_188970();
     bp_8 = bp_4->sub_18A190(dword_4F2370[53]);
     bp_8->unk_24 = sub_18B5F0;
@@ -434,6 +479,7 @@ void sub_18BBB0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18BCD0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018BCD0
+// sp-match: ?sub_18BCD0@@YAXPAUtype_4EBE00@@H@Z @ 0x0011FA30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCSaveOK, or $MCOverwriteOK when overwriting (arg_4 a
 // type_18BCD0), with an OK (1 into its answer).
@@ -450,7 +496,15 @@ void sub_18BCD0(type_4EBE00 *arg_0, RwInt32 arg_4)
     else
         sub_18B540(arg_0, dword_4F2370[24], 0x19);
     bp_8 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_8->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_8->unk_00, "");
+#endif
     bp_8 = arg_0->sub_188970();
     var_C = bp_8->sub_18A190(dword_4F2370[46]);
     var_C->unk_24 = sub_18B5F0;
@@ -460,6 +514,7 @@ void sub_18BCD0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18BD90@@YAXPAUtype_4EBE00@@H@Z @ 0x0018BD90
+// sp-match: ?sub_18BD90@@YAXPAUtype_4EBE00@@H@Z @ 0x0011FAC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCSaveFailedContinue, or $MCOverwriteFailedContinue when
 // overwriting (arg_4 a type_18BCD0), as continue or retry (and cancel when
@@ -479,7 +534,15 @@ void sub_18BD90(type_4EBE00 *arg_0, RwInt32 arg_4)
     else
         sub_18B540(arg_0, dword_4F2370[26], 0x19);
     bp_8 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_8->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_8->unk_00, "");
+#endif
     bp_8 = arg_0->sub_188970();
     var_C = bp_8->sub_18A190(dword_4F2370[53]);
     var_C->unk_24 = sub_18B5F0;
@@ -504,6 +567,7 @@ void sub_18BD90(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18BF10@@YAXPAUtype_4EBE00@@H@Z @ 0x0018BF10
+// sp-match: ?sub_18BF10@@YAXPAUtype_4EBE00@@H@Z @ 0x0011FBC0
 // Opens $MCLoading.
 void sub_18BF10(type_4EBE00 *arg_0, RwInt32 arg_4)
 {
@@ -512,6 +576,7 @@ void sub_18BF10(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18BF50@@YAXPAUtype_4EBE00@@H@Z @ 0x0018BF50
+// sp-match: ?sub_18BF50@@YAXPAUtype_4EBE00@@H@Z @ 0x0011FBF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCLoadOK with an OK (1 into the int at arg_4).
 void sub_18BF50(type_4EBE00 *arg_0, RwInt32 arg_4)
@@ -522,7 +587,15 @@ void sub_18BF50(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[10], 0x19);
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     var_8 = l4->sub_18A190(dword_4F2370[46]);
     var_8->unk_24 = sub_18B5F0;
@@ -532,6 +605,7 @@ void sub_18BF50(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18BFF0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018BFF0
+// sp-match: ?sub_18BFF0@@YAXPAUtype_4EBE00@@H@Z @ 0x0011FC70
 // Opens $MCLoadFailed with an OK (1 into the int at arg_4).
 void sub_18BFF0(type_4EBE00 *arg_0, RwInt32 arg_4)
 {
@@ -541,7 +615,15 @@ void sub_18BFF0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[11], 0x19);
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     var_8 = l4->sub_18A190(dword_4F2370[46]);
     var_8->unk_24 = sub_18B5F0;
@@ -551,6 +633,7 @@ void sub_18BFF0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18C090@@YAXPAUtype_4EBE00@@H@Z @ 0x0018C090
+// sp-match: ?sub_18C090@@YAXPAUtype_4EBE00@@H@Z @ 0x0011FCF0
 // Opens $MCCardChanged with an OK (1 into the int at arg_4).
 void sub_18C090(type_4EBE00 *arg_0, RwInt32 arg_4)
 {
@@ -560,7 +643,15 @@ void sub_18C090(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[52], 0x19);
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     var_8 = l4->sub_18A190(dword_4F2370[46]);
     var_8->unk_24 = sub_18B5F0;
@@ -570,6 +661,7 @@ void sub_18C090(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18C130@@YAXPAUtype_4EBE00@@H@Z @ 0x0018C130
+// sp-match: ?sub_18C130@@YAXPAUtype_4EBE00@@H@Z @ 0x0011FD70
 // Opens $MCNoCardLoad with an OK (1 into the int at arg_4).
 void sub_18C130(type_4EBE00 *arg_0, RwInt32 arg_4)
 {
@@ -579,7 +671,15 @@ void sub_18C130(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[1], 0x19);
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     var_8 = l4->sub_18A190(dword_4F2370[46]);
     var_8->unk_24 = sub_18B5F0;
@@ -589,6 +689,7 @@ void sub_18C130(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18C1D0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018C1D0
+// sp-match: ?sub_18C1D0@@YAXPAUtype_4EBE00@@H@Z @ 0x0011FDF0
 // Opens $MCNoCardSave with an OK (1 into the int at arg_4).
 void sub_18C1D0(type_4EBE00 *arg_0, RwInt32 arg_4)
 {
@@ -598,7 +699,15 @@ void sub_18C1D0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[0], 0x19);
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     var_8 = l4->sub_18A190(dword_4F2370[46]);
     var_8->unk_24 = sub_18B5F0;
@@ -608,6 +717,7 @@ void sub_18C1D0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18C270@@YAXPAUtype_4EBE00@@H@Z @ 0x0018C270
+// sp-match: ?sub_18C270@@YAXPAUtype_4EBE00@@H@Z @ 0x0011FE70
 // Opens $MCDataRequired with an OK (1 into the int at arg_4).
 void sub_18C270(type_4EBE00 *arg_0, RwInt32 arg_4)
 {
@@ -617,7 +727,15 @@ void sub_18C270(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[39], 0x19);
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     var_8 = l4->sub_18A190(dword_4F2370[46]);
     var_8->unk_24 = sub_18B5F0;
@@ -627,6 +745,7 @@ void sub_18C270(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18C310@@YAXPAUtype_4EBE00@@H@Z @ 0x0018C310
+// sp-match: ?sub_18C310@@YAXPAUtype_4EBE00@@H@Z @ 0x0011FEF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCContinueWOSaving as a yes or no question, no selected; the answer (1 or
 // 2) into the int at arg_4.
@@ -640,7 +759,15 @@ void sub_18C310(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[49], 0x19);
     bp_4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_4->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_4->unk_00, "");
+#endif
     bp_4 = arg_0->sub_188970();
     bp_8 = bp_4->sub_18A190(dword_4F2370[53]);
     bp_8->unk_24 = sub_18B5F0;
@@ -658,6 +785,7 @@ void sub_18C310(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18C430@@YAXPAUtype_4EBE00@@H@Z @ 0x0018C430
+// sp-match: ?sub_18C430@@YAXPAUtype_4EBE00@@H@Z @ 0x0011FFB0
 // Opens $MCCorrupted with an OK (1 into the int at arg_4).
 void sub_18C430(type_4EBE00 *arg_0, RwInt32 arg_4)
 {
@@ -667,7 +795,15 @@ void sub_18C430(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[38], 0x19);
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     var_8 = l4->sub_18A190(dword_4F2370[46]);
     var_8->unk_24 = sub_18B5F0;
@@ -677,6 +813,7 @@ void sub_18C430(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18C4D0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018C4D0
+// sp-match: ?sub_18C4D0@@YAXPAUtype_4EBE00@@H@Z @ 0x00120030
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCOverwriteContinue as a yes or no question, no selected; the answer (1 or
 // 2) into the int at arg_4.
@@ -690,7 +827,15 @@ void sub_18C4D0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[48], 0x19);
     bp_4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_4->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_4->unk_00, "");
+#endif
     bp_4 = arg_0->sub_188970();
     bp_8 = bp_4->sub_18A190(dword_4F2370[53]);
     bp_8->unk_24 = sub_18B5F0;
@@ -708,6 +853,7 @@ void sub_18C4D0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18C5F0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018C5F0
+// sp-match: ?sub_18C5F0@@YAXPAUtype_4EBE00@@H@Z @ 0x001200F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCNoSpace with an OK (1 into the answer of arg_4, a
 // type_18BCD0).
@@ -721,7 +867,15 @@ void sub_18C5F0(type_4EBE00 *arg_0, RwInt32 arg_4)
     sub_18B540(arg_0, dword_4F2370[4], 0x19);
     bp_4 = (type_18BCD0 *)arg_4;
     bp_8 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_8->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_8->unk_00, "");
+#endif
     bp_8 = arg_0->sub_188970();
     var_C = bp_8->sub_18A190(dword_4F2370[46]);
     var_C->unk_24 = sub_18B5F0;
@@ -731,6 +885,7 @@ void sub_18C5F0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18C6A0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018C6A0
+// sp-match: ?sub_18C6A0@@YAXPAUtype_4EBE00@@H@Z @ 0x00120170
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCNoSpaceContinue as continue or retry (and cancel when it can
 // be cancelled), retry selected; the answer (1, 4 or 3) into arg_4, a
@@ -747,7 +902,15 @@ void sub_18C6A0(type_4EBE00 *arg_0, RwInt32 arg_4)
     sub_18B540(arg_0, dword_4F2370[5], 0x19);
     bp_4 = (type_18BCD0 *)arg_4;
     bp_8 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_8->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_8->unk_00, "");
+#endif
     bp_8 = arg_0->sub_188970();
     var_C = bp_8->sub_18A190(dword_4F2370[53]);
     var_C->unk_24 = sub_18B5F0;
@@ -772,6 +935,7 @@ void sub_18C6A0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18C800@@YAXPAUtype_4EBE00@@H@Z @ 0x0018C800
+// sp-match: ?sub_18C800@@YAXPAUtype_4EBE00@@H@Z @ 0x00120260
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCConfirmFormat as a yes or no question, no selected; the answer (1 or
 // 2) into the int at arg_4.
@@ -785,7 +949,15 @@ void sub_18C800(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[29], 0x19);
     bp_4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_4->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_4->unk_00, "");
+#endif
     bp_4 = arg_0->sub_188970();
     bp_8 = bp_4->sub_18A190(dword_4F2370[53]);
     bp_8->unk_24 = sub_18B5F0;
@@ -803,6 +975,7 @@ void sub_18C800(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18C920@@YAXPAUtype_4EBE00@@H@Z @ 0x0018C920
+// sp-match: ?sub_18C920@@YAXPAUtype_4EBE00@@H@Z @ 0x00120320
 // Opens $MCFormatOK with an OK (1 into the int at arg_4).
 void sub_18C920(type_4EBE00 *arg_0, RwInt32 arg_4)
 {
@@ -812,7 +985,15 @@ void sub_18C920(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[32], 0x19);
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     var_8 = l4->sub_18A190(dword_4F2370[46]);
     var_8->unk_24 = sub_18B5F0;
@@ -822,6 +1003,7 @@ void sub_18C920(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18C9C0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018C9C0
+// sp-match: ?sub_18C9C0@@YAXPAUtype_4EBE00@@H@Z @ 0x001203A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCFormatFailedContinue as yes, no or retry, retry selected; the
 // answer (1, 2 or 4) into the int at arg_4.
@@ -835,7 +1017,15 @@ void sub_18C9C0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_2CF0 = 1;
     sub_18B540(arg_0, dword_4F2370[34], 0x19);
     bp_4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_4->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_4->unk_00, "");
+#endif
     bp_4 = arg_0->sub_188970();
     bp_8 = bp_4->sub_18A190(dword_4F2370[53]);
     bp_8->unk_24 = sub_18B5F0;
@@ -857,6 +1047,7 @@ void sub_18C9C0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18CB10@@YAXPAUtype_4EBE00@@H@Z @ 0x0018CB10
+// sp-match: ?sub_18CB10@@YAXPAUtype_4EBE00@@H@Z @ 0x00120480
 // Opens $MCFormatting.
 void sub_18CB10(type_4EBE00 *arg_0, RwInt32 arg_4)
 {
@@ -865,6 +1056,7 @@ void sub_18CB10(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18CB50@@YAXPAUtype_4EBE00@@H@Z @ 0x0018CB50
+// sp-match: ?sub_18CB50@@YAXPAUtype_4EBE00@@H@Z @ 0x001204B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCUnformatted as format, continue or retry (and cancel when it
 // can be cancelled), continue selected; the answer (1, 2, 4 or 3) into
@@ -883,7 +1075,15 @@ void sub_18CB50(type_4EBE00 *arg_0, RwInt32 arg_4)
     sub_18B540(arg_0, dword_4F2370[27], 0x19);
     bp_4 = (type_18BCD0 *)arg_4;
     bp_8 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_8->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_8->unk_00, "");
+#endif
     bp_8 = arg_0->sub_188970();
     var_C = bp_8->sub_18A190(dword_4F2370[43]);
     var_C->unk_24 = sub_18B5F0;
@@ -915,6 +1115,7 @@ void sub_18CB50(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18CD20@@YAXPAUtype_4EBE00@@H@Z @ 0x0018CD20
+// sp-match: ?sub_18CD20@@YAXPAUtype_4EBE00@@H@Z @ 0x001205E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCConfirmSave as a yes or no question, no selected; the answer
 // (1 or 2) into the int at arg_4.
@@ -930,7 +1131,15 @@ void sub_18CD20(type_4EBE00 *arg_0, RwInt32 arg_4)
     sub_18B540(arg_0, dword_4F2370[61], 0x19);
     bp_4 = arg_4;
     bp_8 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_8->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_8->unk_00, "");
+#endif
     bp_8 = arg_0->sub_188970();
     var_C = bp_8->sub_18A190(dword_4F2370[53]);
     var_C->unk_24 = sub_18B5F0;
@@ -948,6 +1157,7 @@ void sub_18CD20(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18CE40@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018CE40
+// sp-match: ?sub_18CE40@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x001206A0
 // A slot's select (arg_C a type_4F24A8): the slot and whether it is empty
 // kept, unless it is empty and cannot be chosen.
 void sub_18CE40(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
@@ -965,6 +1175,7 @@ void sub_18CE40(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     }
 }
 // match: ?sub_18CE90@@YAXPAUtype_4EBE00@@H@Z @ 0x0018CE90
+// sp-match: ?sub_18CE90@@YAXPAUtype_4EBE00@@H@Z @ 0x001206D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The slot menu's update (arg_4 a type_18CFA0): the card looked for, and
 // when it has come back (or the menu asks), the slots' choices named from
@@ -1006,6 +1217,7 @@ void sub_18CE90(type_4EBE00 *arg_0, RwInt32 arg_4)
     }
 }
 // match: ?sub_18CFA0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018CFA0
+// sp-match: ?sub_18CFA0@@YAXPAUtype_4EBE00@@H@Z @ 0x00120780
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens the memory card slot menu (arg_4 a type_18CFA0): a heading for its
 // mode, four slots (named by its update, sub_18CE90) and cancel.
@@ -1037,7 +1249,15 @@ void sub_18CFA0(type_4EBE00 *arg_0, RwInt32 arg_4)
     }
     sub_18B540(arg_0, (RwChar *)var_20, 0x19);
     bp_8 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_8->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_8->unk_00, "");
+#endif
     memset(l1C, 'W', 14);
     l1C[13] = 0;
     for (var_28 = 0; var_28 < 4; var_28++)
@@ -1061,7 +1281,15 @@ void sub_18CFA0(type_4EBE00 *arg_0, RwInt32 arg_4)
         }
     }
     bp_8 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_8->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_8->unk_00, "");
+#endif
     bp_8 = arg_0->sub_188970();
     ebp_24 = bp_8->sub_18A190(dword_4F2370[45]);
     ebp_24->unk_24 = sub_18B630;
@@ -1076,6 +1304,7 @@ void sub_18CFA0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18D220@@YAXPAUtype_4EBE00@@H@Z @ 0x0018D220
+// sp-match: ?sub_18D220@@YAXPAUtype_4EBE00@@H@Z @ 0x00120970
 // Opens $MCChecking.
 void sub_18D220(type_4EBE00 *arg_0, RwInt32 arg_4)
 {
@@ -1084,6 +1313,7 @@ void sub_18D220(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18D260@@YAXPAUtype_4EBE00@@H@Z @ 0x0018D260
+// sp-match: ?sub_18D260@@YAXPAUtype_4EBE00@@H@Z @ 0x001209A0
 // Opens $MCCheckOK.
 void sub_18D260(type_4EBE00 *arg_0, RwInt32 arg_4)
 {
@@ -1092,6 +1322,7 @@ void sub_18D260(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18D2A0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018D2A0
+// sp-match: ?sub_18D2A0@@YAXPAUtype_4EBE00@@H@Z @ 0x001209D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCCheckFailed as yes or retry, retry selected; the answer (1 or
 // 4) into the int at arg_4.
@@ -1107,7 +1338,15 @@ void sub_18D2A0(type_4EBE00 *arg_0, RwInt32 arg_4)
     sub_18B540(arg_0, dword_4F2370[7], 0x19);
     bp_4 = arg_4;
     bp_8 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_8->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_8->unk_00, "");
+#endif
     bp_8 = arg_0->sub_188970();
     var_C = bp_8->sub_18A190(dword_4F2370[53]);
     var_C->unk_24 = sub_18B5F0;
@@ -1125,6 +1364,7 @@ void sub_18D2A0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18D3C0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018D3C0
+// sp-match: ?sub_18D3C0@@YAXPAUtype_4EBE00@@H@Z @ 0x00120A90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCNoCardSaveContinueGame as continue or retry (and cancel when it can
 // be cancelled), retry selected; the answer (1, 4 or 3) into arg_4, a
@@ -1141,7 +1381,15 @@ void sub_18D3C0(type_4EBE00 *arg_0, RwInt32 arg_4)
     sub_18B540(arg_0, dword_4F2370[3], 0x19);
     bp_4 = (type_18BCD0 *)arg_4;
     bp_8 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_8->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_8->unk_00, "");
+#endif
     bp_8 = arg_0->sub_188970();
     var_C = bp_8->sub_18A190(dword_4F2370[53]);
     var_C->unk_24 = sub_18B5F0;
@@ -1166,6 +1414,7 @@ void sub_18D3C0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18D520@@YAXPAUtype_4EBE00@@H@Z @ 0x0018D520
+// sp-match: ?sub_18D520@@YAXPAUtype_4EBE00@@H@Z @ 0x00120B80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens $MCNoCardSaveContinue as continue or retry (and cancel when it can
 // be cancelled), retry selected; the answer (1, 4 or 3) into arg_4, a
@@ -1182,7 +1431,15 @@ void sub_18D520(type_4EBE00 *arg_0, RwInt32 arg_4)
     sub_18B540(arg_0, dword_4F2370[2], 0x19);
     bp_4 = (type_18BCD0 *)arg_4;
     bp_8 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(bp_8->unk_00, pEmpty);
+    }
+#else
     strcpy(bp_8->unk_00, "");
+#endif
     bp_8 = arg_0->sub_188970();
     var_C = bp_8->sub_18A190(dword_4F2370[53]);
     var_C->unk_24 = sub_18B5F0;
@@ -1220,6 +1477,7 @@ void sub_18D680(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18D6D0@@YAXPAUtype_4EBE00@@PAD@Z @ 0x0018D6D0
+// sp-match: ?sub_18D6D0@@YAXPAUtype_4EBE00@@PAD@Z @ 0x00120C70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Adds the text arg_4 to the box arg_0, a line for each of its lines.
 void sub_18D6D0(type_4EBE00 *arg_0, RwChar *arg_4)
@@ -1249,6 +1507,7 @@ void sub_18D6D0(type_4EBE00 *arg_0, RwChar *arg_4)
     }
 }
 // match: ?sub_18D7C0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018D7C0
+// sp-match: ?sub_18D7C0@@YAXPAUtype_4EBE00@@H@Z @ 0x00120D20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The not enough free blocks screen's update: the first button closes the
 // messages (sub_187040), the second goes to the dashboard's memory page to
@@ -1260,8 +1519,14 @@ void sub_18D7C0(type_4EBE00 *arg_0, RwInt32 arg_4)
     RwInt32 bp_8;
     RwReal bp_4;
 
+#ifdef CODFH_SP
+    // Single player's bindings number these actions 8 and 9 (SP 0x120D2F, 0x120D44).
+    var_C = unk_4B9308.sub_EE790(8, 0);
+    bp_8 = unk_4B9308.sub_EE790(9, 0);
+#else
     var_C = unk_4B9308.sub_EE790(10, 0);
     bp_8 = unk_4B9308.sub_EE790(11, 0);
+#endif
     bp_4 = unk_4B9308.sub_EE8F0(0, var_C);
     if (bp_4 != 0.0f)
     {
@@ -1280,6 +1545,7 @@ void sub_18D7C0(type_4EBE00 *arg_0, RwInt32 arg_4)
     }
 }
 // match: ?sub_18D8A0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018D8A0
+// sp-match: ?sub_18D8A0@@YAXPAUtype_4EBE00@@H@Z @ 0x00120DF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens the not enough free blocks screen: the language's text with the
 // blocks needed (dword_4F616C), nothing selected, sub_18D7C0 its update.
@@ -1298,6 +1564,7 @@ void sub_18D8A0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18D940@@YAXPAUtype_4EBE00@@H@Z @ 0x0018D940
+// sp-match: ?sub_18D940@@YAXPAUtype_4EBE00@@H@Z @ 0x00120E80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens _Xbox_Live_Cant_Connect (two lines), then sets unk_18.
 void sub_18D940(type_4EBE00 *arg_0, RwInt32 arg_4)
@@ -1307,7 +1574,15 @@ void sub_18D940(type_4EBE00 *arg_0, RwInt32 arg_4)
 
     arg_0->unk_2CF0 = 1;
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     var_8 = l4->sub_18A190(dword_4F6178[8]);
     l4->unk_264 = 0;
@@ -1318,6 +1593,7 @@ void sub_18D940(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->unk_18 = 1;
 }
 // match: ?sub_18D9E0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018D9E0
+// sp-match: ?sub_18D9E0@@YAXPAUtype_4EBE00@@H@Z @ 0x00120F00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens _Important_Xbox_Message (two lines).
 void sub_18D9E0(type_4EBE00 *arg_0, RwInt32 arg_4)
@@ -1327,7 +1603,15 @@ void sub_18D9E0(type_4EBE00 *arg_0, RwInt32 arg_4)
 
     arg_0->unk_2CF0 = 1;
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     var_8 = l4->sub_18A190(dword_4F6178[19]);
     l4->unk_264 = 0;
@@ -1337,6 +1621,7 @@ void sub_18D9E0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18DA80@@YAXPAUtype_4EBE00@@H@Z @ 0x0018DA80
+// sp-match: ?sub_18DA80@@YAXPAUtype_4EBE00@@H@Z @ 0x00120F80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens _Xbox_Multiple_Accounts (three lines).
 void sub_18DA80(type_4EBE00 *arg_0, RwInt32 arg_4)
@@ -1346,7 +1631,15 @@ void sub_18DA80(type_4EBE00 *arg_0, RwInt32 arg_4)
 
     arg_0->unk_2CF0 = 1;
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     var_8 = l4->sub_18A190(dword_4F6178[21]);
     l4->unk_264 = 0;
@@ -1359,24 +1652,28 @@ void sub_18DA80(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18DB40@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018DB40
+// sp-match: ?sub_18DB40@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121020
 // _Friends_List's select.
 void sub_18DB40(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
     dword_4F3130.sub_19C440();
 }
 // match: ?sub_18DB50@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018DB50
+// sp-match: ?sub_18DB50@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121030
 // _Appear_Offline's select.
 void sub_18DB50(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
     dword_4F3130.sub_19C3A0();
 }
 // match: ?sub_18DB60@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018DB60
+// sp-match: ?sub_18DB60@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121040
 // _Sign_Out's select.
 void sub_18DB60(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
     dword_4F3130.sub_19C4D0();
 }
 // match: ?sub_18DB70@@YAXPAUtype_4EBE00@@H@Z @ 0x0018DB70
+// sp-match: ?sub_18DB70@@YAXPAUtype_4EBE00@@H@Z @ 0x00121050
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens the Xbox Live options while appearing online: the friends list,
 // appear offline and sign out (raised while paused).
@@ -1408,12 +1705,14 @@ void sub_18DB70(type_4EBE00 *arg_0, RwInt32 arg_4)
         arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18DC90@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018DC90
+// sp-match: ?sub_18DC90@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121110
 // _Appear_Online's select.
 void sub_18DC90(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
     dword_4F3130.sub_19C3F0();
 }
 // match: ?sub_18DCA0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018DCA0
+// sp-match: ?sub_18DCA0@@YAXPAUtype_4EBE00@@H@Z @ 0x00121120
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens the Xbox Live options while appearing offline: the friends list,
 // appear online and sign out (raised while paused).
@@ -1445,12 +1744,14 @@ void sub_18DCA0(type_4EBE00 *arg_0, RwInt32 arg_4)
         arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18DDC0@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018DDC0
+// sp-match: ?sub_18DDC0@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x001211E0
 // _Sign_In's select.
 void sub_18DDC0(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
     dword_4F3130.sub_19C490();
 }
 // match: ?sub_18DDD0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018DDD0
+// sp-match: ?sub_18DDD0@@YAXPAUtype_4EBE00@@H@Z @ 0x001211F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens the Xbox Live options while signed out: sign in (raised while
 // paused).
@@ -1472,6 +1773,7 @@ void sub_18DDD0(type_4EBE00 *arg_0, RwInt32 arg_4)
         arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18DE80@@YAXPAUtype_4EBE00@@H@Z @ 0x0018DE80
+// sp-match: ?sub_18DE80@@YAXPAUtype_4EBE00@@H@Z @ 0x00121270
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens _Quit_Question with _Unsaved_Lost.
 void sub_18DE80(type_4EBE00 *arg_0, RwInt32 arg_4)
@@ -1481,7 +1783,15 @@ void sub_18DE80(type_4EBE00 *arg_0, RwInt32 arg_4)
 
     arg_0->unk_2CF0 = 1;
     l4 = arg_0->sub_188970();
+#ifdef CODFH_SP
+    // shape: the empty text through a pointer: the image copies it byte by byte.
+    {
+        const RwChar *pEmpty = "";
+        strcpy(l4->unk_00, pEmpty);
+    }
+#else
     strcpy(l4->unk_00, "");
+#endif
     l4 = arg_0->sub_188970();
     var_8 = l4->sub_18A190(dword_4F6178[2]);
     l4->unk_264 = 0;
@@ -1491,24 +1801,28 @@ void sub_18DE80(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, 0);
 }
 // match: ?sub_18DF20@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018DF20
+// sp-match: ?sub_18DF20@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x001212F0
 // The pause menu's second choice: opens message 2.
 void sub_18DF20(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
     sub_186E70(2, 0, 0);
 }
 // match: ?sub_18DF40@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018DF40
+// sp-match: ?sub_18DF40@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121300
 // The pause menu's third choice: opens message 3.
 void sub_18DF40(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
     sub_186E70(3, 0, 0);
 }
 // match: ?sub_18DF60@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018DF60
+// sp-match: ?sub_18DF60@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121310
 // The pause menu's first choice: opens message 1.
 void sub_18DF60(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
     sub_186E70(1, 0, 0);
 }
 // match: ?sub_18DF80@@YAXPAUtype_4EBE00@@H@Z @ 0x0018DF80
+// sp-match: ?sub_18DF80@@YAXPAUtype_4EBE00@@H@Z @ 0x00121320
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens the pause menu: its heading and options, restart and quit (the bar
 // shown with the pad's buttons when dword_42926C is set).
@@ -1560,6 +1874,7 @@ void sub_18DF80(type_4EBE00 *arg_0, RwInt32 arg_4)
         arg_0->sub_1884B0(10.0f, flt_42B510);
 }
 // match: ?sub_18E140@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018E140
+// sp-match: ?sub_18E140@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121980
 // An options line's change: the difficulty (dword_4F234C) from its choice, then
 // applied (sub_18E380).
 void sub_18E140(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
@@ -1571,6 +1886,7 @@ void sub_18E140(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     sub_18E380(arg_0, arg_4, arg_8, arg_C);
 }
 // match: ?sub_18E180@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018E180
+// sp-match: ?sub_18E180@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x001219A0
 // An options line's change: option unk_21 (dword_4F2354) from its choice, then
 // applied (sub_18E380).
 void sub_18E180(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
@@ -1582,6 +1898,7 @@ void sub_18E180(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     sub_18E380(arg_0, arg_4, arg_8, arg_C);
 }
 // match: ?sub_18E1C0@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018E1C0
+// sp-match: ?sub_18E1C0@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x001219C0
 // An options line's change: option unk_22 (dword_4F2358) from its choice, then
 // applied (sub_18E380).
 void sub_18E1C0(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
@@ -1593,6 +1910,7 @@ void sub_18E1C0(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     sub_18E380(arg_0, arg_4, arg_8, arg_C);
 }
 // match: ?sub_18E200@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018E200
+// sp-match: ?sub_18E200@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x001219E0
 // An options line's change: option unk_1C (dword_4F2350) from its choice, then
 // applied (sub_18E380).
 void sub_18E200(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
@@ -1604,6 +1922,7 @@ void sub_18E200(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     sub_18E380(arg_0, arg_4, arg_8, arg_C);
 }
 // match: ?sub_18E240@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018E240
+// sp-match: ?sub_18E240@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121A00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The rumble line's change: dword_4F235C from its choice, the pad rumbled
 // once when it is turned on, then applied (sub_18E380).
@@ -1624,6 +1943,7 @@ void sub_18E240(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     sub_18E380(arg_0, arg_4, arg_8, arg_C);
 }
 // match: ?sub_18E2C0@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018E2C0
+// sp-match: ?sub_18E2C0@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121A60
 // An options line's change: the help messages (dword_4F2360) from its choice, then
 // applied (sub_18E380).
 void sub_18E2C0(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
@@ -1635,6 +1955,7 @@ void sub_18E2C0(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     sub_18E380(arg_0, arg_4, arg_8, arg_C);
 }
 // match: ?sub_18E300@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018E300
+// sp-match: ?sub_18E300@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121A80
 // An options line's change: option unk_180 (dword_4F2364) from its choice, then
 // applied (sub_18E380).
 void sub_18E300(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
@@ -1646,6 +1967,7 @@ void sub_18E300(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     sub_18E380(arg_0, arg_4, arg_8, arg_C);
 }
 // match: ?sub_18E340@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018E340
+// sp-match: ?sub_18E340@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121AA0
 // An options line's change: option unk_181 (dword_4F2368) from its choice, then
 // applied (sub_18E380).
 void sub_18E340(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
@@ -1657,6 +1979,7 @@ void sub_18E340(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     sub_18E380(arg_0, arg_4, arg_8, arg_C);
 }
 // match: ?sub_18E380@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018E380
+// sp-match: ?sub_18E380@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121470
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Applies the pause menu's options to the player, the save state, the
 // sound output and the HUD.
@@ -1727,6 +2050,7 @@ void sub_18E380(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     var_8->unk_304 = dword_4F2368;
 }
 // match: ?sub_18E5A0@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018E5A0
+// sp-match: ?sub_18E5A0@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121600
 // The options' defaults: set, applied (sub_18E380), then the box closed
 // and the pause menu (message 1) opened again.
 void sub_18E5A0(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
@@ -1744,7 +2068,16 @@ void sub_18E5A0(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     sub_186F80(1, 0);
     sub_186E70(1, 0, 0);
 }
+#ifdef CODFH_SP
+// shape: single player copies seven of the menu titles stepping the destination, the source read at
+// its offset (SP 0x121D80...: sub ebp, edi; mov cl, [eax+ebp]; mov [eax], cl; inc eax; cmp cl, bl), a loop
+// no strcpy spelling gives; the last one (the aim-assist title, loc7C) is a strcpy
+#define SP_MENU_COPY(d, s) { RwChar *d_ = (d); RwChar c_; do { c_ = d_[(s) - (d)]; *d_ = c_; d_++; } while (c_); }
+#else
+#define SP_MENU_COPY(d, s) strcpy(d, s)
+#endif
 // match: ?sub_18E640@@YAXPAUtype_4EBE00@@H@Z @ 0x0018E640
+// sp-match: ?sub_18E640@@YAXPAUtype_4EBE00@@H@Z @ 0x00121AC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens the options menu (while the player exists): turn speed, control
 // set, subtitles, invert aim, controller shake, hint messages, friendly
@@ -1846,10 +2179,29 @@ void sub_18E640(type_4EBE00 *arg_0, RwInt32 arg_4)
     l1C = y58->sub_197550(0, 0);
     y58 = sub_198880("COD_InGameText+Event_OptMenuSetDefaults");
     ebp_14 = y58->sub_197550(0, 0);
+#ifdef CODFH_SP
+    // shape: SP 0x121AC0 steps the source and addresses the heading by its
+    // offset. Subtract through a reference to keep the destination's LEA
+    // separate and the source as the store's base register.
+    {
+        RwChar *d = arg_0->unk_27DC[0];
+        RwInt32 o = (RwInt32)d;
+        { RwInt32 &r = o; r -= (RwInt32)y54; }
+        RwChar *s = (RwChar *)y54;
+        RwChar c;
+        do {
+            c = *s;
+            s[o] = c;
+            ++s;
+        } while (c);
+    }
+#else
+    // MP 0x18E640.
     arg_0->set_heading(0, y54);
+#endif
     arg_0->unk_2CE0 = 0;
     frm_48 = arg_0->sub_188970();
-    strcpy(frm_48->unk_00, bp_88);
+    SP_MENU_COPY(frm_48->unk_00, bp_88);
     local_70 = frm_48->sub_18A190(var_C);
     local_70->unk_1C = sub_18E140;
     local_70->unk_20 = 0;
@@ -1877,7 +2229,7 @@ void sub_18E640(type_4EBE00 *arg_0, RwInt32 arg_4)
     frm_48->unk_264 = m_84;
     dword_4F234C = m_84;
     frm_48 = arg_0->sub_188970();
-    strcpy(frm_48->unk_00, var_6C);
+    SP_MENU_COPY(frm_48->unk_00, var_6C);
     local_70 = frm_48->sub_18A190(loc68);
     local_70->unk_1C = sub_18E200;
     local_70->unk_20 = 0;
@@ -1895,7 +2247,7 @@ void sub_18E640(type_4EBE00 *arg_0, RwInt32 arg_4)
     local_70->unk_20 = 0;
     frm_48->unk_264 = dword_4F28F0->get_unk_1C();
     frm_48 = arg_0->sub_188970();
-    strcpy(frm_48->unk_00, l34);
+    SP_MENU_COPY(frm_48->unk_00, l34);
     local_70 = frm_48->sub_18A190(bp_4);
     local_70->unk_1C = sub_18E180;
     local_70->unk_20 = 0;
@@ -1910,7 +2262,7 @@ void sub_18E640(type_4EBE00 *arg_0, RwInt32 arg_4)
     frm_48->unk_264 = lv_10;
     dword_4F2354 = lv_10;
     frm_48 = arg_0->sub_188970();
-    strcpy(frm_48->unk_00, var30);
+    SP_MENU_COPY(frm_48->unk_00, var30);
     local_70 = frm_48->sub_18A190(stk_90);
     local_70->unk_1C = sub_18E1C0;
     local_70->unk_20 = 0;
@@ -1925,7 +2277,7 @@ void sub_18E640(type_4EBE00 *arg_0, RwInt32 arg_4)
     frm_48->unk_264 = w3C;
     dword_4F2358 = w3C;
     frm_48 = arg_0->sub_188970();
-    strcpy(frm_48->unk_00, w60);
+    SP_MENU_COPY(frm_48->unk_00, w60);
     local_70 = frm_48->sub_18A190(bp_4);
     local_70->unk_1C = sub_18E240;
     local_70->unk_20 = 0;
@@ -1940,7 +2292,7 @@ void sub_18E640(type_4EBE00 *arg_0, RwInt32 arg_4)
     frm_48->unk_264 = u5C;
     dword_4F235C = u5C;
     frm_48 = arg_0->sub_188970();
-    strcpy(frm_48->unk_00, m_80);
+    SP_MENU_COPY(frm_48->unk_00, m_80);
     local_70 = frm_48->sub_18A190(bp_4);
     local_70->unk_1C = sub_18E2C0;
     local_70->unk_20 = 0;
@@ -1955,7 +2307,7 @@ void sub_18E640(type_4EBE00 *arg_0, RwInt32 arg_4)
     frm_48->unk_264 = w8C;
     dword_4F2360 = w8C;
     frm_48 = arg_0->sub_188970();
-    strcpy(frm_48->unk_00, l1C);
+    SP_MENU_COPY(frm_48->unk_00, l1C);
     local_70 = frm_48->sub_18A190(bp_4);
     local_70->unk_1C = sub_18E300;
     local_70->unk_20 = 0;
@@ -1995,6 +2347,7 @@ void sub_18E640(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, flt_42B510);
 }
 // match: ?sub_18F000@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018F000
+// sp-match: ?sub_18F000@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x00121680
 // The quit question's yes: queues the quit (sub_D8BC0).
 void sub_18F000(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
 {
@@ -2002,6 +2355,7 @@ void sub_18F000(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     dword_4EBCD8 = 1;
 }
 // match: ?sub_18F020@@YAXPAUtype_4EBE00@@H@Z @ 0x0018F020
+// sp-match: ?sub_18F020@@YAXPAUtype_4EBE00@@H@Z @ 0x00121690
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens the quit question (with _Unsaved_Lost): no closes it, yes quits
 // (sub_18F000).
@@ -2043,6 +2397,7 @@ void sub_18F020(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, -55.0f);
 }
 // match: ?sub_18F190@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x0018F190
+// sp-match: ?sub_18F190@@YAXPAUtype_4EBE00@@PAUtype_4EBE00_DC@@PADH@Z @ 0x001217A0
 // The restart question's yes: the checkpoint restored (sub_D93F0) and the
 // restart flagged.
 void sub_18F190(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt32 arg_C)
@@ -2053,6 +2408,7 @@ void sub_18F190(type_4EBE00 *arg_0, type_4EBE00_DC *arg_4, RwChar *arg_8, RwInt3
     dword_4EBCD8 = 1;
 }
 // match: ?sub_18F1C0@@YAXPAUtype_4EBE00@@H@Z @ 0x0018F1C0
+// sp-match: ?sub_18F1C0@@YAXPAUtype_4EBE00@@H@Z @ 0x001217D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens the restart question (with _Unsaved_Lost): no closes it, yes
 // restarts (sub_18F190).
@@ -2094,6 +2450,7 @@ void sub_18F1C0(type_4EBE00 *arg_0, RwInt32 arg_4)
     arg_0->sub_1884B0(0, -55.0f);
 }
 // match: ?sub_18F330@@YAXPAUtype_4EBE00@@H@Z @ 0x0018F330
+// sp-match: ?sub_18F330@@YAXPAUtype_4EBE00@@H@Z @ 0x001218E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens _Insert_Controller_1 for the pad that was removed (numbered from
 // 1).
@@ -2109,3 +2466,20 @@ void sub_18F330(type_4EBE00 *arg_0, RwInt32 arg_4)
     l8C->unk_264 = 0;
     arg_0->sub_1884B0(0, 0);
 }
+
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_121960@@YAPADXZ @ 0x00121960
+// The text $MCEmptySlot (single player's profile list, SP 0xAF80B and 0xAF82C).
+RwChar *sp_sub_121960()
+{
+    return dword_4F2370[56];
+}
+
+// sp-match: ?sp_sub_121970@@YAXPAUtype_4EBE00@@H@Z @ 0x00121970
+// Opens _Insert_Controller_1 (sub_18F330): single player's message table's
+// entry for it (SP 0x328464).
+void sp_sub_121970(type_4EBE00 *arg_0, RwInt32 arg_4)
+{
+    sub_18F330(arg_0, arg_4);
+}
+#endif

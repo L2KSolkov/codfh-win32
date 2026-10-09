@@ -85,6 +85,7 @@ ShapeRepGetNodeCount(_rt2dShapeRep *rep)
 }
 
 _rt2dShapeRep *
+// sp-match: __rt2dShapeRepCreate @ 0x0016D6C0
 _rt2dShapeRepCreate(RwInt32 nodeCount)
 {
     _rt2dShapeRep *rep;
@@ -111,6 +112,7 @@ _rt2dShapeRepCreate(RwInt32 nodeCount)
 // match: _rcsid @ 0x003EE444
 
 // match: __rt2dShapeRepDestroy @ 0x00256D40
+// sp-match: __rt2dShapeRepDestroy @ 0x0016D710
 RwBool
 _rt2dShapeRepDestroy(_rt2dShapeRep *rep)
 {
@@ -167,6 +169,7 @@ _rt2dShapeRepAddRef(_rt2dShapeRep *rep)
 
 /* Function to create a geometry from meshs */
 static RpGeometry *
+// sp-match: _CreateGeometryFromMeshes @ 0x0016D790
 CreateGeometryFromMeshes(_rt2dPathMeshHeader *pMeshHeader,
                          _rt2dPathMeshNode *pMeshNode,
                          RwUInt32 nodeCount,
@@ -233,6 +236,7 @@ CreateGeometryFromMeshes(_rt2dPathMeshHeader *pMeshHeader,
  * Function to convert a shape to a geometry
  */
 static RpGeometry *
+// sp-match: _ShapeRepCreateGeometry @ 0x0016D860
 ShapeRepCreateGeometry(_rt2dShapeRep *rep)
 {
     Rt2dPath            *subPath, *tmpPath;
@@ -449,6 +453,7 @@ ShapeRepCreateGeometry(_rt2dShapeRep *rep)
 
 /* Cache the material starting colors */
 static RwRGBA *
+// sp-match: _ShapeCreateColorCache @ 0x0016DB60
 ShapeCreateColorCache(RpGeometry *geom)
 {
     RwUInt32 count = RpGeometryGetNumMaterials(geom);
@@ -512,6 +517,7 @@ _rt2dShapeRepStreamGetSize(_rt2dShapeRep *rep)
 }
 
 _rt2dShapeRep *
+// sp-match: __rt2dShapeRepStreamRead @ 0x0016DBB0
 _rt2dShapeRepStreamRead(RwStream *stream)
 {
     _rt2dStreamShape sShape;
@@ -716,6 +722,7 @@ Rt2dShapeCreate(void)
 }
 
 RwBool
+// sp-match: __rt2dShapeInit @ 0x0016DCD0
 _rt2dShapeInit(Rt2dObject *shape, RwInt32 nodeCount, _rt2dShapeRep *rep)
 {
     RwBool result = TRUE;
@@ -779,6 +786,7 @@ Rt2dShapeDestroy(Rt2dObject *object)
 
 
 // match: __rt2dShapeDestruct @ 0x00256DC0
+// sp-match: __rt2dShapeDestruct @ 0x0016DD30
 RwBool
 _rt2dShapeDestruct(Rt2dObject *shape)
 {
@@ -960,6 +968,7 @@ Rt2dShapeRender(Rt2dObject *shape)
 }
 
 Rt2dObject *
+// sp-match: __rt2dShapeRenderChild @ 0x0016DDA0
 _rt2dShapeRenderChild(Rt2dObject *shape, const RwRGBAReal *colorMult, const RwRGBAReal *colorOffs)
 {
     _rt2dShapeNode *current, *finish;
@@ -1239,6 +1248,7 @@ Rt2dShapeStreamGetSize(Rt2dObject *shape)
 }
 
 Rt2dObject *
+// sp-match: __rt2dShapeStreamReadTo @ 0x0016E220
 _rt2dShapeStreamReadTo(Rt2dObject *shape, RwStream *stream, _rt2dSceneResourcePool *pool)
 {
     _rt2dShapeRep *rep;

@@ -38,6 +38,10 @@ VOID WINAPI XInitDevices(DWORD dwPreallocTypeCount, PXDEVICE_PREALLOC_TYPE Preal
 DWORD WINAPI XGetDevices(PXPP_DEVICE_TYPE DeviceType);
 BOOL WINAPI XGetDeviceChanges(PXPP_DEVICE_TYPE DeviceType, PDWORD pdwInsertions,
                               PDWORD pdwRemovals);
+/* The Win32 port has four controller ports and does not enumerate voice devices. */
+#define XGetPortCount() 4
+#define XDEVICE_ENUMERATION_BUSY 1
+DWORD WINAPI XGetDeviceEnumerationStatus(VOID);
 
 /* Controllers */
 #pragma pack(push, 1)
@@ -152,6 +156,7 @@ typedef struct _LAUNCH_DATA
 } LAUNCH_DATA, *PLAUNCH_DATA;
 
 #define XLD_LAUNCH_DASHBOARD_MEMORY 2
+#define XLD_LAUNCH_DASHBOARD_ACCOUNT_MANAGEMENT 3
 
 typedef struct _LD_LAUNCH_DASHBOARD
 {

@@ -53,6 +53,7 @@ RwInt32 _RpXboxMaterialPixelShaderOffset;
 // match: _unk_419640 @ 0x00419640
 
 // match: _rpXboxMaterialPixelShaderConstructor @ 0x002E1AD0
+// sp-match: _rpXboxMaterialPixelShaderConstructor @ 0x001FC5A0
 static void *
 rpXboxMaterialPixelShaderConstructor(void *object,
                                      RwInt32 offsetInObject __RWUNUSED__,
@@ -69,6 +70,7 @@ rpXboxMaterialPixelShaderConstructor(void *object,
 }
 
 // match: __rpXboxMaterialPixelShaderClose @ 0x002E1AF0
+// sp-match: __rpXboxMaterialPixelShaderClose @ 0x001FC5C0
 void
 _rpXboxMaterialPixelShaderClose(void)
 {
@@ -86,6 +88,7 @@ _rpXboxMaterialPixelShaderClose(void)
 }
 
 // match: _RpXboxMaterialSetPixelShader @ 0x002E1B30
+// sp-match: _RpXboxMaterialSetPixelShader @ 0x001FC600
 void
 RpXboxMaterialSetPixelShader(RpMaterial *material, DWORD pixelShader)
 {
@@ -115,6 +118,7 @@ RpXboxMaterialSetPixelShader(RpMaterial *material, DWORD pixelShader)
 }
 
 // match: _rpXboxMaterialPixelShaderDestructor @ 0x002E1B90
+// sp-match: _rpXboxMaterialPixelShaderDestructor @ 0x001FC660
 static void *
 rpXboxMaterialPixelShaderDestructor(void *object,
                                     RwInt32 offsetInObject __RWUNUSED__,
@@ -129,6 +133,7 @@ rpXboxMaterialPixelShaderDestructor(void *object,
 }
 
 // match: _rpXboxMaterialPixelShaderCopy @ 0x002E1BE0
+// sp-match: _rpXboxMaterialPixelShaderCopy @ 0x001FC6B0
 static void *
 rpXboxMaterialPixelShaderCopy(void *dstObject,
                               const void *srcObject,
@@ -145,6 +150,7 @@ rpXboxMaterialPixelShaderCopy(void *dstObject,
 }
 
 // match: __rpXboxMaterialPixelShaderOpen @ 0x002E1C10
+// sp-match: __rpXboxMaterialPixelShaderOpen @ 0x001FC6E0
 RwBool
 _rpXboxMaterialPixelShaderOpen(void)
 {

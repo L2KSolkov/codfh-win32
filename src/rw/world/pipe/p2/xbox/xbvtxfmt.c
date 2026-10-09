@@ -53,9 +53,7 @@ const RwUInt32 rpWorldVSDETexFlags[4] =
     D3DVSDE_TEXCOORD3
 };
 
-/* The plugin's constructor and destructor: nothing to do. /OPT:ICF folded it
- * into colldata.c's CollisionDataConstructor (aliased), so it has no place of
- * its own here. */
+/* The plugin's destructor: nothing to do. */
 static void *
 rxXboxVertexFmtConst(void *object,
                      RwInt32 offsetInObject __RWUNUSED__,
@@ -64,10 +62,25 @@ rxXboxVertexFmtConst(void *object,
     return object;
 }
 
+/* Xbox geometry allocations begin zeroed; the Win32 allocator does not. Keep
+ * the lazy RpXboxVtxFmtInit check in _rpXboxDefaultInstance equivalent by
+ * initializing this extension when a geometry or world is created. */
+#if defined(CODFH_WIN32)
+static void *
+rxXboxVertexFmtInit(void *object,
+                    RwInt32 offsetInObject,
+                    RwInt32 sizeInObject)
+{
+    memset((RwUInt8 *)object + offsetInObject, 0, sizeInObject);
+    return object;
+}
+#endif
+
 /* Finds fmt in the sorted buffer: its index, or -(insertion point + 1).
  * /OPT:ICF kept the skin plugin's identical copy, SkinBinaryFindVertexFormat. */
 // match: _BinaryFindVertexFormat @ 0x002D43D0
 static RwInt32
+// sp-match: _BinaryFindVertexFormat @ 0x001EED20
 BinaryFindVertexFormat(const RpXboxVtxFmt *value,
                        const _rpXboxVtxFmtDescItem *buffer,
                        RwInt32 numElems)
@@ -132,6 +145,7 @@ BinaryFindVertexFormat(const RpXboxVtxFmt *value,
 // match: __real@3a802008 @ 0x004193C4
 
 // match: _rwXboxVertexFormatCreate @ 0x002DCB70
+// sp-match: _rwXboxVertexFormatCreate @ 0x001F7640
 
 void
 rwXboxVertexFormatCreate(void)
@@ -157,6 +171,7 @@ rwXboxVertexFormatCreate(void)
 }
 
 // match: _rwXboxVertexFormatDestroy @ 0x002DCBE0
+// sp-match: _rwXboxVertexFormatDestroy @ 0x001F76B0
 void
 rwXboxVertexFormatDestroy(void)
 {
@@ -183,6 +198,7 @@ rwXboxVertexFormatDestroy(void)
 }
 
 // match: __rpXboxVtxFmtGetSize @ 0x002DCC50
+// sp-match: __rpXboxVtxFmtGetSize @ 0x001F7720
 RwUInt32
 _rpXboxVtxFmtGetSize(RpXboxCompType type, RwUInt32 numElems)
 {
@@ -195,6 +211,7 @@ _rpXboxVtxFmtGetSize(RpXboxCompType type, RwUInt32 numElems)
 }
 
 // match: __rpXboxVtxFmtGetStride @ 0x002DCC70
+// sp-match: __rpXboxVtxFmtGetStride @ 0x001F7740
 RwUInt32
 _rpXboxVtxFmtGetStride(const RpXboxVtxFmt *fmt)
 {
@@ -262,6 +279,7 @@ _rpXboxVtxFmtGetStride(const RpXboxVtxFmt *fmt)
 }
 
 // match: __rpXboxVtxFmtInstV3d @ 0x002DCD20
+// sp-match: __rpXboxVtxFmtInstV3d @ 0x001F77F0
 RwUInt32
 _rpXboxVtxFmtInstV3d(RpXboxCompType type, RwUInt8 *mem, const RwV3d *src,
                      RwInt32 numVerts, RwUInt32 stride)
@@ -391,6 +409,7 @@ instv3dend:
 }
 
 // match: __rpXboxVtxFmtInstV3dComp @ 0x002DCFA0
+// sp-match: __rpXboxVtxFmtInstV3dComp @ 0x001F7A70
 RwUInt32
 _rpXboxVtxFmtInstV3dComp(RpXboxCompType type, RwUInt8 *mem, const RpVertexNormal *src,
                          RwInt32 numVerts, RwUInt32 stride)
@@ -519,6 +538,7 @@ _rpXboxVtxFmtInstV3dComp(RpXboxCompType type, RwUInt8 *mem, const RpVertexNormal
 }
 
 // match: __rpXboxVtxFmtInstV3dMorph @ 0x002DD3B0
+// sp-match: __rpXboxVtxFmtInstV3dMorph @ 0x001F7E80
 RwUInt32
 _rpXboxVtxFmtInstV3dMorph(RpXboxCompType type, RwUInt8 *mem,
                           const RwV3d *src1, const RwV3d *src2, RwReal scale,
@@ -640,6 +660,7 @@ _rpXboxVtxFmtInstV3dMorph(RpXboxCompType type, RwUInt8 *mem,
 }
 
 // match: __rpXboxVtxFmtInstV2d @ 0x002DD8F0
+// sp-match: __rpXboxVtxFmtInstV2d @ 0x001F83C0
 RwUInt32
 _rpXboxVtxFmtInstV2d(RpXboxCompType type, RwUInt8 *mem, const RwTexCoords *src,
                      RwInt32 numVerts, RwUInt32 stride)
@@ -739,6 +760,7 @@ _rpXboxVtxFmtInstV2d(RpXboxCompType type, RwUInt8 *mem, const RwTexCoords *src,
 }
 
 // match: __rpXboxVtxFmtInstColor @ 0x002DDAF0
+// sp-match: __rpXboxVtxFmtInstColor @ 0x001F85C0
 RwBool
 _rpXboxVtxFmtInstColor(RwUInt8 *dst, const RwRGBA *src,
                        RwInt32 numVerts, RwUInt32 stride)
@@ -786,6 +808,7 @@ MACRO_START                                                     \
 MACRO_STOP
 #define BNT_SMALL_FLOAT 1e-12f
 // match: __rpXboxVtxFmtInstBNT @ 0x002DDB50
+// sp-match: __rpXboxVtxFmtInstBNT @ 0x001F8620
 RwUInt32
 _rpXboxVtxFmtInstBNT(RwUInt8 *mem,
                      const RwV3d *pos,
@@ -962,6 +985,7 @@ MACRO_START                                                     \
 MACRO_STOP
 #define BNTCOMP_SMALL_FLOAT 9.999999960041972e-13
 // match: __rpXboxVtxFmtInstBNTComp @ 0x002DE0F0
+// sp-match: __rpXboxVtxFmtInstBNTComp @ 0x001F8BC0
 RwUInt32
 _rpXboxVtxFmtInstBNTComp(RwUInt8 *mem,
                      const RwV3d *pos,
@@ -1133,6 +1157,7 @@ _rpXboxVtxFmtInstBNTComp(RwUInt8 *mem,
 }
 
 // match: __rpXboxVtxFmtUnInstV3d @ 0x002DE6B0
+// sp-match: __rpXboxVtxFmtUnInstV3d @ 0x001F9180
 void
 _rpXboxVtxFmtUnInstV3d(RpXboxCompType type, RwV3d *dst, const RwUInt8 *src)
 {
@@ -1183,6 +1208,7 @@ _rpXboxVtxFmtUnInstV3d(RpXboxCompType type, RwV3d *dst, const RwUInt8 *src)
 }
 
 // match: __rpXboxVtxFmtUnInstV2d @ 0x002DE830
+// sp-match: __rpXboxVtxFmtUnInstV2d @ 0x001F9300
 void
 _rpXboxVtxFmtUnInstV2d(RpXboxCompType type, RwV2d *dst, const RwUInt8 *src)
 {
@@ -1227,6 +1253,7 @@ _rpXboxVtxFmtUnInstV2d(RpXboxCompType type, RwV2d *dst, const RwUInt8 *src)
 }
 
 // match: _rxXboxVertexFmtCopy @ 0x002DE950
+// sp-match: _rxXboxVertexFmtCopy @ 0x001F9420
 static void *
 rxXboxVertexFmtCopy(void *dstObject, const void *srcObject,
                     RwInt32 offsetInObject,
@@ -1239,6 +1266,7 @@ rxXboxVertexFmtCopy(void *dstObject, const void *srcObject,
 }
 
 // match: _rpXboxVtxFmtOpen @ 0x002DE970
+// sp-match: _rpXboxVtxFmtOpen @ 0x001F9440
 static void *
 rpXboxVtxFmtOpen(void *instance,
                  RwInt32 offset __RWUNUSED__,
@@ -1253,6 +1281,7 @@ rpXboxVtxFmtOpen(void *instance,
 }
 
 // match: _rpXboxVtxFmtClose @ 0x002DE990
+// sp-match: _rpXboxVtxFmtClose @ 0x001F9460
 static void *
 rpXboxVtxFmtClose(void *instance,
                   RwInt32 offset __RWUNUSED__,
@@ -1267,6 +1296,7 @@ rpXboxVtxFmtClose(void *instance,
 }
 
 // match: _rxXboxVtxFmtSize @ 0x002DE9B0
+// sp-match: _rxXboxVtxFmtSize @ 0x00088220
 static RwInt32
 rxXboxVtxFmtSize(const void *object __RWUNUSED__,
                  RwInt32 offsetInObject __RWUNUSED__,
@@ -1276,6 +1306,7 @@ rxXboxVtxFmtSize(const void *object __RWUNUSED__,
 }
 
 // match: _rxXboxVtxFmtWrite @ 0x002DE9C0
+// sp-match: _rxXboxVtxFmtWrite @ 0x001F9480
 static RwStream *
 rxXboxVtxFmtWrite(RwStream *stream,
                   RwInt32 binaryLength __RWUNUSED__,
@@ -1289,6 +1320,7 @@ rxXboxVtxFmtWrite(RwStream *stream,
 }
 
 // match: _RpXboxVtxFmtInit @ 0x002DE9E0
+// sp-match: _RpXboxVtxFmtInit @ 0x001F94A0
 void
 RpXboxVtxFmtInit(RpXboxVtxFmt *fmt, RwUInt32 flags, RwUInt32 numTexCoordSets)
 {
@@ -1338,6 +1370,7 @@ RpXboxVtxFmtInit(RpXboxVtxFmt *fmt, RwUInt32 flags, RwUInt32 numTexCoordSets)
 }
 
 // match: _RpXboxGeometryGetVtxFmt @ 0x002DEAB0
+// sp-match: _RpXboxGeometryGetVtxFmt @ 0x001F9570
 RpXboxVtxFmt *
 RpXboxGeometryGetVtxFmt(RpGeometry *geometry)
 {
@@ -1345,6 +1378,7 @@ RpXboxGeometryGetVtxFmt(RpGeometry *geometry)
 }
 
 // match: _RpXboxWorldGetVtxFmt @ 0x002DEAC0
+// sp-match: _RpXboxWorldGetVtxFmt @ 0x001F9580
 RpXboxVtxFmt *
 RpXboxWorldGetVtxFmt(RpWorld *world)
 {
@@ -1352,6 +1386,7 @@ RpXboxWorldGetVtxFmt(RpWorld *world)
 }
 
 // match: _RxXboxGetVertexFormatShader @ 0x002DEAD0
+// sp-match: _RxXboxGetVertexFormatShader @ 0x001F9590
 DWORD
 RxXboxGetVertexFormatShader(const RpXboxVtxFmt *fmt)
 {
@@ -1505,6 +1540,7 @@ RxXboxGetVertexFormatShader(const RpXboxVtxFmt *fmt)
 }
 
 // match: __rpXboxDefaultInstance @ 0x002DED60
+// sp-match: __rpXboxDefaultInstance @ 0x001F9820
 RwBool
 _rpXboxDefaultInstance(RpXboxVtxFmt *fmt,
                        RwUInt32 flags,
@@ -1663,7 +1699,11 @@ _rpXboxDefaultInstance(RpXboxVtxFmt *fmt,
                                  texCoordSets[fmt->bnt - 1], instancedHeader,
                                  numVertices, instancedHeader->stride);
         }
+#ifdef CODFH_WIN32
+        else if (packedNormals)
+#else
         else
+#endif
         {
             _rpXboxVtxFmtInstBNTComp(lockedVertexBuffer, positions, packedNormals,
                                      texCoordSets[fmt->bnt - 1], instancedHeader,
@@ -1675,6 +1715,7 @@ _rpXboxDefaultInstance(RpXboxVtxFmt *fmt,
 }
 
 // match: _rxXboxVtxFmtGeometryRead @ 0x002DF000
+// sp-match: _rxXboxVtxFmtGeometryRead @ 0x001F9AC0
 static RwStream *
 rxXboxVtxFmtGeometryRead(RwStream *stream,
                          RwInt32 binaryLength __RWUNUSED__,
@@ -1713,6 +1754,7 @@ rxXboxVtxFmtGeometryRead(RwStream *stream,
 }
 
 // match: _rxXboxVtxFmtWorldSectorFixVertexShader @ 0x002DF060
+// sp-match: _rxXboxVtxFmtWorldSectorFixVertexShader @ 0x001F9B20
 static RpWorldSector *
 rxXboxVtxFmtWorldSectorFixVertexShader(RpWorldSector *worldSector, void *data)
 {
@@ -1738,6 +1780,7 @@ rxXboxVtxFmtWorldSectorFixVertexShader(RpWorldSector *worldSector, void *data)
 }
 
 // match: _rxXboxVtxFmtWorldRead @ 0x002DF0A0
+// sp-match: _rxXboxVtxFmtWorldRead @ 0x001F9B60
 static RwStream *
 rxXboxVtxFmtWorldRead(RwStream *stream,
                       RwInt32 binaryLength __RWUNUSED__,
@@ -1760,18 +1803,26 @@ rxXboxVtxFmtWorldRead(RwStream *stream,
 }
 
 // match: __rpXboxVtxFmtPluginAttach @ 0x002DF0E0
+// sp-match: __rpXboxVtxFmtPluginAttach @ 0x001F9BA0
 RwBool
 _rpXboxVtxFmtPluginAttach(void)
 {
+    RwPluginObjectConstructor constructor;
+
     if (RwEngineRegisterPlugin(0, rwID_VERTEXFMTPLUGIN,
                                rpXboxVtxFmtOpen, rpXboxVtxFmtClose) < 0)
     {
         return FALSE;
     }
 
+    constructor = rxXboxVertexFmtConst;
+#if defined(CODFH_WIN32)
+    constructor = rxXboxVertexFmtInit;
+#endif
+
     _rpXboxGeomVtxFmtOffset = RpGeometryRegisterPlugin(sizeof(RpXboxVtxFmt),
                                                        rwID_VERTEXFMTPLUGIN,
-                                                       rxXboxVertexFmtConst,
+                                                       constructor,
                                                        rxXboxVertexFmtConst,
                                                        rxXboxVertexFmtCopy);
     if (_rpXboxGeomVtxFmtOffset < 0)
@@ -1786,7 +1837,7 @@ _rpXboxVtxFmtPluginAttach(void)
 
     rpXboxWorldVtxFmtOffset = RpWorldRegisterPlugin(sizeof(RpXboxVtxFmt),
                                                     rwID_VERTEXFMTPLUGIN,
-                                                    rxXboxVertexFmtConst,
+                                                    constructor,
                                                     rxXboxVertexFmtConst,
                                                     rxXboxVertexFmtCopy);
     if (rpXboxWorldVtxFmtOffset < 0)

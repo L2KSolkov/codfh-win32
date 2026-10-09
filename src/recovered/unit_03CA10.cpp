@@ -26,6 +26,7 @@ RwInt32 sub_37220(RwInt32 arg_0, type_3D410 *arg_4);
 RwInt32 sub_39AA0(RwInt32 arg_0, type_3D410 *arg_4);
 RwInt32 sub_32700(RwInt32 arg_0, type_3D410 *arg_4);
 
+#if !defined(CODFH_SP) || CODFH_SP_PART == 1 // single player: sub_3D3E0 alone in a second file (src/sp/units/sp_unit_03CA10_2.cpp)
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003CE6CC
 extern const RwReal flt_3CE6CC = 16.666666f;
@@ -52,6 +53,9 @@ RwInt32 dword_4395AC;
 // functions at the end of .text).
 type_16C2A0 dword_4395B0;
 type_16C2A0 dword_4395D0;
+#else
+extern type_4392A8 dword_4392A8[64];
+#endif
 // Its data (PLAN M5): literals, constants and tables where the image has them.
 // match: ?flt_3CE6CC@@3MB @ 0x003CE6CC
 // match: ??_7type_3CE6D0@@6B@ @ 0x003CE6D0
@@ -69,6 +73,10 @@ type_16C2A0 dword_4395D0;
 // match: _$E3 @ 0x0030DCA0
 // match: _$E5 @ 0x00309850
 // match: _$E6 @ 0x0030DCB0
+// sp-match: _$E6 @ 0x0021E0E0
+// sp-match: _$E2 @ 0x0021C2B0
+// sp-match: _$E5 @ 0x0021C2D0
+// sp-match: _$E3 @ 0x0021E0D0
 
 void sub_3CD10();
 RwInt32 sub_3CD60();
@@ -80,7 +88,12 @@ type_365A0 sub_3CE20(RwInt32 arg_0);
 // handle arg_8, dropping
 // those that fail, and creates the best-scoring kind not masked by arg_C
 // unless the group has one; returns its handle.
+#ifdef CODFH_SP
+// Single player passes and returns the handle by value (SP 0x2E770, 0x2E8A0).
+type_365A0 sub_3D150(type_3DF30 *arg_0, type_3D410 *arg_4, type_365A0 arg_8, RwInt32 arg_C);
+#else
 RwUInt32 sub_3D150(type_3DF30 *arg_0, type_3D410 *arg_4, RwUInt32 arg_8, RwInt32 arg_C);
+#endif
 type_365A0 sub_3D2E0(type_3CE6D0 *arg_0, RwInt32 arg_4);
 void sub_3D3A0(type_365A0 arg_0);
 
@@ -93,7 +106,9 @@ static inline void register_maneuver_handle(type_3CE6D0 *object, RwInt32 kind)
     object->unk_18_h = sub_3D2E0(object, kind);
 }
 
+#if !defined(CODFH_SP) || CODFH_SP_PART == 1
 // match: ??0type_3CE6D0@@QAE@XZ @ 0x0003CA10
+// sp-match: ??0type_3CE6D0@@QAE@XZ @ 0x0002E210
 // symbol: ??_7type_3CE6D0@@6B@ = 0x003CE6D0
 type_3CE6D0::type_3CE6D0()
 {
@@ -103,12 +118,15 @@ type_3CE6D0::type_3CE6D0()
 
 // match: ??_Gtype_3CE6D0@@UAEPAXI@Z @ 0x0003CA40
 // match: ??1type_3CE6D0@@UAE@XZ @ 0x0003CA60
+// sp-match: ??1type_3CE6D0@@UAE@XZ @ 0x0002E230
+// sp-match: ??_Gtype_3CE6D0@@UAEPAXI@Z @ 0x0002E310
 type_3CE6D0::~type_3CE6D0()
 {
     unk_08 = 0;
 }
 
 // match: ?vf_004@type_3CE6D0@@UAEXPAUtype_3DF30@@@Z @ 0x0003CA80
+// sp-match: ?vf_004@type_3CE6D0@@UAEXPAUtype_3DF30@@@Z @ 0x0002E240
 void type_3CE6D0::vf_004(type_3DF30 *arg_0)
 {
     unk_08 = arg_0;
@@ -117,6 +135,7 @@ void type_3CE6D0::vf_004(type_3DF30 *arg_0)
 }
 
 // match: ?vf_00C@type_3CE6D0@@UAEHMPAUtype_3D410@@@Z @ 0x0003CAB0
+// sp-match: ?vf_00C@type_3CE6D0@@UAEHMPAUtype_3D410@@@Z @ 0x0002E260
 RwInt32 type_3CE6D0::vf_00C(RwReal arg_0, type_3D410 *arg_4)
 {
     if (unk_04 != 0)
@@ -125,12 +144,14 @@ RwInt32 type_3CE6D0::vf_00C(RwReal arg_0, type_3D410 *arg_4)
 }
 
 // match: ?vf_010@type_3CE6D0@@UAEHPAUtype_3D410@@@Z @ 0x0003CAE0
+// sp-match: ?vf_010@type_3CE6D0@@UAEHPAUtype_3D410@@@Z @ 0x0002E280
 RwInt32 type_3CE6D0::vf_010(type_3D410 *arg_0)
 {
     return 0x7FFFFFF;
 }
 
 // match: ?vf_01C@type_3CE6D0@@UAEHPAUtype_3D3548@@@Z @ 0x0003CB00
+// sp-match: ?vf_01C@type_3CE6D0@@UAEHPAUtype_3D3548@@@Z @ 0x0002E290
 // Takes the entity arg_0 on, from the object it served (vf_014).
 RwInt32 type_3CE6D0::vf_01C(type_3D3548 *arg_0)
 {
@@ -158,6 +179,7 @@ RwInt32 type_3CE6D0::vf_01C(type_3D3548 *arg_0)
 }
 
 // match: ?vf_014@type_3CE6D0@@UAEXPAUtype_3D3548@@@Z @ 0x0003CBB0
+// sp-match: ?vf_014@type_3CE6D0@@UAEXPAUtype_3D3548@@@Z @ 0x0002E2F0
 void type_3CE6D0::vf_014(type_3D3548 *arg_0)
 {
     AIData *local_8;
@@ -169,6 +191,7 @@ void type_3CE6D0::vf_014(type_3D3548 *arg_0)
 }
 
 // match: sub_3CBF0 @ 0x0003CBF0
+// sp-match: sub_3CBF0 @ 0x0002E4D0
 // Sets the pools up (sized for the largest kind and the next largest) and
 // clears the handle table.
 void sub_3CBF0()
@@ -180,9 +203,20 @@ void sub_3CBF0()
 
     v8 = sub_3CD60();
     var_4 = sub_3CDB0();
+#ifdef CODFH_SP
+    // Single player's pools hold 5 large and 15 normal maneuvers (SP 0x2E4D0).
+    dword_4395B0.sub_16C2C0(5, v8, "m_freeManeuversLarge", 4, 0);
+    dword_4395D0.sub_16C2C0(15, var_4, "m_freeManeuversNormal", 4, 0);
+#else
     dword_4395B0.sub_16C2C0(0x20, v8, "m_freeManeuversLarge", 4, 0);
     dword_4395D0.sub_16C2C0(0x20, var_4, "m_freeManeuversNormal", 4, 0);
+#endif
+#ifdef CODFH_SP
+    // single player's handle table has 20 entries (SP 0x2E4D0, 0x2E540, 0x2E400)
+    for (var_10 = 0; var_10 < 20; var_10++) {
+#else
     for (var_10 = 0; var_10 < 0x40; var_10++) {
+#endif
         ebp_C.unk_00_lo = var_10;
         sub_3D3A0(ebp_C);
     }
@@ -191,13 +225,19 @@ void sub_3CBF0()
 }
 
 // match: sub_3CC80 @ 0x0003CC80
+// sp-match: sub_3CC80 @ 0x0002E540
 void sub_3CC80()
 {
     RwInt32 local_8;
     type_365A0 var_4;
 
     sub_3CD10();
+#ifdef CODFH_SP
+    // single player's handle table has 20 entries (SP 0x2E4D0, 0x2E540, 0x2E400)
+    for (local_8 = 0; local_8 < 20; local_8++) {
+#else
     for (local_8 = 0; local_8 < 0x40; local_8++) {
+#endif
         var_4.unk_00_lo = local_8;
         sub_3D3A0(var_4);
     }
@@ -206,6 +246,7 @@ void sub_3CC80()
 }
 
 // match: sub_3CCE0 @ 0x0003CCE0
+// sp-match: sub_3CCE0 @ 0x0002E580
 void sub_3CCE0()
 {
     sub_3CD10();
@@ -216,13 +257,22 @@ void sub_3CCE0()
 // match: sub_3CD10 @ 0x0003CD10
 void sub_3CD10()
 {
-    if (dword_4395B0.in_use())
+    if (dword_4395B0.in_use()) {
+#ifndef CODFH_SP
+        // single player compiles the warnings out (their texts are not in default.xbe; its
+        // callers call an empty function, SP 0x2E541, 0x2E580)
         sub_19A750("AIManeuverManager: Some large maneuvers were not deleted during restart/shutdown!");
-    if (dword_4395D0.in_use())
+#endif
+    }
+    if (dword_4395D0.in_use()) {
+#ifndef CODFH_SP
         sub_19A750("AIManeuverManager: Some normal maneuvers were not deleted during restart/shutdown!");
+#endif
+    }
 }
 
 // match: sub_3CD60 @ 0x0003CD60
+// sp-match: sub_3CD60 @ 0x0002E320
 // The largest kind's size.
 RwInt32 sub_3CD60()
 {
@@ -238,6 +288,7 @@ RwInt32 sub_3CD60()
 }
 
 // match: sub_3CDB0 @ 0x0003CDB0
+// sp-match: sub_3CDB0 @ 0x0002E380
 // The next largest size.
 RwInt32 sub_3CDB0()
 {
@@ -257,6 +308,7 @@ RwInt32 sub_3CDB0()
 // match: ?sub_3CE20@@YA?ATtype_365A0@@H@Z @ 0x0003CE20
 // match: __ehhandler$?sub_3CE20@@YA?ATtype_365A0@@H@Z-0x66 @ 0x002FF660
 // match: __ehhandler$?sub_3CE20@@YA?ATtype_365A0@@H@Z @ 0x002FF6C6
+// sp-match: ?sub_3CE20@@YA?ATtype_365A0@@H@Z @ 0x0002E5A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_365A0 sub_3CE20(RwInt32 arg_0)
 {
@@ -283,6 +335,7 @@ type_365A0 sub_3CE20(RwInt32 arg_0)
 }
 
 // match: sub_3D0B0 @ 0x0003D0B0
+// sp-match: sub_3D0B0 @ 0x0002E720
 // Destroys the object with handle arg_0: its vf_008, back to its pool, and
 // its handle freed.
 void sub_3D0B0(type_365A0 arg_0)
@@ -299,19 +352,42 @@ void sub_3D0B0(type_365A0 arg_0)
 }
 
 // match: sub_3D120 @ 0x0003D120
+// sp-match: sub_3D120 @ 0x0002E8A0
 RwUInt32 sub_3D120(type_3DF30 *arg_0, type_3D410 *arg_4, RwInt32 arg_8)
 {
+#ifdef CODFH_SP
+    // the null handle by value (SP 0x2E8A0)
+    type_365A0 var_4;
+#else
     RwUInt32 var_4;
+#endif
     RwUInt32 local_8;
 
+#ifdef CODFH_SP
+    var_4.unk_00 = 0;
+#else
     var_4 = 0;
+#endif
+#ifdef CODFH_SP
+    // SP 0x2E8A0 receives the handle returned by value.
+    local_8 = sub_3D150(arg_0, arg_4, var_4, arg_8).unk_00;
+#else
+    // MP 0x3D120 receives the scalar handle (no union-return temporary).
     local_8 = sub_3D150(arg_0, arg_4, var_4, arg_8);
+#endif
     return local_8;
 }
 
 // match: ?sub_3D150@@YAIPAUtype_3DF30@@PAUtype_3D410@@IH@Z @ 0x0003D150
+// sp-match: ?sub_3D150@@YAIPAUtype_3DF30@@PAUtype_3D410@@IH@Z @ 0x0002E770
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
+#ifdef CODFH_SP
+// The parameter and return value are handles by value (SP 0x2E770).
+type_365A0 sub_3D150(type_3DF30 *arg_0, type_3D410 *arg_4, type_365A0 arg_8, RwInt32 arg_C)
+#else
+// MP 0x3D150 passes and returns scalar handle bits.
 RwUInt32 sub_3D150(type_3DF30 *arg_0, type_3D410 *arg_4, RwUInt32 arg_8, RwInt32 arg_C)
+#endif
 {
     // Named handle copies precede the factory's union-return temporary
     // at -0x64; the original receiver and score slots remain above them.
@@ -323,13 +399,24 @@ RwUInt32 sub_3D150(type_3DF30 *arg_0, type_3D410 *arg_4, RwUInt32 arg_8, RwInt32
     RwInt32 x4C;
     type_3CE6D0 *w48;
     type_3CE6D0 *loc44;
+#ifdef CODFH_SP
+    // SP 0x2E770 returns the null handle or the factory's handle directly.
+    type_365A0 fp_40;
+#else
+    // MP 0x3D150.
     RwUInt32 fp_40;
+#endif
     RwInt32 l3C[7];
     RwInt32 var_20[7];
     type_3CE6D0 *bp_4;
 
+#ifdef CODFH_SP
+    fp_40.unk_00 = 0;
+    bp_4 = sub_3D3E0(arg_8.unk_00);
+#else
     fp_40 = 0;
     bp_4 = sub_3D3E0(arg_8);
+#endif
     x4C = -1;
     var50 = -1;
     for (l54 = 0; l54 < 7; l54++)
@@ -345,8 +432,12 @@ RwUInt32 sub_3D150(type_3DF30 *arg_0, type_3D410 *arg_4, RwUInt32 arg_8, RwInt32
         l3C[loc44->vf_030()] = loc44->vf_010(arg_4);
         if (l3C[loc44->vf_030()] == -1)
         {
+#ifdef CODFH_SP
+            arg_0->sub_3E3B0(loc44->get_unk_18());
+#else
             stk_60 = loc44->unk_18;
             arg_0->sub_3E3B0(stk_60);
+#endif
         }
         else
             var_20[loc44->vf_030()] = 1;
@@ -367,10 +458,17 @@ RwUInt32 sub_3D150(type_3DF30 *arg_0, type_3D410 *arg_4, RwUInt32 arg_8, RwInt32
     }
     if (var_20[var50])
         return fp_40;
+#ifdef CODFH_SP
+    // SP 0x2E770 preserves the factory's union return.
+    return sub_3CE20(var50);
+#else
+    // MP 0x3D150.
     return sub_3CE20(var50).unk_00;
+#endif
 }
 
 // match: sub_3D2E0 @ 0x0003D2E0
+// sp-match: sub_3D2E0 @ 0x0002E400
 // Gives the object arg_0 (of kind arg_4) the first free handle, with a new
 // serial.
 type_365A0 sub_3D2E0(type_3CE6D0 *arg_0, RwInt32 arg_4)
@@ -382,11 +480,20 @@ type_365A0 sub_3D2E0(type_3CE6D0 *arg_0, RwInt32 arg_4)
     var_4 = 0;
     if (dword_4395A8 == 0)
         dword_4395A8 = 1;
+#ifdef CODFH_SP
+    // single player's handle table has 20 entries (SP 0x2E4D0, 0x2E540, 0x2E400)
+    for (varC = 1; varC < 20; varC++) {
+#else
     for (varC = 1; varC < 0x40; varC++) {
+#endif
         if (dword_4392A8[varC].unk_00.unk_00 == 0 && dword_4392A8[varC].unk_08 == 0) {
             v8.unk_00_lo = varC;
             v8.unk_02 = dword_4395A8;
+#ifdef CODFH_SP // shape: the handle copied as its dword (SP 0x2E400 stores the entry's object before its handle)
+            dword_4392A8[v8.unk_00_lo].unk_00.unk_00 = v8.unk_00;
+#else
             dword_4392A8[v8.unk_00_lo].unk_00 = v8;
+#endif
             dword_4392A8[v8.unk_00_lo].unk_08 = arg_0;
             dword_4392A8[v8.unk_00_lo].unk_04 = arg_4;
             var_4 = 1;
@@ -398,6 +505,7 @@ type_365A0 sub_3D2E0(type_3CE6D0 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_3D3A0 @ 0x0003D3A0
+// sp-match: sub_3D3A0 @ 0x0002E480
 void sub_3D3A0(type_365A0 arg_0)
 {
     dword_4392A8[arg_0.unk_00_lo].unk_00.unk_00 = 0;
@@ -405,7 +513,10 @@ void sub_3D3A0(type_365A0 arg_0)
     dword_4392A8[arg_0.unk_00_lo].unk_04 = -1;
 }
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 2 // single player compiles sub_3D3E0 in another file (sp_unit_03CA10_2.cpp)
 // match: sub_3D3E0 @ 0x0003D3E0
+// sp-match: sub_3D3E0 @ 0x0002E4B0
 type_3CE6D0 *sub_3D3E0(RwUInt32 arg_0)
 {
     if (dword_4392A8[(RwUInt16)arg_0].unk_00.unk_00 == arg_0)
@@ -413,6 +524,8 @@ type_3CE6D0 *sub_3D3E0(RwUInt32 arg_0)
     return 0;
 }
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 1
 // Members /OPT:ICF folded into shared trivial bodies (config/aliases.txt): defined here for
 // the authentic link (PLAN M7); the placement link takes the shared bodies.
 
@@ -475,8 +588,12 @@ RwInt32 type_3CE6D0::vf_030()
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
+#ifndef CODFH_SP
+// (single player defines it in unit_032210.cpp, beside its caller sub_32DD0)
 // ?sub_18F420@type_3CE6D0@@QAEHPAUtype_F8350@@PAUtype_3D410@@@Z (folded into 0x18F420)
 RwInt32 type_3CE6D0::sub_18F420(struct type_F8350 * arg_0, struct type_3D410 * arg_4)
 {
     return 1;
 }
+#endif
+#endif

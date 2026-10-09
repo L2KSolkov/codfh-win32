@@ -68,6 +68,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/src/plcore/
 // match: _rcsid @ 0x00416B20
 
 // match: __rwPluginRegistryAddPluginStream @ 0x002B2D10
+// sp-match: __rwPluginRegistryAddPluginStream @ 0x001CE130
 RwInt32
 _rwPluginRegistryAddPluginStream(RwPluginRegistry * reg, RwUInt32 pluginID,
                                 RwPluginDataChunkReadCallBack readCB,
@@ -115,6 +116,7 @@ _rwPluginRegistryAddPluginStream(RwPluginRegistry * reg, RwUInt32 pluginID,
  */
 
 // match: __rwPluginRegistryAddPlgnStrmlwysCB @ 0x002B2D50
+// sp-match: __rwPluginRegistryAddPlgnStrmlwysCB @ 0x001CE170
 RwInt32
 _rwPluginRegistryAddPlgnStrmlwysCB(
     RwPluginRegistry * reg,
@@ -163,6 +165,7 @@ _rwPluginRegistryAddPlgnStrmlwysCB(
  On exit    : Offset into structure of reserved memory
  */
 // match: __rwPluginRegistryAddPlgnStrmRightsCB @ 0x002B2D80
+// sp-match: __rwPluginRegistryAddPlgnStrmRightsCB @ 0x001CE1A0
 RwInt32
 _rwPluginRegistryAddPlgnStrmRightsCB(RwPluginRegistry *reg, RwUInt32 pluginID,
                                      RwPluginDataChunkRightsCallBack rightsCB)
@@ -204,6 +207,7 @@ _rwPluginRegistryAddPlgnStrmRightsCB(RwPluginRegistry *reg, RwUInt32 pluginID,
  */
 
 // match: __rwPluginRegistryReadDataChunks @ 0x002B2DB0
+// sp-match: __rwPluginRegistryReadDataChunks @ 0x001CE1D0
 const RwPluginRegistry *
 _rwPluginRegistryReadDataChunks(const RwPluginRegistry * reg, RwStream * stream, void *object)
 {
@@ -333,6 +337,7 @@ _rwPluginRegistryReadDataChunks(const RwPluginRegistry * reg, RwStream * stream,
  */
 
 // match: __rwPluginRegistryInvokeRights @ 0x002B2EF0
+// sp-match: __rwPluginRegistryInvokeRights @ 0x001CE310
 const RwPluginRegistry*
 _rwPluginRegistryInvokeRights(const RwPluginRegistry *reg, RwUInt32 id,
                               void *obj, RwUInt32 extraData)
@@ -373,6 +378,7 @@ _rwPluginRegistryInvokeRights(const RwPluginRegistry *reg, RwUInt32 id,
  */
 
 // match: __rwPluginRegistryGetSize @ 0x002B2F40
+// sp-match: __rwPluginRegistryGetSize @ 0x001CE360
 RwInt32
 _rwPluginRegistryGetSize(const RwPluginRegistry * reg, const void *object)
 {
@@ -430,6 +436,7 @@ _rwPluginRegistryGetSize(const RwPluginRegistry * reg, const void *object)
  */
 
 // match: __rwPluginRegistryWriteDataChunks @ 0x002B2F80
+// sp-match: __rwPluginRegistryWriteDataChunks @ 0x001CE3A0
 const RwPluginRegistry *
 _rwPluginRegistryWriteDataChunks(const RwPluginRegistry * reg, RwStream * stream, const void *object)
 {
@@ -501,6 +508,7 @@ _rwPluginRegistryWriteDataChunks(const RwPluginRegistry * reg, RwStream * stream
  */
 
 // match: __rwPluginRegistrySkipDataChunks @ 0x002B3030
+// sp-match: __rwPluginRegistrySkipDataChunks @ 0x001CE450
 const RwPluginRegistry *
 _rwPluginRegistrySkipDataChunks(const RwPluginRegistry * reg, RwStream * stream)
 {

@@ -166,6 +166,7 @@ static RwBool inCameraBeginEndUpdate;
 // match: __rwCameraFreeListPreallocBlocks @ 0x004354F0
 
 // match: _CameraUpdateZShiftScale @ 0x002A9B80
+// sp-match: _CameraUpdateZShiftScale @ 0x001C4FB0
 
 static RwCamera    *
 CameraUpdateZShiftScale(RwCamera * camera)
@@ -276,6 +277,7 @@ CameraUpdateZShiftScale(RwCamera * camera)
  */
 
 // match: _CameraBuildPerspClipPlanes @ 0x002A9C20
+// sp-match: _CameraBuildPerspClipPlanes @ 0x001C5050
 static void
 CameraBuildPerspClipPlanes(RwCamera * camera)
 {
@@ -409,6 +411,7 @@ CameraBuildPerspClipPlanes(RwCamera * camera)
  */
 
 // match: _CameraBuildPerspViewMatrix @ 0x002AA7F0
+// sp-match: _CameraBuildPerspViewMatrix @ 0x001C5C20
 static RwCamera    *
 CameraBuildPerspViewMatrix(RwCamera * camera)
 {
@@ -524,6 +527,7 @@ CameraBuildPerspViewMatrix(RwCamera * camera)
 /* 1 Bll 0 Fur */
 
 // match: _CameraBuildParallelClipPlanes @ 0x002AA990
+// sp-match: _CameraBuildParallelClipPlanes @ 0x001C5DC0
 static void
 CameraBuildParallelClipPlanes(RwCamera * camera)
 {
@@ -651,6 +655,7 @@ CameraBuildParallelClipPlanes(RwCamera * camera)
  */
 
 // match: _CameraBuildParallelViewMatrix @ 0x002AAEE0
+// sp-match: _CameraBuildParallelViewMatrix @ 0x001C6310
 static RwCamera    *
 CameraBuildParallelViewMatrix(RwCamera * camera)
 {
@@ -751,6 +756,7 @@ CameraBuildParallelViewMatrix(RwCamera * camera)
  */
 
 // match: _CameraSync @ 0x002AB070
+// sp-match: _CameraSync @ 0x001C64A0
 static RwObjectHasFrame *
 CameraSync(RwObjectHasFrame * type)
 {
@@ -791,6 +797,7 @@ CameraSync(RwObjectHasFrame * type)
  */
 
 // match: _CameraEndUpdate @ 0x002AB0C0
+// sp-match: _CameraEndUpdate @ 0x001C64F0
 static RwCamera    *
 CameraEndUpdate(RwCamera * camera)
 {
@@ -832,6 +839,7 @@ CameraEndUpdate(RwCamera * camera)
  */
 
 // match: _CameraBeginUpdate @ 0x002AB0F0
+// sp-match: _CameraBeginUpdate @ 0x001C6520
 static RwCamera    *
 CameraBeginUpdate(RwCamera * camera)
 {
@@ -929,6 +937,7 @@ CameraBeginUpdate(RwCamera * camera)
  */
 
 // match: __rwCameraClose @ 0x002AB130
+// sp-match: __rwCameraClose @ 0x001C6560
 void               *
 _rwCameraClose(void *instance,
                RwInt32 __RWUNUSED__ offset,
@@ -993,6 +1002,7 @@ RwCameraSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc 
  */
 
 // match: __rwCameraOpen @ 0x002AB170
+// sp-match: __rwCameraOpen @ 0x001C65A0
 void               *
 _rwCameraOpen(void * instance,
               RwInt32 offset,
@@ -1047,6 +1057,7 @@ _rwCameraOpen(void * instance,
  *
  */
 // match: _RwCameraEndUpdate @ 0x002AB1C0
+// sp-match: _RwCameraEndUpdate @ 0x001C65F0
 RwCamera *
 RwCameraEndUpdate(RwCamera *camera)
 {
@@ -1096,6 +1107,7 @@ RwCameraEndUpdate(RwCamera *camera)
  *
  */
 // match: _RwCameraBeginUpdate @ 0x002AB1D0
+// sp-match: _RwCameraBeginUpdate @ 0x001C6600
 RwCamera *
 RwCameraBeginUpdate(RwCamera *camera)
 {
@@ -1191,6 +1203,7 @@ RwCameraGetViewOffset(const RwCamera *camera)
  *
  */
 // match: _RwCameraSetViewOffset @ 0x002AB1E0
+// sp-match: _RwCameraSetViewOffset @ 0x001C6610
 RwCamera *
 RwCameraSetViewOffset(RwCamera *camera, const RwV2d *offset)
 {
@@ -1402,6 +1415,7 @@ RwCameraGetZRaster(const RwCamera *camera)
  *
  */
 // match: _RwCameraSetNearClipPlane @ 0x002AB210
+// sp-match: _RwCameraSetNearClipPlane @ 0x001C6640
 RwCamera *
 RwCameraSetNearClipPlane(RwCamera *camera, RwReal nearClip)
 {
@@ -1500,6 +1514,7 @@ RwCameraGetNearClipPlane(const RwCamera *camera)
  *
  */
 // match: _RwCameraSetFarClipPlane @ 0x002AB2D0
+// sp-match: _RwCameraSetFarClipPlane @ 0x001C6700
 RwCamera *
 RwCameraSetFarClipPlane(RwCamera *camera, RwReal farClip)
 {
@@ -1714,6 +1729,7 @@ RwCameraGetCurrentCamera(void)
  *
  */
 // match: _RwCameraFrustumTestSphere @ 0x002AB390
+// sp-match: _RwCameraFrustumTestSphere @ 0x001C67C0
 RwFrustumTestResult
 RwCameraFrustumTestSphere(const RwCamera *camera, const RwSphere *sphere)
 {
@@ -1796,6 +1812,7 @@ RwCameraFrustumTestSphere(const RwCamera *camera, const RwSphere *sphere)
  *
  */
 // match: _RwCameraClear @ 0x002AB400
+// sp-match: _RwCameraClear @ 0x001C6830
 RwCamera *
 RwCameraClear(RwCamera *camera, RwRGBA *color, RwInt32 clearMode)
 {
@@ -1851,6 +1868,7 @@ RwCameraClear(RwCamera *camera, RwRGBA *color, RwInt32 clearMode)
  *
  */
 // match: _RwCameraShowRaster @ 0x002AB430
+// sp-match: _RwCameraShowRaster @ 0x001C6860
 RwCamera *
 RwCameraShowRaster(RwCamera *camera, void *dev, RwUInt32 flags)
 {
@@ -1906,6 +1924,7 @@ RwCameraShowRaster(RwCamera *camera, void *dev, RwUInt32 flags)
  *
  */
 // match: _RwCameraSetProjection @ 0x002AB460
+// sp-match: _RwCameraSetProjection @ 0x001C6890
 RwCamera *
 RwCameraSetProjection(RwCamera *camera, RwCameraProjection projection)
 {
@@ -2014,6 +2033,7 @@ RwCameraGetProjection(const RwCamera *camera)
  *
  */
 // match: _RwCameraSetViewWindow @ 0x002AB4D0
+// sp-match: _RwCameraSetViewWindow @ 0x001C6900
 RwCamera *
 RwCameraSetViewWindow(RwCamera *camera, const RwV2d *viewWindow)
 {
@@ -2135,6 +2155,7 @@ RwCameraGetViewMatrix(RwCamera *camera)
  *
  */
 // match: _RwCameraRegisterPlugin @ 0x002AB520
+// sp-match: _RwCameraRegisterPlugin @ 0x001C6950
 RwInt32
 RwCameraRegisterPlugin(RwInt32 size,
                        RwUInt32 pluginID,
@@ -2312,6 +2333,7 @@ RwCameraGetFrame(const RwCamera *camera)
  *
  */
 // match: _RwCameraDestroy @ 0x002AB550
+// sp-match: _RwCameraDestroy @ 0x001C6980
 RwBool
 RwCameraDestroy(RwCamera *camera)
 {
@@ -2384,6 +2406,7 @@ RwCameraDestroy(RwCamera *camera)
  *
  */
 // match: _RwCameraCreate @ 0x002AB590
+// sp-match: _RwCameraCreate @ 0x001C69C0
 RwCamera *
 RwCameraCreate(void)
 {

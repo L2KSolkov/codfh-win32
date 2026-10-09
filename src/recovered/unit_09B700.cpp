@@ -41,8 +41,10 @@
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D53F8
 extern const RwReal flt_3D53F8 = 16.666666f;
+#ifndef CODFH_SP // single player has no unreferenced 0.0f: the class name follows 16.666666f (SP 0x2E1B8C)
 // 0x003D53FC
 extern const RwReal flt_3D53FC = 0.0f;
+#endif
 
 // match: ?flt_3D53F8@@3MB @ 0x003D53F8
 // match: ?flt_3D53FC@@3MB @ 0x003D53FC
@@ -55,10 +57,14 @@ extern const RwReal flt_3D53FC = 0.0f;
 // match: ??_Gtype_3D5400@@UAEPAXI@Z @ 0x0009B830
 // match: ??_7type_3D5400@@6B@ @ 0x003D5400
 // match: ??_C@_0BL@MFGJPJCP@MeshSwapDestructableEntity?$AA@ @ 0x003D5638
+// sp-match: ??_Gtype_3D5400@@UAEPAXI@Z @ 0x0007AE60
 
 // match: ?sub_9B700@@YAPAUtype_3D5400@@PAUtype_712B0@@@Z @ 0x0009B700
 // match: __ehhandler$?sub_9B700@@YAPAUtype_3D5400@@PAUtype_712B0@@@Z-0x19 @ 0x002FFAC0
 // match: __ehhandler$?sub_9B700@@YAPAUtype_3D5400@@PAUtype_712B0@@@Z @ 0x002FFAD9
+// sp-match: ?sub_9B700@@YAPAUtype_3D5400@@PAUtype_712B0@@@Z @ 0x0007AED0
+// (its constructor, defined in the class: single player calls its out-of-line copy)
+// sp-match: ??0type_3D5400@@QAE@PAUtype_712B0@@@Z @ 0x0007AE00
 type_3D5400 *sub_9B700(type_712B0 *arg_0)
 {
     type_3D5400 *var_10;
@@ -73,22 +79,26 @@ type_3D5400 *sub_9B700(type_712B0 *arg_0)
             var_10 = 0;
         }
     }
+#ifndef CODFH_SP
     else
     {
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
                    "location(%6.2f,%6.2f,%6.2f)",
                    arg_0->unk_90, arg_0->unk_94, arg_0->unk_98);
     }
+#endif
     return var_10;
 }
 // match: ??1type_3D5400@@UAE@XZ @ 0x0009B860
 // match: __ehhandler$??1type_3D5400@@UAE@XZ-0x8 @ 0x002FFAF0
 // match: __ehhandler$??1type_3D5400@@UAE@XZ @ 0x002FFAF8
+// sp-match: ??1type_3D5400@@UAE@XZ @ 0x0007AE80
 type_3D5400::~type_3D5400()
 {
     vf_230();
 }
 // match: ?vf_234@type_3D5400@@UAEHPAUtype_712B0@@@Z @ 0x0009B8C0
+// sp-match: ?vf_234@type_3D5400@@UAEHPAUtype_712B0@@@Z @ 0x0007A710
 // Sets the mesh-swap destructable entity up from its trigger arg_0: the
 // base's set-up and its kind; its health from the trigger's +0xE0; its
 // name object (unk_D0) told it is the entity (flags 0x402); its first mesh
@@ -152,6 +162,7 @@ RwInt32 type_3D5400::vf_234(type_712B0 *arg_0)
 }
 // Takes it down: its AI object, and the trigger's AI script's entity.
 // match: ?vf_230@type_3D5400@@UAEXXZ @ 0x0009BAB0
+// sp-match: ?vf_230@type_3D5400@@UAEXXZ @ 0x0007A870
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3D5400::vf_230()
 {
@@ -176,6 +187,7 @@ void type_3D5400::vf_230()
     }
 }
 // match: ?sub_9BB60@type_9BB60@@QAEXXZ @ 0x0009BB60
+// sp-match: ?sub_9BB60@type_9BB60@@QAEXXZ @ 0x0007A8F0
 // "SwapToDestroyedVersion" (type_9BB60 is type_3D5400 as the script command
 // sees it): takes on its trigger's second mesh (unk_108, a kind-3 object)
 // when it has one, spawns the trigger's particle system (unk_DC) where it
@@ -186,7 +198,6 @@ void type_9BB60::sub_9BB60()
     MeshSwapDestructableObjectTrigger *var_8;
     type_3DF8D8 *var_C;
     type_3DF8D8 *var_10;
-    RwMatrix var_50;
 
     var_8 = (MeshSwapDestructableObjectTrigger *)unk_344.unk_08;
     if (var_8->unk_108.unk_00 != 0 || var_8->unk_108.unk_04 != 0) {
@@ -198,6 +209,8 @@ void type_9BB60::sub_9BB60()
         vf_224(var_10, 0, 0);
     }
     if (var_8->unk_DC != 0) {
+        RwMatrix var_50;
+
         RwMatrixSetIdentityMacro(&var_50);
         var_50.pos = *sub_CD550();
         sub_F2FF0(var_8->unk_DC, &var_50, 0, 1, false, false);
@@ -206,6 +219,7 @@ void type_9BB60::sub_9BB60()
         unk_28_2 = 0;
 }
 // match: ?vf_064@type_3D5400@@UAEHPAUtype_75600@@@Z @ 0x0009BCC0
+// sp-match: ?vf_064@type_3D5400@@UAEHPAUtype_75600@@@Z @ 0x0007AA30
 // Hit by a bullet: as type_3D32F8's (unit_073710), by its trigger's flags
 // (unk_F0 bullets at all, unk_E8 and unk_EC from allies and enemies), off
 // its health unk_3D8.
@@ -235,6 +249,7 @@ RwInt32 type_3D5400::vf_064(type_75600 *arg_0)
     return 0;
 }
 // match: ?vf_068@type_3D5400@@UAEHPAUtype_758F0@@@Z @ 0x0009BDE0
+// sp-match: ?vf_068@type_3D5400@@UAEHPAUtype_758F0@@@Z @ 0x0007AB00
 // Hit by an explosion: likewise (unk_F4), telling the script where it came
 // from and whether in front.
 RwInt32 type_3D5400::vf_068(type_758F0 *arg_0)
@@ -270,6 +285,7 @@ RwInt32 type_3D5400::vf_068(type_758F0 *arg_0)
     return 0;
 }
 // match: ?vf_060@type_3D5400@@UAEHPAUtype_3D3548@@@Z @ 0x0009BFB0
+// sp-match: ?vf_060@type_3D5400@@UAEHPAUtype_3D3548@@@Z @ 0x0007AC70
 // Struck by an entity of kind 0x80 or 0x40000 (a vehicle, a tank): 100 off
 // its health, told to the script as an explosion at the entity of strength 1.
 RwInt32 type_3D5400::vf_060(type_3D3548 *arg_0)
@@ -304,12 +320,14 @@ RwInt32 type_3D5400::vf_060(type_3D3548 *arg_0)
     return 0;
 }
 // match: ?vf_098@type_3D5400@@UAEPAUtype_3D2E7C@@XZ @ 0x0009C140
+// sp-match: ?vf_098@type_3D5400@@UAEPAUtype_3D2E7C@@XZ @ 0x0007ADA0
 type_3D2E7C *type_3D5400::vf_098()
 {
     return (type_3D2E7C *)sub_67620(unk_3D4);
 }
 // Whether arg_0 is one of its keys (the trigger's unk_100_k and unk_108_k).
 // match: ?vf_058@type_3D5400@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x0009C160
+// sp-match: ?vf_058@type_3D5400@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x0007ADB0
 RwInt32 type_3D5400::vf_058(type_3DF8D8_04 *arg_0)
 {
     type_712B0 *var_4;

@@ -831,7 +831,11 @@ void *off_430CE8[110] =
     (void *)0x1,
 };
 // 0x00430EA0
+#ifdef CODFH_SP // 23 entries, no 0x80, 1 after them: SP 0x32D31C is the next object's (table at SP 0x32D150)
+void *off_430EA0[115] =
+#else
 void *off_430EA0[117] =
+#endif
 {
     (void *)&unk_3EDFF8,
     0,
@@ -948,8 +952,10 @@ void *off_430EA0[117] =
     0,
     (void *)&unk_3ED52C,
     (void *)0x1,
+#ifndef CODFH_SP
     (void *)0x80,
     (void *)0x1,
+#endif
 };
 // 0x00506B44
 RwInt32 dword_506B44;
@@ -981,6 +987,7 @@ RwUInt8 dword_507EBC[40];
 // match: _off_430EA0 @ 0x00430EA0
 
 // match: _sub_250B20 @ 0x00250B20
+// sp-match: _sub_250B20 @ 0x00164BF0
 
 RwBool
 sub_250B20(void)
@@ -990,6 +997,7 @@ sub_250B20(void)
 
 /* Closes a source: the last stops the WMA thread. */
 // match: _sub_250B30 @ 0x00250B30
+// sp-match: _sub_250B30 @ 0x00164C00
 void
 sub_250B30(void)
 {
@@ -1003,6 +1011,7 @@ sub_250B30(void)
 }
 
 // match: _sub_250B70 @ 0x00250B70
+// sp-match: _sub_250B70 @ 0x00164C40
 void
 sub_250B70(rwaWmaSource *obj, void *a, void *b)
 {
@@ -1026,6 +1035,7 @@ sub_250B70(rwaWmaSource *obj, void *a, void *b)
 
 /* The default creation parameters. */
 // match: _sub_250C10 @ 0x00250C10
+// sp-match: _sub_250C10 @ 0x00164CE0
 void *
 sub_250C10(rwaWmaSource *obj, rwaWmaParams *params)
 {
@@ -1055,6 +1065,7 @@ sub_250C10(rwaWmaSource *obj, rwaWmaParams *params)
 
 /* The play queue's read: the next filled packet, as a queue item. */
 // match: _sub_250C80 @ 0x00250C80
+// sp-match: _sub_250C80 @ 0x00164D50
 rwaQueueItem *
 sub_250C80(rwaWmaSource *obj)
 {
@@ -1101,6 +1112,7 @@ sub_250C80(rwaWmaSource *obj)
 /* The play position, in seconds or (unit 2) samples.
  * The unit switch preserves the original SUB dispatch and ECX state pointer. */
 // match: _sub_250D90 @ 0x00250D90
+// sp-match: _sub_250D90 @ 0x00164E60
 void
 sub_250D90(rwaWmaSource *obj, rwaStreamPosition *position)
 {
@@ -1120,6 +1132,7 @@ sub_250D90(rwaWmaSource *obj, rwaStreamPosition *position)
 }
 
 // match: _sub_250E00 @ 0x00250E00
+// sp-match: _sub_250E00 @ 0x00164ED0
 void
 sub_250E00(rwaWmaSource *obj, RwBool loop)
 {
@@ -1136,6 +1149,7 @@ sub_250E00(rwaWmaSource *obj, RwBool loop)
 }
 
 // match: _sub_250E30 @ 0x00250E30
+// sp-match: _sub_250E30 @ 0x00164F00
 RwBool
 sub_250E30(rwaWmaSource *obj)
 {
@@ -1144,6 +1158,7 @@ sub_250E30(rwaWmaSource *obj)
 
 /* Sets the node's mode, and lists the source for the WMA thread. */
 // match: _sub_250E50 @ 0x00250E50
+// sp-match: _sub_250E50 @ 0x00164F20
 void
 sub_250E50(rwaWmaSource *obj, RwInt32 mode)
 {
@@ -1176,6 +1191,7 @@ sub_250E50(rwaWmaSource *obj, RwInt32 mode)
 }
 
 // match: _sub_250F10 @ 0x00250F10
+// sp-match: _sub_250F10 @ 0x00164FE0
 rwaStreamInfo *
 sub_250F10(rwaWmaSource *obj)
 {
@@ -1183,6 +1199,7 @@ sub_250F10(rwaWmaSource *obj)
 }
 
 // match: _sub_250F20 @ 0x00250F20
+// sp-match: _sub_250F20 @ 0x00164FF0
 void
 sub_250F20(rwaWmaSource *obj, rwaStreamConnect *connect)
 {
@@ -1193,6 +1210,7 @@ sub_250F20(rwaWmaSource *obj, rwaStreamConnect *connect)
 
 /* Drops the decoded packets. */
 // match: _sub_250F50 @ 0x00250F50
+// sp-match: _sub_250F50 @ 0x00165020
 void
 sub_250F50(rwaWmaSource *obj, RwUInt32 unused)
 {
@@ -1215,6 +1233,7 @@ sub_250F50(rwaWmaSource *obj, RwUInt32 unused)
 }
 
 // match: _sub_250FF0 @ 0x00250FF0
+// sp-match: _sub_250FF0 @ 0x001650C0
 rwaWmaSource *
 sub_250FF0(rwaWmaSource *obj, const void *param, rwaStreamPosition *value)
 {
@@ -1223,6 +1242,7 @@ sub_250FF0(rwaWmaSource *obj, const void *param, rwaStreamPosition *value)
 }
 
 // match: _sub_251010 @ 0x00251010
+// sp-match: _sub_251010 @ 0x001650E0
 rwaWmaSource *
 sub_251010(rwaWmaSource *obj, const void *param, const RwBool *value)
 {
@@ -1231,6 +1251,7 @@ sub_251010(rwaWmaSource *obj, const void *param, const RwBool *value)
 }
 
 // match: _sub_251030 @ 0x00251030
+// sp-match: _sub_251030 @ 0x00165100
 rwaWmaSource *
 sub_251030(rwaWmaSource *obj, const void *param, RwBool *value)
 {
@@ -1239,6 +1260,7 @@ sub_251030(rwaWmaSource *obj, const void *param, RwBool *value)
 }
 
 // match: _sub_251050 @ 0x00251050
+// sp-match: _sub_251050 @ 0x00165120
 rwaWmaSource *
 sub_251050(rwaWmaSource *obj, const void *param, const RwInt32 *value)
 {
@@ -1247,6 +1269,7 @@ sub_251050(rwaWmaSource *obj, const void *param, const RwInt32 *value)
 }
 
 // match: _sub_251070 @ 0x00251070
+// sp-match: _sub_251070 @ 0x00165140
 rwaWmaSource *
 sub_251070(rwaWmaSource *obj, const void *param, rwaStreamInfo **value)
 {
@@ -1255,6 +1278,7 @@ sub_251070(rwaWmaSource *obj, const void *param, rwaStreamInfo **value)
 }
 
 // match: _sub_251090 @ 0x00251090
+// sp-match: _sub_251090 @ 0x00165160
 rwaWmaSource *
 sub_251090(rwaWmaSource *obj, const void *param, rwaStreamConnect *value)
 {
@@ -1263,6 +1287,7 @@ sub_251090(rwaWmaSource *obj, const void *param, rwaStreamConnect *value)
 }
 
 // match: _sub_2510B0 @ 0x002510B0
+// sp-match: _sub_2510B0 @ 0x00165180
 rwaWmaSource *
 sub_2510B0(rwaWmaSource *obj, const void *param, const RwUInt32 *value)
 {
@@ -1273,6 +1298,7 @@ sub_2510B0(rwaWmaSource *obj, const void *param, const RwUInt32 *value)
 /* A queue item played: its packet is free again (the last one ends the
  * stream). */
 // match: _sub_2510D0 @ 0x002510D0
+// sp-match: _sub_2510D0 @ 0x001651A0
 void
 sub_2510D0(rwaQueueItem *item, rwaWmaSource *obj)
 {
@@ -1292,6 +1318,7 @@ sub_2510D0(rwaQueueItem *item, rwaWmaSource *obj)
 /* Seeks (in seconds or samples; flushing first when asked) at the WMA
  * thread's next pass. */
 // match: _sub_251130 @ 0x00251130
+// sp-match: _sub_251130 @ 0x00165200
 void
 sub_251130(rwaWmaSource *obj, rwaStreamSeek *seek)
 {
@@ -1325,6 +1352,7 @@ sub_251130(rwaWmaSource *obj, rwaStreamSeek *seek)
 }
 
 // match: _sub_2511F0 @ 0x002511F0
+// sp-match: _sub_2511F0 @ 0x001652C0
 rwaWmaSource *
 sub_2511F0(rwaWmaSource *obj, const void *param, rwaStreamSeek *value)
 {
@@ -1336,6 +1364,7 @@ sub_2511F0(rwaWmaSource *obj, const void *param, rwaStreamSeek *value)
 /* The decode loop retains its next-link iterator and initializes the
  * per-packet output position after the other status and loop locals. */
 // match: _sub_251210 @ 0x00251210
+// sp-match: _sub_251210 @ 0x001652E0
 RwUInt32
 sub_251210(void *data)
 {
@@ -1519,6 +1548,7 @@ sub_251210(void *data)
 
 
 // match: _sub_251630 @ 0x00251630
+// sp-match: _sub_251630 @ 0x00165700
 RwBool
 sub_251630(void)
 {
@@ -1550,6 +1580,7 @@ sub_251630(void)
 }
 
 // match: _sub_2516E0 @ 0x002516E0
+// sp-match: _sub_2516E0 @ 0x001657B0
 rwaWmaSource *
 sub_2516E0(rwaWmaSource *obj, rwaInstance *parent, rwaWmaParams *params, void *a, void *b)
 {
@@ -1760,6 +1791,7 @@ sub_2516E0(rwaWmaSource *obj, rwaInstance *parent, rwaWmaParams *params, void *a
 }
 
 // match: _sub_251CE0 @ 0x00251CE0
+// sp-match: _sub_251CE0 @ 0x00165DB0
 static void
 sub_251CE0(rwaObjDef *def)
 {
@@ -1776,6 +1808,7 @@ sub_251CE0(rwaObjDef *def)
 }
 
 // match: _sub_251F20 @ 0x00251F20
+// sp-match: _sub_251F20 @ 0x00165FF0
 rwaObjDef *
 sub_251F20(void)
 {
@@ -1811,6 +1844,7 @@ sub_251F20(void)
 }
 
 // match: _sub_251FA0 @ 0x00251FA0
+// sp-match: _sub_251FA0 @ 0x00166070
 void *
 sub_251FA0(void)
 {
@@ -1826,6 +1860,7 @@ sub_251FA0(void)
 }
 
 // match: _sub_251FF0 @ 0x00251FF0
+// sp-match: _sub_251FF0 @ 0x001660C0
 RwBool
 sub_251FF0(void)
 {

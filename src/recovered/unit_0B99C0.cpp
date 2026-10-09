@@ -26,20 +26,25 @@ RWS_REGISTERCLASS(SoundBankTrigger);
 // match: ?MakeNew@SoundBankTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000B99C0
 // match: __ehhandler$?MakeNew@SoundBankTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x003003D0
 // match: __ehhandler$?MakeNew@SoundBankTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x003003DF
+// sp-match: ?MakeNew@SoundBankTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0008E4D0
 RWS_DEFINE_MAKENEW(SoundBankTrigger)
 
 // match: ??0SoundBankTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000B9A40
+// sp-match: ??0SoundBankTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0008E400
 SoundBankTrigger::SoundBankTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
 }
 
 // match: ??_GSoundBankTrigger@@UAEPAXI@Z @ 0x000B9B00
+// sp-match: ??_GSoundBankTrigger@@UAEPAXI@Z @ 0x0008E4C0
 
 // match: ??1SoundBankTrigger@@UAE@XZ @ 0x000B9B20
+// sp-match: ??1SoundBankTrigger@@UAE@XZ @ 0x0008E050
 // (Defined in the class, in SoundBankTrigger.h.)
 
 // Command 0: its banks, as CSoundBankSelector reads them (a word count).
 // match: ?HandleAttributes@SoundBankTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000B9B50
+// sp-match: ?HandleAttributes@SoundBankTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0008E070
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void SoundBankTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
@@ -110,6 +115,7 @@ void SoundBankTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?sub_B9D80@SoundBankTrigger@@QAEXXZ @ 0x000B9D80
+// sp-match: ?sub_B9D80@SoundBankTrigger@@QAEXXZ @ 0x0008E1D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void SoundBankTrigger::sub_B9D80()
 {
@@ -137,6 +143,7 @@ void SoundBankTrigger::sub_B9D80()
 }
 
 // match: ??_ESoundBankTrigger@@WBI@AEPAXI@Z @ 0x000B9E90
+// sp-match: ??_ESoundBankTrigger@@WBI@AEPAXI@Z @ 0x0008E3F0
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

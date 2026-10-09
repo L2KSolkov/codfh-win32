@@ -8,6 +8,7 @@
 #include "rws/framehelper.h"
 
 // match: ?FrameDestroy@FrameHelper@RWS@@YAHPAURwFrame@@@Z @ 0x00133040
+// sp-match: ?FrameDestroy@FrameHelper@RWS@@YAHPAURwFrame@@@Z @ 0x000E3800
 RwBool RWS::FrameHelper::FrameDestroy(RwFrame *pFrame)
       {
          if (reinterpret_cast<void*>(pFrame->objectList.link.next) == reinterpret_cast<void*>(&pFrame->objectList))
@@ -21,6 +22,7 @@ RwBool RWS::FrameHelper::FrameDestroy(RwFrame *pFrame)
       }
 
 // match: ?RemoveChildFrame@FrameHelper@RWS@@YAPAURwFrame@@PAU3@PAX@Z @ 0x00133070
+// sp-match: ?RemoveChildFrame@FrameHelper@RWS@@YAPAURwFrame@@PAU3@PAX@Z @ 0x000E3830
 RwFrame* RWS::FrameHelper::RemoveChildFrame(RwFrame* pFrame, void*)
       {
          RwMatrixCopy( RwFrameGetMatrix(pFrame), RwFrameGetLTM(pFrame) );

@@ -81,6 +81,7 @@ static RwModuleInfo colorModule;
 // match: _rcsid @ 0x00416D78
 
 // match: __rwColorOpen @ 0x002B4EE0
+// sp-match: __rwColorOpen @ 0x001D0300
 void           *
 _rwColorOpen(void *instance,
              RwInt32 __RWUNUSED__ offset ,
@@ -104,6 +105,7 @@ _rwColorOpen(void *instance,
  */
 
 // match: __rwColorClose @ 0x002B4EF0
+// sp-match: __rwColorClose @ 0x001D0310
 void           *
 _rwColorClose(void *instance,
               RwInt32 __RWUNUSED__ offset,

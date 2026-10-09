@@ -47,6 +47,7 @@ RwInt32 dword_4E5518[3];
 type_4E51D0 dword_4E5528[3][8];
 
 // match: ?sub_16F2C0@@YAXHH@Z @ 0x0016F2C0
+// sp-match: ?sub_16F2C0@@YAXHH@Z @ 0x0010C940
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Loads the weapon bank arg_4 into the slot arg_0 now (not when it is
 // there already or the slot is busy), unloading the slot first.
@@ -67,7 +68,9 @@ void sub_16F2C0(RwInt32 arg_0, RwInt32 arg_4)
     dword_4E5518[arg_0] = make_bank_state(0, 1);
     sprintf(var_28, "wbank_%02d.bin", arg_4);
     sprintf(var_128, "Request to load %s", var_28);
+#ifndef CODFH_SP // single player compiles the debug print out (the message is still formatted: SP 0x10C9C2)
     sub_19A750(var_128);
+#endif
     sub_16F770(var_128, 0x100, arg_4);
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_128);
     if (l4)
@@ -78,6 +81,7 @@ void sub_16F2C0(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_16F3E0@@YAXHH@Z @ 0x0016F3E0
+// sp-match: ?sub_16F3E0@@YAXHH@Z @ 0x0010CA20
 // Sets the slot arg_0's bank to arg_4 and loads it (as sub_16F2C0).
 void sub_16F3E0(RwInt32 arg_0, RwInt32 arg_4)
 {
@@ -96,6 +100,7 @@ void sub_16F3E0(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_16F460@@YAXPAURwStream@@HH@Z @ 0x0016F460
+// sp-match: ?sub_16F460@@YAXPAURwStream@@HH@Z @ 0x0010C770
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Reads the bank arg_8 into the slot arg_4 from the stream arg_0 (as the
 // clump banks' sub_16EAE0, with the slot's heap and table).
@@ -135,11 +140,15 @@ void sub_16F460(RwStream *arg_0, RwInt32 arg_4, RwInt32 arg_8)
         {
             if (frm_24)
             {
+#ifndef CODFH_SP // single player compiles the debug print out
                 sub_19A750("\tStream Skip: %d bytes", frm_24);
+#endif
                 RwStreamSkip(arg_0, frm_24);
                 frm_24 = 0;
             }
+#ifndef CODFH_SP // single player compiles the debug print out
             sub_19A750("\tLoading weapon clump: (0x%x,0x%x)", m_18->unk_00.unk_00, m_18->unk_00.unk_04);
+#endif
             RwStreamRead(arg_0, &var_40, sizeof(var_40));
             RtlEnterCriticalSection(&dword_44BFB8);
             sub_16FE00(arg_4, &var_40.unk_0C.unk_04, 3);
@@ -156,8 +165,10 @@ void sub_16F460(RwStream *arg_0, RwInt32 arg_4, RwInt32 arg_8)
         }
         else
         {
+#ifndef CODFH_SP // single player compiles the debug print out
             sub_19A750("\tIgnoring clump: (0x%x,0x%x). Already Loaded!", m_18->unk_00.unk_00,
                        m_18->unk_00.unk_04);
+#endif
             frm_24 += m_18->unk_08;
         }
         m_18++;
@@ -168,10 +179,12 @@ void sub_16F460(RwStream *arg_0, RwInt32 arg_4, RwInt32 arg_8)
         RwStreamSkip(arg_0, frm_24);
         frm_24 = 0;
     }
+#ifndef CODFH_SP // single player compiles the debug print out
     sub_19A750("Weapon file contained %d weapon clumps. %d loaded with a total mem footprint of %d bytes. \n%d "
                "slots are still available.  %d bytes are still free in weapon bank (%d).",
                var_48.unk_00, l1C, dword_4E54F4[arg_4].unk_04, sub_16FAC0(arg_4),
                dword_4E54F4[arg_4].unk_08 - dword_4E54F4[arg_4].unk_04, arg_4);
+#endif
     dword_4E54D0[arg_4] = arg_8;
     dword_4E54DC[arg_4] = -1;
     clear_bank_state(arg_4, 0);
@@ -180,12 +193,14 @@ void sub_16F460(RwStream *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_16F750@@YAPAUtype_4E51D0@@PAXPAUtype_3DF8D8_04@@H@Z @ 0x0016F750
+// sp-match: ?sub_16F750@@YAPAUtype_4E51D0@@PAXPAUtype_3DF8D8_04@@H@Z @ 0x0010C690
 type_4E51D0 *sub_16F750(void *arg_0, type_3DF8D8_04 *arg_4, RwInt32 arg_8)
 {
     return sub_16FE00((RwInt32)arg_0, arg_4, arg_8);
 }
 
 // match: ?sub_16F770@@YAXPADHH@Z @ 0x0016F770
+// sp-match: ?sub_16F770@@YAXPADHH@Z @ 0x0010C240
 // The path of the weapon bank arg_8's file into arg_0 (arg_4 bytes).
 void sub_16F770(RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
@@ -200,6 +215,7 @@ void sub_16F770(RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_16F860@@YAHH@Z @ 0x0016F860
+// sp-match: ?sub_16F860@@YAHH@Z @ 0x0010C320
 // The slot holding the bank arg_0, or -1.
 RwInt32 sub_16F860(RwInt32 arg_0)
 {
@@ -214,6 +230,7 @@ RwInt32 sub_16F860(RwInt32 arg_0)
 }
 
 // match: ?sub_16F8A0@@YAHH@Z @ 0x0016F8A0
+// sp-match: ?sub_16F8A0@@YAHH@Z @ 0x0010C340
 RwInt32 sub_16F8A0(RwInt32 arg_0)
 {
     RwInt32 var_4;
@@ -227,6 +244,7 @@ RwInt32 sub_16F8A0(RwInt32 arg_0)
 }
 
 // match: ?sub_16F8E0@@YAHHH@Z @ 0x0016F8E0
+// sp-match: ?sub_16F8E0@@YAHHH@Z @ 0x0010C370
 RwInt32 sub_16F8E0(RwInt32 arg_0, RwInt32 arg_4)
 {
     if (dword_4E54DC[arg_0] == arg_4)
@@ -235,6 +253,7 @@ RwInt32 sub_16F8E0(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_16F900@@YAHHH@Z @ 0x0016F900
+// sp-match: ?sub_16F900@@YAHHH@Z @ 0x0010C6A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Queues the load of the weapon bank arg_4 into the slot arg_0; 0 when it
 // is ignored.
@@ -245,18 +264,24 @@ RwInt32 sub_16F900(RwInt32 arg_0, RwInt32 arg_4)
 
     if (sub_16F860(arg_4) == arg_0)
     {
+#ifndef CODFH_SP // single player compiles the debug print out
         sub_19A750("A request to load wbank_%02d.bin is ignored because it is already loaded in slot %d!", arg_4,
                    arg_0);
+#endif
         return 0;
     }
     if (sub_16F8E0(arg_0, arg_4))
     {
+#ifndef CODFH_SP // single player compiles the debug print out
         sub_19A750("\tRequest to load wbank_%02d.bin is ignored because it is already loading!", arg_4);
+#endif
         return 0;
     }
     if (get_bank_state(arg_0))
     {
+#ifndef CODFH_SP // single player compiles the debug print out
         sub_19A750("A request to load wbank_%02d.bin is ignored because the bank(%d) is locked!", arg_4, arg_0);
+#endif
         return 0;
     }
     sub_16FAE0(arg_0);
@@ -268,7 +293,9 @@ RwInt32 sub_16F900(RwInt32 arg_0, RwInt32 arg_4)
         return 1;
     if (sub_82020(3, l4))
         return 1;
+#ifndef CODFH_SP // single player compiles the debug print out
     sub_19A750("Request to load %s\n", var_28);
+#endif
     sub_81EB0(3, var_28, l4);
     return 1;
 }
@@ -298,6 +325,7 @@ RwInt32 sub_16FAC0(RwInt32 arg_0)
 }
 
 // match: ?sub_16FAE0@@YAXH@Z @ 0x0016FAE0
+// sp-match: ?sub_16FAE0@@YAXH@Z @ 0x0010C390
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Unloads the slot arg_0's bank (as the clump banks' sub_16EFD0).
 void sub_16FAE0(RwInt32 arg_0)
@@ -317,7 +345,9 @@ void sub_16FAE0(RwInt32 arg_0)
     ebp_14 = lv_10;
     if (dword_4E54D0[arg_0] != -1)
     {
+#ifndef CODFH_SP // single player compiles the debug print out
         sub_19A750("Request to unload wbank_%02d.bin\n", dword_4E54D0[arg_0]);
+#endif
         while (*ebp_14)
         {
             for (var_20 = dword_4E5528[arg_0], var_24 = 0; var_24 < 8; var_24++, var_20++)
@@ -334,7 +364,9 @@ void sub_16FAE0(RwInt32 arg_0)
                     }
                     sub_198F00(&var_20->unk_00);
                     m_18++;
+#ifndef CODFH_SP // single player compiles the debug print out
                     sub_19A750("\tUnloading GodID (0x%08x,0x%08x)", var_20->unk_00.unk_00, var_20->unk_00.unk_04);
+#endif
                     var_20->unk_00.unk_00 = 0;
                     var_20->unk_00.unk_04 = 0;
                     var_20->unk_08 = 0;
@@ -342,7 +374,9 @@ void sub_16FAE0(RwInt32 arg_0)
             }
             ebp_14++;
         }
+#ifndef CODFH_SP // single player compiles the debug print out
         sub_19A750("Unloaded %d GodIDs. %d slots are available.", m_18, sub_16FAC0(arg_0));
+#endif
         dword_4E54F4[arg_0].unk_04 = 0;
     }
     dword_4E54D0[arg_0] = -1;
@@ -350,6 +384,7 @@ void sub_16FAE0(RwInt32 arg_0)
 }
 
 // match: ?sub_16FC80@@YAXXZ @ 0x0016FC80
+// sp-match: ?sub_16FC80@@YAXXZ @ 0x0010C480
 void sub_16FC80()
 {
     RwInt32 var_4;
@@ -366,6 +401,7 @@ void sub_16FC80()
 }
 
 // match: ?sub_16FD10@@YAXXZ @ 0x0016FD10
+// sp-match: ?sub_16FD10@@YAXXZ @ 0x0010C510
 void sub_16FD10()
 {
     RwInt32 var_4;
@@ -379,6 +415,7 @@ void sub_16FD10()
 }
 
 // match: ?sub_16FD60@@YAXXZ @ 0x0016FD60
+// sp-match: ?sub_16FD60@@YAXXZ @ 0x0010C540
 void sub_16FD60()
 {
     RwInt32 var_4;
@@ -389,6 +426,7 @@ void sub_16FD60()
 }
 
 // match: ?sub_16FDA0@@YAPAUtype_4E51D0@@H@Z @ 0x0016FDA0
+// sp-match: ?sub_16FDA0@@YAPAUtype_4E51D0@@H@Z @ 0x0010C560
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_4E51D0 *sub_16FDA0(RwInt32 arg_0)
 {
@@ -404,6 +442,7 @@ type_4E51D0 *sub_16FDA0(RwInt32 arg_0)
 }
 
 // match: ?sub_16FE00@@YAPAUtype_4E51D0@@HPAUtype_3DF8D8_04@@H@Z @ 0x0016FE00
+// sp-match: ?sub_16FE00@@YAPAUtype_4E51D0@@HPAUtype_3DF8D8_04@@H@Z @ 0x0010C590
 type_4E51D0 *sub_16FE00(RwInt32 arg_0, type_3DF8D8_04 *arg_4, RwInt32 arg_8)
 {
     type_4E51D0 *var_4;
@@ -415,6 +454,7 @@ type_4E51D0 *sub_16FE00(RwInt32 arg_0, type_3DF8D8_04 *arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_16FE40@@YAHHI@Z @ 0x0016FE40
+// sp-match: ?sub_16FE40@@YAHHI@Z @ 0x0010C5C0
 RwInt32 sub_16FE40(RwInt32 arg_0, RwUInt32 arg_4)
 {
     if (arg_4 & 0x1F)
@@ -425,6 +465,7 @@ RwInt32 sub_16FE40(RwInt32 arg_0, RwUInt32 arg_4)
 }
 
 // match: ?sub_16FE80@@YAHI@Z @ 0x0016FE80
+// sp-match: ?sub_16FE80@@YAHI@Z @ 0x0010C5F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Lays the three slots' heaps out one after another from arg_0 (none for
 // 0).
@@ -451,6 +492,7 @@ RwInt32 sub_16FE80(RwUInt32 arg_0)
 }
 
 // match: ?sub_16FF00@@YAXI@Z @ 0x0016FF00
+// sp-match: ?sub_16FF00@@YAXI@Z @ 0x0010C640
 // Shares arg_0 bytes between the three slots' heaps (32-aligned).
 void sub_16FF00(RwUInt32 arg_0)
 {
@@ -461,6 +503,7 @@ void sub_16FF00(RwUInt32 arg_0)
 }
 
 // match: ?sub_16FF40@@YAHXZ @ 0x0016FF40
+// sp-match: ?sub_16FF40@@YAHXZ @ 0x0010C670
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_16FF40()
 {

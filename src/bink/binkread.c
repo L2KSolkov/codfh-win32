@@ -1005,6 +1005,7 @@ extern U32 binkread_pending_cb_bink_IO;
 // match: _unk_52B868 @ 0x0052B868
 
 // match: _bpopmalloc @ 0x00341480
+// sp-match: _bpopmalloc @ 0x00251480
 
 static void *bpopmalloc(HBINK bink, U32 amt)
 {
@@ -1013,6 +1014,7 @@ static void *bpopmalloc(HBINK bink, U32 amt)
 }
 
 // match: _BinkSetError@4 @ 0x003414A0
+// sp-match: _BinkSetError@4 @ 0x002514A0
 RADEXPFUNC void RADEXPLINK BinkSetError(const char PTR4 *err)
 {
   char *d = binkerr;
@@ -1027,6 +1029,7 @@ RADEXPFUNC void RADEXPLINK BinkSetError(const char PTR4 *err)
 }
 
 // match: _BinkGetError@0 @ 0x003414D0
+// sp-match: _BinkGetError@0 @ 0x002514D0
 RADEXPFUNC char PTR4 *RADEXPLINK BinkGetError(void)
 {
   return binkerr;
@@ -1059,6 +1062,7 @@ static S32 BinkSetSoundSystem(BINKSNDSYSOPEN open, U32 param)
 }
 
 // match: _dosilence @ 0x003414E0
+// sp-match: _dosilence @ 0x002514E0
 static U32 dosilence(BINKSND *bs)
 {
   if (bs->sndamt < bs->sndprime)
@@ -1092,6 +1096,7 @@ static U8 *conv16to8(U16 *src, U8 *dest, U32 bytes)
 }
 
 // match: _checksound@4 @ 0x00341570
+// sp-match: _checksound@4 @ 0x00251570
 static void RADLINK checksound(HBINK bink)
 {
   U32 len;
@@ -1172,6 +1177,7 @@ static void RADLINK checksound(HBINK bink)
 }
 
 // match: _inittimer @ 0x00341830
+// sp-match: _inittimer @ 0x00251830
 static void inittimer(HBINK bink)
 {
   if (bink->startsynctime == 0)
@@ -1182,6 +1188,7 @@ static void inittimer(HBINK bink)
 }
 
 // match: _GotoFrame @ 0x00341860
+// sp-match: _GotoFrame @ 0x00251860
 static void GotoFrame(HBINK bink, U32 frame)
 {
   if (frame)
@@ -1219,6 +1226,7 @@ static void GotoFrame(HBINK bink, U32 frame)
 }
 
 // match: _BinkSetSoundTrack@8 @ 0x00341940
+// sp-match: _BinkSetSoundTrack@8 @ 0x00251940
 RADEXPFUNC void RADEXPLINK BinkSetSoundTrack(U32 total_tracks, U32 PTR4 *tracks)
 {
   U32 i;
@@ -1231,6 +1239,7 @@ RADEXPFUNC void RADEXPLINK BinkSetSoundTrack(U32 total_tracks, U32 PTR4 *tracks)
 }
 
 // match: _high1secrate @ 0x00341990
+// sp-match: _high1secrate @ 0x00251990
 static U32 high1secrate(U32 *offs, S32 frames, S32 persec, U32 *highframe, U32 *allkeys)
 {
   U32 keys = 1;
@@ -1268,6 +1277,7 @@ static U32 high1secrate(U32 *offs, S32 frames, S32 persec, U32 *highframe, U32 *
 }
 
 // match: _bink_get_priority_IO@8 @ 0x00341A40
+// sp-match: _bink_get_priority_IO@8 @ 0x00251A40
 static S32 RADLINK bink_get_priority_IO(void *data, U32 count)
 {
   HBINK bink = BINKFROMIODATA(data);
@@ -1281,6 +1291,7 @@ static S32 RADLINK bink_get_priority_IO(void *data, U32 count)
 }
 
 // match: _bink_IO_callback@8 @ 0x00341A90
+// sp-match: _bink_IO_callback@8 @ 0x00251A90
 static void RADLINK bink_IO_callback(void *data, U32 count)
 {
   HBINK bink = BINKFROMIODATA(data);
@@ -1290,30 +1301,35 @@ static void RADLINK bink_IO_callback(void *data, U32 count)
 }
 
 // match: _bink_suspend_io@4 @ 0x00341AB0
+// sp-match: _bink_suspend_io@4 @ 0x00251AB0
 static void RADLINK bink_suspend_io(BINKIO *bio)
 {
   RADCB_suspend_callback(cb_bink_IO, (void *)bio->callback_control);
 }
 
 // match: _bink_try_suspend_io@4 @ 0x00341AD0
+// sp-match: _bink_try_suspend_io@4 @ 0x00251AD0
 static S32 RADLINK bink_try_suspend_io(BINKIO *bio)
 {
   return RADCB_try_to_suspend_callback(cb_bink_IO, (void *)bio->callback_control);
 }
 
 // match: _bink_resume_io@4 @ 0x00341AF0
+// sp-match: _bink_resume_io@4 @ 0x00251AF0
 static void RADLINK bink_resume_io(BINKIO *bio)
 {
   RADCB_resume_callback(cb_bink_IO, (void *)bio->callback_control);
 }
 
 // match: _bink_idle_on_io@4 @ 0x00341B10
+// sp-match: _bink_idle_on_io@4 @ 0x00251B10
 static void RADLINK bink_idle_on_io(BINKIO *bio)
 {
   RADCB_idle_on_callbacks();
 }
 
 // match: _bink_get_priority_sound@8 @ 0x00341B20
+// sp-match: _bink_get_priority_sound@8 @ 0x00251B20
 static S32 RADLINK bink_get_priority_sound(void *data, U32 count)
 {
   HBINK bink = BINKFROMSNDDATA(data);
@@ -1324,6 +1340,7 @@ static S32 RADLINK bink_get_priority_sound(void *data, U32 count)
 }
 
 // match: _bink_sound_callback@8 @ 0x00341B40
+// sp-match: _bink_sound_callback@8 @ 0x00251B40
 static void RADLINK bink_sound_callback(void *data, U32 count)
 {
   HBINK bink = BINKFROMSNDDATA(data);
@@ -1334,6 +1351,7 @@ static void RADLINK bink_sound_callback(void *data, U32 count)
 }
 
 // match: _BinkCopyToBufferRect@44 @ 0x00342AA0
+// sp-match: _BinkCopyToBufferRect@44 @ 0x00252AA0
 RADEXPFUNC S32 RADEXPLINK BinkCopyToBufferRect(HBINK bink, void *dest, S32 destpitch, U32 destheight,
                                                U32 destx, U32 desty, U32 srcx, U32 srcy, U32 srcw,
                                                U32 srch, U32 flags)
@@ -1937,6 +1955,7 @@ RADEXPFUNC HBINK RADEXPLINK BinkOpen_pending(const char PTR4 *name, U32 flags)
 }
 
 // match: _BinkOpen@8 @ 0x00341B80
+// sp-match: _BinkOpen@8 @ 0x00251B80
 // Transcribed from the image for now (docs/questions.md); the C draft is a near miss.
 __declspec(naked) RADEXPFUNC HBINK RADEXPLINK BinkOpen(const char PTR4 *name, U32 flags)
 {
@@ -3056,6 +3075,7 @@ __declspec(naked) RADEXPFUNC HBINK RADEXPLINK BinkOpen(const char PTR4 *name, U3
 }
 
 // match: _endframe @ 0x00343360
+// sp-match: _endframe @ 0x00253360
 static void endframe(HBINK bink, U32 time)
 {
   if (bink->entireframetime)
@@ -3079,6 +3099,7 @@ static void endframe(HBINK bink, U32 time)
 }
 
 // match: _BinkWait@4 @ 0x003433C0
+// sp-match: _BinkWait@4 @ 0x002533C0
 RADEXPFUNC S32 RADEXPLINK BinkWait(HBINK bink)
 {
   U32 start;
@@ -3161,6 +3182,7 @@ RADEXPFUNC S32 RADEXPLINK BinkWait(HBINK bink)
 }
 
 // match: _BinkPause@8 @ 0x003435C0
+// sp-match: _BinkPause@8 @ 0x002535C0
 RADEXPFUNC S32 RADEXPLINK BinkPause(HBINK bink, S32 pause)
 {
   U32 i;
@@ -3194,6 +3216,7 @@ RADEXPFUNC S32 RADEXPLINK BinkPause(HBINK bink, S32 pause)
 }
 
 // match: _idtoindex @ 0x00343680
+// sp-match: _idtoindex @ 0x00253680
 static S32 idtoindex(HBINK bink, S32 id)
 {
   S32 i;
@@ -3207,6 +3230,7 @@ static S32 idtoindex(HBINK bink, S32 id)
 }
 
 // match: _BinkSetVolume@12 @ 0x003436C0
+// sp-match: _BinkSetVolume@12 @ 0x002536C0
 RADEXPFUNC void RADEXPLINK BinkSetVolume(HBINK bink, U32 trackid, S32 volume)
 {
   if ((bink) && (bink->playingtracks))
@@ -3219,6 +3243,7 @@ RADEXPFUNC void RADEXPLINK BinkSetVolume(HBINK bink, U32 trackid, S32 volume)
 }
 
 // match: _BinkGetTrackID@8 @ 0x00343710
+// sp-match: _BinkGetTrackID@8 @ 0x00253710
 RADEXPFUNC U32 RADEXPLINK BinkGetTrackID(HBINK bink, U32 trackindex)
 {
   if (bink)
@@ -3227,6 +3252,7 @@ RADEXPFUNC U32 RADEXPLINK BinkGetTrackID(HBINK bink, U32 trackindex)
 }
 
 // match: _BinkSetSoundOnOff@8 @ 0x00343730
+// sp-match: _BinkSetSoundOnOff@8 @ 0x00253730
 RADEXPFUNC S32 RADEXPLINK BinkSetSoundOnOff(HBINK bink, S32 onoff)
 {
   S32 ret = 0;
@@ -3275,6 +3301,7 @@ RADEXPFUNC S32 RADEXPLINK BinkSetSoundOnOff(HBINK bink, S32 onoff)
 }
 
 // match: _BinkCopyToBuffer@28 @ 0x00343870
+// sp-match: _BinkCopyToBuffer@28 @ 0x00253870
 RADEXPFUNC S32 RADEXPLINK BinkCopyToBuffer(HBINK bink, void *dest, S32 destpitch, U32 destheight,
                                            U32 destx, U32 desty, U32 flags)
 {
@@ -3283,6 +3310,7 @@ RADEXPFUNC S32 RADEXPLINK BinkCopyToBuffer(HBINK bink, void *dest, S32 destpitch
 }
 
 // match: _BinkNextFrame@4 @ 0x00343E90
+// sp-match: _BinkNextFrame@4 @ 0x00253E90
 RADEXPFUNC void RADEXPLINK BinkNextFrame(HBINK bink)
 {
   U32 i;
@@ -3341,6 +3369,7 @@ RADEXPFUNC void RADEXPLINK BinkNextFrame(HBINK bink)
 }
 
 // match: _BinkClose@4 @ 0x00344030
+// sp-match: _BinkClose@4 @ 0x00254030
 RADEXPFUNC void RADEXPLINK BinkClose(HBINK bink)
 {
   U32 i;
@@ -3410,6 +3439,7 @@ static S32 tracktoindex(HBINK bink, U32 track)
 }
 
 // match: _BinkDoFrame@4 @ 0x003438B0
+// sp-match: _BinkDoFrame@4 @ 0x002538B0
 RADEXPFUNC S32 RADEXPLINK BinkDoFrame(HBINK bink)
 {
   U8 *out;

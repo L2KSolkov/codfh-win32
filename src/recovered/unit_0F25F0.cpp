@@ -23,6 +23,7 @@ RwInt32 dword_4BC8A4[4];
 // match: ??_C@_0CP@HLKNMMJJ@Surfaces?$CLParticles?$CLParticleEvent@ @ 0x003D9288
 
 // match: ?sub_F25F0@@YAXXZ @ 0x000F25F0
+// sp-match: ?sub_F25F0@@YAXXZ @ 0x000B8FC0
 
 void sub_F25F0()
 {
@@ -36,6 +37,7 @@ void sub_F25F0()
 }
 
 // match: ?sub_F2630@@YAXXZ @ 0x000F2630
+// sp-match: ?sub_F2630@@YAXXZ @ 0x000B8FF0
 void sub_F2630()
 {
     RwInt32 var_4;
@@ -51,6 +53,7 @@ void sub_F2630()
 }
 
 // match: ?sub_F2680@@YAXXZ @ 0x000F2680
+// sp-match: ?sub_F2680@@YAXXZ @ 0x000B9020
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_F2680()
 {
@@ -75,6 +78,7 @@ void sub_F2680()
 }
 
 // match: ?sub_F2750@@YAHHHPAURwMatrixTag@@H@Z @ 0x000F2750
+// sp-match: ?sub_F2750@@YAHHHPAURwMatrixTag@@H@Z @ 0x000B90B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_F2750(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, RwInt32 arg_C)
 {

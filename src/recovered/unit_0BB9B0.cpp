@@ -64,11 +64,13 @@ RWS_REGISTERCLASS(Trigger);
 // match: ?MakeNew@Trigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000BB9B0
 // match: __ehhandler$?MakeNew@Trigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x003004B0
 // match: __ehhandler$?MakeNew@Trigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x003004BF
+// sp-match: ?MakeNew@Trigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00091F80
 RWS_DEFINE_MAKENEW(Trigger)
 
 // match: ??0Trigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000BBA30
 // match: __ehhandler$??0Trigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x13 @ 0x003004D0
 // match: __ehhandler$??0Trigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x003004E3
+// sp-match: ??0Trigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00090C70
 Trigger::Trigger(const RWS::CAttributePacket &attr)
 {
     sub_BBF80(0);
@@ -100,10 +102,12 @@ Trigger::Trigger(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_GTrigger@@UAEPAXI@Z @ 0x000BBCF0
+// sp-match: ??_GTrigger@@UAEPAXI@Z @ 0x00091250
 
 // match: ??1Trigger@@UAE@XZ @ 0x000BBD10
 // match: __ehhandler$??1Trigger@@UAE@XZ-0x2F @ 0x003004F0
 // match: __ehhandler$??1Trigger@@UAE@XZ @ 0x0030051F
+// sp-match: ??1Trigger@@UAE@XZ @ 0x00090DF0
 Trigger::~Trigger()
 {
     type_144940 *lv_14;
@@ -173,12 +177,14 @@ Trigger::~Trigger()
 }
 
 // match: ?sub_BBF80@Trigger@@QAEXH@Z @ 0x000BBF80
+// sp-match: ?sub_BBF80@Trigger@@QAEXH@Z @ 0x00090230
 void Trigger::sub_BBF80(RwInt32 arg_0)
 {
     unk_42 = (unk_42 & 0xF0) + arg_0;
 }
 
 // match: ?HandleAttributes@Trigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000BBFB0
+// sp-match: ?HandleAttributes@Trigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00091710
 // The system commands (sub_BD0B0), then command 35 (the buffer at unk_B0,
 // unk_24_16) first, then the rest: its key (0, registered as a trigger
 // handle) and named object (17), its shape and metrics (1 to 4), flags
@@ -577,6 +583,7 @@ void Trigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?HandleEvents@Trigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000BCF10
+// sp-match: ?HandleEvents@Trigger@@UAEXAAVCMsg@RWS@@@Z @ 0x00091260
 // dword_4B67B8 (a restart) moves it back, takes its script's id and lets
 // its script object go (clearing unk_24_3 and its CCESS slot, and its
 // action icon from the high four bits); dword_4B67C0 and dword_4B8750 make
@@ -627,6 +634,7 @@ void Trigger::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?sub_BD0B0@Trigger@@QAEXABVCAttributePacket@RWS@@@Z @ 0x000BD0B0
+// sp-match: ?sub_BD0B0@Trigger@@QAEXABVCAttributePacket@RWS@@@Z @ 0x00090250
 // The system commands: its matrix (orthonormalised, marking unk_24_0).
 void Trigger::sub_BD0B0(const RWS::CAttributePacket &attr)
 {
@@ -655,6 +663,7 @@ void Trigger::sub_BD0B0(const RWS::CAttributePacket &attr)
 }
 
 // match: ?sub_BD1A0@Trigger@@QAEXPAUtype_144940@@@Z @ 0x000BD1A0
+// sp-match: ?sub_BD1A0@Trigger@@QAEXPAUtype_144940@@@Z @ 0x00090310
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void Trigger::sub_BD1A0(type_144940 *arg_0)
 {
@@ -673,6 +682,7 @@ void Trigger::sub_BD1A0(type_144940 *arg_0)
 }
 
 // match: ?sub_BD200@Trigger@@QAEXPAUtype_144940@@@Z @ 0x000BD200
+// sp-match: ?sub_BD200@Trigger@@QAEXPAUtype_144940@@@Z @ 0x00090340
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void Trigger::sub_BD200(type_144940 *arg_0)
 {
@@ -703,6 +713,7 @@ void Trigger::sub_BD200(type_144940 *arg_0)
 }
 
 // match: ?sub_BD290@Trigger@@QAEXPAHGG@Z @ 0x000BD290
+// sp-match: ?sub_BD290@Trigger@@QAEXPAHGG@Z @ 0x00090FA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void Trigger::sub_BD290(RwInt32 *arg_0, RwUInt16 arg_4, RwUInt16 arg_8)
 {
@@ -725,6 +736,7 @@ void Trigger::sub_BD290(RwInt32 *arg_0, RwUInt16 arg_4, RwUInt16 arg_8)
 }
 
 // match: ?sub_BD310@Trigger@@QAEXPAH@Z @ 0x000BD310
+// sp-match: ?sub_BD310@Trigger@@QAEXPAH@Z @ 0x00090380
 void Trigger::sub_BD310(RwInt32 *arg_0)
 {
     type_67620 *var_4;
@@ -738,6 +750,7 @@ void Trigger::sub_BD310(RwInt32 *arg_0)
 }
 
 // match: ?sub_BD350@Trigger@@QAEXPAPAE@Z @ 0x000BD350
+// sp-match: ?sub_BD350@Trigger@@QAEXPAPAE@Z @ 0x000903B0
 void Trigger::sub_BD350(RwUInt8 **arg_0)
 {
     sub_145790(*arg_0);
@@ -745,6 +758,7 @@ void Trigger::sub_BD350(RwUInt8 **arg_0)
 }
 
 // match: ?sub_BD380@Trigger@@QAEXPAPAUTrigger_30@@@Z @ 0x000BD380
+// sp-match: ?sub_BD380@Trigger@@QAEXPAPAUTrigger_30@@@Z @ 0x000903D0
 void Trigger::sub_BD380(Trigger_30 **arg_0)
 {
     sub_1457B0(*arg_0);
@@ -752,12 +766,14 @@ void Trigger::sub_BD380(Trigger_30 **arg_0)
 }
 
 // match: ?sub_BD3B0@Trigger@@QAEXPAPAUTrigger_30@@@Z @ 0x000BD3B0
+// sp-match: ?sub_BD3B0@Trigger@@QAEXPAPAUTrigger_30@@@Z @ 0x000903F0
 void Trigger::sub_BD3B0(Trigger_30 **arg_0)
 {
     *arg_0 = sub_1457D0();
 }
 
 // match: ?sub_BD3D0@Trigger@@QAEXPAPAUTrigger_30@@@Z @ 0x000BD3D0
+// sp-match: ?sub_BD3D0@Trigger@@QAEXPAPAUTrigger_30@@@Z @ 0x00090400
 // Frees the block list *arg_0 once all seven of its blocks are gone.
 void Trigger::sub_BD3D0(Trigger_30 **arg_0)
 {
@@ -779,6 +795,7 @@ void Trigger::sub_BD3D0(Trigger_30 **arg_0)
 }
 
 // match: ?sub_BD460@Trigger@@QAEXPAPAUtype_71250@@@Z @ 0x000BD460
+// sp-match: ?sub_BD460@Trigger@@QAEXPAPAUtype_71250@@@Z @ 0x00090450
 void Trigger::sub_BD460(type_71250 **arg_0)
 {
     sub_6CA20(*arg_0);
@@ -787,6 +804,7 @@ void Trigger::sub_BD460(type_71250 **arg_0)
 }
 
 // match: ?sub_BD490@Trigger@@QAEXPBDPAPAE@Z @ 0x000BD490
+// sp-match: ?sub_BD490@Trigger@@QAEXPBDPAPAE@Z @ 0x00090480
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void Trigger::sub_BD490(const RwChar *arg_0, RwUInt8 **arg_4)
 {
@@ -818,6 +836,7 @@ void Trigger::sub_BD490(const RwChar *arg_0, RwUInt8 **arg_4)
 }
 
 // match: ?sub_BD560@Trigger@@QAEXPAUtype_3D3548@@@Z @ 0x000BD560
+// sp-match: ?sub_BD560@Trigger@@QAEXPAUtype_3D3548@@@Z @ 0x00091360
 // Runs the block for an entity of the kind arg_0 (its unk_2C kind bits):
 // block 0 for kind 0x10, 2 for 0x20 and 0x20000 (and for 0x80 and 0x40000
 // unless its player passenger is of kind 0x10), 4 for 0x100, 0x2000 and
@@ -864,6 +883,7 @@ void Trigger::sub_BD560(type_3D3548 *arg_0)
 }
 
 // match: ?sub_BD780@Trigger@@QAEXPAUtype_3D3548@@@Z @ 0x000BD780
+// sp-match: ?sub_BD780@Trigger@@QAEXPAUtype_3D3548@@@Z @ 0x00091500
 // sub_BD560's counterpart: block 1 for kind 0x10, 3 for the others.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void Trigger::sub_BD780(type_3D3548 *arg_0)
@@ -902,6 +922,7 @@ void Trigger::sub_BD780(type_3D3548 *arg_0)
 }
 
 // match: ?sub_BD860@Trigger@@QAEXXZ @ 0x000BD860
+// sp-match: ?sub_BD860@Trigger@@QAEXXZ @ 0x00091580
 void Trigger::sub_BD860()
 {
     if (unk_30 && unk_30->unk_00[5])
@@ -911,6 +932,7 @@ void Trigger::sub_BD860()
 }
 
 // match: ?sub_BD8A0@Trigger@@QAEXPAUtype_3D3548@@@Z @ 0x000BD8A0
+// sp-match: ?sub_BD8A0@Trigger@@QAEXPAUtype_3D3548@@@Z @ 0x000915A0
 // Runs block 6 for an entity of kind 0x10.
 void Trigger::sub_BD8A0(type_3D3548 *arg_0)
 {
@@ -933,6 +955,7 @@ void Trigger::sub_BD8A0(type_3D3548 *arg_0)
 }
 
 // match: ?sub_BD900@Trigger@@QAEXPAEPAUtype_3D3548@@@Z @ 0x000BD900
+// sp-match: ?sub_BD900@Trigger@@QAEXPAEPAUtype_3D3548@@@Z @ 0x00091000
 // Sends the messages of the block arg_0 (up to five, each with its value)
 // from the entity arg_4 to its script object, or, with unk_24_13, to the
 // named object unk_A0's (an entity's, or a trigger's); nothing when that
@@ -1018,12 +1041,19 @@ void Trigger::sub_BD900(RwUInt8 *arg_0, type_3D3548 *arg_4)
     }
     for (fp_1C = 0; fp_1C < 5 && ((Trigger_block *)arg_0)->unk_14[fp_1C] != 0xFFFF; fp_1C++)
     {
+#ifdef CODFH_SP
+        // shape: the value in a loop-scoped local (SP 0x91000 keeps it in the dead argument's slot)
+        RwInt32 val = ((Trigger_block *)arg_0)->unk_00[fp_1C];
+        sub_6B680(((Trigger_block *)arg_0)->unk_14[fp_1C], (type_67620 *)var_8, (type_42E00_10 *)((RwInt32)this), (type_3D2E7C *)((RwInt32)fp_C), &val, 1, 1, 0);
+#else
         ebp_20 = ((Trigger_block *)arg_0)->unk_00[fp_1C];
         sub_6B680(((Trigger_block *)arg_0)->unk_14[fp_1C], (type_67620 *)var_8, (type_42E00_10 *)((RwInt32)this), (type_3D2E7C *)((RwInt32)fp_C), &ebp_20, 1, 1, 0);
+#endif
     }
 }
 
 // match: ?sub_BDAC0@Trigger@@QAEXHHPAUtype_3D2E7C@@@Z @ 0x000BDAC0
+// sp-match: ?sub_BDAC0@Trigger@@QAEXHHPAUtype_3D2E7C@@@Z @ 0x00090500
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void Trigger::sub_BDAC0(RwInt32 arg_0, RwInt32 arg_4, type_3D2E7C *arg_8)
 {
@@ -1034,12 +1064,19 @@ void Trigger::sub_BDAC0(RwInt32 arg_0, RwInt32 arg_4, type_3D2E7C *arg_8)
     var_4 = arg_4 ? ((type_3D3548 *)arg_4)->vf_098() : 0;
     for (v8 = 0; v8 < 5 && ((Trigger_block *)arg_0)->unk_14[v8] != 0xFFFF; v8++)
     {
+#ifdef CODFH_SP
+        // shape: the value in a loop-scoped local (SP 0x90500 keeps it in the dead argument's slot)
+        RwInt32 val = ((Trigger_block *)arg_0)->unk_00[v8];
+        sub_6B680(((Trigger_block *)arg_0)->unk_14[v8], (type_67620 *)arg_8, (type_42E00_10 *)((RwInt32)this), (type_3D2E7C *)((RwInt32)var_4), &val, 1, 1, 0);
+#else
         varC = ((Trigger_block *)arg_0)->unk_00[v8];
         sub_6B680(((Trigger_block *)arg_0)->unk_14[v8], (type_67620 *)arg_8, (type_42E00_10 *)((RwInt32)this), (type_3D2E7C *)((RwInt32)var_4), &varC, 1, 1, 0);
+#endif
     }
 }
 
 // match: ?sub_BDB60@Trigger@@QAEXPBD@Z @ 0x000BDB60
+// sp-match: ?sub_BDB60@Trigger@@QAEXPBD@Z @ 0x00091650
 // Builds its message filter list (unk_AC) from a count and that many pairs
 // of named variables: each pair's channel (sub_BDC90) and rank (sub_BDD10)
 // fill their entry when registered, and the list is sorted once all are in.
@@ -1080,6 +1117,7 @@ void Trigger::sub_BDB60(const RwChar *arg_0)
 }
 
 // match: ?sub_BDC90@@YAHHHH@Z @ 0x000BDC90
+// sp-match: ?sub_BDC90@@YAHHHH@Z @ 0x000915D0
 // The channel variable arg_0 of the trigger arg_4's filter entry arg_8
 // (sub_198900's callback); sorts the list once every value is in.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -1105,6 +1143,7 @@ RwInt32 sub_BDC90(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_BDD10@@YAHHHH@Z @ 0x000BDD10
+// sp-match: ?sub_BDD10@@YAHHHH@Z @ 0x00091610
 // Likewise for the rank.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_BDD10(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
@@ -1129,12 +1168,14 @@ RwInt32 sub_BDD10(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_BDD90@@YAXPAUtype_71250@@@Z @ 0x000BDD90
+// sp-match: ?sub_BDD90@@YAXPAUtype_71250@@@Z @ 0x00091120
 void sub_BDD90(type_71250 *arg_0)
 {
     qsort(arg_0->unk_02, arg_0->unk_00, 4, sub_BDDC0);
 }
 
 // match: ?sub_BDDC0@@YAHPBX0@Z @ 0x000BDDC0
+// sp-match: ?sub_BDDC0@@YAHPBX0@Z @ 0x00090580
 // By channel, then by rank.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 __cdecl sub_BDDC0(const void *arg_0, const void *arg_4)
@@ -1156,14 +1197,20 @@ RwInt32 __cdecl sub_BDDC0(const void *arg_0, const void *arg_4)
     {
         return -1;
     }
+#ifdef CODFH_SP
+    // shape: the last test as the returned value (SP 0x90580)
+    return local_8->unk_02 > var_4->unk_02;
+#else
     if (local_8->unk_02 > var_4->unk_02)
     {
         return 1;
     }
     return 0;
+#endif
 }
 
 // match: ?sub_BDE40@@YAHHHH@Z @ 0x000BDE40
+// sp-match: ?sub_BDE40@@YAHHHH@Z @ 0x000905C0
 // A trigger-handle variable arg_0 made to hold the trigger arg_8
 // (sub_198900's callback).
 RwInt32 sub_BDE40(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
@@ -1177,6 +1224,7 @@ RwInt32 sub_BDE40(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_BDE70@Trigger@@QAEXG@Z @ 0x000BDE70
+// sp-match: ?sub_BDE70@Trigger@@QAEXG@Z @ 0x00091140
 // Sets its script (unk_3E) and, once its script object is live (unk_24_14),
 // starts it, making the object first when there is none.
 void Trigger::sub_BDE70(RwUInt16 arg_0)
@@ -1193,6 +1241,7 @@ void Trigger::sub_BDE70(RwUInt16 arg_0)
 }
 
 // match: ?sub_BDEE0@Trigger@@QAEXG@Z @ 0x000BDEE0
+// sp-match: ?sub_BDEE0@Trigger@@QAEXG@Z @ 0x00091190
 // Likewise for its task function (unk_40).
 void Trigger::sub_BDEE0(RwUInt16 arg_0)
 {
@@ -1208,12 +1257,14 @@ void Trigger::sub_BDEE0(RwUInt16 arg_0)
 }
 
 // match: ?sub_BDF50@Trigger@@QAEPAUtype_3D2E7C@@XZ @ 0x000BDF50
+// sp-match: ?sub_BDF50@Trigger@@QAEPAUtype_3D2E7C@@XZ @ 0x000905E0
 type_3D2E7C *Trigger::sub_BDF50()
 {
     return (type_3D2E7C *)sub_67620(unk_A8);
 }
 
 // match: ?sub_BDF70@Trigger@@QAEXPAURwV3d@@@Z @ 0x000BDF70
+// sp-match: ?sub_BDF70@Trigger@@QAEXPAURwV3d@@@Z @ 0x000905F0
 // A random point inside its shape (a sphere's cube, a cylinder's box or a
 // box), through its matrix, into *arg_0.
 void Trigger::sub_BDF70(RwV3d *arg_0)
@@ -1249,6 +1300,7 @@ void Trigger::sub_BDF70(RwV3d *arg_0)
 }
 
 // match: ?vf_028@Trigger@@UAEHPAURwMatrixTag@@@Z @ 0x000BE110
+// sp-match: ?vf_028@Trigger@@UAEHPAURwMatrixTag@@@Z @ 0x00090760
 // Whether the matrix arg_0 faces the trigger's way (always, unless
 // unk_24_7): its at axis, laid into the trigger's right-at plane, must be
 // within unk_34 of the trigger's at axis, and laid into its up-at plane
@@ -1277,7 +1329,11 @@ RwInt32 Trigger::vf_028(RwMatrixTag *arg_0)
     RwV3dScaleMacro(&v34, var_8, RwV3dDotProductMacro(&v28, var_8));
     RwV3dScaleMacro(&fp_14, slot_1C, RwV3dDotProductMacro(&v28, slot_1C));
     RwV3dAddMacro(&v34, &v34, &fp_14);
+#ifdef CODFH_SP // shape: z first
+    if (v34.z * v34.z + v34.y * v34.y + v34.x * v34.x == 0.0f)
+#else
     if (RwV3dDotProductMacro(&v34, &v34) == 0.0f)
+#endif
     {
     }
     else
@@ -1290,7 +1346,11 @@ RwInt32 Trigger::vf_028(RwMatrixTag *arg_0)
         return 0;
     }
     l4 = &l38->up;
+#ifdef CODFH_SP // shape: the up axis read through l38
+    RwV3dScaleMacro(&v34, &l38->up, RwV3dDotProductMacro(&v28, &l38->up));
+#else
     RwV3dScaleMacro(&v34, l4, RwV3dDotProductMacro(&v28, l4));
+#endif
     RwV3dAddMacro(&v34, &v34, &fp_14);
     RwV3dNormalize(&v34, &v34);
     var_18 = RwV3dDotProductMacro(&v34, slot_1C);
@@ -1303,6 +1363,7 @@ RwInt32 Trigger::vf_028(RwMatrixTag *arg_0)
 }
 
 // match: ?vf_02C@Trigger@@UAEHPAURwMatrixTag@@@Z @ 0x000BE410
+// sp-match: ?vf_02C@Trigger@@UAEHPAURwMatrixTag@@@Z @ 0x00090950
 // Whether the matrix arg_0 faces the trigger (always, unless unk_24_12):
 // likewise, against the direction to the trigger and the level axes about
 // it.
@@ -1332,7 +1393,11 @@ RwInt32 Trigger::vf_02C(RwMatrixTag *arg_0)
     RwV3dScaleMacro(&bp_40, &slot_24, RwV3dDotProductMacro(&v34, &slot_24));
     RwV3dScaleMacro(&var_18, &var_C, RwV3dDotProductMacro(&v34, &var_C));
     RwV3dAddMacro(&bp_40, &bp_40, &var_18);
+#ifdef CODFH_SP // shape: z first
+    if (bp_40.z * bp_40.z + bp_40.y * bp_40.y + bp_40.x * bp_40.x == 0.0f)
+#else
     if (RwV3dDotProductMacro(&bp_40, &bp_40) == 0.0f)
+#endif
     {
     }
     else
@@ -1357,6 +1422,7 @@ RwInt32 Trigger::vf_02C(RwMatrixTag *arg_0)
 }
 
 // match: ?sub_BE710@Trigger@@QAEXMMM@Z @ 0x000BE710
+// sp-match: ?sub_BE710@Trigger@@QAEXMMM@Z @ 0x000911E0
 // Moves it to (arg_0, arg_4, arg_8), keeping where it was in a record
 // (sub_145830) for sub_BE810.
 void Trigger::sub_BE710(RwReal arg_0, RwReal arg_4, RwReal arg_8)
@@ -1365,9 +1431,12 @@ void Trigger::sub_BE710(RwReal arg_0, RwReal arg_4, RwReal arg_8)
 
     sub_BE810();
     var_4 = sub_145830();
+#ifndef CODFH_SP
+    // single player compiles the debug prints out (SP 0x911E0)
     sub_19A750("*Trigger (%d) being moved to:(%6.3f,%6.3f,%6.3f) from:(%6.3f,%6.3f,%6.3f)", unk_3C,
                (RwDouble)arg_0, (RwDouble)arg_4, (RwDouble)arg_8, (RwDouble)unk_90, (RwDouble)unk_94,
                (RwDouble)unk_98);
+#endif
     var_4->unk_04.x = unk_90;
     var_4->unk_04.y = unk_94;
     var_4->unk_04.z = unk_98;
@@ -1380,6 +1449,7 @@ void Trigger::sub_BE710(RwReal arg_0, RwReal arg_4, RwReal arg_8)
 }
 
 // match: ?sub_BE810@Trigger@@QAEXXZ @ 0x000BE810
+// sp-match: ?sub_BE810@Trigger@@QAEXXZ @ 0x00090BA0
 // Moves it back to where its record says, if it was moved.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void Trigger::sub_BE810()
@@ -1394,14 +1464,18 @@ void Trigger::sub_BE810()
             var_4 = (type_145830 *)dword_4D1D98.sub_16C6A0(local_8);
             if (var_4 && var_4->unk_00 == unk_3C)
             {
+#ifndef CODFH_SP
+                // single player compiles the debug prints out (SP 0x90BA0)
                 sub_19A750("-Trigger (%d) being moved to:(%6.3f,%6.3f,%6.3f) from:(%6.3f,%6.3f,%6.3f)", unk_3C,
                            (RwDouble)var_4->unk_04.x, (RwDouble)var_4->unk_04.y, (RwDouble)var_4->unk_04.z,
                            (RwDouble)unk_90, (RwDouble)unk_94, (RwDouble)unk_98);
+#endif
                 unk_90 = var_4->unk_04.x;
                 unk_94 = var_4->unk_04.y;
                 unk_98 = var_4->unk_04.z;
                 RwMatrixOrthoNormalize((RwMatrix *)&unk_60_m, (RwMatrix *)&unk_60_m);
                 RwMatrixOptimize((RwMatrix *)&unk_60_m, 0);
+#ifndef CODFH_SP
                 sub_19A750("\tOrthoNormalizing trigger(%d)", unk_3C);
                 sub_19A750("\t\tLoc now:(%6.3f,%6.3f,%6.3f)", (RwDouble)unk_90, (RwDouble)unk_94, (RwDouble)unk_98);
                 sub_19A750("\t\tAt now:(%6.3f,%6.3f,%6.3f)", (RwDouble)unk_60_m.at.x, (RwDouble)unk_60_m.at.y,
@@ -1410,6 +1484,7 @@ void Trigger::sub_BE810()
                            (RwDouble)unk_60_m.up.z);
                 sub_19A750("\t\tRt now:(%6.3f,%6.3f,%6.3f)", (RwDouble)unk_60_m.right.x,
                            (RwDouble)unk_60_m.right.y, (RwDouble)unk_60_m.right.z);
+#endif
                 sub_145A40(this);
                 sub_145870(var_4);
                 break;
@@ -1420,6 +1495,7 @@ void Trigger::sub_BE810()
 }
 
 // match: ?sub_BEA60@Trigger@@QAEPAEXZ @ 0x000BEA60
+// sp-match: ?sub_BEA60@Trigger@@QAEPAEXZ @ 0x00090C40
 RwUInt8 *Trigger::sub_BEA60()
 {
     if (!unk_B0)
@@ -1430,6 +1506,7 @@ RwUInt8 *Trigger::sub_BEA60()
 }
 
 // match: ??_ETrigger@@WBI@AEPAXI@Z @ 0x000BEAA0
+// sp-match: ??_ETrigger@@WBI@AEPAXI@Z @ 0x00090DE0
 
 // Members /OPT:ICF folded into shared trivial bodies (config/aliases.txt): defined here for
 // the authentic link (PLAN M7); the placement link takes the shared bodies.

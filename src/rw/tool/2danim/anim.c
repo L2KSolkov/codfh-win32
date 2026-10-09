@@ -99,6 +99,7 @@ extern Rt2dAnimOnEndReachedCallBack _rt2dAnimOnEndReachedCallBack;
  ****************************************************************************/
 
 Rt2dAnim *
+// sp-match: __rt2dAnimInit @ 0x00170140
 _rt2dAnimInit(Rt2dAnim *anim, RwUInt32 frameCount)
 {
     RWFUNCTION(RWSTRING("_rt2dAnimInit"));
@@ -153,6 +154,7 @@ Rt2dAnimCreate(void)
 // match: _rcsid @ 0x003EE5EC
 
 // match: __rt2dAnimAdaptKeyFrameDestroy @ 0x002576E0
+// sp-match: __rt2dAnimAdaptKeyFrameDestroy @ 0x001701B0
 static Rt2dKeyFrameList *
 _rt2dAnimAdaptKeyFrameDestroy(  Rt2dAnim *anim __RWUNUSED__,
                                 Rt2dAnimProps *props __RWUNUSED__,
@@ -169,6 +171,7 @@ _rt2dAnimAdaptKeyFrameDestroy(  Rt2dAnim *anim __RWUNUSED__,
 }
 
 // match: __rt2dAnimDestruct @ 0x00257770
+// sp-match: __rt2dAnimDestruct @ 0x00170670
 Rt2dAnim *
 _rt2dAnimDestruct(Rt2dAnim *anim, Rt2dAnimProps *props)
 {
@@ -422,6 +425,7 @@ Rt2dAnimStreamGetSize(Rt2dAnim *anim, Rt2dAnimProps *props)
 
 
 Rt2dAnim *
+// sp-match: __rt2dAnimStreamRead @ 0x001701E0
 _rt2dAnimStreamRead(Rt2dAnim *anim, RwStream* stream,
                    Rt2dAnimProps *props __RWUNUSED__)
 {
@@ -652,6 +656,7 @@ Rt2dAnimStreamWrite(Rt2dAnim *anim, RwStream *stream,
  *
  */
 Rt2dAnim *
+// sp-match: _Rt2dAnimReset @ 0x001702C0
 Rt2dAnimReset(Rt2dAnim *anim, Rt2dAnimProps *props)
 {
     RwInt32 numEntries = rwSListGetNumEntries(anim->keyframeLists);
@@ -728,6 +733,7 @@ Rt2dAnimSetDeltaTimeScale(Rt2dAnim *anim, RwReal timeScale)
  * \see Rt2dAnimGotoKeyFrameListByIndex
  */
 Rt2dAnim *
+// sp-match: _Rt2dAnimAddDeltaTime @ 0x001706B0
 Rt2dAnimAddDeltaTime(Rt2dAnim *anim, Rt2dAnimProps *props,
                          RwReal deltaTime)
 {
@@ -766,6 +772,7 @@ Rt2dAnimAddDeltaTime(Rt2dAnim *anim, Rt2dAnimProps *props,
  * \see Rt2dAnimGotoKeyFrameListByIndex
  */
 Rt2dAnim *
+// sp-match: _Rt2dAnimAddDeltaFrameIndex @ 0x00170330
 Rt2dAnimAddDeltaFrameIndex(Rt2dAnim *anim, Rt2dAnimProps *props,
                  RwInt32 deltaFrame)
 {
@@ -828,6 +835,7 @@ Rt2dAnimAddDeltaFrameIndex(Rt2dAnim *anim, Rt2dAnimProps *props,
  * \see Rt2dAnimGotoKeyFrameListByIndex
  */
 Rt2dAnim *
+// sp-match: _Rt2dAnimTimeUpdate @ 0x001706E0
 Rt2dAnimTimeUpdate(Rt2dAnim *anim, Rt2dAnimProps *props)
 {
     RwReal interp;
@@ -899,6 +907,7 @@ Rt2dAnimTimeUpdate(Rt2dAnim *anim, Rt2dAnimProps *props)
  * \see Rt2dAnimGotoKeyFrameListByIndex
  */
 Rt2dAnim *
+// sp-match: _Rt2dAnimGotoKeyFrameListByTime @ 0x001703D0
 Rt2dAnimGotoKeyFrameListByTime(Rt2dAnim *anim, Rt2dAnimProps *props,
                                RwReal newTime)
 {
@@ -979,6 +988,7 @@ Rt2dAnimGotoKeyFrameListByTime(Rt2dAnim *anim, Rt2dAnimProps *props,
  * \see Rt2dAnimGotoKeyFrameListByTime
  */
 Rt2dAnim *
+// sp-match: _Rt2dAnimGotoKeyFrameListByIndex @ 0x001704B0
 Rt2dAnimGotoKeyFrameListByIndex(Rt2dAnim *anim, Rt2dAnimProps *props,
                                 RwInt32 frameIndex)
 {
@@ -1028,6 +1038,7 @@ Rt2dAnimGotoKeyFrameListByIndex(Rt2dAnim *anim, Rt2dAnimProps *props,
  * \see Rt2dKeyFrameListCallBack
  */
 // match: _Rt2dAnimForAllKeyFrameLists @ 0x00257710
+// sp-match: _Rt2dAnimForAllKeyFrameLists @ 0x00170520
 Rt2dAnim *
 Rt2dAnimForAllKeyFrameLists(Rt2dAnim *anim,
                             Rt2dKeyFrameListCallBack callBack,
@@ -1066,6 +1077,7 @@ Rt2dAnimForAllKeyFrameLists(Rt2dAnim *anim,
  * \see Rt2dAnimAddKeyFrameList
  */
 RwInt32
+// sp-match: _Rt2dAnimGetNumberOfKeyFrames @ 0x00170580
 Rt2dAnimGetNumberOfKeyFrames(Rt2dAnim *anim)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dAnimGetNumberOfKeyFrames"));
@@ -1085,6 +1097,7 @@ Rt2dAnimGetNumberOfKeyFrames(Rt2dAnim *anim)
  * \return Returns a pointer to the keyframe list if successful, NULL otherwise.
  */
 Rt2dKeyFrameList *
+// sp-match: _Rt2dAnimGetKeyFrameListByIndex @ 0x00170590
 Rt2dAnimGetKeyFrameListByIndex(Rt2dAnim *anim, RwUInt32 frameIndex)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dAnimGetKeyFrameListByIndex"));
@@ -1110,6 +1123,7 @@ Rt2dAnimGetKeyFrameListByIndex(Rt2dAnim *anim, RwUInt32 frameIndex)
  * \see Rt2dAnimGetNextFrameTime
  */
 RwReal
+// sp-match: _Rt2dAnimGetCurrentTime @ 0x001705B0
 Rt2dAnimGetCurrentTime(Rt2dAnim *anim)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dAnimGetCurrentTime"));
@@ -1130,6 +1144,7 @@ Rt2dAnimGetCurrentTime(Rt2dAnim *anim)
  * \see Rt2dAnimGetNextFrameTime
  */
 RwReal
+// sp-match: _Rt2dAnimGetFinalKeyFrameListTime @ 0x001705C0
 Rt2dAnimGetFinalKeyFrameListTime(Rt2dAnim *anim)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dAnimGetFinalKeyFrameListTime"));
@@ -1149,6 +1164,7 @@ Rt2dAnimGetFinalKeyFrameListTime(Rt2dAnim *anim)
  * \see Rt2dAnimGetNextFrameIndex
  */
 RwInt32
+// sp-match: _Rt2dAnimGetPrevFrameIndex @ 0x001705D0
 Rt2dAnimGetPrevFrameIndex(Rt2dAnim *anim)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dAnimGetPrevFrameIndex"));
@@ -1174,6 +1190,7 @@ Rt2dAnimGetPrevFrameIndex(Rt2dAnim *anim)
  * \see Rt2dAnimGetPrevFrameTime
  */
 RwReal
+// sp-match: _Rt2dAnimGetPrevFrameTime @ 0x00170600
 Rt2dAnimGetPrevFrameTime(Rt2dAnim *anim)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dAnimGetPrevFrameTime"));
@@ -1196,6 +1213,7 @@ Rt2dAnimGetPrevFrameTime(Rt2dAnim *anim)
  * \see Rt2dAnimGetPrevFrameIndex
  */
 RwInt32
+// sp-match: _Rt2dAnimGetNextFrameIndex @ 0x00170620
 Rt2dAnimGetNextFrameIndex(Rt2dAnim *anim)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dAnimGetNextFrameIndex"));
@@ -1219,6 +1237,7 @@ Rt2dAnimGetNextFrameIndex(Rt2dAnim *anim)
  * \see Rt2dAnimGetPrevFrameTime
  */
 RwReal
+// sp-match: _Rt2dAnimGetNextFrameTime @ 0x00170650
 Rt2dAnimGetNextFrameTime(Rt2dAnim *anim)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dAnimGetNextFrameTime"));

@@ -23,6 +23,10 @@
 #include "types/type_3DF8D8.h"
 #include <string.h>
 #include <stdlib.h>
+#ifdef CODFH_SP
+#include "game/xboxlive.h"     // dword_4F3130.sp_sub_12AD50
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART != 2 // single player compiles the rest in another file (src/sp/units/sp_unit_185C30_2.cpp)
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003DE8E4
@@ -185,10 +189,22 @@ type_4EBE00 dword_4EBE00[2];
 extern RwRGBA dword_42B470[2];
 
 // match: ?sub_185C30@@YAXPAURwCamera@@_NP6AX0PAX@Z2@Z @ 0x00185C30
+// sp-match: ?sub_185C30@@YAXPAURwCamera@@_NP6AX0PAX@Z2@Z @ 0x0011B740
 // One frame of a waiting screen for the camera arg_0: the pads read, the
 // front end's music kept (track 0x2C started while no pad is in, faded when
 // one is, when arg_4), the front end's step, the screen cleared, arg_8's
 // draw with arg_C, the HUD's, shown; then the sounds and the files.
+#ifdef CODFH_SP
+// Single player has no arg_4: the music is always kept (SP 0x11B740 reads
+// the callback at +8, and its caller SP 0x11B7F0 passes three arguments).
+void sub_185C30(RwCamera *arg_0, void (*arg_8)(RwCamera *, void *), void *arg_C)
+{
+    unk_4B9308.sub_EE6D0();
+    if (!dword_42926C && sub_188350() != 0x2C)
+        sub_186E70(0x2C, 0, 0);
+    else if (dword_42926C && sub_188350() == 0x2C)
+        sub_186F80(0x2C, 1);
+#else
 void sub_185C30(RwCamera *arg_0, bool arg_4, void (*arg_8)(RwCamera *, void *), void *arg_C)
 {
     unk_4B9308.sub_EE6D0();
@@ -199,6 +215,7 @@ void sub_185C30(RwCamera *arg_0, bool arg_4, void (*arg_8)(RwCamera *, void *), 
         else if (dword_42926C && sub_188350() == 0x2C)
             sub_186F80(0x2C, 1);
     }
+#endif
     sub_187B30();
     RwCameraClear(arg_0, dword_42B470, 3);
     if (arg_8)
@@ -213,15 +230,22 @@ void sub_185C30(RwCamera *arg_0, bool arg_4, void (*arg_8)(RwCamera *, void *), 
 }
 
 // match: ?sub_185CF0@@YAXPAHPAURwCamera@@P6AX1PAX@Z2@Z @ 0x00185CF0
+// sp-match: ?sub_185CF0@@YAXPAHPAURwCamera@@P6AX1PAX@Z2@Z @ 0x0011B7F0
 // Runs waiting frames (the music kept after half a second) until *arg_0 is
 // set or the memory unit operation ends, which sets it to 3.
 void sub_185CF0(RwInt32 *arg_0, RwCamera *arg_4, void (*arg_8)(RwCamera *, void *), void *arg_C)
 {
+#ifdef CODFH_SP
+    // No half-second delay: sub_185C30 has no arg_4 here (SP 0x11B7F0).
+    while (!*arg_0 && sub_186D00())
+        sub_185C30(arg_4, arg_8, arg_C);
+#else
     RwUInt32 var_4;
 
     var_4 = RWS::Time::GetTime() + 500;
     while (!*arg_0 && sub_186D00())
         sub_185C30(arg_4, RWS::Time::GetTime() >= var_4, arg_8, arg_C);
+#endif
     if (!sub_186D00())
         *arg_0 = 3;
 }
@@ -305,6 +329,7 @@ RwInt32 sub_185D50(RwCamera *arg_0, type_D9CF0 *arg_4, void (*arg_8)(RwCamera *,
 }
 
 // match: ?sub_185F30@@YAXPAURwCamera@@P6AX0PAX@Z1@Z @ 0x00185F30
+// sp-match: ?sub_185F30@@YAXPAURwCamera@@P6AX0PAX@Z1@Z @ 0x0011B840
 // Shows message 0x1C until answered.
 void sub_185F30(RwCamera *arg_0, void (*arg_4)(RwCamera *, void *), void *arg_8)
 {
@@ -317,6 +342,64 @@ void sub_185F30(RwCamera *arg_0, void (*arg_4)(RwCamera *, void *), void *arg_8)
     sub_187040();
     sub_187B30();
 }
+
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_11B890@@YA?AUtype_186020@@PAURwCamera@@P6AX0PAX@Z1@Z @ 0x0011B890
+// Shows message 0x22 until answered: 1 to go on, 0 when its first choice was
+// taken (single player's front end, SP 0xB17FB).
+type_186020 sp_sub_11B890(RwCamera *arg_0, void (*arg_4)(RwCamera *, void *), void *arg_8)
+{
+    type_186E70 var_8;
+
+    var_8.unk_00 = 0;
+    var_8.unk_04 = 0;
+    sub_186E70(0x22, &var_8, 0);
+    sub_185CF0(&var_8.unk_00, arg_0, arg_4, arg_8);
+    sub_187040();
+    sub_187B30();
+    if (var_8.unk_00 == 1)
+        return type_186020(0, 0);
+    return type_186020(1, 0);
+}
+
+// sp-match: ?sp_sub_11B900@@YA?AUtype_186020@@PAURwCamera@@PAUtype_D9CF0@@HP6AX0PAX@Z2@Z @ 0x0011B900
+// Loads save slot arg_8 into the save state (type_D9CF0::sp_sub_A4CA0): 1 when that returns nonzero
+// (single player's front end, SP 0xB0F12; sub_1866E0's arguments).
+type_186020 sp_sub_11B900(RwCamera *arg_0, type_D9CF0 *arg_4, RwInt32 arg_8, void (*arg_C)(RwCamera *, void *),
+                          void *arg_10)
+{
+    return type_186020(arg_4->sp_sub_A4CA0(arg_8) ? 1 : 0, 0);
+}
+
+// sp-match: ?sp_sub_11B930@@YA?AUtype_186020@@PAURwCamera@@PAUtype_D9CF0@@P6AX0PAX@Z2@Z @ 0x0011B930
+// Shows message 0x1B until answered: 1 to go on, 0 when its first choice was
+// taken (single player's front end, SP 0xB100B, and sp_sub_11BAE0).
+type_186020 sp_sub_11B930(RwCamera *arg_0, type_D9CF0 *arg_4, void (*arg_8)(RwCamera *, void *), void *arg_C)
+{
+    type_186E70 var_8;
+
+    var_8.unk_00 = 0;
+    var_8.unk_04 = 0;
+    sub_186E70(0x1B, &var_8, 0);
+    sub_185CF0(&var_8.unk_00, arg_0, arg_8, arg_C);
+    sub_187040();
+    sub_187B30();
+    if (var_8.unk_00 == 1)
+        return type_186020(0, 0);
+    return type_186020(1, 0);
+}
+#endif
+
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_11B9A0@@YA?AUtype_186020@@PAURwCamera@@PAUtype_D9CF0@@HP6AX0PAX@Z2@Z @ 0x0011B9A0
+// A save step that does nothing in this build: 0 (single player's front end,
+// SP 0xB17A3, 0xB1837, 0xB18B6, with sub_1866E0's arguments).
+type_186020 sp_sub_11B9A0(RwCamera *arg_0, type_D9CF0 *arg_4, RwInt32 arg_8, void (*arg_C)(RwCamera *, void *),
+                          void *arg_10)
+{
+    return type_186020(0, 0);
+}
+#endif
 
 // match: ?sub_185F80@@YAXPAURwCamera@@P6AX0PAX@Z1@Z @ 0x00185F80
 // Shows message 8 until answered.
@@ -387,6 +470,7 @@ type_186020 sub_186020(RwCamera *arg_0, type_D9CF0 *arg_4, bool arg_8, void (*ar
 }
 
 // match: ?sub_186140@@YA?AUtype_186020@@PAURwCamera@@PAUtype_D9CF0@@H_NHPAXP6AX03@Z3@Z @ 0x00186140
+// sp-match: ?sub_186140@@YA?AUtype_186020@@PAURwCamera@@PAUtype_D9CF0@@H_NHPAXP6AX03@Z3@Z @ 0x0011B9C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Saves into slot arg_8 of the card arg_4 (message 0xE with arg_14 shown
 // for two frames unless saving is off, then a second's wait): 0 on this
@@ -548,6 +632,7 @@ type_186020 sub_186630(RwCamera *arg_0, type_D9CF0 *arg_4, bool arg_8, bool arg_
 }
 
 // match: ?sub_1866E0@@YA?AUtype_186020@@PAURwCamera@@PAUtype_D9CF0@@HP6AX0PAX@Z2@Z @ 0x001866E0
+// sp-match: ?sub_1866E0@@YA?AUtype_186020@@PAURwCamera@@PAUtype_D9CF0@@HP6AX0PAX@Z2@Z @ 0x0011BAA0
 // The checkpoint's save into the save state's slot (arg_8 unused).
 type_186020 sub_1866E0(RwCamera *arg_0, type_D9CF0 *arg_4, RwInt32 arg_8, void (*arg_C)(RwCamera *, void *),
                        void *arg_10)
@@ -558,7 +643,47 @@ type_186020 sub_1866E0(RwCamera *arg_0, type_D9CF0 *arg_4, RwInt32 arg_8, void (
     return sub_186140(arg_0, arg_4, var_4, 0, 0, 0, arg_C, arg_10);
 }
 
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_11BAE0@@YA?AUtype_186020@@PAURwCamera@@PAUtype_D9CF0@@HP6AX0PAX@Z2@Z @ 0x0011BAE0
+// Waits for the memory card (sub_185D50; message 0x1C when there is none),
+// asks to save (sp_sub_11B930: 3 when declined) and saves into the save
+// state's slot (sub_186140): 1 when saved, 0 when not, waiting for the card
+// for ever after a full card's fourth choice (single player's front end,
+// SP 0xB174D).
+type_186020 sp_sub_11BAE0(RwCamera *arg_0, type_D9CF0 *arg_4, RwInt32 arg_8, void (*arg_C)(RwCamera *, void *),
+                          void *arg_10)
+{
+    type_186020 var_10(0, 0);
+    RwInt32 var_14;
+    RwInt32 var_8;
+    bool var_1;
+
+    var_1 = false;
+    for (;;)
+    {
+        var_8 = sub_185D50(0, arg_4, 0, 0, 0);
+        if (var_8 == -2)
+            sub_185F30(arg_0, arg_C, arg_10);
+        if (var_1 || var_8 || !arg_4->sub_DA230())
+            continue;
+        if (sp_sub_11B930(arg_0, arg_4, arg_C, arg_10).unk_00 == 1)
+            return type_186020(3, 0);
+        var_14 = dword_4F28F0->unk_44;
+        var_10 = sub_186140(arg_0, arg_4, var_14, 0, 0, (void *)1, arg_C, arg_10);
+        if (var_10.unk_00 == 0)
+            return type_186020(0, 0);
+        if (var_10.unk_00 == 4)
+            var_1 = true;
+        else if (var_10.unk_00 == 1)
+            return type_186020(1, 0);
+    }
+}
+#endif
+
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART != 1 // single player: sp_unit_185C30_2.cpp, the second file
 // match: ?sub_186720@@YAXXZ @ 0x00186720
+// sp-match: ?sub_186720@@YAXXZ @ 0x0011BBF0
 // Sets the message boxes up: none open, their colours and layout, no text.
 void sub_186720()
 {
@@ -586,7 +711,12 @@ void sub_186720()
 }
 
 // match: ?sub_186880@@YA_NH@Z @ 0x00186880
+// sp-match: ?sub_186880@@YA_NH@Z @ 0x0011BCD0
+#ifdef CODFH_SP // single player's returns an int (SP 0x11BCD0)
+RwInt32 sub_186880(RwInt32 arg_0)
+#else
 bool sub_186880(RwInt32 arg_0)
+#endif
 {
     if (pBlock && !arg_0)
     {
@@ -600,6 +730,7 @@ bool sub_186880(RwInt32 arg_0)
 }
 
 // match: ?sub_1868E0@@YAXXZ @ 0x001868E0
+// sp-match: ?sub_1868E0@@YAXXZ @ 0x0011D2A0
 // Shuts the message boxes down (the text freed unless kept).
 void sub_1868E0()
 {
@@ -617,6 +748,7 @@ void sub_1868E0()
 }
 
 // match: ?sub_186950@@YAXXZ @ 0x00186950
+// sp-match: ?sub_186950@@YAXXZ @ 0x0011BD20
 // Closes the message box and shows them.
 void sub_186950()
 {
@@ -625,12 +757,14 @@ void sub_186950()
 }
 
 // match: ?sub_186970@@YAXPAUtype_DA580@@@Z @ 0x00186970
+// sp-match: ?sub_186970@@YAXPAUtype_DA580@@@Z @ 0x0011BD40
 void sub_186970(type_DA580 *arg_0)
 {
     dword_4EBD2C = arg_0;
 }
 
 // match: ?sub_186980@@YAXXZ @ 0x00186980
+// sp-match: ?sub_186980@@YAXXZ @ 0x0011BD50
 // Registers the in-game menus' text events (their Yes, No and so on, the
 // pause, quit, restart and options menus, and the no-controller lines).
 void sub_186980()
@@ -680,6 +814,7 @@ void sub_186980()
 }
 
 // match: ?sub_186D00@@YAHXZ @ 0x00186D00
+// sp-match: ?sub_186D00@@YAHXZ @ 0x0011C070
 // How many message boxes are open.
 RwInt32 sub_186D00()
 {
@@ -687,18 +822,31 @@ RwInt32 sub_186D00()
 }
 
 // match: ?sub_186D10@@YAPAUtype_4EBE00@@XZ @ 0x00186D10
+// sp-match: ?sub_186D10@@YAPAUtype_4EBE00@@XZ @ 0x0011D990
 // Opens the next message box (reset, with the font).
 type_4EBE00 *sub_186D10()
 {
+#ifdef CODFH_SP // shape: the index kept in a local (SP 0x11D990 reads dword_4EBD34 once)
+    RwInt32 i;
+
+    i = dword_4EBD34 = dword_4EBD34 + 1;
+    dword_4EBE00[i].sub_1883B0();
+    dword_4EBE00[i].sub_1888F0((RwCamera *)dword_4EBD04, 0);
+    dword_4EBE00[i].unk_00 = 1;
+    dword_4EBE00[i].unk_18 = 0;
+    return &dword_4EBE00[i];
+#else
     dword_4EBD34 = dword_4EBD34 + 1;
     dword_4EBE00[dword_4EBD34].sub_1883B0();
     dword_4EBE00[dword_4EBD34].sub_1888F0((RwCamera *)dword_4EBD04, 0);
     dword_4EBE00[dword_4EBD34].unk_00 = 1;
     dword_4EBE00[dword_4EBD34].unk_18 = 0;
     return &dword_4EBE00[dword_4EBD34];
+#endif
 }
 
 // match: ?sub_186DA0@@YAXXZ @ 0x00186DA0
+// sp-match: ?sub_186DA0@@YAXXZ @ 0x0011C080
 // With the first box open, holds the pad bindings (clearing them).
 void sub_186DA0()
 {
@@ -707,7 +855,12 @@ void sub_186DA0()
     if (dword_4EBD34 == 0 && !dword_4EBCDC)
     {
         dword_4EBCDC = 1;
+#ifdef CODFH_SP
+        // SP @ 0x11C080; MP @ 0x186DA0.
+        for (var_4 = 0; var_4 < 0x28; var_4++)
+#else
         for (var_4 = 0; var_4 < 0x2C; var_4++)
+#endif
         {
             dword_4EBD38[var_4] = dword_429498[var_4].unk_04;
             dword_429498[var_4].unk_04 = 0;
@@ -716,6 +869,7 @@ void sub_186DA0()
 }
 
 // match: ?sub_186E10@@YAXXZ @ 0x00186E10
+// sp-match: ?sub_186E10@@YAXXZ @ 0x0011C0C0
 // With none open, puts the pad bindings back.
 void sub_186E10()
 {
@@ -723,13 +877,19 @@ void sub_186E10()
 
     if (dword_4EBD34 == -1 && dword_4EBCDC)
     {
+#ifdef CODFH_SP
+        // SP @ 0x11C0C0; MP @ 0x186E10.
+        for (var_4 = 0; var_4 < 0x28; var_4++)
+#else
         for (var_4 = 0; var_4 < 0x2C; var_4++)
+#endif
             dword_429498[var_4].unk_04 = dword_4EBD38[var_4];
         dword_4EBCDC = 0;
     }
 }
 
 // match: ?sub_186E70@@YAHHPAX0@Z @ 0x00186E70
+// sp-match: ?sub_186E70@@YAHHPAX0@Z @ 0x0011D9E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Opens message arg_0 with arg_4 (its opener from off_42B518), in the font
 // arg_8 (kept) or the last; 0 without a font or an opener.
@@ -737,11 +897,20 @@ RwInt32 sub_186E70(RwInt32 arg_0, void *arg_4, void *arg_8)
 {
     type_42B518 *var_8;
     type_4EBE00 *l4;
+#ifdef CODFH_SP
+    type_3D3548 *p;
+    RwV3d v;
+#endif
 
     if (arg_8)
         dword_4EBD04 = arg_8;
     if (!dword_4EBD04)
         return 0;
+#ifdef CODFH_SP
+    // Single player opens a message only once (SP 0x11DA02).
+    if (sub_188350() == arg_0)
+        return 0;
+#endif
     sub_1882C0();
     sub_1882C0();
     l4 = sub_186D10();
@@ -763,10 +932,22 @@ RwInt32 sub_186E70(RwInt32 arg_0, void *arg_4, void *arg_8)
         return 0;
     }
     sub_186DA0();
+#ifdef CODFH_SP
+    // Single player plays the open sound (SP 0x11DA8E: dword_4B1C98 at SP 0x3ADCC0).
+    p = sub_1745A0(0);
+    if (p)
+        p->unk_1C0.sub_8A980(&dword_4B1C98, p, 1, p->sub_CD550(), 0, 0);
+    else
+    {
+        v.x = v.y = v.z = 1.0f;
+        p->unk_1C0.sub_8A980(&dword_4B1C98, 0, 0, &v, 0, 0);
+    }
+#endif
     return 1;
 }
 
 // match: ?sub_186F20@@YAHH@Z @ 0x00186F20
+// sp-match: ?sub_186F20@@YAHH@Z @ 0x0011C100
 // Whether message arg_0 is open.
 RwInt32 sub_186F20(RwInt32 arg_0)
 {
@@ -781,6 +962,7 @@ RwInt32 sub_186F20(RwInt32 arg_0)
 }
 
 // match: ?sub_186F80@@YAXHH@Z @ 0x00186F80
+// sp-match: ?sub_186F80@@YAXHH@Z @ 0x0011DAF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Closes message arg_0 (the top one popped, with the player's close sound
 // when arg_4).
@@ -788,15 +970,28 @@ void sub_186F80(RwInt32 arg_0, RwInt32 arg_4)
 {
     type_3D3548 *var_8;
     RwInt32 l4;
+#ifdef CODFH_SP
+    RwInt32 n;
+#endif
 
+#ifdef CODFH_SP // shape: the count read once per pass (SP 0x11DB23 compares the cached count)
+    for (l4 = 0; l4 <= (n = dword_4EBD34); l4++)
+#else
     for (l4 = 0; l4 <= dword_4EBD34; l4++)
+#endif
     {
         if (dword_4EBE00[l4].unk_2CDC == arg_0)
         {
             dword_4EBE00[l4].sub_188490();
+#ifdef CODFH_SP
+            if (l4 == n)
+            {
+                dword_4EBD34 = n - 1;
+#else
             if (l4 == dword_4EBD34)
             {
                 dword_4EBD34 = dword_4EBD34 - 1;
+#endif
                 if (arg_4)
                 {
                     var_8 = sub_1745A0(0);
@@ -810,6 +1005,7 @@ void sub_186F80(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_187040@@YAXXZ @ 0x00187040
+// sp-match: ?sub_187040@@YAXXZ @ 0x0011DB80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Closes every message box, with the close sound.
 void sub_187040()
@@ -829,15 +1025,26 @@ void sub_187040()
 }
 
 // match: ?sub_1870D0@@YAXXZ @ 0x001870D0
+// sp-match: ?sub_1870D0@@YAXXZ @ 0x0011DC00
 // Closes the top message box, with the close sound.
 void sub_1870D0()
 {
     type_3D3548 *var_4;
+#ifdef CODFH_SP // shape: the top index read once (SP 0x11DC01 keeps it across sub_188490)
+    RwInt32 n;
+
+    n = dword_4EBD34;
+    if (n == -1)
+        return;
+    dword_4EBE00[n].sub_188490();
+    dword_4EBD34 = n - 1;
+#else
 
     if (dword_4EBD34 == -1)
         return;
     dword_4EBE00[dword_4EBD34].sub_188490();
     dword_4EBD34 = dword_4EBD34 - 1;
+#endif
     var_4 = sub_1745A0(0);
     if (var_4)
         var_4->unk_1C0.sub_8A980(&dword_4B1B48, var_4, 1, var_4->sub_CD550(), 0, 0);
@@ -845,6 +1052,7 @@ void sub_1870D0()
 }
 
 // match: ?sub_187150@@YAXH@Z @ 0x00187150
+// sp-match: ?sub_187150@@YAXH@Z @ 0x0011DC60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws the top message box on the camera arg_0 (kept for the boxes) while
 // they are shown with a font: a 384 by 448 screen, the text scaled to at
@@ -867,6 +1075,10 @@ void sub_187150(RwInt32 arg_0)
     dword_4EBD04 = (void *)arg_0;
     if (!dword_4EBD30 || !dword_4EBD2C || dword_4EBD34 == -1)
         return;
+#ifdef CODFH_SP // single player also returns while Live has a message up (SP 0x11DC9A)
+    if (dword_4F3130.sp_sub_12AD50())
+        return;
+#endif
     RwCameraBeginUpdate((RwCamera *)arg_0);
     Rt2dCTMPush();
     Rt2dCTMSetIdentity();
@@ -914,10 +1126,15 @@ void sub_187150(RwInt32 arg_0)
     RwRenderStateSet(rwRENDERSTATETEXTUREFILTER, (void *)ebp_14);
     RwRenderStateSet(rwRENDERSTATECULLMODE, (void *)var_20);
     Rt2dCTMPop();
+#ifdef CODFH_SP
+    // Single player ends the camera update here (SP 0x11DEC6).
+    RwCameraEndUpdate((RwCamera *)arg_0);
+#endif
     flt_4292C8 = var_30;
 }
 
 // match: ?sub_187400@@YAXPAUtype_4EBE00@@@Z @ 0x00187400
+// sp-match: ?sub_187400@@YAXPAUtype_4EBE00@@@Z @ 0x0011D2F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws the message box arg_0: its backdrop, its heading's backdrop when it
 // has one and its frame, the heading lines (centred when set), then its
@@ -1003,6 +1220,7 @@ void sub_187400(type_4EBE00 *arg_0)
 }
 
 // match: ?sub_187800@@YAXXZ @ 0x00187800
+// sp-match: ?sub_187800@@YAXXZ @ 0x0011D620
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The top box's button bar: its labels looked up once ("Action",
 // "Back", "Navigate", "UnPause", "ChangeOption"), then up to three of its
@@ -1059,6 +1277,7 @@ void sub_187800()
 }
 
 // match: ?sub_1879F0@@YAXHPAURwV2d@@PBDPAURwRGBA@@@Z @ 0x001879F0
+// sp-match: ?sub_1879F0@@YAXHPAURwV2d@@PBDPAURwRGBA@@@Z @ 0x0011C140
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws the text arg_8 at *arg_4 (y from the top of a 448-high screen)
 // in the colour arg_C or the style arg_0's (0 grey, else white; 1 a
@@ -1105,6 +1324,7 @@ void sub_1879F0(RwInt32 arg_0, RwV2d *arg_4, const RwChar *arg_8, RwRGBA *arg_C)
 }
 
 // match: ?sub_187B30@@YAXXZ @ 0x00187B30
+// sp-match: ?sub_187B30@@YAXXZ @ 0x0011DEE0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The top message box's step (unless it waits): its own update, then the
 // pad: up and down move the selection, left and right change the line's
@@ -1138,9 +1358,17 @@ void sub_187B30()
     type_4EBE00 *var_C;
     RwInt32 bp_8;
     RwInt32 bp_4;
+#ifdef CODFH_SP
+    RwInt32 found;
+    RwInt32 i;
+#endif
 
     if (dword_4EBD34 == -1)
         return;
+#ifdef CODFH_SP // single player also returns while Live has a message up (SP 0x11DEF1)
+    if (dword_4F3130.sp_sub_12AD50())
+        return;
+#endif
     var_C = &dword_4EBE00[dword_4EBD34];
     if (var_C->unk_18)
         return;
@@ -1153,8 +1381,10 @@ void sub_187B30()
     bp_4 = dword_4EBD18;
     var_20 = dword_4EBDEC;
     ebp_14 = unk_4B9308.sub_EE8F0(0, frm_24);
+#ifndef CODFH_SP
     if (dword_4F3168 == 6)
         ebp_14 = 0;
+#endif
     if (ebp_14 != 0.0f)
     {
         var_C->unk_38 = var_C->sub_18A060(var_C->unk_38);
@@ -1163,8 +1393,10 @@ void sub_187B30()
             lcl_28->unk_1C0.sub_8A980(&dword_4B1C88, lcl_28, 1, lcl_28->sub_CD550(), 0, 0);
     }
     ebp_14 = unk_4B9308.sub_EE8F0(0, m_18);
+#ifndef CODFH_SP
     if (dword_4F3168 == 6)
         ebp_14 = 0;
+#endif
     if (ebp_14 != 0.0f)
     {
         var_C->unk_38 = var_C->sub_189FB0(var_C->unk_38);
@@ -1193,8 +1425,10 @@ void sub_187B30()
     if (lv_10 != -1)
     {
         ebp_14 = unk_4B9308.sub_EE8F0(0, bp_8);
+#ifndef CODFH_SP
         if (dword_4F3168 == 6)
             ebp_14 = 0;
+#endif
         if (ebp_14 != 0.0f)
         {
             lcl_5C = var_C->unk_DC[lv_10].unk_260;
@@ -1217,8 +1451,10 @@ void sub_187B30()
             }
         }
         ebp_14 = unk_4B9308.sub_EE8F0(0, l1C);
+#ifndef CODFH_SP
         if (dword_4F3168 == 6)
             ebp_14 = 0;
+#endif
         if (ebp_14 != 0.0f)
         {
             frm_64 = var_C->unk_DC[lv_10].unk_260;
@@ -1240,7 +1476,11 @@ void sub_187B30()
             }
         }
         ebp_14 = unk_4B9308.sub_EE8F0(0, bp_4);
+#ifdef CODFH_SP
+        if (ebp_14 != 0.0f)
+#else
         if (ebp_14 != 0.0f && dword_4F3168 != 6)
+#endif
         {
             local_48 = var_C->unk_DC[lv_10].unk_264;
             if (local_48 != -1 && var_C->unk_DC[lv_10].unk_100[local_48].unk_24)
@@ -1250,8 +1490,10 @@ void sub_187B30()
         }
     }
     ebp_14 = unk_4B9308.sub_EE8F0(0, var_20);
+#ifndef CODFH_SP
     if (dword_4F3168 != 6)
         ebp_14 = 0;
+#endif
     if (ebp_14 != 0.0f && !dword_4B88AC)
     {
         var_6C = var_C->unk_2CF0;
@@ -1269,9 +1511,33 @@ void sub_187B30()
                 dword_4B1E98.sub_8A980(&dword_4B1B48, 0, 0, &bp_58, 0, 0);
         }
     }
+#ifdef CODFH_SP
+    // Single player swaps the no-controller message (4) for message 0 when a
+    // pad is in, and opens it while paused without one (SP 0x11E302).
+    if (dword_42926C)
+    {
+        found = 0;
+        for (i = 0; i < 2; i++)
+        {
+            if (dword_4EBE00[i].unk_2CDC == 4)
+                found = 1;
+        }
+        if (found)
+        {
+            sub_187040();
+            sub_186E70(0, 0, 0);
+        }
+    }
+    if ((dword_4B86F8 & 0x10) && !dword_42926C && dword_4EBE00[dword_4EBD34].unk_2CDC != 4)
+    {
+        sub_187040();
+        sub_186E70(4, 0, 0);
+    }
+#endif
 }
 
 // match: ?sub_1882C0@@YAXXZ @ 0x001882C0
+// sp-match: ?sub_1882C0@@YAXXZ @ 0x0011C250
 // While a pad is in, the buttons the boxes answer to from its bindings
 // (actions 0 to 3, 10 and 11).
 void sub_1882C0()
@@ -1282,11 +1548,18 @@ void sub_1882C0()
     dword_4EBD1C = unk_4B9308.sub_EE790(1, 0);
     dword_4EBD00 = unk_4B9308.sub_EE790(2, 0);
     dword_4EBDF0 = unk_4B9308.sub_EE790(3, 0);
+#ifdef CODFH_SP
+    // Single player's bindings number these actions 8 and 9 (SP 0x11C2A2, 0x11C2B5).
+    dword_4EBD18 = unk_4B9308.sub_EE790(8, 0);
+    dword_4EBDEC = unk_4B9308.sub_EE790(9, 0);
+#else
     dword_4EBD18 = unk_4B9308.sub_EE790(0xA, 0);
     dword_4EBDEC = unk_4B9308.sub_EE790(0xB, 0);
+#endif
 }
 
 // match: ?sub_188350@@YAHXZ @ 0x00188350
+// sp-match: ?sub_188350@@YAHXZ @ 0x0011C2D0
 // The top box's message, or -1.
 RwInt32 sub_188350()
 {
@@ -1297,3 +1570,5 @@ RwInt32 sub_188350()
         var_4 = dword_4EBE00[dword_4EBD34].unk_2CDC;
     return var_4;
 }
+
+#endif

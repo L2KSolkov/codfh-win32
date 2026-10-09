@@ -267,6 +267,7 @@ static RwInt32 NumShadersInCache;
 // match: _LastVertexShaderDesc @ 0x00436A8C
 
 // match: __rpSkinXboxPurgeShaderCache @ 0x002D1840
+// sp-match: __rpSkinXboxPurgeShaderCache @ 0x001EC190
 
 void
 _rpSkinXboxPurgeShaderCache(void)
@@ -276,6 +277,7 @@ _rpSkinXboxPurgeShaderCache(void)
 }
 
 // match: __rpSkinXboxInitShaders @ 0x002D1850
+// sp-match: __rpSkinXboxInitShaders @ 0x001EC1A0
 RwBool
 _rpSkinXboxInitShaders(void)
 {
@@ -294,6 +296,7 @@ _rpSkinXboxInitShaders(void)
 }
 
 // match: __rpSkinXboxSetShader @ 0x002D1890
+// sp-match: __rpSkinXboxSetShader @ 0x001EC1E0
 void
 _rpSkinXboxSetShader(DWORD formatIndex, const DWORD *shader)
 {
@@ -308,6 +311,7 @@ _rpSkinXboxSetShader(DWORD formatIndex, const DWORD *shader)
 }
 
 // match: __rpSkinXboxComputeProjViewWorld @ 0x002D18D0
+// sp-match: __rpSkinXboxComputeProjViewWorld @ 0x001EC220
 void
 _rpSkinXboxComputeProjViewWorld(D3DMATRIX *worldMatrix, D3DMATRIX *viewMatrix,
                                 D3DMATRIX *projViewWorldMatrix,
@@ -460,6 +464,7 @@ _rpSkinXboxComputeProjViewWorld(D3DMATRIX *worldMatrix, D3DMATRIX *viewMatrix,
 }
 
 // match: _FindLights @ 0x002D1D30
+// sp-match: _FindLights @ 0x001EC680
 static RwV4d *
 FindLights(RwV4d *shaderConstantPtr,
            RwInt32 *dirLightCount,
@@ -668,6 +673,7 @@ FindLights(RwV4d *shaderConstantPtr,
 }
 
 // match: __rpSkinXboxEnumerateLights @ 0x002D2130
+// sp-match: __rpSkinXboxEnumerateLights @ 0x001ECA80
 RwV4d *
 _rpSkinXboxEnumerateLights(RwV4d *shaderConstantPtr,
                            RwInt32 *dirLightCount,
@@ -715,6 +721,7 @@ _rpSkinXboxEnumerateLights(RwV4d *shaderConstantPtr,
 }
 
 // match: _D3DMATRIXFromRwMatrix @ 0x002D21C0
+// sp-match: _D3DMATRIXFromRwMatrix @ 0x001ECB10
 static void
 D3DMATRIXFromRwMatrix(D3DMATRIX *d, const RwMatrix *m)
 {
@@ -737,6 +744,7 @@ D3DMATRIXFromRwMatrix(D3DMATRIX *d, const RwMatrix *m)
 }
 
 // match: __rpSkinXboxMatrixUpdate @ 0x002D2230
+// sp-match: __rpSkinXboxMatrixUpdate @ 0x001ECB80
 void
 _rpSkinXboxMatrixUpdate(RwV4d *shaderConstants, RpAtomic *atomic, RpSkin *skin)
 {
@@ -838,6 +846,7 @@ _rpSkinXboxMatrixUpdate(RwV4d *shaderConstants, RpAtomic *atomic, RpSkin *skin)
 }
 
 // match: __rpSkinXboxSetMaterialColor @ 0x002D24F0
+// sp-match: __rpSkinXboxSetMaterialColor @ 0x001ECE40
 void
 _rpSkinXboxSetMaterialColor(const RpMaterial *material, RwUInt32 modulate)
 {
@@ -898,6 +907,7 @@ _rpSkinXboxSetMaterialColor(const RpMaterial *material, RwUInt32 modulate)
 }
 
 // match: __rpSkinXboxCreateAtomicPipeline @ 0x002D2660
+// sp-match: __rpSkinXboxCreateAtomicPipeline @ 0x001ECFB0
 RxPipeline *
 _rpSkinXboxCreateAtomicPipeline(void)
 {
@@ -944,6 +954,7 @@ static const DWORD *const off_4185D8[7] =
      SASM_DISABLE_GLOBAL_OPTIMIZATIONS)
 
 // match: __rpSkinXboxGenerateShader @ 0x002D26B0
+// sp-match: __rpSkinXboxGenerateShader @ 0x001ED000
 static const DWORD *
 _rpSkinXboxGenerateShader(const _rpSkinXboxShaderDesc *desc)
 {
@@ -1324,6 +1335,7 @@ _rpSkinXboxGenerateShader(const _rpSkinXboxShaderDesc *desc)
 }
 
 // match: _BinaryFindVertexShader @ 0x002D3110
+// sp-match: _BinaryFindVertexShader @ 0x001EDA60
 static RwInt32
 BinaryFindVertexShader(const _rpSkinXboxShaderDesc *value,
                        const _rpSkinXboxShaderItemDesc *buffer,
@@ -1379,6 +1391,7 @@ BinaryFindVertexShader(const _rpSkinXboxShaderDesc *value,
 }
 
 // match: __rpSkinXboxGetShader @ 0x002D3180
+// sp-match: __rpSkinXboxGetShader @ 0x001EDAD0
 const DWORD *
 _rpSkinXboxGetShader(const _rpSkinXboxShaderDesc *desc)
 {
@@ -1449,6 +1462,7 @@ _rpSkinXboxGetShader(const _rpSkinXboxShaderDesc *desc)
 }
 
 // match: _RpXboxSkinVertexShaderCachePurge @ 0x002D32A0
+// sp-match: _RpXboxSkinVertexShaderCachePurge @ 0x001EDBF0
 void
 RpXboxSkinVertexShaderCachePurge(void)
 {
@@ -1476,6 +1490,7 @@ RpXboxSkinVertexShaderCachePurge(void)
 }
 
 // match: __rpSkinXboxDestroyShaders @ 0x002D3310
+// sp-match: __rpSkinXboxDestroyShaders @ 0x001EDC60
 void
 _rpSkinXboxDestroyShaders(void)
 {

@@ -8,12 +8,14 @@
 #include "game/hostoptions.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E94A8
 extern const RwReal flt_3E94A8 = 0.01f;
 // 0x003E94AC
 extern const RwReal flt_3E94AC = 0.01f;
 // 0x003E94B0
 extern const RwReal flt_3E94B0 = 16.666666f;
+#endif
 // End of its data definitions.
 
 using namespace kujuUI;

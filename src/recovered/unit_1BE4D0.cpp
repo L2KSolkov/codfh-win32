@@ -22,12 +22,14 @@
 #include "types/type_4C19C0.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E2F64
 extern const RwReal flt_3E2F64 = 0.01f;
 // 0x003E2F68
 extern const RwReal flt_3E2F68 = 0.01f;
 // 0x003E2F6C
 extern const RwReal flt_3E2F6C = 16.666666f;
+#endif
 // 0x004F8130
 #ifndef CODFH_PLAIN
 cNetPlayerTrigger *dword_4F8130;

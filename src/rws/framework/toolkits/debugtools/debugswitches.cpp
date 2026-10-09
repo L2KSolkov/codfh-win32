@@ -15,12 +15,14 @@ namespace RWS
 }
 
 // match: ?SetSwitch@DebugSwitches@RWS@@YAXH_N@Z @ 0x00132690
+// sp-match: ?SetSwitch@DebugSwitches@RWS@@YAXH_N@Z @ 0x000E30B0
 void RWS::DebugSwitches::SetSwitch(RwInt32 var, bool flag)
       {
          _flags[var] = flag;
       }
 
 // match: ?GetSwitch@DebugSwitches@RWS@@YA_NH@Z @ 0x001326B0
+// sp-match: ?GetSwitch@DebugSwitches@RWS@@YA_NH@Z @ 0x000E30C0
 bool RWS::DebugSwitches::GetSwitch(RwInt32 var)
       {
          return (_flags[var]);

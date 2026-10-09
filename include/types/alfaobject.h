@@ -286,7 +286,11 @@ struct type_3D2CD0 : type_3D2C30
     // Plays the arg_0 animations at arg_4 (bit i of arg_8 each one's flag),
     // releasing the entity's last hold when arg_C is set; whether the last
     // played (the VM's animation opcodes).
+#ifdef CODFH_SP // single player's sub_6DE40 has no speed (SP 0x5C340 ends ret 0x10)
+    bool sub_6DE40(RwInt32 arg_0, RwInt32 *arg_4, RwInt32 arg_8, bool arg_C);
+#else
     bool sub_6DE40(RwInt32 arg_0, RwInt32 *arg_4, RwInt32 arg_8, bool arg_C, RwReal arg_10);
+#endif
     // Advances the performance (sub_6D5A0; the entity's vf_03C passes its
     // time step, unused): starts a requested one, steps its transition
     // (unk_118), then applies the entity's performance values.

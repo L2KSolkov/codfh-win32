@@ -9,12 +9,14 @@
 #include "types/asynchload.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E382C
 extern const RwReal flt_3E382C = 0.01f;
 // 0x003E3830
 extern const RwReal flt_3E3830 = 0.01f;
 // 0x003E3834
 extern const RwReal flt_3E3834 = 16.666666f;
+#endif
 
 // match: ?flt_3E382C@@3MB @ 0x003E382C
 // match: ?flt_3E3830@@3MB @ 0x003E3830

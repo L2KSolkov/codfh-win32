@@ -111,6 +111,7 @@ static RwInt32 _rwPluginRegFreeListBlockSize = 64,
 // match: __rwPluginRegListPreallocBlocks @ 0x00435704
 
 // match: __rwPluginRegistryOpen @ 0x002B49F0
+// sp-match: __rwPluginRegistryOpen @ 0x001CFE10
 
 RwBool
 _rwPluginRegistryOpen(void)
@@ -143,6 +144,7 @@ _rwPluginRegistryOpen(void)
  */
 
 // match: _rwDestroyEntry @ 0x002B4A30
+// sp-match: _rwDestroyEntry @ 0x001CFE50
 static void
 rwDestroyEntry(void *object, void *freelist)
 {
@@ -173,6 +175,7 @@ rwDestroyEntry(void *object, void *freelist)
  */
 
 // match: __rwPluginRegistryClose @ 0x002B4A70
+// sp-match: __rwPluginRegistryClose @ 0x001CFE90
 RwBool
 _rwPluginRegistryClose(void)
 {
@@ -349,6 +352,7 @@ _rwPluginRegistrySetStaticPluginsSize(RwPluginRegistry * reg, RwInt32 size)
  */
 
 // match: __rwPluginRegistryGetPluginOffset @ 0x002B4B30
+// sp-match: __rwPluginRegistryGetPluginOffset @ 0x001CFF50
 RwBool
 _rwPluginRegistryGetPluginOffset(const RwPluginRegistry * reg,
                                  RwUInt32 pluginID)
@@ -383,6 +387,7 @@ _rwPluginRegistryGetPluginOffset(const RwPluginRegistry * reg,
  */
 
 // match: __rwPluginRegistryAddPlugin @ 0x002B4B60
+// sp-match: __rwPluginRegistryAddPlugin @ 0x001CFF80
 RwInt32
 _rwPluginRegistryAddPlugin(RwPluginRegistry * reg,
                            RwInt32 size, RwUInt32 pluginID,
@@ -647,6 +652,7 @@ _rwPluginRegistryValidateObject(const RwPluginRegistry * reg, const void *object
  */
 
 // match: __rwPluginRegistryInitObject @ 0x002B4D60
+// sp-match: __rwPluginRegistryInitObject @ 0x001D0180
 const RwPluginRegistry *
 _rwPluginRegistryInitObject(const RwPluginRegistry * reg, void *object)
 {
@@ -701,6 +707,7 @@ _rwPluginRegistryInitObject(const RwPluginRegistry * reg, void *object)
  */
 
 // match: __rwPluginRegistryDeInitObject @ 0x002B4DC0
+// sp-match: __rwPluginRegistryDeInitObject @ 0x001D01E0
 const RwPluginRegistry *
 _rwPluginRegistryDeInitObject(const RwPluginRegistry * reg, void *object)
 {
@@ -749,6 +756,7 @@ _rwPluginRegistryDeInitObject(const RwPluginRegistry * reg, void *object)
  */
 
 // match: __rwPluginRegistryCopyObject @ 0x002B4DF0
+// sp-match: __rwPluginRegistryCopyObject @ 0x001D0210
 const RwPluginRegistry *
 _rwPluginRegistryCopyObject(const RwPluginRegistry * reg, void
                             *dstObject, const void *srcObject)

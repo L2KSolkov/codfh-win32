@@ -26,6 +26,7 @@ static const char rcsid[] = "@@@@(#)$Id: //RenderWare/RW36Active/rwsdk/world/pip
 // match: _rcsid @ 0x00419548
 
 // match: __rxWorldDevicePluginAttach @ 0x002E15F0
+// sp-match: __rxWorldDevicePluginAttach @ 0x001FC0C0
 RwBool
 _rxWorldDevicePluginAttach(void)
 {
@@ -36,6 +37,7 @@ _rxWorldDevicePluginAttach(void)
 }
 
 // match: __rpCreatePlatformWorldSectorPipelines @ 0x002E1600
+// sp-match: __rpCreatePlatformWorldSectorPipelines @ 0x001FC0D0
 RwBool
 _rpCreatePlatformWorldSectorPipelines(void)
 {
@@ -72,6 +74,7 @@ _rpCreatePlatformWorldSectorPipelines(void)
 }
 
 // match: __rpDestroyPlatformWorldSectorPipelines @ 0x002E1670
+// sp-match: __rpDestroyPlatformWorldSectorPipelines @ 0x001FC140
 void
 _rpDestroyPlatformWorldSectorPipelines(void)
 {
@@ -87,6 +90,7 @@ _rpDestroyPlatformWorldSectorPipelines(void)
 }
 
 // match: __rpCreatePlatformAtomicPipelines @ 0x002E16B0
+// sp-match: __rpCreatePlatformAtomicPipelines @ 0x001FC180
 RwBool
 _rpCreatePlatformAtomicPipelines(void)
 {
@@ -123,6 +127,7 @@ _rpCreatePlatformAtomicPipelines(void)
 }
 
 // match: __rpDestroyPlatformAtomicPipelines @ 0x002E1720
+// sp-match: __rpDestroyPlatformAtomicPipelines @ 0x001FC1F0
 void
 _rpDestroyPlatformAtomicPipelines(void)
 {

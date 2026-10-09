@@ -36,12 +36,14 @@ RWS_REGISTERCLASS(WorldLight);
 // match: ?MakeNew@WorldLight@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C5380
 // match: __ehhandler$?MakeNew@WorldLight@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300690
 // match: __ehhandler$?MakeNew@WorldLight@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030069F
+// sp-match: ?MakeNew@WorldLight@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000965D0
 RWS_DEFINE_MAKENEW(WorldLight)
 
 // A white light of no type yet: its type comes with command 0.
 // match: ??0WorldLight@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C5400
 // match: __ehhandler$??0WorldLight@@QAE@ABVCAttributePacket@RWS@@@Z-0x16 @ 0x003006B0
 // match: __ehhandler$??0WorldLight@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x003006C6
+// sp-match: ??0WorldLight@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00096260
 WorldLight::WorldLight(const RWS::CAttributePacket &attr)
     : Trigger(attr), unk_C0(0), unk_C8(1000.0f), unk_CC(3), unk_D0(0xFFFFFFFF)
 {
@@ -56,16 +58,19 @@ WorldLight::WorldLight(const RWS::CAttributePacket &attr)
 // constructor's unwinding.)
 
 // match: ?vf_008@WorldLight@@UAEHXZ @ 0x000C5540
+// sp-match: ?vf_008@WorldLight@@UAEHXZ @ 0x00028FF0
 RwInt32 WorldLight::vf_008()
 {
     return 3;
 }
 
 // match: ??_GWorldLight@@UAEPAXI@Z @ 0x000C5550
+// sp-match: ??_GWorldLight@@UAEPAXI@Z @ 0x000965C0
 
 // match: ??1WorldLight@@UAE@XZ @ 0x000C5570
 // match: __ehhandler$??1WorldLight@@UAE@XZ-0x1E @ 0x003006F0
 // match: __ehhandler$??1WorldLight@@UAE@XZ @ 0x0030070E
+// sp-match: ??1WorldLight@@UAE@XZ @ 0x00096310
 WorldLight::~WorldLight()
 {
     if (unk_D4.get_unk_08())
@@ -78,6 +83,7 @@ WorldLight::~WorldLight()
 // ambient, point, spot, soft spot); 1 to 4 set its settings, which are then
 // given to it.
 // match: ?HandleAttributes@WorldLight@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C5630
+// sp-match: ?HandleAttributes@WorldLight@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000963A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void WorldLight::HandleAttributes(const RWS::CAttributePacket &attr)
 {
@@ -175,6 +181,7 @@ void WorldLight::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?sub_C58F0@WorldLight@@QAEXXZ @ 0x000C58F0
+// sp-match: ?sub_C58F0@WorldLight@@QAEXXZ @ 0x00096140
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void WorldLight::sub_C58F0()
 {
@@ -212,6 +219,7 @@ void WorldLight::sub_C58F0()
 }
 
 // match: ??_EWorldLight@@WBI@AEPAXI@Z @ 0x000C5A50
+// sp-match: ??_EWorldLight@@WBI@AEPAXI@Z @ 0x00096300
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

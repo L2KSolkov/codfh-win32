@@ -163,7 +163,20 @@ struct type_4E73F0
     RwInt32 unk_18;             // the next sample (0 to 94)
     RwReal unk_1C[49][95];      // each timer's samples
 
+#ifdef CODFH_SP // inline: dword_4E73F0 is static .data (SP 0x3239A8, +4 = 30.0f), no initializer or out-of-line copy
+    type_4E73F0()
+    {
+        unk_08 = 1;
+        unk_18 = 0;
+        unk_00 = 0;
+        unk_04 = 30.0f;
+        unk_08 = 0;
+        unk_0C = 0;
+        unk_10 = 0;
+    }
+#else
     type_4E73F0();
+#endif
     // Makes its switches (clearing them first) and frees them.
     void sub_184CF0();
     void sub_184E40();

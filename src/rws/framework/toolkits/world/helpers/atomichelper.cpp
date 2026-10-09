@@ -8,6 +8,7 @@
 #include "rws/atomichelper.h"
 
 // match: ?SetIsVisible@AtomicHelper@RWS@@YAXAAURpAtomic@@_N@Z @ 0x00132B50
+// sp-match: ?SetIsVisible@AtomicHelper@RWS@@YAXAAURpAtomic@@_N@Z @ 0x000E3470
 void RWS::AtomicHelper::SetIsVisible( RpAtomic& pAtomic, bool isVisible )
       {
          RwUInt32 flags = RpAtomicGetFlags(&pAtomic);
@@ -19,6 +20,7 @@ void RWS::AtomicHelper::SetIsVisible( RpAtomic& pAtomic, bool isVisible )
       }
 
 // match: ?SetCanCollide@AtomicHelper@RWS@@YAXAAURpAtomic@@_N@Z @ 0x00132B90
+// sp-match: ?SetCanCollide@AtomicHelper@RWS@@YAXAAURpAtomic@@_N@Z @ 0x000E3490
 void RWS::AtomicHelper::SetCanCollide( RpAtomic& pAtomic, bool canCollide )
       {
          RwUInt32 flags = RpAtomicGetFlags(&pAtomic);

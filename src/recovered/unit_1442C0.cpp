@@ -27,11 +27,13 @@
 // match: ??0type_4E5CC8@@QAE@XZ @ 0x001442C0
 // match: __ehhandler$??0type_4E5CC8@@QAE@XZ-0x8 @ 0x00301A60
 // match: __ehhandler$??0type_4E5CC8@@QAE@XZ @ 0x00301A68
+// sp-match: ??0type_4E5CC8@@QAE@XZ @ 0x000EFC00
 type_4E5CC8::type_4E5CC8()
 {
     sub_144310();
 }
 // match: ?sub_144310@type_4E5CC8@@QAEXXZ @ 0x00144310
+// sp-match: ?sub_144310@type_4E5CC8@@QAEXXZ @ 0x000EFA20
 void type_4E5CC8::sub_144310()
 {
     unk_00.sub_16B830();
@@ -40,6 +42,7 @@ void type_4E5CC8::sub_144310()
 // match: ?sub_144330@type_4E5CC8@@QAEXXZ @ 0x00144330
 // match: __ehhandler$?sub_144330@type_4E5CC8@@QAEXXZ-0x8 @ 0x00301A80
 // match: __ehhandler$?sub_144330@type_4E5CC8@@QAEXXZ @ 0x00301A88
+// sp-match: ?sub_144330@type_4E5CC8@@QAEXXZ @ 0x000EFC50
 // Destroys its texture dictionary and deletes the animations.
 void type_4E5CC8::sub_144330()
 {
@@ -49,11 +52,13 @@ void type_4E5CC8::sub_144330()
         delete (type_143DC0 *)var_14.sub_16B990();
 }
 // match: ?sub_144400@type_4E5CC8@@QAEXPAUtype_143DC0@@@Z @ 0x00144400
+// sp-match: ?sub_144400@type_4E5CC8@@QAEXPAUtype_143DC0@@@Z @ 0x000EFA40
 void type_4E5CC8::sub_144400(type_143DC0 *arg_0)
 {
     unk_00.sub_16B8B0(arg_0);
 }
 // match: ?sub_144420@type_4E5CC8@@QAEXXZ @ 0x00144420
+// sp-match: ?sub_144420@type_4E5CC8@@QAEXXZ @ 0x000EFA50
 // Steps every animation, unless dword_4CFE24 holds them.
 void type_4E5CC8::sub_144420()
 {
@@ -64,6 +69,7 @@ void type_4E5CC8::sub_144420()
     }
 }
 // match: ?sub_1444B0@type_4E5CC8@@QAEXPAURpMaterial@@H@Z @ 0x001444B0
+// sp-match: ?sub_1444B0@type_4E5CC8@@QAEXPAURpMaterial@@H@Z @ 0x000EFD00
 // Stops animating the material arg_0 (with arg_4): its entry in the first
 // animation that has it is unlinked and deleted.
 void type_4E5CC8::sub_1444B0(RpMaterial *arg_0, RwInt32 arg_4)
@@ -84,6 +90,7 @@ void type_4E5CC8::sub_1444B0(RpMaterial *arg_0, RwInt32 arg_4)
 // match: ?sub_144590@type_4E5CC8@@QAEXPAURpMaterial@@H@Z @ 0x00144590
 // match: __ehhandler$?sub_144590@type_4E5CC8@@QAEXPAURpMaterial@@H@Z-0x8 @ 0x00301AA0
 // match: __ehhandler$?sub_144590@type_4E5CC8@@QAEXPAURpMaterial@@H@Z @ 0x00301AA8
+// sp-match: ?sub_144590@type_4E5CC8@@QAEXPAURpMaterial@@H@Z @ 0x000EFAE0
 // Animates the material arg_0 (with arg_4) by the animation named as its
 // texture.
 void type_4E5CC8::sub_144590(RpMaterial *arg_0, RwInt32 arg_4)
@@ -106,6 +113,7 @@ void type_4E5CC8::sub_144590(RpMaterial *arg_0, RwInt32 arg_4)
     }
 }
 // match: ?sub_144650@type_4E5CC8@@QAEPAURwTexture@@PBD@Z @ 0x00144650
+// sp-match: ?sub_144650@type_4E5CC8@@QAEPAURwTexture@@PBD@Z @ 0x000EFBD0
 RwTexture *type_4E5CC8::sub_144650(const RwChar *arg_0)
 {
     RwTexture *var_4;
@@ -116,17 +124,20 @@ RwTexture *type_4E5CC8::sub_144650(const RwChar *arg_0)
     return var_4;
 }
 // match: ?sub_144690@type_4E5CC8@@QAEXPAURwTexDictionary@@@Z @ 0x00144690
+// sp-match: ?sub_144690@type_4E5CC8@@QAEXPAURwTexDictionary@@@Z @ 0x000EFBF0
 void type_4E5CC8::sub_144690(RwTexDictionary *arg_0)
 {
     unk_0C = arg_0;
 }
 // match: sub_1446B0 @ 0x001446B0
+// sp-match: sub_1446B0 @ 0x000EFDC0
 // The shared texture dictionary (object).
 void sub_1446B0()
 {
     object = RwTexDictionaryCreate();
 }
 // match: sub_1446C0 @ 0x001446C0
+// sp-match: sub_1446C0 @ 0x000EFFA0
 void sub_1446C0()
 {
     if (object)
@@ -136,16 +147,20 @@ void sub_1446C0()
     }
 }
 // match: ?fpCallBack@@YAPAURwTexture@@PAU1@PAX@Z @ 0x00144700
+// sp-match: ?fpCallBack@@YAPAURwTexture@@PAU1@PAX@Z @ 0x001C7590
 // Destroys the texture arg_0, warning when something else still holds it.
 RwTexture *fpCallBack(RwTexture *texture, void *pData)
 {
+#ifndef CODFH_SP // single player compiles the warning out: the body folds into destroyTexture
     if (texture->refCount > 2)
         sub_19A750("TextureManager: WARNING: Texture might not be destroyed! Ref count is: %d",
                    texture->refCount - 1);
+#endif
     RwTextureDestroy(texture);
     return texture;
 }
 // match: sub_144740 @ 0x00144740
+// sp-match: sub_144740 @ 0x000EFDD0
 // RenderWare's RwTexDictionaryStreamRead (babintex.c) as the game adapted
 // it: the textures go into the shared dictionary (object) instead of a new
 // one, one it already holds is destroyed, and with arg_4 each kept texture

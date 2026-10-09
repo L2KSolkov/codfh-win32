@@ -11,8 +11,10 @@
 #include "game/gameloop.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: single player has no unreferenced 16.666666f here: the fonts path follows sp_fendbase's vtable (SP 0x2E4154)
 // 0x003D8CAC
 extern const RwReal flt_3D8CAC = 16.666666f;
+#endif
 // End of its data definitions.
 
 // Its data (PLAN M5): literals, constants and tables where the image has them.

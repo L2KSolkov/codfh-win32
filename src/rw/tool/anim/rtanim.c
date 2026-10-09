@@ -248,6 +248,7 @@ RtAnimInitialize(void)
 // match: _rcsid @ 0x003EE128
 
 // match: _RtAnimRegisterInterpolationScheme @ 0x00252000
+// sp-match: _RtAnimRegisterInterpolationScheme @ 0x00166130
 RwBool
 RtAnimRegisterInterpolationScheme(RtAnimInterpolatorInfo *interpInfo)
 {
@@ -299,6 +300,7 @@ RtAnimRegisterInterpolationScheme(RtAnimInterpolatorInfo *interpInfo)
  * \see RtAnimRegisterInterpolationScheme
  */
 // match: _RtAnimGetInterpolatorInfo @ 0x002520A0
+// sp-match: _RtAnimGetInterpolatorInfo @ 0x001661D0
 RtAnimInterpolatorInfo *
 RtAnimGetInterpolatorInfo(RwInt32 typeID)
 {
@@ -339,6 +341,7 @@ RtAnimGetInterpolatorInfo(RwInt32 typeID)
  */
 
 // match: _RtAnimAnimationCreate @ 0x00252110
+// sp-match: _RtAnimAnimationCreate @ 0x00166240
 RtAnimAnimation         *
 RtAnimAnimationCreate(RwInt32 typeID,
                        RwInt32 numFrames,
@@ -395,6 +398,7 @@ RtAnimAnimationCreate(RwInt32 typeID,
  */
 
 // match: _RtAnimAnimationDestroy @ 0x00252190
+// sp-match: _RtAnimAnimationDestroy @ 0x001662C0
 RwBool
 RtAnimAnimationDestroy(RtAnimAnimation *animation)
 {
@@ -536,6 +540,7 @@ RtAnimAnimationWrite(const RtAnimAnimation *animation, const RwChar *filename)
  */
 
 // match: _RtAnimAnimationStreamRead @ 0x002521B0
+// sp-match: _RtAnimAnimationStreamRead @ 0x001662E0
 RtAnimAnimation         *
 RtAnimAnimationStreamRead(RwStream *stream)
 {
@@ -633,6 +638,7 @@ RtAnimAnimationStreamRead(RwStream *stream)
  */
 
 // match: _RtAnimAnimationStreamWrite @ 0x00252610
+// sp-match: _RtAnimAnimationStreamWrite @ 0x00166750
 RwBool
 RtAnimAnimationStreamWrite(const RtAnimAnimation *animation,
                             RwStream *stream)
@@ -695,6 +701,7 @@ RtAnimAnimationStreamWrite(const RtAnimAnimation *animation,
  *
  */
 // match: _RtAnimAnimationStreamGetSize @ 0x00252290
+// sp-match: _RtAnimAnimationStreamGetSize @ 0x001663C0
 RwInt32
 RtAnimAnimationStreamGetSize(const RtAnimAnimation *animation)
 {
@@ -728,6 +735,7 @@ RtAnimAnimationStreamGetSize(const RtAnimAnimation *animation)
  * \return The number of nodes
  */
 // match: _RtAnimAnimationGetNumNodes @ 0x002522B0
+// sp-match: _RtAnimAnimationGetNumNodes @ 0x001663E0
 RwUInt32
 RtAnimAnimationGetNumNodes(const RtAnimAnimation *animation)
 {
@@ -834,6 +842,7 @@ RtAnimAnimationGetTypeID(RtAnimAnimation *animation)
  * \see RtAnimInterpolatorCreateSubInterpolator
  */
 // match: _RtAnimInterpolatorCreate @ 0x002522E0
+// sp-match: _RtAnimInterpolatorCreate @ 0x00166410
 RtAnimInterpolator *
 RtAnimInterpolatorCreate(RwInt32 numNodes,
                          RwInt32 maxInterpKeyFrameSize)
@@ -892,6 +901,7 @@ RtAnimInterpolatorCreate(RwInt32 numNodes,
  * \see RtAnimInterpolatorCreateSubInterpolator
  */
 void
+// sp-match: _RtAnimInterpolatorDestroy @ 0x00166490
 RtAnimInterpolatorDestroy(RtAnimInterpolator *anim)
 {
     RWAPIFUNCTION(RWSTRING("RtAnimInterpolatorDestroy"));
@@ -921,6 +931,7 @@ RtAnimInterpolatorDestroy(RtAnimInterpolator *anim)
  *
  */
 // match: _RtAnimInterpolatorSetCurrentAnim @ 0x00252360
+// sp-match: _RtAnimInterpolatorSetCurrentAnim @ 0x001664A0
 RwBool
 RtAnimInterpolatorSetCurrentAnim(RtAnimInterpolator *animI,
                                RtAnimAnimation *anim)
@@ -1162,6 +1173,7 @@ RtAnimInterpolatorCopy(RtAnimInterpolator *outAnim,
  */
 
 // match: _RtAnimInterpolatorSubAnimTime @ 0x002526C0
+// sp-match: _RtAnimInterpolatorSubAnimTime @ 0x00166800
 RwBool
 RtAnimInterpolatorSubAnimTime(RtAnimInterpolator *interp,
                               RwReal time)
@@ -1285,6 +1297,7 @@ RtAnimInterpolatorSubAnimTime(RtAnimInterpolator *interp,
  * \see RtAnimInterpolatorSubAnimTime
  */
 // match: _RtAnimInterpolatorAddAnimTime @ 0x00252430
+// sp-match: _RtAnimInterpolatorAddAnimTime @ 0x00166570
 RwBool
 RtAnimInterpolatorAddAnimTime(RtAnimInterpolator *interp, RwReal time)
 {
@@ -1460,6 +1473,7 @@ RtAnimInterpolatorAddAnimTime(RtAnimInterpolator *interp, RwReal time)
  * \see RtAnimInterpolatorSetCurrentTime
  */
 // match: _RtAnimInterpolatorSetCurrentTime @ 0x00252830
+// sp-match: _RtAnimInterpolatorSetCurrentTime @ 0x00166970
 RwBool
 RtAnimInterpolatorSetCurrentTime(RtAnimInterpolator *anim,
                                    RwReal time)

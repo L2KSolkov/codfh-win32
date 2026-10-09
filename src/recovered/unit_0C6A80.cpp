@@ -29,21 +29,26 @@ RWS_REGISTERCLASS(PlaySoundTrigger);
 // match: ?MakeNew@PlaySoundTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C6A80
 // match: __ehhandler$?MakeNew@PlaySoundTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300880
 // match: __ehhandler$?MakeNew@PlaySoundTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030088F
+// sp-match: ?MakeNew@PlaySoundTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00097590
 RWS_DEFINE_MAKENEW(PlaySoundTrigger)
 
 // match: ??0PlaySoundTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C6B00
+// sp-match: ??0PlaySoundTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00097340
 PlaySoundTrigger::PlaySoundTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
 }
 
 // match: ??_GPlaySoundTrigger@@UAEPAXI@Z @ 0x000C6B50
+// sp-match: ??_GPlaySoundTrigger@@UAEPAXI@Z @ 0x00097580
 
 // match: ??1PlaySoundTrigger@@UAE@XZ @ 0x000C6B70
+// sp-match: ??1PlaySoundTrigger@@UAE@XZ @ 0x00097380
 PlaySoundTrigger::~PlaySoundTrigger()
 {
 }
 
 // match: ?HandleAttributes@PlaySoundTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C6BA0
+// sp-match: ?HandleAttributes@PlaySoundTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000973A0
 void PlaySoundTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -78,6 +83,7 @@ void PlaySoundTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_030@PlaySoundTrigger@@UAEXXZ @ 0x000C6CF0
+// sp-match: ?vf_030@PlaySoundTrigger@@UAEXXZ @ 0x000974C0
 void PlaySoundTrigger::vf_030()
 {
     type_3D3548 *var_4;
@@ -102,11 +108,13 @@ void PlaySoundTrigger::vf_030()
 }
 
 // match: ??_EPlaySoundTrigger@@WBI@AEPAXI@Z @ 0x000C6DE0
+// sp-match: ??_EPlaySoundTrigger@@WBI@AEPAXI@Z @ 0x00097570
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ?HandleEvents@PlaySoundTrigger@@UAEXAAVCMsg@RWS@@@Z (folded into 0xBB1B0)
+// sp-match: ?HandleEvents@PlaySoundTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000974A0
 void PlaySoundTrigger::HandleEvents(class RWS::CMsg & pMsg)
 {
     if (pMsg.Id.p_msgrec == dword_4B67B8.p_msgrec)
@@ -117,6 +125,7 @@ void PlaySoundTrigger::HandleEvents(class RWS::CMsg & pMsg)
 }
 
 // ?vf_008@PlaySoundTrigger@@UAEHXZ (folded into 0x1B3C10)
+// sp-match: ?vf_008@PlaySoundTrigger@@UAEHXZ @ 0x00097370
 RwInt32 PlaySoundTrigger::vf_008()
 {
     return 13;

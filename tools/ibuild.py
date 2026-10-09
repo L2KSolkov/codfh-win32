@@ -171,6 +171,9 @@ def sources_step():
     sources = sorted(glob.glob(os.path.join(ROOT, 'src', '**', '*.cpp'), recursive=True)
                      + glob.glob(os.path.join(ROOT, 'src', '**', '*.c'), recursive=True)
                      + glob.glob(os.path.join(ROOT, 'src', '**', '*.asm'), recursive=True))
+    # (src/sp is the single player's: never part of the multiplayer image; portbuild.py --sp builds it)
+    sp = os.path.join(ROOT, 'src', 'sp') + os.sep
+    sources = [s for s in sources if not s.startswith(sp)]
     jobs = int(os.environ.get('BUILD_JOBS') or os.cpu_count() or 1)
     failures = compiled = 0
     with ProcessPoolExecutor(max_workers=jobs) as pool:

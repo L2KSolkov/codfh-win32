@@ -104,6 +104,7 @@ _rt2dHandlerDefaultPlay(Rt2dMaestro *maestro, Rt2dMessage *message)
 
 
 static Rt2dMessage *
+// sp-match: __rt2dHandlerDefaultNextFrame @ 0x00171380
 _rt2dHandlerDefaultNextFrame(Rt2dMaestro *maestro, Rt2dMessage *message)
 {
     RwInt32                 frameIndex;
@@ -128,6 +129,7 @@ _rt2dHandlerDefaultNextFrame(Rt2dMaestro *maestro, Rt2dMessage *message)
 }
 
 static Rt2dMessage *
+// sp-match: __rt2dHandlerDefaultPrevFrame @ 0x001713D0
 _rt2dHandlerDefaultPrevFrame(Rt2dMaestro *maestro, Rt2dMessage *message)
 {
     RwInt32                 frameIndex;
@@ -175,6 +177,7 @@ _rt2dHandlerDefaultGotoFrame(Rt2dMaestro *maestro, Rt2dMessage *message)
 
 
 static Rt2dMessage *
+// sp-match: __rt2dHandlerDefaultGotoLabel @ 0x00171410
 _rt2dHandlerDefaultGotoLabel(Rt2dMaestro *maestro, Rt2dMessage *message)
 {
     RwInt32                 frameIndex;
@@ -230,6 +233,7 @@ _rt2dHandlerDefaultForeign(Rt2dMaestro *maestro __RWUNUSED__, Rt2dMessage *messa
 }
 
 void
+// sp-match: __rt2dApplyMouseState @ 0x00171450
 _rt2dApplyMouseState(Rt2dMaestro *maestro, RwV2d *point)
 {
     RwInt32                 keyframeIndex, i, j, k, numButton, numAnim, *buttonIndex, oldAnimIndex;
@@ -396,6 +400,7 @@ _rt2dHandlerDefaultMouseMoveTo(Rt2dMaestro *maestro, Rt2dMessage *message)
 }
 
 static Rt2dMessage *
+// sp-match: __rt2dHandlerDefaultMouseButtonState @ 0x001716A0
 _rt2dHandlerDefaultMouseButtonState(Rt2dMaestro *maestro, Rt2dMessage *message)
 {
     RwInt32                 keyframeIndex, i, j, k, numAnim, numButton, *buttonIndex, oldAnimIndex;
@@ -533,6 +538,7 @@ _rt2dHandlerDefaultMouseButtonState(Rt2dMaestro *maestro, Rt2dMessage *message)
 }
 
 static Rt2dMessage *
+// sp-match: __rt2dHandlerDefaultButtonByLabel @ 0x001718C0
 _rt2dHandlerDefaultButtonByLabel(Rt2dMaestro *maestro, Rt2dMessage *message)
 {
     Rt2dAnimNode            *animNode;
@@ -647,6 +653,7 @@ _rt2dHandlerDefaultButtonByLabel(Rt2dMaestro *maestro, Rt2dMessage *message)
  */
 
 Rt2dMessage *
+// sp-match: _Rt2dMessageHandlerDefaultCallBack @ 0x001719D0
 Rt2dMessageHandlerDefaultCallBack(Rt2dMaestro *maestro, Rt2dMessage *message)
 {
     Rt2dMessage             *result;
@@ -777,6 +784,7 @@ Rt2dMaestroGetMessageHandler(Rt2dMaestro *maestro)
  */
 
 Rt2dMaestro *
+// sp-match: _Rt2dMaestroSetMessageHandler @ 0x00171B40
 Rt2dMaestroSetMessageHandler(Rt2dMaestro *maestro, Rt2dMessageHandlerCallBack handler)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dMaestroSetMessageHandler"));

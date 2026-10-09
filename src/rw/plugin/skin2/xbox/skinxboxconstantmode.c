@@ -21,6 +21,7 @@ static RwBool in192ConstantMode;
 // match: _rcsid @ 0x00419078
 
 // match: __rpSkinXboxTo192Constants @ 0x002D4B20
+// sp-match: __rpSkinXboxTo192Constants @ 0x001EF460
 void
 _rpSkinXboxTo192Constants(void)
 {
@@ -29,6 +30,7 @@ _rpSkinXboxTo192Constants(void)
 }
 
 // match: __rpSkinXboxTo96Constants @ 0x002D4B40
+// sp-match: __rpSkinXboxTo96Constants @ 0x001EF480
 void
 _rpSkinXboxTo96Constants(void)
 {

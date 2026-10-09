@@ -41,11 +41,13 @@ RWS_REGISTERCLASS(ShrimpTrigger);
 // match: ?MakeNew@ShrimpTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000CAE20
 // match: __ehhandler$?MakeNew@ShrimpTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300A60
 // match: __ehhandler$?MakeNew@ShrimpTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00300A6F
+// sp-match: ?MakeNew@ShrimpTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0009A3F0
 RWS_DEFINE_MAKENEW(ShrimpTrigger)
 
 // match: ??0ShrimpTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000CAEA0
 // match: __ehhandler$??0ShrimpTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x24 @ 0x00300A80
 // match: __ehhandler$??0ShrimpTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300AA4
+// sp-match: ??0ShrimpTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0009A040
 ShrimpTrigger::ShrimpTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_C0.unk_00 = 0;
@@ -65,19 +67,24 @@ ShrimpTrigger::ShrimpTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 
 // match: ??1type_17CC40@@UAE@XZ @ 0x000CB040
 // match: ??_Gtype_17CC40@@UAEPAXI@Z @ 0x000CB060
+// sp-match: ??_Gtype_17CC40@@UAEPAXI@Z @ 0x0009A010
+// sp-match: ??1type_17CC40@@UAE@XZ @ 0x0009A000
 // (Defined in the struct, in type_17CC40.h.)
 
 // match: ?vf_00C@ShrimpTrigger@@UAEHXZ @ 0x000CB0A0
+// sp-match: ?vf_00C@ShrimpTrigger@@UAEHXZ @ 0x0009A150
 RwInt32 ShrimpTrigger::vf_00C()
 {
     return unk_E4;
 }
 
 // match: ??_GShrimpTrigger@@UAEPAXI@Z @ 0x000CB0C0
+// sp-match: ??_GShrimpTrigger@@UAEPAXI@Z @ 0x0009A3E0
 
 // match: ??1ShrimpTrigger@@UAE@XZ @ 0x000CB0E0
 // match: __ehhandler$??1ShrimpTrigger@@UAE@XZ-0x24 @ 0x00300AB0
 // match: __ehhandler$??1ShrimpTrigger@@UAE@XZ @ 0x00300AD4
+// sp-match: ??1ShrimpTrigger@@UAE@XZ @ 0x0009A160
 ShrimpTrigger::~ShrimpTrigger()
 {
     UnLinkMsg(RWS::iMsgStartSystem);
@@ -86,6 +93,7 @@ ShrimpTrigger::~ShrimpTrigger()
 }
 
 // match: ?HandleAttributes@ShrimpTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000CB190
+// sp-match: ?HandleAttributes@ShrimpTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0009A1F0
 void ShrimpTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -138,6 +146,7 @@ void ShrimpTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_020@ShrimpTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000CB370
+// sp-match: ?vf_020@ShrimpTrigger@@UAEPAUtype_3D3548@@XZ @ 0x0009A360
 type_3D3548 *ShrimpTrigger::vf_020()
 {
     type_3D3548 *var_4;
@@ -156,6 +165,7 @@ type_3D3548 *ShrimpTrigger::vf_020()
 }
 
 // match: ?vf_010@ShrimpTrigger@@UAEXHH@Z @ 0x000CB3C0
+// sp-match: ?vf_010@ShrimpTrigger@@UAEXHH@Z @ 0x0009A390
 void ShrimpTrigger::vf_010(RwInt32 arg_0, RwInt32 arg_4)
 {
     if (arg_0)
@@ -176,6 +186,7 @@ void ShrimpTrigger::vf_010(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ??_EShrimpTrigger@@WBI@AEPAXI@Z @ 0x000CB420
+// sp-match: ??_EShrimpTrigger@@WBI@AEPAXI@Z @ 0x0009A3D0
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

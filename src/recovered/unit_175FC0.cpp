@@ -16,6 +16,7 @@
 #include "game/gameloop.h"
 #include "rw/bavector.h"
 
+#if !defined(CODFH_SP) || CODFH_SP_PART == 2 // single player: the data with the second of its two files (src/sp/units/sp_unit_175FC0_2.cpp)
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003DDB7C
 extern const RwReal flt_3DDB7C = 16.666666f;
@@ -42,6 +43,7 @@ RwReal flt_42A03C = 4.0f;
 RwInt32 dword_4E5F00;
 // End of its data definitions.
 
+#endif
 
 extern type_4E5E50 unk_4E5E50;   // unit_174950 defines it (its initializer is placed there)
 
@@ -55,9 +57,11 @@ extern type_4E5E50 unk_4E5E50;   // unit_174950 defines it (its initializer is p
 // match: ?flt_42A038@@3MA @ 0x0042A038
 // match: ?flt_42A03C@@3MA @ 0x0042A03C
 
+#if !defined(CODFH_SP) || CODFH_SP_PART == 1 // single player compiles the constructors and the destructor in a file of their own (sp_unit_175FC0_1.cpp, SP 0x110200-0x1102C0)
 // match: ??0type_4E5E50@@QAE@XZ @ 0x00175FC0
 // match: __ehhandler$??0type_4E5E50@@QAE@XZ-0x2C @ 0x00302030
 // match: __ehhandler$??0type_4E5E50@@QAE@XZ @ 0x0030205C
+// sp-match: ??0type_4E5E50@@QAE@XZ @ 0x00110240
 
 type_4E5E50::type_4E5E50()
 {
@@ -65,6 +69,7 @@ type_4E5E50::type_4E5E50()
 }
 
 // match: ??0type_176040@@QAE@XZ @ 0x00176040
+// sp-match: ??0type_176040@@QAE@XZ @ 0x00110200
 type_176040::type_176040()
 {
     unk_00 = (RwReal)(rand() % 16384);
@@ -76,11 +81,15 @@ type_176040::type_176040()
 // match: ??1type_4E5E50@@QAE@XZ @ 0x00176090
 // match: __ehhandler$??1type_4E5E50@@QAE@XZ-0x16 @ 0x00302070
 // match: __ehhandler$??1type_4E5E50@@QAE@XZ @ 0x00302086
+// sp-match: ??1type_4E5E50@@QAE@XZ @ 0x001102C0
 type_4E5E50::~type_4E5E50()
 {
 }
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 2
 // match: ?sub_176100@type_4E5E50@@QAEXXZ @ 0x00176100
+// sp-match: ?sub_176100@type_4E5E50@@QAEXXZ @ 0x001111B0
 // Stops every effect and clears the table's last-start times.
 void type_4E5E50::sub_176100()
 {
@@ -101,6 +110,7 @@ void type_4E5E50::sub_176100()
 }
 
 // match: ?sub_176180@type_4E5E50@@QAEXHPAURwV3d@@MM@Z @ 0x00176180
+// sp-match: ?sub_176180@type_4E5E50@@QAEXHPAURwV3d@@MM@Z @ 0x001113E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Starts the effect arg_0 at the point arg_4 (0: at full strength) with
 // the size arg_8 (and the time arg_C, 0 for the table's), unless a higher
@@ -125,7 +135,13 @@ void type_4E5E50::sub_176180(RwInt32 arg_0, RwV3d *arg_4, RwReal arg_8, RwReal a
         return;
     if (bp_8->unk_02 != 0 && bp_8->unk_00 < unk_3C)
         return;
+#ifdef CODFH_SP
+    // shape: the time scaled in a second step (SP 0x1113E0 multiplies twice)
+    bp_4 = dword_4B87C8 * flt_3DDB7C;
+    bp_4 /= 1000.0f;
+#else
     bp_4 = dword_4B87C8 * flt_3DDB7C / 1000.0f;
+#endif
     if (bp_4 - bp_8->unk_1C < bp_8->unk_18)
         return;
     bp_8->unk_1C = bp_4;
@@ -160,7 +176,12 @@ void type_4E5E50::sub_176180(RwInt32 arg_0, RwV3d *arg_4, RwReal arg_8, RwReal a
         unk_0C = 0;
         if (!dword_4E5F00 && bp_8->unk_14)
         {
+#ifdef CODFH_SP
+            // shape: the rumble strength from the table's value first (SP 0x1113E0)
+            lcl_28 = (RwInt32)((RwReal)bp_8->unk_14 * flt_42A038 * m_18 * arg_8);
+#else
             lcl_28 = (RwInt32)((arg_8 * m_18) * ((RwReal)bp_8->unk_14) * (RwDouble)flt_42A038);
+#endif
             if (lcl_28 > 255)
                 lcl_28 = 255;
             var_30 = (RwInt32)(var_2C = flt_42A03C * unk_14);
@@ -185,6 +206,7 @@ void type_4E5E50::sub_176180(RwInt32 arg_0, RwV3d *arg_4, RwReal arg_8, RwReal a
 }
 
 // match: ?sub_176420@type_4E5E50@@QAEPAUtype_429EB8@@H@Z @ 0x00176420
+// sp-match: ?sub_176420@type_4E5E50@@QAEPAUtype_429EB8@@H@Z @ 0x001111F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The table's effect arg_0.
 type_429EB8 *type_4E5E50::sub_176420(RwInt32 arg_0)
@@ -204,6 +226,7 @@ type_429EB8 *type_4E5E50::sub_176420(RwInt32 arg_0)
 }
 
 // match: ?sub_176470@type_4E5E50@@QAEPAUtype_429EB8@@HM@Z @ 0x00176470
+// sp-match: ?sub_176470@type_4E5E50@@QAEPAUtype_429EB8@@HM@Z @ 0x00111220
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Seeds the noise of the effect arg_0's kind with its speed and size, and
 // its time left (arg_4, or the table's).
@@ -246,6 +269,7 @@ type_429EB8 *type_4E5E50::sub_176470(RwInt32 arg_0, RwReal arg_4)
 }
 
 // match: ?sub_1765E0@type_4E5E50@@QAEPAURwMatrixTag@@PAU2@@Z @ 0x001765E0
+// sp-match: ?sub_1765E0@type_4E5E50@@QAEPAURwMatrixTag@@PAU2@@Z @ 0x001115F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Turns the matrix arg_0 by the effects' noise (once a frame each is
 // advanced, and one whose time is up stopped) and returns it.
@@ -260,7 +284,12 @@ RwMatrix *type_4E5E50::sub_1765E0(RwMatrix *arg_0)
         return arg_0;
     if (!unk_3C && !unk_10 && !unk_68)
         return arg_0;
+#ifdef CODFH_SP
+    // shape: the product parenthesized, so the two constants are not folded (SP 0x1115F0 multiplies twice)
+    static RwReal s_step = (deltaTime * flt_3DDB7C) / 1000.0f;
+#else
     static RwReal s_step = deltaTime * flt_3DDB7C / 1000.0f;
+#endif
     if (unk_04 != dword_4B87D8)
     {
         unk_04 = dword_4B87D8;
@@ -286,7 +315,12 @@ RwMatrix *type_4E5E50::sub_1765E0(RwMatrix *arg_0)
     {
         ebp_14 = unk_44;
         if (unk_40 < 0.1f)
+#ifdef CODFH_SP
+            // shape: the fade fraction parenthesized, not reassociated (SP 0x1115F0)
+            ebp_14 = (unk_40 / 0.1f) * ebp_14;
+#else
             ebp_14 = unk_40 / 0.1f * ebp_14;
+#endif
         sub_176AB0(unk_48, unk_40, ebp_14, 0, &var_20, 0);
     }
     else if (unk_68)
@@ -297,7 +331,12 @@ RwMatrix *type_4E5E50::sub_1765E0(RwMatrix *arg_0)
     {
         ebp_14 = unk_18;
         if (unk_14 < 0.1f)
+#ifdef CODFH_SP
+            // shape: the fade fraction parenthesized, not reassociated (SP 0x1115F0)
+            ebp_14 = (unk_14 / 0.1f) * ebp_14;
+#else
             ebp_14 = unk_14 / 0.1f * ebp_14;
+#endif
         sub_176AB0(unk_1C, unk_14, ebp_14, unk_00, &var_20, 1);
     }
     sub_13FDA0(&var_20, &lv_10);
@@ -311,6 +350,7 @@ RwMatrix *type_4E5E50::sub_1765E0(RwMatrix *arg_0)
 }
 
 // match: ?sub_176A10@type_4E5E50@@QAEXXZ @ 0x00176A10
+// sp-match: ?sub_176A10@type_4E5E50@@QAEXXZ @ 0x00111300
 // Stops the sway (and its rumble), and goes back to the drift.
 void type_4E5E50::sub_176A10()
 {
@@ -323,6 +363,7 @@ void type_4E5E50::sub_176A10()
 }
 
 // match: ?sub_176A90@type_4E5E50@@QAEXXZ @ 0x00176A90
+// sp-match: ?sub_176A90@type_4E5E50@@QAEXXZ @ 0x00111360
 // Stops the shake.
 void type_4E5E50::sub_176A90()
 {
@@ -331,6 +372,7 @@ void type_4E5E50::sub_176A90()
 }
 
 // match: ?sub_176AB0@type_4E5E50@@QAEXPAUtype_176040@@MMMPAURwV3d@@H@Z @ 0x00176AB0
+// sp-match: ?sub_176AB0@type_4E5E50@@QAEXPAUtype_176040@@MMMPAURwV3d@@H@Z @ 0x00111370
 // Adds the two noises arg_0 by the time arg_4 and size arg_8 (by the scale
 // arg_C too, when arg_14 is set) to the angles *arg_10.
 void type_4E5E50::sub_176AB0(type_176040 *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C, RwV3d *arg_10,
@@ -355,3 +397,4 @@ void type_4E5E50::sub_176AB0(type_176040 *arg_0, RwReal arg_4, RwReal arg_8, RwR
 type_176040::~type_176040()
 {
 }
+#endif

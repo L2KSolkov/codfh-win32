@@ -43,12 +43,14 @@ RWS_REGISTERCLASS(PulseZoneTrigger);
 // match: ?MakeNew@PulseZoneTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000CB430
 // match: __ehhandler$?MakeNew@PulseZoneTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300AE0
 // match: __ehhandler$?MakeNew@PulseZoneTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00300AEF
+// sp-match: ?MakeNew@PulseZoneTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0009A7F0
 RWS_DEFINE_MAKENEW(PulseZoneTrigger)
 
 // Its handler serves the destructor too (folded by /OPT:ICF).
 // match: ??0PulseZoneTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000CB4B0
 // match: __ehhandler$??0PulseZoneTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x8 @ 0x00300B00
 // match: __ehhandler$??0PulseZoneTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300B08
+// sp-match: ??0PulseZoneTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0009A460
 PulseZoneTrigger::PulseZoneTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_C0 = 0;
@@ -65,8 +67,10 @@ PulseZoneTrigger::PulseZoneTrigger(const RWS::CAttributePacket &attr) : Trigger(
 }
 
 // match: ??_GPulseZoneTrigger@@UAEPAXI@Z @ 0x000CB5C0
+// sp-match: ??_GPulseZoneTrigger@@UAEPAXI@Z @ 0x0009A7E0
 
 // match: ??1PulseZoneTrigger@@UAE@XZ @ 0x000CB5E0
+// sp-match: ??1PulseZoneTrigger@@UAE@XZ @ 0x0009A520
 PulseZoneTrigger::~PulseZoneTrigger()
 {
     UnLinkMsg(dword_4B8750);
@@ -74,6 +78,7 @@ PulseZoneTrigger::~PulseZoneTrigger()
 }
 
 // match: ?HandleAttributes@PulseZoneTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000CB660
+// sp-match: ?HandleAttributes@PulseZoneTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0009A590
 void PulseZoneTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -120,6 +125,7 @@ void PulseZoneTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?HandleEvents@PulseZoneTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000CB850
+// sp-match: ?HandleEvents@PulseZoneTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x0009A720
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void PulseZoneTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
@@ -148,6 +154,7 @@ void PulseZoneTrigger::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?sub_CB960@PulseZoneTrigger@@QAEXH@Z @ 0x000CB960
+// sp-match: ?sub_CB960@PulseZoneTrigger@@QAEXH@Z @ 0x0009A790
 void PulseZoneTrigger::sub_CB960(RwInt32 arg_0)
 {
     if (unk_D8)
@@ -157,6 +164,7 @@ void PulseZoneTrigger::sub_CB960(RwInt32 arg_0)
 }
 
 // match: ?sub_CB990@PulseZoneTrigger@@QAEXH@Z @ 0x000CB990
+// sp-match: ?sub_CB990@PulseZoneTrigger@@QAEXH@Z @ 0x0009A7B0
 void PulseZoneTrigger::sub_CB990(RwInt32 arg_0)
 {
     if (unk_D8)
@@ -166,6 +174,7 @@ void PulseZoneTrigger::sub_CB990(RwInt32 arg_0)
 }
 
 // match: ??_EPulseZoneTrigger@@WBI@AEPAXI@Z @ 0x000CB9C0
+// sp-match: ??_EPulseZoneTrigger@@WBI@AEPAXI@Z @ 0x0009A7D0
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

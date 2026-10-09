@@ -44,9 +44,11 @@ RWS_REGISTERCLASS(DogTrigger);
 // match: ?MakeNew@DogTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A3E80
 // match: __ehhandler$?MakeNew@DogTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFEB0
 // match: __ehhandler$?MakeNew@DogTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFEBF
+// sp-match: ?MakeNew@DogTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000806B0
 RWS_DEFINE_MAKENEW(DogTrigger)
 
 // match: ??0DogTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A3F00
+// sp-match: ??0DogTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007FFE0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 DogTrigger::DogTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
@@ -83,10 +85,12 @@ DogTrigger::DogTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 }
 
 // match: ??_GDogTrigger@@UAEPAXI@Z @ 0x000A4110
+// sp-match: ??_GDogTrigger@@UAEPAXI@Z @ 0x000806A0
 
 // match: ??1DogTrigger@@UAE@XZ @ 0x000A4130
 // match: __ehhandler$??1DogTrigger@@UAE@XZ-0x16 @ 0x002FFED0
 // match: __ehhandler$??1DogTrigger@@UAE@XZ @ 0x002FFEE6
+// sp-match: ??1DogTrigger@@UAE@XZ @ 0x00080110
 DogTrigger::~DogTrigger()
 {
     if (unk_124)
@@ -97,6 +101,7 @@ DogTrigger::~DogTrigger()
 
 // Commands 2 and 3 first (the kind of names unk_118 picks), then the rest.
 // match: ?HandleAttributes@DogTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A41B0
+// sp-match: ?HandleAttributes@DogTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00080180
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void DogTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
@@ -251,6 +256,7 @@ void DogTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_020@DogTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000A4840
+// sp-match: ?vf_020@DogTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000805E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_3D3548 *DogTrigger::vf_020()
 {
@@ -275,6 +281,7 @@ type_3D3548 *DogTrigger::vf_020()
 }
 
 // match: ?sub_A48B0@DogTrigger@@QAEXPAUtype_3D2E7C@@@Z @ 0x000A48B0
+// sp-match: ?sub_A48B0@DogTrigger@@QAEXPAUtype_3D2E7C@@@Z @ 0x00080620
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void DogTrigger::sub_A48B0(type_3D2E7C *arg_0)
 {
@@ -293,6 +300,7 @@ void DogTrigger::sub_A48B0(type_3D2E7C *arg_0)
 }
 
 // match: ??_EDogTrigger@@WBI@AEPAXI@Z @ 0x000A4940
+// sp-match: ??_EDogTrigger@@WBI@AEPAXI@Z @ 0x00080690
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

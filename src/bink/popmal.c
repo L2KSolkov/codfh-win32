@@ -22,6 +22,7 @@ static U32 cursize = 32;
 // match: _cursize @ 0x00431184
 
 // match: _pushmalloc@8 @ 0x00258B20
+// sp-match: _pushmalloc@8 @ 0x00174990
 
 RADEXPFUNC void RADEXPLINK pushmalloc(void PTR4 *ptr, U32 amount)
 {
@@ -50,12 +51,14 @@ RADEXPFUNC void RADEXPLINK pushmalloc(void PTR4 *ptr, U32 amount)
 }
 
 // match: _popmalloctotal@0 @ 0x00258C00
+// sp-match: _popmalloctotal@0 @ 0x00174A70
 RADEXPFUNC U32 RADEXPLINK popmalloctotal(void)
 {
   return pushtot;
 }
 
 // match: _popmalloc@4 @ 0x00258C10
+// sp-match: _popmalloc@4 @ 0x00174A80
 RADEXPFUNC void PTR4 *RADEXPLINK popmalloc(U32 amount)
 {
   U8 PTR4 *p;

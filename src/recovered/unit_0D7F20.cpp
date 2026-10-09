@@ -34,7 +34,9 @@
 // 0x003D7B9C
 extern const RwReal flt_3D7B9C = 16.666666f;
 // 0x0042926C
+#ifndef CODFH_SP // single player defines it in unit_0D6640, before unk_4B8744 (SP 0x321508)
 RwInt32 dword_42926C = 1;
+#endif
 // 0x00429270
 RwReal flt_429270 = 73.0f;
 // 0x00429274
@@ -81,16 +83,19 @@ RwReal flt_429280 = 1.0f;
 // match: ??_C@_0CK@LLJLCCI@Saving?5progress?5to?5Memory?5Card?5i@ @ 0x003D7DEC
 // match: __real@43e00000 @ 0x003D7E18
 // match: __real@44000000 @ 0x003D7E1C
+// sp-match: ?sub_D7F20@@YAXPADPBD@Z @ 0x000A3420
 void sub_D7F20(RwChar *arg_0, const RwChar *arg_4)
 {
     sprintf(arg_0, "%s", arg_4);
 }
 // match: ?sub_D7F40@@YAXPADPBD@Z @ 0x000D7F40
+// sp-match: ?sub_D7F40@@YAXPADPBD@Z @ 0x000A3440
 void sub_D7F40(RwChar *arg_0, const RwChar *arg_4)
 {
     sprintf(arg_0, "LEVELS\\%s\\%s", sub_19B060(sub_19B050()), arg_4);
 }
 // match: ?sub_D7F70@@YAXH@Z @ 0x000D7F70
+// sp-match: ?sub_D7F70@@YAXH@Z @ 0x000A3F90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D7F70(RwInt32 arg_0)
 {
@@ -114,10 +119,12 @@ void sub_D7F70(RwInt32 arg_0)
         m_10C = sub_142F70(l4, (type_141C10 *)&var_128);
         RwStreamClose(l4, var_1A8);
     }
+#ifndef CODFH_SP
     else
     {
         sub_19A750("Unabled to open file: %s", var108);
     }
+#endif
     if (m_10C == -1)
     {
         return;
@@ -126,6 +133,7 @@ void sub_D7F70(RwInt32 arg_0)
     dword_4E5D30[m_10C].unk_04 = 0;
 }
 // match: ?sub_D80C0@@YAHPBDP6AHPAURwStream@@PAUtype_142F70@@@ZHPAH@Z @ 0x000D80C0
+// sp-match: ?sub_D80C0@@YAHPBDP6AHPAURwStream@@PAUtype_142F70@@@ZHPAH@Z @ 0x000A3A70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_D80C0(const RwChar *arg_0, RwInt32 (*arg_4)(RwStream *, type_142F70 *), RwInt32 arg_8,
                   RwInt32 *arg_C)
@@ -173,6 +181,7 @@ RwInt32 sub_D80C0(const RwChar *arg_0, RwInt32 (*arg_4)(RwStream *, type_142F70 
     return 1;
 }
 // match: ?sub_D8230@@YAXH@Z @ 0x000D8230
+// sp-match: ?sub_D8230@@YAXH@Z @ 0x000A3BA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D8230(RwInt32 arg_0)
 {
@@ -196,6 +205,7 @@ void sub_D8230(RwInt32 arg_0)
     }
 }
 // match: ?sub_D8310@@YAHXZ @ 0x000D8310
+// sp-match: ?sub_D8310@@YAHXZ @ 0x000A3470
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_D8310()
 {
@@ -208,18 +218,23 @@ RwInt32 sub_D8310()
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_208);
     if (l4)
     {
+#ifndef CODFH_SP
         sub_19A750("Loading GODDATA.DFF file...\n");
+#endif
         RWS::CStreamHandler::ProcessStream(l4);
         RwStreamClose(l4, var_208);
     }
+#ifndef CODFH_SP
     else
     {
         sub_19A750("***Unable to load GODDATA.DFF file!\n");
     }
+#endif
     dword_4B8EF0.sub_E9FB0(3);
     return 1;
 }
 // match: ?sub_D83C0@@YAHXZ @ 0x000D83C0
+// sp-match: ?sub_D83C0@@YAHXZ @ 0x000A3C50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_D83C0()
 {
@@ -242,28 +257,36 @@ RwInt32 sub_D83C0()
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_138);
     if (l4)
     {
+#ifndef CODFH_SP
         sub_19A750("Loading GLOBAL.DFF file...\n");
+#endif
         RWS::CStreamHandler::ProcessStream(l4);
         RwStreamClose(l4, var_138);
     }
+#ifndef CODFH_SP
     else
     {
         sub_19A750("***Unable to load GLOBAL.DFF\n");
     }
+#endif
     dword_4B8EF0.sub_E9FB0(1);
     sub_D7F40(var_88, "LEVEL.DFF");
     sub_D7F20(var_138, var_88);
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_138);
     if (l4)
     {
+#ifndef CODFH_SP
         sub_19A750("Loading LEVEL.DFF file...\n");
+#endif
         RWS::CStreamHandler::ProcessStream(l4);
         RwStreamClose(l4, var_138);
     }
+#ifndef CODFH_SP
     else
     {
         sub_19A750("***Unable to load LEVEL.DFF\n");
     }
+#endif
     dword_4B8EF0.sub_E9FB0(2);
     RWS::MainLoop::StartSystem(var_9C, 0);
     RWS::MainLoop::Logic::Running();
@@ -273,22 +296,27 @@ RwInt32 sub_D83C0()
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_138);
     if (l4)
     {
+#ifndef CODFH_SP
         sub_19A750("Loading LEVEL.RWS file...\n");
+#endif
         stk_B8.unk_00 = 0x13;
         stk_B8.unk_04 = 0;
         stk_B8.unk_08 = 0;
         sub_142F70(l4, (type_141C10 *)&stk_B8);
         RwStreamClose(l4, var_138);
     }
+#ifndef CODFH_SP
     else
     {
         sub_19A750("***Unable to load LEVEL.RWS\n");
     }
+#endif
     dword_4B8EF0.sub_E9FB0(6);
     sub_D8310();
     return 1;
 }
 // match: ?sub_D8660@@YAXXZ @ 0x000D8660
+// sp-match: ?sub_D8660@@YAXXZ @ 0x000A4070
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D8660()
 {
@@ -455,6 +483,7 @@ void sub_D8660()
     }
 }
 // match: ?sub_D8A40@@YAHXZ @ 0x000D8A40
+// sp-match: ?sub_D8A40@@YAHXZ @ 0x000A3500
 RwInt32 sub_D8A40()
 {
     dword_4B86FC++;
@@ -481,6 +510,7 @@ RwInt32 sub_D8A40()
     return 1;
 }
 // match: ?sub_D8B90@@YAHXZ @ 0x000D8B90
+// sp-match: ?sub_D8B90@@YAHXZ @ 0x000A3E00
 RwInt32 sub_D8B90()
 {
     RwInt32 var_4;
@@ -491,6 +521,7 @@ RwInt32 sub_D8B90()
     return var_4;
 }
 // match: ?sub_D8BC0@@YAXXZ @ 0x000D8BC0
+// sp-match: ?sub_D8BC0@@YAXXZ @ 0x000A3E20
 void sub_D8BC0()
 {
     if (!((dword_4B86F8 >> 6) & 1))
@@ -501,12 +532,14 @@ void sub_D8BC0()
     }
 }
 // match: ?sub_D8C00@@YAXXZ @ 0x000D8C00
+// sp-match: ?sub_D8C00@@YAXXZ @ 0x000A35D0
 void sub_D8C00()
 {
     sub_19B000(-1);
     dword_4B86F8 |= 4;
 }
 // match: ?sub_D8C20@@YAXXZ @ 0x000D8C20
+// sp-match: ?sub_D8C20@@YAXXZ @ 0x000A42A0
 void sub_D8C20()
 {
     if (!((dword_4B86F8 >> 6) & 1))
@@ -517,6 +550,7 @@ void sub_D8C20()
     }
 }
 // match: ?sub_D8C60@@YAXXZ @ 0x000D8C60
+// sp-match: ?sub_D8C60@@YAXXZ @ 0x000A3E60
 void sub_D8C60()
 {
     unk_4B9308.sub_EEF90(0, 1);
@@ -525,17 +559,52 @@ void sub_D8C60()
     {
         sub_E8AC0("Credits.bik", dword_4E5C74, 1, 0);
     }
+#ifdef CODFH_SP
+    // Single player records the level and, after level 38, unlocks 0x4000
+    // and the difficulty's extras (SP 0xA3E93).
+    dword_4B8770 = sub_19B050();
+    {
+        RwInt32 *flags = &dword_4F28F0->unk_30;
+
+        if (dword_4B8770 == 38)
+        {
+            *flags |= 0x4000;
+            switch (dword_42B714)
+            {
+            case 2:
+                *flags |= 0x40;
+            case 1:
+                *flags |= 0x30;
+            case 0:
+                *flags |= 0xF;
+            }
+        }
+    }
+#endif
     sub_D8F60();
     sub_D8F80();
     sub_19B000(-1);
     dword_4B86F8 |= 4;
 }
 // match: ?sub_D8CC0@@YAXH@Z @ 0x000D8CC0
+// sp-match: ?sub_D8CC0@@YAXH@Z @ 0x000A42E0
 void sub_D8CC0(RwInt32 arg_0)
 {
     if (!((dword_4B86F8 >> 7) & 1))
     {
         dword_4B8770 = sub_19B050();
+#ifdef CODFH_SP
+        // Single player unlocks 0x1000 when entering level 12 and 0x2000 for
+        // level 18 (SP 0xA42EE).
+        {
+            type_4F28F0 *data = dword_4F28F0;
+
+            if (dword_4B8770 == 12)
+                data->unk_30 |= 0x1000;
+            else if (dword_4B8770 == 18)
+                data->unk_30 |= 0x2000;
+        }
+#endif
         sub_19B000(arg_0);
         dword_4B86F8 |= 0x80;
         sub_124EE0(2.0f, 1);
@@ -543,10 +612,17 @@ void sub_D8CC0(RwInt32 arg_0)
     }
 }
 // match: ?sub_D8D20@@YAXXZ @ 0x000D8D20
+// sp-match: ?sub_D8D20@@YAXXZ @ 0x000A4350
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D8D20()
 {
+#ifdef CODFH_SP
+    // Single player's level sequence (SP 0xA4350): twenty levels, ending
+    // with 39.
+    RwInt32 frm_24[20] = {1, 2, 4, 5, 7, 8, 11, 12, 14, 15, 17, 18, 24, 25, 26, 30, 36, 37, 38, 39};
+#else
     RwInt32 frm_24[9] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+#endif
     RwInt32 var_2C;
     RwInt32 var_28;
 
@@ -554,7 +630,11 @@ void sub_D8D20()
     {
         var_2C = sub_19B050();
         var_28 = 0;
+#ifdef CODFH_SP
+        while (frm_24[var_28] != 39)
+#else
         while (frm_24[var_28] != 9)
+#endif
         {
             if (frm_24[var_28] == var_2C)
             {
@@ -565,6 +645,7 @@ void sub_D8D20()
     }
 }
 // match: ?sub_D8DC0@@YAXXZ @ 0x000D8DC0
+// sp-match: ?sub_D8DC0@@YAXXZ @ 0x000A3F00
 void sub_D8DC0()
 {
     unk_4B9308.sub_EEF90(0, 1);
@@ -589,6 +670,7 @@ void sub_D8DC0()
     dword_4B86F8 |= 0x20;
 }
 // match: ?sub_D8E30@@YAXXZ @ 0x000D8E30
+// sp-match: ?sub_D8E30@@YAXXZ @ 0x000A35F0
 void sub_D8E30()
 {
     dword_4B877C = 1;
@@ -599,6 +681,7 @@ void sub_D8E30()
     dword_4B86F8 &= ~0x80;
 }
 // match: ?sub_D8E80@@YAXXZ @ 0x000D8E80
+// sp-match: ?sub_D8E80@@YAXXZ @ 0x000A3620
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D8E80()
 {
@@ -618,6 +701,7 @@ void sub_D8E80()
     dword_4B8EF0.sub_E9BE0(var_108, &var_110, 0, -1.0f, -1.0f, -1.0f);
 }
 // match: ?sub_D8F60@@YAXXZ @ 0x000D8F60
+// sp-match: ?sub_D8F60@@YAXXZ @ 0x000A36F0
 void sub_D8F60()
 {
     sub_85D60();
@@ -625,6 +709,7 @@ void sub_D8F60()
     dword_4B8890 = 0;
 }
 // match: ?sub_D8F80@@YAXXZ @ 0x000D8F80
+// sp-match: ?sub_D8F80@@YAXXZ @ 0x000A3710
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D8F80()
 {
@@ -658,7 +743,10 @@ void sub_D8F80()
         RwInt32 var_150;
     }
 }
+// (Single player has sub_D9120 and sub_D90B0 inline: include/types/type_DA0A0.h.)
+#ifndef CODFH_SP
 // match: ?sub_D90B0@type_D90B0@@QAEXXZ @ 0x000D90B0
+// sp-match: ?sub_D90B0@type_D90B0@@QAEXXZ @ 0x000A33C0
 void type_D90B0::sub_D90B0()
 {
     RwInt32 var_4;              // never used; the image's frame keeps its slot
@@ -669,6 +757,8 @@ void type_D90B0::sub_D90B0()
     unk_50 = 100;
     unk_58 = 0;
 }
+#endif
+#ifndef CODFH_SP
 // match: ?sub_D9120@type_D90B0@@QAEXXZ @ 0x000D9120
 void type_D90B0::sub_D9120()
 {
@@ -682,7 +772,9 @@ void type_D90B0::sub_D9120()
         unk_08[var_4] = -1;
     }
 }
+#endif
 // match: ?sub_D9180@type_D90B0@@QAE_N_N@Z @ 0x000D9180
+// sp-match: ?sub_D9180@type_D90B0@@QAE_N_N@Z @ 0x00083E70
 bool type_D90B0::sub_D9180(bool arg_0)
 {
     RwInt32 var_4;              // never used; the image's frame keeps their
@@ -703,6 +795,7 @@ bool type_D90B0::sub_D9180(bool arg_0)
     return true;
 }
 // match: ?sub_D9240@type_D90B0@@QAE_N_N@Z @ 0x000D9240
+// sp-match: ?sub_D9240@type_D90B0@@QAE_N_N@Z @ 0x00083E00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 bool type_D90B0::sub_D9240(bool arg_0)
 {
@@ -736,6 +829,7 @@ bool type_D90B0::sub_D9240(bool arg_0)
     return true;
 }
 // match: ?sub_D9320@@YAXXZ @ 0x000D9320
+// sp-match: ?sub_D9320@@YAXXZ @ 0x000A3800
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D9320()
 {
@@ -779,6 +873,7 @@ void sub_D9320()
     byte_4B8784 = (RwUInt8)dword_429EA8;
 }
 // match: ?sub_D93F0@@YAXXZ @ 0x000D93F0
+// sp-match: ?sub_D93F0@@YAXXZ @ 0x000A38C0
 void sub_D93F0()
 {
     RwInt32 var_4;
@@ -794,6 +889,7 @@ void sub_D93F0()
     dword_429EA8 = byte_4B8784;
 }
 // match: ?sub_D9450@@YAXXZ @ 0x000D9450
+// sp-match: ?sub_D9450@@YAXXZ @ 0x000A3F60
 void sub_D9450()
 {
     if (!dword_4B8710)
@@ -808,6 +904,7 @@ void sub_D9450()
     sub_D9490(0, dword_4B8734);
 }
 // match: ?sub_D9490@@YAXHH@Z @ 0x000D9490
+// sp-match: ?sub_D9490@@YAXHH@Z @ 0x000A3920
 // The loading screen's drawing: "Loading" and arg_4 dots at the screen's
 // share of (73, 56) of 512 by 448, twice on the camera (flipped between),
 // then shown. The function jumps to its end straight away: its set-up is
@@ -827,6 +924,36 @@ void sub_D9490(RwInt32 arg_0, RwInt32 arg_4)
     RwReal bp_8;
     RwCamera *bp_4;
 
+#ifdef CODFH_SP
+    // Single player draws it (SP 0xA3920): on the second camera, with the
+    // localised "_Loading" text and at most 32 dots.
+    bp_4 = (RwCamera *)dword_4E5CBC;
+    if (!bp_4)
+        return;
+    if (arg_0 == 0)
+        sprintf(stk_58, dword_4F6178[5]);
+    else
+        sprintf(stk_58, dword_4F6178[5]);
+    if (arg_4 > 32)
+        arg_4 = 32;
+    sprintf(m_6c, ".");
+    for (stk_7c = 0; stk_7c < arg_4; stk_7c++)
+        strcat(stk_58, m_6c);
+    ebp_14 = flt_429270 / 512.0f;
+    v5c = flt_429274 / 448.0f;
+    fp_78 = (RwReal)bp_4->frameBuffer->width;
+    lv_10 = (RwReal)bp_4->frameBuffer->height;
+    local_c = fp_78 * ebp_14;
+    bp_8 = lv_10 * v5c;
+    frm_74.x = local_c;
+    frm_74.y = bp_8;
+    dword_4B8EF0.sub_E9BE0(stk_58, &frm_74, 0, flt_429278, flt_42927C, flt_429280);
+    sub_126750(bp_4);
+    dword_4B8EF0.sub_E9BE0(stk_58, &frm_74, 0, flt_429278, flt_42927C, flt_429280);
+    sub_126750(bp_4);
+    sub_125ED0(bp_4, 0);
+    return;
+#endif
     goto end;
     bp_4 = (RwCamera *)dword_4E5C74;
     strcpy(stk_58, "Loading");

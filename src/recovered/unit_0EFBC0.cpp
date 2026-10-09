@@ -45,6 +45,7 @@ RwUInt32 dword_4B9E88;
 // match: ?unk_4296C0@@3Utype_4296C0@@A @ 0x004296C0
 
 // match: _RpPrtStdEmitterCreatePTank @ 0x000EFBC0
+// sp-match: _RpPrtStdEmitterCreatePTank @ 0x000B7550
 
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 extern "C" void RpPrtStdEmitterCreatePTank()
@@ -85,6 +86,7 @@ extern "C" void RpPrtStdEmitterCreatePTank()
 }
 
 // match: ?sub_EFF70@@YAXXZ @ 0x000EFF70
+// sp-match: ?sub_EFF70@@YAXXZ @ 0x000B77A0
 void sub_EFF70()
 {
     dword_4B9E7C = 0;
@@ -96,6 +98,7 @@ void sub_EFF70()
 }
 
 // match: ?sub_F0000@@YAXXZ @ 0x000F0000
+// sp-match: ?sub_F0000@@YAXXZ @ 0x000B7800
 void sub_F0000()
 {
     RwFrame *var_4;
@@ -119,6 +122,7 @@ void sub_F0000()
 }
 
 // match: ?sub_F00C0@@YAXXZ @ 0x000F00C0
+// sp-match: ?sub_F00C0@@YAXXZ @ 0x000B7880
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_F00C0()
 {
@@ -194,6 +198,7 @@ void sub_F00C0()
 }
 
 // match: ?sub_F03F0@@YAXXZ @ 0x000F03F0
+// sp-match: ?sub_F03F0@@YAXXZ @ 0x000B7AE0
 void sub_F03F0()
 {
     if (atomic)
@@ -212,6 +217,7 @@ void sub_F03F0()
 }
 
 // match: ?sub_F04E0@@YAXPAURwMatrixTag@@HH@Z @ 0x000F04E0
+// sp-match: ?sub_F04E0@@YAXPAURwMatrixTag@@HH@Z @ 0x000B7B90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_F04E0(RwMatrix *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {

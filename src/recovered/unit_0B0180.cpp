@@ -26,9 +26,11 @@ RWS_REGISTERCLASS(SectionTrigger);
 // match: ?MakeNew@SectionTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000B0180
 // match: __ehhandler$?MakeNew@SectionTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x003001F0
 // match: __ehhandler$?MakeNew@SectionTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x003001FF
+// sp-match: ?MakeNew@SectionTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00088360
 RWS_DEFINE_MAKENEW(SectionTrigger)
 
 // match: ??0SectionTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000B0200
+// sp-match: ??0SectionTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000881E0
 SectionTrigger::SectionTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_C0 = 0;
@@ -39,11 +41,14 @@ SectionTrigger::SectionTrigger(const RWS::CAttributePacket &attr) : Trigger(attr
 }
 
 // match: ??_GSectionTrigger@@UAEPAXI@Z @ 0x000B0270
+// sp-match: ??_GSectionTrigger@@UAEPAXI@Z @ 0x00088350
 
 // match: ??1SectionTrigger@@UAE@XZ @ 0x000B0290
+// sp-match: ??1SectionTrigger@@UAE@XZ @ 0x00088230
 // (Defined in the class, in SectionTrigger.h.)
 
 // match: ?HandleAttributes@SectionTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000B02C0
+// sp-match: ?HandleAttributes@SectionTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00088250
 void SectionTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -73,6 +78,7 @@ void SectionTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_ESectionTrigger@@WBI@AEPAXI@Z @ 0x000B0400
+// sp-match: ??_ESectionTrigger@@WBI@AEPAXI@Z @ 0x00088340
 
 // Members /OPT:ICF folded into shared trivial bodies (config/aliases.txt): defined here for
 // the authentic link (PLAN M7); the placement link takes the shared bodies.

@@ -43,6 +43,12 @@ public:
     // Puts the player arg_0 on it (type_10F710::sub_114920) while unk_D0 is
     // set.
     void sub_CAC30(type_3D3548 *arg_0);
+#ifdef CODFH_SP
+    // What it does when the entity arg_0 leaves it: nothing (single player's
+    // sub_145640 calls it at SP 0xF073C; folded, /OPT:ICF, into the empty SP
+    // 0xD60D0).
+    void sp_leave(type_3D3548 *arg_0);
+#endif
 
     type_3DF8D8_04 unk_C0;
     RwInt32 unk_C8;

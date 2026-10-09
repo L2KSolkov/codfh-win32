@@ -37,11 +37,13 @@ RWS_REGISTERCLASS(SplinePath);
 // match: ?MakeNew@SplinePath@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000B9EA0
 // match: __ehhandler$?MakeNew@SplinePath@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x003003F0
 // match: __ehhandler$?MakeNew@SplinePath@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x003003FF
+// sp-match: ?MakeNew@SplinePath@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0008ED70
 RWS_DEFINE_MAKENEW(SplinePath)
 
 // match: ??0SplinePath@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000B9F20
 // match: __ehhandler$??0SplinePath@@QAE@ABVCAttributePacket@RWS@@@Z-0x8 @ 0x00300410
 // match: __ehhandler$??0SplinePath@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300418
+// sp-match: ??0SplinePath@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0008E540
 SplinePath::SplinePath(const RWS::CAttributePacket &attr)
 {
     unk_2C.unk_00 = 0;
@@ -53,16 +55,20 @@ SplinePath::SplinePath(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_GSplinePath@@UAEPAXI@Z @ 0x000BA010
+// sp-match: ??_GSplinePath@@UAEPAXI@Z @ 0x0008EBF0
 
 // match: ??1SplinePath@@UAE@XZ @ 0x000BA030
 // match: __ehhandler$??1SplinePath@@UAE@XZ-0x8 @ 0x00300430
 // match: __ehhandler$??1SplinePath@@UAE@XZ @ 0x00300438
+// sp-match: ??1SplinePath@@UAE@XZ @ 0x0008E5B0
+// sp-match: ??1SplinePath@@UAE@XZ @ 0x0008E5B0
 // The empty destructor in SplinePath.h retains EH state 0 with this
 // unit's /EHa setting (docs/toolchain.md).
 
 // Command 0: its name (a kind 0x2E, which takes it through sub_BA420);
 // 1: its end mode; 2: a flag.
 // match: ?HandleAttributes@SplinePath@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000BA080
+// sp-match: ?HandleAttributes@SplinePath@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0008EC00
 void SplinePath::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     vf_008(attr);
@@ -91,6 +97,7 @@ void SplinePath::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_008@SplinePath@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000BA1B0
+// sp-match: ?vf_008@SplinePath@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0008ECF0
 void SplinePath::vf_008(const RWS::CAttributePacket &attr)
 {
     RWS::CAttributeCommandIterator attrIt(attr, RWS::CSystemCommands::pCSystemCommandsClassID);
@@ -111,6 +118,7 @@ void SplinePath::vf_008(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_00C@SplinePath@@UAEXPBX@Z @ 0x000BA230
+// sp-match: ?vf_00C@SplinePath@@UAEXPBX@Z @ 0x0008E5F0
 // Takes the attached resource arg_0 (a resource id) as its spline when it is
 // an "rwID_SPLINE" (none for a resource of -1), and measures its length
 // (unk_24) in steps of a hundredth of a segment.
@@ -170,6 +178,7 @@ void SplinePath::vf_00C(const void *arg_0)
 }
 
 // match: ?sub_BA420@@YAHHHH@Z @ 0x000BA420
+// sp-match: ?sub_BA420@@YAHHHH@Z @ 0x0008E780
 RwInt32 sub_BA420(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_3DFEEC *var_4 = (type_3DFEEC *)arg_0;
@@ -180,6 +189,7 @@ RwInt32 sub_BA420(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_BA450@SplinePath@@QAEMPAURwV3d@@MM@Z @ 0x000BA450
+// sp-match: ?sub_BA450@SplinePath@@QAEMPAURwV3d@@MM@Z @ 0x0008E7A0
 RwReal SplinePath::sub_BA450(RwV3d *arg_0, RwReal arg_4, RwReal arg_8)
 {
     RwInt32 var_8;
@@ -196,17 +206,21 @@ RwReal SplinePath::sub_BA450(RwV3d *arg_0, RwReal arg_4, RwReal arg_8)
     RwReal var_44;
     RwReal var_48;
     RwReal var_4C;
+#ifndef CODFH_SP
     RwV3d var_58;
     RwV3d var_64;
     RwV3d var_70;
+#endif
     RwReal var_74;
     RwReal var_D4;
     RwReal var_D8;
     RwReal var_DC;
     RwReal var_E0;
+#ifndef CODFH_SP
     RwV3d var_EC;
     RwV3d var_F8;
     RwV3d var_104;
+#endif
     RwReal var_108;
     RwReal var_164;
 
@@ -237,6 +251,11 @@ RwReal SplinePath::sub_BA450(RwV3d *arg_0, RwReal arg_4, RwReal arg_8)
     }
     if (var_10 > 0.0f)
     {
+#ifdef CODFH_SP // shape: block-scoped vectors share the frame (SP 0x8E7A3 sub esp,0x74)
+        RwV3d var_58;
+        RwV3d var_64;
+        RwV3d var_70;
+#endif
         var_44 = (var_10 - 1.0f) * var_1C;
         var_48 = var_10 * var_1C;
         var_4C = var_44;
@@ -250,7 +269,12 @@ RwReal SplinePath::sub_BA450(RwV3d *arg_0, RwReal arg_4, RwReal arg_8)
             __m128 b = _mm_sqrt_ss(a);
             _mm_store_ss(&var_74, b);
         } while (0);
+#ifdef CODFH_SP // shape: divide, then scale, as two steps (SP 0x8E8F7 fld arg_4, fdiv, fmul)
+        var_74 = arg_4 / var_74;
+        var_74 *= var_1C;
+#else
         var_74 = arg_4 / var_74 * var_1C;
+#endif
         while (var_4C < var_48)
         {
             RpSplineFindPosition(unk_28, 0xA, var_4C, &var_30, 0);
@@ -267,6 +291,11 @@ RwReal SplinePath::sub_BA450(RwV3d *arg_0, RwReal arg_4, RwReal arg_8)
     }
     if (var_10 + 1.0f < var_18)
     {
+#ifdef CODFH_SP // shape: block-scoped vectors share the frame (SP 0x8E7A3 sub esp,0x74)
+        RwV3d var_EC;
+        RwV3d var_F8;
+        RwV3d var_104;
+#endif
         var_D8 = var_10 * var_1C;
         var_DC = (var_10 + 1.0f) * var_1C;
         var_E0 = var_D8;
@@ -280,7 +309,12 @@ RwReal SplinePath::sub_BA450(RwV3d *arg_0, RwReal arg_4, RwReal arg_8)
             __m128 b = _mm_sqrt_ss(a);
             _mm_store_ss(&var_108, b);
         } while (0);
+#ifdef CODFH_SP // shape: divide, then scale, as two steps (SP 0x8E8F7 fld arg_4, fdiv, fmul)
+        var_108 = arg_4 / var_108;
+        var_108 *= var_1C;
+#else
         var_108 = arg_4 / var_108 * var_1C;
+#endif
         while (var_E0 <= var_DC)
         {
             RpSplineFindPosition(unk_28, 0xA, var_E0, &var_30, 0);
@@ -303,6 +337,7 @@ RwReal SplinePath::sub_BA450(RwV3d *arg_0, RwReal arg_4, RwReal arg_8)
 }
 
 // match: ?sub_BA990@SplinePath@@QAEXMPAURwV3d@@PAURwMatrixTag@@@Z @ 0x000BA990
+// sp-match: ?sub_BA990@SplinePath@@QAEXMPAURwV3d@@PAURwMatrixTag@@@Z @ 0x0008EBB0
 void SplinePath::sub_BA990(RwReal arg_0, RwV3d *arg_4, RwMatrix *arg_8)
 {
     if (!arg_4)

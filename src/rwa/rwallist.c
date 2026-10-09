@@ -16,6 +16,7 @@ extern void *sub_243950(RwUInt32 size, RwUInt32 count, RwUInt32 align, RwInt32 a
                         void *freeList, RwUInt32 hint);
 
 // match: __rwaLListModuleOpen @ 0x00243490
+// sp-match: __rwaLListModuleOpen @ 0x001585D0
 RwBool
 _rwaLListModuleOpen(void)
 {
@@ -30,6 +31,7 @@ _rwaLListModuleOpen(void)
 }
 
 // match: _sub_2434C0 @ 0x002434C0
+// sp-match: _sub_2434C0 @ 0x00158600
 void
 sub_2434C0(void)
 {
@@ -38,6 +40,7 @@ sub_2434C0(void)
 }
 
 // match: _sub_2434E0 @ 0x002434E0
+// sp-match: _sub_2434E0 @ 0x00158620
 RwaLLNode *
 sub_2434E0(RwaLLNode *list, void *data)
 {
@@ -58,6 +61,7 @@ sub_2434E0(RwaLLNode *list, void *data)
 }
 
 // match: _sub_243510 @ 0x00243510
+// sp-match: _sub_243510 @ 0x00158650
 RwaLLNode *
 sub_243510(RwaLLNode *list, RwUInt32 index)
 {
@@ -78,6 +82,7 @@ sub_243510(RwaLLNode *list, RwUInt32 index)
 }
 
 // match: _sub_243540 @ 0x00243540
+// sp-match: _sub_243540 @ 0x00158680
 RwInt32
 sub_243540(RwaLLNode *list, void *data)
 {
@@ -98,6 +103,7 @@ sub_243540(RwaLLNode *list, void *data)
 }
 
 // match: _sub_243570 @ 0x00243570
+// sp-match: _sub_243570 @ 0x001586B0
 void *
 sub_243570(RwaLLNode *list, RwUInt32 index)
 {
@@ -107,6 +113,7 @@ sub_243570(RwaLLNode *list, RwUInt32 index)
 }
 
 // match: _sub_243590 @ 0x00243590
+// sp-match: _sub_243590 @ 0x001586D0
 void
 sub_243590(RwaLLNode *list, RwaLLNode *node)
 {
@@ -122,6 +129,7 @@ sub_243590(RwaLLNode *list, RwaLLNode *node)
 }
 
 // match: _sub_2435D0 @ 0x002435D0
+// sp-match: _sub_2435D0 @ 0x00158710
 void
 sub_2435D0(RwaLLNode *list)
 {
@@ -132,6 +140,7 @@ sub_2435D0(RwaLLNode *list)
 }
 
 // match: _sub_243600 @ 0x00243600
+// sp-match: _sub_243600 @ 0x00158740
 RwUInt32
 sub_243600(RwaLLNode *list, void *(*callback)(RwaLLNode *node, void *data), void *data)
 {
@@ -157,6 +166,7 @@ sub_243600(RwaLLNode *list, void *(*callback)(RwaLLNode *node, void *data), void
 }
 
 // match: _sub_243640 @ 0x00243640
+// sp-match: _sub_243640 @ 0x00158780
 RwaLLNode *
 sub_243640(RwaLLNode *list, void *data)
 {

@@ -24,14 +24,18 @@ RWS_REGISTERCLASS(PathNode);
 // match: ?MakeNew@PathNode@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A8FC0
 // match: __ehhandler$?MakeNew@PathNode@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300050
 // match: __ehhandler$?MakeNew@PathNode@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030005F
+// sp-match: ?MakeNew@PathNode@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000837A0
 RWS_DEFINE_MAKENEW(PathNode)
 
 // match: ??0PathNode@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A9040
+// sp-match: ??0PathNode@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00083760
 PathNode::PathNode(const RWS::CAttributePacket &attr)
 {
 }
 
 // match: ??_GPathNode@@UAEPAXI@Z @ 0x000A90A0
+// sp-match: ??_GPathNode@@UAEPAXI@Z @ 0x00083790
 
 // match: ??1PathNode@@UAE@XZ @ 0x000A90C0
+// sp-match: ??1PathNode@@UAE@XZ @ 0x00083780
 // (Defined in the class, in PathNode.h.)

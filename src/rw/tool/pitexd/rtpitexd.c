@@ -553,6 +553,7 @@ rtpitexdTexture2ImageWriteCallBack( RwTexture *texture,
 // match: _rcsid @ 0x0041A068
 
 // match: _rtpitexdImage2TextureReadLegacy @ 0x002F5180
+// sp-match: _rtpitexdImage2TextureReadLegacy @ 0x0020FC30
 static RwTexDictionary *
 rtpitexdImage2TextureReadLegacy( RwStream *stream,
                                  RwTexDictionary **texDict )
@@ -904,6 +905,7 @@ rtpitexdImage2TextureReadLegacy( RwStream *stream,
  *  On exit : Pointer to the RwTexture read, or NULL if there was an error.
  * --------------------------------------------------------------------- */
 // match: _rtpitexdTextureStreamReadPre @ 0x002F5540
+// sp-match: _rtpitexdTextureStreamReadPre @ 0x0020FFF0
 static RwTexture *
 rtpitexdTextureStreamReadPre( RwStream *stream )
 {
@@ -1110,6 +1112,7 @@ rtpitexdTextureStreamReadPost( RwStream *stream,
  *  On exit : RwBool, TRUE if successful, FALSE otherwise.
  * --------------------------------------------------------------------- */
 // match: _rtpitexdImage2TextureRead @ 0x002F5740
+// sp-match: _rtpitexdImage2TextureRead @ 0x002101F0
 static RwBool
 rtpitexdImage2TextureRead( RwStream *stream )
 {
@@ -1754,6 +1757,7 @@ RtPITexDictionaryStreamGetSize( const RwTexDictionary *texDict )
  * \see RwStreamFindChunk
  */
 // match: _RtPITexDictionaryStreamRead @ 0x002F5AE0
+// sp-match: _RtPITexDictionaryStreamRead @ 0x00210590
 RwTexDictionary *
 RtPITexDictionaryStreamRead( RwStream *stream )
 {

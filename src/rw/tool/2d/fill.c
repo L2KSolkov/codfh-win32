@@ -109,6 +109,7 @@ WireRender2d(RwIm3DVertex * vertex, int vcount,
 
 /****************************************************************************/
 static Rt2dPath *
+// sp-match: _DefaultPathClosedFill2d @ 0x0016EDB0
 DefaultPathClosedFill2d(Rt2dPath * path, Rt2dBrush * brush)
 {
     Rt2dPath           *flat;
@@ -510,6 +511,7 @@ DefaultPathClosedFill2d(Rt2dPath * path, Rt2dBrush * brush)
 
 /****************************************************************************/
 static Rt2dPath    *
+// sp-match: _DefaultPathFill2d @ 0x0016F920
 DefaultPathFill2d(Rt2dPath * path, Rt2dBrush * brush)
 {
     RWFUNCTION(RWSTRING("DefaultPathFill2d"));
@@ -555,6 +557,7 @@ DefaultPathFill2d(Rt2dPath * path, Rt2dBrush * brush)
  */
 
 Rt2dPath           *
+// sp-match: _Rt2dPathFill @ 0x0016F960
 Rt2dPathFill(Rt2dPath * path, Rt2dBrush * brush)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dPathFill"));
@@ -575,6 +578,7 @@ Rt2dPathFill(Rt2dPath * path, Rt2dBrush * brush)
  * single mesh.
  */
 Rt2dPath *
+// sp-match: __rt2dPathFillCreateGeometry @ 0x0016F9A0
 _rt2dPathFillCreateGeometry(Rt2dPath * path, Rt2dBrush * brush,
                             RpGeometry *geom, RwUInt32 *geomVertIdx, RwUInt32 *geomTriIdx)
 {
@@ -659,10 +663,14 @@ _rt2dPathFillCreateGeometry(Rt2dPath * path, Rt2dBrush * brush,
     {
         if ((numTris * 3) > Rt2dGlobals.triIdxCacheSize)
         {
+#ifdef CODFH_SP /* single player frees the index cache without a NULL test (SP 0x16F9A0; MP drops the function) */
+            RwFree(Rt2dGlobals.triIdxCache);
+#else
             if( Rt2dGlobals.triIdxCache )
             {        
                 RwFree(Rt2dGlobals.triIdxCache);
             }
+#endif
 
             Rt2dGlobals.triIdxCacheSize = 0;
 

@@ -28,9 +28,11 @@ RWS_REGISTERCLASS(DestructableObjectTrigger);
 // match: ?MakeNew@DestructableObjectTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A3510
 // match: __ehhandler$?MakeNew@DestructableObjectTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFE70
 // match: __ehhandler$?MakeNew@DestructableObjectTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFE7F
+// sp-match: ?MakeNew@DestructableObjectTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007FC80
 RWS_DEFINE_MAKENEW(DestructableObjectTrigger)
 
 // match: ??0DestructableObjectTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A3590
+// sp-match: ??0DestructableObjectTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007F930
 DestructableObjectTrigger::DestructableObjectTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_C0.unk_00 = 0;
@@ -48,8 +50,10 @@ DestructableObjectTrigger::DestructableObjectTrigger(const RWS::CAttributePacket
 }
 
 // match: ??_GDestructableObjectTrigger@@UAEPAXI@Z @ 0x000A36C0
+// sp-match: ??_GDestructableObjectTrigger@@UAEPAXI@Z @ 0x0007FC70
 
 // match: ??1DestructableObjectTrigger@@UAE@XZ @ 0x000A36E0
+// sp-match: ??1DestructableObjectTrigger@@UAE@XZ @ 0x0007F9D0
 DestructableObjectTrigger::~DestructableObjectTrigger()
 {
 }
@@ -57,6 +61,7 @@ DestructableObjectTrigger::~DestructableObjectTrigger()
 // Commands 0 to 2: its names; 3 and 6 to 10: numbers; 4: a name whose value
 // goes to unk_DC; 5: a block whose word at +0x14 it keeps (0 without one).
 // match: ?HandleAttributes@DestructableObjectTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A3710
+// sp-match: ?HandleAttributes@DestructableObjectTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007F9F0
 void DestructableObjectTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -139,6 +144,7 @@ void DestructableObjectTrigger::HandleAttributes(const RWS::CAttributePacket &at
 }
 
 // match: ??_EDestructableObjectTrigger@@WBI@AEPAXI@Z @ 0x000A3A30
+// sp-match: ??_EDestructableObjectTrigger@@WBI@AEPAXI@Z @ 0x0007FC60
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

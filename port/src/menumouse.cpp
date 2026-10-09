@@ -10,7 +10,9 @@
 #include <xtl.h>
 #include <string.h>
 
+#ifndef CODFH_SP
 #include "game/kujuui.h"
+#endif
 
 #include "port.h"
 #include "d3d/pdev.h"
@@ -33,6 +35,7 @@ extern "C" int port_in_menus(void)
     return port_menu_frame && port_frame - port_menu_frame <= 2;
 }
 
+#ifndef CODFH_SP
 /* cLayoutPage's vtable (unit_1E8350), to tell a page among the widgets without RTTI: the menus'
    pages are its subclasses (cTopLayoutPage and the menus' own), which keep its slot 13 (vf_034,
    whether a widget is the focused one) */
@@ -147,3 +150,9 @@ extern "C" void port_menu_mouse_frame(void)
             InterlockedIncrement(&port_menu_mouse_clicks);
     }
 }
+#else
+/* (single player's menus are Rt2d maestro movies, not kujuUI pages) */
+extern "C" void port_menu_mouse_frame(void)
+{
+}
+#endif

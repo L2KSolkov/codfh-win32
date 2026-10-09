@@ -142,6 +142,7 @@ _rpMeshHeaderDestroy(RpMeshHeader * meshHeader)
 // match: _rcsid @ 0x00419480
 
 // match: __rpMeshHeaderCreate @ 0x002E07A0
+// sp-match: __rpMeshHeaderCreate @ 0x001FB270
 RpMeshHeader *
 _rpMeshHeaderCreate(RwUInt32 size)
 {
@@ -163,6 +164,7 @@ _rpMeshHeaderCreate(RwUInt32 size)
  */
 
 // match: __rpMeshClose @ 0x002E07C0
+// sp-match: __rpMeshClose @ 0x001FB290
 void *
 _rpMeshClose(void *instance,
              RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -189,6 +191,7 @@ _rpMeshClose(void *instance,
  */
 
 // match: __rpMeshOpen @ 0x002E07F0
+// sp-match: __rpMeshOpen @ 0x001FB2C0
 void *
 _rpMeshOpen(void *instance,
             RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -252,6 +255,7 @@ _rpMeshOpen(void *instance,
  */
 
 // match: __rpBuildMeshCreate @ 0x002E08A0
+// sp-match: __rpBuildMeshCreate @ 0x001FB370
 RpBuildMesh *
 _rpBuildMeshCreate(RwUInt32 bufferSize)
 {
@@ -308,6 +312,7 @@ _rpBuildMeshCreate(RwUInt32 bufferSize)
  */
 
 // match: __rpBuildMeshDestroy @ 0x002E0980
+// sp-match: __rpBuildMeshDestroy @ 0x001FB450
 RwBool
 _rpBuildMeshDestroy(RpBuildMesh * mesh)
 {
@@ -334,6 +339,7 @@ _rpBuildMeshDestroy(RpBuildMesh * mesh)
  */
 
 // match: __rpMeshDestroy @ 0x002E09C0
+// sp-match: __rpMeshDestroy @ 0x001FB490
 RwBool
 _rpMeshDestroy(RpMeshHeader * mesh)
 {
@@ -363,6 +369,7 @@ _rpMeshDestroy(RpMeshHeader * mesh)
  */
 
 // match: __rpBuildMeshAddTriangle @ 0x002E0A00
+// sp-match: __rpBuildMeshAddTriangle @ 0x001FB4D0
 RpBuildMesh *
 _rpBuildMeshAddTriangle(RpBuildMesh * mesh, RpMaterial * material,
                         RwInt32 vert1, RwInt32 vert2, RwInt32 vert3,
@@ -513,6 +520,7 @@ RpMeshHeaderSetPrimType(RpMeshHeader * meshHeader,
  */
 
 // match: __rpMeshHeaderForAllMeshes @ 0x002E0B20
+// sp-match: __rpMeshHeaderForAllMeshes @ 0x001FB5F0
 RpMeshHeader *
 _rpMeshHeaderForAllMeshes(RpMeshHeader * meshHeader,
                           RpMeshCallBack fpCallBack, void *pData)
@@ -556,6 +564,7 @@ _rpMeshHeaderForAllMeshes(RpMeshHeader * meshHeader,
  On exit    : Stream pointer on success
  */
 // match: __rpMeshWrite @ 0x002E0B60
+// sp-match: __rpMeshWrite @ 0x001FB630
 RwStream *
 _rpMeshWrite(const RpMeshHeader *meshHeader,
              const void *object,
@@ -663,6 +672,7 @@ _rpMeshWrite(const RpMeshHeader *meshHeader,
  On exit    : Mesh read from the stream
  */
 // match: __rpMeshRead @ 0x002E0CC0
+// sp-match: __rpMeshRead @ 0x001FB790
 RpMeshHeader *
 _rpMeshRead(RwStream *stream,
             const void *object,
@@ -783,6 +793,7 @@ _rpMeshRead(RwStream *stream,
  On exit    : Size of mesh when serialised (in bytes)
  */
 // match: __rpMeshSize @ 0x002E0EA0
+// sp-match: __rpMeshSize @ 0x001FB970
 RwInt32
 _rpMeshSize(const RpMeshHeader *meshHeader,
             const void *object)

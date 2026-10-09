@@ -57,6 +57,7 @@ static const char rcsid[] = "@@@@(#)$Id: //RenderWare/RW36Active/rwsdk/plugin/pr
 // match: _rcsid @ 0x00419DB8
 
 // match: _rpPrtStdPropTabPostRead @ 0x002EE450
+// sp-match: _rpPrtStdPropTabPostRead @ 0x00208F00
 static RpPrtStdPropertyTable *
 rpPrtStdPropTabPostRead( RpPrtStdPropertyTable * propTab )
 {
@@ -147,6 +148,7 @@ _rpPrtStdPropTabAdd(RpPrtStdPropertyTable *propTabHead,
 /************************************************************************/
 
 // match: __rpPrtStdPropTabCompareProp @ 0x002EE4D0
+// sp-match: __rpPrtStdPropTabCompareProp @ 0x00208F80
 RwBool
 _rpPrtStdPropTabCompareProp(RpPrtStdPropertyTable *propTab,
                             RwInt32 numProp, RwInt32 *propID, RwInt32 *propStride)
@@ -239,6 +241,7 @@ _rpPrtStdPropTabCompareProp(RpPrtStdPropertyTable *propTab,
  * \see RpPrtStdPClassSetPropTab
  */
 // match: _RpPrtStdPropTabCreate @ 0x002EE720
+// sp-match: _RpPrtStdPropTabCreate @ 0x002091D0
 RpPrtStdPropertyTable *
 RpPrtStdPropTabCreate(RwInt32 numProp, RwInt32 *propID, RwInt32 *propStride)
 {
@@ -393,6 +396,7 @@ RpPrtStdPropTabCreate(RwInt32 numProp, RwInt32 *propID, RwInt32 *propStride)
  * \see RpPrtStdPClassSetPropTab
  */
 // match: _RpPrtStdPropTabDestroy @ 0x002EE550
+// sp-match: _RpPrtStdPropTabDestroy @ 0x00209000
 RwBool
 RpPrtStdPropTabDestroy(RpPrtStdPropertyTable *propTab)
 {
@@ -648,6 +652,7 @@ RpPrtStdPropTabGetProperties(RpPrtStdPropertyTable *propTab,
  * \see RpPrtStdPropTabGetPropOffset
  */
 // match: _RpPrtStdPropTabGetPropIndex @ 0x002EE610
+// sp-match: _RpPrtStdPropTabGetPropIndex @ 0x002090C0
 RwInt32
 RpPrtStdPropTabGetPropIndex(RpPrtStdPropertyTable *propTab, RwInt32 propID)
 {
@@ -699,6 +704,7 @@ RpPrtStdPropTabGetPropIndex(RpPrtStdPropertyTable *propTab, RwInt32 propID)
  * \see RpPrtStdPropTabGetPropIndex
  */
 // match: _RpPrtStdPropTabGetPropOffset @ 0x002EE650
+// sp-match: _RpPrtStdPropTabGetPropOffset @ 0x00209100
 RwInt32
 RpPrtStdPropTabGetPropOffset(RpPrtStdPropertyTable *propTab, RwInt32 propID)
 {
@@ -738,6 +744,7 @@ RpPrtStdPropTabGetPropOffset(RpPrtStdPropertyTable *propTab, RwInt32 propID)
  * \see RpPrtStdPropTabGetByProperties
  */
 // match: _RpPrtStdPropTabGet @ 0x002EE680
+// sp-match: _RpPrtStdPropTabGet @ 0x00209130
 RpPrtStdPropertyTable *
 RpPrtStdPropTabGet(RwInt32 id)
 {
@@ -788,6 +795,7 @@ RpPrtStdPropTabGet(RwInt32 id)
  * \see RpPrtStdPropTabGet
  */
 // match: _RpPrtStdPropTabGetByProperties @ 0x002EE6B0
+// sp-match: _RpPrtStdPropTabGetByProperties @ 0x00209160
 RpPrtStdPropertyTable *
 RpPrtStdPropTabGetByProperties(RwInt32 numProp, RwInt32 *propID, RwInt32 *propStride)
 {
@@ -882,6 +890,7 @@ RpPrtStdPropTabGetByProperties(RwInt32 numProp, RwInt32 *propID, RwInt32 *propSt
  * \see RpPrtStdPluginAttach
  */
 // match: _RpPrtStdPropTabStreamRead @ 0x002EE8D0
+// sp-match: _RpPrtStdPropTabStreamRead @ 0x00209380
 RpPrtStdPropertyTable *
 RpPrtStdPropTabStreamRead(RwStream *stream)
 {
@@ -991,6 +1000,7 @@ RpPrtStdPropTabStreamRead(RwStream *stream)
  * \see RpPrtStdGlobalDataGetStreamEmbedded
  */
 // match: _RpPrtStdPropTabStreamWrite @ 0x002EE9D0
+// sp-match: _RpPrtStdPropTabStreamWrite @ 0x00209480
 RpPrtStdPropertyTable *
 RpPrtStdPropTabStreamWrite(RpPrtStdPropertyTable *propTab, RwStream *stream)
 {
@@ -1042,6 +1052,7 @@ RpPrtStdPropTabStreamWrite(RpPrtStdPropertyTable *propTab, RwStream *stream)
  * \see RpPrtStdPropTabStreamWrite
  */
 // match: _RpPrtStdPropTabStreamGetSize @ 0x002EE700
+// sp-match: _RpPrtStdPropTabStreamGetSize @ 0x002091B0
 RwInt32
 RpPrtStdPropTabStreamGetSize(RpPrtStdPropertyTable *propTab)
 {

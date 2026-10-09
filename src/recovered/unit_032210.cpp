@@ -50,6 +50,7 @@ extern const RwReal flt_3CE274 = 16.666666f;
 // match: ??0type_3CE278@@QAE@XZ @ 0x00032210
 // match: ??_7type_3CE278@@6B@ @ 0x003CE278
 // match: ??_C@_0BE@IDLKJEIG@LTA_StartAlertStand?$AA@ @ 0x003CE2AC
+// sp-match: ??0type_3CE278@@QAE@XZ @ 0x00027510
 // symbol: ??0type_3CE6D0@@QAE@XZ = 0x0003CA10
 // symbol: ??1type_3CE6D0@@UAE@XZ = 0x0003CA60
 // symbol: ?vf_004@type_3CE6D0@@UAEXPAUtype_3DF30@@@Z = 0x0003CA80
@@ -59,13 +60,24 @@ extern const RwReal flt_3CE274 = 16.666666f;
 type_3CE278::type_3CE278()
 {
 }
+#ifdef CODFH_SP // single player's copy of the folded body sits here, after the constructor (SP 0x27530)
+// sp-match: ?vf_02C@type_3CE278@@UAEHXZ @ 0x00027530
+RwInt32 type_3CE278::vf_02C()
+{
+    return 9;
+}
+#endif
 // match: ?vf_010@type_3CE278@@UAEHPAUtype_3D410@@@Z @ 0x00032260
 // match: ??_Gtype_3CE278@@UAEPAXI@Z @ 0x00032270
 // match: ??1type_3CE278@@UAE@XZ @ 0x00032290
+// sp-match: ??1type_3CE278@@UAE@XZ @ 0x00027540
+// sp-match: ?vf_010@type_3CE278@@UAEHPAUtype_3D410@@@Z @ 0x0002A7C0
+// sp-match: ??_Gtype_3CE278@@UAEPAXI@Z @ 0x000279C0
 type_3CE278::~type_3CE278()
 {
 }
 // match: ?vf_004@type_3CE278@@UAEXPAUtype_3DF30@@@Z @ 0x000322B0
+// sp-match: ?vf_004@type_3CE278@@UAEXPAUtype_3DF30@@@Z @ 0x00027550
 void type_3CE278::vf_004(type_3DF30 *arg_0)
 {
     unk_1C = 0;
@@ -73,6 +85,7 @@ void type_3CE278::vf_004(type_3DF30 *arg_0)
     type_3CE6D0::vf_004(arg_0);
 }
 // match: sub_322E0 @ 0x000322E0
+// sp-match: sub_322E0 @ 0x00027570
 void type_3CE278::sub_322E0(type_3D410 *arg_0)
 {
     AIData *var_4;
@@ -91,6 +104,7 @@ void type_3CE278::sub_322E0(type_3D410 *arg_0)
     }
 }
 // match: ?vf_00C@type_3CE278@@UAEHMPAUtype_3D410@@@Z @ 0x00032390
+// sp-match: ?vf_00C@type_3CE278@@UAEHMPAUtype_3D410@@@Z @ 0x00027B30
 // The handlers' second argument carries the context here (their type says
 // only its width), and the third a flag.
 RwInt32 type_3CE278::vf_00C(RwReal arg_0, type_3D410 *arg_4)
@@ -184,12 +198,14 @@ RwInt32 type_3CE278::vf_00C(RwReal arg_0, type_3D410 *arg_4)
     return type_3CE6D0::vf_00C(arg_0, arg_4);
 }
 // match: sub_326D0 @ 0x000326D0
+// sp-match: sub_326D0 @ 0x000279D0
 RwInt32 type_3CE278::sub_326D0(type_3D410 *arg_0)
 {
     unk_1C = sub_32750(arg_0);
     return unk_1C != 0;
 }
 // match: sub_32700 @ 0x00032700
+// sp-match: sub_32700 @ 0x000275F0
 // Reached only through the table at 0x427658 (the database had not made it a
 // function). arg_0 is only known by width.
 RwInt32 sub_32700(RwInt32 arg_0, type_3D410 *arg_4)
@@ -210,6 +226,7 @@ extern type_3D3548 *&dword_4B8640;
 extern type_3D3548 *dword_4B8640;
 #endif
 // match: sub_32750 @ 0x00032750
+// sp-match: sub_32750 @ 0x00027620
 // A kind-15 node within 1500 of the group's leader (or its first entity);
 // when an animated background entity in state 1 stands within 300 of it,
 // the node takes that entity's "AT01" frame turned by 90 degrees (its
@@ -228,7 +245,6 @@ type_F8350 *type_3CE278::sub_32750(type_3D410 *arg_0)
     RpClump *var_9C;
     RwInt32 var_A0;
     type_EC1F0 *var_A4;
-    RwMatrix var_F0;
     RwFrame *var_F4;
 
     var_8 = arg_0->unk_00;
@@ -270,7 +286,7 @@ type_F8350 *type_3CE278::sub_32750(type_3D410 *arg_0)
         if (var_9C != 0) {
             var_A0 = 0x41543031; // not an address: the frame's name, "AT01"
             var_A4 = sub_EC1F0(var_9C, var_A0);
-            var_F0 = var_A4->unk_10;
+            RwMatrix var_F0 = var_A4->unk_10;
             RwMatrixRotate(&var_F0, &stru_3CE268, 90.0f, rwCOMBINEPRECONCAT);
             RtQuatConvertFromMatrix(&var_74->unk_1C, &var_F0);
             var_F4 = RpClumpGetFrame(var_9C);
@@ -281,6 +297,7 @@ type_F8350 *type_3CE278::sub_32750(type_3D410 *arg_0)
     return var_74;
 }
 // match: sub_32A50 @ 0x00032A50
+// sp-match: sub_32A50 @ 0x000279F0
 type_3D3548 *type_3CE278::sub_32A50(type_F8350 *arg_0, RwInt32 arg_4, type_3D410 *arg_8)
 {
     RwInt32 var_4;
@@ -310,6 +327,7 @@ type_3D3548 *type_3CE278::sub_32A50(type_F8350 *arg_0, RwInt32 arg_4, type_3D410
     return 0;
 }
 // match: sub_32B40 @ 0x00032B40
+// sp-match: sub_32B40 @ 0x00027820
 void sub_32B40(type_3D3548 *arg_0, void *arg_4)
 {
     type_32A50_20 *var_4;
@@ -328,6 +346,7 @@ void sub_32B40(type_3D3548 *arg_0, void *arg_4)
     }
 }
 // match: sub_32BF0 @ 0x00032BF0
+// sp-match: sub_32BF0 @ 0x000278A0
 RwInt32 type_3CE278::sub_32BF0(type_3D3548 *arg_0)
 {
     AIData *var_1C;
@@ -358,6 +377,7 @@ RwInt32 type_3CE278::sub_32BF0(type_3D3548 *arg_0)
     return 1;
 }
 // match: ?vf_014@type_3CE278@@UAEXPAUtype_3D3548@@@Z @ 0x00032CF0
+// sp-match: ?vf_014@type_3CE278@@UAEXPAUtype_3D3548@@@Z @ 0x00027940
 void type_3CE278::vf_014(type_3D3548 *arg_0)
 {
     if (unk_24.sub_D4910() == arg_0)
@@ -365,6 +385,7 @@ void type_3CE278::vf_014(type_3D3548 *arg_0)
     type_3CE6D0::vf_014(arg_0);
 }
 // match: sub_32D30 @ 0x00032D30
+// sp-match: sub_32D30 @ 0x00027AC0
 RwInt32 type_3CE278::sub_32D30(type_3D410 *arg_0)
 {
     type_3D3548 *var_4;
@@ -385,7 +406,18 @@ RwInt32 type_3CE278::sub_32D30(type_3D410 *arg_0)
     }
     return 1;
 }
+#ifdef CODFH_SP
+// Single player compiles type_3CE6D0's sub_18F420 in this file: sub_32DD0's twin keeps edx
+// (its argument) across the call (SP 0x27985), as VC does only for a callee in the same file.
+// ?sub_18F420@type_3CE6D0@@QAEHPAUtype_F8350@@PAUtype_3D410@@@Z (folded into SP 0x61DA0)
+RwInt32 type_3CE6D0::sub_18F420(struct type_F8350 * arg_0, struct type_3D410 * arg_4)
+{
+    return 1;
+}
+#endif
+
 // match: sub_32DD0 @ 0x00032DD0
+// sp-match: sub_32DD0 @ 0x00027970
 RwInt32 type_3CE278::sub_32DD0(type_3D410 *arg_0)
 {
     AIData *var_4;

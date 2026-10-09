@@ -25,6 +25,7 @@ namespace RWS
 // match: ?pCSystemCommandsClassID@CSystemCommands@RWS@@2PBDB @ 0x00429C2C
 
 // match: ?UpdateFrame@CSystemCommands@RWS@@SAXAAURwFrame@@ABVCAttributeCommand@2@@Z @ 0x0012DC20
+// sp-match: ?UpdateFrame@CSystemCommands@RWS@@SAXAAURwFrame@@ABVCAttributeCommand@2@@Z @ 0x000E01F0
 
 void RWS::CSystemCommands::UpdateFrame(RwFrame &rFrame, const CAttributeCommand &rAttrCmd)
    {
@@ -67,6 +68,7 @@ namespace RWS
 }
 
 // match: ?Plugin_Constructor@?A0x7854dc35@RpAtomicCollisionProperties@RWS@@YAPAXPAXHH@Z @ 0x0012DC70
+// sp-match: ?Plugin_Constructor@?A0x7854dc35@RpAtomicCollisionProperties@RWS@@YAPAXPAXHH@Z @ 0x000E0220
 namespace RWS
 {
    namespace RpAtomicCollisionProperties
@@ -86,6 +88,7 @@ namespace RWS
 }
 
 // match: ?Plugin_Copy@?A0x7854dc35@RpAtomicCollisionProperties@RWS@@YAPAXPAXPBXHH@Z @ 0x0012DCB0
+// sp-match: ?Plugin_Copy@?A0x7854dc35@RpAtomicCollisionProperties@RWS@@YAPAXPAXPBXHH@Z @ 0x000E0230
 namespace RWS
 {
    namespace RpAtomicCollisionProperties
@@ -106,6 +109,7 @@ namespace RWS
 }
 
 // match: ?PluginAttach@RpAtomicCollisionProperties@RWS@@YAHXZ @ 0x0012DD00
+// sp-match: ?PluginAttach@RpAtomicCollisionProperties@RWS@@YAHXZ @ 0x000E0250
 RwBool RWS::RpAtomicCollisionProperties::PluginAttach(void)
       {
          iPlugin_Offset = RpAtomicRegisterPlugin(
@@ -120,12 +124,14 @@ RwBool RWS::RpAtomicCollisionProperties::PluginAttach(void)
       }
 
 // match: ?SetIsSolid@RpAtomicCollisionProperties@RWS@@YAXAAURpAtomic@@_N@Z @ 0x0012DD40
+// sp-match: ?SetIsSolid@RpAtomicCollisionProperties@RWS@@YAXAAURpAtomic@@_N@Z @ 0x000E0280
 void RWS::RpAtomicCollisionProperties::SetIsSolid( RpAtomic& atomic, bool isSolid )
       {
          GetPluginData(atomic)->m_isSolid = isSolid?1:0;
       }
 
 // match: ?GetIsSolid@RpAtomicCollisionProperties@RWS@@YA_NABURpAtomic@@@Z @ 0x0012DD80
+// sp-match: ?GetIsSolid@RpAtomicCollisionProperties@RWS@@YA_NABURpAtomic@@@Z @ 0x000E02B0
 bool RWS::RpAtomicCollisionProperties::GetIsSolid( const RpAtomic& atomic )
       {
          return (GetPluginData(atomic)->m_isSolid?true:false);

@@ -49,6 +49,7 @@ struct _rxXboxSkinInstanceNodeData
 // match: ?nodeXboxSkinAtomicAllInOneCSL@?1??RxNodeDefinitionGetXboxSkinAtomicAllInOne@@9@9 @ 0x00436AA8
 
 // match: _XBoxSkinAtomicAllInOneNode @ 0x002D46F0
+// sp-match: _XBoxSkinAtomicAllInOneNode @ 0x001EF040
 
 static RwBool
 XBoxSkinAtomicAllInOneNode(RxPipelineNode *self, const RxPipelineNodeParam *params)
@@ -288,6 +289,7 @@ XBoxSkinAtomicAllInOneNode(RxPipelineNode *self, const RxPipelineNodeParam *para
 }
 
 // match: _XBoxSkinAtomicAllInOnePipelineInit @ 0x002D4AD0
+// sp-match: _XBoxSkinAtomicAllInOnePipelineInit @ 0x001EF420
 RwBool
 XBoxSkinAtomicAllInOnePipelineInit(RxPipelineNode *node)
 {
@@ -302,6 +304,7 @@ XBoxSkinAtomicAllInOnePipelineInit(RxPipelineNode *node)
 }
 
 // match: _RxNodeDefinitionGetXboxSkinAtomicAllInOne @ 0x002D4B00
+// sp-match: _RxNodeDefinitionGetXboxSkinAtomicAllInOne @ 0x001EF450
 RxNodeDefinition *
 RxNodeDefinitionGetXboxSkinAtomicAllInOne(void)
 {
@@ -333,6 +336,7 @@ RxNodeDefinitionGetXboxSkinAtomicAllInOne(void)
 }
 
 // match: __rxXboxSkinAllInOneSetRenderCallBack @ 0x002D4B10
+// sp-match: __rxXboxSkinAllInOneSetRenderCallBack @ 0x001FB260
 void
 _rxXboxSkinAllInOneSetRenderCallBack(RxPipelineNode *node,
                                      _rxXboxSkinAllInOneRenderCallBack callback)

@@ -89,6 +89,7 @@ static RwModuleInfo errorModule;
 // match: _rcsid @ 0x00416CA8
 
 // match: __rwErrorOpen @ 0x002B4920
+// sp-match: __rwErrorOpen @ 0x001CFC80
 void *
 _rwErrorOpen(void *object, RwInt32 offset, RwInt32 __RWUNUSED__ size )
 {
@@ -116,6 +117,7 @@ _rwErrorOpen(void *object, RwInt32 offset, RwInt32 __RWUNUSED__ size )
  */
 
 // match: __rwErrorClose @ 0x002B4950
+// sp-match: __rwErrorClose @ 0x001CFCB0
 void *
 _rwErrorClose(void *object,
               RwInt32 __RWUNUSED__ offset ,
@@ -152,6 +154,7 @@ _rwErrorClose(void *object,
  */
 /**************************************************************************/
 // match: _RwErrorSet @ 0x002B4960
+// sp-match: _RwErrorSet @ 0x001CFCC0
 RwError *
 RwErrorSet(RwError *code)
 {
@@ -199,6 +202,7 @@ RwErrorSet(RwError *code)
  *
  */
 // match: _RwErrorGet @ 0x002B49C0
+// sp-match: _RwErrorGet @ 0x001CFD20
 RwError *
 RwErrorGet(RwError *code)
 {
@@ -213,6 +217,7 @@ RwErrorGet(RwError *code)
 }
 
 // match: __rwerror @ 0x002D9180
+// sp-match: __rwerror @ 0x000BF090
 RwInt32
 _rwerror(RwInt32 code, ...)
 {

@@ -321,6 +321,7 @@ RwaAllocBitmap dword_51DE60;
 // match: _off_4302A0 @ 0x004302A0
 
 // match: _sub_24DA70 @ 0x0024DA70
+// sp-match: _sub_24DA70 @ 0x00163AB0
 
 RwaWave *
 sub_24DA70(void *params, const RwaWaveFormat *format, RwaWaveFormat *target, RwBool mono,
@@ -330,6 +331,7 @@ sub_24DA70(void *params, const RwaWaveFormat *format, RwaWaveFormat *target, RwB
 }
 
 // match: _sub_24DAA0 @ 0x0024DAA0
+// sp-match: _sub_24DAA0 @ 0x00163AE0
 void
 sub_24DAA0(RwaWave *wave)
 {
@@ -338,6 +340,7 @@ sub_24DAA0(RwaWave *wave)
 
 /* Releases the streamed waves' memory and the definition. */
 // match: _sub_24DAB0 @ 0x0024DAB0
+// sp-match: _sub_24DAB0 @ 0x00163AF0
 RwBool
 sub_24DAB0(void)
 {
@@ -346,6 +349,7 @@ sub_24DAB0(void)
 }
 
 // match: _sub_24DAD0 @ 0x0024DAD0
+// sp-match: _sub_24DAD0 @ 0x00163B10
 static RwUInt32
 sub_24DAD0(RwUInt32 size)
 {
@@ -360,6 +364,7 @@ sub_24DAD0(RwUInt32 size)
 }
 
 // match: _sub_24DB10 @ 0x0024DB10
+// sp-match: _sub_24DB10 @ 0x00163B50
 void
 sub_24DB10(RwUInt32 handle)
 {
@@ -375,6 +380,7 @@ sub_24DB10(RwUInt32 handle)
 
 /* The free streamed wave memory. */
 // match: _sub_24DB40 @ 0x0024DB40
+// sp-match: _sub_24DB40 @ 0x00163B80
 RwUInt32
 sub_24DB40(void)
 {
@@ -387,6 +393,7 @@ sub_24DB40(void)
 
 /* The address of a handle's memory. */
 // match: _sub_24DB60 @ 0x0024DB60
+// sp-match: _sub_24DB60 @ 0x00163BA0
 RwUInt8 *
 sub_24DB60(RwUInt32 handle)
 {
@@ -399,6 +406,7 @@ sub_24DB60(RwUInt32 handle)
 }
 
 // match: _sub_24DBA0 @ 0x0024DBA0
+// sp-match: _sub_24DBA0 @ 0x00163BE0
 RwaWave *
 sub_24DBA0(RwaWave *volatile input, rwaInstance *obj)
 {
@@ -434,6 +442,7 @@ sub_24DBA0(RwaWave *volatile input, rwaInstance *obj)
 }
 
 // match: _sub_24DC60 @ 0x0024DC60
+// sp-match: _sub_24DC60 @ 0x00163CA0
 void
 sub_24DC60(RwaWave *wave)
 {
@@ -442,6 +451,7 @@ sub_24DC60(RwaWave *wave)
 
 /* Writes size bytes at offset of the wave's data. */
 // match: _sub_24DC70 @ 0x0024DC70
+// sp-match: _sub_24DC70 @ 0x00163CB0
 RwaWave *
 sub_24DC70(RwaWave *wave, RwUInt32 offset, const void *src, RwUInt32 size)
 {
@@ -451,6 +461,7 @@ sub_24DC70(RwaWave *wave, RwUInt32 offset, const void *src, RwUInt32 size)
 
 /* Reads the wave's data from offset. */
 // match: _sub_24DCB0 @ 0x0024DCB0
+// sp-match: _sub_24DCB0 @ 0x00163CF0
 RwaWave *
 sub_24DCB0(RwaWave *wave, void *unused, RwUInt32 offset, void *dest)
 {
@@ -459,6 +470,7 @@ sub_24DCB0(RwaWave *wave, void *unused, RwUInt32 offset, void *dest)
 }
 
 // match: _sub_24DCF0 @ 0x0024DCF0
+// sp-match: _sub_24DCF0 @ 0x00163D30
 RwUInt8 *
 sub_24DCF0(RwaWave *wave)
 {
@@ -471,6 +483,7 @@ sub_24DCF0(RwaWave *wave)
 
 /* Grows (add) or shrinks the wave's memory by size. */
 // match: _sub_24DD10 @ 0x0024DD10
+// sp-match: _sub_24DD10 @ 0x00163D50
 void
 sub_24DD10(RwaWave *wave, RwUInt32 size, RwBool add)
 {
@@ -502,6 +515,7 @@ sub_24DD10(RwaWave *wave, RwUInt32 size, RwBool add)
 }
 
 // match: _sub_24DDA0 @ 0x0024DDA0
+// sp-match: _sub_24DDA0 @ 0x00163DE0
 void
 sub_24DDA0(RwaWave *wave)
 {
@@ -510,6 +524,7 @@ sub_24DDA0(RwaWave *wave)
 
 /* Loads size bytes of the file into the wave's memory (whole sectors). */
 // match: _sub_24DDB0 @ 0x0024DDB0
+// sp-match: _sub_24DDB0 @ 0x00163DF0
 RwUInt32
 sub_24DDB0(void *file, RwUInt32 handle, RwUInt32 offset, RwUInt32 size)
 {
@@ -530,6 +545,7 @@ sub_24DDB0(void *file, RwUInt32 handle, RwUInt32 offset, RwUInt32 size)
 }
 
 // match: _sub_24DE20 @ 0x0024DE20
+// sp-match: _sub_24DE20 @ 0x00163E60
 RwaWave *
 sub_24DE20(RwaWave *wave)
 {
@@ -543,6 +559,7 @@ sub_24DE20(RwaWave *wave)
 
 /* Registers the streamed wave definition. */
 // match: _sub_24DE40 @ 0x0024DE40
+// sp-match: _sub_24DE40 @ 0x00163E80
 RwaWaveDef *
 sub_24DE40(void)
 {
@@ -581,6 +598,7 @@ sub_24DE40(void)
 }
 
 // match: _sub_24DF00 @ 0x0024DF00
+// sp-match: _sub_24DF00 @ 0x00163F40
 RwaUUID *
 sub_24DF00(void)
 {

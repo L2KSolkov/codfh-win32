@@ -21,6 +21,14 @@
 
 // match: _$E2 @ 0x0030B830
 // match: _$E3 @ 0x0030E630
+// sp-match: _$E2 @ 0x0021D890
+// sp-match: _$E3 @ 0x0021E9C0
+// STL templates single player calls out of line from _Insert_n (MP expands them):
+// sp-match: ??$fill@PAPAULinearMemoryPool@CLinearMemoryManager@RWS@@PAU123@@std@@YAXPAPAULinearMemoryPool@CLinearMemoryManager@RWS@@0ABQAU123@@Z @ 0x000DFDE0
+// sp-match: ??$copy_backward@PAPAULinearMemoryPool@CLinearMemoryManager@RWS@@PAPAU123@@std@@YAPAPAULinearMemoryPool@CLinearMemoryManager@RWS@@PAPAU123@00@Z @ 0x000DFE00
+// sp-match: ??$_Ucopy@PAPAULinearMemoryPool@CLinearMemoryManager@RWS@@@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@std@@IAEPAPAULinearMemoryPool@CLinearMemoryManager@RWS@@PAPAU234@00@Z @ 0x000DFE30
+// sp-match: ?_Ufill@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@std@@IAEPAPAULinearMemoryPool@CLinearMemoryManager@RWS@@PAPAU345@IABQAU345@@Z @ 0x000DFE60
+// sp-match: _$E2 @ 0x0021D890
 
 namespace RWS
 {
@@ -29,6 +37,7 @@ namespace RWS
 }
 
 // match: ?SetupPlacementNewInfo@?A0x27aea8e5@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x0012D0A0
+// sp-match: ?SetupPlacementNewInfo@?A0x27aea8e5@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000E0120
 namespace RWS
 {
    namespace
@@ -78,6 +87,7 @@ namespace RWS
 }
 
 // match: ?RegisterStreamChunkHandlers@CLinearMemoryManager@RWS@@SAXXZ @ 0x0012D270
+// sp-match: ?RegisterStreamChunkHandlers@CLinearMemoryManager@RWS@@SAXXZ @ 0x000E01D0
 void RWS::CLinearMemoryManager::RegisterStreamChunkHandlers(void)
    {
       CStreamHandler::RegisterChunkHandler(MAKECHUNKID (rwVENDORID_CRITERIONRM,
@@ -85,6 +95,7 @@ void RWS::CLinearMemoryManager::RegisterStreamChunkHandlers(void)
    }
 
 // match: ?RequestMemory@CLinearMemoryManager@RWS@@SAPAXI@Z @ 0x0012D290
+// sp-match: ?RequestMemory@CLinearMemoryManager@RWS@@SAPAXI@Z @ 0x000DFDA0
 void * RWS::CLinearMemoryManager::RequestMemory(size_t size)
    {
       if (!m_pCurrentPool)
@@ -123,3 +134,5 @@ void * RWS::CLinearMemoryManager::RequestMemory(size_t size)
 // match: __ehhandler$?_Insert_n@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@std@@IAEXViterator@12@IABQAULinearMemoryPool@CLinearMemoryManager@RWS@@@Z @ 0x003016A0
 // match: ?_Buy@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@std@@IAE_NI@Z @ 0x0012DB10
 // match: ?_Tidy@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@std@@IAEXXZ @ 0x0012DBB0
+// sp-match: ?CreateMemoryPool@CLinearMemoryManager@RWS@@SAPAV12@I@Z @ 0x000E0070
+// sp-match: ?_Insert_n@?$vector@PAULinearMemoryPool@CLinearMemoryManager@RWS@@V?$allocator@PAULinearMemoryPool@CLinearMemoryManager@RWS@@@std@@@std@@IAEXViterator@12@IABQAULinearMemoryPool@CLinearMemoryManager@RWS@@@Z @ 0x000DFE90

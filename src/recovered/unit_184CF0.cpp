@@ -113,6 +113,7 @@ type_4E73F0 dword_4E73F0;
 
 // match: _$E2 @ 0x0030BF90
 // match: ?sub_184CF0@type_4E73F0@@QAEXXZ @ 0x00184CF0
+// sp-match: ?sub_184CF0@type_4E73F0@@QAEXXZ @ 0x0011B5F0
 
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its switches under "Performance Statistics": a graph switch for each
@@ -150,6 +151,7 @@ void type_4E73F0::sub_184CF0()
 }
 
 // match: ?sub_184E40@type_4E73F0@@QAEXXZ @ 0x00184E40
+// sp-match: ?sub_184E40@type_4E73F0@@QAEXXZ @ 0x0011B160
 // Forgets the groups' submenus and clears the statistics (building a
 // fresh display on the stack it never uses).
 void type_4E73F0::sub_184E40()
@@ -167,6 +169,7 @@ void type_4E73F0::sub_184E40()
 }
 
 // match: ??0type_4E73F0@@QAE@XZ @ 0x00184EA0
+#ifndef CODFH_SP // single player's constructor is inline (include/game/debugmenu.h; SP 0x3239A8)
 type_4E73F0::type_4E73F0()
 {
     unk_08 = 1;
@@ -177,8 +180,10 @@ type_4E73F0::type_4E73F0()
     unk_0C = 0;
     unk_10 = 0;
 }
+#endif
 
 // match: ?sub_184F00@type_4E73F0@@QAEXXZ @ 0x00184F00
+// sp-match: ?sub_184F00@type_4E73F0@@QAEXXZ @ 0x0011ADB0
 void type_4E73F0::sub_184F00()
 {
     type_42A598 *var_4;
@@ -200,6 +205,7 @@ void type_4E73F0::sub_184F00()
 }
 
 // match: ?sub_184F90@type_4E73F0@@QAEXXZ @ 0x00184F90
+// sp-match: ?sub_184F90@type_4E73F0@@QAEXXZ @ 0x0011B190
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its step: closes the timers still open, then for each shown one (or all,
 // with the text or the highest four) its time as a share of 180 of a frame
@@ -252,7 +258,11 @@ void type_4E73F0::sub_184F90()
                 else
                     bp_8->unk_20 = 0;
                 bp_8->unk_24 = bp_8->unk_20;
+#ifdef CODFH_SP // shape: the most compared as floats, its conversion shared
+                bp_8->unk_28 = (RwReal)bp_8->unk_20 > bp_8->unk_28 ? (RwReal)bp_8->unk_20 : bp_8->unk_28;
+#else
                 bp_8->unk_28 = (RwDouble)bp_8->unk_20 > bp_8->unk_28 ? (RwReal)bp_8->unk_20 : (RwReal)(RwDouble)bp_8->unk_28;
+#endif
                 bp_8->unk_2C = bp_8->unk_20 + bp_8->unk_2C;
                 bp_8->unk_30++;
                 unk_1C[bp_4][unk_18] = (RwReal)bp_8->unk_20;
@@ -268,6 +278,7 @@ void type_4E73F0::sub_184F90()
 }
 
 // match: ?sub_1851C0@type_4E73F0@@QAEXPAURwCamera@@@Z @ 0x001851C0
+// sp-match: ?sub_1851C0@type_4E73F0@@QAEXPAURwCamera@@@Z @ 0x0011B6F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its draw: the text when shown, the graphs when any is.
 void type_4E73F0::sub_1851C0(RwCamera *arg_0)
@@ -289,6 +300,7 @@ void type_4E73F0::sub_1851C0(RwCamera *arg_0)
 }
 
 // match: ?sub_185220@type_4E73F0@@QAEXXZ @ 0x00185220
+// sp-match: ?sub_185220@type_4E73F0@@QAEXXZ @ 0x0011ADF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The text: each render timer's name, its last frame's and its most time
 // as a percentage of a frame, a line of 14 each from (360, 30).
@@ -310,8 +322,8 @@ void type_4E73F0::sub_185220()
     {
         sprintf(var_88, "%s", l4->unk_04);
         unk_4E73A8.sub_184C50(var_88, var94, l8C);
-        s98 = l4->unk_24 / 180.0f * 100.0f;
-        var_9C = l4->unk_28 / 180.0f * 100.0f;
+        s98 = (RwReal)(l4->unk_24 / 180.0f) * 100.0f;
+        var_9C = (RwReal)(l4->unk_28 / 180.0f) * 100.0f;
         sprintf(var_88, "%3.1f", s98);
         unk_4E73A8.sub_184C50(var_88, var94 + 170, l8C);
         sprintf(var_88, "%3.1f", var_9C);
@@ -322,6 +334,7 @@ void type_4E73F0::sub_185220()
 }
 
 // match: ?sub_185390@type_4E73F0@@QAEXPAURwCamera@@@Z @ 0x00185390
+// sp-match: ?sub_185390@type_4E73F0@@QAEXPAURwCamera@@@Z @ 0x0011B2D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The graphs (their backdrop made once, sub_185B50): a white box, each
 // shown timer's last 94 samples in its colour, its name and last share by
@@ -378,9 +391,18 @@ void type_4E73F0::sub_185390(RwCamera *arg_0)
             var_43C = lv_300;
             for (var_440 = 0; var_440 < 0x5E; var_440++)
             {
+#ifdef CODFH_SP // shape: SP 0x11B2D0 captures the origin and next sample inside each coordinate.
+                RwReal x_origin;
+                RwInt32 next_sample;
+                var_43C->x = (x_origin = local_428, (var_440 << 1) + x_origin);
+                var_43C->y = (next_sample = (unk_18 + 1) % 95,
+                             var304 - unk_1C[local_310][unk_18]);
+                unk_18 = next_sample;
+#else // MP 0x185390 advances the sample after writing the coordinates.
                 var_43C->x = var_440 * 2 + local_428;
                 var_43C->y = var304 - (unk_1C[local_310][unk_18]);
                 unk_18 = (unk_18 + 1) % 95;
+#endif
                 var_43C++;
             }
             fp_434 = q30C->unk_3C;
@@ -403,7 +425,11 @@ void type_4E73F0::sub_185390(RwCamera *arg_0)
             p42C = 212.0f;
             fp_424 = (RwUInt32)Height - var304;
             unk_4E73A8.sub_184C50(stk_420, (RwInt32)p42C, (RwInt32)(fp_424 = q30C->unk_24 + fp_424));
+#ifdef CODFH_SP // shape: the share first (SP multiplies by 1/180, then by 100; no folded 5/9)
+            sprintf(stk_420, "%3.1f %%", l318 = (q30C->unk_24 / 180.0f) * 100.0f);
+#else
             sprintf(stk_420, "%3.1f %%", l318 = q30C->unk_24 / 180.0f * 100.0f);
+#endif
             p42C = q30C->unk_48 + p42C;
             unk_4E73A8.sub_184C50(stk_420, (RwInt32)p42C, (RwInt32)fp_424);
         }
@@ -416,6 +442,7 @@ void type_4E73F0::sub_185390(RwCamera *arg_0)
 }
 
 // match: ?sub_185820@type_4E73F0@@QAEXPAURwCamera@@PAURwV2d@@HHPAURwRGBA@@H@Z @ 0x00185820
+// sp-match: ?sub_185820@type_4E73F0@@QAEXPAURwCamera@@PAURwV2d@@HHPAURwRGBA@@H@Z @ 0x0011AEF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_4E73F0::sub_185820(RwCamera *arg_0, RwV2d *arg_4, RwInt32 arg_8, RwInt32 arg_C, RwRGBA *arg_10,
                              RwInt32 arg_14)
@@ -452,6 +479,7 @@ void type_4E73F0::sub_185820(RwCamera *arg_0, RwV2d *arg_4, RwInt32 arg_8, RwInt
 }
 
 // match: ?sub_1859A0@type_4E73F0@@QAEXH@Z @ 0x001859A0
+// sp-match: ?sub_1859A0@type_4E73F0@@QAEXH@Z @ 0x0011AFF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Shows the graphs of the arg_0 timers with the most time last frame
 // (an insertion into a list of indices), hiding the rest.
@@ -499,6 +527,7 @@ void type_4E73F0::sub_1859A0(RwInt32 arg_0)
 }
 
 // match: ?sub_185B50@type_4E73F0@@QAEXXZ @ 0x00185B50
+// sp-match: ?sub_185B50@type_4E73F0@@QAEXXZ @ 0x0011B0B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Each timer's label offset: the width of its name (trailing spaces after
 // the fourth character dropped) in the menu's font, plus 25.

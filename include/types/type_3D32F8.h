@@ -80,7 +80,7 @@ struct type_758F0_08
     virtual void vf_050();
     virtual void vf_054();
     virtual RwInt32 vf_058();
-    virtual void vf_05C();
+    virtual void vf_05C();      // (kept in single player: SP 0xF63A0 calls vf_064 at +0x64)
     virtual void vf_060();
     // Its kind of weapon (a vehicle's vf_068 scales the damage of kinds 20
     // to 22 from a player's kind-5 weapon).
@@ -154,7 +154,28 @@ struct type_76290
         unk_01 = 0;
         sub_761F0();
     }
+#ifdef CODFH_SP // inline in single player: SP 0x61500 expands it (no twin of 0x761F0)
+    void sub_761F0()
+    {
+        unk_00 = 0;
+        unk_02 = -1;
+        unk_01 = 0;
+        unk_01 = 1;
+        unk_2C = 0;
+        unk_10.z = 0;
+        unk_10.y = 0;
+        unk_10.x = 0;
+        unk_04.z = 0;
+        unk_04.y = 0;
+        unk_04.x = 0;
+        unk_28 = 0;
+        unk_1C = 0;
+        unk_24 = 0;
+        unk_20 = 0;
+    }
+#else
     void sub_761F0();
+#endif
 };
 
 // An entity's bounding box at +0x574, as type_3D32F8's vf_204 reads it from
@@ -250,10 +271,12 @@ struct type_3D32F8 : type_3D3548
     // +0x204: breaks apart when arg_0 is 1 (the breaker's AI object is
     // arg_8), else stops its physics callback.
     virtual void vf_204(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8);
+#ifndef CODFH_SP // single player keeps the base's (SP vtable 0x2E0B00 +0x204: sub_CDC70's twin)
     // +0x208: plays an animation (type_3D3548's own, sub_CDC70), first
     // settling unk_45C's wait.
     virtual RwInt32 vf_208(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwReal arg_C,
                            RwReal arg_10, RwReal arg_14, RwInt32 arg_18);
+#endif
 
     // unk_3D4 through a local of its own: an inline with no address, named
     // for its field. Evidence: type_3CE278::sub_32750 compares it with 1
@@ -284,6 +307,7 @@ struct type_3D32F8 : type_3D3548
     RwUInt8 unk_452[0x2];
     type_D48D0 unk_454;         // its own entity
     type_76290 *unk_458;        // its debris state (vf_248, vf_24C)
+#ifndef CODFH_SP // single player has no five-way blend: unk_488 sits at +0x45C (SP 0x60560)
     RwInt32 unk_45C;            // sub_76860's flag
     RwInt16 unk_460;            // the animation it waits on (-1 for none)
     RwUInt8 unk_462[0x2];
@@ -292,13 +316,17 @@ struct type_3D32F8 : type_3D3548
     RwReal unk_47C;             // its current one (sub_76960), with their
     RwReal unk_480;             // magnitudes
     RwReal unk_484;
+#endif
     RwInt32 unk_488;            // set while it is up (vf_230)
+#ifndef CODFH_SP
     RwUInt8 unk_48C[0x4];
+#endif
 
     type_3D32F8(type_712B0 *arg_0)
     {
         sub_740B0(arg_0);
     }
+#ifndef CODFH_SP // (single player has no five-way blend)
     // An inline accessor with no address and so no database name, named for
     // its field. Evidence: the flag part's step (sub_1B2670) passes the value
     // through a slot of its own.
@@ -306,6 +334,7 @@ struct type_3D32F8 : type_3D3548
     {
         unk_480 = arg_0;
     }
+#endif
     // Updates its physics unless it is at rest; the argument is unused.
     void sub_74A30(RwReal arg_0);
     // Takes its model from its trigger's unk_C8 (unless that is its unk_C0).
@@ -345,11 +374,26 @@ struct type_3D32F8 : type_3D3548
         return vf_06C(arg_0);
     }
 };
+#ifdef CODFH_SP // single player's is 0x460 bytes (SP 0x620E0 push 0x460)
+typedef RwChar type_3D32F8_size_check[sizeof(type_3D32F8) == 0x460 ? 1 : -1];
+#else
 typedef RwChar type_3D32F8_size_check[sizeof(type_3D32F8) == 0x490 ? 1 : -1];
+#endif
 
 // sub_78870 releases the animation object sub_78830 made (type_3D3548's
 // unk_280); sub_8B840 takes the entity out of the CCESS pool (types/ccess.h).
 void sub_78870(RwInt32 arg_0);
+#ifdef CODFH_SP
+// Releases an entity's animation object (unk_280, unk_288) and clears the
+// field: single player's inline, named for what it does. Evidence: SP
+// 0x111CF0 and 0xF5F6F copy the loaded field to another register before
+// pushing it, as an inline's reference parameter does.
+inline void release_anim(RwInt32 &arg_0)
+{
+    sub_78870(arg_0);
+    arg_0 = 0;
+}
+#endif
 // The state sub_74A30 hands the physics step sub_950C0, one 48-byte local
 // (its members are passed one by one; a frame of separate locals would leave
 // the 12-byte vectors a hole each).

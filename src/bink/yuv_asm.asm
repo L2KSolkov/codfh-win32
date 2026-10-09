@@ -74,6 +74,7 @@ EXTERN _z2hsize:BYTE
 segcz SEGMENT PARA PUBLIC ALIAS('BINK') 'CODE'
 
 ; // match: ?checkzoombufs@@YAXK@Z @ 0x0034A2B0
+; // sp-match: ?checkzoombufs@@YAXK@Z @ 0x0025A2B0
 ?checkzoombufs@@YAXK@Z PROC PUBLIC
         db 056h   ; push esi
         db 08Bh, 0F0h   ; mov esi, eax
@@ -122,6 +123,7 @@ seg1 SEGMENT PARA PUBLIC ALIAS('BINK') 'CODE'
 
 
 ; // match: ?setdbls@@YAXPAKK@Z @ 0x0034A7B0
+; // sp-match: ?setdbls@@YAXPAKK@Z @ 0x0025A7B0
 ?setdbls@@YAXPAKK@Z PROC PUBLIC
         db 0A1h   ; mov eax, dword ptr [0x5388c8]
         dd _rdtscavail
@@ -179,6 +181,7 @@ $L_34a802:
 ?setdbls@@YAXPAKK@Z ENDP
 
 ; // match: ?setevenodd@@YAXKPAKKKPAUBLITS@@0@Z @ 0x0034A840
+; // sp-match: ?setevenodd@@YAXKPAKKKPAUBLITS@@0@Z @ 0x0025A840
 ?setevenodd@@YAXKPAKKKPAUBLITS@@0@Z PROC PUBLIC
         db 08Bh, 00Fh   ; mov ecx, dword ptr [edi]
         db 055h   ; push ebp
@@ -539,6 +542,7 @@ seg1 ENDS
 seg2 SEGMENT PARA PUBLIC ALIAS('BINK') 'CODE'
 
 ; // match: ?YUV_blit@@YAXPAXKKK0KKKKKKK0PAUBLITS@@@Z @ 0x0034ACD0
+; // sp-match: ?YUV_blit@@YAXPAXKKK0KKKKKKK0PAUBLITS@@@Z @ 0x0025ACD0
 ?YUV_blit@@YAXPAXKKK0KKKKKKK0PAUBLITS@@@Z PROC PUBLIC
 $L_34acd0:
         db 08Bh, 04Ch, 024h, 02Ch   ; mov ecx, dword ptr [esp + 0x2c]
@@ -997,6 +1001,7 @@ seg2 ENDS
 seg3 SEGMENT PARA PUBLIC ALIAS('BINK') 'CODE'
 
 ; // match: _YUV_init@4 @ 0x0034BB90
+; // sp-match: _YUV_init@4 @ 0x0025BB90
 _YUV_init@4 PROC PUBLIC
         db 0A1h   ; mov eax, dword ptr [0x5388c8]
         dd _rdtscavail
@@ -1769,6 +1774,7 @@ seg3 ENDS
 segbm SEGMENT PARA PUBLIC ALIAS('BINK') 'CODE'
 
 ; // match: ?YUV_blit_mask@@YAXPAXKKKPAEK0KKKKKKK0PAUBLITS@@@Z @ 0x0034B150
+; // sp-match: ?YUV_blit_mask@@YAXPAXKKKPAEK0KKKKKKK0PAUBLITS@@@Z @ 0x0025B150
 ?YUV_blit_mask@@YAXPAXKKKPAEK0KKKKKKK0PAUBLITS@@@Z PROC PUBLIC
         db 081h, 0ECh, 084h, 000h, 000h, 000h   ; sub esp, 0x84
         db 08Bh, 08Ch, 024h, 094h, 000h, 000h, 000h   ; mov ecx, dword ptr [esp + 0x94]
@@ -2574,6 +2580,7 @@ segbm ENDS
 segw32 SEGMENT PARA PUBLIC ALIAS('BINK32') 'CODE'
 
 ; // match: _YUV_blit_32bpp@52 @ 0x0034EBD0
+; // sp-match: _YUV_blit_32bpp@52 @ 0x0025EBD0
 _YUV_blit_32bpp@52 PROC PUBLIC
         db 08Bh, 044h, 024h, 030h   ; mov eax, dword ptr [esp + 0x30]
         db 08Bh, 04Ch, 024h, 034h   ; mov ecx, dword ptr [esp + 0x34]
@@ -2611,6 +2618,7 @@ segw32 ENDS
 segw32a SEGMENT PARA PUBLIC ALIAS('BINK32A') 'CODE'
 
 ; // match: _YUV_blit_32abpp@52 @ 0x0034FFA0
+; // sp-match: _YUV_blit_32abpp@52 @ 0x0025FFA0
 _YUV_blit_32abpp@52 PROC PUBLIC
         db 08Bh, 044h, 024h, 030h   ; mov eax, dword ptr [esp + 0x30]
         db 08Bh, 04Ch, 024h, 034h   ; mov ecx, dword ptr [esp + 0x34]
@@ -2648,6 +2656,7 @@ segw32a ENDS
 segw16 SEGMENT PARA PUBLIC ALIAS('BINK16') 'CODE'
 
 ; // match: _YUV_blit_16bpp@52 @ 0x00351290
+; // sp-match: _YUV_blit_16bpp@52 @ 0x00261290
 _YUV_blit_16bpp@52 PROC PUBLIC
         db 08Bh, 044h, 024h, 030h   ; mov eax, dword ptr [esp + 0x30]
         db 08Bh, 04Ch, 024h, 034h   ; mov ecx, dword ptr [esp + 0x34]
@@ -2685,6 +2694,7 @@ segw16 ENDS
 segw4444 SEGMENT PARA PUBLIC ALIAS('BINK4444') 'CODE'
 
 ; // match: _YUV_blit_16a4bpp@52 @ 0x00352760
+; // sp-match: _YUV_blit_16a4bpp@52 @ 0x00262760
 _YUV_blit_16a4bpp@52 PROC PUBLIC
         db 08Bh, 044h, 024h, 030h   ; mov eax, dword ptr [esp + 0x30]
         db 08Bh, 04Ch, 024h, 034h   ; mov ecx, dword ptr [esp + 0x34]
@@ -2722,6 +2732,7 @@ segw4444 ENDS
 segw5551 SEGMENT PARA PUBLIC ALIAS('BINK5551') 'CODE'
 
 ; // match: _YUV_blit_16a1bpp@52 @ 0x00353C80
+; // sp-match: _YUV_blit_16a1bpp@52 @ 0x00263C80
 _YUV_blit_16a1bpp@52 PROC PUBLIC
         db 08Bh, 044h, 024h, 030h   ; mov eax, dword ptr [esp + 0x30]
         db 08Bh, 04Ch, 024h, 034h   ; mov ecx, dword ptr [esp + 0x34]
@@ -2759,6 +2770,7 @@ segw5551 ENDS
 segwyuy2 SEGMENT PARA PUBLIC ALIAS('BINKYUY2') 'CODE'
 
 ; // match: _YUV_blit_YUY2@52 @ 0x00354D70
+; // sp-match: _YUV_blit_YUY2@52 @ 0x00264D70
 _YUV_blit_YUY2@52 PROC PUBLIC
         db 08Bh, 054h, 024h, 004h   ; mov edx, dword ptr [esp + 4]
         db 08Bh, 0C2h   ; mov eax, edx

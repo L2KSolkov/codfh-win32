@@ -68,6 +68,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/src/baresam
 // match: __real@47800000 @ 0x004160A4
 
 // match: _ImageResampleGetSpan @ 0x002B7010
+// sp-match: _ImageResampleGetSpan @ 0x001D2430
 
 static  void
 ImageResampleGetSpan(const RwImage * _image,
@@ -146,6 +147,7 @@ ImageResampleGetSpan(const RwImage * _image,
  */
 
 // match: _ImageResampleGetAvgPixel @ 0x002B72A0
+// sp-match: _ImageResampleGetAvgPixel @ 0x001D26C0
 static void
 ImageResampleGetAvgPixel(const RwImage * _image,
                          RwFixed _nXStart,
@@ -228,6 +230,7 @@ ImageResampleGetAvgPixel(const RwImage * _image,
  *
  */
 // match: _RwImageResample @ 0x002B74F0
+// sp-match: _RwImageResample @ 0x001D2910
 RwImage            *
 RwImageResample(RwImage * dstImage, const RwImage * srcImage)
 {
@@ -314,6 +317,7 @@ RwImageResample(RwImage * dstImage, const RwImage * srcImage)
  *
  */
 // match: _RwImageCreateResample @ 0x002B7650
+// sp-match: _RwImageCreateResample @ 0x001D2A70
 RwImage            *
 RwImageCreateResample(const RwImage * srcImage,
                       RwInt32 width,

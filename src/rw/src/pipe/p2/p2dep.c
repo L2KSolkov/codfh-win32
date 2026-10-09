@@ -118,6 +118,7 @@ _ReqSearch4Cluster(rxReq *req, RxClusterDefinition *clusterDef)
 // match: _rcsid @ 0x00417470
 
 // match: __ReqAddEntry @ 0x002BC910
+// sp-match: __ReqAddEntry @ 0x001D7D20
 static RwReqEntry *
 _ReqAddEntry(rxReq *req,
              RxClusterDefinition *clusterDef,
@@ -201,6 +202,7 @@ _IoSpecSearch4Cluster(RxIoSpec * iospec,
    below if cluster dies */
 
 // match: __PropDownElimPath @ 0x002BC990
+// sp-match: __PropDownElimPath @ 0x001D7DA0
 static void
 _PropDownElimPath(RxPipeline * pipeline, RxPipelineNode * node,
                   RxClusterDefinition * clusterDef)
@@ -282,6 +284,7 @@ _ScopeTraceAddEntry(RwScopeTrace * scopetrace, RwReqEntry * reqentry)
 }
 
 // match: __ScopeTraceMerge @ 0x002BCAB0
+// sp-match: __ScopeTraceMerge @ 0x001D7EC0
 static void
 _ScopeTraceMerge(RwScopeTrace ** headref, RwScopeTrace * p,
                  RwScopeTrace * q)
@@ -513,6 +516,7 @@ _ScopeTracesDump(RwScopeTrace * head)
 #define E_RX_DEP_SUCCESS              0
 
 // match: __PropagateDependenciesAndKillDeadPaths @ 0x002BCB20
+// sp-match: __PropagateDependenciesAndKillDeadPaths @ 0x001D7F30
 static RwUInt32
 _PropagateDependenciesAndKillDeadPaths(RxPipeline * pipeline)
 {
@@ -666,6 +670,7 @@ _PropagateDependenciesAndKillDeadPaths(RxPipeline * pipeline)
 
 /*****************************************************************************/
 // match: __ForAllNodeReqsAddOutputClustersAndBuildContinuityBitfields @ 0x002BCED0
+// sp-match: __ForAllNodeReqsAddOutputClustersAndBuildContinuityBitfields @ 0x001D82E0
 static              RwUInt32
 _ForAllNodeReqsAddOutputClustersAndBuildContinuityBitfields(RxPipeline
                                                             * pipeline)
@@ -762,6 +767,7 @@ _ForAllNodeReqsAddOutputClustersAndBuildContinuityBitfields(RxPipeline
 
 /*****************************************************************************/
 // match: __TraceClusterScopes @ 0x002BD1C0
+// sp-match: __TraceClusterScopes @ 0x001D85D0
 static              RwUInt32
 _TraceClusterScopes(RxPipeline * pipeline, RwScopeTrace ** stheadref)
 {
@@ -859,6 +865,7 @@ _TraceClusterScopes(RxPipeline * pipeline, RwScopeTrace ** stheadref)
 
 /*****************************************************************************/
 // match: __AssignClusterSlots @ 0x002BD390
+// sp-match: __AssignClusterSlots @ 0x001D87A0
 static              RwUInt32
 _AssignClusterSlots(RxPipeline * pipeline, RwScopeTrace ** stheadref)
 {
@@ -941,6 +948,7 @@ typedef void (*EnumPipelineClustersCallBack)
      void                *privatedata);
 
 // match: __EnumPipelineClusters @ 0x002BD430
+// sp-match: __EnumPipelineClusters @ 0x001D8840
 static RwUInt32
 _EnumPipelineClusters(RwScopeTrace *head,
                       EnumPipelineClustersCallBack fp,
@@ -985,6 +993,7 @@ _EnumPipelineClusters(RwScopeTrace *head,
 
 /*****************************************************************************/
 // match: __CountHeadNodeRqdsAndOpts @ 0x002BD490
+// sp-match: __CountHeadNodeRqdsAndOpts @ 0x001D88A0
 static              RwUInt32
 _CountHeadNodeRqdsAndOpts(RxPipeline * pipeline)
 {
@@ -1010,6 +1019,7 @@ _CountHeadNodeRqdsAndOpts(RxPipeline * pipeline)
 
 /*****************************************************************************/
 // match: __WriteHeadNodeRqdsAndOpts2PipelineRequirements @ 0x002BD4D0
+// sp-match: __WriteHeadNodeRqdsAndOpts2PipelineRequirements @ 0x001D88E0
 static void
 _WriteHeadNodeRqdsAndOpts2PipelineRequirements(RxPipeline *pipeline)
 {
@@ -1050,6 +1060,7 @@ _WriteHeadNodeRqdsAndOpts2PipelineRequirements(RxPipeline *pipeline)
 
 /*****************************************************************************/
 // match: __MyEnumPipelineClustersCallBack @ 0x002BD560
+// sp-match: __MyEnumPipelineClustersCallBack @ 0x001D8970
 static void
 _MyEnumPipelineClustersCallBack(RxClusterDefinition *clusterdef,
                                 RwUInt32 __RWUNUSED__ pipelineclusterindex,
@@ -1090,6 +1101,7 @@ _MyEnumPipelineClustersCallBack(RxClusterDefinition *clusterdef,
 
 /*****************************************************************************/
 // match: __ForAllNodesWriteClusterAllocations @ 0x002BD590
+// sp-match: __ForAllNodesWriteClusterAllocations @ 0x001D89A0
 static RwUInt32
 _ForAllNodesWriteClusterAllocations(RxPipeline   *pipeline,
                                     RwScopeTrace *stHead)
@@ -1257,6 +1269,7 @@ _ForAllNodesWriteClusterAllocations(RxPipeline   *pipeline,
  * _rxChaseDependencies
  */
 // match: __rxChaseDependencies @ 0x002BD800
+// sp-match: __rxChaseDependencies @ 0x001D8C10
 RwUInt32
 _rxChaseDependencies(RxPipeline * pipeline)
 {

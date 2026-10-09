@@ -316,6 +316,13 @@ struct AIData
     type_14D180 *sub_23100(type_154C0_12F4 *arg_0);
     // Clears +0x4C and +0x50, then works through the owner (unk_568).
     void sub_1FC70();
+#ifdef CODFH_SP
+    // Single player only (SP 0x16540; its caller is SP 0xE4C59).
+    RwInt32 sp_sub_16540(type_3D3548 *arg_0, RwV3d *arg_4);
+    // The unk_574 object's vf_030, or -1: an inline MP expands in sub_34E60 and single
+    // player keeps out of line (SP 0x1CEF0); defined in unit_0348D0.
+    RwInt32 sp_sub_1CEF0();
+#endif
     // The unk_80 record of arg_0 (claimed for it when free); callers pass 0
     // for arg_4.
     type_154C0_80 *sub_16ED0(type_3D3548 *arg_0, RwBool *arg_4);

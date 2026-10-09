@@ -20,12 +20,14 @@
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003E1A60
 extern const RwUInt32 dword_3E1A60[3] = { 4, 10, 29 };
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E1A6C
 extern const RwReal flt_3E1A6C = 0.01f;
 // 0x003E1A70
 extern const RwReal flt_3E1A70 = 0.01f;
 // 0x003E1A74
 extern const RwReal flt_3E1A74 = 16.666666f;
+#endif
 // 0x004F84B8
 type_4F84B8 *dword_4F84B8;
 // End of its data definitions.

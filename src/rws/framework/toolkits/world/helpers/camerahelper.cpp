@@ -15,7 +15,7 @@
 #include "rws/mainloop.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
-// 0x003DAC18
+// 0x003DAC18 (single player's at SP 0x2E69AC, after rwgfxresource's six-slot vtable)
 extern const RwReal flt_3DAC18 = 16.666666f;
 // 0x00429C38
 RwReal flt_429C38 = 1.0f;
@@ -41,8 +41,10 @@ namespace RWS
          const RwReal DefaultNearClipPlane = 30.0f;
          const RwCameraProjection DefaultCameraProjection = rwPERSPECTIVE;
 
+#ifndef CODFH_SP // single player widens by a literal: its 1.33f follows the double (SP 0x2E69C8, read at SP 0xE36FE)
          // The widescreen view's widening (not an address).
          const RwReal WideViewWindowScale = 1.33f;
+#endif
       }
    }
 }
@@ -56,6 +58,7 @@ namespace RWS
 // match: ?flt_429C38@@3MA @ 0x00429C38
 
 // match: ?Destroy@CameraHelper@RWS@@YAHPAURwCamera@@@Z @ 0x00132BD0
+// sp-match: ?Destroy@CameraHelper@RWS@@YAHPAURwCamera@@@Z @ 0x000E34B0
 
 RwBool RWS::CameraHelper::Destroy(RwCamera *pCamera)
       {
@@ -104,6 +107,7 @@ RwBool RWS::CameraHelper::Destroy(RwCamera *pCamera)
       }
 
 // match: ?CreateMainRasterCamera@CameraHelper@RWS@@YAPAURwCamera@@III@Z @ 0x00132CC0
+// sp-match: ?CreateMainRasterCamera@CameraHelper@RWS@@YAPAURwCamera@@III@Z @ 0x000E3540
 RwCamera *RWS::CameraHelper::CreateMainRasterCamera(RwUInt32 Width, RwUInt32 Height, RwUInt32 ZDepth)
       {
          RwCamera *_camera = RwCameraCreate();
@@ -144,6 +148,7 @@ RwCamera *RWS::CameraHelper::CreateMainRasterCamera(RwUInt32 Width, RwUInt32 Hei
       }
 
 // match: ?CreateSubRasterCamera@CameraHelper@RWS@@YAPAURwCamera@@AAURwRect@@@Z @ 0x00132DE0
+// sp-match: ?CreateSubRasterCamera@CameraHelper@RWS@@YAPAURwCamera@@AAURwRect@@@Z @ 0x000E3610
 RwCamera *RWS::CameraHelper::CreateSubRasterCamera(RwRect &rRect)
       {
          RwUInt32 width = rRect.w;
@@ -169,6 +174,7 @@ RwCamera *RWS::CameraHelper::CreateSubRasterCamera(RwRect &rRect)
       }
 
 // match: ?SetFieldOfView@CameraHelper@RWS@@YAXMPAURwCamera@@@Z @ 0x00132EB0
+// sp-match: ?SetFieldOfView@CameraHelper@RWS@@YAXMPAURwCamera@@@Z @ 0x000E36B0
 void RWS::CameraHelper::SetFieldOfView(RwReal rViewWindow, RwCamera *pCamera)
       {
          RwVideoMode videoMode;
@@ -187,7 +193,11 @@ void RWS::CameraHelper::SetFieldOfView(RwReal rViewWindow, RwCamera *pCamera)
 
          vw.x = rViewWindow;
 
+#ifdef CODFH_SP // a literal (__real@3faa3d71 after __real@3fe0c15240000000, SP 0x2E69C8)
+         if (dword_4CF9A8) vw.x *= 1.33f;
+#else
          if (dword_4CF9A8) vw.x *= WideViewWindowScale;
+#endif
 
          vw.y = (rect.h * rViewWindow) / rect.w;
 

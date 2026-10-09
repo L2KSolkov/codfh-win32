@@ -203,6 +203,17 @@ namespace RWS
    // Sends the message Id with no data when handlers are linked to it: an
    // inline with no address (the restart builds each message in a local of
    // its own after testing the id's record).
+#ifdef CODFH_SP // single player's returns whether it was handled (its out-of-line copy, SP 0xA2340)
+   inline RwBool SendMsg(CEventId &Id)
+   {
+      if (Id.p_msgrec && Id.p_msgrec->Erm.p_next)
+      {
+         CMsg Msg(Id);
+         return _SendMsg(Msg);
+      }
+      return false;
+   }
+#else
    inline void SendMsg(CEventId &Id)
    {
       if (Id.p_msgrec && Id.p_msgrec->Erm.p_next)
@@ -211,6 +222,7 @@ namespace RWS
          _SendMsg(Msg);
       }
    }
+#endif
 
    extern CEventId iMsgStartSystem;
    extern CEventId iMsgDeleteEventHandler;

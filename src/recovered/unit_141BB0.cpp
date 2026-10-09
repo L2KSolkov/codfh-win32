@@ -62,6 +62,7 @@ RwTexDictionary *dword_4CFA10;
 // match: __ehhandler$?sub_142D70@@YAXPAURwStream@@PAUtype_141C10@@@Z>1 @ 0x0041DBCC
 
 // match: sub_141BB0 @ 0x00141BB0
+// sp-match: sub_141BB0 @ 0x000EE180
 
 void sub_141BB0()
 {
@@ -69,22 +70,31 @@ void sub_141BB0()
 }
 
 // match: sub_141BD0 @ 0x00141BD0
+// sp-match: sub_141BD0 @ 0x000EDDD0
 void sub_141BD0()
 {
     RWS::CStreamHandler::UnRegisterChunkHandler(0x719); // not an address: a chunk id
 }
 
 // match: ?ChunkHandler@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00141BF0
+// sp-match: ?ChunkHandler@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000EE160
 void ChunkHandler(RwChunkHeaderInfo &rChunkHeader, RwStream *pStream)
 {
     sub_141C10(pStream, &rChunkHeader);
 }
 
 // match: sub_141C10 @ 0x00141C10
+// sp-match: sub_141C10 @ 0x000EDDE0
 // Reads the chunk's record and hands it to the handler for its kind (the
 // loading bar advanced to a stage for some), then skips what the handler
 // left of the chunk.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
+#ifdef CODFH_SP
+// Single player's empty handlers for kinds 15 and 30: separate functions (sub_141C10 calls each
+// on its own), all folded with kind 14's into the empty function by /OPT:ICF.
+void sub_141C10_kind15(RwStream *arg_0, type_141C10 *arg_4);
+void sub_141C10_kind30(RwStream *arg_0, type_141C10 *arg_4);
+#endif
 void sub_141C10(RwStream *arg_0, RwChunkHeaderInfo *arg_4)
 {
     RwInt32 var_4;
@@ -168,7 +178,11 @@ void sub_141C10(RwStream *arg_0, RwChunkHeaderInfo *arg_4)
         break;
     case 15:
         sub_12F0A0();
+#ifdef CODFH_SP // single player's kind-15 handler is its own empty function (not tail-merged with kind 14's call, SP 0xEDDE0)
+        sub_141C10_kind15(arg_0, &local_20);
+#else
         sub_19A750(arg_0, &local_20);
+#endif
         break;
     case 20:
         sub_143230(arg_0, &local_20);
@@ -204,7 +218,11 @@ void sub_141C10(RwStream *arg_0, RwChunkHeaderInfo *arg_4)
         sub_143B90(arg_0, &local_20);
         break;
     case 30:
+#ifdef CODFH_SP // likewise kind 30's (SP 0xEDDE0)
+        sub_141C10_kind30(arg_0, &local_20);
+#else
         sub_19A750(arg_0, &local_20);
+#endif
         break;
     }
     var_4 = arg_4->length - local_20.unk_08;
@@ -213,6 +231,7 @@ void sub_141C10(RwStream *arg_0, RwChunkHeaderInfo *arg_4)
 }
 
 // match: sub_142030 @ 0x00142030
+// sp-match: sub_142030 @ 0x000EEF60
 // Kind 1: the opaque BSP of the section arg_4->unk_04, read into its record
 // when it is the section being loaded (or any is); the world is handed on
 // (sub_173CE0), or the record dropped when it cannot be read. Returns what
@@ -231,9 +250,11 @@ RwInt32 sub_142030(RwStream *arg_0, type_141C10 *arg_4)
         if (arg_4->unk_04 == (RwUInt16)word_429EAC || (RwUInt16)word_429EAC == 0xFFFF)
         {
             stk_C = (type_173F50 *)sub_173F50((RwUInt16)arg_4->unk_04);
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEEF60)
             if (!stk_C)
                 sub_19A750("***ERROR: no section bank available to load Opaque BSP for section %d\n",
                            arg_4->unk_04);
+#endif
             RwTexDictionarySetCurrent(0);
             stk_C->set_unk_08((RwInt16)arg_4->unk_04);
             sub_19A750(stk_C, 0);
@@ -254,20 +275,25 @@ RwInt32 sub_142030(RwStream *arg_0, type_141C10 *arg_4)
         }
         else
         {
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEEF60)
             sub_19A750("Warning: Loading opaque BSP for section %d but section to load is %d\n", arg_4->unk_04,
                        (RwUInt16)word_429EAC);
+#endif
             RwStreamSkip(arg_0, arg_4->unk_08);
         }
     }
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEEF60)
     else
     {
         sub_19A750("Warning: not able to find world chunk for Opaque BSP while loading section %d\n",
                    arg_4->unk_04);
     }
+#endif
     return v8;
 }
 
 // match: sub_1421B0 @ 0x001421B0
+// sp-match: sub_1421B0 @ 0x000EF030
 // Kind 2: the alpha BSP (as sub_142030, with 1 for 0: the second world) of the section arg_4->unk_04, read into its record
 // when it is the section being loaded (or any is); the world is handed on
 // (sub_173CE0), or the record dropped when it cannot be read. Returns what
@@ -286,9 +312,11 @@ RwInt32 sub_1421B0(RwStream *arg_0, type_141C10 *arg_4)
         if (arg_4->unk_04 == (RwUInt16)word_429EAC || (RwUInt16)word_429EAC == 0xFFFF)
         {
             stk_C = (type_173F50 *)sub_173F50((RwUInt16)arg_4->unk_04);
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF030)
             if (!stk_C)
                 sub_19A750("***ERROR: no section bank available to load Alpha BSP for section %d\n",
                            arg_4->unk_04);
+#endif
             RwTexDictionarySetCurrent(0);
             stk_C->set_unk_08((RwInt16)arg_4->unk_04);
             sub_19A750(stk_C, 1);
@@ -309,20 +337,25 @@ RwInt32 sub_1421B0(RwStream *arg_0, type_141C10 *arg_4)
         }
         else
         {
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF030)
             sub_19A750("Warning: Loading Alpha BSP for section %d but section to load is %d\n", arg_4->unk_04,
                        (RwUInt16)word_429EAC);
+#endif
             RwStreamSkip(arg_0, arg_4->unk_08);
         }
     }
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF030)
     else
     {
         sub_19A750("Warning: not able to find world chunk for Alpha BSP while loading section %d\n",
                    arg_4->unk_04);
     }
+#endif
     return v8;
 }
 
 // match: sub_142330 @ 0x00142330
+// sp-match: sub_142330 @ 0x000EE8B0
 // Kind 4: the section's texture dictionary (its error message is the alpha
 // BSP's). Returns 1 when it was read, else -1.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -339,9 +372,11 @@ RwInt32 sub_142330(RwStream *arg_0, type_141C10 *arg_4)
         if (arg_4->unk_04 == (RwUInt16)word_429EAC || (RwUInt16)word_429EAC == 0xFFFF)
         {
             var_10 = (type_173F50 *)sub_173F50((RwUInt16)arg_4->unk_04);
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEE8B0)
             if (!var_10)
                 sub_19A750("***ERROR: no section bank available to load Alpha BSP for section %d\n",
                            arg_4->unk_04);
+#endif
             var_10->set_unk_08((RwInt16)arg_4->unk_04);
             sub_19A750(var_10, 3);
             stk_C = RwTexDictionaryStreamRead(arg_0, var_10->unk_10);
@@ -360,20 +395,25 @@ RwInt32 sub_142330(RwStream *arg_0, type_141C10 *arg_4)
         }
         else
         {
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEE8B0)
             sub_19A750("Warning: Loading TXD for section %d but section to load is %d\n", arg_4->unk_04,
                        (RwUInt16)word_429EAC);
+#endif
             RwStreamSkip(arg_0, arg_4->unk_08);
         }
     }
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEE8B0)
     else
     {
         sub_19A750("Warning: not able to find TXD chunk for section TXD while loading section %d\n",
                    arg_4->unk_04);
     }
+#endif
     return v8;
 }
 
 // match: sub_142490 @ 0x00142490
+// sp-match: sub_142490 @ 0x000EF100
 // Kind 18: the XBSP (the world with animated UVs, stage 4), as sub_142030
 // with the UV animation dictionary made current first. Its last warning
 // has no `else` before it: it is logged after every load.
@@ -391,9 +431,11 @@ RwInt32 sub_142490(RwStream *arg_0, type_141C10 *arg_4)
         if (arg_4->unk_04 == (RwUInt16)word_429EAC || (RwUInt16)word_429EAC == 0xFFFF)
         {
             stk_C = (type_173F50 *)sub_173F50((RwUInt16)arg_4->unk_04);
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF100)
             if (!stk_C)
                 sub_19A750("***ERROR: no section bank available to load XBSP for section %d\n",
                            arg_4->unk_04);
+#endif
             RwTexDictionarySetCurrent(0);
             RtDictSchemaSetCurrentDict(&_rpUVAnimDictSchema, schema);
             stk_C->set_unk_08((RwInt16)arg_4->unk_04);
@@ -415,16 +457,21 @@ RwInt32 sub_142490(RwStream *arg_0, type_141C10 *arg_4)
         }
         else
         {
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF100)
             sub_19A750("Warning: Loading XBSP for section %d but section to load is %d\n", arg_4->unk_04,
                        (RwUInt16)word_429EAC);
+#endif
             RwStreamSkip(arg_0, arg_4->unk_08);
         }
     }
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF100)
     sub_19A750("Warning: not able to find world chunk for XBSP while loading section %d\n", arg_4->unk_04);
+#endif
     return v8;
 }
 
 // match: sub_142620 @ 0x00142620
+// sp-match: sub_142620 @ 0x000EE970
 // Kind 5: the level's global texture dictionary (dword_4CFA10), read into
 // the arena dword_4E5BD0 unless sections are set up; its size is kept
 // rounded up to 128 bytes. What a failed read leaves is skipped.
@@ -485,6 +532,7 @@ void sub_142620(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_1427A0 @ 0x001427A0
+// sp-match: sub_1427A0 @ 0x000EEA90
 // Kind 17: a UV animation dictionary, whose entries are added to the
 // current one (schema) before it is destroyed.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -521,6 +569,7 @@ void sub_1427A0(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: ?callBack@@YAPAXPAX0@Z @ 0x00142860
+// sp-match: ?callBack@@YAPAXPAX0@Z @ 0x000EE1A0
 RtDictEntryType callBack(RtDictEntryType entry, void *data)
 {
     RtDict *var_4;
@@ -531,6 +580,7 @@ RtDictEntryType callBack(RtDictEntryType entry, void *data)
 }
 
 // match: sub_142890 @ 0x00142890
+// sp-match: sub_142890 @ 0x000EF1E0
 // Kind 3: the collision BSP, as sub_142030 with 2 (the collision world).
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_142890(RwStream *arg_0, type_141C10 *arg_4)
@@ -546,9 +596,11 @@ RwInt32 sub_142890(RwStream *arg_0, type_141C10 *arg_4)
         if (arg_4->unk_04 == (RwUInt16)word_429EAC || (RwUInt16)word_429EAC == 0xFFFF)
         {
             stk_C = (type_173F50 *)sub_173F50((RwUInt16)arg_4->unk_04);
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF1E0)
             if (!stk_C)
                 sub_19A750("***ERROR: no section bank available to load Collision BSP for section %d\n",
                            arg_4->unk_04);
+#endif
             RwTexDictionarySetCurrent(0);
             stk_C->set_unk_08((RwInt16)arg_4->unk_04);
             sub_19A750(stk_C, 2);
@@ -569,20 +621,25 @@ RwInt32 sub_142890(RwStream *arg_0, type_141C10 *arg_4)
         }
         else
         {
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF1E0)
             sub_19A750("Warning: Loading Collsion BSP for section %d but section to load is %d\n", arg_4->unk_04,
                        (RwUInt16)word_429EAC);
+#endif
             RwStreamSkip(arg_0, arg_4->unk_08);
         }
     }
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF1E0)
     else
     {
         sub_19A750("Warning: not able to find world chunk for collision BSP while loading section %d\n",
                    arg_4->unk_04);
     }
+#endif
     return v8;
 }
 
 // match: sub_142A10 @ 0x00142A10
+// sp-match: sub_142A10 @ 0x000EE1C0
 void sub_142A10()
 {
     type_2A9830 *var_4;
@@ -593,6 +650,7 @@ void sub_142A10()
 }
 
 // match: sub_142A30 @ 0x00142A30
+// sp-match: sub_142A30 @ 0x000EE1E0
 // Kind 6: a world read with the shared texture dictionary (sub_174460 takes
 // it).
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -613,6 +671,7 @@ void sub_142A30(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_142A90 @ 0x00142A90
+// sp-match: sub_142A90 @ 0x000EE230
 // Kind 16: likewise for sub_174470.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_142A90(RwStream *arg_0, type_141C10 *arg_4)
@@ -632,6 +691,7 @@ void sub_142A90(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_142AF0 @ 0x00142AF0
+// sp-match: sub_142AF0 @ 0x000EE280
 // Likewise for sub_174480, with the UV animation dictionary made current
 // (no kind reaches it).
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -653,6 +713,7 @@ void sub_142AF0(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_142B70 @ 0x00142B70
+// sp-match: sub_142B70 @ 0x000EE2E0
 // Kind 7: a texture dictionary read by sub_144740 and handed to sub_174490.
 void sub_142B70(RwStream *arg_0, type_141C10 *arg_4)
 {
@@ -667,6 +728,7 @@ void sub_142B70(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_142BC0 @ 0x00142BC0
+// sp-match: sub_142BC0 @ 0x000EE320
 // Kinds 8 and 9.
 void sub_142BC0(RwStream *arg_0, type_141C10 *arg_4)
 {
@@ -674,6 +736,7 @@ void sub_142BC0(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_142BE0 @ 0x00142BE0
+// sp-match: sub_142BE0 @ 0x000EE330
 // Kind 11: the particle definitions file (the rest of the chunk), read into
 // a buffer of its own and handed to sub_F2B00.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -692,6 +755,7 @@ void sub_142BE0(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_142C30 @ 0x00142C30
+// sp-match: sub_142C30 @ 0x000EE370
 // Kind 26: the particle meshes.
 void sub_142C30(RwStream *arg_0, type_141C10 *arg_4)
 {
@@ -703,6 +767,7 @@ void sub_142C30(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_142C60 @ 0x00142C60
+// sp-match: sub_142C60 @ 0x000EE390
 // Kind 12: the particles' texture dictionary.
 void sub_142C60(RwStream *arg_0, type_141C10 *arg_4)
 {
@@ -716,6 +781,7 @@ void sub_142C60(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_142CA0 @ 0x00142CA0
+// sp-match: sub_142CA0 @ 0x000EE3C0
 // Kind 13: the path nodes; one stage fewer of the loading screen left
 // (dword_4B86FC).
 void sub_142CA0(RwStream *arg_0, type_141C10 *arg_4)
@@ -729,6 +795,7 @@ void sub_142CA0(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_142CE0 @ 0x00142CE0
+// sp-match: sub_142CE0 @ 0x000EE3F0
 // Kind 10: the rest of the chunk read into a buffer that nothing keeps.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_142CE0(RwStream *arg_0, type_141C10 *arg_4)
@@ -744,6 +811,7 @@ void sub_142CE0(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_142D20 @ 0x00142D20
+// sp-match: sub_142D20 @ 0x000EE420
 // A texture dictionary handed to unk_4E5CC8 (no kind reaches it).
 void sub_142D20(RwStream *arg_0, type_141C10 *arg_4)
 {
@@ -758,6 +826,7 @@ void sub_142D20(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_142D70 @ 0x00142D70
+// sp-match: sub_142D70 @ 0x000EE460
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Kind 18 within a section load: a list of type_143DC0 objects, each with
 // its name, a value (none for -1) and its values, then the names of what it
@@ -823,6 +892,7 @@ void sub_142D70(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_142F70 @ 0x00142F70
+// sp-match: sub_142F70 @ 0x000EF2B0
 // Kind 19: a whole section load, as a run of (kind, size) sub-chunks up to
 // kind 11, each read by its loader; a BSP or dictionary that cannot be read
 // aborts the rest. The section's streaming record is marked done. Returns
@@ -914,14 +984,17 @@ RwInt32 sub_142F70(RwStream *arg_0, type_141C10 *arg_4)
             break;
         }
     }
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF2B0)
     if (stk_C)
         sub_19A750("Received abort of section load...\n");
+#endif
     if (var_10 >= 0 && var_10 < 4)
         get_4E5D30(var_10)->unk_04 = 0;
     return var_10;
 }
 
 // match: sub_143230 @ 0x00143230
+// sp-match: sub_143230 @ 0x000EF4A0
 // Kind 20: a list of objects: a count, then a record and its data for each; an
 // object whose key is not known yet is made (kind 0xD), registered and
 // read through its vf_000, else its data is skipped. Ends early when the stream does.
@@ -966,6 +1039,7 @@ void sub_143230(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_143360 @ 0x00143360
+// sp-match: sub_143360 @ 0x000EEB20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Kind 21: a list of objects: a count, then a record and its data for each; an
 // object whose key is not known yet is made (kind 0x1E), registered and
@@ -1010,6 +1084,7 @@ void sub_143360(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_143480 @ 0x00143480
+// sp-match: sub_143480 @ 0x000EEBF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Kind 22: a list of objects: a count, then a record and its data for each; an
 // object whose key is not known yet is made (kind 0x1C), registered and
@@ -1055,6 +1130,7 @@ void sub_143480(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_1435A0 @ 0x001435A0
+// sp-match: sub_1435A0 @ 0x000EECC0
 // Kind 23: a list of objects: a count, then a record and its data for each; an
 // object whose key is not known yet is made (kind 0x1B), registered and
 // read (sub_193A00), else its data is skipped. Ends early when the stream does.
@@ -1099,6 +1175,7 @@ void sub_1435A0(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_1436C0 @ 0x001436C0
+// sp-match: sub_1436C0 @ 0x000EED90
 // Kind 24: a list of objects: a count, then a record and its data for each; an
 // object whose key is not known yet is made (kind 0x1D), registered and
 // read (sub_193A00), else its data is skipped. Ends early when the stream does.
@@ -1143,6 +1220,7 @@ void sub_1436C0(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_1437E0 @ 0x001437E0
+// sp-match: sub_1437E0 @ 0x000EEE60
 // Kind 25: a list of objects: a count, then a record and its data for each; an
 // object whose key is not known yet is made (kind 0x2A), registered and
 // read (sub_192870), else its data is skipped. Ends early when the stream does.
@@ -1187,6 +1265,7 @@ void sub_1437E0(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_143900 @ 0x00143900
+// sp-match: sub_143900 @ 0x000EE640
 // Kind 27: the level's directory name (kept in dword_4E5CC4); a name of the
 // form L_d_d asks for that level's hit-death data, else the shared one, and
 // the scene data (the per-level branch is compiled out). Two stages of the
@@ -1233,13 +1312,16 @@ void sub_143900(RwStream *arg_0, type_141C10 *arg_4)
             sub_1989D0("COD_MapData+SceneData+Filename", 0x18, 0, 0, 0);
         }
     }
+#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEE640)
     else
     {
         sub_19A750("NO level directory name received! This is bad!");
     }
+#endif
 }
 
 // match: sub_143AF0 @ 0x00143AF0
+// sp-match: sub_143AF0 @ 0x000EE760
 // Kind 28: a clump bank, a weapon's (the top bit of unk_18 set; its bank
 // and weapon in the next bytes) or a plain one, which is announced.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -1269,6 +1351,7 @@ void sub_143AF0(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_143B90 @ 0x00143B90
+// sp-match: sub_143B90 @ 0x000EE7C0
 // Kind 29: an animation data set, requested by the record's values; its
 // arrival is announced when dword_4B8710 is set.
 void sub_143B90(RwStream *arg_0, type_141C10 *arg_4)
@@ -1290,6 +1373,7 @@ void sub_143B90(RwStream *arg_0, type_141C10 *arg_4)
 }
 
 // match: sub_143C30 @ 0x00143C30
+// sp-match: sub_143C30 @ 0x000EEF30
 // While a section's BSP is read, textures are found in the global
 // dictionary (sub_174520) and the section's arg_0 (sub_143C80); the
 // previous find callback is kept for sub_143C60 to put back.
@@ -1302,12 +1386,21 @@ RwBool sub_143C30(RwTexDictionary *arg_0)
 }
 
 // match: sub_143C60 @ 0x00143C60
+// sp-match: sub_143C60 @ 0x000EE860
+#ifdef CODFH_SP // returns nothing (SP 0xEE86B: pop ecx, the result unused)
+void sub_143C60()
+{
+    RwTextureSetFindCallBack(dword_4CFA04);
+}
+#else
 RwBool sub_143C60()
 {
     return RwTextureSetFindCallBack(dword_4CFA04);
 }
+#endif
 
 // match: sub_143C80 @ 0x00143C80
+// sp-match: sub_143C80 @ 0x000EE870
 // The texture arg_0 from the first of the two dictionaries that has it.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwTexture *sub_143C80(const RwChar *arg_0)
@@ -1331,14 +1424,21 @@ RwTexture *sub_143C80(const RwChar *arg_0)
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ?sub_19A750@@YAXPAURwStream@@@Z (folded into 0x19A750)
+#ifndef CODFH_SP
+// Single player keeps sub_142F70's call (SP 0xEF3CF), so the empty body is not in this file there.
 void sub_19A750(struct RwStream * arg_0)
 {
 }
+#endif
 
 // ?sub_19A750@@YAXPAURwStream@@PAUtype_141C10@@@Z (folded into 0x19A750)
+#ifndef CODFH_SP
+// Single player keeps sub_141C10's calls for kinds 14, 15 and 30 (SP 0xEDDE0), so the empty
+// body is not in this file there.
 void sub_19A750(struct RwStream * arg_0, struct type_141C10 * arg_4)
 {
 }
+#endif
 
 // ?sub_19A750@@YAXPAUtype_173F50@@H@Z (folded into 0x19A750)
 void sub_19A750(struct type_173F50 * arg_0, RwInt32 arg_4)

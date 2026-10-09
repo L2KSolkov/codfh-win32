@@ -201,6 +201,7 @@ _rxEmbeddedPacketBetweenPipelines(RxPipeline * fromPipeline,
  * _rxEmbeddedPacketBetweenNodes()
  */
 // match: __rxEmbeddedPacketBetweenNodes @ 0x002BB2B0
+// sp-match: __rxEmbeddedPacketBetweenNodes @ 0x001D66C0
 RxPipelineNode *
 _rxEmbeddedPacketBetweenNodes(RxPipeline * pipeline,
                              RxPipelineNode * nodeFrom,
@@ -242,6 +243,7 @@ _rxPacketCreate(RxPipeline * forPipeline)
  * _rxPacketDestroy()
  */
 // match: __rxPacketDestroy @ 0x002BB380
+// sp-match: __rxPacketDestroy @ 0x001D6790
 void
 _rxPacketDestroy(RxPacket * packet)
 {

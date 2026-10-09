@@ -60,6 +60,9 @@ type_16C2A0 dword_4E7244;
 // match: ??0type_3DDE70@@QAE@PAVShrimpTrigger@@@Z @ 0x0017CA70
 // match: __ehhandler$??0type_3DDE70@@QAE@PAVShrimpTrigger@@@Z-0x8 @ 0x00302180
 // match: __ehhandler$??0type_3DDE70@@QAE@PAVShrimpTrigger@@@Z @ 0x00302188
+// sp-match: ??0type_3DDE70@@QAE@PAVShrimpTrigger@@@Z @ 0x00115D10
+// sp-match: _$E2 @ 0x0021DE10
+// sp-match: _$E3 @ 0x0021ED40
 
 type_3DDE70::type_3DDE70(ShrimpTrigger *arg_0)
 {
@@ -68,14 +71,17 @@ type_3DDE70::type_3DDE70(ShrimpTrigger *arg_0)
 }
 
 // match: ??_Gtype_3DDE70@@UAEPAXI@Z @ 0x0017CAE0
+// sp-match: ??_Gtype_3DDE70@@UAEPAXI@Z @ 0x00116190
 // (Compiler-written: the destructor, then operator delete.)
 
 // match: ??1type_3DDE70@@UAE@XZ @ 0x0017CB10
+// sp-match: ??1type_3DDE70@@UAE@XZ @ 0x001161B0
 // (Implicit: the base's destructor.)
 
 // match: ?sub_17CB30@@YAPAUtype_3DDE70@@PAVShrimpTrigger@@@Z @ 0x0017CB30
 // match: __ehhandler$?sub_17CB30@@YAPAUtype_3DDE70@@PAVShrimpTrigger@@@Z-0x11 @ 0x003021A0
 // match: __ehhandler$?sub_17CB30@@YAPAUtype_3DDE70@@PAVShrimpTrigger@@@Z @ 0x003021B1
+// sp-match: ?sub_17CB30@@YAPAUtype_3DDE70@@PAVShrimpTrigger@@@Z @ 0x00115D80
 type_3DDE70 *sub_17CB30(ShrimpTrigger *arg_0)
 {
     type_3DDE70 *var_10;
@@ -87,14 +93,18 @@ type_3DDE70 *sub_17CB30(ShrimpTrigger *arg_0)
             sub_D5A60(var_10, 0);
             var_10 = 0;
         }
-    } else
+    }
+#ifndef CODFH_SP // single player compiles the debug print out
+    else
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
                    "location(%6.2f,%6.2f,%6.2f)",
                    arg_0->unk_90, arg_0->unk_94, arg_0->unk_98);
+#endif
     return var_10;
 }
 
 // match: ?sub_17CC40@type_17CC40@@QAEHPAVTrigger@@@Z @ 0x0017CC40
+// sp-match: ?sub_17CC40@type_17CC40@@QAEHPAVTrigger@@@Z @ 0x00115E20
 RwInt32 type_17CC40::sub_17CC40(Trigger *arg_0)
 {
     unk_08 = arg_0;
@@ -108,6 +118,7 @@ RwInt32 type_17CC40::sub_17CC40(Trigger *arg_0)
 }
 
 // match: ?sub_17CCA0@type_17CC40@@QAEXXZ @ 0x0017CCA0
+// sp-match: ?sub_17CCA0@type_17CC40@@QAEXXZ @ 0x00115E50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Frees its shrimps (unless they are not to be touched).
 void type_17CC40::sub_17CCA0()
@@ -131,6 +142,7 @@ void type_17CC40::sub_17CCA0()
 }
 
 // match: ?sub_17CD10@type_17CC40@@QAE_NXZ @ 0x0017CD10
+// sp-match: ?sub_17CD10@type_17CC40@@QAE_NXZ @ 0x00115EA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 bool type_17CC40::sub_17CD10()
 {
@@ -177,6 +189,7 @@ bool type_17CC40::sub_17CD10()
 }
 
 // match: ?sub_17CE90@type_17CC40@@QAEXM@Z @ 0x0017CE90
+// sp-match: ?sub_17CE90@type_17CC40@@QAEXM@Z @ 0x00115FC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_17CC40::sub_17CE90(RwReal arg_0)
 {
@@ -190,7 +203,12 @@ void type_17CC40::sub_17CE90(RwReal arg_0)
     bp_8 = 0;
     if (!unk_0C)
         return;
+#ifdef CODFH_SP // shape: SP 0x115FEA multiplies step by step (16.666, 0.001, 60, 0.35)
+    var_C = deltaTime * flt_3DDE6C;
+    var_C = (var_C = (var_C = var_C * 0.001f) * 60.0f) * 0.35f;
+#else
     var_C = (var_C = (var_C = deltaTime * flt_3DDE6C / 1000.0f) * 60.0f) * 0.35f;
+#endif
     while (bp_4)
     {
         bp_8 = bp_4->unk_0C;
@@ -222,6 +240,7 @@ void type_17CC40::sub_17CE90(RwReal arg_0)
 }
 
 // match: ?sub_17CFF0@type_17CC40@@QAEXPAURwCamera@@@Z @ 0x0017CFF0
+// sp-match: ?sub_17CFF0@type_17CC40@@QAEXPAURwCamera@@@Z @ 0x00115980
 void type_17CC40::sub_17CFF0(RwCamera *arg_0)
 {
     type_17CA70_node *var_8;
@@ -262,6 +281,7 @@ void type_17CC40::sub_17CFF0(RwCamera *arg_0)
 }
 
 // match: ?sub_17D180@type_17CC40@@QAEXPAUtype_17CA70_node@@@Z @ 0x0017D180
+// sp-match: ?sub_17D180@type_17CC40@@QAEXPAUtype_17CA70_node@@@Z @ 0x00115AE0
 void type_17CC40::sub_17D180(type_17CA70_node *arg_0)
 {
     arg_0->unk_0C = unk_14;
@@ -272,6 +292,7 @@ void type_17CC40::sub_17D180(type_17CA70_node *arg_0)
 }
 
 // match: ?sub_17D1D0@type_17CC40@@QAEXPAUtype_17CA70_node@@@Z @ 0x0017D1D0
+// sp-match: ?sub_17D1D0@type_17CC40@@QAEXPAUtype_17CA70_node@@@Z @ 0x00115B10
 void type_17CC40::sub_17D1D0(type_17CA70_node *arg_0)
 {
     type_17CA70_node *var_4;
@@ -289,6 +310,7 @@ void type_17CC40::sub_17D1D0(type_17CA70_node *arg_0)
 }
 
 // match: ?sub_17D240@@YAHXZ @ 0x0017D240
+// sp-match: ?sub_17D240@@YAHXZ @ 0x00115B50
 // Sets the shrimps up (500 in the pool).
 RwInt32 sub_17D240()
 {
@@ -299,6 +321,7 @@ RwInt32 sub_17D240()
 }
 
 // match: ?sub_17D280@@YAXXZ @ 0x0017D280
+// sp-match: ?sub_17D280@@YAXXZ @ 0x00115B90
 // Ends the spawn.
 void sub_17D280()
 {
@@ -308,6 +331,7 @@ void sub_17D280()
 }
 
 // match: ?sub_17D2B0@@YAXXZ @ 0x0017D2B0
+// sp-match: ?sub_17D2B0@@YAXXZ @ 0x001160E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Shuts the shrimps down.
 void sub_17D2B0()
@@ -331,12 +355,14 @@ void sub_17D2B0()
 }
 
 // match: ?sub_17D330@@YAXPAVShrimpTrigger@@@Z @ 0x0017D330
+// sp-match: ?sub_17D330@@YAXPAVShrimpTrigger@@@Z @ 0x00116140
 void sub_17D330(ShrimpTrigger *arg_0)
 {
     dword_4E723C = sub_17CB30(arg_0);
 }
 
 // match: ?sub_17D350@@YAXPAUtype_17CC40@@@Z @ 0x0017D350
+// sp-match: ?sub_17D350@@YAXPAUtype_17CC40@@@Z @ 0x00115BB0
 void sub_17D350(type_17CC40 *arg_0)
 {
     arg_0->unk_18 = dword_4E7238;
@@ -344,6 +370,7 @@ void sub_17D350(type_17CC40 *arg_0)
 }
 
 // match: ?sub_17D370@@YAXM@Z @ 0x0017D370
+// sp-match: ?sub_17D370@@YAXM@Z @ 0x00116160
 // Moves every holder's shrimps.
 void sub_17D370(RwReal arg_0)
 {
@@ -358,6 +385,7 @@ void sub_17D370(RwReal arg_0)
 }
 
 // match: ?sub_17D3A0@@YAXPAURwCamera@@@Z @ 0x0017D3A0
+// sp-match: ?sub_17D3A0@@YAXPAURwCamera@@@Z @ 0x00115BD0
 // Draws every holder's shrimps into the camera arg_0 (in the default world,
 // with its ambient and first directional lights), alpha-tested.
 void sub_17D3A0(RwCamera *arg_0)
@@ -407,9 +435,11 @@ void *type_3DDE70::operator new(RwUInt32 arg_0, void *arg_4)
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ??3type_3DDE70@@SAXPAX@Z (folded into 0x19A750)
+#ifndef CODFH_SP // single player's deleting destructor calls it (SP 0x1161A0, sp_nullsub_1): not in this file there
 void type_3DDE70::operator delete(void * arg_0)
 {
 }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

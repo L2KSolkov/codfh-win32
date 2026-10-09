@@ -86,6 +86,7 @@ static void XbDynamicVertexBufferClose(void);
 // match: _AllocatedVertexBufferFreeListNumBlocksToPrealloc @ 0x00435614
 
 // match: __rwXbMemoryManagerOpen @ 0x002AD980
+// sp-match: __rwXbMemoryManagerOpen @ 0x001CB140
 
 RwBool
 _rwXbMemoryManagerOpen(void)
@@ -118,6 +119,7 @@ _rwXbMemoryManagerOpen(void)
 }
 
 // match: __rwXbMemoryPhysicalFree @ 0x002ADA10
+// sp-match: __rwXbMemoryPhysicalFree @ 0x001CB1D0
 void
 _rwXbMemoryPhysicalFree(void *memIn)
 {
@@ -347,6 +349,7 @@ _rwXbMemoryPhysicalFree(void *memIn)
 }
 
 // match: _RwXbReleaseVertexBuffer @ 0x002ADCA0
+// sp-match: _RwXbReleaseVertexBuffer @ 0x001CB460
 void
 RwXbReleaseVertexBuffer(D3DVertexBuffer *vertexBuffer)
 {
@@ -373,6 +376,7 @@ RwXbReleaseVertexBuffer(D3DVertexBuffer *vertexBuffer)
 }
 
 // match: _XbDynamicVertexBufferClose @ 0x002ADD00
+// sp-match: _XbDynamicVertexBufferClose @ 0x001CB4C0
 static void
 XbDynamicVertexBufferClose(void)
 {
@@ -394,6 +398,7 @@ XbDynamicVertexBufferClose(void)
 /* Releases idle dynamic vertex buffers (all, if releaseBusyVB) until size
    bytes are released. */
 // match: _XbDynamicVertexBufferDiscardMemory @ 0x002ADDB0
+// sp-match: _XbDynamicVertexBufferDiscardMemory @ 0x001CB570
 static RwUInt32
 XbDynamicVertexBufferDiscardMemory(RwUInt32 size, RwBool releaseBusyVB)
 {
@@ -498,6 +503,7 @@ XbDynamicVertexBufferDiscardMemory(RwUInt32 size, RwBool releaseBusyVB)
 }
 
 // match: _XbDynamicVertexBufferAdd @ 0x002ADEE0
+// sp-match: _XbDynamicVertexBufferAdd @ 0x001CB6A0
 static void
 XbDynamicVertexBufferAdd(D3DVertexBuffer *vertexBuffer, RwUInt32 size)
 {
@@ -532,6 +538,7 @@ XbDynamicVertexBufferAdd(D3DVertexBuffer *vertexBuffer, RwUInt32 size)
 }
 
 // match: _RwXboxSetCurrentStream @ 0x002ADF40
+// sp-match: _RwXboxSetCurrentStream @ 0x001CB700
 void
 RwXboxSetCurrentStream(RwUInt32 stride)
 {
@@ -539,6 +546,7 @@ RwXboxSetCurrentStream(RwUInt32 stride)
 }
 
 // match: _RwXboxGetCurrentVertexBuffer @ 0x002ADF60
+// sp-match: _RwXboxGetCurrentVertexBuffer @ 0x001CB720
 D3DVertexBuffer *
 RwXboxGetCurrentVertexBuffer(void)
 {
@@ -546,6 +554,7 @@ RwXboxGetCurrentVertexBuffer(void)
 }
 
 // match: __rwXbMemoryManagerClose @ 0x002ADF70
+// sp-match: __rwXbMemoryManagerClose @ 0x001CB730
 void
 _rwXbMemoryManagerClose(void)
 {
@@ -580,6 +589,7 @@ _rwXbMemoryManagerClose(void)
 }
 
 // match: __rwXbMemoryPhysicalAlloc @ 0x002AE000
+// sp-match: __rwXbMemoryPhysicalAlloc @ 0x001CB7C0
 void *
 _rwXbMemoryPhysicalAlloc(RwUInt32 size, RwUInt32 alignment)
 {
@@ -774,6 +784,7 @@ _rwXbMemoryPhysicalAlloc(RwUInt32 size, RwUInt32 alignment)
 }
 
 // match: _RwXbCreateVertexBuffer @ 0x002AE2B0
+// sp-match: _RwXbCreateVertexBuffer @ 0x001CBA70
 D3DVertexBuffer *
 RwXbCreateVertexBuffer(RwUInt32 size)
 {
@@ -801,6 +812,7 @@ RwXbCreateVertexBuffer(RwUInt32 size)
 }
 
 // match: _RwXboxLockDynamicVertexBuffer @ 0x002AE330
+// sp-match: _RwXboxLockDynamicVertexBuffer @ 0x001CBAF0
 RwUInt8 *
 RwXboxLockDynamicVertexBuffer(RwInt32 size)
 {
@@ -930,6 +942,7 @@ RwXboxLockDynamicVertexBuffer(RwInt32 size)
 }
 
 // match: _RwXbVertexBufferLockDiscard @ 0x002AE520
+// sp-match: _RwXbVertexBufferLockDiscard @ 0x001CBCE0
 RwUInt8 *
 RwXbVertexBufferLockDiscard(D3DVertexBuffer *vertexBuffer, RwUInt32 size)
 {

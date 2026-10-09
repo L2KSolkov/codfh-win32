@@ -297,6 +297,7 @@ extern void RwXboxSetCurrentPixelShader(DWORD handle);
 // match: ?texMat@?1??ApplyAnimTextureMatrix@@9@9 @ 0x00437650
 
 // match: _rxXbMatFXInstanceCallback @ 0x002F7CA0
+// sp-match: _rxXbMatFXInstanceCallback @ 0x00212430
 
 static RwBool
 rxXbMatFXInstanceCallback(void *object,
@@ -334,6 +335,7 @@ rxXbMatFXInstanceCallback(void *object,
 }
 
 // match: _XbAtomicMatFXInstanceCallback @ 0x002F7D00
+// sp-match: _XbAtomicMatFXInstanceCallback @ 0x00212490
 static RwBool
 XbAtomicMatFXInstanceCallback(void *object,
                               RxXboxResEntryHeader *instancedHeader,
@@ -343,6 +345,7 @@ XbAtomicMatFXInstanceCallback(void *object,
 }
 
 // match: _XbWorldSectorMatFXInstanceCallback @ 0x002F7D20
+// sp-match: _XbWorldSectorMatFXInstanceCallback @ 0x002124B0
 static RwBool
 XbWorldSectorMatFXInstanceCallback(void *object,
                                    RxXboxResEntryHeader *instancedHeader,
@@ -353,6 +356,7 @@ XbWorldSectorMatFXInstanceCallback(void *object,
 }
 
 // match: __rpMatFXSetupBumpMapTexture @ 0x002F7D40
+// sp-match: __rpMatFXSetupBumpMapTexture @ 0x002124D0
 RwTexture *
 _rpMatFXSetupBumpMapTexture(const RwTexture *baseTexture,
                             const RwTexture *effectTexture)
@@ -400,6 +404,7 @@ _rpMatFXSetupBumpMapTexture(const RwTexture *baseTexture,
 }
 
 // match: _BumpMapGetVertexShader @ 0x002F7DA0
+// sp-match: _BumpMapGetVertexShader @ 0x00212530
 static DWORD
 BumpMapGetVertexShader(const RpXboxVtxFmt *fmt)
 {
@@ -462,6 +467,7 @@ BumpMapGetVertexShader(const RpXboxVtxFmt *fmt)
 }
 
 // match: _rxXbAtomicMatFXBumpMapRender @ 0x002F7F20
+// sp-match: _rxXbAtomicMatFXBumpMapRender @ 0x002126B0
 static void
 rxXbAtomicMatFXBumpMapRender(const RpXboxVtxFmt *fmt,
                              RxXboxResEntryHeader *resEntryHeader,
@@ -621,6 +627,7 @@ rxXbAtomicMatFXBumpMapRender(const RpXboxVtxFmt *fmt,
 }
 
 // match: _ApplyAnimTextureMatrix @ 0x002F84E0
+// sp-match: _ApplyAnimTextureMatrix @ 0x00212C70
 static void
 ApplyAnimTextureMatrix(RwUInt32 stage, const RwMatrix *matrix)
 {
@@ -649,6 +656,7 @@ ApplyAnimTextureMatrix(RwUInt32 stage, const RwMatrix *matrix)
 }
 
 // match: _rxXbAtomicMatFXDualPassRender @ 0x002F85A0
+// sp-match: _rxXbAtomicMatFXDualPassRender @ 0x00212D30
 static void
 rxXbAtomicMatFXDualPassRender(RxXboxResEntryHeader *resEntryHeader,
                               RxXboxInstanceData *mesh,
@@ -944,6 +952,7 @@ rxXbAtomicMatFXDualPassRender(RxXboxResEntryHeader *resEntryHeader,
 }
 
 // match: _ApplyEnvMapTextureMatrix @ 0x002F9A40
+// sp-match: _ApplyEnvMapTextureMatrix @ 0x002141D0
 static RwBool
 ApplyEnvMapTextureMatrix(RwTexture *texture, RwUInt32 stage, RwFrame *frame)
 {
@@ -1034,6 +1043,7 @@ ApplyEnvMapTextureMatrix(RwTexture *texture, RwUInt32 stage, RwFrame *frame)
 }
 
 // match: _rxXbAtomicMatFXBumpEnvMapRender @ 0x002F9D10
+// sp-match: _rxXbAtomicMatFXBumpEnvMapRender @ 0x002144A0
 static void
 rxXbAtomicMatFXBumpEnvMapRender(const RpXboxVtxFmt *fmt,
                                 RxXboxResEntryHeader *resEntryHeader,
@@ -1232,6 +1242,7 @@ rxXbAtomicMatFXBumpEnvMapRender(const RpXboxVtxFmt *fmt,
 }
 
 // match: _rxXbAtomicMatFXEnvRender @ 0x002FA3D0
+// sp-match: _rxXbAtomicMatFXEnvRender @ 0x00214B60
 static void
 rxXbAtomicMatFXEnvRender(RxXboxResEntryHeader *resEntryHeader,
                          RxXboxInstanceData *mesh,
@@ -1449,6 +1460,7 @@ rxXbAtomicMatFXEnvRender(RxXboxResEntryHeader *resEntryHeader,
 }
 
 // match: __rxXbSetCachedTextureStates @ 0x002FB150
+// sp-match: __rxXbSetCachedTextureStates @ 0x002158E0
 static void
 _rxXbSetCachedTextureStates(const RpMatFXXboxStage *stValue, RwUInt32 stage)
 {
@@ -1462,6 +1474,7 @@ _rxXbSetCachedTextureStates(const RpMatFXXboxStage *stValue, RwUInt32 stage)
 }
 
 // match: __rxXbSetCachedFixedCombinerStates @ 0x002FB310
+// sp-match: __rxXbSetCachedFixedCombinerStates @ 0x00215AA0
 static void
 _rxXbSetCachedFixedCombinerStates(const RpMatFXXboxStage *stValue, RwUInt32 stage)
 {
@@ -1477,6 +1490,7 @@ _rxXbSetCachedFixedCombinerStates(const RpMatFXXboxStage *stValue, RwUInt32 stag
 }
 
 // match: __rxXbResetCachedFixedCombinerStates @ 0x002FB550
+// sp-match: __rxXbResetCachedFixedCombinerStates @ 0x00215CE0
 static void
 _rxXbResetCachedFixedCombinerStates(void)
 {
@@ -1499,6 +1513,7 @@ _rxXbResetCachedFixedCombinerStates(void)
 }
 
 // match: __rxXbSetCachedFixedVertexStates @ 0x002FB7F0
+// sp-match: __rxXbSetCachedFixedVertexStates @ 0x00215F80
 static void
 _rxXbSetCachedFixedVertexStates(const RpMatFXXboxStage *stValue, RwUInt32 stage,
                                 RwUInt8 texCoord)
@@ -1522,6 +1537,7 @@ _rxXbSetCachedFixedVertexStates(const RpMatFXXboxStage *stValue, RwUInt32 stage,
 }
 
 // match: __rxXbResetCachedFixedVertexStates @ 0x002FB8C0
+// sp-match: __rxXbResetCachedFixedVertexStates @ 0x00216050
 static void
 _rxXbResetCachedFixedVertexStates(void)
 {
@@ -1542,6 +1558,7 @@ _rxXbSetCachedMiscStates(const RpMatFXXboxMiscState *miscState)
 }
 
 // match: __rxXbSetCachedFinalBlend @ 0x002FBA40
+// sp-match: __rxXbSetCachedFinalBlend @ 0x002161D0
 static void
 _rxXbSetCachedFinalBlend(const RpMatFXXboxFinalBlend *finalBlend)
 {
@@ -1550,6 +1567,7 @@ _rxXbSetCachedFinalBlend(const RpMatFXXboxFinalBlend *finalBlend)
 }
 
 // match: __rpMatFXMTRenderStateSetUp @ 0x002FBAB0
+// sp-match: __rpMatFXMTRenderStateSetUp @ 0x00216240
 void
 _rpMatFXMTRenderStateSetUp(RwBool useVertexShader,
                            RpMultiTexture *multiTexture,
@@ -1606,6 +1624,7 @@ _rpMatFXMTRenderStateSetUp(RwBool useVertexShader,
 }
 
 // match: __rpMatFXMTRenderStateCleanUp @ 0x002FBBF0
+// sp-match: __rpMatFXMTRenderStateCleanUp @ 0x00216380
 void
 _rpMatFXMTRenderStateCleanUp(RwBool useVertexShader, RpMultiTexture *multiTexture)
 {
@@ -1630,6 +1649,7 @@ _rpMatFXMTRenderStateCleanUp(RwBool useVertexShader, RpMultiTexture *multiTextur
 }
 
 // match: _rxXbAtomicMatFXRenderCallback @ 0x002FBCA0
+// sp-match: _rxXbAtomicMatFXRenderCallback @ 0x00216430
 void
 rxXbAtomicMatFXRenderCallback(RxXboxResEntryHeader *resEntryHeader,
                               void *object,
@@ -1734,6 +1754,7 @@ rxXbAtomicMatFXRenderCallback(RxXboxResEntryHeader *resEntryHeader,
 }
 
 // match: _rpAtomicMatFxPipelineCreate @ 0x002FBE70
+// sp-match: _rpAtomicMatFxPipelineCreate @ 0x00216600
 static RxPipeline *
 rpAtomicMatFxPipelineCreate(void)
 {
@@ -1763,6 +1784,7 @@ rpAtomicMatFxPipelineCreate(void)
 }
 
 // match: _rpWorldSectorMatFxPipelineCreate @ 0x002FBEC0
+// sp-match: _rpWorldSectorMatFxPipelineCreate @ 0x00216650
 static RxPipeline *
 rpWorldSectorMatFxPipelineCreate(void)
 {
@@ -1792,6 +1814,7 @@ rpWorldSectorMatFxPipelineCreate(void)
 }
 
 // match: __rpMatFXPipelinesCreate @ 0x002FBF10
+// sp-match: __rpMatFXPipelinesCreate @ 0x002166A0
 RwBool
 _rpMatFXPipelinesCreate(void)
 {
@@ -1847,6 +1870,7 @@ _rpMatFXPipelinesCreate(void)
 }
 
 // match: __rpMatFXPipelinesDestroy @ 0x002FC060
+// sp-match: __rpMatFXPipelinesDestroy @ 0x002167F0
 RwBool
 _rpMatFXPipelinesDestroy(void)
 {
@@ -1889,6 +1913,7 @@ _rpMatFXPipelinesDestroy(void)
 }
 
 // match: __rpMatFXPipelineWorldSectorSetup @ 0x002FC140
+// sp-match: __rpMatFXPipelineWorldSectorSetup @ 0x002168D0
 RpWorldSector *
 _rpMatFXPipelineWorldSectorSetup(RpWorldSector *worldSector)
 {
@@ -1896,6 +1921,7 @@ _rpMatFXPipelineWorldSectorSetup(RpWorldSector *worldSector)
 }
 
 // match: __rpMatFXPipelineAtomicSetup @ 0x002FC150
+// sp-match: __rpMatFXPipelineAtomicSetup @ 0x002168F0
 RpAtomic *
 _rpMatFXPipelineAtomicSetup(RpAtomic *atomic)
 {

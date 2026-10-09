@@ -19,6 +19,7 @@ BINK16M SEGMENT PARA PUBLIC 'CODE'
 segstart:
 
 ; // match: _YUV_16m_8x2_MMX@4 @ 0x003557E0
+; // sp-match: _YUV_16m_8x2_MMX@4 @ 0x002657E0
 _YUV_16m_8x2_MMX@4 PROC PUBLIC
         push ebx
         push ebp
@@ -99,6 +100,7 @@ __do_lower:
 _YUV_16m_8x2_MMX@4 ENDP
 
 ; // match: _YUV_16m_4x2@4 @ 0x003558F0
+; // sp-match: _YUV_16m_4x2@4 @ 0x002658F0
 _YUV_16m_4x2@4 PROC PUBLIC
         push ebx
         push ebp

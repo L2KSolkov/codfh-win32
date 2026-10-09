@@ -147,6 +147,7 @@ MACRO_STOP
 // match: __real@c4268000 @ 0x00419D6C
 
 // match: __rpPTankGENInstance @ 0x002EB1E0
+// sp-match: __rpPTankGENInstance @ 0x00205C90
 
 RwBool
 _rpPTankGENInstance(RpAtomic *atomic, RpPTankData *ptankGlobal,
@@ -488,6 +489,7 @@ _rpPTankGenCreate(RpAtomic *atomic,
  *****************************************************************************
  */
 // match: __rpPTankGENKill @ 0x002EB2D0
+// sp-match: __rpPTankGENKill @ 0x00205D80
 void
 _rpPTankGENKill(RpAtomic *atomic, RwInt32 start, RwInt32 end)
 {
@@ -529,6 +531,7 @@ _rpPTankGENKill(RpAtomic *atomic, RwInt32 start, RwInt32 end)
  *****************************************************************************
  */
 // match: __rpPTankGENInstanceSelectCB @ 0x002EDE80
+// sp-match: __rpPTankGENInstanceSelectCB @ 0x00208930
 void
 _rpPTankGENInstanceSelectCB(RpAtomic *atomic)
 {
@@ -691,6 +694,7 @@ _rpPTankGENInstanceSelectCB(RpAtomic *atomic)
  */
 
 // match: _rpPTankGENInsPosNCCSNR @ 0x002EB370
+// sp-match: _rpPTankGENInsPosNCCSNR @ 0x00205E20
 void
 rpPTankGENInsPosNCCSNR(RpPTankLockStruct *dstCluster,
                         RwV3d *right,
@@ -780,6 +784,7 @@ rpPTankGENInsPosNCCSNR(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsPosCCCSNR @ 0x002EB890
+// sp-match: _rpPTankGENInsPosCCCSNR @ 0x00206340
 void
 rpPTankGENInsPosCCCSNR(RpPTankLockStruct *dstCluster,
                         RwV3d *right,
@@ -880,6 +885,7 @@ rpPTankGENInsPosCCCSNR(RpPTankLockStruct *dstCluster,
 
 
 // match: _rpPTankGENInsPosNCCSPR @ 0x002EBE40
+// sp-match: _rpPTankGENInsPosNCCSPR @ 0x002068F0
 void
 rpPTankGENInsPosNCCSPR(RpPTankLockStruct *dstCluster,
                         RwV3d *right,
@@ -975,6 +981,7 @@ rpPTankGENInsPosNCCSPR(RpPTankLockStruct *dstCluster,
 
 
 // match: _rpPTankGENInsPosNCPSNR @ 0x002EC0A0
+// sp-match: _rpPTankGENInsPosNCPSNR @ 0x00206B50
 void
 rpPTankGENInsPosNCPSNR(RpPTankLockStruct *dstCluster,
                         RwV3d *right,
@@ -1058,6 +1065,7 @@ rpPTankGENInsPosNCPSNR(RpPTankLockStruct *dstCluster,
 
 
 // match: _rpPTankGENInsPosNCPSPR @ 0x002EC220
+// sp-match: _rpPTankGENInsPosNCPSPR @ 0x00206CD0
 void
 rpPTankGENInsPosNCPSPR(RpPTankLockStruct *dstCluster,
                         RwV3d *right,
@@ -1159,6 +1167,7 @@ rpPTankGENInsPosNCPSPR(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsPosCCCSPR @ 0x002EC4A0
+// sp-match: _rpPTankGENInsPosCCCSPR @ 0x00206F50
 void
 rpPTankGENInsPosCCCSPR(RpPTankLockStruct *dstCluster,
                         RwV3d *right,
@@ -1261,6 +1270,7 @@ rpPTankGENInsPosCCCSPR(RpPTankLockStruct *dstCluster,
 
 
 // match: _rpPTankGENInsPosCCPSNR @ 0x002EC7A0
+// sp-match: _rpPTankGENInsPosCCPSNR @ 0x00207250
 void
 rpPTankGENInsPosCCPSNR(RpPTankLockStruct *dstCluster,
                         RwV3d *right,
@@ -1348,6 +1358,7 @@ rpPTankGENInsPosCCPSNR(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsPosCCPSPR @ 0x002EC9C0
+// sp-match: _rpPTankGENInsPosCCPSPR @ 0x00207470
 void
 rpPTankGENInsPosCCPSPR(RpPTankLockStruct *dstCluster,
                         RwV3d *right,
@@ -1454,6 +1465,7 @@ rpPTankGENInsPosCCPSPR(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsPosNCPM @ 0x002ECCF0
+// sp-match: _rpPTankGENInsPosNCPM @ 0x002077A0
 void
 rpPTankGENInsPosNCPM(RpPTankLockStruct *dstCluster,
                         RwV3d *_right __RWUNUSED__,  /* ignore */
@@ -1520,6 +1532,7 @@ rpPTankGENInsPosNCPM(RpPTankLockStruct *dstCluster,
 
 
 // match: _rpPTankGENInsPosCCPM @ 0x002ECE40
+// sp-match: _rpPTankGENInsPosCCPM @ 0x002078F0
 void
 rpPTankGENInsPosCCPM(RpPTankLockStruct *dstCluster,
                         RwV3d *_right __RWUNUSED__,  /* ignore */
@@ -1596,6 +1609,7 @@ rpPTankGENInsPosCCPM(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsColorPP @ 0x002ECFF0
+// sp-match: _rpPTankGENInsColorPP @ 0x00207AA0
 void
 rpPTankGENInsColorPP(RpPTankLockStruct *dstCluster,
                         RwInt32 pCount,
@@ -1651,6 +1665,7 @@ rpPTankGENInsColorPP(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsColorPV @ 0x002ED050
+// sp-match: _rpPTankGENInsColorPV @ 0x00207B00
 void
 rpPTankGENInsColorPV(RpPTankLockStruct *dstCluster,
                         RwInt32 pCount,
@@ -1705,6 +1720,7 @@ rpPTankGENInsColorPV(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsColorPVC @ 0x002ED110
+// sp-match: _rpPTankGENInsColorPVC @ 0x00207BC0
 void
 rpPTankGENInsColorPVC(RpPTankLockStruct *dstCluster,
                         RwInt32 pCount,
@@ -1755,6 +1771,7 @@ rpPTankGENInsColorPVC(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsColorPPC @ 0x002ED1E0
+// sp-match: _rpPTankGENInsColorPPC @ 0x00207C90
 void
 rpPTankGENInsColorPPC(RpPTankLockStruct *dstCluster,
                         RwInt32 pCount,
@@ -1802,6 +1819,7 @@ rpPTankGENInsColorPPC(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsUV2 @ 0x002ED230
+// sp-match: _rpPTankGENInsUV2 @ 0x00207CE0
 void
 rpPTankGENInsUV2(RpPTankLockStruct *dstCluster,
                         RwInt32 pCount,
@@ -1860,6 +1878,7 @@ rpPTankGENInsUV2(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsUV4 @ 0x002ED3D0
+// sp-match: _rpPTankGENInsUV4 @ 0x00207E80
 void
 rpPTankGENInsUV4(RpPTankLockStruct *dstCluster,
                         RwInt32 pCount,
@@ -1922,6 +1941,7 @@ rpPTankGENInsUV4(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsUV2C @ 0x002ED5F0
+// sp-match: _rpPTankGENInsUV2C @ 0x002080A0
 void
 rpPTankGENInsUV2C(RpPTankLockStruct *dstCluster,
                         RwInt32 pCount,
@@ -1973,6 +1993,7 @@ rpPTankGENInsUV2C(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsUV4C @ 0x002ED7E0
+// sp-match: _rpPTankGENInsUV4C @ 0x00208290
 void
 rpPTankGENInsUV4C(RpPTankLockStruct *dstCluster,
                         RwInt32 pCount,
@@ -2028,6 +2049,7 @@ rpPTankGENInsUV4C(RpPTankLockStruct *dstCluster,
 }
 
 // match: _rpPTankGENInsNormals @ 0x002ED9D0
+// sp-match: _rpPTankGENInsNormals @ 0x00208480
 void
 rpPTankGENInsNormals(RpPTankLockStruct *dstCluster,
                         RwInt32 pCount,
@@ -2088,6 +2110,7 @@ rpPTankGENInsNormals(RpPTankLockStruct *dstCluster,
  *****************************************************************************
  */
 // match: _rpPTankGENInsSetup @ 0x002EDBD0
+// sp-match: _rpPTankGENInsSetup @ 0x00208680
 void
 rpPTankGENInsSetup(RpPTANKInstanceSetupData *data,
                 RpAtomic *atomic,
@@ -2220,6 +2243,7 @@ rpPTankGENInsSetup(RpPTANKInstanceSetupData *data,
 }
 
 // match: _rpPTankGENInsEnding @ 0x002EDE70
+// sp-match: _rpPTankGENInsEnding @ 0x00208920
 void
 rpPTankGENInsEnding(RpPTANKInstanceSetupData *data __RWUNUSED__,
                 RpAtomic *atomic,

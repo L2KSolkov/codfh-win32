@@ -100,6 +100,7 @@ MACRO_STOP
 // match: _rcsid @ 0x00417068
 
 // match: _HeapFreeBlocksNewEntry @ 0x002B92A0
+// sp-match: _HeapFreeBlocksNewEntry @ 0x001D46B0
 static rxHeapFreeBlock *
 HeapFreeBlocksNewEntry(RxHeap *heap)
 {
@@ -253,6 +254,7 @@ HeapSuperBlockDestroy(rxHeapSuperBlockDescriptor * superBlock)
  */
 
 // match: _HeapSuperBlockReset @ 0x002B9340
+// sp-match: _HeapSuperBlockReset @ 0x001D4750
 static              RwBool
 HeapSuperBlockReset(rxHeapSuperBlockDescriptor * superBlock,
                     rxHeapSuperBlockDescriptor * attach2SuperBlock,
@@ -671,6 +673,7 @@ HeapRealloc(RxHeap * heap, void *block,
  *
  */
 // match: _RxHeapFree @ 0x002B93C0
+// sp-match: _RxHeapFree @ 0x001D47D0
 void
 RxHeapFree(RxHeap * heap, void *block)
 {
@@ -1041,6 +1044,7 @@ RwBool
 #if (defined(DOXYGEN))
 RxHeapReset(RxHeap * heap)
 // match: __rxHeapReset @ 0x002B9500
+// sp-match: __rxHeapReset @ 0x001D4910
 #else  /* (defined(DOXYGEN)) */
 _rxHeapReset(RxHeap * heap)
 #endif /* (defined(DOXYGEN)) */
@@ -1154,6 +1158,7 @@ _rxHeapReset(RxHeap * heap)
  *
  */
 // match: _RxHeapDestroy @ 0x002B9570
+// sp-match: _RxHeapDestroy @ 0x001D4980
 void
 RxHeapDestroy(RxHeap * heap)
 {
@@ -1247,6 +1252,7 @@ RxHeapDestroy(RxHeap * heap)
  *
  */
 // match: _RxHeapCreate @ 0x002B95C0
+// sp-match: _RxHeapCreate @ 0x001D49D0
 RxHeap *
 RxHeapCreate(RwUInt32 size)
 {

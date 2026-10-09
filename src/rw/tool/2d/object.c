@@ -120,6 +120,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/tool/2d/obj
 // match: __rt2dObjectFreeListPreallocBlocks @ 0x00431088
 
 // match: __rt2dObjectClose @ 0x00252950
+// sp-match: __rt2dObjectClose @ 0x00167240
 
 void
 _rt2dObjectClose(void)
@@ -151,6 +152,7 @@ static RwFreeList _rt2dObjectFreeList;
  *
  */
 // match: _Rt2dObjectSetFreeListCreateParams @ 0x00252970
+// sp-match: _Rt2dObjectSetFreeListCreateParams @ 0x00167260
 void
 Rt2dObjectSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc )
 {
@@ -170,6 +172,7 @@ Rt2dObjectSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPreallo
 /****************************************************************************/
 
 // match: __rt2dObjectOpen @ 0x00252990
+// sp-match: __rt2dObjectOpen @ 0x00167280
 RwBool
 _rt2dObjectOpen(void)
 {
@@ -186,6 +189,7 @@ _rt2dObjectOpen(void)
 /*************************************************************************/
 
 // match: __rt2dObjectDestruct @ 0x002529D0
+// sp-match: __rt2dObjectDestruct @ 0x001672C0
 RwBool
 _rt2dObjectDestruct(Rt2dObject *object)
 {
@@ -261,6 +265,7 @@ _rt2dObjectDestroy(Rt2dObject *object)
 /****************************************************************************/
 
 void
+// sp-match: __rt2dObjectDestroyAfterRealloc @ 0x00167310
 _rt2dObjectDestroyAfterRealloc(Rt2dObject *object)
 {
     RWFUNCTION(RWSTRING("_rt2dObjectDestroyAfterRealloc"));
@@ -275,6 +280,7 @@ _rt2dObjectDestroyAfterRealloc(Rt2dObject *object)
 /****************************************************************************/
 
 void
+// sp-match: __rt2dObjectRealloc @ 0x00167330
 _rt2dObjectRealloc(Rt2dObject *dst, Rt2dObject *src)
 {
     RWFUNCTION(RWSTRING("_rt2dObjectRealloc"));
@@ -429,6 +435,7 @@ Rt2dObjectCopy(Rt2dObject *dst, Rt2dObject *src)
 /****************************************************************************/
 
 Rt2dObject*
+// sp-match: __rt2dObjectCreate @ 0x00167350
 _rt2dObjectCreate()
 {
     Rt2dObject           *object;
@@ -443,6 +450,7 @@ _rt2dObjectCreate()
 }
 
 Rt2dObject*
+// sp-match: __rt2dObjectInit @ 0x00167370
 _rt2dObjectInit(Rt2dObject *object, RwInt32 objectType)
 {
     RWFUNCTION(RWSTRING("_rt2dObjectInit"));
@@ -534,6 +542,7 @@ _rt2dObjectBaseStreamWrite(Rt2dObject *object, RwStream *stream)
 
 /****************************************************************************/
 Rt2dObject*
+// sp-match: __rt2dObjectBaseStreamReadTo @ 0x00167480
 _rt2dObjectBaseStreamReadTo(Rt2dObject *object, RwStream *stream)
 {
     _rt2dStreamObject sObject;
@@ -684,6 +693,7 @@ _rt2dObjectStreamWrite(Rt2dObject *object, RwStream *stream, _rt2dSceneResourceP
 
 /****************************************************************************/
 Rt2dObject*
+// sp-match: __rt2dObjectStreamReadTo @ 0x00167530
 _rt2dObjectStreamReadTo(Rt2dObject *object, RwStream *stream, _rt2dSceneResourcePool *pool)
 {
     RWFUNCTION(RWSTRING("_rt2dObjectStreamReadTo"));
@@ -731,6 +741,7 @@ _rt2dObjectStreamReadTo(Rt2dObject *object, RwStream *stream, _rt2dSceneResource
 /****************************************************************************/
 
 extern Rt2dObject *
+// sp-match: __rt2dObjectRender @ 0x001675B0
 _rt2dObjectRender(Rt2dObject  *object, const RwRGBAReal *colorMult, const RwRGBAReal *colorOffs)
 {
     RWFUNCTION(RWSTRING("_rt2dObjectRender"));
@@ -798,6 +809,7 @@ _rt2dObjectRender(Rt2dObject  *object, const RwRGBAReal *colorMult, const RwRGBA
  * \see Rt2dObjectIsVisible
  */
 Rt2dObject *
+// sp-match: _Rt2dObjectSetVisible @ 0x00167630
 Rt2dObjectSetVisible(Rt2dObject *object, RwBool isVisible)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dObjectSetVisible"));
@@ -826,6 +838,7 @@ Rt2dObjectSetVisible(Rt2dObject *object, RwBool isVisible)
  * \see Rt2dObjectSetVisible
  */
 RwBool
+// sp-match: _Rt2dObjectIsVisible @ 0x00167650
 Rt2dObjectIsVisible(Rt2dObject *object)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dObjectIsVisible"));
@@ -901,6 +914,7 @@ Rt2dObjectApplyCTM(Rt2dObject *object)
  * \see Rt2dObjectGetLTM
  */
 Rt2dObject *
+// sp-match: _Rt2dObjectSetMTM @ 0x00167660
 Rt2dObjectSetMTM(Rt2dObject *object, RwMatrix *mtm)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dObjectSetMTM"));
@@ -953,6 +967,7 @@ Rt2dObjectGetLTM(Rt2dObject *object)
  * \see Rt2dObjectGetLTM
  */
 void
+// sp-match: _Rt2dObjectMTMChanged @ 0x00167680
 Rt2dObjectMTMChanged(Rt2dObject *object)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dObjectMTMChanged"));
@@ -1019,6 +1034,7 @@ Rt2dObjectMTMSetIdentity(Rt2dObject *object)
  *
  */
 Rt2dObject *
+// sp-match: _Rt2dObjectMTMScale @ 0x00167690
 Rt2dObjectMTMScale(Rt2dObject *object, RwReal x, RwReal y)
 {
     RwV3d               scale;
@@ -1060,6 +1076,7 @@ Rt2dObjectMTMScale(Rt2dObject *object, RwReal x, RwReal y)
  *
  */
 Rt2dObject *
+// sp-match: _Rt2dObjectMTMTranslate @ 0x001676F0
 Rt2dObjectMTMTranslate(Rt2dObject *object, RwReal x, RwReal y)
 {
     RwV3d               translate;
@@ -1150,6 +1167,7 @@ Rt2dObjectGetColorMultiplier(Rt2dObject *object)
  * \see Rt2dObjectGetColorMultiplier
  */
 Rt2dObject *
+// sp-match: _Rt2dObjectSetColorMultiplier @ 0x00167740
 Rt2dObjectSetColorMultiplier(Rt2dObject *object, RwRGBAReal *multCol)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dObjectSetColorMultiplier"));
@@ -1205,6 +1223,7 @@ Rt2dObjectGetColorOffset(Rt2dObject *object)
  * \see Rt2dObjectGetColorOffset
  */
 Rt2dObject *
+// sp-match: _Rt2dObjectSetColorOffset @ 0x00167770
 Rt2dObjectSetColorOffset(Rt2dObject *object, RwRGBAReal *oofsCol)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dObjectSetColorOffset"));
@@ -1273,6 +1292,7 @@ Rt2dObjectGetDepth(Rt2dObject *object)
  * \see Rt2dObjectGetDepth
  */
 Rt2dObject *
+// sp-match: _Rt2dObjectSetDepth @ 0x00167800
 Rt2dObjectSetDepth(Rt2dObject *object, RwInt32 depth)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dObjectSetDepth"));
@@ -1296,6 +1316,7 @@ Rt2dObjectSetDepth(Rt2dObject *object, RwInt32 depth)
 *  \see Rt2dObjectIsPickRegion
  */
 RwBool
+// sp-match: _Rt2dObjectIsScene @ 0x00167810
 Rt2dObjectIsScene(Rt2dObject *object)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dObjectIsScene"));
@@ -1356,6 +1377,7 @@ Rt2dObjectIsPickRegion(Rt2dObject *object)
  * \see Rt2dObjectIsPickRegion
  */
 RwBool
+// sp-match: _Rt2dObjectIsObjectString @ 0x00167820
 Rt2dObjectIsObjectString(Rt2dObject *object)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dObjectIsObjectString"));

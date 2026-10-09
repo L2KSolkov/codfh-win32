@@ -35,6 +35,7 @@ extern S64 wintimer_qpfirst;
 extern S64 wintimer_qpfreq;
 
 // match: _RADTimerRead@0 @ 0x00344990
+// sp-match: _RADTimerRead@0 @ 0x00254990
 RADEXPFUNC U32 RADEXPLINK RADTimerRead(void)
 {
   S64 now;

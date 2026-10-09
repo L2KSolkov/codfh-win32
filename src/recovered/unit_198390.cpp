@@ -27,6 +27,10 @@ type_42B6E4 dword_42B6E4[6] = {
     { 850, 72 },
     { 175, -1 },
 };
+#ifdef CODFH_SP // single player defines it here: it follows dword_42B6E4 (SP 0x328524), and unit_19AAB0's 8-aligned .data starts at 0x328528 with sub_19B060's levels
+// 0x0042B714
+RwInt32 dword_42B714 = -1;
+#endif
 // 0x004F24E8
 RwUInt32 dword_4F24E8[0x3C];
 // 0x004F25D8
@@ -85,6 +89,18 @@ alfahash dword_4F26D4;
 // match: _$E14 @ 0x0030E9F0
 // match: _$E16 @ 0x0030C090
 // match: _$E17 @ 0x0030EA00
+// sp-match: _$E17 @ 0x0021EDC0
+// sp-match: _$E1 @ 0x0021DE90
+// sp-match: _$E4 @ 0x0021DEB0
+// sp-match: _$E7 @ 0x0021DEE0
+// sp-match: _$E10 @ 0x0021DF00
+// sp-match: _$E13 @ 0x0021DF20
+// sp-match: _$E16 @ 0x0021DF40
+// sp-match: _$E2 @ 0x0021ED60
+// sp-match: _$E5 @ 0x0021ED70
+// sp-match: _$E8 @ 0x0021ED90
+// sp-match: _$E11 @ 0x0021EDA0
+// sp-match: _$E14 @ 0x0021EDB0
 
 void sub_198F00(type_3DF8D8_04 *arg_0);
 RwInt32 sub_18F750();
@@ -111,6 +127,7 @@ type_3DF8D8_base *sub_198900(type_3DF8D8_04 *arg_0, RwInt32 arg_4, void (*arg_8)
 void sub_19A760(type_3DF8D8_base *arg_0, void (*arg_4)(RwInt32, RwInt32, RwInt32), RwInt32 arg_8, RwInt32 arg_C);
 
 // match: ?sub_198390@@YAXXZ @ 0x00198390
+// sp-match: ?sub_198390@@YAXXZ @ 0x001287E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Sets the manager up: m_freeGodAssetPools (the last sized for the largest
 // asset), m_fileInfoPool, m_requestPool, the two tables and the string pool.
@@ -154,6 +171,7 @@ void sub_198390()
 }
 
 // match: ?sub_198570@@YAXXZ @ 0x00198570
+// sp-match: ?sub_198570@@YAXXZ @ 0x00127630
 // Notes when the manager was set up.
 void sub_198570()
 {
@@ -161,6 +179,7 @@ void sub_198570()
 }
 
 // match: ?sub_198580@@YAXXZ @ 0x00198580
+// sp-match: ?sub_198580@@YAXXZ @ 0x00128C70
 // Shuts the manager down: every object's registration freed, the requests,
 // tables and pools.
 void sub_198580()
@@ -179,6 +198,7 @@ void sub_198580()
 }
 
 // match: ?sub_198610@@YAXXZ @ 0x00198610
+// sp-match: ?sub_198610@@YAXXZ @ 0x00127640
 // At the game's start: m_requestPool again, for 50 requests.
 void sub_198610()
 {
@@ -188,12 +208,14 @@ void sub_198610()
 }
 
 // match: ?sub_198650@@YAMXZ @ 0x00198650
+// sp-match: ?sub_198650@@YAMXZ @ 0x001151A0
 RwReal sub_198650()
 {
     return 0.0f;
 }
 
 // match: ?sub_198660@@YAXPAUtype_198660@@@Z @ 0x00198660
+// sp-match: ?sub_198660@@YAXPAUtype_198660@@@Z @ 0x00127670
 // The key of the first object waiting to be read into *arg_0 (0 for none).
 void sub_198660(type_198660 *arg_0)
 {
@@ -213,6 +235,7 @@ void sub_198660(type_198660 *arg_0)
 }
 
 // match: ?sub_1986B0@@YAPADXZ @ 0x001986B0
+// sp-match: ?sub_1986B0@@YAPADXZ @ 0x001276B0
 // A string buffer from GodAssetStringPool.
 RwChar *sub_1986B0()
 {
@@ -220,12 +243,14 @@ RwChar *sub_1986B0()
 }
 
 // match: ?sub_1986D0@@YAXPAD@Z @ 0x001986D0
+// sp-match: ?sub_1986D0@@YAXPAD@Z @ 0x001276C0
 void sub_1986D0(RwChar *arg_0)
 {
     dword_4F275C.sub_16C710(arg_0);
 }
 
 // match: ?sub_1986F0@@YA_NPAX@Z @ 0x001986F0
+// sp-match: ?sub_1986F0@@YA_NPAX@Z @ 0x00128B10
 bool sub_1986F0(void *arg_0)
 {
     type_3DF8D8_base *var_4;
@@ -238,6 +263,7 @@ bool sub_1986F0(void *arg_0)
 // match: ?sub_198710@@YAPAUtype_199010@@PAUtype_3DF8D8_04@@@Z @ 0x00198710
 // match: __ehhandler$?sub_198710@@YAPAUtype_199010@@PAUtype_3DF8D8_04@@@Z-8 @ 0x00302360
 // match: __ehhandler$?sub_198710@@YAPAUtype_199010@@PAUtype_3DF8D8_04@@@Z @ 0x00302368
+// sp-match: ?sub_198710@@YAPAUtype_199010@@PAUtype_3DF8D8_04@@@Z @ 0x001276D0
 // The object with the key *arg_0 (through a key object of its own), or 0.
 type_199010 *sub_198710(type_3DF8D8_04 *arg_0)
 {
@@ -247,6 +273,7 @@ type_199010 *sub_198710(type_3DF8D8_04 *arg_0)
 }
 
 // match: ?sub_198770@@YAHPAUtype_3DF8D8_04@@@Z @ 0x00198770
+// sp-match: ?sub_198770@@YAHPAUtype_3DF8D8_04@@@Z @ 0x00128930
 // The object a request for *arg_0 is waiting to read, or 0.
 RwInt32 sub_198770(type_3DF8D8_04 *arg_0)
 {
@@ -259,6 +286,7 @@ RwInt32 sub_198770(type_3DF8D8_04 *arg_0)
 }
 
 // match: ?sub_1987A0@@YAPAUtype_4F26D0@@PAUtype_3DF8D8_04@@@Z @ 0x001987A0
+// sp-match: ?sub_1987A0@@YAPAUtype_4F26D0@@PAUtype_3DF8D8_04@@@Z @ 0x00127740
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The request for the key *arg_0, or 0.
 type_4F26D0 *sub_1987A0(type_3DF8D8_04 *arg_0)
@@ -276,6 +304,7 @@ type_4F26D0 *sub_1987A0(type_3DF8D8_04 *arg_0)
 }
 
 // match: ?sub_198800@@YAPAUtype_3DF8D8@@PAUtype_3DF8D8_04@@@Z @ 0x00198800
+// sp-match: ?sub_198800@@YAPAUtype_3DF8D8@@PAUtype_3DF8D8_04@@@Z @ 0x00127780
 type_3DF8D8 *sub_198800(type_3DF8D8_04 *arg_0)
 {
     if (arg_0->unk_00 == 0 && arg_0->unk_04 == 0)
@@ -288,6 +317,7 @@ type_3DF8D8 *sub_198800(type_3DF8D8_04 *arg_0)
 // match: ?sub_198880@@YAPAUtype_3DF8D8@@PBD@Z @ 0x00198880
 // match: __ehhandler$?sub_198880@@YAPAUtype_3DF8D8@@PBD@Z-8 @ 0x00302380
 // match: __ehhandler$?sub_198880@@YAPAUtype_3DF8D8@@PBD@Z @ 0x00302388
+// sp-match: ?sub_198880@@YAPAUtype_3DF8D8@@PBD@Z @ 0x00128950
 // The object named arg_0 (its key hashed from the name, sub_198A20).
 type_3DF8D8 *sub_198880(const RwChar *arg_0)
 {
@@ -300,6 +330,7 @@ type_3DF8D8 *sub_198880(const RwChar *arg_0)
 }
 
 // match: ?sub_198900@@YAPAUtype_3DF8D8_base@@PAUtype_3DF8D8_04@@HP6AXHHH@ZHHH@Z @ 0x00198900
+// sp-match: ?sub_198900@@YAPAUtype_3DF8D8_base@@PAUtype_3DF8D8_04@@HP6AXHHH@ZHHH@Z @ 0x001289D0
 // Asks for the object with the key *arg_0 (of the kind arg_4): an object
 // already read is handed to the callback arg_8 (with arg_C and arg_10) or
 // marked wanted; one waiting to be read is marked wanted; else it is made
@@ -335,6 +366,7 @@ type_3DF8D8_base *sub_198900(type_3DF8D8_04 *arg_0, RwInt32 arg_4, void (*arg_8)
 }
 
 // match: ?sub_1989D0@@YAPAUtype_1989D0@@PBDHHHH@Z @ 0x001989D0
+// sp-match: ?sub_1989D0@@YAPAUtype_1989D0@@PBDHHHH@Z @ 0x00128A70
 // The same for the object named arg_0.
 type_1989D0 *sub_1989D0(const RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C, RwInt32 arg_10)
 {
@@ -345,6 +377,7 @@ type_1989D0 *sub_1989D0(const RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt
 }
 
 // match: ?sub_198A20@@YAXPBDPAUtype_3DF8D8_04@@@Z @ 0x00198A20
+// sp-match: ?sub_198A20@@YAXPBDPAUtype_3DF8D8_04@@@Z @ 0x00127810
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The key of the name arg_0: the name quoted (and each '+' in it), upper-
 // cased, and its odd and even characters hashed apart (FNV-1).
@@ -415,6 +448,7 @@ void sub_198A20(const RwChar *arg_0, type_3DF8D8_04 *arg_4)
 }
 
 // match: ?sub_198C70@@YAXPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00198C70
+// sp-match: ?sub_198C70@@YAXPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00128CF0
 // Reads an object from the stream, then the others its header counts
 // (each with a header of its own).
 void sub_198C70(RwStream *arg_0, type_3DF8D8_ev *arg_4)
@@ -440,6 +474,7 @@ void sub_198C70(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 }
 
 // match: ?sub_198D30@@YAXPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00198D30
+// sp-match: ?sub_198D30@@YAXPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00128B30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Reads one object: skipped unless requested; else read by its handler,
 // every request for it answered (the object marked wanted unless a callback
@@ -491,6 +526,7 @@ void sub_198D30(RwStream *arg_0, type_3DF8D8_ev *arg_4)
 }
 
 // match: ?sub_198F00@@YAXPAUtype_3DF8D8_04@@@Z @ 0x00198F00
+// sp-match: ?sub_198F00@@YAXPAUtype_3DF8D8_04@@@Z @ 0x00128AC0
 // Frees the object with the key *arg_0: out of the table, released
 // (vf_004) and its memory back to its pool.
 void sub_198F00(type_3DF8D8_04 *arg_0)
@@ -504,6 +540,7 @@ void sub_198F00(type_3DF8D8_04 *arg_0)
 }
 
 // match: ?sub_198F40@@YAXPAUtype_3DF8D8_base@@@Z @ 0x00198F40
+// sp-match: ?sub_198F40@@YAXPAUtype_3DF8D8_base@@@Z @ 0x00127920
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Returns arg_0's memory to the pool it came from and counts one of its
 // kind fewer.
@@ -525,6 +562,7 @@ void sub_198F40(type_3DF8D8_base *arg_0)
 }
 
 // match: ?sub_198FC0@@YAHPAUtype_4F26D0@@@Z @ 0x00198FC0
+// sp-match: ?sub_198FC0@@YAHPAUtype_4F26D0@@@Z @ 0x00128AF0
 // Takes the request out of the list and registers its object.
 RwInt32 sub_198FC0(type_4F26D0 *arg_0)
 {
@@ -533,6 +571,7 @@ RwInt32 sub_198FC0(type_4F26D0 *arg_0)
 }
 
 // match: ?sub_198FE0@@YAHPAUtype_3DF8D8_base@@@Z @ 0x00198FE0
+// sp-match: ?sub_198FE0@@YAHPAUtype_3DF8D8_base@@@Z @ 0x00127980
 // Registers arg_0 under its key unless an object has it: whether it did.
 RwInt32 sub_198FE0(type_3DF8D8_base *arg_0)
 {
@@ -547,6 +586,7 @@ RwInt32 sub_198FE0(type_3DF8D8_base *arg_0)
 // match: ?sub_199010@@YAPAUtype_199010@@PAUtype_3DF8D8_04@@H@Z @ 0x00199010
 // match: __ehhandler$?sub_199010@@YAPAUtype_199010@@PAUtype_3DF8D8_04@@H@Z-0x428 @ 0x003023A0
 // match: __ehhandler$?sub_199010@@YAPAUtype_199010@@PAUtype_3DF8D8_04@@H@Z @ 0x003027C8
+// sp-match: ?sub_199010@@YAPAUtype_199010@@PAUtype_3DF8D8_04@@H@Z @ 0x001279B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Makes the object of the kind arg_4 with the key *arg_0: built in the first
 // of m_freeGodAssetPools with room for the kind's size (sub_18F710) and a
@@ -770,6 +810,7 @@ void sub_19A750(const RwChar *arg_0, ...)
 }
 
 // match: ?sub_19A760@@YAXPAUtype_3DF8D8_base@@P6AXHHH@ZHH@Z @ 0x0019A760
+// sp-match: ?sub_19A760@@YAXPAUtype_3DF8D8_base@@P6AXHHH@ZHH@Z @ 0x001285B0
 // Queues a request for arg_0 (the callback arg_4 with arg_8 and arg_C).
 void sub_19A760(type_3DF8D8_base *arg_0, void (*arg_4)(RwInt32, RwInt32, RwInt32), RwInt32 arg_8, RwInt32 arg_C)
 {
@@ -788,6 +829,7 @@ void sub_19A760(type_3DF8D8_base *arg_0, void (*arg_4)(RwInt32, RwInt32, RwInt32
 }
 
 // match: ?sub_19A7D0@@YAXPAUtype_4F26D0@@@Z @ 0x0019A7D0
+// sp-match: ?sub_19A7D0@@YAXPAUtype_4F26D0@@@Z @ 0x00128600
 // Takes the request arg_0 out of the list.
 void sub_19A7D0(type_4F26D0 *arg_0)
 {
@@ -802,6 +844,7 @@ void sub_19A7D0(type_4F26D0 *arg_0)
 }
 
 // match: ?sub_19A830@@YAPAURpClump@@PAUtype_3DF8D8_ev@@PAU1@H@Z @ 0x0019A830
+// sp-match: ?sub_19A830@@YAPAURpClump@@PAUtype_3DF8D8_ev@@PAU1@H@Z @ 0x00128640
 // Notes the clump arg_4 read for the header arg_0's file (with arg_8), when
 // it has one; returns arg_4.
 RpClump *sub_19A830(type_3DF8D8_ev *arg_0, RpClump *arg_4, RwInt32 arg_8)
@@ -821,6 +864,7 @@ RpClump *sub_19A830(type_3DF8D8_ev *arg_0, RpClump *arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_19A8A0@@YAXHHH@Z @ 0x0019A8A0
+// sp-match: ?sub_19A8A0@@YAXHHH@Z @ 0x001286A0
 // Forgets the record arg_0, arg_4, arg_8.
 void sub_19A8A0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
@@ -836,6 +880,7 @@ void sub_19A8A0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_19A8D0@@YAPAXPAUtype_3DF8D8_ev@@H@Z @ 0x0019A8D0
+// sp-match: ?sub_19A8D0@@YAPAXPAUtype_3DF8D8_ev@@H@Z @ 0x001286D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The clump noted for the header arg_0's file and arg_4, or 0.
 void *sub_19A8D0(type_3DF8D8_ev *arg_0, RwInt32 arg_4)
@@ -858,6 +903,7 @@ void *sub_19A8D0(type_3DF8D8_ev *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_19A930@@YAHHH@Z @ 0x0019A930
+// sp-match: ?sub_19A930@@YAHHH@Z @ 0x00128720
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The value noted for the file arg_0 and the clump arg_4, or -1.
 RwInt32 sub_19A930(RwInt32 arg_0, RwInt32 arg_4)
@@ -880,6 +926,7 @@ RwInt32 sub_19A930(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_19A980@@YAIPAX@Z @ 0x0019A980
+// sp-match: ?sub_19A980@@YAIPAX@Z @ 0x0005F6B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The object table's hash: the key's first word.
 RwUInt32 sub_19A980(void *arg_0)
@@ -893,6 +940,7 @@ RwUInt32 sub_19A980(void *arg_0)
 }
 
 // match: ?sub_19A9A0@@YA_NPAX0@Z @ 0x0019A9A0
+// sp-match: ?sub_19A9A0@@YA_NPAX0@Z @ 0x00128770
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The object table's test: equal keys.
 bool sub_19A9A0(void *arg_0, void *arg_4)
@@ -909,6 +957,7 @@ bool sub_19A9A0(void *arg_0, void *arg_4)
 }
 
 // match: ?sub_19AA00@@YAIPAX@Z @ 0x0019AA00
+// sp-match: ?sub_19AA00@@YAIPAX@Z @ 0x000BC9F0
 // The file-info table's hash: the file id.
 RwUInt32 sub_19AA00(void *arg_0)
 {
@@ -919,6 +968,7 @@ RwUInt32 sub_19AA00(void *arg_0)
 }
 
 // match: ?sub_19AA20@@YA_NPAX0@Z @ 0x0019AA20
+// sp-match: ?sub_19AA20@@YA_NPAX0@Z @ 0x001287A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The file-info table's test: the same file and value, or with either value
 // -1, the same file and clump.

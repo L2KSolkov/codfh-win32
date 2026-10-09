@@ -186,6 +186,7 @@ _rwStrDup(RwChar * name)
 // match: _rcsid @ 0x00419B08
 
 // match: _AnimOpen @ 0x002E8230
+// sp-match: _AnimOpen @ 0x00202CD0
 static void        *
 AnimOpen(void *instance,
          RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -200,6 +201,7 @@ AnimOpen(void *instance,
 }
 
 // match: _AnimClose @ 0x002E8240
+// sp-match: _AnimClose @ 0x00202CE0
 static void        *
 AnimClose(void *instance,
           RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -220,6 +222,7 @@ AnimClose(void *instance,
    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 // match: _AtomicAnimCtorDtor @ 0x002E8250
+// sp-match: _AtomicAnimCtorDtor @ 0x00202CF0
 static void        *
 AtomicAnimCtorDtor(void *object,
                    RwInt32 __RWUNUSED__ offset,
@@ -242,6 +245,7 @@ AtomicAnimCtorDtor(void *object,
 }
 
 // match: _AtomicAnimCopy @ 0x002E8280
+// sp-match: _AtomicAnimCopy @ 0x00202D20
 static void        *
 AtomicAnimCopy(void *dstObject,
                const void *srcObject,
@@ -302,6 +306,7 @@ AtomicAnimCopy(void *dstObject,
 }
 
 // match: _GeomAnimDtor @ 0x002E8390
+// sp-match: _GeomAnimDtor @ 0x00202E30
 static void        *
 GeomAnimDtor(void *object,
              RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -326,6 +331,7 @@ GeomAnimDtor(void *object,
 }
 
 // match: _GeomAnimCopy @ 0x002E83D0
+// sp-match: _GeomAnimCopy @ 0x00202E70
 static void        *
 GeomAnimCopy(void *dstObject,
              const void *srcObject,
@@ -368,6 +374,7 @@ GeomAnimCopy(void *dstObject,
 }
 
 // match: _GeomAnimWriteStream @ 0x002E8430
+// sp-match: _GeomAnimWriteStream @ 0x00202ED0
 static RwStream    *
 GeomAnimWriteStream(RwStream * stream,
                     RwInt32 __RWUNUSED__ binaryLength,
@@ -425,6 +432,7 @@ GeomAnimWriteStream(RwStream * stream,
 }
 
 // match: _GeomAnimReadStream @ 0x002E85F0
+// sp-match: _GeomAnimReadStream @ 0x00203090
 static RwStream    *
 GeomAnimReadStream(RwStream * stream,
                    RwInt32 __RWUNUSED__ binaryLength,
@@ -497,6 +505,7 @@ GeomAnimReadStream(RwStream * stream,
 }
 
 // match: _GeomAnimSizeStream @ 0x002E84F0
+// sp-match: _GeomAnimSizeStream @ 0x00202F90
 static              RwInt32
 GeomAnimSizeStream(const void *object,
                    RwInt32 __RWUNUSED__ offsetInObject,
@@ -527,6 +536,7 @@ GeomAnimSizeStream(const void *object,
 }
 
 // match: _DefaultGeomAnimCB @ 0x002E8510
+// sp-match: _DefaultGeomAnimCB @ 0x00202FB0
 static              RwReal
 DefaultGeomAnimCB(RpAtomic * atomic, RwReal position)
 {
@@ -549,6 +559,7 @@ DefaultGeomAnimCB(RpAtomic * atomic, RwReal position)
 }
 
 // match: _GeomAnimCtor @ 0x002E8550
+// sp-match: _GeomAnimCtor @ 0x00202FF0
 static void        *
 GeomAnimCtor(void *object,
              RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -591,6 +602,7 @@ GeomAnimCtor(void *object,
  * \see RpMorphPluginAttach
  */
 // match: _RpMorphGeometryCreateInterpolators @ 0x002E8580
+// sp-match: _RpMorphGeometryCreateInterpolators @ 0x00203020
 RpGeometry         *
 RpMorphGeometryCreateInterpolators(RpGeometry * geometry,
                                    RwInt32 numInterps)
@@ -1267,6 +1279,7 @@ RpMorphAtomicAddTime(RpAtomic * atomic, RwReal time)
  * \see RpWorldPluginAttach
  */
 // match: _RpMorphPluginAttach @ 0x002E86E0
+// sp-match: _RpMorphPluginAttach @ 0x00203180
 RwBool
 RpMorphPluginAttach(void)
 {

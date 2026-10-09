@@ -14,17 +14,34 @@
 #include "types/type_4B83A0.h"
 #include "types/type_4B85F8.h"
 #include "types/type_3D32F8.h"
+#ifdef CODFH_SP
+#include "types/animbank.h" // get_pool (sub_D56D0)
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 2 // single player: the data with the second of its two files (src/sp/units/sp_unit_0D5170_2.cpp)
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D7120
 extern const RwReal flt_3D7120 = 16.666666f;
+#ifndef CODFH_SP // single player has neither 0.01f: its table follows 16.666666f's pad (SP 0x2E3510, 0x2E3518)
 // 0x003D7124
 extern const RwReal flt_3D7124 = 0.01f;
 // 0x003D7128
 extern const RwReal flt_3D7128 = 0.01f;
+#endif
 // 0x003D7130
 extern const type_3D7130 dword_3D7130[9] =
 {
+#ifdef CODFH_SP // single player's sizes and counts (SP 0x2E3518, read at SP 0xA1945)
+    { 0x3D0, 25 },
+    { 0x420, 25 },
+    { 0x460, 30 },
+    { 0x5E0, 5 },
+    { 0x790, 30 },
+    { 0x9B0, 0 },
+    { 0x2170, 15 },
+    { 0x2260, 1 },
+    { 0x29D0, 10 },
+#else
     { 0x3E0, 32 },
     { 0x420, 25 },
     { 0x490, 10 },
@@ -34,6 +51,7 @@ extern const type_3D7130 dword_3D7130[9] =
     { 0x2240, 32 },
     { 0x22F0, 1 },
     { 0x29D0, 0 },
+#endif
 };
 // 0x00429264
 RwInt32 dword_429264 = 10;
@@ -98,7 +116,14 @@ type_76290 unk_4B8220[8];
 // match: _$E8 @ 0x0030B170
 // match: _$E9 @ 0x0030E3C0
 // match: _$E11 @ 0x0030B1A0
+// sp-match: _$E2 @ 0x0021D4A0
+// sp-match: _$E5 @ 0x0021D4D0
+// sp-match: _$E3 @ 0x0021E7A0
+// sp-match: _$E6 @ 0x0021E7C0
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 1 // single player compiles type_4B85F8's members in a file of their own (sp_unit_0D5170_1.cpp, SP 0xA1410-0xA14FF)
 // match: ??0type_4B85F8@@QAE@XZ @ 0x000D5170
+// sp-match: ??0type_4B85F8@@QAE@XZ @ 0x000A14F0
 
 type_4B85F8::type_4B85F8()
 {
@@ -106,6 +131,7 @@ type_4B85F8::type_4B85F8()
 }
 
 // match: ?sub_D5190@type_4B85F8@@QAEXXZ @ 0x000D5190
+// sp-match: ?sub_D5190@type_4B85F8@@QAEXXZ @ 0x000A1410
 void type_4B85F8::sub_D5190()
 {
     unk_00 = 0;
@@ -115,6 +141,7 @@ void type_4B85F8::sub_D5190()
 }
 
 // match: ?sub_D51D0@type_4B85F8@@QAEXH@Z @ 0x000D51D0
+// sp-match: ?sub_D51D0@type_4B85F8@@QAEXH@Z @ 0x000A1430
 void type_4B85F8::sub_D51D0(RwInt32 arg_0)
 {
     sub_D5190();
@@ -123,12 +150,14 @@ void type_4B85F8::sub_D51D0(RwInt32 arg_0)
 }
 
 // match: ?sub_D5200@type_4B85F8@@QAEXXZ @ 0x000D5200
+// sp-match: ?sub_D5200@type_4B85F8@@QAEXXZ @ 0x000A1450
 void type_4B85F8::sub_D5200()
 {
     sub_D5190();
 }
 
 // match: ?sub_D5220@type_4B85F8@@QAEXPAUtype_3D3548@@@Z @ 0x000D5220
+// sp-match: ?sub_D5220@type_4B85F8@@QAEXPAUtype_3D3548@@@Z @ 0x000A1460
 void type_4B85F8::sub_D5220(type_3D3548 *arg_0)
 {
     arg_0->unk_14 = 0;
@@ -148,6 +177,7 @@ void type_4B85F8::sub_D5220(type_3D3548 *arg_0)
 }
 
 // match: ?sub_D5290@type_4B85F8@@QAEXPAUtype_3D3548@@@Z @ 0x000D5290
+// sp-match: ?sub_D5290@type_4B85F8@@QAEXPAUtype_3D3548@@@Z @ 0x000A14A0
 void type_4B85F8::sub_D5290(type_3D3548 *arg_0)
 {
     if (arg_0->unk_14)
@@ -171,7 +201,10 @@ void type_4B85F8::sub_D5290(type_3D3548 *arg_0)
     arg_0->unk_14 = 0;
 }
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 2
 // match: ?sub_D5320@@YAXPAH@Z @ 0x000D5320
+// sp-match: ?sub_D5320@@YAXPAH@Z @ 0x000A1910
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D5320(RwInt32 *arg_0)
 {
@@ -222,6 +255,7 @@ void sub_D5320(RwInt32 *arg_0)
 }
 
 // match: ?sub_D5480@@YAXXZ @ 0x000D5480
+// sp-match: ?sub_D5480@@YAXXZ @ 0x000A2140
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D5480()
 {
@@ -243,6 +277,7 @@ void sub_D5480()
     dword_4B8208 = 0;
     dword_4B69F8 = 0;
     dword_429268 = 1;
+#ifndef CODFH_SP // single player compiles the debug print out
     for (var_8 = 0; var_8 < 0x300; var_8++)
     {
         if (dword_4B6A00[var_8].unk_00 || dword_4B6A00[var_8].unk_04)
@@ -250,9 +285,11 @@ void sub_D5480()
             sub_19A750("GameEntityManager::Restart - Handle array %d is not empty at restart!\n", var_8);
         }
     }
+#endif
 }
 
 // match: ?sub_D5570@@YAXXZ @ 0x000D5570
+// sp-match: ?sub_D5570@@YAXXZ @ 0x000A21A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D5570()
 {
@@ -273,6 +310,7 @@ void sub_D5570()
     }
     dword_4B8200 = 0;
     sub_D6350();
+#ifndef CODFH_SP // single player compiles the debug print out
     for (var_8 = 0; var_8 < 0x300; var_8++)
     {
         if (dword_4B6A00[var_8].unk_00 || dword_4B6A00[var_8].unk_04)
@@ -280,9 +318,11 @@ void sub_D5570()
             sub_19A750("GameEntityManager::Shutdown - Handle array %d is not empty at restart!\n", var_8);
         }
     }
+#endif
 }
 
 // match: ?sub_D5650@@YAXXZ @ 0x000D5650
+// sp-match: ?sub_D5650@@YAXXZ @ 0x000A20F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D5650()
 {
@@ -308,6 +348,7 @@ void sub_D5650()
 }
 
 // match: ?sub_D56D0@@YAPAXH_NH@Z @ 0x000D56D0
+// sp-match: ?sub_D56D0@@YAPAXH_NH@Z @ 0x000A1D90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void *sub_D56D0(RwInt32 arg_0, bool arg_4, RwInt32 arg_8)
 {
@@ -336,6 +377,31 @@ void *sub_D56D0(RwInt32 arg_0, bool arg_4, RwInt32 arg_8)
     var30 = 1;
     frm_24 = 0;
     w44 = 1;
+#ifdef CODFH_SP
+    // SP 0xA1D9C: single player's sizes (0x3D0, 0x2170) and two more cases: a
+    // 0x3D0 spawn of kind 0x18 takes pool 0 alone and may always sacrifice, and
+    // a 0x2170 spawn takes pool 6 only while animation pool 2 has room.
+    if (arg_0 == 0x3D0 && arg_8 == 0x18)
+    {
+        var30 = 0;
+        frm_48 = 1;
+        arg_4 = true;
+        w44 = 0;
+    }
+    else if (arg_0 == 0x2170)
+    {
+        var30 = 6;
+        frm_48 = 7;
+        if (!get_pool(2).m_pool.unk_18)
+        {
+            frm_24 = 1;
+        }
+    }
+    else if ((RwUInt32)arg_0 < 0x2170)
+    {
+        frm_48 = 6;
+    }
+#else
     if (arg_0 == 0x3E0)
     {
         var30 = 0;
@@ -345,6 +411,7 @@ void *sub_D56D0(RwInt32 arg_0, bool arg_4, RwInt32 arg_8)
     {
         frm_48 = 6;
     }
+#endif
     if (!frm_24)
     {
         for (ebp_14 = var30; ebp_14 < frm_48; ebp_14++)
@@ -424,17 +491,20 @@ void *sub_D56D0(RwInt32 arg_0, bool arg_4, RwInt32 arg_8)
             bp_8 = dword_4B83A0[var_C].sub_D65C0();
             dword_429264 = var_C;
         }
+#ifndef CODFH_SP // single player compiles the debug print out
         else
         {
             sub_19A750("WARNING: A priority spawn could not be created due to lack of sacficial lambs. "
                        "Trigger location(%6.2f,%6.2f,%6.2f)",
                        (RwDouble)l34->unk_90, (RwDouble)l34->unk_94, (RwDouble)l34->unk_98);
         }
+#endif
     }
     return bp_8;
 }
 
 // match: ?sub_D5A60@@YAXPAUtype_3D3548@@H@Z @ 0x000D5A60
+// sp-match: ?sub_D5A60@@YAXPAUtype_3D3548@@H@Z @ 0x000A2050
 void sub_D5A60(type_3D3548 *arg_0, RwInt32 arg_4)
 {
     if (!(arg_0->unk_28 & 1))
@@ -462,6 +532,7 @@ void sub_D5A60(type_3D3548 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_D5AD0@@YAXPAUtype_3D3548@@@Z @ 0x000D5AD0
+// sp-match: ?sub_D5AD0@@YAXPAUtype_3D3548@@@Z @ 0x000A19D0
 void sub_D5AD0(type_3D3548 *arg_0)
 {
     RwInt32 var_4;
@@ -483,12 +554,14 @@ void sub_D5AD0(type_3D3548 *arg_0)
 }
 
 // match: ?sub_D5B80@@YAXPAUtype_3D3548@@H@Z @ 0x000D5B80
+// sp-match: ?sub_D5B80@@YAXPAUtype_3D3548@@H@Z @ 0x000A1500
 void sub_D5B80(type_3D3548 *arg_0, RwInt32 arg_4)
 {
     dword_4B85F8[arg_4].sub_D5220(arg_0);
 }
 
 // match: ?sub_D5BA0@@YAXPAUtype_3D3548@@@Z @ 0x000D5BA0
+// sp-match: ?sub_D5BA0@@YAXPAUtype_3D3548@@@Z @ 0x000A1520
 void sub_D5BA0(type_3D3548 *arg_0)
 {
     RwInt32 var_4;
@@ -501,6 +574,7 @@ void sub_D5BA0(type_3D3548 *arg_0)
 }
 
 // match: ?sub_D5BE0@@YAHPAUtype_3D3548@@@Z @ 0x000D5BE0
+// sp-match: ?sub_D5BE0@@YAHPAUtype_3D3548@@@Z @ 0x000A1550
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_D5BE0(type_3D3548 *arg_0)
 {
@@ -533,6 +607,7 @@ RwInt32 sub_D5BE0(type_3D3548 *arg_0)
 }
 
 // match: ?sub_D5CC0@@YAXH@Z @ 0x000D5CC0
+// sp-match: ?sub_D5CC0@@YAXH@Z @ 0x000A15E0
 void sub_D5CC0(RwInt32 arg_0)
 {
     dword_4B6A00[(RwInt16)arg_0].unk_00 = 0;
@@ -540,6 +615,7 @@ void sub_D5CC0(RwInt32 arg_0)
 }
 
 // match: ?sub_D5CF0@@YAPAUtype_3D3548@@H@Z @ 0x000D5CF0
+// sp-match: ?sub_D5CF0@@YAPAUtype_3D3548@@H@Z @ 0x000A1600
 type_3D3548 *sub_D5CF0(RwInt32 arg_0)
 {
     if (dword_4B6A00[(RwInt16)arg_0].unk_00 == arg_0)
@@ -550,6 +626,7 @@ type_3D3548 *sub_D5CF0(RwInt32 arg_0)
 }
 
 // match: ?sub_D5D20@@YAXH@Z @ 0x000D5D20
+// sp-match: ?sub_D5D20@@YAXH@Z @ 0x000A1A40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D5D20(RwInt32 arg_0)
 {
@@ -595,14 +672,19 @@ void sub_D5D20(RwInt32 arg_0)
 }
 
 // match: ?sub_D5E20@@YAXXZ @ 0x000D5E20
+// sp-match: ?sub_D5E20@@YAXXZ @ 0x000A1AD0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D5E20()
 {
+#ifndef CODFH_SP // single player scopes its block locals (SP 0xA1AD0)
     type_712B0 *var_2C;
+#endif
     RwFrame *var_28;
+#ifndef CODFH_SP // single player scopes its block locals (SP 0xA1AD0)
     RwInt32 ebp_24;
     RwV3d var_20;
     RwReal ebp_14;
+#endif
     type_3D3548 *lv_10;
     RwReal var_C;
     type_3D3548 *bp_8;
@@ -625,6 +707,12 @@ void sub_D5E20()
             {
                 if (bp_8->unk_88_10 && (bp_8->unk_244 & 0x3F) == (dword_4B87D8 & 0x3F))
                 {
+#ifdef CODFH_SP
+                    type_712B0 *var_2C;
+                    RwInt32 ebp_24;
+                    RwV3d var_20;
+                    RwReal ebp_14;
+#endif
                     RwV3dSub(&var_20, (RwV3d *)lv_10->vf_0C4(), (RwV3d *)bp_8->vf_0C4());
                     ebp_14 = RwV3dLength(&var_20);
                     var_2C = (type_712B0 *)bp_8->unk_344.unk_08;
@@ -703,6 +791,7 @@ void sub_D5E20()
 }
 
 // match: ?sub_D61F0@@YAXPAUtype_3DF8D8_04@@@Z @ 0x000D61F0
+// sp-match: ?sub_D61F0@@YAXPAUtype_3DF8D8_04@@@Z @ 0x000A20A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D61F0(type_3DF8D8_04 *arg_0)
 {
@@ -711,6 +800,7 @@ void sub_D61F0(type_3DF8D8_04 *arg_0)
     type_4B6A00 *bp_8;
     type_3D3548 *bp_4;
 
+#ifndef CODFH_SP // single player compiles the debug print out
     if (!dword_4B8200)
     {
         for (var_C = 0; var_C < 0x300; var_C++)
@@ -722,6 +812,7 @@ void sub_D61F0(type_3DF8D8_04 *arg_0)
             }
         }
     }
+#endif
     bp_8 = dword_4B6A00;
     for (var_10 = 0; var_10 < 0x300; var_10++, bp_8++)
     {
@@ -743,6 +834,7 @@ void sub_D61F0(type_3DF8D8_04 *arg_0)
 }
 
 // match: ?sub_D62D0@@YAXPAX@Z @ 0x000D62D0
+// sp-match: ?sub_D62D0@@YAXPAX@Z @ 0x000A1620
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_D62D0(void *arg_0)
 {
@@ -770,6 +862,7 @@ void sub_D62D0(void *arg_0)
 }
 
 // match: ?sub_D6350@@YAXXZ @ 0x000D6350
+// sp-match: ?sub_D6350@@YAXXZ @ 0x000A1680
 void sub_D6350()
 {
     RwInt32 var_4;
@@ -782,6 +875,7 @@ void sub_D6350()
 }
 
 // match: ?sub_D63A0@@YAPAUtype_76290@@PAXH@Z @ 0x000D63A0
+// sp-match: ?sub_D63A0@@YAPAUtype_76290@@PAXH@Z @ 0x000A18E0
 type_76290 *sub_D63A0(void *arg_0, RwInt32 arg_4)
 {
     RwInt32 var_4;
@@ -800,17 +894,20 @@ type_76290 *sub_D63A0(void *arg_0, RwInt32 arg_4)
 // match: ??0type_4B83A0@@QAE@XZ @ 0x000D63F0
 // match: __ehhandler$??0type_4B83A0@@QAE@XZ-0xB @ 0x00300CB0
 // match: __ehhandler$??0type_4B83A0@@QAE@XZ @ 0x00300CBB
+// sp-match: ??0type_4B83A0@@QAE@XZ @ 0x000A2320
 type_4B83A0::type_4B83A0()
 {
     sub_D6460();
 }
 
 // match: ??1type_4B83A0@@QAE@XZ @ 0x000D6440
+// sp-match: ??1type_4B83A0@@QAE@XZ @ 0x000A2200
 type_4B83A0::~type_4B83A0()
 {
 }
 
 // match: ?sub_D6460@type_4B83A0@@QAEXXZ @ 0x000D6460
+// sp-match: ?sub_D6460@type_4B83A0@@QAEXXZ @ 0x000A2210
 void type_4B83A0::sub_D6460()
 {
     unk_08 = 0;
@@ -820,6 +917,7 @@ void type_4B83A0::sub_D6460()
 }
 
 // match: ?sub_D64A0@type_4B83A0@@QAEHHHH@Z @ 0x000D64A0
+// sp-match: ?sub_D64A0@type_4B83A0@@QAEHHHH@Z @ 0x000A2230
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_4B83A0::sub_D64A0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
@@ -847,6 +945,7 @@ RwInt32 type_4B83A0::sub_D64A0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_D6550@type_4B83A0@@QAEXXZ @ 0x000D6550
+#ifndef CODFH_SP // single player compiles the debug print out: the body is empty and folded elsewhere (SP 0xA2172 calls the shared empty function)
 void type_4B83A0::sub_D6550()
 {
     if (unk_14.in_use())
@@ -854,8 +953,10 @@ void type_4B83A0::sub_D6550()
         sub_19A750("GameEntityPool:: %d was not empty at restart!", unk_0C);
     }
 }
+#endif
 
 // match: ?sub_D65A0@type_4B83A0@@QAEXXZ @ 0x000D65A0
+// sp-match: ?sub_D65A0@type_4B83A0@@QAEXXZ @ 0x000A22C0
 void type_4B83A0::sub_D65A0()
 {
     unk_14.sub_16C4D0(1);
@@ -863,6 +964,7 @@ void type_4B83A0::sub_D65A0()
 }
 
 // match: ?sub_D65C0@type_4B83A0@@QAEPAXXZ @ 0x000D65C0
+// sp-match: ?sub_D65C0@type_4B83A0@@QAEPAXXZ @ 0x000A22E0
 void *type_4B83A0::sub_D65C0()
 {
     void *var_4;
@@ -877,6 +979,7 @@ void *type_4B83A0::sub_D65C0()
 }
 
 // match: ?sub_D6600@type_4B83A0@@QAEXPAX@Z @ 0x000D6600
+// sp-match: ?sub_D6600@type_4B83A0@@QAEXPAX@Z @ 0x000A2300
 void type_4B83A0::sub_D6600(void *arg_0)
 {
     if (arg_0)
@@ -890,9 +993,11 @@ void type_4B83A0::sub_D6600(void *arg_0)
 // the authentic link (PLAN M7); the placement link takes the shared bodies.
 
 // ?pDtor@type_4B85F8@@QAEXXZ (folded into the empty body at 0x1E41C0)
+#ifndef CODFH_SP // single player keeps the calls (SP 0xA2157): the empty body is not in this object
 void type_4B85F8::pDtor()
 {
 }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
@@ -920,4 +1025,5 @@ type_3D3548 *&dword_4B8640 = *(type_3D3548 * *)((RwUInt8 *)&dword_4B85F8 + 0x48)
 type_3D3548 *&dword_4B8690 = *(type_3D3548 * *)((RwUInt8 *)&dword_4B85F8 + 0x98);
 // 0x004B86A0: dword_4B85F8 + 0xA8
 type_3D3548 *&dword_4B86A0 = *(type_3D3548 * *)((RwUInt8 *)&dword_4B85F8 + 0xA8);
+#endif
 #endif

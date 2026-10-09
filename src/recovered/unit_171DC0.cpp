@@ -156,6 +156,15 @@ type_D48D0 dword_4E5D1C[4];
 // match: _$E11 @ 0x0030BE50
 // match: _$E12 @ 0x0030E940
 // match: ?sub_171DC0@@YAXXZ @ 0x00171DC0
+// sp-match: _$E2 @ 0x0021DD10
+// sp-match: _$E5 @ 0x0021DD30
+// sp-match: _$E8 @ 0x0021DD60
+// sp-match: _$E11 @ 0x0021DD80
+// sp-match: _$E3 @ 0x0021ECC0
+// sp-match: _$E6 @ 0x0021ECD0
+// sp-match: _$E12 @ 0x0021ED00
+// sp-match: ?sub_171DC0@@YAXXZ @ 0x0010F610
+// sp-match: _$E9 @ 0x0021ECF0
 
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Sets the manager up: everything cleared, the UV animation dictionary,
@@ -223,7 +232,12 @@ void sub_171DC0()
     ((type_4E5BE0 *)&dword_4E5BE0)->unk_00.unk_04 = -500000.0f;
     ((type_4E5BE0 *)&dword_4E5BE0)->unk_00.unk_08 = -500000.0f;
     ((type_4E5BE0 *)&dword_4E5BE0)->unk_00.unk_0C = 1.0f;
+#ifdef CODFH_SP
+    // shape: the cleared red stored as the integer 0 (SP 0x10F610 stores esi)
+    *(RwInt32 *)&unk_4E5C60.red = 0;
+#else
     unk_4E5C60.red = 0;
+#endif
     for (v14 = 0; v14 < 3; v14++)
     {
         ((type_4E5BE0 *)&dword_4E5BE0)->unk_20[v14].unk_10.unk_00 = 0;
@@ -267,6 +281,7 @@ void sub_171DC0()
 }
 
 // match: ?sub_172210@@YAXXZ @ 0x00172210
+// sp-match: ?sub_172210@@YAXXZ @ 0x0010F990
 void sub_172210()
 {
     sub_1724C0();
@@ -275,6 +290,7 @@ void sub_172210()
 }
 
 // match: ?sub_172230@@YAXXZ @ 0x00172230
+// sp-match: ?sub_172230@@YAXXZ @ 0x0010FF50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Shuts the manager down: the lights, the cameras taken out of their
 // worlds, the sections, the default world, shared.txd.
@@ -331,7 +347,12 @@ void sub_172230()
     sub_172430();
     sub_174060(&unk_4E5CD8, 0);
     unk_4E5CD8.sub_1747D0();
+#ifdef CODFH_SP
+    // shape: an unsigned 0xFFFF store, not CSE'd with the -1 below (SP 0x10FF50 stores both as immediates)
+    *(RwUInt16 *)&word_429EAC = 0xFFFF;
+#else
     word_429EAC = -1;
+#endif
     sub_1744A0();
     bp_4 = dword_4E5C78;
     if (bp_4)
@@ -351,6 +372,7 @@ void sub_172230()
 }
 
 // match: ?sub_172430@@YAXXZ @ 0x00172430
+// sp-match: ?sub_172430@@YAXXZ @ 0x0010FF00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Unloads the four sections.
 void sub_172430()
@@ -367,6 +389,7 @@ void sub_172430()
 }
 
 // match: ?sub_172480@@YAXXZ @ 0x00172480
+// sp-match: ?sub_172480@@YAXXZ @ 0x0010E510
 void sub_172480()
 {
     RwInt32 var_4;
@@ -376,6 +399,7 @@ void sub_172480()
 }
 
 // match: ?sub_1724C0@@YAXXZ @ 0x001724C0
+// sp-match: ?sub_1724C0@@YAXXZ @ 0x0010E530
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Warns of every world still holding something at a restart or shutdown.
 void sub_1724C0()
@@ -396,53 +420,71 @@ void sub_1724C0()
         {
             sprintf(var_110, "Opaque world is not empty for section ID %d bank %d at restart//shutdown\n",
                     var_114->get_unk_08(), var_8);
+#ifndef CODFH_SP
+            // single player compiles the debug prints out (SP 0x10E530)
             sub_19A750(var_110);
+#endif
         }
         l4 = var_114->unk_24;
         if (l4 && !sub_16E5C0(l4, 0, 0))
         {
             sprintf(var_110, "Alpha world is not empty for section ID %d bank %d at restart//shutdown\n",
                     var_114->get_unk_08(), var_8);
+#ifndef CODFH_SP
             sub_19A750(var_110);
+#endif
         }
         l4 = var_114->unk_28;
         if (l4 && !sub_16E5C0(l4, 0, 0))
         {
             sprintf(var_110, "Collision world is not empty for section ID %d bank %d at restart//shutdown\n",
                     var_114->get_unk_08(), var_8);
+#ifndef CODFH_SP
             sub_19A750(var_110);
+#endif
         }
         l4 = var_114->unk_2C;
         if (l4 && !sub_16E5C0(l4, 0, 0))
         {
             sprintf(var_110, "Extra world is not empty for section ID %d bank %d at restart//shutdown\n",
                     var_114->get_unk_08(), var_8);
+#ifndef CODFH_SP
             sub_19A750(var_110);
+#endif
         }
     }
     if (world && !sub_16E5C0(world, 0, 0))
     {
         sprintf(var_110, "SkyBox world is not empty at restart//shutdown!\n");
+#ifndef CODFH_SP
         sub_19A750(var_110);
+#endif
     }
     if (dword_4E5C84 && !sub_16E5C0(dword_4E5C84, 0, 0))
     {
         sprintf(var_110, "SkyBox alpha world is not empty at restart//shutdown!\n");
+#ifndef CODFH_SP
         sub_19A750(var_110);
+#endif
     }
     if (dword_4E5C88 && !sub_16E5C0(dword_4E5C88, 0, 0))
     {
         sprintf(var_110, "SkyBox extra world is not empty at restart//shutdown!\n");
+#ifndef CODFH_SP
         sub_19A750(var_110);
+#endif
     }
     if (dword_4E5C78 && !sub_16E5C0(dword_4E5C78, 0, 0))
     {
         sprintf(var_110, "Default world is not empty at restart//shutdown!\n");
+#ifndef CODFH_SP
         sub_19A750(var_110);
+#endif
     }
 }
 
 // match: ?sub_1727E0@@YAXPAH@Z @ 0x001727E0
+// sp-match: ?sub_1727E0@@YAXPAH@Z @ 0x0010E700
 void sub_1727E0(RwInt32 *arg_0)
 {
     dword_4B6850 = 1;
@@ -453,6 +495,7 @@ void sub_1727E0(RwInt32 *arg_0)
 }
 
 // match: ?sub_172820@@YAHXZ @ 0x00172820
+// sp-match: ?sub_172820@@YAHXZ @ 0x0010E740
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Allocates the arena: the clump banks' heap, the weapon banks' heaps and
 // the sections' (the four sizes SectionInfo gives, else a global
@@ -543,6 +586,7 @@ RwInt32 sub_172820()
 }
 
 // match: ?sub_172A80@@YAXXZ @ 0x00172A80
+// sp-match: ?sub_172A80@@YAXXZ @ 0x0010E930
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Frees the arena and its heaps, and gives RenderWare its memory functions
 // back.
@@ -584,6 +628,7 @@ void sub_172A80()
 }
 
 // match: ?sub_172BB0@@YAXXZ @ 0x00172BB0
+// sp-match: ?sub_172BB0@@YAXXZ @ 0x0010EA10
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Shares the sections' part of the arena (after the global dictionary's)
 // between the four sections, 128-aligned.
@@ -615,6 +660,7 @@ void sub_172BB0()
 }
 
 // match: ?sub_172C60@@YAGPAURwFrame@@PAUtype_3D96F0@@@Z @ 0x00172C60
+// sp-match: ?sub_172C60@@YAGPAURwFrame@@PAUtype_3D96F0@@@Z @ 0x0010EA90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The section whose world (by the extension arg_4's flags: alpha,
 // collision or opaque) holds the frame arg_0's position, the nearest
@@ -663,7 +709,12 @@ RwUInt16 sub_172C60(RwFrame *arg_0, type_3D96F0 *arg_4)
                 RwV3dSubMacro(&var_3C, &var_24->sup, &var_24->inf);
                 RwV3dAddMacro(&var_30, &var_24->inf, &var_3C);
                 RwV3dSubMacro(&var_3C, &var_30, ebp_14);
+#ifdef CODFH_SP
+                // shape: the squared length summed from z down (SP 0x10EA90)
+                l1C = var_3C.z * var_3C.z + var_3C.y * var_3C.y + var_3C.x * var_3C.x;
+#else
                 l1C = RwV3dDotProductMacro(&var_3C, &var_3C);
+#endif
                 if (ebp_14->x <= var_24->sup.x && ebp_14->x >= var_24->inf.x && ebp_14->y <= var_24->sup.y
                     && ebp_14->y >= var_24->inf.y && ebp_14->z <= var_24->sup.z && ebp_14->z >= var_24->inf.z)
                     var_20 = 1;
@@ -681,6 +732,7 @@ RwUInt16 sub_172C60(RwFrame *arg_0, type_3D96F0 *arg_4)
 }
 
 // match: ?sub_172EB0@@YAPAURpWorld@@GPAUtype_3D96F0@@@Z @ 0x00172EB0
+// sp-match: ?sub_172EB0@@YAPAURpWorld@@GPAUtype_3D96F0@@@Z @ 0x0010EBE0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The world of the section arg_0 (0x7FFF: the global section) the
 // extension arg_4's flags pick; the default world without one.
@@ -712,6 +764,7 @@ RpWorld *sub_172EB0(RwUInt16 arg_0, type_3D96F0 *arg_4)
 }
 
 // match: ?sub_172F60@@YAHPAURpWorld@@0@Z @ 0x00172F60
+// sp-match: ?sub_172F60@@YAHPAURpWorld@@0@Z @ 0x0010EC40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Whether the worlds arg_0 and arg_4 are one world of one section.
 RwInt32 sub_172F60(RpWorld *arg_0, RpWorld *arg_4)
@@ -732,6 +785,7 @@ RwInt32 sub_172F60(RpWorld *arg_0, RpWorld *arg_4)
 }
 
 // match: ?sub_172FF0@@YAPAURpWorld@@PAHPAURwFrame@@PAUtype_3D96F0@@PAU1@@Z @ 0x00172FF0
+// sp-match: ?sub_172FF0@@YAPAURpWorld@@PAHPAURwFrame@@PAUtype_3D96F0@@PAU1@@Z @ 0x0010F9B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The world the frame arg_4 (with the extension arg_8) belongs in; *arg_0
 // says whether it moves (1), stays (0) or is new (2, no world arg_C), and
@@ -762,6 +816,7 @@ RpWorld *sub_172FF0(RwInt32 *arg_0, RwFrame *arg_4, type_3D96F0 *arg_8, RpWorld 
 }
 
 // match: ?sub_173080@@YAXGPAUtype_3D96F0@@@Z @ 0x00173080
+// sp-match: ?sub_173080@@YAXGPAUtype_3D96F0@@@Z @ 0x0010ECB0
 // Gives the extension arg_4 the section arg_0 (and its level section).
 void sub_173080(RwUInt16 arg_0, type_3D96F0 *arg_4)
 {
@@ -783,6 +838,7 @@ void sub_173080(RwUInt16 arg_0, type_3D96F0 *arg_4)
 }
 
 // match: ?sub_173100@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x00173100
+// sp-match: ?sub_173100@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0010ED20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // An atomic callback: the atomic arg_0 takes the section arg_4.
 RpAtomic *sub_173100(RpAtomic *arg_0, void *arg_4)
@@ -797,6 +853,7 @@ RpAtomic *sub_173100(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_173140@@YAPAURpLight@@PAU1@PAX@Z @ 0x00173140
+// sp-match: ?sub_173140@@YAPAURpLight@@PAU1@PAX@Z @ 0x0010ED40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Likewise for the light arg_0.
 RpLight *sub_173140(RpLight *arg_0, void *arg_4)
@@ -811,6 +868,7 @@ RpLight *sub_173140(RpLight *arg_0, void *arg_4)
 }
 
 // match: ?sub_173180@@YAPAURpWorld@@PAURpClump@@@Z @ 0x00173180
+// sp-match: ?sub_173180@@YAPAURpWorld@@PAURpClump@@@Z @ 0x0010FA30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Puts the clump arg_0 in the world its position picks (the global
 // section's opaque world for an entity whose trigger has flag 10 of +0x24,
@@ -874,6 +932,7 @@ RpWorld *sub_173180(RpClump *arg_0)
 }
 
 // match: ?sub_173320@@YAPAURpWorld@@PAURpAtomic@@@Z @ 0x00173320
+// sp-match: ?sub_173320@@YAPAURpWorld@@PAURpAtomic@@@Z @ 0x0010FB60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Likewise for the atomic arg_0.
 RpWorld *sub_173320(RpAtomic *arg_0)
@@ -930,6 +989,7 @@ RpWorld *sub_173320(RpAtomic *arg_0)
 }
 
 // match: ?sub_173450@@YAPAURpWorld@@PAURpLight@@@Z @ 0x00173450
+// sp-match: ?sub_173450@@YAPAURpWorld@@PAURpLight@@@Z @ 0x0010FC40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Likewise for the light arg_0 (by its position alone).
 RpWorld *sub_173450(RpLight *arg_0)
@@ -957,6 +1017,7 @@ RpWorld *sub_173450(RpLight *arg_0)
 }
 
 // match: ?sub_1734E0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x001734E0
+// sp-match: ?sub_1734E0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0010ED60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Takes the atomic arg_0 out of its world, untagged.
 RpAtomic *sub_1734E0(RpAtomic *arg_0, void *arg_4)
@@ -973,6 +1034,7 @@ RpAtomic *sub_1734E0(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_173540@@YAPAURpLight@@PAU1@PAX@Z @ 0x00173540
+// sp-match: ?sub_173540@@YAPAURpLight@@PAU1@PAX@Z @ 0x0010EDA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Likewise the light arg_0.
 RpLight *sub_173540(RpLight *arg_0, void *arg_4)
@@ -989,6 +1051,7 @@ RpLight *sub_173540(RpLight *arg_0, void *arg_4)
 }
 
 // match: ?sub_1735A0@@YAPAURpWorld@@PAURpClump@@@Z @ 0x001735A0
+// sp-match: ?sub_1735A0@@YAPAURpWorld@@PAURpClump@@@Z @ 0x0010EDE0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Takes the clump arg_0 (and its atomics and lights) out of its world,
 // untagged; returns the world.
@@ -1010,6 +1073,7 @@ RpWorld *sub_1735A0(RpClump *arg_0)
 }
 
 // match: ?sub_173620@@YAPAURpWorld@@PAURpAtomic@@@Z @ 0x00173620
+// sp-match: ?sub_173620@@YAPAURpWorld@@PAURpAtomic@@@Z @ 0x0010EE30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpWorld *sub_173620(RpAtomic *arg_0)
 {
@@ -1027,6 +1091,7 @@ RpWorld *sub_173620(RpAtomic *arg_0)
 }
 
 // match: ?sub_173680@@YAPAURpClump@@PAU1@PAX@Z @ 0x00173680
+// sp-match: ?sub_173680@@YAPAURpClump@@PAU1@PAX@Z @ 0x0010FCB0
 RpClump *sub_173680(RpClump *arg_0, void *arg_4)
 {
     sub_173180(arg_0);
@@ -1034,6 +1099,7 @@ RpClump *sub_173680(RpClump *arg_0, void *arg_4)
 }
 
 // match: ?sub_1736A0@@YAPAURpLight@@PAU1@PAX@Z @ 0x001736A0
+// sp-match: ?sub_1736A0@@YAPAURpLight@@PAU1@PAX@Z @ 0x0010FCD0
 RpLight *sub_1736A0(RpLight *arg_0, void *arg_4)
 {
     sub_173450(arg_0);
@@ -1041,6 +1107,7 @@ RpLight *sub_1736A0(RpLight *arg_0, void *arg_4)
 }
 
 // match: ?sub_1736C0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x001736C0
+// sp-match: ?sub_1736C0@@YAPAURpAtomic@@PAU1@PAX@Z @ 0x0010FCF0
 RpAtomic *sub_1736C0(RpAtomic *arg_0, void *arg_4)
 {
     sub_173320(arg_0);
@@ -1048,6 +1115,7 @@ RpAtomic *sub_1736C0(RpAtomic *arg_0, void *arg_4)
 }
 
 // match: ?sub_1736E0@@YAPAURpWorldSector@@PAU1@PAX@Z @ 0x001736E0
+// sp-match: ?sub_1736E0@@YAPAURpWorldSector@@PAU1@PAX@Z @ 0x0010FD10
 RpWorldSector *sub_1736E0(RpWorldSector *arg_0, void *arg_4)
 {
     RpWorldSectorForAllAtomics(arg_0, sub_1736C0, 0);
@@ -1055,6 +1123,7 @@ RpWorldSector *sub_1736E0(RpWorldSector *arg_0, void *arg_4)
 }
 
 // match: ?sub_173700@@YAXPAURpWorld@@@Z @ 0x00173700
+// sp-match: ?sub_173700@@YAXPAURpWorld@@@Z @ 0x0010FD30
 // Puts everything in the world arg_0 back in the world its position picks.
 void sub_173700(RpWorld *arg_0)
 {
@@ -1067,6 +1136,7 @@ void sub_173700(RpWorld *arg_0)
 }
 
 // match: ?sub_173750@@YAXXZ @ 0x00173750
+// sp-match: ?sub_173750@@YAXXZ @ 0x0010FD70
 // Likewise for every section's opaque and collision worlds, the default
 // world and the global section's.
 void sub_173750()
@@ -1087,6 +1157,7 @@ void sub_173750()
 }
 
 // match: ?sub_173800@@YAHPAURpLight@@@Z @ 0x00173800
+// sp-match: ?sub_173800@@YAHPAURpLight@@@Z @ 0x0010EE70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Adds the level's light arg_0 at the head of the list (an ambient one is
 // the ambient light, its colour kept; a directional one light 0).
@@ -1123,6 +1194,7 @@ RwInt32 sub_173800(RpLight *arg_0)
 }
 
 // match: ?sub_1738D0@@YAHPAURpLight@@@Z @ 0x001738D0
+// sp-match: ?sub_1738D0@@YAHPAURpLight@@@Z @ 0x0010EF00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Takes the light arg_0 out of the list.
 RwInt32 sub_1738D0(RpLight *arg_0)
@@ -1161,6 +1233,7 @@ RwInt32 sub_1738D0(RpLight *arg_0)
 }
 
 // match: ?sub_1739C0@@YAXXZ @ 0x001739C0
+// sp-match: ?sub_1739C0@@YAXXZ @ 0x0010EF90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Copies the ambient light's colour and direction (its frame's at vector)
 // into the default zone's first pair, directional light 0's into its
@@ -1232,6 +1305,7 @@ void sub_1739C0()
 }
 
 // match: ?sub_173BE0@@YAXPAURpWorld@@HGG@Z @ 0x00173BE0
+// sp-match: ?sub_173BE0@@YAXPAURpWorld@@HGG@Z @ 0x0010F150
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Tags the world arg_0's extension with the section slot arg_C and level
 // section arg_8, and whether the PVS shows it (the world passed as a
@@ -1275,6 +1349,7 @@ void sub_173BE0(RpWorld *arg_0, RwInt32 arg_4, RwUInt16 arg_8, RwUInt16 arg_C)
 }
 
 // match: ?sub_173CE0@@YAHPAURpWorld@@HG@Z @ 0x00173CE0
+// sp-match: ?sub_173CE0@@YAHPAURpWorld@@HG@Z @ 0x0010F1D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Gives the level section arg_8 (0x7FFF: the global section) the world
 // arg_0 of kind arg_4 (0 opaque, 1 alpha, 2 collision, 4 UV-animated): its
@@ -1356,6 +1431,7 @@ RwInt32 sub_173CE0(RpWorld *arg_0, RwInt32 arg_4, RwUInt16 arg_8)
 }
 
 // match: ?sub_173F30@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x00173F30
+// sp-match: ?sub_173F30@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x0010F190
 // A material callback: starts the material arg_0's texture animation
 // (arg_4 the world).
 RpMaterial *sub_173F30(RpMaterial *arg_0, void *arg_4)
@@ -1365,6 +1441,7 @@ RpMaterial *sub_173F30(RpMaterial *arg_0, void *arg_4)
 }
 
 // match: ?sub_173F50@@YAPAUtype_4E5D30@@G@Z @ 0x00173F50
+// sp-match: ?sub_173F50@@YAPAUtype_4E5D30@@G@Z @ 0x0010F310
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The slot holding the level section arg_0, else a free one (taken), else 0.
 type_4E5D30 *sub_173F50(RwUInt16 arg_0)
@@ -1396,6 +1473,7 @@ type_4E5D30 *sub_173F50(RwUInt16 arg_0)
 }
 
 // match: ?sub_174030@@YAXGH@Z @ 0x00174030
+// sp-match: ?sub_174030@@YAXGH@Z @ 0x0010FF30
 // Drops the section slot arg_0 (sub_174060 with arg_4).
 void sub_174030(RwUInt16 arg_0, RwInt32 arg_4)
 {
@@ -1406,6 +1484,7 @@ void sub_174030(RwUInt16 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_174060@@YAXPAUtype_4E5D30@@H@Z @ 0x00174060
+// sp-match: ?sub_174060@@YAXPAUtype_4E5D30@@H@Z @ 0x0010FDD0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Drops the section slot arg_0 (arg_4 unused), under the section lock: its
 // collision world's zones and its worlds' material animations released,
@@ -1418,9 +1497,12 @@ void sub_174060(type_4E5D30 *arg_0, RwInt32 arg_4)
     RpWorld *lv_10[4];
 
     RtlEnterCriticalSection(&dword_44BFB8);
+#ifndef CODFH_SP
+    // single player compiles the debug prints out (SP 0x10FDD0)
     sub_19A750("Removing world %d in bank %d", arg_0->get_unk_08(), arg_0->get_unk_0A());
     if (arg_0->get_unk_08() == 0xFFFF)
         sub_19A750("!!!\n");
+#endif
     lv_10[0] = arg_0->get_unk_20();
     lv_10[1] = arg_0->get_unk_24();
     lv_10[2] = arg_0->get_unk_28();
@@ -1450,9 +1532,13 @@ void sub_174060(type_4E5D30 *arg_0, RwInt32 arg_4)
     }
     if (var_14)
     {
+#ifdef CODFH_SP
+        sub_16E6F0(var_14);
+#else
         if (!sub_16E6F0(var_14))
             sub_19A750("Unable to destroy Texture Dictionary for section %d in bank %d", arg_0->get_unk_08(),
                        arg_0->get_unk_0A());
+#endif
         RwTexDictionaryDestroy(arg_0->get_unk_30());
     }
     arg_0->unk_20 = 0;
@@ -1466,6 +1552,7 @@ void sub_174060(type_4E5D30 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_1742B0@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x001742B0
+// sp-match: ?sub_1742B0@@YAPAURpMaterial@@PAU1@PAX@Z @ 0x0010F1B0
 // A material callback: stops the material arg_0's texture animation
 // (arg_4 the world).
 RpMaterial *sub_1742B0(RpMaterial *arg_0, void *arg_4)
@@ -1475,6 +1562,7 @@ RpMaterial *sub_1742B0(RpMaterial *arg_0, void *arg_4)
 }
 
 // match: ?sub_1742D0@@YAHPAURwTexDictionary@@G@Z @ 0x001742D0
+// sp-match: ?sub_1742D0@@YAHPAURwTexDictionary@@G@Z @ 0x0010F380
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Gives the level section arg_4's slot (else a free one) the texture
 // dictionary arg_0; returns the slot, or -1.
@@ -1516,6 +1604,7 @@ RwInt32 sub_1742D0(RwTexDictionary *arg_0, RwUInt16 arg_4)
 }
 
 // match: ?sub_1743E0@@YAPAURwTexDictionary@@H@Z @ 0x001743E0
+// sp-match: ?sub_1743E0@@YAPAURwTexDictionary@@H@Z @ 0x0010F400
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The texture dictionary of the level section arg_0's slot, or 0.
 RwTexDictionary *sub_1743E0(RwInt32 arg_0)
@@ -1533,6 +1622,7 @@ RwTexDictionary *sub_1743E0(RwInt32 arg_0)
 }
 
 // match: ?sub_174460@@YAXPAURpWorld@@@Z @ 0x00174460
+// sp-match: ?sub_174460@@YAXPAURpWorld@@@Z @ 0x0010F440
 // Setters for the skybox worlds and the shared texture dictionary.
 void sub_174460(RpWorld *arg_0)
 {
@@ -1540,24 +1630,28 @@ void sub_174460(RpWorld *arg_0)
 }
 
 // match: ?sub_174470@@YAXPAURpWorld@@@Z @ 0x00174470
+// sp-match: ?sub_174470@@YAXPAURpWorld@@@Z @ 0x0010F450
 void sub_174470(RpWorld *arg_0)
 {
     dword_4E5C84 = arg_0;
 }
 
 // match: ?sub_174480@@YAXPAURpWorld@@@Z @ 0x00174480
+// sp-match: ?sub_174480@@YAXPAURpWorld@@@Z @ 0x0010F460
 void sub_174480(RpWorld *arg_0)
 {
     dword_4E5C88 = arg_0;
 }
 
 // match: ?sub_174490@@YAXPAURwTexDictionary@@@Z @ 0x00174490
+// sp-match: ?sub_174490@@YAXPAURwTexDictionary@@@Z @ 0x0010F470
 void sub_174490(RwTexDictionary *arg_0)
 {
     dword_4E5C8C = arg_0;
 }
 
 // match: ?sub_1744A0@@YAXXZ @ 0x001744A0
+// sp-match: ?sub_1744A0@@YAXXZ @ 0x0010F480
 // Destroys the skybox worlds.
 void sub_1744A0()
 {
@@ -1579,6 +1673,7 @@ void sub_1744A0()
 }
 
 // match: ?sub_174510@@YAXPAURwTexDictionary@@@Z @ 0x00174510
+// sp-match: ?sub_174510@@YAXPAURwTexDictionary@@@Z @ 0x0010F4E0
 // Sets shared.txd, and sub_174520 gets it.
 void sub_174510(RwTexDictionary *arg_0)
 {
@@ -1586,25 +1681,33 @@ void sub_174510(RwTexDictionary *arg_0)
 }
 
 // match: ?sub_174520@@YAPAURwTexDictionary@@XZ @ 0x00174520
+// sp-match: ?sub_174520@@YAPAURwTexDictionary@@XZ @ 0x0010F4F0
 RwTexDictionary *sub_174520()
 {
     return dword_4E5C90;
 }
 
 // match: ?sub_174530@@YAXXZ @ 0x00174530
+// sp-match: ?sub_174530@@YAXXZ @ 0x0010F500
 // Destroys shared.txd and its textures.
 void sub_174530()
 {
     if (dword_4E5C90)
     {
+#ifdef CODFH_SP
+        // single player compiles the debug print out, keeping the check's call (SP 0x10F500)
+        sub_16E6F0(dword_4E5C90);
+#else
         if (!sub_16E6F0(dword_4E5C90))
             sub_19A750("Unable to destroy shared.txd!");
+#endif
         RwTexDictionaryDestroy(dword_4E5C90);
         dword_4E5C90 = 0;
     }
 }
 
 // match: ?sub_174580@@YAXPAUtype_3D3548@@H@Z @ 0x00174580
+// sp-match: ?sub_174580@@YAXPAUtype_3D3548@@H@Z @ 0x0010F530
 // Points the entity table's entry arg_4 at the entity arg_0 (sub_1745A0
 // reads it back, sub_1745C0 clears it).
 void sub_174580(type_3D3548 *arg_0, RwInt32 arg_4)
@@ -1614,12 +1717,14 @@ void sub_174580(type_3D3548 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_1745A0@@YAPAUtype_3D3548@@H@Z @ 0x001745A0
+// sp-match: ?sub_1745A0@@YAPAUtype_3D3548@@H@Z @ 0x0010F550
 type_3D3548 *sub_1745A0(RwInt32 arg_0)
 {
     return dword_4E5D1C[arg_0].sub_D4910();
 }
 
 // match: ?sub_1745C0@@YAXPAUtype_3D3548@@H@Z @ 0x001745C0
+// sp-match: ?sub_1745C0@@YAXPAUtype_3D3548@@H@Z @ 0x0010F560
 void sub_1745C0(type_3D3548 *arg_0, RwInt32 arg_4)
 {
     if (arg_4 != -1 && dword_4E5D1C[arg_4].sub_D4910() == arg_0)
@@ -1627,6 +1732,7 @@ void sub_1745C0(type_3D3548 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_1745F0@@YAHH@Z @ 0x001745F0
+// sp-match: ?sub_1745F0@@YAHH@Z @ 0x0010F590
 // The slot whose level section is arg_0 (live or not), or -1.
 RwInt32 sub_1745F0(RwInt32 arg_0)
 {
@@ -1641,6 +1747,7 @@ RwInt32 sub_1745F0(RwInt32 arg_0)
 }
 
 // match: ?sub_174640@@YAHG@Z @ 0x00174640
+// sp-match: ?sub_174640@@YAHG@Z @ 0x0010F5C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Whether the level section arg_0 is loaded in a live slot.
 RwInt32 sub_174640(RwUInt16 arg_0)
@@ -1658,6 +1765,7 @@ RwInt32 sub_174640(RwUInt16 arg_0)
 }
 
 // match: ?sub_1746B0@@YAXXZ @ 0x001746B0
+// sp-match: ?sub_1746B0@@YAXXZ @ 0x0010F5F0
 // Destroys the UV animation dictionary.
 void sub_1746B0()
 {
@@ -1669,6 +1777,7 @@ void sub_1746B0()
 }
 
 // match: ??0type_4E5D30@@QAE@XZ @ 0x001746E0
+// sp-match: ??0type_4E5D30@@QAE@XZ @ 0x001101D0
 type_4E5D30::type_4E5D30()
 {
     unk_1C = 0;
@@ -1676,6 +1785,7 @@ type_4E5D30::type_4E5D30()
 }
 
 // match: ?sub_174700@type_4E5D30@@QAEXH@Z @ 0x00174700
+// sp-match: ?sub_174700@type_4E5D30@@QAEXH@Z @ 0x001100A0
 void type_4E5D30::sub_174700(RwInt32 arg_0)
 {
     unk_00 = 0;
@@ -1693,6 +1803,7 @@ void type_4E5D30::sub_174700(RwInt32 arg_0)
 }
 
 // match: ?sub_174790@type_4E5D30@@QAEXXZ @ 0x00174790
+// sp-match: ?sub_174790@type_4E5D30@@QAEXXZ @ 0x001100D0
 void type_4E5D30::sub_174790()
 {
     sub_174700(0);
@@ -1703,6 +1814,7 @@ void type_4E5D30::sub_174790()
 }
 
 // match: ?sub_1747D0@type_4E5D30@@QAEXXZ @ 0x001747D0
+// sp-match: ?sub_1747D0@type_4E5D30@@QAEXXZ @ 0x001100F0
 // Warns of each world and the texture dictionary still held at shutdown.
 void type_4E5D30::sub_1747D0()
 {
@@ -1711,29 +1823,40 @@ void type_4E5D30::sub_1747D0()
     if (unk_20)
     {
         sprintf(var_108, "Opaque world was not deleted for section ID %d bank %d on shutdown\n", unk_08, unk_0A);
+#ifndef CODFH_SP
+        // single player compiles the debug prints out (SP 0x1100F0)
         sub_19A750(var_108);
+#endif
     }
     if (unk_24)
     {
         sprintf(var_108, "Alpha world was not deleted for section ID %d bank %d on shutdown\n", unk_08, unk_0A);
+#ifndef CODFH_SP
         sub_19A750(var_108);
+#endif
     }
     if (unk_28)
     {
         sprintf(var_108, "Collision world was not deleted for section ID %d bank %d on shutdown\n", unk_08,
                 unk_0A);
+#ifndef CODFH_SP
         sub_19A750(var_108);
+#endif
     }
     if (unk_30)
     {
         sprintf(var_108, "Texture dictionary was not deleted for section ID %d bank %d on shutdown\n", unk_08,
                 unk_0A);
+#ifndef CODFH_SP
         sub_19A750(var_108);
+#endif
     }
     if (unk_2C)
     {
         sprintf(var_108, "Extra world was not deleted for section ID %d bank %d on shutdown\n", unk_08, unk_0A);
+#ifndef CODFH_SP
         sub_19A750(var_108);
+#endif
     }
 }
 
@@ -1741,9 +1864,11 @@ void type_4E5D30::sub_1747D0()
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ??1type_4E5D30@@QAE@XZ (folded into 0x1E41C0)
+#ifndef CODFH_SP // single player keeps the call (unk_4E5CD8's exit function, SP 0x21ECF0): the empty body is not in this object
 type_4E5D30::~type_4E5D30()
 {
 }
+#endif
 
 
 #ifdef CODFH_PLAIN

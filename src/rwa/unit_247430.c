@@ -50,14 +50,25 @@ extern void sub_24D640(rwaReadCache *cache);
 extern void *sub_24D670(rwaStreamInfo *info);
 extern void *sub_246FC0(void *mem, RwUInt32 unused);
 extern void *sub_2473D0(RwUInt32 size, RwUInt32 unused);
+#ifdef CODFH_SP // single player compiles unit_243AE0.c in this file (sp_unit_247430.c): its declarations
+RwaObjInterfaceDef *sub_243CD0(RwaObjInterfaceDef *def, _rwaParamID *inputs, RwUInt32 noInputs,
+                               _rwaParamID *outputs, RwUInt32 noOutputs);
+RwaObjInterfaceDef *RwaWaveDictAssignID(RwaObjInterfaceDef *def, const RwaUUID *uuid,
+                                        const RwChar *name);
+RwaObjInterfaceDef *sub_243E20(RwaObjInterfaceDef *def);
+RwBool sub_243EA0(RwaObjInterfaceDef *def);
+#else
 extern void *sub_243E20(void *iface);
 extern void RwaWaveDictAssignID(void *iface, const void *uuid, const void *textID);
 extern void sub_243CD0(void *iface, void *sets, RwInt32 noSets, void *gets, RwInt32 noGets);
 extern RwBool sub_243EA0(void *iface);
+#endif
 
 extern RwUInt8 dword_5079D4[];      /* the stream node interface */
 extern RwUInt8 dword_5079FC[];      /* the stream source interface */
+#ifndef CODFH_SP // single player defines it here (SP 0x2EE7E4)
 extern const RwUInt8 unk_3ED964[];
+#endif
 extern RwChar unk_42FB48[];   /* the stream file extensions */
 extern RwChar aRws1[];
 
@@ -65,6 +76,7 @@ RwUInt8 *sub_247C50(rwaDecoderState *state, rwaStreamRegion **region);
 void sub_247E00(rwaDecoderState *state, RwUInt8 *chunk);
 
 
+#if !defined(CODFH_SP) || CODFH_SP_PART == 1 // single player: sp_unit_247430.c, after unit_243AE0's interface IDs
 /* Releases what the state holds once. */
 /* Reads one available batch and publishes its regions before unlocking. */
 static __forceinline RwInt32
@@ -186,6 +198,9 @@ extern RwUInt8 unk_3ED4EC[];
 extern RwUInt8 unk_3ED55C[];
 extern RwUInt8 unk_3ED56C[];
 // Its data definitions (PLAN M5), in the image's address order.
+#ifdef CODFH_SP // the stream node interface's ID, after unit_243AE0's interface IDs (SP 0x2EE7E4); multiplayer's is unit_2452A0's (0x3ED964)
+const RwaUUID unk_3ED964 = { 0x9347B0DD, 0xF26E, 0x40BA, { 0x87, 0x8B, 0x7E, 0xCD, 0x63, 0xA0, 0x30, 0x9D } };
+#endif
 // 0x003ED974
 const RwaUUID unk_3ED974 = { 0x529307C9, 0xFF22, 0x4BBE, { 0xB0, 0x92, 0x2E, 0x8C, 0x10, 0x7A, 0x91, 0x57 } };
 // 0x003ED984
@@ -212,6 +227,8 @@ const RwaUUID unk_3EDA14 = { 0x4312D242, 0x793A, 0x4B79, { 0x98, 0xCE, 0xD0, 0xA
 RwChar unk_42FB48[4] = "rws";
 // 0x0042FB4C
 RwChar aRws1[8] = "rws;1";
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 2 // single player: after unit_243AE0's tables (SP 0x32BF1C)
 // 0x0042FB54
 void *off_42FB54[15] =
 {
@@ -332,6 +349,7 @@ RwUInt8 dword_5079FC[424];
 // match: _off_42FC20 @ 0x0042FC20
 
 // match: _sub_247430 @ 0x00247430
+// sp-match: _sub_247430 @ 0x0015B380
 
 static void
 sub_247430(rwaDecoderState *state)
@@ -369,6 +387,7 @@ sub_247430(rwaDecoderState *state)
 }
 
 // match: _sub_247500 @ 0x00247500
+// sp-match: _sub_247500 @ 0x0015B450
 void
 sub_247500(rwaDecoderState *state)
 {
@@ -377,6 +396,7 @@ sub_247500(rwaDecoderState *state)
 
 /* The marker with the UUID. */
 // match: _sub_247510 @ 0x00247510
+// sp-match: _sub_247510 @ 0x0015B460
 RwUInt32
 sub_247510(rwaDecoderState *state, const RwaUUID *uuid)
 {
@@ -397,6 +417,7 @@ sub_247510(rwaDecoderState *state, const RwaUUID *uuid)
 
 /* The marker with the name. */
 // match: _sub_247570 @ 0x00247570
+// sp-match: _sub_247570 @ 0x0015B4C0
 RwUInt32
 sub_247570(rwaDecoderState *state, const RwChar *name)
 {
@@ -416,6 +437,7 @@ sub_247570(rwaDecoderState *state, const RwChar *name)
 }
 void sub_248810(void *file, RwUInt32 bytes, RwInt32 status, RwInt32 event, void *data);
 // match: _sub_2475D0 @ 0x002475D0
+// sp-match: _sub_2475D0 @ 0x0015B520
 static void
 sub_2475D0(rwaDecoderState *state)
 {
@@ -446,6 +468,7 @@ sub_2475D0(rwaDecoderState *state)
  * The unk174 access qualifiers preserve the observed repeated reads
  * at 0x2476F6 and 0x247B24; original declarations remain unestablished. */
 // match: _sub_247660 @ 0x00247660
+// sp-match: _sub_247660 @ 0x0015B5B0
 RwUInt8 *
 sub_247660(rwaDecoderState *state)
 {
@@ -666,6 +689,7 @@ sub_247660(rwaDecoderState *state)
 }
 
 // match: _sub_247C50 @ 0x00247C50
+// sp-match: _sub_247C50 @ 0x0015BBA0
 RwUInt8 *
 sub_247C50(rwaDecoderState *state, rwaStreamRegion **region)
 {
@@ -739,6 +763,7 @@ none:
 /* A chunk has been played: free again (1), and the next one to fill. */
 
 // match: _sub_247E00 @ 0x00247E00
+// sp-match: _sub_247E00 @ 0x0015BD50
 void
 sub_247E00(rwaDecoderState *state, RwUInt8 *chunk)
 {
@@ -796,6 +821,7 @@ unlock:
 /* Stops reading: the pending reads finish, the chunks are free again. */
 /* Returns the wrap count for the current marker, or -1 for once. */
 // match: _sub_247F20 @ 0x00247F20
+// sp-match: _sub_247F20 @ 0x0015BE70
 RwInt32
 sub_247F20(rwaDecoderState *state)
 {
@@ -842,6 +868,7 @@ sub_247F20(rwaDecoderState *state)
 
 /* Seeks to a byte position in one track of the selected marker. */
 // match: _sub_247FE0 @ 0x00247FE0
+// sp-match: _sub_247FE0 @ 0x0015BF30
 RwBool
 sub_247FE0(rwaDecoderState *state, RwUInt32 track, RwUInt32 position)
 {
@@ -926,6 +953,7 @@ sub_247FE0(rwaDecoderState *state, RwUInt32 track, RwUInt32 position)
 }
 
 // match: _sub_2481E0 @ 0x002481E0
+// sp-match: _sub_2481E0 @ 0x0015C130
 void
 sub_2481E0(rwaDecoderState *state)
 {
@@ -988,6 +1016,7 @@ sub_2481E0(rwaDecoderState *state)
  * -1 for once. */
 
 // match: _sub_248360 @ 0x00248360
+// sp-match: _sub_248360 @ 0x0015C2B0
 RwUInt32
 sub_248360(rwaDecoderState *state, rwaStreamRegion *region, RwUInt32 track)
 {
@@ -1004,6 +1033,7 @@ sub_248360(rwaDecoderState *state, rwaStreamRegion *region, RwUInt32 track)
 }
 
 // match: _sub_2483B0 @ 0x002483B0
+// sp-match: _sub_2483B0 @ 0x0015C300
 void
 sub_2483B0(rwaDecoderState *state, const RwaUUID *uuid)
 {
@@ -1011,6 +1041,7 @@ sub_2483B0(rwaDecoderState *state, const RwaUUID *uuid)
 }
 
 // match: _sub_2483E0 @ 0x002483E0
+// sp-match: _sub_2483E0 @ 0x0015C330
 void
 sub_2483E0(rwaDecoderState *state, const RwChar *name)
 {
@@ -1021,6 +1052,7 @@ sub_2483E0(rwaDecoderState *state, const RwChar *name)
  * channel by channel (the samples of a track's channels are interleaved in
  * units of its channel step), until a playing chunk is filled. */
 // match: _sub_248410 @ 0x00248410
+// sp-match: _sub_248410 @ 0x0015C360
 void
 sub_248410(rwaDecoderState *state)
 {
@@ -1061,6 +1093,7 @@ sub_248410(rwaDecoderState *state)
 
 /* Waits for an available region, seeking to the marker again when needed. */
 // match: _sub_248520 @ 0x00248520
+// sp-match: _sub_248520 @ 0x0015C470
 RwInt32
 sub_248520(rwaDecoderState *state)
 {
@@ -1122,6 +1155,7 @@ extern RwUInt8 *sub_247660(rwaDecoderState *);
 * _RwaStreamSourceFileOpCallback, in rwastreamsourcecommon.c.
 * Its data argument is copied into a typed state local. */
 // match: _sub_248810 @ 0x00248810
+// sp-match: _sub_248810 @ 0x0015C760
 void
 sub_248810(void *file, RwUInt32 bytes, RwInt32 status, RwInt32 event, void *data)
 {
@@ -1490,6 +1524,7 @@ reads:
 }
 
 // match: _sub_249160 @ 0x00249160
+// sp-match: _sub_249160 @ 0x0015D0B0
 RwBool
 sub_249160(rwaDecoderState *state, rwaStreamSourceParams *params)
 {
@@ -1594,7 +1629,10 @@ failed:
     return TRUE;
 }
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 3 // single player: after unit_243AE0's and rwasymboltable's code (SP 0x15D510)
 // match: _RwaStreamNodeInterfaceRegister @ 0x002493D0
+// sp-match: _RwaStreamNodeInterfaceRegister @ 0x0015D510
 void *
 RwaStreamNodeInterfaceRegister(void)
 {
@@ -1603,13 +1641,18 @@ RwaStreamNodeInterfaceRegister(void)
         return NULL;
     }
 
+#ifdef CODFH_SP // shape: single player's unk_3ED964 is this file's RwaUUID
+    RwaWaveDictAssignID(dword_5079D4, &unk_3ED964, NULL);
+#else
     RwaWaveDictAssignID(dword_5079D4, unk_3ED964, NULL);
+#endif
     sub_243CD0(dword_5079D4, off_42FB54, 3, off_42FB90, 2);
 
     return dword_5079D4;
 }
 
 // match: _sub_249420 @ 0x00249420
+// sp-match: _sub_249420 @ 0x0015D560
 RwBool
 sub_249420(void)
 {
@@ -1617,6 +1660,7 @@ sub_249420(void)
 }
 
 // match: _RwaStreamSourceInterfaceRegister @ 0x00249430
+// sp-match: _RwaStreamSourceInterfaceRegister @ 0x0015D570
 void *
 RwaStreamSourceInterfaceRegister(void)
 {
@@ -1632,8 +1676,10 @@ RwaStreamSourceInterfaceRegister(void)
 }
 
 // match: _sub_249480 @ 0x00249480
+// sp-match: _sub_249480 @ 0x0015D5C0
 RwBool
 sub_249480(void)
 {
     return sub_243EA0(dword_5079FC);
 }
+#endif

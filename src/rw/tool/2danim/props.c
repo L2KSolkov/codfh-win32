@@ -79,6 +79,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/tool/2danim
 
 
 static Rt2dObject *
+// sp-match: __rt2dAnimObjectAddToDirectory @ 0x00173330
 _rt2dAnimObjectAddToDirectory(Rt2dObject *object,
                               Rt2dObject *parent __RWUNUSED__,
                               void *data)
@@ -100,6 +101,7 @@ _rt2dAnimObjectAddToDirectory(Rt2dObject *object,
 }
 
 Rt2dAnimProps *
+// sp-match: __rt2dAnimPropsInit @ 0x00173350
 _rt2dAnimPropsInit(Rt2dAnimProps *props, Rt2dObject *scene)
 {
     RWFUNCTION(RWSTRING("_rt2dAnimPropsInit"));
@@ -166,6 +168,7 @@ Rt2dAnimPropsCreate(Rt2dObject *scene)
 // match: _rcsid @ 0x003EE748
 
 // match: __rt2dAnimPropsDestruct @ 0x002579C0
+// sp-match: __rt2dAnimPropsDestruct @ 0x001733A0
 Rt2dAnimProps *
 _rt2dAnimPropsDestruct(Rt2dAnimProps *props)
 {
@@ -279,6 +282,7 @@ _rt2dAnimPropsStreamWrite(Rt2dAnimProps *props, RwStream *stream)
 }
 
 Rt2dObject *
+// sp-match: __rt2dAnimPropsGet2dObjectByIndex @ 0x001733E0
 _rt2dAnimPropsGet2dObjectByIndex(Rt2dAnimProps *props, RwInt32 index)
 {
     Rt2dObject **ptr;

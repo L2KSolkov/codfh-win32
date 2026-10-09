@@ -73,6 +73,7 @@ type_4F6170 unk_4F6170;
 
 // match: _$E1 @ 0x0030C110
 // match: ??0type_4F6170@@QAE@XZ @ 0x001A16D0
+// sp-match: ??0type_4F6170@@QAE@XZ @ 0x0012F5B0
 
 type_4F6170::type_4F6170()
 {
@@ -83,6 +84,7 @@ type_4F6170::type_4F6170()
 }
 
 // match: ?sub_1A1720@@YAXXZ @ 0x001A1720
+// sp-match: ?sub_1A1720@@YAXXZ @ 0x0012EFE0
 void sub_1A1720()
 {
     RwInt32 lv_14[4];           // unused: the frame keeps 0x10 bytes below the counter
@@ -97,7 +99,31 @@ void sub_1A1720()
     dword_4F5A30 = 0;
 }
 
+#ifdef CODFH_SP
+// Single player only (SP 0x12F120): whether the save drive lacks the 30
+// blocks (16 KB each) a save needs; if so the shortfall goes into the blocks
+// needed (dword_4F616C) for the not enough free blocks text.
+// sp-match: ?sp_sub_12F120@@YAHXZ @ 0x0012F120
+RwInt32 sp_sub_12F120()
+{
+    ULARGE_INTEGER avail;
+    ULARGE_INTEGER total;
+    ULARGE_INTEGER total_free;
+    RwInt32 blocks;
+
+    GetDiskFreeSpaceExA(byte_4F6110, &avail, &total, &total_free);
+    blocks = avail.LowPart >> 14;
+    if (blocks < 30)
+    {
+        dword_4F616C = 30 - blocks;
+        return 1;
+    }
+    return 0;
+}
+#endif
+
 // match: ?sub_1A1790@@YAHH@Z @ 0x001A1790
+// sp-match: ?sub_1A1790@@YAHH@Z @ 0x0012F170
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_1A1790(RwInt32 arg_0)
 {
@@ -127,6 +153,7 @@ RwInt32 sub_1A1790(RwInt32 arg_0)
 }
 
 // match: ?sub_1A1820@@YAHPAUtype_DA0A0@@H@Z @ 0x001A1820
+// sp-match: ?sub_1A1820@@YAHPAUtype_DA0A0@@H@Z @ 0x0012F680
 // Saves the record arg_0 into slot arg_4: the slot is taken (and nothing
 // written while saving is off), the slot's old save game deleted, a new one
 // made ("Profile <n>: <name>"), its file written behind the header, and the
@@ -221,6 +248,7 @@ RwInt32 sub_1A1820(type_DA0A0 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_1A1BB0@@YAXPADH@Z @ 0x001A1BB0
+// sp-match: ?sub_1A1BB0@@YAXPADH@Z @ 0x0012F950
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Slot arg_4's profile name into arg_0: the name after "<n>: " in its save
 // game's name, or "Profile <n>" when it has none.
@@ -271,6 +299,7 @@ void sub_1A1BB0(RwChar *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_1A1D40@@YAHXZ @ 0x001A1D40
+// sp-match: ?sub_1A1D40@@YAHXZ @ 0x0012FA50
 // Reads the profiles from the save games found (sub_1A1790's search): each
 // "DANTE<n>.dat" whose header, size and signature check out goes into its
 // slot; a damaged one is marked (dword_4F6158) and its slot takes what was
@@ -347,6 +376,7 @@ RwInt32 sub_1A1D40()
 }
 
 // match: ?sub_1A2000@@YA_NPAXKPAUXCALCSIG_SIGNATURE@@@Z @ 0x001A2000
+// sp-match: ?sub_1A2000@@YA_NPAXKPAUXCALCSIG_SIGNATURE@@@Z @ 0x0012F1D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 bool sub_1A2000(void *arg_0, DWORD arg_4, XCALCSIG_SIGNATURE *arg_8)
 {
@@ -366,6 +396,7 @@ bool sub_1A2000(void *arg_0, DWORD arg_4, XCALCSIG_SIGNATURE *arg_8)
 }
 
 // match: ?sub_1A2060@@YAPADPAGPAD@Z @ 0x001A2060
+// sp-match: ?sub_1A2060@@YAPADPAGPAD@Z @ 0x0012F630
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwChar *sub_1A2060(WCHAR *arg_0, RwChar *arg_4)
 {
@@ -380,6 +411,7 @@ RwChar *sub_1A2060(WCHAR *arg_0, RwChar *arg_4)
 }
 
 // match: ?sub_1A20C0@@YAXPBDPAG@Z @ 0x001A20C0
+// sp-match: ?sub_1A20C0@@YAXPBDPAG@Z @ 0x0012F210
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_1A20C0(const RwChar *arg_0, WCHAR *arg_4)
 {
@@ -398,6 +430,7 @@ void sub_1A20C0(const RwChar *arg_0, WCHAR *arg_4)
 }
 
 // match: ?sub_1A2110@@YADG@Z @ 0x001A2110
+// sp-match: ?sub_1A2110@@YADG@Z @ 0x0012F240
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // One wide character narrowed: the printable ASCII, the space and the
 // Latin-1 letters and marks the fonts have pass; everything else is 0xDB.
@@ -508,6 +541,7 @@ RwChar sub_1A2110(WCHAR arg_0)
 }
 
 // match: ?sub_1A24D0@@YAXPAUtype_4EBE00@@H@Z @ 0x001A24D0
+// sp-match: ?sub_1A24D0@@YAXPAUtype_4EBE00@@H@Z @ 0x0012F3A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The damaged-profile box's update: the accept button, once let go since
 // the box opened, closes it.
@@ -516,7 +550,12 @@ void sub_1A24D0(type_4EBE00 *arg_0, RwInt32 arg_4)
     RwInt32 var_8;
     RwReal l4;
 
+#ifdef CODFH_SP
+    // Single player's bindings number the accept action 8 (SP 0x12F3A2).
+    var_8 = unk_4B9308.sub_EE790(8, 0);
+#else
     var_8 = unk_4B9308.sub_EE790(10, 0);
+#endif
     l4 = unk_4B9308.sub_EE8F0(0, var_8);
     if (dword_4F2B74)
     {
@@ -534,6 +573,7 @@ void sub_1A24D0(type_4EBE00 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_1A2580@@YAXPAUtype_4EBE00@@H@Z @ 0x001A2580
+// sp-match: ?sub_1A2580@@YAXPAUtype_4EBE00@@H@Z @ 0x0012F440
 // Opens the damaged-profile box: the language's text naming profile
 // dword_4F6168, nothing selected, sub_1A24D0 its update. IDA has no function
 // here; it is message 0x2D's opener in off_42B518.
@@ -554,6 +594,7 @@ void sub_1A2580(type_4EBE00 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_1A2650@@YAXPAX@Z @ 0x001A2650
+// sp-match: ?sub_1A2650@@YAXPAX@Z @ 0x0012F4F0
 void sub_1A2650(void *arg_0)
 {
     type_4F45F8 *var_4;
@@ -563,6 +604,7 @@ void sub_1A2650(void *arg_0)
 }
 
 // match: ?sub_1A2680@@YAXPAX@Z @ 0x001A2680
+// sp-match: ?sub_1A2680@@YAXPAX@Z @ 0x0012F510
 void sub_1A2680(void *arg_0)
 {
     type_4F45F8 *var_4;
@@ -572,6 +614,7 @@ void sub_1A2680(void *arg_0)
 }
 
 // match: ?sub_1A26B0@@YAXH@Z @ 0x001A26B0
+// sp-match: ?sub_1A26B0@@YAXH@Z @ 0x0012F530
 // Marks slot arg_0 the chosen one.
 void sub_1A26B0(RwInt32 arg_0)
 {
@@ -595,4 +638,26 @@ struct type_4F5DD8;
 type_4F5DC4 (&dword_4F5DC4)[4] = *(type_4F5DC4 (*)[4])((RwUInt8 *)&dword_4F5DC0 + 0x4);
 // 0x004F5DD8: dword_4F5DC0 + 0x18
 type_4F5DD8 (&unk_4F5DD8)[1] = *(type_4F5DD8 (*)[1])((RwUInt8 *)&dword_4F5DC0 + 0x18);
+#endif
+
+#ifdef CODFH_SP
+// Single player only (SP 0x12F570): loads the chosen slot's save (the first
+// slot when none is chosen) through the memory card's load (SP 0xA4CA0).
+// sp-match: ?sp_sub_12F570@@YAXXZ @ 0x0012F570
+void sp_sub_12F570()
+{
+    RwInt32 slot;
+    RwInt32 i;
+
+    slot = 0;
+    for (i = 0; i < 4; i++)
+    {
+        if (dword_4F5DC0[i].unk_D0)
+        {
+            slot = i;
+            break;
+        }
+    }
+    unk_4B8744.sp_sub_A4CA0(slot);
+}
 #endif

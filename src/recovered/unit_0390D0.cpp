@@ -53,6 +53,7 @@ extern const RwReal flt_3CE5E4 = 16.666666f;
 // match: ??0type_3CE5E8@@QAE@XZ @ 0x000390D0
 // match: __ehhandler$??0type_3CE5E8@@QAE@XZ-0x36 @ 0x002FF5E0
 // match: __ehhandler$??0type_3CE5E8@@QAE@XZ @ 0x002FF616
+// sp-match: ??0type_3CE5E8@@QAE@XZ @ 0x0002CE60
 
 // The destructor's handler and funclets are the same bytes, folded by
 // /OPT:ICF into these.
@@ -62,14 +63,18 @@ type_3CE5E8::type_3CE5E8()
 }
 
 // match: ?vf_02C@type_3CE5E8@@UAEHXZ @ 0x00039180
+// sp-match: ?vf_02C@type_3CE5E8@@UAEHXZ @ 0x0007F7B0
 
 // match: ??_Gtype_3CE5E8@@UAEPAXI@Z @ 0x00039190
 // match: ??1type_3CE5E8@@UAE@XZ @ 0x000391B0
+// sp-match: ??1type_3CE5E8@@UAE@XZ @ 0x0002BC30
+// sp-match: ??_Gtype_3CE5E8@@UAEPAXI@Z @ 0x0002CF00
 type_3CE5E8::~type_3CE5E8()
 {
 }
 
 // match: ?vf_004@type_3CE5E8@@UAEXPAUtype_3DF30@@@Z @ 0x00039250
+// sp-match: ?vf_004@type_3CE5E8@@UAEXPAUtype_3DF30@@@Z @ 0x0002BCC0
 void type_3CE5E8::vf_004(type_3DF30 *arg_0)
 {
     RwInt32 var_4;
@@ -108,6 +113,7 @@ void type_3CE5E8::vf_004(type_3DF30 *arg_0)
 }
 
 // match: ?vf_008@type_3CE5E8@@UAEXXZ @ 0x00039440
+// sp-match: ?vf_008@type_3CE5E8@@UAEXXZ @ 0x00027560
 // sub_39440: also type_3CE278's and type_3CE5AC's slot +0x008, folded by
 // /OPT:ICF.
 void type_3CE5E8::vf_008()
@@ -120,12 +126,15 @@ type_143D90::~type_143D90()
 {
 }
 
+#ifndef CODFH_SP // MP only: kujuUI's (the multiplayer front end; single player builds no kujuUI unit)
 // ??1type_1E37A0@kujuUI@@QAE@XZ (folded into 0x39440)
 kujuUI::type_1E37A0::~type_1E37A0()
 {
 }
+#endif
 
 // match: ?vf_00C@type_3CE5E8@@UAEHMPAUtype_3D410@@@Z @ 0x00039460
+// sp-match: ?vf_00C@type_3CE5E8@@UAEHMPAUtype_3D410@@@Z @ 0x0002D8F0
 RwInt32 type_3CE5E8::vf_00C(RwReal arg_0, type_3D410 *arg_4)
 {
     type_3D3548 *l4;
@@ -200,6 +209,7 @@ RwInt32 type_3CE5E8::vf_00C(RwReal arg_0, type_3D410 *arg_4)
 }
 
 // match: ?vf_010@type_3CE5E8@@UAEHPAUtype_3D410@@@Z @ 0x000398E0
+// sp-match: ?vf_010@type_3CE5E8@@UAEHPAUtype_3D410@@@Z @ 0x0002CF10
 RwInt32 type_3CE5E8::vf_010(type_3D410 *arg_0)
 {
     RwInt32 var_4;
@@ -239,6 +249,7 @@ RwInt32 type_3CE5E8::vf_010(type_3D410 *arg_0)
 // match: ?sub_39AA0@@YAHHPAUtype_3D410@@@Z @ 0x00039AA0
 // match: __ehhandler$?sub_39AA0@@YAHHPAUtype_3D410@@@Z-0x16 @ 0x002FF620
 // match: __ehhandler$?sub_39AA0@@YAHHPAUtype_3D410@@@Z @ 0x002FF636
+// sp-match: ?sub_39AA0@@YAHHPAUtype_3D410@@@Z @ 0x0002D060
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_39AA0(RwInt32 arg_0, type_3D410 *arg_4)
 {
@@ -303,6 +314,7 @@ RwInt32 sub_39AA0(RwInt32 arg_0, type_3D410 *arg_4)
 }
 
 // match: ?vf_018@type_3CE5E8@@UAEHPAUtype_3D3548@@@Z @ 0x00039EB0
+// sp-match: ?vf_018@type_3CE5E8@@UAEHPAUtype_3D3548@@@Z @ 0x0002D2E0
 // Takes the member arg_0 on when it can join the advance and is far enough
 // from the point.
 RwInt32 type_3CE5E8::vf_018(type_3D3548 *arg_0)
@@ -353,6 +365,7 @@ RwInt32 type_3CE5E8::vf_018(type_3D3548 *arg_0)
 }
 
 // match: ?vf_01C@type_3CE5E8@@UAEHPAUtype_3D3548@@@Z @ 0x0003A120
+// sp-match: ?vf_01C@type_3CE5E8@@UAEHPAUtype_3D3548@@@Z @ 0x0002D470
 RwInt32 type_3CE5E8::vf_01C(type_3D3548 *arg_0)
 {
     unk_5D8 = 0.0f;
@@ -360,6 +373,7 @@ RwInt32 type_3CE5E8::vf_01C(type_3D3548 *arg_0)
 }
 
 // match: ?vf_020@type_3CE5E8@@UAEXH@Z @ 0x0003A150
+// sp-match: ?vf_020@type_3CE5E8@@UAEXH@Z @ 0x0002BDE0
 void type_3CE5E8::vf_020(RwInt32 arg_0)
 {
     if (arg_0 != 0)
@@ -367,6 +381,7 @@ void type_3CE5E8::vf_020(RwInt32 arg_0)
 }
 
 // match: sub_3A170 @ 0x0003A170
+// sp-match: sub_3A170 @ 0x0002BE00
 // Moves the advance to the point arg_0 (none: 0): members with a node give
 // it up when the point moves more than sqrt(10).
 void type_3CE5E8::sub_3A170(RwV3d *arg_0)
@@ -411,6 +426,7 @@ void type_3CE5E8::sub_3A170(RwV3d *arg_0)
 }
 
 // match: ?sub_3A450@type_3CE5E8@@QAEHPAUtype_3D3548@@@Z @ 0x0003A450
+// sp-match: ?sub_3A450@type_3CE5E8@@QAEHPAUtype_3D3548@@@Z @ 0x0002C000
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3CE5E8::sub_3A450(type_3D3548 *arg_0)
 {
@@ -492,6 +508,7 @@ RwInt32 type_3CE5E8::sub_3A450(type_3D3548 *arg_0)
 }
 
 // match: ?vf_014@type_3CE5E8@@UAEXPAUtype_3D3548@@@Z @ 0x0003A7B0
+// sp-match: ?vf_014@type_3CE5E8@@UAEXPAUtype_3D3548@@@Z @ 0x0002C240
 void type_3CE5E8::vf_014(type_3D3548 *arg_0)
 {
     type_3D3548 *var_4;
@@ -516,6 +533,7 @@ void type_3CE5E8::vf_014(type_3D3548 *arg_0)
 }
 
 // match: sub_3A9C0 @ 0x0003A9C0
+// sp-match: sub_3A9C0 @ 0x0002D730
 // Drives the member arg_0 (slot arg_4) of the team that holds: to a node
 // near it, then through its action handlers.
 void type_3CE5E8::sub_3A9C0(type_3DBC78 *arg_0, type_39250_14 *arg_4, type_3D410 *arg_8)
@@ -575,6 +593,7 @@ void type_3CE5E8::sub_3A9C0(type_3DBC78 *arg_0, type_39250_14 *arg_4, type_3D410
 }
 
 // match: sub_3AC40 @ 0x0003AC40
+// sp-match: sub_3AC40 @ 0x0002D480
 // Likewise for the member arg_0 of the team that moves up to the point.
 void type_3CE5E8::sub_3AC40(type_3DBC78 *arg_0, type_39250_14 *arg_4, type_3D410 *arg_8)
 {
@@ -665,6 +684,7 @@ void type_3CE5E8::sub_3AC40(type_3DBC78 *arg_0, type_39250_14 *arg_4, type_3D410
 }
 
 // match: ?vf_024@type_3CE5E8@@UAEHPAUtype_3D3548@@@Z @ 0x0003B060
+// sp-match: ?vf_024@type_3CE5E8@@UAEHPAUtype_3D3548@@@Z @ 0x0002C3C0
 RwInt32 type_3CE5E8::vf_024(type_3D3548 *arg_0)
 {
     RwInt32 var_4;
@@ -676,6 +696,7 @@ RwInt32 type_3CE5E8::vf_024(type_3D3548 *arg_0)
 }
 
 // match: sub_3B0A0 @ 0x0003B0A0
+// sp-match: sub_3B0A0 @ 0x0002C410
 // Keeps in the 32 handles at arg_0 only the candidates near (within 3000,
 // by their AI records) at least 65% of the others that are themselves that
 // well connected; 1 when any is left. arg_4 is not read.
@@ -735,6 +756,7 @@ RwBool sub_3B0A0(type_D48D0 *arg_0, type_3D410 *arg_4)
 }
 
 // match: sub_3B490 @ 0x0003B490
+// sp-match: sub_3B490 @ 0x0002C6E0
 // The mean position of the members held in the 32 handles at arg_0.
 RwV3d sub_3B490(type_D48D0 *arg_0)
 {
@@ -770,6 +792,7 @@ inline RwInt32 xor_side(RwInt32 arg_0, type_3D3548 *arg_4)
 }
 
 // match: sub_3B560 @ 0x0003B560
+// sp-match: sub_3B560 @ 0x0002C7B0
 // Copies into the 32 handles at arg_4 the context's candidates of another
 // side that can join the advance, then keeps those close enough together
 // (sub_3B0A0).
@@ -792,6 +815,7 @@ RwBool sub_3B560(type_3D410 *arg_0, type_D48D0 *arg_4)
 }
 
 // match: sub_3B680 @ 0x0003B680
+// sp-match: sub_3B680 @ 0x0002C850
 // Recounts the teams and decides whether it is time to swap them.
 RwInt32 type_3CE5E8::sub_3B680()
 {
@@ -820,6 +844,7 @@ RwInt32 type_3CE5E8::sub_3B680()
 // match: sub_3B7E0 @ 0x0003B7E0
 // match: __ehhandler$?sub_3B7E0@type_3CE5E8@@QAEHXZ-0x16 @ 0x002FF640
 // match: __ehhandler$?sub_3B7E0@type_3CE5E8@@QAEHXZ @ 0x002FF656
+// sp-match: sub_3B7E0 @ 0x0002C920
 // Swaps roles: regroups every member held, the nearer half of the point
 // (a quickselect on the distances unk_10) into the first team, the rest
 // into the second, and draws the next swap time (unk_5EC to unk_5F0).
@@ -935,6 +960,7 @@ RwInt32 type_3CE5E8::sub_3B7E0()
 }
 
 // match: sub_3C070 @ 0x0003C070
+// sp-match: sub_3C070 @ 0x0002CD80
 // Whether the moving team has (nearly) all reached cover: none of up to
 // two members, or at most one of more, still flagged in unk_0C.
 RwInt32 type_3CE5E8::sub_3C070()
@@ -960,6 +986,7 @@ RwInt32 type_3CE5E8::sub_3C070()
 }
 
 // match: sub_3C110 @ 0x0003C110
+// sp-match: sub_3C110 @ 0x0002CDE0
 // Sends every member of both teams back to its group.
 void type_3CE5E8::sub_3C110()
 {

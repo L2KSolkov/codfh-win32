@@ -108,7 +108,11 @@ void *unk_42F930[30] =
     (void *)0x1,
 };
 // 0x0042F9A8
+#ifdef CODFH_SP // no trailing word: unit_2422B0's unk_42F7A0 follows at SP 0x32BC4C (table at SP 0x32BBE8)
+void *unk_42F9A8[25] =
+#else
 void *unk_42F9A8[26] =
+#endif
 {
     (void *)&unk_3ED7C4,
     0,
@@ -135,7 +139,9 @@ void *unk_42F9A8[26] =
     0,
     (void *)&unk_3ED56C,
     (void *)0x1,
+#ifndef CODFH_SP
     0,
+#endif
 };
 // 0x005070F0
 RwaWaveDef unk_5070F0;
@@ -152,6 +158,7 @@ RwaObjInterfaceDef unk_50714C;
 // match: _unk_42F9A8 @ 0x0042F9A8
 
 // match: _sub_244790 @ 0x00244790
+// sp-match: _sub_244790 @ 0x001562B0
 
 RwBool
 sub_244790(void)
@@ -160,6 +167,7 @@ sub_244790(void)
 }
 
 // match: _sub_2447B0 @ 0x002447B0
+// sp-match: _sub_2447B0 @ 0x001562D0
 RwaWave *
 sub_2447B0(RwaWave *wave)
 {
@@ -180,6 +188,7 @@ sub_2447B0(RwaWave *wave)
 }
 
 // match: _sub_244800 @ 0x00244800
+// sp-match: _sub_244800 @ 0x00156320
 void
 sub_244800(RwaWave *wave)
 {
@@ -190,6 +199,7 @@ sub_244800(RwaWave *wave)
 }
 
 // match: _sub_244820 @ 0x00244820
+// sp-match: _sub_244820 @ 0x00156340
 RwaWave *
 sub_244820(RwaWave *wave, RwUInt32 offset, const void *block, RwUInt32 size)
 {
@@ -199,6 +209,7 @@ sub_244820(RwaWave *wave, RwUInt32 offset, const void *block, RwUInt32 size)
 }
 
 // match: _sub_244850 @ 0x00244850
+// sp-match: _sub_244850 @ 0x00156370
 RwaWave *
 sub_244850(RwaWave *wave, const RwaWaveFormat *format, RwUInt32 offset, void *block)
 {
@@ -208,6 +219,7 @@ sub_244850(RwaWave *wave, const RwaWaveFormat *format, RwUInt32 offset, void *bl
 }
 
 // match: _sub_244880 @ 0x00244880
+// sp-match: _sub_244880 @ 0x001563A0
 RwaWaveDef *
 sub_244880(void)
 {
@@ -228,6 +240,7 @@ sub_244880(void)
 }
 
 // match: _sub_2448D0 @ 0x002448D0
+// sp-match: _sub_2448D0 @ 0x001563F0
 RwaObjInterfaceDef *
 sub_2448D0(void)
 {
@@ -243,6 +256,7 @@ sub_2448D0(void)
 }
 
 // match: _sub_244920 @ 0x00244920
+// sp-match: _sub_244920 @ 0x00156440
 RwBool
 sub_244920(void)
 {

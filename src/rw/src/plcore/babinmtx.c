@@ -78,6 +78,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/src/plcore/
  * \see RwMatrixStreamWrite
  */
 RwUInt32
+// sp-match: _RwMatrixStreamGetSize @ 0x001C7810
 RwMatrixStreamGetSize( const RwMatrix * matrix __RWUNUSEDRELEASE__ )
 {
     const RwUInt32 result = sizeof(rwStreamMatrix) + rwCHUNKHEADERSIZE;
@@ -110,6 +111,7 @@ RwMatrixStreamGetSize( const RwMatrix * matrix __RWUNUSEDRELEASE__ )
 // match: _rcsid @ 0x00416558
 
 // match: _RwMatrixStreamWrite @ 0x002AC400
+// sp-match: _RwMatrixStreamWrite @ 0x001C7820
 const RwMatrix *
 RwMatrixStreamWrite(const RwMatrix *matrix, RwStream *stream)
 {
@@ -315,6 +317,7 @@ RwMatrixChunkInfoRead(RwStream *stream,
  *
  */
 // match: _RwMatrixStreamRead @ 0x002AC590
+// sp-match: _RwMatrixStreamRead @ 0x001C79B0
 RwMatrix *
 RwMatrixStreamRead(RwStream *stream, RwMatrix *matrix)
 {

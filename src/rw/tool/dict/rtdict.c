@@ -153,6 +153,7 @@ struct Iterator
 // match: _rcsid @ 0x003EB06C
 
 // match: _RtDictSchemaInit @ 0x0022B1B0
+// sp-match: _RtDictSchemaInit @ 0x0012FEA0
 RtDictSchema *
 RtDictSchemaInit(RtDictSchema *schema)
 {
@@ -185,6 +186,7 @@ RtDictSchemaInit(RtDictSchema *schema)
  * \see RtDictAddEntry
  */
 // match: _RtDictSchemaDestruct @ 0x0022B1E0
+// sp-match: _RtDictSchemaDestruct @ 0x0012FED0
 RwBool
 RtDictSchemaDestruct(RtDictSchema *schema)
 {
@@ -212,6 +214,7 @@ RtDictSchemaDestruct(RtDictSchema *schema)
  * \see RtDictAddEntry
  */
 // match: _RtDictSchemaCreateDict @ 0x0022B450
+// sp-match: _RtDictSchemaCreateDict @ 0x00130140
 RtDict *
 RtDictSchemaCreateDict(RtDictSchema *schema)
 {
@@ -286,6 +289,7 @@ RtDictSchemaAddDict(RtDictSchema *schema, RtDict *dict)
  * \see RtDictSchemaAddDict
  */
 // match: _RtDictSchemaRemoveDict @ 0x0022B200
+// sp-match: _RtDictSchemaRemoveDict @ 0x0012FEF0
 RtDictSchema *
 RtDictSchemaRemoveDict(RtDictSchema *schema, RtDict *dict)
 {
@@ -350,6 +354,7 @@ RtDictSchemaGetCurrentDict(RtDictSchema *schema)
  * \see RtDictGetCurrent
  */
 // match: _RtDictSchemaSetCurrentDict @ 0x0022B260
+// sp-match: _RtDictSchemaSetCurrentDict @ 0x0012FF50
 RtDictSchema *
 RtDictSchemaSetCurrentDict(RtDictSchema *schema, RtDict *dict)
 {
@@ -363,6 +368,7 @@ RtDictSchemaSetCurrentDict(RtDictSchema *schema, RtDict *dict)
 
 
 // match: __rtDictSchemaInitDict @ 0x0022B270
+// sp-match: __rtDictSchemaInitDict @ 0x0012FF60
 RtDict *
 _rtDictSchemaInitDict(RtDictSchema *schema, RtDict *dict)
 {
@@ -389,6 +395,7 @@ _rtDictSchemaInitDict(RtDictSchema *schema, RtDict *dict)
 }
 
 // match: __rtDictDestruct @ 0x0022B2D0
+// sp-match: __rtDictDestruct @ 0x0012FFC0
 RwBool
 _rtDictDestruct(RtDict *dict)
 {
@@ -429,6 +436,7 @@ _rtDictDestruct(RtDict *dict)
  * \see RtDictCreate
  */
 // match: _RtDictAddEntry @ 0x0022B320
+// sp-match: _RtDictAddEntry @ 0x00130010
 RtDictEntryType
 RtDictAddEntry(RtDict *dict, RtDictEntryType entry)
 {
@@ -458,6 +466,7 @@ RtDictAddEntry(RtDict *dict, RtDictEntryType entry)
  * \return A valid pointer to an entry if the entry is found, NULL otherwise
  */
 // match: _RtDictFindNamedEntry @ 0x0022B350
+// sp-match: _RtDictFindNamedEntry @ 0x00130040
 RtDictEntryType
 RtDictFindNamedEntry(RtDict *dict, const RwChar *name)
 {
@@ -504,6 +513,7 @@ RtDictFindNamedEntry(RtDict *dict, const RwChar *name)
  * \see RtDictSchemaForAllDictionaries
  */
 // match: _RtDictForAllEntries @ 0x0022B3B0
+// sp-match: _RtDictForAllEntries @ 0x001300A0
 const RtDict *
 RtDictForAllEntries(const RtDict *dict, RtDictEntryCallBack *callBack, void *data)
 {
@@ -593,6 +603,7 @@ RtDictRemoveEntry(RtDict *dict, RtDictEntryType entry)
  * \see RtDictSchemaSetCurrentDict
  */
 // match: _RtDictDestroy @ 0x0022B410
+// sp-match: _RtDictDestroy @ 0x00130100
 RwBool
 RtDictDestroy(RtDict *dict)
 {
@@ -676,6 +687,7 @@ RtDictStreamGetSize(const RtDict *dict)
  *
  */
 // match: _RtDictSchemaStreamReadDict @ 0x0022B4D0
+// sp-match: _RtDictSchemaStreamReadDict @ 0x001301C0
 RtDict *
 RtDictSchemaStreamReadDict(RtDictSchema *schema, RwStream *stream)
 {

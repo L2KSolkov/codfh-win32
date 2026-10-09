@@ -108,11 +108,13 @@ RWS_REGISTERCLASS(CGlobalSounds);
 // match: ?MakeNew@CGlobalSounds@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C7CE0
 // match: __ehhandler$?MakeNew@CGlobalSounds@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300900
 // match: __ehhandler$?MakeNew@CGlobalSounds@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030090F
+// sp-match: ?MakeNew@CGlobalSounds@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000997D0
 RWS_DEFINE_MAKENEW(CGlobalSounds)
 
 // match: ??0CGlobalSounds@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C7D60
 // match: __ehhandler$??0CGlobalSounds@@QAE@ABVCAttributePacket@RWS@@@Z-0x13 @ 0x00300920
 // match: __ehhandler$??0CGlobalSounds@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300933
+// sp-match: ??0CGlobalSounds@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00097F60
 CGlobalSounds::CGlobalSounds(const RWS::CAttributePacket &attr)
 {
     LinkMsg(iMsgSparkStartSystem, 0, 0x8000);
@@ -122,10 +124,12 @@ CGlobalSounds::CGlobalSounds(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_GCGlobalSounds@@UAEPAXI@Z @ 0x000C7E80
+// sp-match: ??_GCGlobalSounds@@UAEPAXI@Z @ 0x00098120
 
 // match: ??1CGlobalSounds@@UAE@XZ @ 0x000C7EA0
 // match: __ehhandler$??1CGlobalSounds@@UAE@XZ-0x2F @ 0x00300940
 // match: __ehhandler$??1CGlobalSounds@@UAE@XZ @ 0x0030096F
+// sp-match: ??1CGlobalSounds@@UAE@XZ @ 0x00098020
 CGlobalSounds::~CGlobalSounds()
 {
     UnLinkMsg(iMsgSparkStartSystem);
@@ -135,6 +139,7 @@ CGlobalSounds::~CGlobalSounds()
 }
 
 // match: ?HandleAttributes@CGlobalSounds@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C7F60
+// sp-match: ?HandleAttributes@CGlobalSounds@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00098130
 void CGlobalSounds::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     RWS::CAttributeHandler::HandleAttributes(attr);
@@ -179,12 +184,14 @@ void CGlobalSounds::HandleAttributes(const RWS::CAttributePacket &attr)
         case 6:
             flt_44E5E8 = attrIt->GetAs_RwReal();
             break;
+#ifndef CODFH_SP // single player has no commands 18 and 19 (SP 0x99530 sends them to the default)
         case 18:
             flt_44D4D0 = attrIt->GetAs_RwReal();
             break;
         case 19:
             flt_44D4BC = attrIt->GetAs_RwReal();
             break;
+#endif
         case 7:
             flt_44D4A0 = attrIt->GetAs_RwReal();
             break;
@@ -744,16 +751,28 @@ void CGlobalSounds::HandleAttributes(const RWS::CAttributePacket &attr)
             }
             break;
         case 158:
+#ifdef CODFH_SP // shape: the milliseconds scale stays two multiplies (SP 0x993F5 fmul 0.001, fmul 60)
+            flt_44D490 = (RwReal)(attrIt->GetAs_RwReal() / 1000.0f) * 60.0f;
+#else
             flt_44D490 = attrIt->GetAs_RwReal();
             flt_44D490 = flt_44D490 / 1000.0f * 60.0f;
+#endif
             break;
         case 159:
+#ifdef CODFH_SP // shape: the milliseconds scale stays two multiplies (SP 0x993F5 fmul 0.001, fmul 60)
+            flt_44D494 = (RwReal)(attrIt->GetAs_RwReal() / 1000.0f) * 60.0f;
+#else
             flt_44D494 = attrIt->GetAs_RwReal();
             flt_44D494 = flt_44D494 / 1000.0f * 60.0f;
+#endif
             break;
         case 160:
+#ifdef CODFH_SP // shape: the milliseconds scale stays two multiplies (SP 0x993F5 fmul 0.001, fmul 60)
+            flt_44D498 = (RwReal)(attrIt->GetAs_RwReal() / 1000.0f) * 60.0f;
+#else
             flt_44D498 = attrIt->GetAs_RwReal();
             flt_44D498 = flt_44D498 / 1000.0f * 60.0f;
+#endif
             break;
         case 161:
             flt_44E814 = attrIt->GetAs_RwReal() / 100.0f;
@@ -769,6 +788,7 @@ void CGlobalSounds::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?HandleEvents@CGlobalSounds@@UAEXAAVCMsg@RWS@@@Z @ 0x000CA250
+// sp-match: ?HandleEvents@CGlobalSounds@@UAEXAAVCMsg@RWS@@@Z @ 0x000980C0
 void CGlobalSounds::HandleEvents(RWS::CMsg &pMsg)
 {
     if (pMsg.Id.p_msgrec == RWS::iMsgStartSystem.p_msgrec)
@@ -789,3 +809,4 @@ void CGlobalSounds::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ??_ECGlobalSounds@@WBI@AEPAXI@Z @ 0x000CA2B0
+// sp-match: ??_ECGlobalSounds@@WBI@AEPAXI@Z @ 0x00098110

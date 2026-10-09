@@ -36,6 +36,7 @@
 // match: _$E1 @ 0x0030BB40
 // match: _$E2 @ 0x0030E800
 // match: ?TexDictionaryStreamRead@CRenderwareResource@RWS@@AAEPAURwTexDictionary@@PAURwStream@@@Z @ 0x00132730
+// sp-match: ?TexDictionaryStreamRead@CRenderwareResource@RWS@@AAEPAURwTexDictionary@@PAURwStream@@@Z @ 0x000E3140
 
 RwTexDictionary* RWS::CRenderwareResource::TexDictionaryStreamRead (RwStream *stream)
       {
@@ -55,6 +56,7 @@ RwTexDictionary* RWS::CRenderwareResource::PiTexDictionaryStreamRead (RwStream *
       }
 
 // match: ?Load@CRenderwareResource@RWS@@UAEPAXPBD00PAURwStream@@IAAI@Z @ 0x00132760
+// sp-match: ?Load@CRenderwareResource@RWS@@UAEPAXPBD00PAURwStream@@IAAI@Z @ 0x000E3160
 void *RWS::CRenderwareResource::Load( const RwChar *psName,
                                        const RwChar *psType,
                                        const RwChar *psResourcePath,
@@ -87,6 +89,7 @@ void *RWS::CRenderwareResource::Load( const RwChar *psName,
       }
 
 // match: ?UnLoad@CRenderwareResource@RWS@@UAEHPBDPAX@Z @ 0x001327F0
+// sp-match: ?UnLoad@CRenderwareResource@RWS@@UAEHPBDPAX@Z @ 0x000E31E0
 RwBool RWS::CRenderwareResource::UnLoad (const RwChar *pStrType, void *pResource)
       {
          RwBool ret = FALSE;
@@ -136,6 +139,7 @@ RwBool RWS::CRenderwareResource::UnLoad (const RwChar *pStrType, void *pResource
       }
 
 // match: ?IsHandled@CRenderwareResource@RWS@@UAEHPBD@Z @ 0x00132970
+// sp-match: ?IsHandled@CRenderwareResource@RWS@@UAEHPBD@Z @ 0x000E3340
 RwBool RWS::CRenderwareResource::IsHandled(const RwChar *psType)
       {
          if (psType[0] == 'r'
@@ -171,3 +175,5 @@ namespace RWS
 // deleting destructor the resource handlers share.
 // match: ??0CRenderwareResource@RWS@@QAE@XZ @ 0x00132AE0
 // match: ??_GCRenderwareResource@RWS@@UAEPAXI@Z @ 0x00132B00
+// sp-match: ??0CRenderwareResource@RWS@@QAE@XZ @ 0x000E3440
+// sp-match: ??_GCRenderwareResource@RWS@@UAEPAXI@Z @ 0x000E1B90

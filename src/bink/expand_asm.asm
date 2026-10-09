@@ -33,6 +33,7 @@ EXTERN __bitlevels:BYTE
 seg0 SEGMENT PARA PUBLIC ALIAS('BINK') 'CODE'
 
 ; // match: _simpmergesort @ 0x00346170
+; // sp-match: _simpmergesort @ 0x00256170
 _simpmergesort PROC PUBLIC
 $L_346170:
         db 053h   ; push ebx
@@ -111,6 +112,7 @@ seg0 ENDS
 segrh SEGMENT PARA PUBLIC ALIAS('BINK') 'CODE'
 
 ; // match: _ReadHuffTable @ 0x003461E0
+; // sp-match: _ReadHuffTable @ 0x002561E0
 _ReadHuffTable PROC PUBLIC
         db 08Bh, 044h, 024h, 004h   ; mov eax, dword ptr [esp + 4]
         db 083h, 0ECh, 020h   ; sub esp, 0x20
@@ -861,6 +863,7 @@ seg1 SEGMENT PARA PUBLIC ALIAS('BINK') 'CODE'
 
 
 ; // match: _CheckReadHuff4PairBundle @ 0x00347300
+; // sp-match: _CheckReadHuff4PairBundle @ 0x00257300
 _CheckReadHuff4PairBundle PROC PUBLIC
         db 08Bh, 007h   ; mov eax, dword ptr [edi]
         db 08Bh, 04Fh, 004h   ; mov ecx, dword ptr [edi + 4]
@@ -1069,6 +1072,7 @@ seg1 ENDS
 segep SEGMENT PARA PUBLIC ALIAS('BINK') 'CODE'
 
 ; // match: _ExpandPlane @ 0x00347B40
+; // sp-match: _ExpandPlane @ 0x00257B40
 _ExpandPlane PROC PUBLIC
 $L_347b40:
         db 055h   ; push ebp
@@ -3673,6 +3677,7 @@ $L_3499e8:
 _ExpandPlane ENDP
 
 ; // match: _ExpandBink@56 @ 0x00349A10
+; // sp-match: _ExpandBink@56 @ 0x00259A10
 _ExpandBink@56 PROC PUBLIC
         db 0F7h, 044h, 024h, 038h, 000h, 000h, 010h, 000h   ; test dword ptr [esp + 0x38], 0x100000
         db 053h   ; push ebx

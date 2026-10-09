@@ -31,22 +31,27 @@ RWS_REGISTERCLASS(CMountedWeaponSelector);
 // match: ?MakeNew@CMountedWeaponSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000CA790
 // match: __ehhandler$?MakeNew@CMountedWeaponSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300A00
 // match: __ehhandler$?MakeNew@CMountedWeaponSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00300A0F
+// sp-match: ?MakeNew@CMountedWeaponSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00099D40
 RWS_DEFINE_MAKENEW(CMountedWeaponSelector)
 
 // match: ??0CMountedWeaponSelector@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000CA810
+// sp-match: ??0CMountedWeaponSelector@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00099B90
 CMountedWeaponSelector::CMountedWeaponSelector(const RWS::CAttributePacket &attr)
 {
 }
 
 // match: ??_GCMountedWeaponSelector@@UAEPAXI@Z @ 0x000CA8A0
+// sp-match: ??_GCMountedWeaponSelector@@UAEPAXI@Z @ 0x00099CB0
 
 // match: ??1CMountedWeaponSelector@@UAE@XZ @ 0x000CA8C0
 // match: __ehhandler$??1CMountedWeaponSelector@@UAE@XZ-0x8 @ 0x00300A20
 // match: __ehhandler$??1CMountedWeaponSelector@@UAE@XZ @ 0x00300A28
+// sp-match: ??1CMountedWeaponSelector@@UAE@XZ @ 0x00099BD0
 // (Defined in the class, in CMountedWeaponSelector.h.)
 
 // Command 0: the mounted weapons' names.
 // match: ?HandleAttributes@CMountedWeaponSelector@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000CA940
+// sp-match: ?HandleAttributes@CMountedWeaponSelector@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00099CC0
 void CMountedWeaponSelector::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     RWS::CAttributeHandler::HandleAttributes(attr);
@@ -64,6 +69,7 @@ void CMountedWeaponSelector::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?sub_CA9C0@CMountedWeaponSelector@@QAEXPBI@Z @ 0x000CA9C0
+// sp-match: ?sub_CA9C0@CMountedWeaponSelector@@QAEXPBI@Z @ 0x00099C30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void CMountedWeaponSelector::sub_CA9C0(const RwUInt32 *arg_0)
 {
@@ -93,6 +99,7 @@ void CMountedWeaponSelector::sub_CA9C0(const RwUInt32 *arg_0)
 }
 
 // match: ??_ECMountedWeaponSelector@@WBI@AEPAXI@Z @ 0x000CAA80
+// sp-match: ??_ECMountedWeaponSelector@@WBI@AEPAXI@Z @ 0x00099CA0
 
 // Members /OPT:ICF folded into shared trivial bodies (config/aliases.txt): defined here for
 // the authentic link (PLAN M7); the placement link takes the shared bodies.

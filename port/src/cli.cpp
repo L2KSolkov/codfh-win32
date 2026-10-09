@@ -1,5 +1,8 @@
 /*
- * Command-line level loading for the port: codfh.exe -map <name|number> [-gametype DM|TDM|CTF|SD|SUP]
+ * Command-line level loading for the port: codfh.exe -map <name|number>
+ * The SP front end also accepts -main-menu to skip Press Start and select the first saved
+ * profile, or -no-main-menu to keep the normal title flow.
+ * (MP additionally accepts -gametype DM|TDM|CTF|SD|SUP and -name <session name>).
  * [-name <session name>] hosts a System Link game on that level as soon as the front end's menus
  * are up, as the create-match page's Start Session does (type_2053C0::sub_205A40): the settings
  * copy's game type and level, the server name, startServer, then the menus closed.
@@ -28,11 +31,18 @@
 #include "game/data.h"
 #include "game/mpgame.h"
 #include "game/parsedfile.h"
+#ifdef CODFH_SP
+#include "sp/sp_fend.h"
+extern type_sp_AE5D0 *sp_dword_3B4724;
+#endif
 
 #include "port.h"
 
 static char cli_map[64], cli_type[16], cli_name[64], cli_movie[64];
 static int cli_pending;
+#ifdef CODFH_SP
+static int cli_auto_main_menu_phase;
+#endif
 
 /* Reads the options from the command line (WinMain). */
 extern "C" void port_cli_parse(const char *cmd)
@@ -63,16 +73,22 @@ extern "C" void port_cli_parse(const char *cmd)
         if (*p)
             *p++ = 0;
     }
-    for (int i = 0; i + 1 < argc; i++)
+    for (int i = 0; i < argc; i++)
     {
-        if (!_stricmp(argv[i], "-map"))
+        if (!_stricmp(argv[i], "-map") && i + 1 < argc)
             strncpy(cli_map, argv[++i], sizeof(cli_map) - 1);
-        else if (!_stricmp(argv[i], "-gametype"))
+        else if (!_stricmp(argv[i], "-gametype") && i + 1 < argc)
             strncpy(cli_type, argv[++i], sizeof(cli_type) - 1);
-        else if (!_stricmp(argv[i], "-name"))
+        else if (!_stricmp(argv[i], "-name") && i + 1 < argc)
             strncpy(cli_name, argv[++i], sizeof(cli_name) - 1);
-        else if (!_stricmp(argv[i], "-movie"))
+        else if (!_stricmp(argv[i], "-movie") && i + 1 < argc)
             strncpy(cli_movie, argv[++i], sizeof(cli_movie) - 1);
+#ifdef CODFH_SP
+        else if (!_stricmp(argv[i], "-main-menu"))
+            cli_auto_main_menu_phase = 1;
+        else if (!_stricmp(argv[i], "-no-main-menu"))
+            cli_auto_main_menu_phase = 0;
+#endif
     }
 #ifdef CODFH_DEDICATED
     if (!cli_map[0])
@@ -81,10 +97,44 @@ extern "C" void port_cli_parse(const char *cmd)
         strcpy(cli_name, "Dedicated server");
 #endif
     cli_pending = cli_map[0] != 0;
+#ifdef CODFH_SP
+    /* Direct level startup takes precedence when both options are present. */
+    if (cli_pending)
+        cli_auto_main_menu_phase = 0;
+    if (cli_auto_main_menu_phase)
+        plog("command line: skip Press Start and select the first saved profile");
+#endif
     if (cli_pending)
         plog("command line: map %s, game type %s, session %s", cli_map, cli_type[0] ? cli_type : "DM",
              cli_name[0] ? cli_name : "(default)");
 }
+
+#ifdef CODFH_SP
+/* The SP front end consumes these in its normal menu and profile-selection callbacks. */
+extern "C" int port_cli_auto_main_menu_start(void)
+{
+    if (cli_auto_main_menu_phase != 1)
+        return 0;
+    cli_auto_main_menu_phase = 2;
+    return 1;
+}
+
+extern "C" int port_cli_auto_main_menu_profile_pending(void)
+{
+    return cli_auto_main_menu_phase == 2;
+}
+
+extern "C" void port_cli_auto_main_menu_finish(int slot)
+{
+    if (cli_auto_main_menu_phase != 2)
+        return;
+    cli_auto_main_menu_phase = 0;
+    if (slot >= 0)
+        plog("command line: selecting profile slot %d", slot + 1);
+    else
+        plog("command line: no saved profile found; leaving profile selection open");
+}
+#endif
 
 static int game_type_bits(const char *t)
 {
@@ -103,6 +153,26 @@ static int contains_nocase(const char *hay, const char *needle)
             return 1;
     return 0;
 }
+
+#ifdef CODFH_SP
+/* The SP command uses the campaign list's zero-based index; names are the
+   game's L_1_1, L_1_1_B, ... identifiers from sub_19B060. */
+static int sp_map_level(const char *map)
+{
+    char *end;
+    long index = strtol(map, &end, 10);
+    if (*map && !*end)
+        return index >= 0 && index < 38 ? (int)index + 1 : -1;
+
+    for (int level = 1; level <= 38; level++)
+    {
+        const char *name = sub_19B060(level);
+        if (name && contains_nocase(name, map))
+            return level;
+    }
+    return -1;
+}
+#endif
 
 /* Run after each frame is presented: -movie once the game has a camera (a level is loaded; the
    movie player draws through it), outside the movie's own frames. */
@@ -161,6 +231,7 @@ extern "C" void port_cli_frame(void)
         set_4F28F0_unk_183(port_config.playerName);
         plog("player name: %s", port_config.playerName);
     }
+#ifndef CODFH_SP
     if (!cli_pending || !dword_4FD974 || !dword_4FD970)
         return;
     cli_pending = 0;
@@ -193,4 +264,26 @@ extern "C" void port_cli_frame(void)
     startServer(false);
     dword_42D28C = 3;
     sub_1FC310()->sub_1FBE20();
+#else
+    if (!cli_pending || !dword_4F28F0 || !sp_dword_3B4724)
+        return;
+
+    cli_pending = 0;
+    plog("SP campaign levels (index: name):");
+    for (RwInt32 i = 0; i < 38; i++)
+        plog("  %2d: %s", i, sub_19B060(i + 1));
+
+    int level = sp_map_level(cli_map);
+    if (level < 0)
+    {
+        plog("command line: no SP level matches \"%s\"", cli_map);
+        return;
+    }
+    plog("command line: starting SP level %s (index %d, game level %d)",
+         sub_19B060(level), level - 1, level);
+    sub_D8CC0(level);
+    /* The SP front end owns a blocking frame loop. Leave it so the shared
+       game-loop fade callback can finish and consume the level change. */
+    sp_dword_3B4724->unk_04 = true;
+#endif
 }

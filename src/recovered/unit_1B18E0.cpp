@@ -17,7 +17,9 @@
 #include "game/parsedfile.h"
 #include "types/alfaobject.h"
 
+#ifndef CODFH_SP // MP only: the network messages, scores and keep-alive thread; single player links only the sleep helpers below (SP 0x694C0, 0x694F0; no other twin in config/sp/shared.txt)
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E1E18
 extern const RwReal flt_3E1E18 = 16.666666f;
 // 0x003E1E1C
@@ -36,6 +38,7 @@ extern const RwReal flt_3E1E30 = 16.666666f;
 extern const RwReal flt_3E1E34 = 0.01f;
 // 0x003E1E38
 extern const RwReal flt_3E1E38 = 0.01f;
+#endif
 // 0x0042CAB8
 RwReal flt_42CAB8 = 1.0f;
 // 0x0042CABC
@@ -439,12 +442,14 @@ void type_4F823C::sub_1B2670()
             ((type_3D2CD0 *)m_18->vf_090())->sub_6D380(t20, 0, 0, 0, 0, 0, 0, 0);
             m_18->vf_090()->set_unk_144(1);
         }
+#ifndef CODFH_SP // (single player has no flag part and no five-way blend: no twin of sub_1B2670)
         if (m_18 && unk_00[bp_4].unk_00 != 1)
         {
             m_18->unk_478 = 0;
             m_18->set_unk_480(flt_42CAB8);
             m_18->sub_76960();
         }
+#endif
     }
 }
 
@@ -529,14 +534,17 @@ DWORD sub_1B29B0(DWORD arg_0)
 {
     return sub_1B2A30(arg_0);
 }
+#endif
 
 void sub_1B2A80(DWORD arg_0);
 // match: ?sub_1B29D0@@YAXI@Z @ 0x001B29D0
+// sp-match: ?sub_1B29D0@@YAXI@Z @ 0x000694F0
 void sub_1B29D0(RwUInt32 arg_0)
 {
     sub_1B2A80(arg_0);
 }
 
+#ifndef CODFH_SP // MP only: the network messages, scores and keep-alive thread; single player links only the sleep helpers below (SP 0x694C0, 0x694F0; no other twin in config/sp/shared.txt)
 // match: ?sub_1B29F0@@YAKP6GKPAX@Z@Z @ 0x001B29F0
 DWORD sub_1B29F0(LPTHREAD_START_ROUTINE arg_0)
 {
@@ -586,13 +594,16 @@ void sub_1B2A80(DWORD arg_0);
 void sub_1B2890();
 DWORD WINAPI sub_1B28C0(LPVOID arg_0);
 void sub_1B2950(RwInt32 arg_0);
+#endif
 
 // match: ?sub_1B2A80@@YAXK@Z @ 0x001B2A80
+// sp-match: ?sub_1B2A80@@YAXK@Z @ 0x000694C0
 void sub_1B2A80(DWORD arg_0)
 {
     Sleep(arg_0);
 }
 
+#ifndef CODFH_SP // MP only: the network messages, scores and keep-alive thread; single player links only the sleep helpers below (SP 0x694C0, 0x694F0; no other twin in config/sp/shared.txt)
 // match: ??0type_3E1E3C@@QAE@XZ @ 0x001B2A90
 type_3E1E3C::type_3E1E3C()
 {
@@ -1280,6 +1291,7 @@ void type_3E1E3C::sub_1B3820()
     unk_C4[0] = 0;
     unk_C4[1] = 0;
 }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

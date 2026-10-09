@@ -26,9 +26,11 @@ RWS_REGISTERCLASS(ConfinedAreaTrigger);
 // match: ?MakeNew@ConfinedAreaTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A2C20
 // match: __ehhandler$?MakeNew@ConfinedAreaTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFDF0
 // match: __ehhandler$?MakeNew@ConfinedAreaTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFDFF
+// sp-match: ?MakeNew@ConfinedAreaTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0007F430
 RWS_DEFINE_MAKENEW(ConfinedAreaTrigger)
 
 // match: ??0ConfinedAreaTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A2CA0
+// sp-match: ??0ConfinedAreaTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0007F350
 ConfinedAreaTrigger::ConfinedAreaTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
 }
@@ -36,12 +38,15 @@ ConfinedAreaTrigger::ConfinedAreaTrigger(const RWS::CAttributePacket &attr) : Tr
 // match: ?vf_008@ConfinedAreaTrigger@@UAEHXZ @ 0x000A2CD0
 
 // match: ??_GConfinedAreaTrigger@@UAEPAXI@Z @ 0x000A2CE0
+// sp-match: ??_GConfinedAreaTrigger@@UAEPAXI@Z @ 0x0007F420
 
 // match: ??1ConfinedAreaTrigger@@UAE@XZ @ 0x000A2D00
+// sp-match: ??1ConfinedAreaTrigger@@UAE@XZ @ 0x0007F370
 // (Defined in the class, in ConfinedAreaTrigger.h.)
 
 // Command 0: a number, kept plus one.
 // match: ?HandleAttributes@ConfinedAreaTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A2D30
+// sp-match: ?HandleAttributes@ConfinedAreaTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0007F390
 void ConfinedAreaTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -59,6 +64,7 @@ void ConfinedAreaTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_EConfinedAreaTrigger@@WBI@AEPAXI@Z @ 0x000A2DC0
+// sp-match: ??_EConfinedAreaTrigger@@WBI@AEPAXI@Z @ 0x0007F410
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

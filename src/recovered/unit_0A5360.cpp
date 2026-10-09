@@ -28,9 +28,11 @@ RWS_REGISTERCLASS(MountedWeaponTrigger);
 // match: ?MakeNew@MountedWeaponTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A5360
 // match: __ehhandler$?MakeNew@MountedWeaponTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFF30
 // match: __ehhandler$?MakeNew@MountedWeaponTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFF3F
+// sp-match: ?MakeNew@MountedWeaponTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000810B0
 RWS_DEFINE_MAKENEW(MountedWeaponTrigger)
 
 // match: ??0MountedWeaponTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A53E0
+// sp-match: ??0MountedWeaponTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00080D50
 MountedWeaponTrigger::MountedWeaponTrigger(const RWS::CAttributePacket &attr)
     : Trigger(attr), unk_C0(1), unk_C4(0), unk_C8(0), unk_CC(0), unk_D4(-1.0f), unk_D8(-1.0f),
       unk_DC(-1)
@@ -40,13 +42,17 @@ MountedWeaponTrigger::MountedWeaponTrigger(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_01C@MountedWeaponTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x000A54D0
+// sp-match: ?vf_01C@MountedWeaponTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x00080DD0
 
 // match: ??_GMountedWeaponTrigger@@UAEPAXI@Z @ 0x000A54F0
+// sp-match: ??_GMountedWeaponTrigger@@UAEPAXI@Z @ 0x00080E30
 
 // match: ??1MountedWeaponTrigger@@UAE@XZ @ 0x000A5510
+// sp-match: ??1MountedWeaponTrigger@@UAE@XZ @ 0x00080DE0
 // (Defined in the class, in MountedWeaponTrigger.h.)
 
 // match: ?HandleAttributes@MountedWeaponTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A5540
+// sp-match: ?HandleAttributes@MountedWeaponTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00080E40
 void MountedWeaponTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -119,12 +125,14 @@ void MountedWeaponTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_020@MountedWeaponTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000A5880
+// sp-match: ?vf_020@MountedWeaponTrigger@@UAEPAUtype_3D3548@@XZ @ 0x00080E10
 type_3D3548 *MountedWeaponTrigger::vf_020()
 {
     return sub_1669B0((type_712B0 *)this);
 }
 
 // match: ??_EMountedWeaponTrigger@@WBI@AEPAXI@Z @ 0x000A58A0
+// sp-match: ??_EMountedWeaponTrigger@@WBI@AEPAXI@Z @ 0x00080E20
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

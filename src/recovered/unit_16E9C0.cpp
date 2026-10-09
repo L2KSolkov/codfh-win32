@@ -82,6 +82,7 @@ RwInt32 dword_4E51C8;
 type_4E51D0 dword_4E51D0[64];
 
 // match: ?sub_16E9C0@@YAXXZ @ 0x0016E9C0
+// sp-match: ?sub_16E9C0@@YAXXZ @ 0x0010BFB0
 // Unloads the bank when an unload is pending (dword_4E51C8).
 void sub_16E9C0()
 {
@@ -90,6 +91,7 @@ void sub_16E9C0()
 }
 
 // match: ?sub_16E9E0@@YAXH@Z @ 0x0016E9E0
+// sp-match: ?sub_16E9E0@@YAXH@Z @ 0x0010C160
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Loads the bank arg_0 now (none for -1; nothing when it is loaded),
 // unloading the one before.
@@ -106,7 +108,9 @@ void sub_16E9E0(RwInt32 arg_0)
     sub_16EFD0();
     sprintf(var_28, "cbank_%02d.bin", arg_0);
     sprintf(var_128, "Request to load %s", var_28);
+#ifndef CODFH_SP
     sub_19A750(var_128);
+#endif
     sub_16EDB0(var_128, 0x100, arg_0);
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_128);
     if (l4)
@@ -117,6 +121,7 @@ void sub_16E9E0(RwInt32 arg_0)
 }
 
 // match: ?sub_16EAB0@@YAXH@Z @ 0x0016EAB0
+// sp-match: ?sub_16EAB0@@YAXH@Z @ 0x0010C210
 void sub_16EAB0(RwInt32 arg_0)
 {
     if (arg_0 == -1)
@@ -128,6 +133,7 @@ void sub_16EAB0(RwInt32 arg_0)
 }
 
 // match: ?sub_16EAE0@@YAXPAURwStream@@H@Z @ 0x0016EAE0
+// sp-match: ?sub_16EAE0@@YAXPAURwStream@@H@Z @ 0x0010BFC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Reads the bank arg_4 from the stream arg_0: its directory, then each
 // clump not already made (a kind-3 object in the bank's heap, its keys
@@ -168,11 +174,15 @@ void sub_16EAE0(RwStream *arg_0, RwInt32 arg_4)
         {
             if (frm_24)
             {
+#ifndef CODFH_SP
                 sub_19A750("\tStream Skip: %d bytes", frm_24);
+#endif
                 RwStreamSkip(arg_0, frm_24);
                 frm_24 = 0;
             }
+#ifndef CODFH_SP
             sub_19A750("\tLoading clump : (0x%x,0x%x)", m_18->unk_00.unk_00, m_18->unk_00.unk_04);
+#endif
             RwStreamRead(arg_0, &var_40, sizeof(var_40));
             RtlEnterCriticalSection(&dword_44BFB8);
             sub_16F250(&var_40.unk_0C.unk_04, 3);
@@ -189,17 +199,23 @@ void sub_16EAE0(RwStream *arg_0, RwInt32 arg_4)
         }
         else
         {
+#ifndef CODFH_SP
             sub_19A750("\tIgnoring clump: (0x%x,0x%x). Already Loaded!", m_18->unk_00.unk_00,
                        m_18->unk_00.unk_04);
+#endif
             frm_24 += m_18->unk_08;
         }
+#ifndef CODFH_SP
         sub_19A750("\t MemoryHeap At: (%08d/%08d)", dword_4E51B8.unk_04, dword_4E51B8.unk_08);
+#endif
         m_18++;
         lv_10--;
     }
+#ifndef CODFH_SP
     sub_19A750("File contained %d clumps. %d loaded with a total mem footprint of %d bytes. %d slots are still "
                "available.  %d bytes are still free.",
                var_48.unk_00, l1C, dword_4E51B8.unk_04, sub_16EF70(), dword_4E51B8.unk_08 - dword_4E51B8.unk_04);
+#endif
     dword_4E51C4 = arg_4;
     if (frm_24)
     {
@@ -211,12 +227,14 @@ void sub_16EAE0(RwStream *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_16ED90@@YAPAUtype_4E51D0@@PAXPAUtype_3DF8D8_04@@H@Z @ 0x0016ED90
+// sp-match: ?sub_16ED90@@YAPAUtype_4E51D0@@PAXPAUtype_3DF8D8_04@@H@Z @ 0x0010BF90
 type_4E51D0 *sub_16ED90(void *arg_0, type_3DF8D8_04 *arg_4, RwInt32 arg_8)
 {
     return sub_16F250(arg_4, arg_8);
 }
 
 // match: ?sub_16EDB0@@YAXPADHH@Z @ 0x0016EDB0
+// sp-match: ?sub_16EDB0@@YAXPADHH@Z @ 0x0010BC50
 // The path of the bank arg_8's file into arg_0 (arg_4 bytes).
 void sub_16EDB0(RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
@@ -231,6 +249,7 @@ void sub_16EDB0(RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_16EE80@@YAHH@Z @ 0x0016EE80
+// sp-match: ?sub_16EE80@@YAHH@Z @ 0x0010BD20
 RwInt32 sub_16EE80(RwInt32 arg_0)
 {
     if (dword_4E51C4 == arg_0)
@@ -239,19 +258,23 @@ RwInt32 sub_16EE80(RwInt32 arg_0)
 }
 
 // match: ?sub_16EEA0@@YAHXZ @ 0x0016EEA0
+// sp-match: ?sub_16EEA0@@YAHXZ @ 0x0010BD40
 RwInt32 sub_16EEA0()
 {
     return dword_4E51C4 != -1;
 }
 
 // match: ?sub_16EEC0@@YAXH@Z @ 0x0016EEC0
+// sp-match: ?sub_16EEC0@@YAXH@Z @ 0x0010BD50
 void sub_16EEC0(RwInt32 arg_0)
 {
     RwChar var_24[0x20];
 
     if (sub_16EE80(arg_0))
     {
+#ifndef CODFH_SP
         sub_19A750("A request to load cbank_%02d.bin is ignored because it is already loaded!", arg_0);
+#endif
         return;
     }
     sprintf(var_24, "cbank_%02d.bin", arg_0);
@@ -260,7 +283,9 @@ void sub_16EEC0(RwInt32 arg_0)
     if (sub_82020(3, arg_0))
         return;
     sub_82130();
+#ifndef CODFH_SP
     sub_19A750("Request to load %s", var_24);
+#endif
     sub_81EB0(3, var_24, arg_0);
 }
 
@@ -283,6 +308,7 @@ RwInt32 sub_16EF70()
 }
 
 // match: ?sub_16EFD0@@YAXXZ @ 0x0016EFD0
+// sp-match: ?sub_16EFD0@@YAXXZ @ 0x0010BDD0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Unloads the bank: every key it made, kind by kind (6, 7, then 3), and
 // empties its heap and table.
@@ -303,7 +329,9 @@ void sub_16EFD0()
     ebp_14 = lv_10;
     if (dword_4E51C4 != -1)
     {
+#ifndef CODFH_SP
         sub_19A750("Request to unload cbank_%02d.bin\n", dword_4E51C4);
+#endif
         while (*ebp_14)
         {
             for (var_20 = dword_4E51D0, var_24 = 0; var_24 < 64; var_24++, var_20++)
@@ -321,7 +349,9 @@ void sub_16EFD0()
                     }
                     sub_198F00(&var_20->unk_00);
                     m_18++;
+#ifndef CODFH_SP
                     sub_19A750("\tUnloading GodID (0x%08x,0x%08x)", var_20->unk_00.unk_00, var_20->unk_00.unk_04);
+#endif
                     var_20->unk_00.unk_00 = 0;
                     var_20->unk_00.unk_04 = 0;
                     var_20->unk_08 = 0;
@@ -329,7 +359,9 @@ void sub_16EFD0()
             }
             ebp_14++;
         }
+#ifndef CODFH_SP
         sub_19A750("Unloaded %d GodIDs. %d slots are available.", m_18, sub_16EF70());
+#endif
         dword_4E51B8.unk_04 = 0;
     }
     dword_4E51C4 = -1;
@@ -338,6 +370,7 @@ void sub_16EFD0()
 }
 
 // match: ?sub_16F160@@YAXXZ @ 0x0016F160
+// sp-match: ?sub_16F160@@YAXXZ @ 0x0010BEB0
 void sub_16F160()
 {
     memset(dword_4E51D0, 0, sizeof(dword_4E51D0));
@@ -350,12 +383,14 @@ void sub_16F160()
 }
 
 // match: ?sub_16F1C0@@YAXXZ @ 0x0016F1C0
+// sp-match: ?sub_16F1C0@@YAXXZ @ 0x0010BEF0
 void sub_16F1C0()
 {
     sub_16EFD0();
 }
 
 // match: ?sub_16F1D0@@YAXXZ @ 0x0016F1D0
+// sp-match: ?sub_16F1D0@@YAXXZ @ 0x0010BF00
 void sub_16F1D0()
 {
     sub_16EFD0();
@@ -365,6 +400,7 @@ void sub_16F1D0()
 }
 
 // match: ?sub_16F200@@YAPAUtype_4E51D0@@XZ @ 0x0016F200
+// sp-match: ?sub_16F200@@YAPAUtype_4E51D0@@XZ @ 0x0010BF20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_4E51D0 *sub_16F200()
 {
@@ -380,6 +416,7 @@ type_4E51D0 *sub_16F200()
 }
 
 // match: ?sub_16F250@@YAPAUtype_4E51D0@@PAUtype_3DF8D8_04@@H@Z @ 0x0016F250
+// sp-match: ?sub_16F250@@YAPAUtype_4E51D0@@PAUtype_3DF8D8_04@@H@Z @ 0x0010BF40
 type_4E51D0 *sub_16F250(type_3DF8D8_04 *arg_0, RwInt32 arg_4)
 {
     type_4E51D0 *var_4;
@@ -391,6 +428,7 @@ type_4E51D0 *sub_16F250(type_3DF8D8_04 *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_16F280@@YAHI@Z @ 0x0016F280
+// sp-match: ?sub_16F280@@YAHI@Z @ 0x0010BF60
 // Sets the heap's base to arg_0, 32-aligned.
 RwInt32 sub_16F280(RwUInt32 arg_0)
 {

@@ -134,6 +134,7 @@ struct RandomGlobals
 // match: _rcsid @ 0x00419AC0
 
 // match: _RandomClose @ 0x002E7FF0
+// sp-match: _RandomClose @ 0x00202A90
 static void        *
 RandomClose(void *instance,
             RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -159,6 +160,7 @@ RandomClose(void *instance,
  */
 
 // match: _RandomOpen @ 0x002E81A0
+// sp-match: _RandomOpen @ 0x00202C40
 static void        *
 RandomOpen(void *instance,
            RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -202,6 +204,7 @@ RandomOpen(void *instance,
  *
  */
 // match: _RpRandomSeed @ 0x002E80A0
+// sp-match: _RpRandomSeed @ 0x00202B40
 void
 RpRandomSeed(RwUInt32 seed)
 {
@@ -257,6 +260,7 @@ RpRandomSeed(RwUInt32 seed)
  * \see RpRandomSeed
  */
 // match: _RpRandom @ 0x002E8020
+// sp-match: _RpRandom @ 0x00202AC0
 RwUInt32
 RpRandom(void)
 {
@@ -316,6 +320,7 @@ RpRandom(void)
  * \see RwEngineStart
  */
 // match: _RpRandomPluginAttach @ 0x002E8200
+// sp-match: _RpRandomPluginAttach @ 0x00202CA0
 RwBool
 RpRandomPluginAttach(void)
 {

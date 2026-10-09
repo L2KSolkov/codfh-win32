@@ -87,6 +87,7 @@ static const char rcsid[] = "@@@@(#)$Id: //RenderWare/dev/rwsdk/plugin/hanim/std
 // match: _rcsid @ 0x003EB10C
 
 // match: _RpUVAnimKeyFrameInit @ 0x0022C290
+// sp-match: _RpUVAnimKeyFrameInit @ 0x00130F70
 RpUVAnimKeyFrame *
 RpUVAnimKeyFrameInit(const RtAnimAnimation *animation,
                     RpUVAnimKeyFrame *keyFrame,
@@ -132,6 +133,7 @@ RpUVAnimKeyFrameInit(const RtAnimAnimation *animation,
  *
  */
 // match: _RpUVAnimKeyFrameStreamRead @ 0x0022C2F0
+// sp-match: _RpUVAnimKeyFrameStreamRead @ 0x00130FD0
 RtAnimAnimation *
 RpUVAnimKeyFrameStreamRead(RwStream * stream, RtAnimAnimation *pAnimation)
 {
@@ -196,6 +198,7 @@ RpUVAnimKeyFrameStreamRead(RwStream * stream, RtAnimAnimation *pAnimation)
  *
  */
 // match: _RpUVAnimKeyFrameStreamWrite @ 0x0022C3A0
+// sp-match: _RpUVAnimKeyFrameStreamWrite @ 0x00131080
 RwBool
 RpUVAnimKeyFrameStreamWrite(const RtAnimAnimation * pAnimation,
                               RwStream * stream)
@@ -256,6 +259,7 @@ RpUVAnimKeyFrameStreamWrite(const RtAnimAnimation * pAnimation,
  *
  */
 // match: _RpUVAnimKeyFrameStreamGetSize @ 0x0022C450
+// sp-match: _RpUVAnimKeyFrameStreamGetSize @ 0x00131130
 RwInt32
 RpUVAnimKeyFrameStreamGetSize(const RtAnimAnimation *animation)
 {

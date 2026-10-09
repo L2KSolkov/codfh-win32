@@ -280,6 +280,7 @@ static RwModuleInfo matrixModule;
 // match: __rwMatrixFreeListPreallocBlocks @ 0x00435368
 
 // match: _MatrixMultiply @ 0x002A46A0
+// sp-match: _MatrixMultiply @ 0x001BFAD0
 
 static RWASMAPI_void
 MatrixMultiply(RwMatrix * dstMat,
@@ -399,6 +400,7 @@ MACRO_START                                                     \
 }                                                               \
 MACRO_STOP
 // match: _MatrixOrthoNormalize @ 0x002A48C0
+// sp-match: _MatrixOrthoNormalize @ 0x001BFCF0
 static __declspec(noinline) RwMatrix *
 MatrixOrthoNormalize(RwMatrix * dst, const RwMatrix * src)
 {
@@ -574,6 +576,7 @@ MatrixInvertOrthoNormalized(RwMatrix * dst,
 }
 
 // match: _MatrixInvertGeneric @ 0x002A4E80
+// sp-match: _MatrixInvertGeneric @ 0x001C02B0
 static RwMatrix *
 MatrixInvertGeneric(RwMatrix * dst, const RwMatrix * src)
 {
@@ -668,6 +671,7 @@ MatrixInvertGeneric(RwMatrix * dst, const RwMatrix * src)
 }
 
 // match: _MatrixQueryRotateDegenerateUnitAxis @ 0x002A50B0
+// sp-match: _MatrixQueryRotateDegenerateUnitAxis @ 0x001C04E0
 static const RwMatrix *
 MatrixQueryRotateDegenerateUnitAxis(const RwMatrix * matrix,
                                     RwV3d * unitAxis)
@@ -737,6 +741,7 @@ MatrixQueryRotateDegenerateUnitAxis(const RwMatrix * matrix,
 
 }
 // match: _MatrixQueryRotate @ 0x002A51E0
+// sp-match: _MatrixQueryRotate @ 0x001C0610
 static const RwMatrix *
 MatrixQueryRotate(const RwMatrix * matrix, RwV3d * unitAxis,
                   RwReal * angle, RwV3d * center)
@@ -866,6 +871,7 @@ _rwMatrixSetOptimizations(RwInt32 optimizeFlags)
  */
 
 // match: __rwMatrixDeterminant @ 0x002A5470
+// sp-match: __rwMatrixDeterminant @ 0x001C08A0
 RwReal
 _rwMatrixDeterminant(const RwMatrix * matrix)
 {
@@ -898,6 +904,7 @@ _rwMatrixDeterminant(const RwMatrix * matrix)
  */
 
 // match: __rwMatrixOrthogonalError @ 0x002A54C0
+// sp-match: __rwMatrixOrthogonalError @ 0x001C08F0
 RwReal
 _rwMatrixOrthogonalError(const RwMatrix * matrix)
 {
@@ -929,6 +936,7 @@ _rwMatrixOrthogonalError(const RwMatrix * matrix)
  */
 
 // match: __rwMatrixNormalError @ 0x002A5520
+// sp-match: __rwMatrixNormalError @ 0x001C0950
 RwReal
 _rwMatrixNormalError(const RwMatrix * matrix)
 {
@@ -960,6 +968,7 @@ _rwMatrixNormalError(const RwMatrix * matrix)
  */
 
 // match: __rwMatrixIdentityError @ 0x002A55F0
+// sp-match: __rwMatrixIdentityError @ 0x001C0A20
 RwReal
 _rwMatrixIdentityError(const RwMatrix * matrix)
 {
@@ -1009,6 +1018,7 @@ _rwMatrixIdentityError(const RwMatrix * matrix)
  */
 
 // match: __rwMatrixClose @ 0x002A56D0
+// sp-match: __rwMatrixClose @ 0x001C0B00
 void *
 _rwMatrixClose(void *instance,
                RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -1077,6 +1087,7 @@ RwMatrixSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc 
  */
 
 // match: __rwMatrixOpen @ 0x002A6340
+// sp-match: __rwMatrixOpen @ 0x001C1770
 void *
 _rwMatrixOpen(void *instance, RwInt32 offset, RwInt32 __RWUNUSED__ size)
 {
@@ -1168,6 +1179,7 @@ RwEngineGetMatrixTolerances(RwMatrixTolerance * const tolerance)
  * \see RwMatrixOptimize
  */
 // match: _RwEngineSetMatrixTolerances @ 0x002A5710
+// sp-match: _RwEngineSetMatrixTolerances @ 0x001C0B40
 RwBool
 RwEngineSetMatrixTolerances(const RwMatrixTolerance * const tolerance)
 {
@@ -1217,6 +1229,7 @@ RwEngineSetMatrixTolerances(const RwMatrixTolerance * const tolerance)
  * \see RwMatrixUpdate
  */
 // match: _RwMatrixOptimize @ 0x002A5740
+// sp-match: _RwMatrixOptimize @ 0x001C0B70
 RwMatrix *
 RwMatrixOptimize(RwMatrix * matrix, const RwMatrixTolerance * tolerance)
 {
@@ -1295,6 +1308,7 @@ RwMatrixOptimize(RwMatrix * matrix, const RwMatrixTolerance * tolerance)
  * \see RwMatrixOptimize
  */
 // match: _RwMatrixUpdate @ 0x002A58A0
+// sp-match: _RwMatrixUpdate @ 0x001C0CD0
 RwMatrix *
 RwMatrixUpdate(RwMatrix * matrix)
 {
@@ -1334,6 +1348,7 @@ RwMatrixUpdate(RwMatrix * matrix)
  * \see RwV3dTransformVectors
  */
 // match: _RwMatrixMultiply @ 0x002A58B0
+// sp-match: _RwMatrixMultiply @ 0x001C0CE0
 RwMatrix *
 RwMatrixMultiply(RwMatrix * dst,
                  const RwMatrix * src1, const RwMatrix * src2)
@@ -1386,6 +1401,7 @@ RwMatrixMultiply(RwMatrix * dst,
  */
 
 // match: _RwMatrixOrthoNormalize @ 0x002A59A0
+// sp-match: _RwMatrixOrthoNormalize @ 0x001C0DD0
 RwMatrix *
 RwMatrixOrthoNormalize(RwMatrix * dst, const RwMatrix * src)
 {
@@ -1424,6 +1440,7 @@ RwMatrixOrthoNormalize(RwMatrix * dst, const RwMatrix * src)
  *
  */
 // match: _RwMatrixRotateOneMinusCosineSine @ 0x002A59B0
+// sp-match: _RwMatrixRotateOneMinusCosineSine @ 0x001C0DE0
 RwMatrix *
 RwMatrixRotateOneMinusCosineSine(RwMatrix * matrix,
                                  const RwV3d * unitAxis,
@@ -1542,6 +1559,7 @@ RwMatrixRotateOneMinusCosineSine(RwMatrix * matrix,
  *
  */
 // match: _RwMatrixRotate @ 0x002A5BC0
+// sp-match: _RwMatrixRotate @ 0x001C0FF0
 RwMatrix *
 RwMatrixRotate(RwMatrix * matrix, const RwV3d * axis,
                RwReal angle, RwOpCombineType combineOp)
@@ -1582,6 +1600,7 @@ RwMatrixRotate(RwMatrix * matrix, const RwV3d * axis,
  *
  */
 // match: _RwMatrixInvert @ 0x002A5CD0
+// sp-match: _RwMatrixInvert @ 0x001C1100
 RwMatrix *
 RwMatrixInvert(RwMatrix * dst, const RwMatrix * src)
 {
@@ -1623,6 +1642,7 @@ RwMatrixInvert(RwMatrix * dst, const RwMatrix * src)
  * \see RwV3dTransformVectors
  */
 // match: _RwMatrixScale @ 0x002A5DF0
+// sp-match: _RwMatrixScale @ 0x001C1220
 RwMatrix *
 RwMatrixScale(RwMatrix * matrix, const RwV3d * scale,
               RwOpCombineType combineOp)
@@ -1709,6 +1729,7 @@ RwMatrixScale(RwMatrix * matrix, const RwV3d * scale,
  * \see RwV3dTransformVectors
  */
 // match: _RwMatrixTranslate @ 0x002A6010
+// sp-match: _RwMatrixTranslate @ 0x001C1440
 RwMatrix *
 RwMatrixTranslate(RwMatrix * matrix,
                   const RwV3d * translation, RwOpCombineType combineOp)
@@ -1799,6 +1820,7 @@ RwMatrixTranslate(RwMatrix * matrix,
  * \see RwV3dTransformVectors
  */
 // match: _RwMatrixTransform @ 0x002A61C0
+// sp-match: _RwMatrixTransform @ 0x001C15F0
 RwMatrix *
 RwMatrixTransform(RwMatrix *matrix,
                   const RwMatrix *transform,
@@ -1880,6 +1902,7 @@ RwMatrixTransform(RwMatrix *matrix,
  *
  */
 // match: _RwMatrixQueryRotate @ 0x002A6280
+// sp-match: _RwMatrixQueryRotate @ 0x001C16B0
 const RwMatrix *
 RwMatrixQueryRotate(const RwMatrix * matrix, RwV3d * unitAxis,
                     RwReal * angle, RwV3d * center)
@@ -1908,6 +1931,7 @@ RwMatrixQueryRotate(const RwMatrix * matrix, RwV3d * unitAxis,
  *
  */
 // match: _RwMatrixDestroy @ 0x002A62A0
+// sp-match: _RwMatrixDestroy @ 0x001C16D0
 RwBool
 RwMatrixDestroy(RwMatrix * matrix)
 {
@@ -1935,6 +1959,7 @@ RwMatrixDestroy(RwMatrix * matrix)
  *
  */
 // match: _RwMatrixCreate @ 0x002A62D0
+// sp-match: _RwMatrixCreate @ 0x001C1700
 RwMatrix *
 RwMatrixCreate(void)
 {

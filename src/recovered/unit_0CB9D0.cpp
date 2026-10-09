@@ -41,11 +41,13 @@ RWS_REGISTERCLASS(GimpVehicleTrigger);
 // match: ?MakeNew@GimpVehicleTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000CB9D0
 // match: __ehhandler$?MakeNew@GimpVehicleTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300B20
 // match: __ehhandler$?MakeNew@GimpVehicleTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00300B2F
+// sp-match: ?MakeNew@GimpVehicleTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0009ACF0
 RWS_DEFINE_MAKENEW(GimpVehicleTrigger)
 
 // match: ??0GimpVehicleTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000CBA50
 // match: __ehhandler$??0GimpVehicleTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x8 @ 0x00300B40
 // match: __ehhandler$??0GimpVehicleTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300B48
+// sp-match: ??0GimpVehicleTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0009A860
 GimpVehicleTrigger::GimpVehicleTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_C0.unk_00 = 0;
@@ -65,10 +67,12 @@ GimpVehicleTrigger::GimpVehicleTrigger(const RWS::CAttributePacket &attr) : Trig
 }
 
 // match: ??_GGimpVehicleTrigger@@UAEPAXI@Z @ 0x000CBC00
+// sp-match: ??_GGimpVehicleTrigger@@UAEPAXI@Z @ 0x0009ACE0
 
 // match: ??1GimpVehicleTrigger@@UAE@XZ @ 0x000CBC20
 // match: __ehhandler$??1GimpVehicleTrigger@@UAE@XZ-0x8 @ 0x00300B60
 // match: __ehhandler$??1GimpVehicleTrigger@@UAE@XZ @ 0x00300B68
+// sp-match: ??1GimpVehicleTrigger@@UAE@XZ @ 0x0009A970
 GimpVehicleTrigger::~GimpVehicleTrigger()
 {
     UnLinkMsg(dword_4B8750);
@@ -78,6 +82,7 @@ GimpVehicleTrigger::~GimpVehicleTrigger()
 
 // Commands 3 and 4 first, then the rest.
 // match: ?HandleAttributes@GimpVehicleTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000CBCB0
+// sp-match: ?HandleAttributes@GimpVehicleTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0009A9F0
 void GimpVehicleTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -151,6 +156,7 @@ void GimpVehicleTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_020@GimpVehicleTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000CBFF0
+// sp-match: ?vf_020@GimpVehicleTrigger@@UAEPAUtype_3D3548@@XZ @ 0x0009AC80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_3D3548 *GimpVehicleTrigger::vf_020()
 {
@@ -184,6 +190,7 @@ type_3D3548 *GimpVehicleTrigger::vf_020()
 }
 
 // match: ??_EGimpVehicleTrigger@@WBI@AEPAXI@Z @ 0x000CC080
+// sp-match: ??_EGimpVehicleTrigger@@WBI@AEPAXI@Z @ 0x0009ACD0
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

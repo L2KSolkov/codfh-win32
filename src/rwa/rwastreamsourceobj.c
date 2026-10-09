@@ -180,6 +180,7 @@ RwUInt8 unk_506BE4[8];
 // match: _unk_42E998 @ 0x0042E998
 
 // match: _sub_240C50 @ 0x00240C50
+// sp-match: _sub_240C50 @ 0x00154D90
 
 RwBool
 sub_240C50(void)
@@ -193,6 +194,7 @@ sub_240C50(void)
 }
 
 // match: _sub_240C70 @ 0x00240C70
+// sp-match: _sub_240C70 @ 0x00154DB0
 rwaDecoder *
 sub_240C70(rwaDecoder *obj)
 {
@@ -255,6 +257,7 @@ sub_240C70(rwaDecoder *obj)
 }
 
 // match: _sub_240D80 @ 0x00240D80
+// sp-match: _sub_240D80 @ 0x00154EC0
 rwaDecoder *
 sub_240D80(rwaDecoder *obj, rwaStreamNodeParams *params)
 {
@@ -283,6 +286,7 @@ sub_240D80(rwaDecoder *obj, rwaStreamNodeParams *params)
 }
 
 // match: _sub_240E20 @ 0x00240E20
+// sp-match: _sub_240E20 @ 0x00154F60
 void
 sub_240E20(rwaQueueItem *item, rwaDecoder *obj)
 {
@@ -300,6 +304,7 @@ sub_240E20(rwaQueueItem *item, rwaDecoder *obj)
 }
 
 // match: _sub_240E70 @ 0x00240E70
+// sp-match: _sub_240E70 @ 0x00154FB0
 rwaQueueItem *
 sub_240E70(rwaDecoder *obj)
 {
@@ -333,6 +338,7 @@ sub_240E70(rwaDecoder *obj)
 }
 
 // match: _sub_240F10 @ 0x00240F10
+// sp-match: _sub_240F10 @ 0x00155050
 void
 sub_240F10(rwaDecoder *obj, rwaStreamSeek *seek)
 {
@@ -379,6 +385,7 @@ sub_240F10(rwaDecoder *obj, rwaStreamSeek *seek)
 }
 
 // match: _sub_240FF0 @ 0x00240FF0
+// sp-match: _sub_240FF0 @ 0x00155130
 void
 sub_240FF0(rwaDecoder *obj, rwaStreamPosition *out)
 {
@@ -407,6 +414,7 @@ sub_240FF0(rwaDecoder *obj, rwaStreamPosition *out)
 }
 
 // match: _sub_241060 @ 0x00241060
+// sp-match: _sub_241060 @ 0x001551A0
 void
 sub_241060(rwaDecoder *obj, RwBool enable)
 {
@@ -421,6 +429,7 @@ sub_241060(rwaDecoder *obj, RwBool enable)
 }
 
 // match: _sub_2410A0 @ 0x002410A0
+// sp-match: _sub_2410A0 @ 0x001551E0
 RwUInt32
 sub_2410A0(rwaDecoder *obj)
 {
@@ -428,6 +437,7 @@ sub_2410A0(rwaDecoder *obj)
 }
 
 // match: _sub_2410B0 @ 0x002410B0
+// sp-match: _sub_2410B0 @ 0x001551F0
 rwaStreamInfo *
 sub_2410B0(rwaDecoder *obj)
 {
@@ -435,6 +445,7 @@ sub_2410B0(rwaDecoder *obj)
 }
 
 // match: _sub_2410C0 @ 0x002410C0
+// sp-match: _sub_2410C0 @ 0x00155200
 void
 sub_2410C0(rwaDecoder *obj, rwaStreamConnect *connect)
 {
@@ -444,6 +455,7 @@ sub_2410C0(rwaDecoder *obj, rwaStreamConnect *connect)
 }
 
 // match: _sub_2410F0 @ 0x002410F0
+// sp-match: _sub_2410F0 @ 0x00155230
 void
 sub_2410F0(rwaDecoder *obj, RwBool flush)
 {
@@ -454,6 +466,7 @@ sub_2410F0(rwaDecoder *obj, RwBool flush)
 }
 
 // match: _sub_241110 @ 0x00241110
+// sp-match: _sub_241110 @ 0x00155250
 rwaDecoder *
 sub_241110(rwaDecoder *obj, RwUInt32 param, void *value)
 {
@@ -463,6 +476,7 @@ sub_241110(rwaDecoder *obj, RwUInt32 param, void *value)
 }
 
 // match: _sub_241130 @ 0x00241130
+// sp-match: _sub_241130 @ 0x00155270
 rwaDecoder *
 sub_241130(rwaDecoder *obj, RwUInt32 param, void *value)
 {
@@ -472,6 +486,7 @@ sub_241130(rwaDecoder *obj, RwUInt32 param, void *value)
 }
 
 // match: _sub_241150 @ 0x00241150
+// sp-match: _sub_241150 @ 0x00155290
 rwaDecoder *
 sub_241150(rwaDecoder *obj, RwUInt32 param, void *value)
 {
@@ -481,6 +496,7 @@ sub_241150(rwaDecoder *obj, RwUInt32 param, void *value)
 }
 
 // match: _sub_241170 @ 0x00241170
+// sp-match: _sub_241170 @ 0x001552B0
 rwaDecoder *
 sub_241170(rwaDecoder *obj, RwUInt32 param, void *value)
 {
@@ -490,6 +506,7 @@ sub_241170(rwaDecoder *obj, RwUInt32 param, void *value)
 }
 
 // match: _sub_241190 @ 0x00241190
+// sp-match: _sub_241190 @ 0x001552D0
 rwaDecoder *
 sub_241190(rwaDecoder *obj, RwUInt32 param, void *value)
 {
@@ -499,6 +516,7 @@ sub_241190(rwaDecoder *obj, RwUInt32 param, void *value)
 }
 
 // match: _sub_2411B0 @ 0x002411B0
+// sp-match: _sub_2411B0 @ 0x001552F0
 rwaDecoder *
 sub_2411B0(rwaDecoder *obj, RwUInt32 param, void *value)
 {
@@ -508,6 +526,7 @@ sub_2411B0(rwaDecoder *obj, RwUInt32 param, void *value)
 }
 
 // match: _sub_2411D0 @ 0x002411D0
+// sp-match: _sub_2411D0 @ 0x00155310
 rwaDecoder *
 sub_2411D0(rwaDecoder *obj, RwUInt32 param, void *value)
 {
@@ -517,6 +536,7 @@ sub_2411D0(rwaDecoder *obj, RwUInt32 param, void *value)
 }
 
 // match: _sub_2411F0 @ 0x002411F0
+// sp-match: _sub_2411F0 @ 0x00155330
 void
 sub_2411F0(rwaDecoder *obj, void *a, void *b)
 {
@@ -527,6 +547,7 @@ sub_2411F0(rwaDecoder *obj, void *a, void *b)
 }
 
 // match: _sub_241230 @ 0x00241230
+// sp-match: _sub_241230 @ 0x00155370
 void
 sub_241230(rwaDecoderState *state, RwBool failed, rwaDecoder *arg)
 {
@@ -570,6 +591,7 @@ sub_241230(rwaDecoderState *state, RwBool failed, rwaDecoder *arg)
 
 
 // match: _sub_2412F0 @ 0x002412F0
+// sp-match: _sub_2412F0 @ 0x00155430
 rwaDecoder *
 sub_2412F0(rwaDecoder *obj, rwaInstance *parent, rwaStreamNodeParams *params, void *a, void *b)
 {
@@ -620,6 +642,7 @@ sub_2412F0(rwaDecoder *obj, rwaInstance *parent, rwaStreamNodeParams *params, vo
 }
 
 // match: _sub_241410 @ 0x00241410
+// sp-match: _sub_241410 @ 0x00155550
 static void
 sub_241410(rwaObjDef *def)
 {
@@ -637,6 +660,7 @@ sub_241410(rwaObjDef *def)
 }
 
 // match: _sub_241660 @ 0x00241660
+// sp-match: _sub_241660 @ 0x001557A0
 rwaObjDef *
 sub_241660(void)
 {

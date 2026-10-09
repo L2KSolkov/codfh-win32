@@ -133,6 +133,7 @@ static P2MemoryLimits gMemoryLimits = { (RwUInt8 *) NULL, (RwUInt8 *) NULL };
 
 /* See RxLockedPipeUnlock, used during unlock for memory allocation */
 // match: _StalacTiteAlloc @ 0x002BB3E0
+// sp-match: _StalacTiteAlloc @ 0x001D67F0
 void *
 StalacTiteAlloc(RwUInt32 size)
 {
@@ -157,6 +158,7 @@ StalacTiteAlloc(RwUInt32 size)
 
 /* See RxLockedPipeUnlock, used during unlock for memory allocation */
 // match: _StalacMiteAlloc @ 0x002BB440
+// sp-match: _StalacMiteAlloc @ 0x001D6850
 void *
 StalacMiteAlloc(RwUInt32 size)
 {
@@ -183,6 +185,7 @@ StalacMiteAlloc(RwUInt32 size)
  PipelineCalcNumUniqueClusters
  */
 // match: _PipelineCalcNumUniqueClusters @ 0x002BB4A0
+// sp-match: _PipelineCalcNumUniqueClusters @ 0x001D68B0
 RwUInt32
 PipelineCalcNumUniqueClusters(RxPipeline *pipeline)
 {
@@ -236,6 +239,7 @@ PipelineCalcNumUniqueClusters(RxPipeline *pipeline)
  ReallocAndFixupSuperBlock
  */
 // match: _ReallocAndFixupSuperBlock @ 0x002BB510
+// sp-match: _ReallocAndFixupSuperBlock @ 0x001D6920
 static RwBool
 ReallocAndFixupSuperBlock(RxPipeline *pipeline, RwUInt32 newSize)
 {
@@ -294,6 +298,7 @@ ReallocAndFixupSuperBlock(RxPipeline *pipeline, RwUInt32 newSize)
  LockPipelineExpandData
  */
 // match: _LockPipelineExpandData @ 0x002BB620
+// sp-match: _LockPipelineExpandData @ 0x001D6A30
 static RwBool
 LockPipelineExpandData(RxPipeline *dstPipe, RxPipeline *srcPipe)
 {
@@ -420,6 +425,7 @@ CalcNodesOutputsCompactedMemSize(RxPipeline *pipeline)
  CalcUnlockPersistentMemSize
  */
 // match: _CalcUnlockPersistentMemSize @ 0x002BB7F0
+// sp-match: _CalcUnlockPersistentMemSize @ 0x001D6C00
 static RwUInt32
 CalcUnlockPersistentMemSize(RxPipeline *pipeline, RwUInt32 numClusters)
 {
@@ -691,6 +697,7 @@ IoSpecSearchForCluster(RxIoSpec * iospec,
  - called from RxLockedPipeAddFragment(), RxLockedPipeReplaceNode()
 */
 // match: __NodeCreate @ 0x002BB840
+// sp-match: __NodeCreate @ 0x001D6C50
 static              RwBool
 _NodeCreate(RxPipeline * pipeline,
             RxPipelineNode * node, RxNodeDefinition * nodespec)
@@ -787,6 +794,7 @@ _NodeCreate(RxPipeline * pipeline,
  - called from RxLockedPipeUnlock()
 */
 // match: _PipelineTallyInputs @ 0x002BB970
+// sp-match: _PipelineTallyInputs @ 0x001D6D80
 static void
 PipelineTallyInputs(RxPipeline * pipeline)
 {
@@ -840,6 +848,7 @@ PipelineTallyInputs(RxPipeline * pipeline)
  - called from RxLockedPipeUnlock() (& from self!)
 */
 // match: _PipelineTopSort @ 0x002BB9E0
+// sp-match: _PipelineTopSort @ 0x001D6DF0
 static void                /* RECURSIVE */
 PipelineTopSort(TopSortData *data, RwUInt32 nodeIndex)
 {
@@ -944,6 +953,7 @@ PipelineTopSort(TopSortData *data, RwUInt32 nodeIndex)
  - called from RxLockedPipeDeleteNode(), RxLockedPipeSetEntryPoint(), RxLockedPipeAddPath()
 */
 // match: _PipelineNode2Index @ 0x002BBBC0
+// sp-match: _PipelineNode2Index @ 0x001D6FD0
 static RwUInt32
 PipelineNode2Index(RxPipeline *pipeline, RxPipelineNode *node)
 {
@@ -966,6 +976,7 @@ PipelineNode2Index(RxPipeline *pipeline, RxPipelineNode *node)
 
 /*****************************************************************************/
 // match: _PipelineUnlockTopSort @ 0x002BBBF0
+// sp-match: _PipelineUnlockTopSort @ 0x001D7000
 static RxPipeline *
 PipelineUnlockTopSort(RxPipeline *pipeline)
 {
@@ -1647,6 +1658,7 @@ RxPipelineNodeGetInitData(RxPipelineNode * node)
  * \see RxLockedPipeSetEntryPoint
  */
 // match: _RxLockedPipeUnlock @ 0x002BBD00
+// sp-match: _RxLockedPipeUnlock @ 0x001D7110
 RxPipeline         *
 RxLockedPipeUnlock(RxPipeline * pipeline)
 {
@@ -2057,6 +2069,7 @@ RxLockedPipeUnlock(RxPipeline * pipeline)
  * \see RxLockedPipeUnlock
  */
 // match: _RxPipelineLock @ 0x002BC0D0
+// sp-match: _RxPipelineLock @ 0x001D74E0
 RxPipeline         *
 RxPipelineLock(RxPipeline * pipeline)
 {
@@ -2283,6 +2296,7 @@ RxPipelineClone(RxPipeline * pipeline)
  * \see RxLockedPipeUnlock
  */
 // match: _RxPipelineFindNodeByName @ 0x002BC1E0
+// sp-match: _RxPipelineFindNodeByName @ 0x001D75F0
 RxPipelineNode     *
 RxPipelineFindNodeByName(RxPipeline * pipeline,
                          const RwChar * name,
@@ -2441,6 +2455,7 @@ RxPipelineFindNodeByIndex(RxPipeline * pipeline, RwUInt32 nodeindex)
  * \see RxLockedPipeUnlock
  */
 // match: _RxLockedPipeAddFragment @ 0x002BC270
+// sp-match: _RxLockedPipeAddFragment @ 0x001D7680
 RxPipeline *
 RxLockedPipeAddFragment(RxPipeline       *pipeline,
                         RwUInt32         *firstIndex,

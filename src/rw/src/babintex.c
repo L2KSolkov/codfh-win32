@@ -125,6 +125,7 @@ struct _nativeTextureWriteInfo
 // match: _rcsid @ 0x004164D8
 
 // match: _RwTextureRegisterPluginStream @ 0x002ABAB0
+// sp-match: _RwTextureRegisterPluginStream @ 0x001C7240
 RwInt32
 RwTextureRegisterPluginStream(RwUInt32 pluginID,
                               RwPluginDataChunkReadCallBack readCB,
@@ -198,6 +199,7 @@ RwTextureSetStreamAlwaysCallBack(
  * \see RwTextureRead
  */
 // match: _RwTextureStreamGetSize @ 0x002ABAE0
+// sp-match: _RwTextureStreamGetSize @ 0x001C7270
 RwUInt32
 RwTextureStreamGetSize(const RwTexture *texture)
 {
@@ -242,6 +244,7 @@ RwTextureStreamGetSize(const RwTexture *texture)
  *
  */
 // match: _RwTextureStreamWrite @ 0x002ABB20
+// sp-match: _RwTextureStreamWrite @ 0x001C72B0
 const RwTexture *
 RwTextureStreamWrite(const RwTexture *texture, RwStream *stream)
 {
@@ -345,6 +348,7 @@ RwTextureStreamWrite(const RwTexture *texture, RwStream *stream)
  * \see RwStreamFindChunk
  */
 // match: _RwTextureStreamRead @ 0x002ABC10
+// sp-match: _RwTextureStreamRead @ 0x001C73A0
 RwTexture *
 RwTextureStreamRead(RwStream *stream)
 {
@@ -849,6 +853,7 @@ RwTexDictionaryStreamWrite(const RwTexDictionary *texDict, RwStream *stream)
  */
 
 // match: _destroyTexture @ 0x002ABE00
+// sp-match: _destroyTexture @ 0x001C7590
 static RwTexture   *
 destroyTexture(RwTexture * texture,
                void * data __RWUNUSED__ )
@@ -906,6 +911,7 @@ destroyTexture(RwTexture * texture,
  * (the game passes one or NULL) and gives up when the arena's abort flag
  * (dword_50F24C) is raised. */
 // match: _RwTexDictionaryStreamRead @ 0x002ABE20
+// sp-match: _RwTexDictionaryStreamRead @ 0x001C75B0
 RwTexDictionary *
 RwTexDictionaryStreamRead(RwStream *stream, void *arena)
 {

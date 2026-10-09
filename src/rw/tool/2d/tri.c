@@ -160,6 +160,7 @@ rt2dTriPolyCreate( void )
  */
 
 static RwBool
+// sp-match: _rt2dTriPolyDestroy @ 0x001669C0
 rt2dTriPolyDestroy( _rt2dTriPoly *poly )
 {
     _rt2dTriVert           *vert, *vertHead, *vertNext;
@@ -309,6 +310,7 @@ rt2dPointTriClassify(_rt2dTriPoly *poly,
  On exit    :
  */
 static _rt2dTriVert *
+// sp-match: _rt2dTriPolyFindConvexVert @ 0x00166A30
 rt2dTriPolyFindConvexVert(_rt2dTriPoly *poly)
 {
     _rt2dTriVert        *v, *v0, *v1, *v2;
@@ -349,6 +351,7 @@ rt2dTriPolyFindConvexVert(_rt2dTriPoly *poly)
  On exit    :
  */
 static _rt2dTriVert *
+// sp-match: _rt2dTriPolyFindIntrudeVert @ 0x00166B00
 rt2dTriPolyFindIntrudeVert(_rt2dTriPoly *poly)
 {
     _rt2dTriVert            *v, *v0, *v1, *v2, *intrude;
@@ -394,6 +397,7 @@ rt2dTriPolyFindIntrudeVert(_rt2dTriPoly *poly)
  On exit    :
  */
 static _rt2dTriPoly *
+// sp-match: _rt2dTriPolySplit @ 0x00166DE0
 rt2dTriPolySplit( _rt2dTriPoly *polyA, _rt2dTriVert *v0, _rt2dTriVert *v1 )
 {
     _rt2dTriPoly        *polyB;
@@ -484,6 +488,7 @@ rt2dTriPolySplit( _rt2dTriPoly *polyA, _rt2dTriVert *v0, _rt2dTriVert *v1 )
  On exit    :
  */
 static _rt2dTriPoly *
+// sp-match: _rt2dTriPolyTriangulate @ 0x00166F50
 rt2dTriPolyTriangulate( _rt2dTriPoly *poly )
 {
     _rt2dTriPoly           *p1;
@@ -541,6 +546,7 @@ rt2dTriPolyTriangulate( _rt2dTriPoly *poly )
  On exit    :
  */
 static _rt2dTriPoly *
+// sp-match: _rt2dPathToPoly @ 0x00167000
 rt2dPathToPoly( Rt2dPath *path )
 {
     rt2dPathNode       *pNode;
@@ -595,6 +601,7 @@ rt2dPathToPoly( Rt2dPath *path )
  On exit    :
  */
 Rt2dPath *
+// sp-match: __rt2dPathTriangulate @ 0x00167110
 _rt2dPathTriangulate( Rt2dPath *path, RwInt32 *count, RwInt32 *index )
 {
     _rt2dTriPoly        *poly;
@@ -637,6 +644,7 @@ _rt2dPathTriangulate( Rt2dPath *path, RwInt32 *count, RwInt32 *index )
 // match: __rt2dTriVertFreeListPreallocBlocks @ 0x00431080
 
 // match: __rt2dTriangulateClose @ 0x00252880
+// sp-match: __rt2dTriangulateClose @ 0x00167170
 
 void
 _rt2dTriangulateClose( void )
@@ -667,6 +675,7 @@ _rt2dTriangulateClose( void )
  *
  */
 // match: _Rt2dTriVertSetFreeListCreateParams @ 0x002528B0
+// sp-match: _Rt2dTriVertSetFreeListCreateParams @ 0x001671A0
 void
 Rt2dTriVertSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc )
 {
@@ -698,6 +707,7 @@ Rt2dTriVertSetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPreall
  *
  */
 // match: _Rt2dTriPolySetFreeListCreateParams @ 0x002528D0
+// sp-match: _Rt2dTriPolySetFreeListCreateParams @ 0x001671C0
 void
 Rt2dTriPolySetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPrealloc )
 {
@@ -722,6 +732,7 @@ Rt2dTriPolySetFreeListCreateParams( RwInt32 blockSize, RwInt32 numBlocksToPreall
  */
 
 // match: __rt2dTriangulateOpen @ 0x002528F0
+// sp-match: __rt2dTriangulateOpen @ 0x001671E0
 RwBool
 _rt2dTriangulateOpen( void )
 {

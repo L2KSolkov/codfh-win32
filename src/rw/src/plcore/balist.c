@@ -62,6 +62,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/src/plcore/
 // match: _rcsid @ 0x00416498
 
 // match: __rwSListCreate @ 0x002AB780
+// sp-match: __rwSListCreate @ 0x001C6F30
 RwSList            *
 _rwSListCreate(RwInt32 size, RwUInt32 hint)
 {
@@ -103,6 +104,7 @@ _rwSListCreate(RwInt32 size, RwUInt32 hint)
  */
 
 // match: __rwSListEmpty @ 0x002AB840
+// sp-match: __rwSListEmpty @ 0x001C6FF0
 void
 _rwSListEmpty(RwSList * sList)
 {
@@ -122,6 +124,7 @@ _rwSListEmpty(RwSList * sList)
  */
 
 // match: __rwSListGetNewEntry @ 0x002AB850
+// sp-match: __rwSListGetNewEntry @ 0x001C7000
 void               *
 _rwSListGetNewEntry(RwSList * sList, RwUInt32 hint)
 {
@@ -168,6 +171,7 @@ _rwSListGetNewEntry(RwSList * sList, RwUInt32 hint)
  */
 
 // match: __rwSListGetNewEntries @ 0x002AB8F0
+// sp-match: __rwSListGetNewEntries @ 0x001C70A0
 void *
 _rwSListGetNewEntries(RwSList * sList,RwInt32 count, RwUInt32 hint)
 {
@@ -256,6 +260,7 @@ _rwSListDestroyEntry(RwSList * sList, RwInt32 entry)
  */
 
 // match: __rwSListDestroyEndEntries @ 0x002AB9A0
+// sp-match: __rwSListDestroyEndEntries @ 0x001C7150
 void
 _rwSListDestroyEndEntries(RwSList * sList, RwInt32 amount)
 {
@@ -275,6 +280,7 @@ _rwSListDestroyEndEntries(RwSList * sList, RwInt32 amount)
  */
 
 // match: __rwSListGetArray @ 0x002AB9C0
+// sp-match: __rwSListGetArray @ 0x001C7170
 void               *
 _rwSListGetArray(RwSList * sList)
 {
@@ -314,6 +320,7 @@ _rwSListReleaseArray(RwSList * sList __RWUNUSEDRELEASE__)
  */
 
 // match: __rwSListDestroy @ 0x002AB9E0
+// sp-match: __rwSListDestroy @ 0x001C7190
 RwBool
 _rwSListDestroy(RwSList * sList)
 {
@@ -357,6 +364,7 @@ _rwSListDestroyArray(RwUInt8 * array)
  */
 
 // match: __rwSListGetNumEntries @ 0x002ABA20
+// sp-match: __rwSListGetNumEntries @ 0x0005F6B0
 RwInt32
 _rwSListGetNumEntries(const RwSList * sList)
 {
@@ -376,6 +384,7 @@ _rwSListGetNumEntries(const RwSList * sList)
  */
 
 // match: __rwSListToArray @ 0x002ABA30
+// sp-match: __rwSListToArray @ 0x001C71D0
 void               *
 _rwSListToArray(RwSList * sList)
 {
@@ -409,6 +418,7 @@ _rwSListToArray(RwSList * sList)
  */
 
 // match: __rwSListGetEntry @ 0x002ABA80
+// sp-match: __rwSListGetEntry @ 0x001C7220
 void               *
 _rwSListGetEntry(RwSList * sList, RwInt32 entry)
 {
@@ -428,6 +438,7 @@ _rwSListGetEntry(RwSList * sList, RwInt32 entry)
  */
 
 // match: __rwSListGetBegin @ 0x002ABA90
+// sp-match: __rwSListGetBegin @ 0x000BC9F0
 void               *
 _rwSListGetBegin(RwSList * sList)
 {
@@ -448,6 +459,7 @@ _rwSListGetBegin(RwSList * sList)
  */
 
 // match: __rwSListGetEnd @ 0x002ABAA0
+// sp-match: __rwSListGetEnd @ 0x001C7230
 void               *
 _rwSListGetEnd(RwSList * sList)
 {

@@ -1,4 +1,4 @@
-"""portbuild.py [--only GLOB]... [--link] [--jobs N]: the Win32 port's build (docs/WIN32_PORT.md): every source
+"""portbuild.py [--sp] [--only GLOB]... [--link] [--jobs N]: the Win32 port's build (docs/WIN32_PORT.md): every source
 under src/ (bar the Xbox-only trees src/xbe and src/xdk) compiled for Win32 x86
 with MSVC 14.51 and Windows SDK 10.0.26100, against the port's bridge headers (port/include, ahead
 of everything; they stand in for the XDK's xtl.h, d3d8.h, dsound.h and the rest, which are not on
@@ -7,9 +7,9 @@ matching rule, as the matching build reads it); the Xbox/VC7.1-only switches are
 port's own are added: CODFH_WIN32 and CODFH_PLAIN, x87 code (/arch:IA32, as the game sets the FPU
 itself), VC7.1-era language rules (/permissive, /Zc:forScope-, /Zc:wchar_t-...).
 
-Objects go to build/port/obj; build/port/compile.log has every unit's compiler output and
-build/port/errors.md a summary: units that fail, error codes by count, and the headers and
-identifiers the errors name most. Linking comes with W0's entry point.
+Objects go to build/port/obj, or build/port_sp/obj with --sp; the selected output directory's
+compile.log has every unit's compiler output and errors.md summarizes failed units, error codes,
+and the headers and identifiers the errors name most. Linking comes with W0's entry point.
 
 CODFH_IMGUI (the port's Dear ImGui overlay, port/third_party/imgui) is on in the game's build and
 off in the dedicated server's; --no-imgui leaves it out. ImGui itself is compiled with the current
@@ -33,7 +33,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
-OUT = os.path.join(ROOT, 'build', 'port')
+SINGLE_PLAYER = '--sp' in sys.argv[1:]
+OUT = os.path.join(ROOT, 'build', 'port_sp' if SINGLE_PLAYER else 'port')
 OBJ = os.path.join(OUT, 'obj')
 EXE = 'codfh.exe'
 
@@ -73,11 +74,48 @@ PORT_FLAGS = [
 DROP = re.compile(r'^/(compiler:.*|G[5-7B]|Gs\d*|QIfist|arch:.*|O[12bdgistxy].*|GF-?|Gy-?|GS-?|'
                   r'EH.*|GR-?|MT.*|MD.*|W\d|Zi|nologo|c)$')
 
-SKIP_DIRS = ('src/xbe/', 'src/xdk/')
+SKIP_DIRS = ('src/xbe/', 'src/xdk/', 'src/sp/xbe/')
 IMGUI_DIR = 'port/third_party/imgui/'
 # Third-party sources (Dear ImGui): the current compiler's own rules, none of the VC7.1 ones.
 THIRD_PARTY_FLAGS = ['/c', '/nologo', '/O2', '/Zi', '/FS', '/MT', '/W1', '/EHsc', '/DWIN32', '/D_CRT_SECURE_NO_WARNINGS']
 ASM_DIRS = ('src/bink/',)
+
+
+def single_player_sources(srcs):
+    """Use SP's unit selection and wrappers without compiling shared units twice."""
+    rules = []
+    cfg = os.path.join(ROOT, 'config', 'sp', 'units.txt')
+    for line in open(cfg, encoding='utf-8'):
+        line = line.strip()
+        if not line or line.startswith('#'):
+            continue
+        op, pattern = line[0], line[1:].strip()
+        if op not in ('+', '-'):
+            raise SystemExit('invalid SP unit rule: %s' % line)
+        rules.append((op, pattern))
+
+    wrapped = set()
+    include_cpp = re.compile(r'^\s*#\s*include\s+"([^"]+\.(?:cpp|c))"')
+    for wrapper in srcs:
+        if not wrapper.startswith('src/sp/units/'):
+            continue
+        for line in open(wrapper, encoding='latin-1'):
+            match = include_cpp.match(line)
+            if match:
+                path = os.path.normpath(os.path.join(os.path.dirname(wrapper), match.group(1)))
+                wrapped.add(path.replace(os.sep, '/'))
+
+    selected = []
+    for src in srcs:
+        if src in wrapped or src.startswith('src/sp/units/sp_data'):
+            continue
+        include = True
+        for op, pattern in rules:
+            if fnmatch.fnmatch(src, pattern):
+                include = op == '+'
+        if include:
+            selected.append(src)
+    return selected
 
 
 def load_rules():
@@ -114,12 +152,18 @@ def compile_unit(job):
         # (ml's errors read "error A2xxx"; reported as the compiler's for the summary)
         return src, r.returncode, out.replace(': error A', ': error C')
     lang = '/TC' if src.endswith('.c') else '/TP'
+    include_dirs = ['/Iport/include', '/Iinclude']
+    if SINGLE_PLAYER and src.startswith('src/sp/units/'):
+        # These wrappers include the Xbox RWA output source, whose headers live one level
+        # above its src/rwa/xbox directory.
+        if src.endswith(('sp_unit_24DF20_1.c', 'sp_unit_24DF20_2.c')):
+            include_dirs.append('/Isrc/rwa')
     if src.startswith('port/third_party/'):
         cmd = ([CL] + THIRD_PARTY_FLAGS + [lang, '/I' + IMGUI_DIR] + ['/Fo' + obj, '/Fd' + os.path.join(OBJ, 'port.pdb'), src])
     else:
         # (the port layer's own sources also see ImGui's headers, which include each other by name)
         extra = ['/I' + IMGUI_DIR] if src.startswith('port/src/') else []
-        cmd = ([CL] + PORT_FLAGS + flags + [lang, '/Iport/include', '/Iinclude'] + extra
+        cmd = ([CL] + PORT_FLAGS + (['/DCODFH_SP'] if SINGLE_PLAYER else []) + flags + [lang] + include_dirs + extra
                + ['/Fo' + obj, '/Fd' + os.path.join(OBJ, 'port.pdb'), src])
     env = dict(os.environ)
     env['INCLUDE'] = ';'.join(SYSTEM_INCLUDES)
@@ -131,8 +175,10 @@ def compile_unit(job):
 
 
 def main():
-    global OUT, OBJ, EXE
+    global OUT, OBJ, EXE, SINGLE_PLAYER
     args = sys.argv[1:]
+    SINGLE_PLAYER = '--sp' in args
+    args = [arg for arg in args if arg != '--sp']
     if '--dedicated' in args:
         OUT = os.path.join(ROOT, 'build', 'port', 'dedicated')
         OBJ = os.path.join(OUT, 'obj')
@@ -156,6 +202,11 @@ def main():
     if imgui:
         srcs += sorted(s.replace(os.sep, '/') for s in glob.glob(IMGUI_DIR + '*.cpp') + glob.glob(IMGUI_DIR + 'backends/*.cpp'))
     srcs = [s for s in srcs if not s.startswith(SKIP_DIRS)]
+    if SINGLE_PLAYER:
+        srcs = single_player_sources(srcs)
+    else:
+        # (src/sp: the single player's own units, --sp only)
+        srcs = [s for s in srcs if not s.startswith('src/sp/')]
     # (an .asm beside a .c of the same name gets its own object)
     def obj_of(s):
         base = os.path.splitext(s)[0] + ('_asm' if s.endswith('.asm') and not s.endswith('_asm.asm') else '')
@@ -165,6 +216,24 @@ def main():
         srcs = [s for s in srcs if any(fnmatch.fnmatch(s, p) for p in only)]
     jobs = [(s, obj_of(s), unit_flags(s, rules)) for s in srcs]
     os.makedirs(OBJ, exist_ok=True)
+    if SINGLE_PLAYER:
+        launcher = r'''@echo off
+setlocal
+rem Override CODFH_DATA before launching to use a different extracted game-data folder.
+rem -main-menu skips Press Start and selects the first saved profile; -no-main-menu opts out.
+if not defined CODFH_DATA set "CODFH_DATA=D:\CODFH_DUMP"
+if not exist "%CODFH_DATA%\" (
+    echo Game data folder not found: "%CODFH_DATA%"
+    echo Set CODFH_DATA to the folder containing the extracted game data and try again.
+    exit /b 1
+)
+pushd "%~dp0"
+"%~dp0codfh.exe" -main-menu %*
+set "GAME_EXIT=%ERRORLEVEL%"
+popd
+endlocal & exit /b %GAME_EXIT%
+'''
+        open(os.path.join(OUT, 'launch.bat'), 'w', encoding='ascii', newline='\r\n').write(launcher)
     with concurrent.futures.ThreadPoolExecutor(jobs_n) as pool:
         results = list(pool.map(compile_unit, jobs))
 

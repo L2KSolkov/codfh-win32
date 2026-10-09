@@ -43,7 +43,11 @@ public:
     RwInt32 unk_E4;
     type_3DF8D8_04 unk_E8;
     type_3DF8D8_04 unk_F0;
+#ifdef CODFH_SP // a real in single player: SP 0xD84D2 loads it with fld
+    RwReal unk_F8;              // the target's spread (type_1227C0::unk_60)
+#else
     RwInt32 unk_F8;
+#endif
     union                       // the generator's path speed (unk_D0)
     {
         RwInt32 unk_FC;         // (the attribute's raw bits)

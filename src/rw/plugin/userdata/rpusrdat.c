@@ -140,6 +140,7 @@ struct RpUserDataList
 // match: _rcsid @ 0x004198B0
 
 // match: _UserDataOpen @ 0x002E41C0
+// sp-match: _UserDataOpen @ 0x001FEC90
 static void        *
 UserDataOpen(void *instance, RwInt32 __RWUNUSED__ offset,
              RwInt32 __RWUNUSED__ size)
@@ -153,6 +154,7 @@ UserDataOpen(void *instance, RwInt32 __RWUNUSED__ offset,
 }
 
 // match: _UserDataClose @ 0x002E41D0
+// sp-match: _UserDataClose @ 0x001FECA0
 static void        *
 UserDataClose(void *instance, RwInt32 __RWUNUSED__ offset,
               RwInt32 __RWUNUSED__ size)
@@ -166,6 +168,7 @@ UserDataClose(void *instance, RwInt32 __RWUNUSED__ offset,
 }
 
 // match: _UserDataDestruct @ 0x002E41E0
+// sp-match: _UserDataDestruct @ 0x001FECB0
 static void
 UserDataDestruct(RpUserDataArray * userData)
 {
@@ -199,6 +202,7 @@ UserDataDestruct(RpUserDataArray * userData)
 }
 
 // match: _UserDataCopy @ 0x002E48B0
+// sp-match: _UserDataCopy @ 0x001FF380
 static void
 UserDataCopy(RpUserDataArray * dstUserData,
              RpUserDataArray * srcUserData)
@@ -256,6 +260,7 @@ UserDataCopy(RpUserDataArray * dstUserData,
 }
 
 // match: _UserDataStreamRead @ 0x002E4240
+// sp-match: _UserDataStreamRead @ 0x001FED10
 static RwStream    *
 UserDataStreamRead(RpUserDataArray * userData, RwStream * stream)
 {
@@ -394,6 +399,7 @@ UserDataStreamRead(RpUserDataArray * userData, RwStream * stream)
 }
 
 // match: _UserDataStreamWrite @ 0x002E4410
+// sp-match: _UserDataStreamWrite @ 0x001FEEE0
 static RwStream    *
 UserDataStreamWrite(RpUserDataArray * userData, RwStream * stream)
 {
@@ -498,6 +504,7 @@ UserDataStreamWrite(RpUserDataArray * userData, RwStream * stream)
 }
 
 // match: _UserDataGetSize @ 0x002E4590
+// sp-match: _UserDataGetSize @ 0x001FF060
 static              RwInt32
 UserDataGetSize(RpUserDataArray * userData)
 {
@@ -563,6 +570,7 @@ UserDataListConstruct(RpUserDataList * userDataList)
 }
 
 // match: _UserDataListDestruct @ 0x002E4610
+// sp-match: _UserDataListDestruct @ 0x001FF0E0
 static void
 UserDataListDestruct(RpUserDataList * userDataList)
 {
@@ -587,6 +595,7 @@ UserDataListDestruct(RpUserDataList * userDataList)
 }
 
 // match: _UserDataListCopy @ 0x002E49C0
+// sp-match: _UserDataListCopy @ 0x001FF490
 static void
 UserDataListCopy(RpUserDataList * dstList,
                  const RpUserDataList * srcList)
@@ -616,6 +625,7 @@ UserDataListCopy(RpUserDataList * dstList,
 }
 
 // match: _UserDataListStreamRead @ 0x002E4660
+// sp-match: _UserDataListStreamRead @ 0x001FF130
 static RwStream    *
 UserDataListStreamRead(RpUserDataList * list, RwStream * stream)
 {
@@ -647,6 +657,7 @@ UserDataListStreamRead(RpUserDataList * list, RwStream * stream)
 }
 
 // match: _UserDataListStreamWrite @ 0x002E46D0
+// sp-match: _UserDataListStreamWrite @ 0x001FF1A0
 static RwStream    *
 UserDataListStreamWrite(const RpUserDataList * list, RwStream * stream)
 {
@@ -687,6 +698,7 @@ UserDataListStreamWrite(const RpUserDataList * list, RwStream * stream)
 }
 
 // match: _UserDataListGetSize @ 0x002E4750
+// sp-match: _UserDataListGetSize @ 0x001FF220
 static              RwInt32
 UserDataListGetSize(const RpUserDataList * list)
 {
@@ -864,6 +876,7 @@ UserDataListRemoveElement(RpUserDataList * list, RwInt32 index)
 /* Generic callback functions */
 
 // match: _UserDataObjectConstruct @ 0x002E47A0
+// sp-match: _UserDataObjectConstruct @ 0x001FF270
 static void        *
 UserDataObjectConstruct(void *object, RwInt32 offset,
                           RwInt32 __RWUNUSED__ size)
@@ -881,6 +894,7 @@ UserDataObjectConstruct(void *object, RwInt32 offset,
 }
 
 // match: _UserDataObjectDestruct @ 0x002E47C0
+// sp-match: _UserDataObjectDestruct @ 0x001FF290
 static void        *
 UserDataObjectDestruct(void *object, RwInt32 offset,
                          RwInt32 __RWUNUSED__ size)
@@ -898,6 +912,7 @@ UserDataObjectDestruct(void *object, RwInt32 offset,
 }
 
 // match: _UserDataObjectCopy @ 0x002E4A20
+// sp-match: _UserDataObjectCopy @ 0x001FF4F0
 static void        *
 UserDataObjectCopy(void *destinationObject, const void *sourceObject,
                      RwInt32 offset,
@@ -919,6 +934,7 @@ UserDataObjectCopy(void *destinationObject, const void *sourceObject,
 }
 
 // match: _UserDataObjectStreamRead @ 0x002E47E0
+// sp-match: _UserDataObjectStreamRead @ 0x001FF2B0
 static RwStream    *
 UserDataObjectStreamRead(RwStream * stream,
                            RwInt32 __RWUNUSED__ binaryLength,
@@ -939,6 +955,7 @@ UserDataObjectStreamRead(RwStream * stream,
 }
 
 // match: _UserDataObjectStreamWrite @ 0x002E4800
+// sp-match: _UserDataObjectStreamWrite @ 0x001FF2D0
 static RwStream    *
 UserDataObjectStreamWrite(RwStream * stream,
                             RwInt32 __RWUNUSED__ binaryLength,
@@ -960,6 +977,7 @@ UserDataObjectStreamWrite(RwStream * stream,
 }
 
 // match: _UserDataObjectGetSize @ 0x002E4820
+// sp-match: _UserDataObjectGetSize @ 0x001FF2F0
 static              RwInt32
 UserDataObjectGetSize(const void *object,
                         RwInt32 offsetInObject,
@@ -1064,6 +1082,7 @@ RpGeometryRemoveUserDataArray(RpGeometry *geometry, RwInt32 index)
  * \see RpUserDataPluginAttach
  */
 // match: _RpGeometryGetUserDataArrayCount @ 0x002E4840
+// sp-match: _RpGeometryGetUserDataArrayCount @ 0x001FF310
 RwInt32
 RpGeometryGetUserDataArrayCount(const RpGeometry * geometry)
 {
@@ -1094,6 +1113,7 @@ RpGeometryGetUserDataArrayCount(const RpGeometry * geometry)
  * \see RpUserDataPluginAttach
  */
 // match: _RpGeometryGetUserDataArray @ 0x002E4870
+// sp-match: _RpGeometryGetUserDataArray @ 0x001FF340
 RpUserDataArray    *
 RpGeometryGetUserDataArray(const RpGeometry * geometry, RwInt32 data)
 {
@@ -2019,6 +2039,7 @@ RpUserDataArrayGetNumElements(RpUserDataArray * userData)
  * \see RpUserDataPluginAttach
  */
 // match: _RpUserDataArrayGetInt @ 0x002E48A0
+// sp-match: _RpUserDataArrayGetInt @ 0x001FF370
 RwInt32
 RpUserDataArrayGetInt(RpUserDataArray * userData, RwInt32 index)
 {
@@ -2256,6 +2277,7 @@ RpUserDataGetFormatSize(RpUserDataFormat format)
  *
  */
 // match: _RpUserDataPluginAttach @ 0x002E4A40
+// sp-match: _RpUserDataPluginAttach @ 0x001FF510
 RwBool
 RpUserDataPluginAttach(void)
 {

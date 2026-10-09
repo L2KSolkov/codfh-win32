@@ -35,6 +35,7 @@ type_4D51C0 dword_4D51C0;
 
 // match: _$E2 @ 0x0030BC00
 // match: ??0type_15B110@@QAE@XZ @ 0x0015B110
+// sp-match: ??0type_15B110@@QAE@XZ @ 0x000FF4A0
 
 type_15B110::type_15B110()
 {
@@ -43,6 +44,8 @@ type_15B110::type_15B110()
 
 // match: ??0type_15B110_00@@QAE@XZ @ 0x0015B150
 // match: ?sub_15B2A0@type_15B110@@QAEXPAUtype_3DF8D8@@PAX@Z @ 0x0015B2A0
+// sp-match: ?sub_15B2A0@type_15B110@@QAEXPAUtype_3DF8D8@@PAX@Z @ 0x000FA990
+// sp-match: ??0type_15B110_00@@QAE@XZ @ 0x000FE7F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The guns from the vehicle's model object arg_0 (a copy of each gun's
 // projectile model, its particles, speed, magazine and flash time) and its
@@ -81,7 +84,11 @@ void type_15B110::sub_15B2A0(type_3DF8D8 *arg_0, void *arg_4)
         {
             unk_00[var_C].unk_24 = ((type_712B0_3DBC78 *)arg_4)->unk_15C[var_C];
             unk_00[var_C].unk_28 = ((type_712B0_3DBC78 *)arg_4)->unk_16C[var_C];
+#ifdef CODFH_SP // shape: the rate stays a divide and a multiply (SP 0xFAA66 fdivr 1.0, fmul 60)
+            unk_00[var_C].unk_30 = (RwReal)(1.0f / ((type_712B0_3DBC78 *)arg_4)->unk_17C[var_C]) * 60.0f;
+#else
             unk_00[var_C].unk_30 = 1.0f / ((type_712B0_3DBC78 *)arg_4)->unk_17C[var_C] * 60.0f;
+#endif
             unk_00[var_C].unk_2C = 0.0f;
         }
         else
@@ -99,12 +106,14 @@ void type_15B110::sub_15B2A0(type_3DF8D8 *arg_0, void *arg_4)
 // match: ??1type_15B110_00@@QAE@XZ @ 0x0015B1C0
 // match: __ehhandler$??1type_15B110_00@@QAE@XZ-0x8 @ 0x00301D90
 // match: __ehhandler$??1type_15B110_00@@QAE@XZ @ 0x00301D98
+// sp-match: ??1type_15B110_00@@QAE@XZ @ 0x00061BF0
 // (Defined in the class, in type_15B110.h; out of line here for the guns'
 // eh vector iterators.)
 
 // match: ??1type_15B110@@QAE@XZ @ 0x0015B220
 // match: __ehhandler$??1type_15B110@@QAE@XZ-0x16 @ 0x00301DB0
 // match: __ehhandler$??1type_15B110@@QAE@XZ @ 0x00301DC6
+// sp-match: ??1type_15B110@@QAE@XZ @ 0x000FE840
 // Releases each gun's projectile model, then the guns go.
 type_15B110::~type_15B110()
 {
@@ -115,6 +124,7 @@ type_15B110::~type_15B110()
 }
 
 // match: ?sub_15B510@type_15B110@@QAEXM@Z @ 0x0015B510
+// sp-match: ?sub_15B510@type_15B110@@QAEXM@Z @ 0x000FAAC0
 void type_15B110::sub_15B510(RwReal arg_0)
 {
     RwInt32 var_4;

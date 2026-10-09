@@ -28,21 +28,27 @@ RWS_REGISTERCLASS(StreamVolume);
 // match: ?MakeNew@StreamVolume@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000BB380
 // match: __ehhandler$?MakeNew@StreamVolume@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300490
 // match: __ehhandler$?MakeNew@StreamVolume@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030049F
+// sp-match: ?MakeNew@StreamVolume@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000901C0
 RWS_DEFINE_MAKENEW(StreamVolume)
 
 // match: ??0StreamVolume@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000BB400
+// sp-match: ??0StreamVolume@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0008F960
 StreamVolume::StreamVolume(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
 }
 
 // match: ?vf_008@StreamVolume@@UAEHXZ @ 0x000BB430
+// sp-match: ?vf_008@StreamVolume@@UAEHXZ @ 0x0008F980
 
 // match: ??_GStreamVolume@@UAEPAXI@Z @ 0x000BB440
+// sp-match: ??_GStreamVolume@@UAEPAXI@Z @ 0x000901B0
 
 // match: ??1StreamVolume@@UAE@XZ @ 0x000BB460
+// sp-match: ??1StreamVolume@@UAE@XZ @ 0x0008F990
 // (Defined in the class, in StreamVolume.h.)
 
 // match: ?HandleAttributes@StreamVolume@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000BB490
+// sp-match: ?HandleAttributes@StreamVolume@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0008F9B0
 void StreamVolume::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -108,6 +114,7 @@ void StreamVolume::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?vf_030@StreamVolume@@UAEXXZ @ 0x000BB860
+// sp-match: ?vf_030@StreamVolume@@UAEXXZ @ 0x0008FC30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void StreamVolume::vf_030()
 {
@@ -127,7 +134,13 @@ void StreamVolume::vf_030()
         }
         if (dword_44E8D8[unk_C0].unk_248)
         {
+#ifdef CODFH_SP
+            // shape: the volume converted into a local first (fild, not fimul; SP 0x8FC30)
+            RwReal f = (RwReal)dword_44E8D8[unk_C0].unk_248->unk_18;
+            l4 = f / 100.0f * l4;
+#else
             l4 = dword_44E8D8[unk_C0].unk_248->unk_18 / 100.0f * l4;
+#endif
         }
         if (l4 < 0.0)
         {
@@ -144,6 +157,7 @@ void StreamVolume::vf_030()
 }
 
 // match: ??_EStreamVolume@@WBI@AEPAXI@Z @ 0x000BB9A0
+// sp-match: ??_EStreamVolume@@WBI@AEPAXI@Z @ 0x000901A0
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

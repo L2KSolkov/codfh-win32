@@ -254,6 +254,7 @@ RpHAnimAtomicGlobalVars RpHAnimAtomicGlobals;
 // match: __rpHAnimHierarchyFreeListPreallocBlocks @ 0x00436D8C
 
 // match: _HAnimFramesLinkToHierarchy @ 0x002E6460
+// sp-match: _HAnimFramesLinkToHierarchy @ 0x00200F00
 
 static RwFrame *
 HAnimFramesLinkToHierarchy(RwFrame *rootFrame, void *pData)
@@ -353,6 +354,7 @@ RpHAnimHierarchySetFreeListCreateParams(RwInt32 blockSize,
 
 
 // match: _HAnimOpen @ 0x002E5E30
+// sp-match: _HAnimOpen @ 0x00200900
 static void        *
 HAnimOpen(void *instance,
           RwInt32 __RWUNUSED__ offset,
@@ -397,6 +399,7 @@ HAnimOpen(void *instance,
 }
 
 // match: _HAnimClose @ 0x002E5EE0
+// sp-match: _HAnimClose @ 0x002009B0
 static void        *
 HAnimClose(void *instance,
            RwInt32 __RWUNUSED__ offset,
@@ -422,6 +425,7 @@ HAnimClose(void *instance,
 /*----------------------------------------------------------------------*/
 
 // match: _HAnimConstructor @ 0x002E5F10
+// sp-match: _HAnimConstructor @ 0x002009E0
 static void        *
 HAnimConstructor(void *object,
                  RwInt32 __RWUNUSED__ offset,
@@ -439,6 +443,7 @@ HAnimConstructor(void *object,
 }
 
 // match: _HAnimDestructor @ 0x002E64C0
+// sp-match: _HAnimDestructor @ 0x00200F60
 static void        *
 HAnimDestructor(void *object,
                 RwInt32 __RWUNUSED__ offset,
@@ -483,6 +488,7 @@ HAnimDestructor(void *object,
 }
 
 // match: _HAnimCopy @ 0x002E6520
+// sp-match: _HAnimCopy @ 0x00200FC0
 static void        *
 HAnimCopy(void *dstObject,
           const void * srcObject,
@@ -547,6 +553,7 @@ HAnimCopy(void *dstObject,
  */
 
 // match: _HAnimWrite @ 0x002E5F30
+// sp-match: _HAnimWrite @ 0x00200A00
 static RwStream    *
 HAnimWrite(RwStream * stream,
            RwInt32 __RWUNUSED__ binaryLength,
@@ -668,6 +675,7 @@ HAnimWrite(RwStream * stream,
  */
 
 // match: _HAnimRead @ 0x002E6050
+// sp-match: _HAnimRead @ 0x00200B20
 static RwStream    *
 HAnimRead(RwStream * stream,
           RwInt32 __RWUNUSED__ binaryLength,
@@ -820,6 +828,7 @@ HAnimRead(RwStream * stream,
  */
 
 // match: _HAnimSize @ 0x002E6220
+// sp-match: _HAnimSize @ 0x00200CF0
 static              RwInt32
 HAnimSize(const void *object,
           RwInt32 __RWUNUSED__ offsetInObject,
@@ -876,6 +885,7 @@ HAnimSize(const void *object,
  */
 
 // match: _RpHAnimPluginAttach @ 0x002E65C0
+// sp-match: _RpHAnimPluginAttach @ 0x00201060
 RwBool
 RpHAnimPluginAttach(void)
 {
@@ -1050,6 +1060,7 @@ RpHAnimHierarchyGetFlags(RpHAnimHierarchy *hierarchy)
  */
 
 // match: _RpHAnimHierarchyCreate @ 0x002E6260
+// sp-match: _RpHAnimHierarchyCreate @ 0x00200D30
 RpHAnimHierarchy *
 RpHAnimHierarchyCreate(RwInt32 numNodes, RwUInt32 *nodeFlags, RwInt32 *nodeIDs,
                        RpHAnimHierarchyFlag flags, RwInt32 maxInterpKeyFrameSize)
@@ -1125,6 +1136,7 @@ RpHAnimHierarchyCreate(RwInt32 numNodes, RwUInt32 *nodeFlags, RwInt32 *nodeIDs,
  *
  */
 // match: _RpHAnimHierarchyDestroy @ 0x002E6350
+// sp-match: _RpHAnimHierarchyDestroy @ 0x00200E20
 RpHAnimHierarchy *
 RpHAnimHierarchyDestroy(RpHAnimHierarchy *hierarchy)
 {
@@ -1369,6 +1381,7 @@ RpHAnimHierarchyCreateFromHierarchy(RpHAnimHierarchy *hierarchy,
  * \see RpHAnimHierarchyDetach
  */
 // match: _RpHAnimHierarchyAttach @ 0x002E6630
+// sp-match: _RpHAnimHierarchyAttach @ 0x002010D0
 RpHAnimHierarchy *
 RpHAnimHierarchyAttach(RpHAnimHierarchy *hierarchy)
 {
@@ -1483,6 +1496,7 @@ RpHAnimHierarchyDetachFrameIndex(RpHAnimHierarchy *hierarchy, RwInt32 nodeIndex)
  *
  */
 // match: _RpHAnimHierarchyGetMatrixArray @ 0x002E63C0
+// sp-match: _RpHAnimHierarchyGetMatrixArray @ 0x00200E90
 RwMatrix               *
 RpHAnimHierarchyGetMatrixArray(RpHAnimHierarchy *hierarchy)
 {
@@ -1552,6 +1566,7 @@ RpHAnimFrameSetHierarchy(RwFrame *frame, RpHAnimHierarchy *hierarchy)
  */
 
 // match: _RpHAnimFrameGetHierarchy @ 0x002E6400
+// sp-match: _RpHAnimFrameGetHierarchy @ 0x00200EA0
 RpHAnimHierarchy     *
 RpHAnimFrameGetHierarchy(RwFrame *frame)
 {
@@ -1610,6 +1625,7 @@ RpHAnimFrameSetID(RwFrame *frame, RwInt32 id)
  */
 
 // match: _RpHAnimFrameGetID @ 0x002E6410
+// sp-match: _RpHAnimFrameGetID @ 0x00200EB0
 RwInt32
 RpHAnimFrameGetID(RwFrame *frame)
 {
@@ -1641,6 +1657,7 @@ RpHAnimFrameGetID(RwFrame *frame)
  * \return The index of the node in the node arrays, based on a given node ID
  */
 // match: _RpHAnimIDGetIndex @ 0x002E6420
+// sp-match: _RpHAnimIDGetIndex @ 0x00200EC0
 RwInt32
 RpHAnimIDGetIndex(RpHAnimHierarchy *hierarchy, RwInt32 ID)
 {

@@ -48,11 +48,13 @@ RWS_REGISTERCLASS(VehicleEnterExitTrigger);
 // match: ?MakeNew@VehicleEnterExitTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000BEAB0
 // match: __ehhandler$?MakeNew@VehicleEnterExitTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300530
 // match: __ehhandler$?MakeNew@VehicleEnterExitTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030053F
+// sp-match: ?MakeNew@VehicleEnterExitTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000927B0
 RWS_DEFINE_MAKENEW(VehicleEnterExitTrigger)
 
 // match: ??0VehicleEnterExitTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000BEB30
 // match: __ehhandler$??0VehicleEnterExitTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x8 @ 0x00300550
 // match: __ehhandler$??0VehicleEnterExitTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300558
+// sp-match: ??0VehicleEnterExitTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00091FF0
 VehicleEnterExitTrigger::VehicleEnterExitTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_CC.unk_00 = 0;
@@ -71,10 +73,12 @@ VehicleEnterExitTrigger::VehicleEnterExitTrigger(const RWS::CAttributePacket &at
 }
 
 // match: ??_GVehicleEnterExitTrigger@@UAEPAXI@Z @ 0x000BEC90
+// sp-match: ??_GVehicleEnterExitTrigger@@UAEPAXI@Z @ 0x00092400
 
 // match: ??1VehicleEnterExitTrigger@@UAE@XZ @ 0x000BECB0
 // match: __ehhandler$??1VehicleEnterExitTrigger@@UAE@XZ-0x8 @ 0x00300570
 // match: __ehhandler$??1VehicleEnterExitTrigger@@UAE@XZ @ 0x00300578
+// sp-match: ??1VehicleEnterExitTrigger@@UAE@XZ @ 0x000920D0
 VehicleEnterExitTrigger::~VehicleEnterExitTrigger()
 {
     if (unk_C0)
@@ -92,6 +96,7 @@ VehicleEnterExitTrigger::~VehicleEnterExitTrigger()
 }
 
 // match: ?HandleEvents@VehicleEnterExitTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000BED80
+// sp-match: ?HandleEvents@VehicleEnterExitTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x00092410
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void VehicleEnterExitTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
@@ -135,6 +140,7 @@ void VehicleEnterExitTrigger::HandleEvents(RWS::CMsg &pMsg)
 
 // Command 0 and 2: the messages (blocks) it waits for; 1 and 3: names; 4.
 // match: ?HandleAttributes@VehicleEnterExitTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000BEF50
+// sp-match: ?HandleAttributes@VehicleEnterExitTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00092530
 void VehicleEnterExitTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -234,9 +240,39 @@ void VehicleEnterExitTrigger::HandleAttributes(const RWS::CAttributePacket &attr
 }
 
 // match: ?sub_BF310@VehicleEnterExitTrigger@@QAEHPAUtype_3D3548@@@Z @ 0x000BF310
+// sp-match: ?sub_BF310@VehicleEnterExitTrigger@@QAEHPAUtype_3D3548@@@Z @ 0x00092180
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 VehicleEnterExitTrigger::sub_BF310(type_3D3548 *arg_0)
 {
+#ifdef CODFH_SP // shape: SP 0x92180 scopes the locals to each branch (an 8-byte frame; the message argument reuses arg_0's slot)
+    type_10F710 *bp_4;
+
+    bp_4 = arg_0->vf_00C();
+    if (bp_4->vf_200())
+    {
+        type_3DF8D8 *ebp_14;
+        RwInt32 bp_8;
+        RwInt32 lv_10[2];
+        ebp_14 = sub_198800(&unk_DC);
+        bp_8 = 0;
+        sub_6B5F0("EntityToAttach", 0, (type_42E00_10 *)((RwInt32)this), (type_3D2E7C *)((RwInt32)bp_4->vf_098()), &bp_8, 1, 1, 0);
+        lv_10[0] = ebp_14->unk_18;
+        lv_10[1] = 1;
+        sub_6B5F0("AddTaskToObject", 0, (type_42E00_10 *)((RwInt32)this), (type_3D2E7C *)((RwInt32)bp_4->vf_098()), lv_10, 2, 1, 0);
+    }
+    else
+    {
+        type_3DF8D8 *ebp_24;
+        RwInt32 m_18;
+        RwInt32 var_20[2];
+        ebp_24 = sub_198800(&unk_CC);
+        m_18 = bp_4->unk_384;
+        sub_6B5F0("EntityToAttach", 0, (type_42E00_10 *)((RwInt32)this), (type_3D2E7C *)((RwInt32)bp_4->vf_098()), &m_18, 1, 1, 0);
+        var_20[0] = ebp_24->unk_18;
+        var_20[1] = 1;
+        sub_6B5F0("AddTaskToObject", 0, (type_42E00_10 *)((RwInt32)this), (type_3D2E7C *)((RwInt32)bp_4->vf_098()), var_20, 2, 1, 0);
+    }
+#else
     RwInt32 var_30;
     RwInt32 var_2C;
     RwInt32 var_28;
@@ -270,10 +306,12 @@ RwInt32 VehicleEnterExitTrigger::sub_BF310(type_3D3548 *arg_0)
         var_20[1] = 1;
         sub_6B5F0("AddTaskToObject", 0, (type_42E00_10 *)((RwInt32)this), (type_3D2E7C *)((RwInt32)bp_4->vf_098()), var_20, 2, 1, 0);
     }
+#endif
     return 1;
 }
 
 // match: ?sub_BF470@VehicleEnterExitTrigger@@QAEHPAUtype_3D3548@@@Z @ 0x000BF470
+// sp-match: ?sub_BF470@VehicleEnterExitTrigger@@QAEHPAUtype_3D3548@@@Z @ 0x00092290
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 VehicleEnterExitTrigger::sub_BF470(type_3D3548 *arg_0)
 {
@@ -308,6 +346,7 @@ RwInt32 VehicleEnterExitTrigger::sub_BF470(type_3D3548 *arg_0)
 }
 
 // match: ?sub_BF510@@YAHPAVVehicleEnterExitTrigger@@@Z @ 0x000BF510
+// sp-match: ?sub_BF510@@YAHPAVVehicleEnterExitTrigger@@@Z @ 0x00092310
 RwInt32 sub_BF510(VehicleEnterExitTrigger *arg_0)
 {
     VehicleEnterExitTrigger *var_4 = arg_0;
@@ -319,6 +358,7 @@ RwInt32 sub_BF510(VehicleEnterExitTrigger *arg_0)
 }
 
 // match: ?sub_BF550@@YAHPAVVehicleEnterExitTrigger@@@Z @ 0x000BF550
+// sp-match: ?sub_BF550@@YAHPAVVehicleEnterExitTrigger@@@Z @ 0x00092340
 RwInt32 sub_BF550(VehicleEnterExitTrigger *arg_0)
 {
     VehicleEnterExitTrigger *var_4 = arg_0;
@@ -330,6 +370,7 @@ RwInt32 sub_BF550(VehicleEnterExitTrigger *arg_0)
 }
 
 // match: ?sub_BF590@VehicleEnterExitTrigger@@QAEXPAUtype_3D3548@@@Z @ 0x000BF590
+// sp-match: ?sub_BF590@VehicleEnterExitTrigger@@QAEXPAUtype_3D3548@@@Z @ 0x00092370
 void VehicleEnterExitTrigger::sub_BF590(type_3D3548 *arg_0)
 {
     if (arg_0->unk_2C_4 && unk_E8)
@@ -343,6 +384,7 @@ void VehicleEnterExitTrigger::sub_BF590(type_3D3548 *arg_0)
 }
 
 // match: ??_EVehicleEnterExitTrigger@@WBI@AEPAXI@Z @ 0x000BF640
+// sp-match: ??_EVehicleEnterExitTrigger@@WBI@AEPAXI@Z @ 0x000923F0
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
@@ -352,3 +394,10 @@ RwInt32 VehicleEnterExitTrigger::vf_008()
 {
         return 0x1A;
     }
+
+#ifdef CODFH_SP
+// ?sp_leave@VehicleEnterExitTrigger@@QAEXPAUtype_3D3548@@@Z (single player: folded into SP 0xD60D0)
+void VehicleEnterExitTrigger::sp_leave(type_3D3548 *arg_0)
+{
+}
+#endif

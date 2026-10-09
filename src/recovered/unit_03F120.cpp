@@ -25,6 +25,7 @@ extern const RwReal flt_3CE850 = 16.666666f;
 // match: ??_7type_3CE854@@6B@ @ 0x003CE854
 
 // match: ??0type_3CE854@@QAE@XZ @ 0x0003F120
+// sp-match: ??0type_3CE854@@QAE@XZ @ 0x0002FB00
 
 // symbol: ??_7type_3CE854@@6B@ = 0x003CE854
 type_3CE854::type_3CE854()
@@ -33,11 +34,14 @@ type_3CE854::type_3CE854()
 
 // match: ??_Gtype_3CE854@@UAEPAXI@Z @ 0x0003F140
 // match: ??1type_3CE854@@UAE@XZ @ 0x0003F160
+// sp-match: ??_Gtype_3CE854@@UAEPAXI@Z @ 0x0002FBB0
+// sp-match: ??1type_3CE854@@UAE@XZ @ 0x0002FB20
 type_3CE854::~type_3CE854()
 {
 }
 
 // match: ?vf_004@type_3CE854@@UAEXPAUtype_3DF30@@@Z @ 0x0003F180
+// sp-match: ?vf_004@type_3CE854@@UAEXPAUtype_3DF30@@@Z @ 0x0002FB30
 // symbol: ?vf_004@type_3CE4F0@@UAEXPAUtype_3DF30@@@Z = 0x00033580
 void type_3CE854::vf_004(type_3DF30 *arg_0)
 {
@@ -46,6 +50,7 @@ void type_3CE854::vf_004(type_3DF30 *arg_0)
 }
 
 // match: ?vf_008@type_3CE854@@UAEXXZ @ 0x0003F1B0
+// sp-match: ?vf_008@type_3CE854@@UAEXXZ @ 0x0002FB40
 // symbol: ?vf_008@type_3CE4F0@@UAEXXZ = 0x00039440
 void type_3CE854::vf_008()
 {
@@ -53,16 +58,25 @@ void type_3CE854::vf_008()
 }
 
 // match: ?vf_00C@type_3CE854@@UAEHMPAUtype_3D410@@@Z @ 0x0003F1D0
+// sp-match: ?vf_00C@type_3CE854@@UAEHMPAUtype_3D410@@@Z @ 0x00030010
 RwInt32 type_3CE854::vf_00C(RwReal arg_0, type_3D410 *arg_4)
 {
+#ifndef CODFH_SP // shape: single player reads the AI data's field straight from the call, into loop-scoped locals (SP 0x30010)
     AIData *var_10;
     RwUInt32 ebp_C;
     RwUInt32 v8;
+#endif
     type_3D3548 *var_4;
 
     for (var_4 = unk_08->unk_00; var_4 != 0; var_4 = var_4->vf_118()) {
+#ifdef CODFH_SP // shape: single player reads the AI data's field straight from the call, into loop-scoped locals (SP 0x30010)
+        RwUInt32 ebp_C;
+        RwUInt32 v8;
+        v8 = var_4->vf_120()->unk_574;
+#else
         var_10 = var_4->vf_120();
         v8 = var_10->unk_574;
+#endif
         ebp_C = unk_18;
         if (v8 == ebp_C)
             sub_3F310(static_cast<type_3DBC78 *>(var_4), arg_4);
@@ -71,6 +85,7 @@ RwInt32 type_3CE854::vf_00C(RwReal arg_0, type_3D410 *arg_4)
 }
 
 // match: ?vf_018@type_3CE854@@UAEHPAUtype_3D3548@@@Z @ 0x0003F260
+// sp-match: ?vf_018@type_3CE854@@UAEHPAUtype_3D3548@@@Z @ 0x0002FB50
 RwInt32 type_3CE854::vf_018(type_3D3548 *arg_0)
 {
     AIData *stk_18;
@@ -96,7 +111,10 @@ RwInt32 type_3CE854::vf_018(type_3D3548 *arg_0)
     return 1;
 }
 
+// (AIData::set_unk_5B0, an inline single player keeps out of line: sub_3F310 calls it, SP 0x2FCAD)
+// sp-match: ?set_unk_5B0@AIData@@QAEXPAURwV3d@@@Z @ 0x00011000
 // match: sub_3F310 @ 0x0003F310
+// sp-match: sub_3F310 @ 0x0002FBC0
 void type_3CE854::sub_3F310(type_3DBC78 *arg_0, type_3D410 *arg_4)
 {
     AIData *var_4;
@@ -144,7 +162,11 @@ void type_3CE854::sub_3F310(type_3DBC78 *arg_0, type_3D410 *arg_4)
                 if (var_C == 0) {
                     var_10 = var_4->sub_16ED0(var_4->unk_137C.sub_D4910(), 0);
                     if (var_10 != 0) {
+#ifdef CODFH_SP // shape: single player calls set_unk_5B0 out of line (SP 0x2FBC0 calls SP 0x11000)
+                        var_4->set_unk_5B0(&var_10->unk_14);
+#else
                         var_4->unk_5B0 = var_10->unk_14;
+#endif
                         var_C = sub_12030(0xF, arg_0, (RwInt32)arg_4, 0);
                         var_4->unk_137C.sub_D48D0(0);
                     }
@@ -154,7 +176,11 @@ void type_3CE854::sub_3F310(type_3DBC78 *arg_0, type_3D410 *arg_4)
                             if (sub_12030(0xE, arg_0, (RwInt32)arg_4, 0) == 0) {
                                 l14 = var_4->sub_16ED0(var_4->unk_1374.sub_D4910(), 0);
                                 if (l14 != 0) {
+#ifdef CODFH_SP // shape: single player calls set_unk_5B0 out of line (SP 0x2FBC0 calls SP 0x11000)
+                                    var_4->set_unk_5B0(&l14->unk_14);
+#else
                                     var_4->unk_5B0 = l14->unk_14;
+#endif
                                     var_C = sub_12030(0xF, arg_0, (RwInt32)arg_4, 0);
                                 }
                                 if (var_C == 0)
@@ -180,7 +206,11 @@ void type_3CE854::sub_3F310(type_3DBC78 *arg_0, type_3D410 *arg_4)
                 if (sub_12030(0xE, arg_0, (RwInt32)arg_4, 0) == 0) {
                     var_1C = var_4->sub_16ED0(var_4->unk_1374.sub_D4910(), 0);
                     if (var_1C != 0) {
+#ifdef CODFH_SP // shape: single player calls set_unk_5B0 out of line (SP 0x2FBC0 calls SP 0x11000)
+                        var_4->set_unk_5B0(&var_1C->unk_14);
+#else
                         var_4->unk_5B0 = var_1C->unk_14;
+#endif
                         var_18 = sub_12030(0xF, arg_0, (RwInt32)arg_4, 0);
                     }
                     if (var_18 == 0) {
@@ -203,7 +233,11 @@ void type_3CE854::sub_3F310(type_3DBC78 *arg_0, type_3D410 *arg_4)
                 if (sub_12030(0x10, arg_0, (RwInt32)arg_4, 0) == 0) {
                     var_24 = var_4->sub_16ED0(var_4->unk_1374.sub_D4910(), 0);
                     if (var_24 != 0) {
+#ifdef CODFH_SP // shape: single player calls set_unk_5B0 out of line (SP 0x2FBC0 calls SP 0x11000)
+                        var_4->set_unk_5B0(&var_24->unk_14);
+#else
                         var_4->unk_5B0 = var_24->unk_14;
+#endif
                         var_20 = sub_12030(0xF, arg_0, (RwInt32)arg_4, 0);
                     }
                     sub_12030(0xD, arg_0, (RwInt32)arg_4, 0);
@@ -252,7 +286,11 @@ void type_3CE854::sub_3F310(type_3DBC78 *arg_0, type_3D410 *arg_4)
             if (sub_12030(0x11, arg_0, (RwInt32)arg_4, 0) == 0) {
                 var_34 = var_4->sub_16ED0(var_4->unk_137C.sub_D4910(), 0);
                 if (var_34 != 0) {
+#ifdef CODFH_SP // shape: single player calls set_unk_5B0 out of line (SP 0x2FBC0 calls SP 0x11000)
+                    var_4->set_unk_5B0(&var_34->unk_14);
+#else
                     var_4->unk_5B0 = var_34->unk_14;
+#endif
                     local_30 = sub_12030(0xF, arg_0, (RwInt32)arg_4, 0);
                     var_4->unk_137C.sub_D48D0(0);
                 }
@@ -262,7 +300,11 @@ void type_3CE854::sub_3F310(type_3DBC78 *arg_0, type_3D410 *arg_4)
                         if (sub_12030(0xE, arg_0, (RwInt32)arg_4, 0) == 0) {
                             var_38 = var_4->sub_16ED0(var_4->unk_1374.sub_D4910(), 0);
                             if (var_38 != 0) {
+#ifdef CODFH_SP // shape: single player calls set_unk_5B0 out of line (SP 0x2FBC0 calls SP 0x11000)
+                                var_4->set_unk_5B0(&var_38->unk_14);
+#else
                                 var_4->unk_5B0 = var_38->unk_14;
+#endif
                                 local_30 = sub_12030(0xF, arg_0, (RwInt32)arg_4, 0);
                             }
                             var_4->sub_29360();

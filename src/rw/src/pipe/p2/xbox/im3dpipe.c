@@ -29,6 +29,7 @@ static const char rcsid[] = "@@@@(#)$Id: //RenderWare/RW36Active/rwsdk/src/pipe/
 // match: _rcsid @ 0x004170B0
 
 // match: __rwIm3DCreatePlatformTransformPipeline @ 0x002B9670
+// sp-match: __rwIm3DCreatePlatformTransformPipeline @ 0x001D4A80
 RwBool
 _rwIm3DCreatePlatformTransformPipeline(RxPipeline **globalPipe)
 {
@@ -81,6 +82,7 @@ _rwIm3DCreatePlatformTransformPipeline(RxPipeline **globalPipe)
  _rwIm3DDestroyPlatformTransformPipeline
  */
 // match: __rwIm3DDestroyPlatformTransformPipeline @ 0x002B96E0
+// sp-match: __rwIm3DDestroyPlatformTransformPipeline @ 0x001D4AF0
 void
 _rwIm3DDestroyPlatformTransformPipeline(RxPipeline **globalPipe)
 {
@@ -103,6 +105,7 @@ _rwIm3DDestroyPlatformTransformPipeline(RxPipeline **globalPipe)
  _rwIm3DDestroyPlatformRenderPipelines
  */
 // match: __rwIm3DDestroyPlatformRenderPipelines @ 0x002B9710
+// sp-match: __rwIm3DDestroyPlatformRenderPipelines @ 0x001D4B20
 void
 _rwIm3DDestroyPlatformRenderPipelines(rwIm3DRenderPipelines *globalPipes)
 {
@@ -134,6 +137,7 @@ _rwIm3DDestroyPlatformRenderPipelines(rwIm3DRenderPipelines *globalPipes)
  _rwIm3DCreatePlatformRenderPipelines
  */
 // match: __rwIm3DCreatePlatformRenderPipelines @ 0x002B9770
+// sp-match: __rwIm3DCreatePlatformRenderPipelines @ 0x001D4B80
 RwBool
 _rwIm3DCreatePlatformRenderPipelines(rwIm3DRenderPipelines *globalPipes)
 {

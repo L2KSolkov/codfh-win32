@@ -8,6 +8,9 @@
 #include "game/fade.h"
 #include "game/functions.h"
 #include "game/gameloop.h"
+#ifdef CODFH_SP
+#include "game/xboxlive.h"
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003DA7D8
@@ -64,6 +67,7 @@ RwReal flt_4CF430;
 // match: __real@3ccccccd @ 0x003DA7E4
 
 // match: ?sub_124DC0@@YAXM@Z @ 0x00124DC0
+// sp-match: ?sub_124DC0@@YAXM@Z @ 0x000DABC0
 
 // Records the frame at time arg_0 (not while a fade runs), and reports
 // (through the empty debug print) whether the last ten frames average under
@@ -76,7 +80,9 @@ void sub_124DC0(RwReal arg_0)
 
     if (byte_4CF428)
     {
+#ifndef CODFH_SP // single player compiles the debug prints out (SP 0xDABC0)
         sub_19A750(1);
+#endif
         return;
     }
     var_4 = arg_0 - flt_4CF430;
@@ -87,6 +93,7 @@ void sub_124DC0(RwReal arg_0)
     }
     dword_4CF3C0[9] = arg_0 - flt_4CF430;
     var_4 = (var_4 += dword_4CF3C0[9]) * 0.0001f;
+#ifndef CODFH_SP // single player compiles the debug prints out (SP 0xDABC0)
     if (var_4 < 0.025f)
     {
         sub_19A750(1);
@@ -95,10 +102,12 @@ void sub_124DC0(RwReal arg_0)
     {
         sub_19A750(0);
     }
+#endif
     flt_4CF430 = arg_0;
 }
 
 // match: ?sub_124E90@@YAXXZ @ 0x00124E90
+// sp-match: ?sub_124E90@@YAXXZ @ 0x000DA920
 void sub_124E90()
 {
     byte_4CF428 = 0;
@@ -112,6 +121,7 @@ void sub_124E90()
 }
 
 // match: ?sub_124EE0@@YAXMH@Z @ 0x00124EE0
+// sp-match: ?sub_124EE0@@YAXMH@Z @ 0x000DA950
 // Starts a fade of arg_0 seconds, in (arg_4 0) or out (1).
 void sub_124EE0(RwReal arg_0, RwInt32 arg_4)
 {
@@ -122,7 +132,10 @@ void sub_124EE0(RwReal arg_0, RwInt32 arg_4)
     dword_4CF3F8 = 0.0f;
     dword_4CF3FC = arg_0 * 1000.0f / flt_3DA7DC;
     byte_4CF408 = 1;
+#ifndef CODFH_SP
+    // single player has no call here (SP 0xDA950)
     sub_19A750(1);
+#endif
     dword_4CF410 = 0;
     for (var_4 = 0; var_4 < 10; var_4++)
     {
@@ -132,6 +145,7 @@ void sub_124EE0(RwReal arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_124F70@@YAXM@Z @ 0x00124F70
+// sp-match: ?sub_124F70@@YAXM@Z @ 0x000DA9C0
 // Runs the fade by arg_0: at its end calls (once) the function for its
 // direction; a fade in stops, a fade out holds.
 void sub_124F70(RwReal arg_0)
@@ -166,18 +180,26 @@ void sub_124F70(RwReal arg_0)
         {
             if (byte_4CF408 && dword_4CF3F8 >= dword_4CF3FC)
             {
+#ifdef CODFH_SP
+                // single player ends any fade here, in or out, without
+                // clamping the time (SP 0xDAA41)
+                byte_4CF428 = 0;
+                byte_4CF408 = 0;
+#else
                 dword_4CF3F8 = dword_4CF3FC;
                 if (!dword_4CF3EC)
                 {
                     byte_4CF428 = 0;
                     byte_4CF408 = 0;
                 }
+#endif
             }
         }
     }
 }
 
 // match: ?sub_125060@@YAXPAURwCamera@@@Z @ 0x00125060
+// sp-match: ?sub_125060@@YAXPAURwCamera@@@Z @ 0x000DAC50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws the fade over the camera arg_0's view: a quad over the screen whose
 // alpha follows the fade (falling as it fades in, rising as it fades out).
@@ -187,6 +209,10 @@ void sub_125060(RwCamera *arg_0)
     RwIm2DVertex m_78[4];
     RwReal bp_4;
 
+#ifdef CODFH_SP // single player draws no fade while Live is busy (SP 0xDAC50)
+    if (dword_4F3130.sp_sub_12AAD0() || dword_4F3130.unk_870)
+        return;
+#endif
     bp_4 = 0.0f;
     if ((byte_4CF428 || byte_4CF400) && !dword_4CF410)
     {
@@ -252,6 +278,7 @@ void sub_125060(RwCamera *arg_0)
 }
 
 // match: ?sub_1252E0@@YAXP6AXXZH@Z @ 0x001252E0
+// sp-match: ?sub_1252E0@@YAXP6AXXZH@Z @ 0x000DAA70
 // Sets the function called at the end of a fade in (arg_4 0) or out (1),
 // unless the fade out's is sub_D8C00's.
 void sub_1252E0(void (*arg_0)(), RwInt32 arg_4)
@@ -272,6 +299,7 @@ void sub_1252E0(void (*arg_0)(), RwInt32 arg_4)
 }
 
 // match: ?sub_125320@@YAXXZ @ 0x00125320
+// sp-match: ?sub_125320@@YAXXZ @ 0x000DAAA0
 void sub_125320()
 {
     RwRenderStateGet(rwRENDERSTATESRCBLEND, &dword_4CF420);
@@ -284,6 +312,7 @@ void sub_125320()
 }
 
 // match: ?sub_1253A0@@YAXXZ @ 0x001253A0
+// sp-match: ?sub_1253A0@@YAXXZ @ 0x000DAB00
 void sub_1253A0()
 {
     RwRenderStateSet(rwRENDERSTATESRCBLEND, (void *)rwBLENDSRCALPHA);
@@ -296,6 +325,7 @@ void sub_1253A0()
 }
 
 // match: ?sub_125410@@YAXXZ @ 0x00125410
+// sp-match: ?sub_125410@@YAXXZ @ 0x000DAB50
 void sub_125410()
 {
     RwRenderStateSet(rwRENDERSTATESRCBLEND, (void *)dword_4CF420);

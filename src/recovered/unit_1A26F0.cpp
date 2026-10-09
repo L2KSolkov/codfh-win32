@@ -86,6 +86,7 @@ void sub_1AF570(RwInt32 arg_0, RwInt32 arg_4, type_3DA44C *arg_8);
 void sub_1AF5D0(RwInt32 arg_0, RwInt32 arg_4, type_3DA44C *arg_8);
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: the network messages' handler table (read by sub_1DDF00) and the multiplayer start-up and log callback; single player has no twin of sub_1A2910/sub_1A2A60 (config/sp/shared.txt), only sub_1A26F0 (SP 0x12FC40)
 // 0x0042C848
 // The message handlers by message id (sub_1DDF00): kind 0 reads the
 // message (unk_08) and takes it (unk_0C), kind 1 takes the stream (unk_10).
@@ -135,6 +136,7 @@ type_42C848 unk_42C848[31] = {
 };
 // 0x0042CAB4
 RwUInt32 dword_42CAB4 = 31;
+#endif
 // 0x004F6178
 RwChar *dword_4F6178[29];
 // 0x004F62FC
@@ -182,6 +184,7 @@ RwUInt32 dword_4F6AB8[5138];
 // match: ?dword_42CAB4@@3IA @ 0x0042CAB4
 
 // match: ?sub_1A26F0@@YAXXZ @ 0x001A26F0
+// sp-match: ?sub_1A26F0@@YAXXZ @ 0x0012FC40
 
 // Reads the in-game messages' texts (dword_4F6178) from
 // "shell\hud\XboxStrings.csv".
@@ -223,6 +226,7 @@ void sub_1A26F0()
     sub_18A890("shell\\hud\\XboxStrings.csv", var_F0, 0);
 }
 
+#ifndef CODFH_SP // MP only: the network messages' handler table (read by sub_1DDF00) and the multiplayer start-up and log callback; single player has no twin of sub_1A2910/sub_1A2A60 (config/sp/shared.txt), only sub_1A26F0 (SP 0x12FC40)
 // match: ?sub_1A2910@@YAXXZ @ 0x001A2910
 // Starts the systems after RenderWare: the log callback, the debug text's
 // buffer, the text's language (from the game's), then unk_4F7EB8 and the
@@ -283,6 +287,7 @@ void sub_1A2A60(RwChar *arg_0)
     sub_1B18D0()->sub_1B1780(arg_0, 2);
 }
 
+#endif
 
 
 

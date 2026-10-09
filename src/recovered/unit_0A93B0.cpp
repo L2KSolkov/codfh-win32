@@ -41,12 +41,14 @@ RWS_REGISTERCLASS(PickupTrigger);
 // match: ?MakeNew@PickupTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A93B0
 // match: __ehhandler$?MakeNew@PickupTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x003000B0
 // match: __ehhandler$?MakeNew@PickupTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x003000BF
+// sp-match: ?MakeNew@PickupTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00083D90
 RWS_DEFINE_MAKENEW(PickupTrigger)
 
 // Its handler serves the destructor too (folded by /OPT:ICF).
 // match: ??0PickupTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A9430
 // match: __ehhandler$??0PickupTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x8 @ 0x003000D0
 // match: __ehhandler$??0PickupTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x003000D8
+// sp-match: ??0PickupTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00083990
 PickupTrigger::PickupTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_C0 = -1;
@@ -60,10 +62,13 @@ PickupTrigger::PickupTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 }
 
 // match: ?vf_008@PickupTrigger@@UAEHXZ @ 0x000A9500
+// sp-match: ?vf_008@PickupTrigger@@UAEHXZ @ 0x00083A30
 
 // match: ??_GPickupTrigger@@UAEPAXI@Z @ 0x000A9510
+// sp-match: ??_GPickupTrigger@@UAEPAXI@Z @ 0x00083D80
 
 // match: ??1PickupTrigger@@UAE@XZ @ 0x000A9530
+// sp-match: ??1PickupTrigger@@UAE@XZ @ 0x00083A40
 PickupTrigger::~PickupTrigger()
 {
     unk_D4 = 0;
@@ -74,6 +79,7 @@ PickupTrigger::~PickupTrigger()
 // Commands 5 and 6 set flags of Trigger's unk_24 (0x40000 when 5 is set,
 // 0x80000 when 6 is not); the rest set its own.
 // match: ?HandleAttributes@PickupTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A95B0
+// sp-match: ?HandleAttributes@PickupTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00083AC0
 void PickupTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -120,6 +126,7 @@ void PickupTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?HandleEvents@PickupTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000A9770
+// sp-match: ?HandleEvents@PickupTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x00083C10
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void PickupTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
@@ -161,6 +168,7 @@ void PickupTrigger::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?vf_020@PickupTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000A98C0
+// sp-match: ?vf_020@PickupTrigger@@UAEPAUtype_3D3548@@XZ @ 0x00083CF0
 type_3D3548 *PickupTrigger::vf_020()
 {
     if (unk_D8)
@@ -173,6 +181,7 @@ type_3D3548 *PickupTrigger::vf_020()
 }
 
 // match: ?sub_A9910@PickupTrigger@@QAEXXZ @ 0x000A9910
+// sp-match: ?sub_A9910@PickupTrigger@@QAEXXZ @ 0x00083D20
 void PickupTrigger::sub_A9910()
 {
     if (unk_CC > 0.0f && !unk_D4)
@@ -184,3 +193,4 @@ void PickupTrigger::sub_A9910()
 }
 
 // match: ??_EPickupTrigger@@WBI@AEPAXI@Z @ 0x000A9970
+// sp-match: ??_EPickupTrigger@@WBI@AEPAXI@Z @ 0x00083D70

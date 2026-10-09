@@ -11,6 +11,7 @@
 #include "rws/lighthelper.h"
 
 // match: ?HandleSystemCommands@LightHelper@RWS@@YAXAAURpLight@@ABVCAttributePacket@2@@Z @ 0x001330B0
+// sp-match: ?HandleSystemCommands@LightHelper@RWS@@YAXAAURpLight@@ABVCAttributePacket@2@@Z @ 0x000E3860
 void RWS::LightHelper::HandleSystemCommands(RpLight& rLight, const CAttributePacket& rAttr)
       {
          CAttributeCommandIterator attrIt(rAttr, RWS_CLASSID_OF(CSystemCommands));

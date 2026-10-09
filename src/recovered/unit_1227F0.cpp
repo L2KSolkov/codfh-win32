@@ -24,6 +24,9 @@
 #include "types/vec4.h"
 #include "types/type_10F710.h"
 #include "types/RenderTrigger.h"
+#ifdef CODFH_SP
+#include "game/savestate.h" // sub_19B050, for sub_122F50
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x004CEA68
@@ -38,6 +41,7 @@ type_128EB0 *dword_4CF7C0;
 // match: __ehhandler$?sub_122DD0@@YAXPAURwCamera@@HH@Z>1 @ 0x0041D500
 
 // match: ?sub_1227F0@@YAXPAURpWorldSector@@@Z @ 0x001227F0
+// sp-match: ?sub_1227F0@@YAXPAURpWorldSector@@@Z @ 0x000D9200
 
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_1227F0(RpWorldSector *arg_0)
@@ -51,6 +55,7 @@ void sub_1227F0(RpWorldSector *arg_0)
 }
 
 // match: ?sub_122820@@YAXPAURpAtomic@@PAUtype_3D3548@@H@Z @ 0x00122820
+// sp-match: ?sub_122820@@YAXPAURpAtomic@@PAUtype_3D3548@@H@Z @ 0x000D8E10
 // Sets the lights for the atomic arg_0 of the entity arg_4 (found from the
 // atomic when 0): all dark for an unskinned prelit atomic (with the ambient
 // light on), else the ambient and up to four point lights from the entity's
@@ -198,6 +203,7 @@ void sub_122820(RpAtomic *arg_0, type_3D3548 *arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_122BC0@@YAXPAURwLLLink@@0@Z @ 0x00122BC0
+// sp-match: ?sub_122BC0@@YAXPAURwLLLink@@0@Z @ 0x000D9080
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Sorts the atomics of the ties from arg_0 to arg_4 that are to be drawn,
 // in view and not yet seen this frame (and whose entity is not hidden) by
@@ -243,7 +249,11 @@ void sub_122BC0(RwLLLink *arg_0, RwLLLink *arg_4)
                         var_30.x = var_3C.x - var_C->pos.x;
                         var_30.y = var_3C.y - var_C->pos.y;
                         var_30.z = var_3C.z - var_C->pos.z;
+#ifdef CODFH_SP // shape: single player squares the members directly, not through the macro's pointers (SP 0xD9080 squares z first)
+                        var_24 = var_30.x * var_30.x + var_30.y * var_30.y + var_30.z * var_30.z;
+#else
                         var_24 = RwV3dDotProduct(&var_30, &var_30);
+#endif
                         dword_4CF7C0->sub_128EB0(bp_8, var_24);
                         if (m_18)
                         {
@@ -259,6 +269,7 @@ void sub_122BC0(RwLLLink *arg_0, RwLLLink *arg_4)
 }
 
 // match: ?sub_122D40@@YAPAURpWorldSector@@PAU1@PAX@Z @ 0x00122D40
+// sp-match: ?sub_122D40@@YAPAURpWorldSector@@PAU1@PAX@Z @ 0x000D9220
 // The sector walk's callback: sorts the sector's atomics, if the PVS shows
 // it when asked to check.
 RpWorldSector *sub_122D40(RpWorldSector *arg_0, void *arg_4)
@@ -281,6 +292,7 @@ RpWorldSector *sub_122D40(RpWorldSector *arg_0, void *arg_4)
 }
 
 // match: ?sub_122D90@@YAXPAURwCamera@@HH@Z @ 0x00122D90
+// sp-match: ?sub_122D90@@YAXPAURwCamera@@HH@Z @ 0x000D9250
 void sub_122D90(RwCamera *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_122D90 var_C;
@@ -297,6 +309,7 @@ void sub_122D90(RwCamera *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 // match: ?sub_122DD0@@YAXPAURwCamera@@HH@Z @ 0x00122DD0
 // match: __ehhandler$?sub_122DD0@@YAXPAURwCamera@@HH@Z-0xB @ 0x00301580
 // match: __ehhandler$?sub_122DD0@@YAXPAURwCamera@@HH@Z @ 0x0030158B
+// sp-match: ?sub_122DD0@@YAXPAURwCamera@@HH@Z @ 0x000D9290
 // Draws the world's atomics for the camera arg_0: sorts those in view, then
 // draws the trees without fog or culling, the second without the depth test.
 void sub_122DD0(RwCamera *arg_0, RwInt32 arg_4, RwInt32 arg_8)
@@ -320,9 +333,11 @@ void sub_122DD0(RwCamera *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ??1type_128EB0@@QAE@XZ @ 0x00122F30
+// sp-match: ??1type_128EB0@@QAE@XZ @ 0x000D8E00
 // (In the class.)
 
 // match: ?sub_122F50@@YAXXZ @ 0x00122F50
+// sp-match: ?sub_122F50@@YAXXZ @ 0x000D9190
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_122F50()
 {
@@ -335,6 +350,14 @@ void sub_122F50()
     {
         local_8 = var_4->unk_2110.sub_D4910();
     }
+#ifdef CODFH_SP // single player raises the alpha reference to 200 on level 0x11 with a player (SP 0xD9190)
+    if (sub_19B050() == 0x11 && local_8)
+    {
+        RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTION, (void *)rwALPHATESTFUNCTIONGREATER);
+        RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, (void *)200);
+        return;
+    }
+#endif
     RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTION, (void *)rwALPHATESTFUNCTIONGREATER);
     RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, (void *)0);
 }

@@ -97,6 +97,7 @@ static const D3DFORMAT convTable[2][11] =
 // match: _convTable @ 0x004172D0
 
 // match: __rwXbNativeTextureGetSize @ 0x002B9DB0
+// sp-match: __rwXbNativeTextureGetSize @ 0x001D51C0
 
 RwBool
 _rwXbNativeTextureGetSize(void *sizeIn, void *textureIn,
@@ -156,6 +157,7 @@ _rwXbNativeTextureGetSize(void *sizeIn, void *textureIn,
 }
 
 // match: __rwXbNativeTextureWrite @ 0x002B9E50
+// sp-match: __rwXbNativeTextureWrite @ 0x001D5260
 RwBool
 _rwXbNativeTextureWrite(void *streamIn, void *textureIn,
                         RwInt32 unused3 __RWUNUSED__)
@@ -318,6 +320,7 @@ _rwXbNativeTextureWrite(void *streamIn, void *textureIn,
 }
 
 // match: __rwXbNativeTextureRead @ 0x002BA100
+// sp-match: __rwXbNativeTextureRead @ 0x001D5510
 RwBool
 _rwXbNativeTextureRead(void *streamIn, void *textureIn,
                        RwInt32 unused3 __RWUNUSED__)

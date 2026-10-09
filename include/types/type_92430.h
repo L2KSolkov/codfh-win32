@@ -63,9 +63,11 @@ type_FC000 *sub_FC000(void *arg_0);
 // *arg_14.
 RwInt32 sub_92620(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwV3d *arg_C, RwV3d *arg_10, RwReal *arg_14);
 // The query's point and how far above it a hit may be (sub_92430 sets them
-// for its callback).
+// for its callback). File-static in single player (unit_08E670).
+#ifndef CODFH_SP
 extern RwV3d dword_4B25A0;
 extern RwReal flt_4B25AC;
+#endif
 // A collision search's context (0xB4 bytes on the stack of sub_948A0,
 // sub_950C0, sub_96EF0 and others; sub_95030 sets it up): the world, what
 // sub_96680 flushes the gathered triangles to, the materials it skips and
@@ -110,7 +112,11 @@ struct type_93DF0
     struct type_3DAFC8_1DDC *unk_7C; // the contact records (sub_948A0's arg_2C)
     RwReal *unk_80;             // where the ground height goes (sub_96680)
     RwReal unk_84;              // the side radius (sub_96EF0)
+#ifdef CODFH_SP // a real in single player (SP 0x1031A0 stores an immediate 0 to it)
+    RwReal unk_88;
+#else
     RwInt32 unk_88;
+#endif
     RwReal unk_8C;              // the step height (sub_96680)
     RwInt32 unk_90;
     RwReal unk_94;
@@ -136,7 +142,23 @@ struct type_93DF0
     };
     RwInt32 unk_B0;
 
+#ifdef CODFH_SP // single player expands it inline (SP 0x77990, 0x78020, 0x78620, 0x79DA0)
+    type_93DF0()
+    {
+        unk_7C = 0;
+        unk_4C = 0.0f;          // (floats: /O2 keeps no 0 in a register for them; SP 0xC4910, 0xC6110)
+        unk_94 = 1e37f;
+        unk_98_v.x = 0.0f;
+        unk_98_v.y = 0.0f;
+        unk_98_v.z = 0.0f;
+        unk_A4_v.x = 0.0f;
+        unk_A4_v.y = 0.0f;
+        unk_A4_v.z = 0.0f;
+        unk_B0 = 0;
+    }
+#else
     type_93DF0();
+#endif
 };
 // Gathers each triangle not of a skipped material (sub_96EF0's world
 // query callback).

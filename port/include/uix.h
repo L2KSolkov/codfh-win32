@@ -43,6 +43,7 @@ typedef DWORD UIX_EXIT_CODE_TYPE;
 #define UIX_EXIT_LOGON_SUCCESSFUL 1
 #define UIX_EXIT_LOGON_FAILED 2
 #define UIX_EXIT_LOGON_USER_EXIT 3
+#define UIX_EXIT_FRIENDS_NORMAL_EXIT 4
 #define UIX_EXIT_FRIENDS_JOIN_GAME 5
 #define UIX_EXIT_FRIENDS_JOIN_GAME_CROSS_TITLE 6
 
@@ -296,5 +297,7 @@ struct LiveEngine
 
 extern "C" HRESULT WINAPI UIXCreateLiveEngine(LPCSTR pSkinFileName, DWORD LanguageID,
                                               ILiveEngine **ppEngine);
+extern "C" HRESULT WINAPI UIXCreateUIPlugin(ITitleFontRenderer *pFontRenderer,
+                                             ITitleUIPlugin **ppPlugin);
 
 #endif

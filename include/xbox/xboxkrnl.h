@@ -8,6 +8,9 @@
 
 #include "rw/ostypes.h"
 
+// A unit that includes the XDK's own headers (xtl.h) first has all of this.
+#ifndef _WINNT_
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -25,6 +28,8 @@ __declspec(dllimport) void __stdcall RtlInitializeCriticalSection(RTL_CRITICAL_S
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif

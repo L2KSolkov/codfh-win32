@@ -42,6 +42,7 @@ static D3DSurface *CurrentStencilSurface;
 // match: _rcsid @ 0x00416710
 
 // match: __rwXbFlushCacheBuffer @ 0x002AE5C0
+// sp-match: __rwXbFlushCacheBuffer @ 0x001C8DA0
 void
 _rwXbFlushCacheBuffer(void)
 {
@@ -105,6 +106,7 @@ _rwXbFlushCacheBuffer(void)
 }
 
 // match: __rwXbRenderStateInit @ 0x002AE6B0
+// sp-match: __rwXbRenderStateInit @ 0x001C8E90
 void
 _rwXbRenderStateInit(D3DRENDERSTATETYPE state, DWORD value)
 {
@@ -113,6 +115,7 @@ _rwXbRenderStateInit(D3DRENDERSTATETYPE state, DWORD value)
 }
 
 // match: __rwXbTextureStageInit @ 0x002AE6D0
+// sp-match: __rwXbTextureStageInit @ 0x001C8EB0
 void
 _rwXbTextureStageInit(DWORD stage, D3DTEXTURESTAGESTATETYPE type, DWORD value)
 {
@@ -121,6 +124,7 @@ _rwXbTextureStageInit(DWORD stage, D3DTEXTURESTAGESTATETYPE type, DWORD value)
 }
 
 // match: __rwXbCacheInit @ 0x002AE700
+// sp-match: __rwXbCacheInit @ 0x001C8EE0
 void
 _rwXbCacheInit(void)
 {
@@ -381,6 +385,7 @@ _rwXbCacheInit(void)
 }
 
 // match: _RwXboxDrawIndexedVertices @ 0x002AF290
+// sp-match: _RwXboxDrawIndexedVertices @ 0x001C9A70
 void
 RwXboxDrawIndexedVertices(D3DPRIMITIVETYPE primitiveType, UINT vertexCount,
                           CONST WORD *indexData)
@@ -390,6 +395,7 @@ RwXboxDrawIndexedVertices(D3DPRIMITIVETYPE primitiveType, UINT vertexCount,
 }
 
 // match: _RwXboxDrawVertices @ 0x002AF2B0
+// sp-match: _RwXboxDrawVertices @ 0x001C9A90
 void
 RwXboxDrawVertices(D3DPRIMITIVETYPE primitiveType, UINT startVertex, UINT vertexCount)
 {
@@ -398,6 +404,7 @@ RwXboxDrawVertices(D3DPRIMITIVETYPE primitiveType, UINT startVertex, UINT vertex
 }
 
 // match: _RwXboxDrawVerticesUP @ 0x002AF2D0
+// sp-match: _RwXboxDrawVerticesUP @ 0x001C9AB0
 void
 RwXboxDrawVerticesUP(D3DPRIMITIVETYPE primitiveType, UINT vertexCount,
                      CONST void *vertexStreamZeroData, UINT vertexStreamZeroStride)
@@ -408,6 +415,7 @@ RwXboxDrawVerticesUP(D3DPRIMITIVETYPE primitiveType, UINT vertexCount,
 }
 
 // match: _RwXboxSetRenderTarget @ 0x002AF2F0
+// sp-match: _RwXboxSetRenderTarget @ 0x001C9AD0
 void
 RwXboxSetRenderTarget(D3DSurface *renderTarget, D3DSurface *zStencil)
 {
@@ -421,6 +429,7 @@ RwXboxSetRenderTarget(D3DSurface *renderTarget, D3DSurface *zStencil)
 }
 
 // match: __rwXbTextureRelease @ 0x002AF330
+// sp-match: __rwXbTextureRelease @ 0x001C9B10
 void
 _rwXbTextureRelease(D3DBaseTexture *texture)
 {

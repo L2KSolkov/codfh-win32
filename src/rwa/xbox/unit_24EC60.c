@@ -570,6 +570,7 @@ RwBool dword_507DE4;
 
 
 // match: _RwaStreamCreate_2 @ 0x0024EC60
+// sp-match: _RwaStreamCreate_2 @ 0x00161C50
 
 rwaInstance *
 RwaStreamCreate_2(rwaInstance *parent, void *params, RwUInt32 flags, void *allocFunc, void *data)
@@ -578,6 +579,7 @@ RwaStreamCreate_2(rwaInstance *parent, void *params, RwUInt32 flags, void *alloc
 }
 
 // match: _RwaListenerUnregister_1 @ 0x0024EC90
+// sp-match: _RwaListenerUnregister_1 @ 0x00161C80
 RwBool
 RwaListenerUnregister_1(void)
 {
@@ -595,6 +597,7 @@ RwaListenerUnregister_1(void)
 
 /* Sets the buffer up for 3D (or not) and finds its I3DL2 mix bin. */
 // match: _sub_24ECC0 @ 0x0024ECC0
+// sp-match: _sub_24ECC0 @ 0x00161CB0
 static RwBool
 sub_24ECC0(rwaXboxVoiceState *state, RwBool is3D)
 {
@@ -641,6 +644,7 @@ sub_24ECC0(rwaXboxVoiceState *state, RwBool is3D)
 
 /* Finds the voice whose mix bin is search's. */
 // match: _sub_24ED50 @ 0x0024ED50
+// sp-match: _sub_24ED50 @ 0x00161D40
 RwBool
 sub_24ED50(rwaXboxVoice *obj, rwaXboxVoiceFind *search)
 {
@@ -656,6 +660,7 @@ sub_24ED50(rwaXboxVoice *obj, rwaXboxVoiceFind *search)
 
 /* Whether the buffer plays. */
 // match: _sub_24ED90 @ 0x0024ED90
+// sp-match: _sub_24ED90 @ 0x00161D80
 static RwBool
 sub_24ED90(void *buffer)
 {
@@ -671,6 +676,7 @@ sub_24ED90(void *buffer)
 
 /* The default creation parameters. */
 // match: _sub_24EDC0 @ 0x0024EDC0
+// sp-match: _sub_24EDC0 @ 0x00161DB0
 static RwBool
 sub_24EDC0(void *buffer, RwUInt32 timeout)
 {
@@ -706,6 +712,7 @@ sub_24EDC0(void *buffer, RwUInt32 timeout)
 
 
 // match: _sub_24EE40 @ 0x0024EE40
+// sp-match: _sub_24EE40 @ 0x00161E30
 static void *
 sub_24EE40(void *obj, rwaXboxVoiceParams *params)
 {
@@ -719,6 +726,7 @@ sub_24EE40(void *obj, rwaXboxVoiceParams *params)
 }
 
 // match: _sub_24EE70 @ 0x0024EE70
+// sp-match: _sub_24EE70 @ 0x00161E60
 void
 sub_24EE70(rwaXboxVoice *obj, const RwaV3d *orientation)
 {
@@ -729,6 +737,7 @@ sub_24EE70(rwaXboxVoice *obj, const RwaV3d *orientation)
 }
 
 // match: _sub_24EEA0 @ 0x0024EEA0
+// sp-match: _sub_24EEA0 @ 0x00161E90
 void
 sub_24EEA0(rwaXboxVoice *obj, RwaV3d *orientation)
 {
@@ -738,6 +747,7 @@ sub_24EEA0(rwaXboxVoice *obj, RwaV3d *orientation)
 }
 
 // match: _sub_24EED0 @ 0x0024EED0
+// sp-match: _sub_24EED0 @ 0x00161EC0
 void
 sub_24EED0(rwaXboxVoice *obj, RwUInt32 angle)
 {
@@ -753,6 +763,7 @@ sub_24EEF0(rwaXboxVoice *obj)
 }
 
 // match: _sub_24EF00 @ 0x0024EF00
+// sp-match: _sub_24EF00 @ 0x00161EE0
 void
 sub_24EF00(rwaXboxVoice *obj, RwUInt32 angle)
 {
@@ -761,6 +772,7 @@ sub_24EF00(rwaXboxVoice *obj, RwUInt32 angle)
 }
 
 // match: _sub_24EF20 @ 0x0024EF20
+// sp-match: _sub_24EF20 @ 0x00161F00
 RwUInt32
 sub_24EF20(rwaXboxVoice *obj)
 {
@@ -768,6 +780,7 @@ sub_24EF20(rwaXboxVoice *obj)
 }
 
 // match: _sub_24EF30 @ 0x0024EF30
+// sp-match: _sub_24EF30 @ 0x00161F10
 void
 sub_24EF30(rwaXboxVoice *obj, RwReal gain)
 {
@@ -776,6 +789,7 @@ sub_24EF30(rwaXboxVoice *obj, RwReal gain)
 }
 
 // match: _sub_24EF60 @ 0x0024EF60
+// sp-match: _sub_24EF60 @ 0x00161F40
 RwReal
 sub_24EF60(rwaXboxVoice *obj)
 {
@@ -785,6 +799,7 @@ sub_24EF60(rwaXboxVoice *obj)
 }
 
 // match: _sub_24EF80 @ 0x0024EF80
+// sp-match: _sub_24EF80 @ 0x00161F60
 void
 sub_24EF80(rwaXboxVoice *obj, RwInt32 level)
 {
@@ -793,6 +808,7 @@ sub_24EF80(rwaXboxVoice *obj, RwInt32 level)
 }
 
 // match: _sub_24EF90 @ 0x0024EF90
+// sp-match: _sub_24EF90 @ 0x00161F70
 RwInt32
 sub_24EF90(rwaXboxVoice *obj)
 {
@@ -800,6 +816,7 @@ sub_24EF90(rwaXboxVoice *obj)
 }
 
 // match: _sub_24EFA0 @ 0x0024EFA0
+// sp-match: _sub_24EFA0 @ 0x00161F80
 void
 sub_24EFA0(rwaXboxVoice *obj, RwInt32 level)
 {
@@ -808,6 +825,7 @@ sub_24EFA0(rwaXboxVoice *obj, RwInt32 level)
 }
 
 // match: _sub_24EFB0 @ 0x0024EFB0
+// sp-match: _sub_24EFB0 @ 0x00161F90
 RwInt32
 sub_24EFB0(rwaXboxVoice *obj)
 {
@@ -815,6 +833,7 @@ sub_24EFB0(rwaXboxVoice *obj)
 }
 
 // match: _sub_24EFC0 @ 0x0024EFC0
+// sp-match: _sub_24EFC0 @ 0x00161FA0
 void
 sub_24EFC0(rwaXboxVoice *obj, RwReal ratio)
 {
@@ -823,6 +842,7 @@ sub_24EFC0(rwaXboxVoice *obj, RwReal ratio)
 }
 
 // match: _sub_24EFE0 @ 0x0024EFE0
+// sp-match: _sub_24EFE0 @ 0x00161FC0
 RwReal
 sub_24EFE0(rwaXboxVoice *obj)
 {
@@ -830,6 +850,7 @@ sub_24EFE0(rwaXboxVoice *obj)
 }
 
 // match: _sub_24EFF0 @ 0x0024EFF0
+// sp-match: _sub_24EFF0 @ 0x00161FD0
 void
 sub_24EFF0(rwaXboxVoice *obj, RwInt32 level)
 {
@@ -838,6 +859,7 @@ sub_24EFF0(rwaXboxVoice *obj, RwInt32 level)
 }
 
 // match: _sub_24F000 @ 0x0024F000
+// sp-match: _sub_24F000 @ 0x00161FE0
 RwInt32
 sub_24F000(rwaXboxVoice *obj)
 {
@@ -845,6 +867,7 @@ sub_24F000(rwaXboxVoice *obj)
 }
 
 // match: _sub_24F010 @ 0x0024F010
+// sp-match: _sub_24F010 @ 0x00161FF0
 void
 sub_24F010(rwaXboxVoice *obj, RwReal ratio)
 {
@@ -853,6 +876,7 @@ sub_24F010(rwaXboxVoice *obj, RwReal ratio)
 }
 
 // match: _sub_24F030 @ 0x0024F030
+// sp-match: _sub_24F030 @ 0x00162010
 RwReal
 sub_24F030(rwaXboxVoice *obj)
 {
@@ -860,6 +884,7 @@ sub_24F030(rwaXboxVoice *obj)
 }
 
 // match: _sub_24F040 @ 0x0024F040
+// sp-match: _sub_24F040 @ 0x00162020
 void
 sub_24F040(rwaXboxVoice *obj, const rwaI3DL2Listener *settings)
 {
@@ -868,6 +893,7 @@ sub_24F040(rwaXboxVoice *obj, const rwaI3DL2Listener *settings)
 }
 
 // match: _sub_24F060 @ 0x0024F060
+// sp-match: _sub_24F060 @ 0x00162040
 void
 sub_24F060(rwaXboxVoice *obj, rwaI3DL2Listener *settings)
 {
@@ -875,6 +901,7 @@ sub_24F060(rwaXboxVoice *obj, rwaI3DL2Listener *settings)
 }
 
 // match: _sub_24F080 @ 0x0024F080
+// sp-match: _sub_24F080 @ 0x00162060
 void
 sub_24F080(rwaXboxVoice *obj, const RwaV3d *position)
 {
@@ -885,6 +912,7 @@ sub_24F080(rwaXboxVoice *obj, const RwaV3d *position)
 }
 
 // match: _sub_24F0B0 @ 0x0024F0B0
+// sp-match: _sub_24F0B0 @ 0x00162090
 void
 sub_24F0B0(rwaXboxVoice *obj, RwaV3d *position)
 {
@@ -894,6 +922,7 @@ sub_24F0B0(rwaXboxVoice *obj, RwaV3d *position)
 }
 
 // match: _sub_24F0E0 @ 0x0024F0E0
+// sp-match: _sub_24F0E0 @ 0x001620C0
 void
 sub_24F0E0(rwaXboxVoice *obj, const RwaV3d *velocity)
 {
@@ -904,6 +933,7 @@ sub_24F0E0(rwaXboxVoice *obj, const RwaV3d *velocity)
 }
 
 // match: _sub_24F110 @ 0x0024F110
+// sp-match: _sub_24F110 @ 0x001620F0
 void
 sub_24F110(rwaXboxVoice *obj, RwaV3d *velocity)
 {
@@ -913,6 +943,7 @@ sub_24F110(rwaXboxVoice *obj, RwaV3d *velocity)
 }
 
 // match: _sub_24F140 @ 0x0024F140
+// sp-match: _sub_24F140 @ 0x00162120
 void
 sub_24F140(rwaXboxVoice *obj, RwReal distance)
 {
@@ -921,6 +952,7 @@ sub_24F140(rwaXboxVoice *obj, RwReal distance)
 }
 
 // match: _sub_24F160 @ 0x0024F160
+// sp-match: _sub_24F160 @ 0x00162140
 RwReal
 sub_24F160(rwaXboxVoice *obj)
 {
@@ -928,6 +960,7 @@ sub_24F160(rwaXboxVoice *obj)
 }
 
 // match: _sub_24F170 @ 0x0024F170
+// sp-match: _sub_24F170 @ 0x00162150
 void
 sub_24F170(rwaXboxVoice *obj, RwReal distance)
 {
@@ -936,6 +969,7 @@ sub_24F170(rwaXboxVoice *obj, RwReal distance)
 }
 
 // match: _sub_24F190 @ 0x0024F190
+// sp-match: _sub_24F190 @ 0x00162170
 RwReal
 sub_24F190(rwaXboxVoice *obj)
 {
@@ -943,6 +977,7 @@ sub_24F190(rwaXboxVoice *obj)
 }
 
 // match: _sub_24F1A0 @ 0x0024F1A0
+// sp-match: _sub_24F1A0 @ 0x00162180
 void
 sub_24F1A0(rwaXboxVoice *obj, RwReal frequency)
 {
@@ -951,6 +986,7 @@ sub_24F1A0(rwaXboxVoice *obj, RwReal frequency)
 }
 
 // match: _sub_24F1C0 @ 0x0024F1C0
+// sp-match: _sub_24F1C0 @ 0x0018F390
 RwReal
 sub_24F1C0(rwaXboxVoice *obj)
 {
@@ -958,6 +994,7 @@ sub_24F1C0(rwaXboxVoice *obj)
 }
 
 // match: _sub_24F1D0 @ 0x0024F1D0
+// sp-match: _sub_24F1D0 @ 0x001621A0
 void
 sub_24F1D0(rwaXboxVoice *obj, RwReal volume)
 {
@@ -966,6 +1003,7 @@ sub_24F1D0(rwaXboxVoice *obj, RwReal volume)
 }
 
 // match: _sub_24F1F0 @ 0x0024F1F0
+// sp-match: _sub_24F1F0 @ 0x001621C0
 RwReal
 sub_24F1F0(rwaXboxVoice *obj)
 {
@@ -974,6 +1012,7 @@ sub_24F1F0(rwaXboxVoice *obj)
 
 /* Starts (play) or stops the voice at the next update. */
 // match: _sub_24F200 @ 0x0024F200
+// sp-match: _sub_24F200 @ 0x001621D0
 void
 sub_24F200(rwaXboxVoice *obj, RwBool play)
 {
@@ -989,6 +1028,7 @@ sub_24F200(rwaXboxVoice *obj, RwBool play)
 }
 
 // match: _sub_24F240 @ 0x0024F240
+// sp-match: _sub_24F240 @ 0x00162210
 RwBool
 sub_24F240(rwaXboxVoice *obj)
 {
@@ -1008,6 +1048,7 @@ sub_24F240(rwaXboxVoice *obj)
 
 /* Sets the play position (in frames). */
 // match: _sub_24F270 @ 0x0024F270
+// sp-match: _sub_24F270 @ 0x00162240
 void
 sub_24F270(rwaXboxVoice *obj, RwUInt32 position)
 {
@@ -1029,6 +1070,7 @@ sub_24F270(rwaXboxVoice *obj, RwUInt32 position)
 }
 
 // match: _sub_24F2F0 @ 0x0024F2F0
+// sp-match: _sub_24F2F0 @ 0x001622C0
 RwUInt32
 sub_24F2F0(rwaXboxVoice *obj)
 {
@@ -1036,6 +1078,7 @@ sub_24F2F0(rwaXboxVoice *obj)
 }
 
 // match: _sub_24F300 @ 0x0024F300
+// sp-match: _sub_24F300 @ 0x001622D0
 void
 sub_24F300(rwaXboxVoice *obj, RwBool loop)
 {
@@ -1050,6 +1093,7 @@ sub_24F300(rwaXboxVoice *obj, RwBool loop)
 }
 
 // match: _sub_24F330 @ 0x0024F330
+// sp-match: _sub_24F330 @ 0x00162300
 RwBool
 sub_24F330(rwaXboxVoice *obj)
 {
@@ -1057,6 +1101,7 @@ sub_24F330(rwaXboxVoice *obj)
 }
 
 // match: _sub_24F350 @ 0x0024F350
+// sp-match: _sub_24F350 @ 0x00162320
 static RwBool
 sub_24F350(const RwaWaveFormat *current, const RwaWaveFormat *format)
 {
@@ -1072,6 +1117,7 @@ sub_24F350(const RwaWaveFormat *current, const RwaWaveFormat *format)
 
 /* The default mix bins of a 3D buffer or one of the channels. */
 // match: _sub_24F380 @ 0x0024F380
+// sp-match: _sub_24F380 @ 0x00162350
 static void
 sub_24F380(rwaMixBins *mixBins, RwUInt32 speakerMode, RwBool is3D, RwUInt32 noChannels)
 {
@@ -1107,6 +1153,7 @@ sub_24F380(rwaMixBins *mixBins, RwUInt32 speakerMode, RwBool is3D, RwUInt32 noCh
 /* Keep the first format pointer across buffer creation and format setup;
  * refresh it after the separately computed play-region offset. */
 // match: _sub_24F410 @ 0x0024F410
+// sp-match: _sub_24F410 @ 0x001623E0
 void
 sub_24F410(rwaXboxVoice *obj, RwaWave *wave)
 {
@@ -1287,6 +1334,7 @@ sub_24F410(rwaXboxVoice *obj, RwaWave *wave)
 }
 
 // match: _sub_24F7E0 @ 0x0024F7E0
+// sp-match: _sub_24F7E0 @ 0x001627B0
 RwaWave *
 sub_24F7E0(rwaXboxVoice *obj)
 {
@@ -1294,6 +1342,7 @@ sub_24F7E0(rwaXboxVoice *obj)
 }
 
 // match: _sub_24F7F0 @ 0x0024F7F0
+// sp-match: _sub_24F7F0 @ 0x001627C0
 void
 sub_24F7F0(rwaXboxVoice *obj, RwReal pan)
 {
@@ -1302,6 +1351,7 @@ sub_24F7F0(rwaXboxVoice *obj, RwReal pan)
 }
 
 // match: _sub_24F810 @ 0x0024F810
+// sp-match: _sub_24F810 @ 0x001627E0
 RwReal
 sub_24F810(rwaXboxVoice *obj)
 {
@@ -1310,6 +1360,7 @@ sub_24F810(rwaXboxVoice *obj)
 
 /* Whether the voice plays in 2D (the wave is not positional). */
 // match: _sub_24F820 @ 0x0024F820
+// sp-match: _sub_24F820 @ 0x001627F0
 RwBool
 sub_24F820(rwaXboxVoice *obj)
 {
@@ -1328,6 +1379,7 @@ sub_24F820(rwaXboxVoice *obj)
 }
 
 // match: _sub_24F850 @ 0x0024F850
+// sp-match: _sub_24F850 @ 0x00162820
 void
 sub_24F850(rwaXboxVoice *obj, RwReal gain)
 {
@@ -1336,6 +1388,7 @@ sub_24F850(rwaXboxVoice *obj, RwReal gain)
 }
 
 // match: _sub_24F870 @ 0x0024F870
+// sp-match: _sub_24F870 @ 0x00162840
 RwReal
 sub_24F870(rwaXboxVoice *obj)
 {
@@ -1345,6 +1398,7 @@ sub_24F870(rwaXboxVoice *obj)
 }
 
 // match: _sub_24F890 @ 0x0024F890
+// sp-match: _sub_24F890 @ 0x00162860
 rwaXboxVoice *
 sub_24F890(rwaXboxVoice *obj, const void *param, const RwaV3d *value)
 {
@@ -1353,6 +1407,7 @@ sub_24F890(rwaXboxVoice *obj, const void *param, const RwaV3d *value)
 }
 
 // match: _sub_24F8B0 @ 0x0024F8B0
+// sp-match: _sub_24F8B0 @ 0x00162880
 rwaXboxVoice *
 sub_24F8B0(rwaXboxVoice *obj, const void *param, RwaV3d *value)
 {
@@ -1361,6 +1416,7 @@ sub_24F8B0(rwaXboxVoice *obj, const void *param, RwaV3d *value)
 }
 
 // match: _sub_24F8D0 @ 0x0024F8D0
+// sp-match: _sub_24F8D0 @ 0x001628A0
 rwaXboxVoice *
 sub_24F8D0(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 {
@@ -1369,6 +1425,7 @@ sub_24F8D0(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 }
 
 // match: _sub_24F8F0 @ 0x0024F8F0
+// sp-match: _sub_24F8F0 @ 0x001628C0
 rwaXboxVoice *
 sub_24F8F0(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 {
@@ -1377,6 +1434,7 @@ sub_24F8F0(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 }
 
 // match: _sub_24F910 @ 0x0024F910
+// sp-match: _sub_24F910 @ 0x001628E0
 rwaXboxVoice *
 sub_24F910(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 {
@@ -1385,6 +1443,7 @@ sub_24F910(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 }
 
 // match: _sub_24F930 @ 0x0024F930
+// sp-match: _sub_24F930 @ 0x00162900
 rwaXboxVoice *
 sub_24F930(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 {
@@ -1393,6 +1452,7 @@ sub_24F930(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 }
 
 // match: _sub_24F950 @ 0x0024F950
+// sp-match: _sub_24F950 @ 0x00162920
 rwaXboxVoice *
 sub_24F950(rwaXboxVoice *obj, const void *param, const RwReal *value)
 {
@@ -1401,6 +1461,7 @@ sub_24F950(rwaXboxVoice *obj, const void *param, const RwReal *value)
 }
 
 // match: _sub_24F970 @ 0x0024F970
+// sp-match: _sub_24F970 @ 0x00162940
 rwaXboxVoice *
 sub_24F970(rwaXboxVoice *obj, const void *param, RwReal *value)
 {
@@ -1409,6 +1470,7 @@ sub_24F970(rwaXboxVoice *obj, const void *param, RwReal *value)
 }
 
 // match: _sub_24F990 @ 0x0024F990
+// sp-match: _sub_24F990 @ 0x00162960
 rwaXboxVoice *
 sub_24F990(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 {
@@ -1417,6 +1479,7 @@ sub_24F990(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 }
 
 // match: _sub_24F9B0 @ 0x0024F9B0
+// sp-match: _sub_24F9B0 @ 0x00162980
 rwaXboxVoice *
 sub_24F9B0(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 {
@@ -1425,6 +1488,7 @@ sub_24F9B0(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 }
 
 // match: _sub_24F9D0 @ 0x0024F9D0
+// sp-match: _sub_24F9D0 @ 0x001629A0
 rwaXboxVoice *
 sub_24F9D0(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 {
@@ -1433,6 +1497,7 @@ sub_24F9D0(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 }
 
 // match: _sub_24F9F0 @ 0x0024F9F0
+// sp-match: _sub_24F9F0 @ 0x001629C0
 rwaXboxVoice *
 sub_24F9F0(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 {
@@ -1441,6 +1506,7 @@ sub_24F9F0(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 }
 
 // match: _sub_24FA10 @ 0x0024FA10
+// sp-match: _sub_24FA10 @ 0x001629E0
 rwaXboxVoice *
 sub_24FA10(rwaXboxVoice *obj, const void *param, const RwReal *value)
 {
@@ -1449,6 +1515,7 @@ sub_24FA10(rwaXboxVoice *obj, const void *param, const RwReal *value)
 }
 
 // match: _sub_24FA30 @ 0x0024FA30
+// sp-match: _sub_24FA30 @ 0x00162A00
 rwaXboxVoice *
 sub_24FA30(rwaXboxVoice *obj, const void *param, RwReal *value)
 {
@@ -1457,6 +1524,7 @@ sub_24FA30(rwaXboxVoice *obj, const void *param, RwReal *value)
 }
 
 // match: _sub_24FA50 @ 0x0024FA50
+// sp-match: _sub_24FA50 @ 0x00162A20
 rwaXboxVoice *
 sub_24FA50(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 {
@@ -1465,6 +1533,7 @@ sub_24FA50(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 }
 
 // match: _sub_24FA70 @ 0x0024FA70
+// sp-match: _sub_24FA70 @ 0x00162A40
 rwaXboxVoice *
 sub_24FA70(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 {
@@ -1473,6 +1542,7 @@ sub_24FA70(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 }
 
 // match: _sub_24FA90 @ 0x0024FA90
+// sp-match: _sub_24FA90 @ 0x00162A60
 rwaXboxVoice *
 sub_24FA90(rwaXboxVoice *obj, const void *param, const RwReal *value)
 {
@@ -1481,6 +1551,7 @@ sub_24FA90(rwaXboxVoice *obj, const void *param, const RwReal *value)
 }
 
 // match: _sub_24FAB0 @ 0x0024FAB0
+// sp-match: _sub_24FAB0 @ 0x00162A80
 rwaXboxVoice *
 sub_24FAB0(rwaXboxVoice *obj, const void *param, RwReal *value)
 {
@@ -1489,6 +1560,7 @@ sub_24FAB0(rwaXboxVoice *obj, const void *param, RwReal *value)
 }
 
 // match: _sub_24FAD0 @ 0x0024FAD0
+// sp-match: _sub_24FAD0 @ 0x00162AA0
 rwaXboxVoice *
 sub_24FAD0(rwaXboxVoice *obj, const void *param, const rwaI3DL2Listener *value)
 {
@@ -1497,6 +1569,7 @@ sub_24FAD0(rwaXboxVoice *obj, const void *param, const rwaI3DL2Listener *value)
 }
 
 // match: _sub_24FAF0 @ 0x0024FAF0
+// sp-match: _sub_24FAF0 @ 0x00162AC0
 rwaXboxVoice *
 sub_24FAF0(rwaXboxVoice *obj, const void *param, rwaI3DL2Listener *value)
 {
@@ -1505,6 +1578,7 @@ sub_24FAF0(rwaXboxVoice *obj, const void *param, rwaI3DL2Listener *value)
 }
 
 // match: _sub_24FB10 @ 0x0024FB10
+// sp-match: _sub_24FB10 @ 0x00162AE0
 rwaXboxVoice *
 sub_24FB10(rwaXboxVoice *obj, const void *param, const RwaV3d *value)
 {
@@ -1513,6 +1587,7 @@ sub_24FB10(rwaXboxVoice *obj, const void *param, const RwaV3d *value)
 }
 
 // match: _sub_24FB30 @ 0x0024FB30
+// sp-match: _sub_24FB30 @ 0x00162B00
 rwaXboxVoice *
 sub_24FB30(rwaXboxVoice *obj, const void *param, RwaV3d *value)
 {
@@ -1521,6 +1596,7 @@ sub_24FB30(rwaXboxVoice *obj, const void *param, RwaV3d *value)
 }
 
 // match: _sub_24FB50 @ 0x0024FB50
+// sp-match: _sub_24FB50 @ 0x00162B20
 rwaXboxVoice *
 sub_24FB50(rwaXboxVoice *obj, const void *param, const RwaV3d *value)
 {
@@ -1529,6 +1605,7 @@ sub_24FB50(rwaXboxVoice *obj, const void *param, const RwaV3d *value)
 }
 
 // match: _sub_24FB70 @ 0x0024FB70
+// sp-match: _sub_24FB70 @ 0x00162B40
 rwaXboxVoice *
 sub_24FB70(rwaXboxVoice *obj, const void *param, RwaV3d *value)
 {
@@ -1537,6 +1614,7 @@ sub_24FB70(rwaXboxVoice *obj, const void *param, RwaV3d *value)
 }
 
 // match: _sub_24FB90 @ 0x0024FB90
+// sp-match: _sub_24FB90 @ 0x00162B60
 rwaXboxVoice *
 sub_24FB90(rwaXboxVoice *obj, const void *param, const RwReal *value)
 {
@@ -1545,6 +1623,7 @@ sub_24FB90(rwaXboxVoice *obj, const void *param, const RwReal *value)
 }
 
 // match: _sub_24FBB0 @ 0x0024FBB0
+// sp-match: _sub_24FBB0 @ 0x00162B80
 rwaXboxVoice *
 sub_24FBB0(rwaXboxVoice *obj, const void *param, RwReal *value)
 {
@@ -1553,6 +1632,7 @@ sub_24FBB0(rwaXboxVoice *obj, const void *param, RwReal *value)
 }
 
 // match: _sub_24FBD0 @ 0x0024FBD0
+// sp-match: _sub_24FBD0 @ 0x00162BA0
 rwaXboxVoice *
 sub_24FBD0(rwaXboxVoice *obj, const void *param, const RwReal *value)
 {
@@ -1561,6 +1641,7 @@ sub_24FBD0(rwaXboxVoice *obj, const void *param, const RwReal *value)
 }
 
 // match: _sub_24FBF0 @ 0x0024FBF0
+// sp-match: _sub_24FBF0 @ 0x00162BC0
 rwaXboxVoice *
 sub_24FBF0(rwaXboxVoice *obj, const void *param, RwReal *value)
 {
@@ -1569,6 +1650,7 @@ sub_24FBF0(rwaXboxVoice *obj, const void *param, RwReal *value)
 }
 
 // match: _sub_24FC10 @ 0x0024FC10
+// sp-match: _sub_24FC10 @ 0x00162BE0
 rwaXboxVoice *
 sub_24FC10(rwaXboxVoice *obj, const void *param, const RwReal *value)
 {
@@ -1577,6 +1659,7 @@ sub_24FC10(rwaXboxVoice *obj, const void *param, const RwReal *value)
 }
 
 // match: _sub_24FC30 @ 0x0024FC30
+// sp-match: _sub_24FC30 @ 0x00162C20
 rwaXboxVoice *
 sub_24FC30(rwaXboxVoice *obj, const void *param, const RwReal *value)
 {
@@ -1585,6 +1668,7 @@ sub_24FC30(rwaXboxVoice *obj, const void *param, const RwReal *value)
 }
 
 // match: _sub_24FC50 @ 0x0024FC50
+// sp-match: _sub_24FC50 @ 0x00162C40
 rwaXboxVoice *
 sub_24FC50(rwaXboxVoice *obj, const void *param, RwReal *value)
 {
@@ -1593,6 +1677,7 @@ sub_24FC50(rwaXboxVoice *obj, const void *param, RwReal *value)
 }
 
 // match: _sub_24FC70 @ 0x0024FC70
+// sp-match: _sub_24FC70 @ 0x00162C60
 rwaXboxVoice *
 sub_24FC70(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 {
@@ -1601,6 +1686,7 @@ sub_24FC70(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 }
 
 // match: _sub_24FC90 @ 0x0024FC90
+// sp-match: _sub_24FC90 @ 0x00162C80
 rwaXboxVoice *
 sub_24FC90(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 {
@@ -1609,6 +1695,7 @@ sub_24FC90(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 }
 
 // match: _sub_24FCB0 @ 0x0024FCB0
+// sp-match: _sub_24FCB0 @ 0x00162CA0
 rwaXboxVoice *
 sub_24FCB0(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 {
@@ -1617,6 +1704,7 @@ sub_24FCB0(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 }
 
 // match: _sub_24FCD0 @ 0x0024FCD0
+// sp-match: _sub_24FCD0 @ 0x00162CC0
 rwaXboxVoice *
 sub_24FCD0(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 {
@@ -1625,6 +1713,7 @@ sub_24FCD0(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 }
 
 // match: _sub_24FCF0 @ 0x0024FCF0
+// sp-match: _sub_24FCF0 @ 0x00162CE0
 rwaXboxVoice *
 sub_24FCF0(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 {
@@ -1633,6 +1722,7 @@ sub_24FCF0(rwaXboxVoice *obj, const void *param, const RwUInt32 *value)
 }
 
 // match: _sub_24FD10 @ 0x0024FD10
+// sp-match: _sub_24FD10 @ 0x00162D00
 rwaXboxVoice *
 sub_24FD10(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 {
@@ -1641,6 +1731,7 @@ sub_24FD10(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 }
 
 // match: _sub_24FD30 @ 0x0024FD30
+// sp-match: _sub_24FD30 @ 0x00162D20
 rwaXboxVoice *
 sub_24FD30(rwaXboxVoice *obj, const void *param, RwaWave *value)
 {
@@ -1649,6 +1740,7 @@ sub_24FD30(rwaXboxVoice *obj, const void *param, RwaWave *value)
 }
 
 // match: _sub_24FD50 @ 0x0024FD50
+// sp-match: _sub_24FD50 @ 0x00162D40
 rwaXboxVoice *
 sub_24FD50(rwaXboxVoice *obj, const void *param, RwaWave **value)
 {
@@ -1657,6 +1749,7 @@ sub_24FD50(rwaXboxVoice *obj, const void *param, RwaWave **value)
 }
 
 // match: _sub_24FD70 @ 0x0024FD70
+// sp-match: _sub_24FD70 @ 0x00162D60
 rwaXboxVoice *
 sub_24FD70(rwaXboxVoice *obj, const void *param, const RwReal *value)
 {
@@ -1665,6 +1758,7 @@ sub_24FD70(rwaXboxVoice *obj, const void *param, const RwReal *value)
 }
 
 // match: _sub_24FD90 @ 0x0024FD90
+// sp-match: _sub_24FD90 @ 0x00162D80
 rwaXboxVoice *
 sub_24FD90(rwaXboxVoice *obj, const void *param, RwReal *value)
 {
@@ -1673,6 +1767,7 @@ sub_24FD90(rwaXboxVoice *obj, const void *param, RwReal *value)
 }
 
 // match: _sub_24FDB0 @ 0x0024FDB0
+// sp-match: _sub_24FDB0 @ 0x00162DA0
 rwaXboxVoice *
 sub_24FDB0(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 {
@@ -1681,6 +1776,7 @@ sub_24FDB0(rwaXboxVoice *obj, const void *param, RwUInt32 *value)
 }
 
 // match: _sub_24FDD0 @ 0x0024FDD0
+// sp-match: _sub_24FDD0 @ 0x00162DC0
 rwaXboxVoice *
 sub_24FDD0(rwaXboxVoice *obj, const void *param, const RwReal *value)
 {
@@ -1689,6 +1785,7 @@ sub_24FDD0(rwaXboxVoice *obj, const void *param, const RwReal *value)
 }
 
 // match: _sub_24FDF0 @ 0x0024FDF0
+// sp-match: _sub_24FDF0 @ 0x00162DE0
 rwaXboxVoice *
 sub_24FDF0(rwaXboxVoice *obj, const void *param, RwReal *value)
 {
@@ -1700,6 +1797,7 @@ sub_24FDF0(rwaXboxVoice *obj, const void *param, RwReal *value)
  * default four or none of them), the voice it mixes into, the 3D and I3DL2
  * defaults, and the buffer of a voice others mix into. */
 // match: _sub_24FE10 @ 0x0024FE10
+// sp-match: _sub_24FE10 @ 0x00162E00
 static rwaXboxVoice *
 sub_24FE10(rwaXboxVoice *obj, rwaInstance *parent, rwaXboxVoiceParams *params)
 {
@@ -1864,6 +1962,7 @@ sub_24FE10(rwaXboxVoice *obj, rwaInstance *parent, rwaXboxVoiceParams *params)
 
 /* Stops a voice mixing into target (a voice being destroyed). */
 // match: _sub_2502A0 @ 0x002502A0
+// sp-match: _sub_2502A0 @ 0x00163290
 static RwBool
 sub_2502A0(rwaXboxVoice *obj, rwaXboxVoice *target)
 {
@@ -1877,6 +1976,7 @@ sub_2502A0(rwaXboxVoice *obj, rwaXboxVoice *target)
 }
 
 // match: _sub_2502F0 @ 0x002502F0
+// sp-match: _sub_2502F0 @ 0x001632E0
 static void
 sub_2502F0(rwaXboxVoice *obj, void *a, void *b)
 {
@@ -1901,6 +2001,7 @@ sub_2502F0(rwaXboxVoice *obj, void *a, void *b)
  * pointer preserves the call's unknown-write boundary; VC7.1 resolves it
  * to the original direct call. The original declaration forms are unknown. */
 // match: _sub_250340 @ 0x00250340
+// sp-match: _sub_250340 @ 0x00163330
 rwaXboxVoice *
 sub_250340(rwaXboxVoice *obj)
 {
@@ -2057,6 +2158,7 @@ sub_250340(rwaXboxVoice *obj)
 
 
 // match: _sub_2507B0 @ 0x002507B0
+// sp-match: _sub_2507B0 @ 0x001637A0
 static void
 sub_2507B0(rwaObjDef *def)
 {
@@ -2073,6 +2175,7 @@ sub_2507B0(rwaObjDef *def)
 }
 
 // match: _sub_2509F0 @ 0x002509F0
+// sp-match: _sub_2509F0 @ 0x001639E0
 rwaObjDef *
 sub_2509F0(void)
 {
@@ -2090,6 +2193,7 @@ sub_2509F0(void)
 }
 
 // match: _sub_250A30 @ 0x00250A30
+// sp-match: _sub_250A30 @ 0x00163A20
 rwaObjDef *
 sub_250A30(void)
 {

@@ -11,6 +11,7 @@
 #include "types/type_3CE4B4.h"
 #include "types/type_3CE4F0.h"
 #include "types/type_3D3548.h"
+#include "sp/sp_target.h"   // sub_3DE00 in single player
 #include "types/type_3DBC78.h"
 #include "types/type_3DF30.h"
 #include "types/type_3D2E7C.h"
@@ -26,35 +27,47 @@ extern const RwReal flt_3CE4EC = 16.666666f;
 
 // match: ??0type_3CE4F0@@QAE@XZ @ 0x000348D0
 // match: ??_7type_3CE4F0@@6B@ @ 0x003CE4F0
+// sp-match: ??0type_3CE4F0@@QAE@XZ @ 0x00028FD0
 // symbol: ??_7type_3CE4F0@@6B@ = 0x003CE4F0
 type_3CE4F0::type_3CE4F0()
 {
 }
 // match: ??_Gtype_3CE4F0@@UAEPAXI@Z @ 0x000348F0
 // match: ??1type_3CE4F0@@UAE@XZ @ 0x00034910
+// sp-match: ??_Gtype_3CE4F0@@UAEPAXI@Z @ 0x000291C0
+// sp-match: ??1type_3CE4F0@@UAE@XZ @ 0x00029000
 type_3CE4F0::~type_3CE4F0()
 {
 }
 // match: ?vf_00C@type_3CE4F0@@UAEHMPAUtype_3D410@@@Z @ 0x00034930
+// sp-match: ?vf_00C@type_3CE4F0@@UAEHMPAUtype_3D410@@@Z @ 0x00029340
 RwInt32 type_3CE4F0::vf_00C(RwReal arg_0, type_3D410 *arg_4)
 {
+#ifndef CODFH_SP // shape: single player reads the AI data's field straight from the call and compares it with unk_18 directly (SP 0x29340)
     AIData *var_10;
     RwUInt32 ebp_C;
+#endif
     RwUInt32 v8;
     type_3D3548 *var_4;
 
     for (var_4 = unk_08->unk_00; var_4 != 0; var_4 = var_4->vf_118()) {
         if (((var_4->unk_2C & 0x3FFFFF0) & 0x80) != 0) {
+#ifdef CODFH_SP // shape: single player reads the AI data's field straight from the call and compares it with unk_18 directly (SP 0x29340)
+            v8 = var_4->vf_120()->unk_574;
+            if (!(v8 != unk_18))
+#else
             var_10 = var_4->vf_120();
             v8 = var_10->unk_574;
             ebp_C = unk_18;
             if (v8 == ebp_C)
+#endif
                 sub_34A60(static_cast<type_3DBC78 *>(var_4), arg_4);
         }
     }
     return type_3CE6D0::vf_00C(arg_0, arg_4);
 }
 // match: ?vf_018@type_3CE4F0@@UAEHPAUtype_3D3548@@@Z @ 0x000349D0
+// sp-match: ?vf_018@type_3CE4F0@@UAEHPAUtype_3D3548@@@Z @ 0x00029010
 RwInt32 type_3CE4F0::vf_018(type_3D3548 *arg_0)
 {
     AIData *stk_18;
@@ -77,6 +90,7 @@ RwInt32 type_3CE4F0::vf_018(type_3D3548 *arg_0)
     return 1;
 }
 // match: sub_34A60 @ 0x00034A60
+// sp-match: sub_34A60 @ 0x000291D0
 void type_3CE4F0::sub_34A60(type_3DBC78 *arg_0, type_3D410 *arg_4)
 {
     RwInt32 var_10;
@@ -126,6 +140,7 @@ void type_3CE4F0::sub_34A60(type_3DBC78 *arg_0, type_3D410 *arg_4)
     }
 }
 // match: sub_34C60 @ 0x00034C60
+// sp-match: sub_34C60 @ 0x00029060
 void type_3CE4F0::sub_34C60(type_3DBC78 *arg_0, type_3D410 *arg_4)
 {
     type_154C0_80 *local_24;
@@ -174,18 +189,35 @@ void type_3CE4F0::sub_34C60(type_3DBC78 *arg_0, type_3D410 *arg_4)
     }
 }
 // match: sub_34E20 @ 0x00034E20
+// sp-match: sub_34E20 @ 0x000293A0
 // Registers an A* search of type 10 for arg_0, with 100 as its data.
 void sub_34E20(type_67620 *arg_0)
 {
     sub_32F70(arg_0, 10, 100.0f, 0);
 }
 // match: sub_34E40 @ 0x00034E40
+// sp-match: sub_34E40 @ 0x000293C0
 // Unregisters arg_0's A* search of type 10.
 void sub_34E40(type_67620 *arg_0)
 {
     sub_330E0(arg_0, 10);
 }
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_1CEF0@AIData@@QAEHXZ @ 0x0001CEF0
+inline RwInt32 AIData::sp_sub_1CEF0()
+{
+    RwUInt32 h = unk_574;
+    if (sub_3D3E0(h))
+    {
+        RwUInt32 h2 = unk_574;
+        return sub_3D3E0(h2)->vf_030();
+    }
+    return -1;
+}
+#endif
+
 // match: sub_34E60 @ 0x00034E60
+// sp-match: sub_34E60 @ 0x000293D0
 // The type-10 A* search's completion (astarscheduler's sub_332D0 calls it):
 // has the owner's AI object pick a cover node of the kind its state asks
 // for.
@@ -204,6 +236,9 @@ RwInt32 sub_34E60(type_67620 *arg_0, RwInt32 arg_4)
             var_4->sub_244E0(0, 0xA, 0, arg_4);
         } else {
             if (v8->vf_008() != 0) {
+#ifdef CODFH_SP // single player calls the inline out of line (SP 0x2942A calls SP 0x1CEF0)
+                l14 = var_4->sp_sub_1CEF0();
+#else
                 ebp_C = var_4->unk_574;
                 if (sub_3D3E0(ebp_C) != 0) {
                     var_10 = var_4->unk_574;
@@ -211,6 +246,7 @@ RwInt32 sub_34E60(type_67620 *arg_0, RwInt32 arg_4)
                 } else {
                     l14 = -1;
                 }
+#endif
                 if (l14 == 5 || (var_4->unk_1430 != -1) != 0) {
                     var_4->sub_244E0(0, 0xD, 1, arg_4);
                     goto done;

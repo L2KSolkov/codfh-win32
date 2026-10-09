@@ -61,6 +61,7 @@ RwInt32 dword_4E3588;
 // match: ??_C@_05ICOCHDKG@Logic?$AA@ @ 0x003DCEF4
 
 // match: ?sub_16D220@type_4E23E8@@QAEXPBDE@Z @ 0x0016D220
+// sp-match: ?sub_16D220@type_4E23E8@@QAEXPBDE@Z @ 0x0010AD20
 
 void type_4E23E8::sub_16D220(const RwChar *arg_0, RwUInt8 arg_4)
 {
@@ -72,6 +73,7 @@ void type_4E23E8::sub_16D220(const RwChar *arg_0, RwUInt8 arg_4)
 }
 
 // match: ?sub_16D270@type_4E23E8@@QAEXXZ @ 0x0016D270
+// sp-match: ?sub_16D270@type_4E23E8@@QAEXXZ @ 0x0010AD60
 void type_4E23E8::sub_16D270()
 {
     sub_16D6E0(&unk_00);
@@ -79,6 +81,7 @@ void type_4E23E8::sub_16D270()
 }
 
 // match: ?sub_16D2A0@type_4E23E8@@QAEXXZ @ 0x0016D2A0
+// sp-match: ?sub_16D2A0@type_4E23E8@@QAEXXZ @ 0x0010AB70
 // Ends its frame: the extremes, the copy for the last frame, and this
 // frame's counters cleared (not the extremes).
 void type_4E23E8::sub_16D2A0()
@@ -96,6 +99,7 @@ void type_4E23E8::sub_16D2A0()
 }
 
 // match: ?sub_16D330@type_4E23E8@@QAEXXZ @ 0x0016D330
+// sp-match: ?sub_16D330@type_4E23E8@@QAEXXZ @ 0x0010ABB0
 void type_4E23E8::sub_16D330()
 {
     unk_00.unk_00 = RWS::Time::GetTime();
@@ -103,6 +107,7 @@ void type_4E23E8::sub_16D330()
 }
 
 // match: ?sub_16D360@type_4E23E8@@QAEXXZ @ 0x0016D360
+// sp-match: ?sub_16D360@type_4E23E8@@QAEXXZ @ 0x0010ABC0
 void type_4E23E8::sub_16D360()
 {
     unk_00.unk_04 = RWS::Time::GetTime();
@@ -111,6 +116,7 @@ void type_4E23E8::sub_16D360()
 }
 
 // match: ?sub_16D3A0@@YAXXZ @ 0x0016D3A0
+// sp-match: ?sub_16D3A0@@YAXXZ @ 0x0010AD80
 // Names the sections (the flag: shown).
 void sub_16D3A0()
 {
@@ -156,6 +162,7 @@ void sub_16D3A0()
 }
 
 // match: ?sub_16D630@@YAXXZ @ 0x0016D630
+// sp-match: ?sub_16D630@@YAXXZ @ 0x0010B000
 // Clears every counter.
 void sub_16D630()
 {
@@ -179,6 +186,7 @@ void sub_16D6A0()
 }
 
 // match: ?sub_16D6E0@@YAXPAUtype_16D6E0@@@Z @ 0x0016D6E0
+// sp-match: ?sub_16D6E0@@YAXPAUtype_16D6E0@@@Z @ 0x0010ABF0
 void sub_16D6E0(type_16D6E0 *arg_0)
 {
     arg_0->unk_00 = 0;
@@ -191,6 +199,7 @@ void sub_16D6E0(type_16D6E0 *arg_0)
 }
 
 // match: ?sub_16D730@@YAXXZ @ 0x0016D730
+// sp-match: ?sub_16D730@@YAXXZ @ 0x0010AC10
 // Starts the frame.
 void sub_16D730()
 {
@@ -198,6 +207,7 @@ void sub_16D730()
 }
 
 // match: ?sub_16D740@@YAXXZ @ 0x0016D740
+// sp-match: ?sub_16D740@@YAXXZ @ 0x0010B040
 // Ends the frame, then every section's (sub_16D780).
 void sub_16D740()
 {
@@ -208,6 +218,7 @@ void sub_16D740()
 }
 
 // match: ?sub_16D780@@YAXXZ @ 0x0016D780
+// sp-match: ?sub_16D780@@YAXXZ @ 0x0010AC20
 void sub_16D780()
 {
     RwInt32 var_4;
@@ -222,6 +233,7 @@ void sub_16D780()
 }
 
 // match: ?sub_16D7F0@@YAXH@Z @ 0x0016D7F0
+// sp-match: ?sub_16D7F0@@YAXH@Z @ 0x0010AC70
 void sub_16D7F0(RwInt32 arg_0)
 {
     if (arg_0 >= 0 && arg_0 < 49)
@@ -233,6 +245,7 @@ void sub_16D7F0(RwInt32 arg_0)
 }
 
 // match: ?sub_16D850@@YAXH@Z @ 0x0016D850
+// sp-match: ?sub_16D850@@YAXH@Z @ 0x0010ACC0
 void sub_16D850(RwInt32 arg_0)
 {
     if (arg_0 >= 0 && arg_0 < 49)

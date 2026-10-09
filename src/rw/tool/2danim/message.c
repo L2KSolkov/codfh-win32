@@ -550,6 +550,7 @@ _rt2dMessageStreamGetSize(Rt2dMaestro *maestro, Rt2dMessage *message)
 }
 
 Rt2dMessage *
+// sp-match: __rt2dMessageStreamRead @ 0x00171B50
 _rt2dMessageStreamRead(Rt2dMaestro *maestro, Rt2dMessage *message, RwStream *stream)
 {
     RWFUNCTION(RWSTRING("_rt2dMessageStreamRead"));
@@ -883,6 +884,7 @@ _rt2dMessageStoreCreate(void)
 }
 
 // match: __rt2dMessageStoreDestroy @ 0x002577C0
+// sp-match: __rt2dMessageStoreDestroy @ 0x00171BD0
 RwBool
 _rt2dMessageStoreDestroy(RwSList *messageStore)
 {
@@ -974,6 +976,7 @@ _rt2dMessageStoreGetMessageByIndex( RwSList * messageStore, RwInt32 idx )
  **************************************************************************/
 
 Rt2dMaestro *
+// sp-match: __rt2dMaestroCreateMessageList @ 0x00171C30
 _rt2dMaestroCreateMessageList(Rt2dMaestro *maestro)
 {
     RWFUNCTION(RWSTRING("_rt2dMaestroCreateMessageList"));
@@ -995,6 +998,7 @@ _rt2dMaestroCreateMessageList(Rt2dMaestro *maestro)
 }
 
 // match: __rt2dMaestroDestroyMessageList @ 0x00257820
+// sp-match: __rt2dMaestroDestroyMessageList @ 0x00171C70
 Rt2dMaestro *
 _rt2dMaestroDestroyMessageList(Rt2dMaestro *maestro)
 {
@@ -1042,6 +1046,7 @@ _rt2dMaestroMessageListStreamGetSize(Rt2dMaestro *maestro)
 }
 
 Rt2dMaestro *
+// sp-match: __rt2dMaestroMessageListStreamRead @ 0x00171CB0
 _rt2dMaestroMessageListStreamRead(Rt2dMaestro *maestro, RwStream *stream)
 {
     RwInt32             num, *beginMessageList;
@@ -1164,6 +1169,7 @@ _rt2dMaestroMessageListGetByIndex(Rt2dMaestro *maestro, RwInt32 idx)
 }
 
 Rt2dMaestro *
+// sp-match: __rt2dMaestroMessageListPostByIndex @ 0x00172050
 _rt2dMaestroMessageListPostByIndex(Rt2dMaestro *maestro, RwInt32 index)
 {
     RwInt32                     messageIdx, *beginMessageList, num;
@@ -1240,6 +1246,7 @@ _rt2dMaestroMessageStoreStreamGetSize(Rt2dMaestro *maestro)
 }
 
 Rt2dMaestro *
+// sp-match: __rt2dMaestroMessageStoreStreamRead @ 0x00171D30
 _rt2dMaestroMessageStoreStreamRead(Rt2dMaestro *maestro, RwStream *stream)
 {
     RwInt32             i, num;
@@ -1439,6 +1446,7 @@ Rt2dMaestroAddMessageList(Rt2dMaestro *maestro,
  * \see Rt2dMessageHandlerDefaultCallBack
  */
 Rt2dMaestro *
+// sp-match: _Rt2dMaestroPostMessages @ 0x001720C0
 Rt2dMaestroPostMessages(Rt2dMaestro *maestro, Rt2dMessage *message, RwInt32 num)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dMaestroPostMessages"));
@@ -1472,6 +1480,7 @@ Rt2dMaestroPostMessages(Rt2dMaestro *maestro, Rt2dMessage *message, RwInt32 num)
  * \see Rt2dMessageHandlerDefaultCallBack
  */
 Rt2dMaestro *
+// sp-match: _Rt2dMaestroProcessMessages @ 0x001720F0
 Rt2dMaestroProcessMessages(Rt2dMaestro *maestro)
 {
     Rt2dMessage             *message;
@@ -1559,6 +1568,7 @@ Rt2dMaestroProcessMessages(Rt2dMaestro *maestro)
  ****************************************************************************/
 
 Rt2dMessage *
+// sp-match: __rt2dMessageSpecialMessageTellTarget @ 0x00171DE0
 _rt2dMessageSpecialMessageTellTarget(Rt2dMaestro *maestro, Rt2dMessage *message,
                                      RwInt32 currAnim, void *pData)
 {
@@ -1734,6 +1744,7 @@ _rt2dMessageQueueDestroy(Rt2dMessageQueue *messageQueue)
 }
 
 Rt2dMessageQueue *
+// sp-match: __rt2dMessageQueueAddMessages @ 0x00171F00
 _rt2dMessageQueueAddMessages(Rt2dMaestro *maestro,
                              Rt2dMessageQueue *messageQueue, Rt2dMessage *message,
                              RwInt32 num, RwInt32 currAnim)
@@ -1749,7 +1760,11 @@ _rt2dMessageQueueAddMessages(Rt2dMaestro *maestro,
     messageQueueIdx = messageQueue->messageBot;
 
     /* Check the message queue is not full. */
+#ifdef CODFH_SP /* single player compares the queue size signed (jle at SP 0x171F15; MP drops the function) */
+    if ((messageQueueIdx + num) > RT2D_MESSAGE_DEFAULT_MAX_QUEUE)
+#else
     if ((RwUInt32)(messageQueueIdx + num) > RT2D_MESSAGE_DEFAULT_MAX_QUEUE)
+#endif
     {
         RWMESSAGE((RWSTRING("Rt2dMaestro message queue full at size %d."),
                    RT2D_MESSAGE_DEFAULT_MAX_QUEUE));
@@ -1845,6 +1860,7 @@ _rt2dMessageQueueGetMessage(Rt2dMessageQueue *messageQueue)
  **************************************************************************/
 
 Rt2dMaestro *
+// sp-match: __rt2dMaestroCreateMessageQueue @ 0x00171FC0
 _rt2dMaestroCreateMessageQueue(Rt2dMaestro *maestro)
 {
     RWFUNCTION(RWSTRING("_rt2dMaestroCreateMessageQueue"));
@@ -1860,6 +1876,7 @@ _rt2dMaestroCreateMessageQueue(Rt2dMaestro *maestro)
 }
 
 // match: __rt2dMaestroDestroyMessageQueue @ 0x00257860
+// sp-match: __rt2dMaestroDestroyMessageQueue @ 0x00172010
 Rt2dMaestro *
 _rt2dMaestroDestroyMessageQueue(Rt2dMaestro *maestro)
 {

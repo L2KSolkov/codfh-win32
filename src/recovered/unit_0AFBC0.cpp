@@ -53,21 +53,26 @@ RWS_REGISTERCLASS(SectionInfo);
 // match: ?MakeNew@SectionInfo@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000AFBC0
 // match: __ehhandler$?MakeNew@SectionInfo@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x003001B0
 // match: __ehhandler$?MakeNew@SectionInfo@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x003001BF
+// sp-match: ?MakeNew@SectionInfo@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000881B0
 RWS_DEFINE_MAKENEW(SectionInfo)
 
 // match: ??0SectionInfo@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000AFC40
+// sp-match: ??0SectionInfo@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00087DE0
 SectionInfo::SectionInfo(const RWS::CAttributePacket &attr)
 {
 }
 
 // match: ??_GSectionInfo@@UAEPAXI@Z @ 0x000AFCD0
+// sp-match: ??_GSectionInfo@@UAEPAXI@Z @ 0x000881A0
 
 // match: ??1SectionInfo@@UAE@XZ @ 0x000AFCF0
 // match: __ehhandler$??1SectionInfo@@UAE@XZ-0x8 @ 0x003001D0
 // match: __ehhandler$??1SectionInfo@@UAE@XZ @ 0x003001D8
+// sp-match: ??1SectionInfo@@UAE@XZ @ 0x00087E20
 // (Defined in the class, in SectionInfo.h.)
 
 // match: ?sub_AFD70@SectionInfo@@SAXXZ @ 0x000AFD70
+// sp-match: ?sub_AFD70@SectionInfo@@SAXXZ @ 0x00087E80
 void SectionInfo::sub_AFD70()
 {
     RwInt32 var_4;
@@ -88,6 +93,7 @@ void SectionInfo::sub_AFD70()
 
 // Commands 0 to 17: the three sections' settings in turn.
 // match: ?HandleAttributes@SectionInfo@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000AFE00
+// sp-match: ?HandleAttributes@SectionInfo@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00087F10
 void SectionInfo::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     RWS::CAttributeCommandIterator attrIt(attr, RWS_CLASSID_OF(SectionInfo));
@@ -159,24 +165,28 @@ void SectionInfo::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?sub_B0140@SectionInfo@@SAHXZ @ 0x000B0140
+// sp-match: ?sub_B0140@SectionInfo@@SAHXZ @ 0x00088160
 RwInt32 SectionInfo::sub_B0140()
 {
     return dword_4B6824;
 }
 
 // match: ?sub_B0150@SectionInfo@@SAPAIXZ @ 0x000B0150
+// sp-match: ?sub_B0150@SectionInfo@@SAPAIXZ @ 0x00088170
 RwUInt32 *SectionInfo::sub_B0150()
 {
     return dword_4B67F0;
 }
 
 // match: ?sub_B0160@SectionInfo@@SAMXZ @ 0x000B0160
+// sp-match: ?sub_B0160@SectionInfo@@SAMXZ @ 0x00088180
 RwReal SectionInfo::sub_B0160()
 {
     return flt_429190;
 }
 
 // match: ??_ESectionInfo@@WBI@AEPAXI@Z @ 0x000B0170
+// sp-match: ??_ESectionInfo@@WBI@AEPAXI@Z @ 0x00088190
 
 // Members /OPT:ICF folded into shared trivial bodies (config/aliases.txt): defined here for
 // the authentic link (PLAN M7); the placement link takes the shared bodies.

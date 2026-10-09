@@ -495,6 +495,7 @@ RwRasterGetOffset(RwRaster * raster, RwInt16 * xOffset,
 // match: __rwRasterFreeListPreallocBlocks @ 0x00435510
 
 // match: _RwRasterUnlock @ 0x002AC080
+// sp-match: _RwRasterUnlock @ 0x001C6BB0
 
 RwRaster           *
 RwRasterUnlock(RwRaster * raster)
@@ -752,6 +753,7 @@ RwRasterRender(RwRaster * raster, RwInt32 x, RwInt32 y)
  *
  */
 // match: _RwRasterUnlockPalette @ 0x002AC0A0
+// sp-match: _RwRasterUnlockPalette @ 0x001C6BD0
 RwRaster           *
 RwRasterUnlockPalette(RwRaster * raster)
 {
@@ -790,6 +792,7 @@ RwRasterUnlockPalette(RwRaster * raster)
  *
  */
 // match: _RwRasterDestroy @ 0x002AC0C0
+// sp-match: _RwRasterDestroy @ 0x001C6BF0
 RwBool
 RwRasterDestroy(RwRaster * raster)
 {
@@ -889,6 +892,7 @@ RwRasterPushContext(RwRaster * raster)
  *
  */
 // match: _RwRasterRegisterPlugin @ 0x002AC110
+// sp-match: _RwRasterRegisterPlugin @ 0x001C6C40
 RwInt32
 RwRasterRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
                        RwPluginObjectConstructor
@@ -930,6 +934,7 @@ RwRasterRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
  *
  */
 // match: _RwRasterLockPalette @ 0x002AC140
+// sp-match: _RwRasterLockPalette @ 0x001C6C70
 RwUInt8            *
 RwRasterLockPalette(RwRaster * raster, RwInt32 lockMode)
 {
@@ -1023,6 +1028,7 @@ RwRasterPopContext(void)
  *
  */
 // match: _RwRasterGetNumLevels @ 0x002AC170
+// sp-match: _RwRasterGetNumLevels @ 0x001C6CA0
 RwInt32
 RwRasterGetNumLevels(RwRaster * raster)
 {
@@ -1076,6 +1082,7 @@ RwRasterGetNumLevels(RwRaster * raster)
  *
  */
 // match: _RwRasterShowRaster @ 0x002AC1A0
+// sp-match: _RwRasterShowRaster @ 0x001C6CD0
 RwRaster           *
 RwRasterShowRaster(RwRaster * raster, void *dev, RwUInt32 flags)
 {
@@ -1144,6 +1151,7 @@ RwRasterShowRaster(RwRaster * raster, void *dev, RwUInt32 flags)
  *
  */
 // match: _RwRasterSubRaster @ 0x002AC1D0
+// sp-match: _RwRasterSubRaster @ 0x001C6D00
 RwRaster           *
 RwRasterSubRaster(RwRaster * subRaster, RwRaster * raster,
                   RwRect * rect)
@@ -1226,6 +1234,7 @@ RwRasterSubRaster(RwRaster * subRaster, RwRaster * raster,
  */
 
 // match: _RwRasterCreate @ 0x002AC230
+// sp-match: _RwRasterCreate @ 0x001C6D60
 RwRaster           *
 RwRasterCreate(RwInt32 width, RwInt32 height, RwInt32 depth,
                RwInt32 flags)
@@ -1329,6 +1338,7 @@ RwRasterCreate(RwInt32 width, RwInt32 height, RwInt32 depth,
  *
  */
 // match: _RwRasterLock @ 0x002AC2F0
+// sp-match: _RwRasterLock @ 0x001C6E20
 RwUInt8 *
 RwRasterLock(RwRaster *raster, RwUInt8 level, RwInt32 lockMode)
 {
@@ -1390,6 +1400,7 @@ RwRasterLock(RwRaster *raster, RwUInt8 level, RwInt32 lockMode)
  */
 
 // match: __rwRasterClose @ 0x002AC320
+// sp-match: __rwRasterClose @ 0x001C6E50
 void               *
 _rwRasterClose(void *instance,
                RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -1455,6 +1466,7 @@ RwRasterSetFreeListCreateParams(RwInt32 blockSize, RwInt32 numBlocksToPrealloc)
  */
 
 // match: __rwRasterOpen @ 0x002AC360
+// sp-match: __rwRasterOpen @ 0x001C6E90
 void               *
 _rwRasterOpen(void *instance, RwInt32 offset, RwInt32 __RWUNUSED__ size)
 {

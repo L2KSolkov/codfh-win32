@@ -3,6 +3,12 @@
 // named for its start address.
 
 #include "rw/ostypes.h"
+#ifdef CODFH_SP // single player's HUD items (include/types/type_DC400.h): MP 0x5A..0x69 are 41 lower,
+                // 0x7A..0x93 47 lower (0x31..0x59 and 0x94..0x96 do not exist there)
+#define HUD_ID(n) ((n) >= 0x7A ? (n) - 47 : (n) >= 0x5A ? (n) - 41 : (n))
+#else
+#define HUD_ID(n) (n)
+#endif
 #include "rw/batypes.h"
 #include "rws/cattributehandler.h"
 #include "rws/cclassfactory.h"
@@ -24,10 +30,16 @@
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D644C
 extern const RwReal flt_3D644C = 16.666666f;
+#ifndef CODFH_SP // MP only: single player has no unreferenced 0.01f (its 16.666666f follows the class name, SP 0x2E2A24)
 // 0x003D6450
 extern const RwReal flt_3D6450 = 0.01f;
+#endif
 // 0x003D6454
+#ifdef CODFH_SP // single player does not emit it: its 16.666666f stands alone between the class name and the vtables (SP 0x2E2A24)
+static const RwReal flt_3D6454 = 1.0f;
+#else
 extern const RwReal flt_3D6454 = 1.0f;
+#endif
 // 0x004B8F0C
 #ifndef CODFH_PLAIN
 RwReal flt_4B8F0C;
@@ -78,11 +90,19 @@ RwV2d dword_4B8F54;
 #endif
 // 0x004B8F5C
 #ifndef CODFH_PLAIN
+#ifdef CODFH_SP // a float in single player (include/types/type_DC400.h)
+RwReal dword_4B8F5C;
+#else
 RwInt32 dword_4B8F5C;
+#endif
 #endif
 // 0x004B8F60
 #ifndef CODFH_PLAIN
+#ifdef CODFH_SP // a float in single player (include/types/type_DC400.h)
+RwReal dword_4B8F60;
+#else
 RwInt32 dword_4B8F60;
+#endif
 #endif
 // 0x004B8F64
 #ifndef CODFH_PLAIN
@@ -415,23 +435,29 @@ RWS_REGISTERCLASS(CShellBehaviorClass);
 // match: ?MakeNew@CShellBehaviorClass@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000B07D0
 // match: __ehhandler$?MakeNew@CShellBehaviorClass@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300250
 // match: __ehhandler$?MakeNew@CShellBehaviorClass@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030025F
+// sp-match: ?MakeNew@CShellBehaviorClass@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0008C2F0
 RWS_DEFINE_MAKENEW(CShellBehaviorClass)
 
 // match: ??0CShellBehaviorClass@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000B0850
+// sp-match: ??0CShellBehaviorClass@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00088650
 CShellBehaviorClass::CShellBehaviorClass(const RWS::CAttributePacket &attr)
 {
 }
 
 // match: ??_GCShellBehaviorClass@@UAEPAXI@Z @ 0x000B08E0
+// sp-match: ??_GCShellBehaviorClass@@UAEPAXI@Z @ 0x00088700
 
 // match: ??1CShellBehaviorClass@@UAE@XZ @ 0x000B0900
 // match: __ehhandler$??1CShellBehaviorClass@@UAE@XZ-0x8 @ 0x00300270
 // match: __ehhandler$??1CShellBehaviorClass@@UAE@XZ @ 0x00300278
+// sp-match: ??1CShellBehaviorClass@@UAE@XZ @ 0x00088690
 // (Defined in the class, in CShellBehaviorClass.h.)
 
 // match: ??_ECShellBehaviorClass@@WBI@AEPAXI@Z @ 0x000B6EA0
+// sp-match: ??_ECShellBehaviorClass@@WBI@AEPAXI@Z @ 0x000886F0
 
 // match: ?HandleAttributes@CShellBehaviorClass@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000B0980
+// sp-match: ?HandleAttributes@CShellBehaviorClass@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00088710
 void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     RwInt32 loc50;
@@ -566,28 +592,29 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 flt_4B9168 = var_64 * var_64;
                 break;
             }
+#ifndef CODFH_SP
             case 207:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x94, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x94), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 208:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E74D0(0x95, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x95), &lv_30);
                 break;
             case 209:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E74D0(0x96, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x96), &lv_30);
                 break;
             case 210:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x96, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x96), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 211:
@@ -597,15 +624,15 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 r34.green = (RwUInt8)((lcl_38 & 0xFF00) >> 8);
                 r34.blue = (RwUInt8)(lcl_38 & 0xFF);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E7200(0x96, r34.red, r34.green, r34.blue, r34.alpha);
+                    dword_4B9190->sub_E7200(HUD_ID(0x96), r34.red, r34.green, r34.blue, r34.alpha);
                 break;
             case 212:
-                loc20->GetCommandData(dword_4B9190->unk_E0[150].unk_1E8);
+                loc20->GetCommandData(dword_4B9190->unk_E0[HUD_ID(150)].unk_1E8);
                 break;
             case 213:
                 loc20->GetCommandData(q28);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E5F60(0x94, q28);
+                    dword_4B9190->sub_E5F60(HUD_ID(0x94), q28);
                 break;
             case 215:
                 loc20->GetCommandData(w48);
@@ -707,6 +734,7 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                     dword_4B9190->sub_E7050(0x53, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
+#ifndef CODFH_SP // MP only: single player's HUD has no unk_5C..unk_78 (include/types/type_DC400.h)
             case 228:
                 loc20->GetCommandData(frm_24);
                 if (dword_4B9190)
@@ -763,6 +791,7 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                     dword_4B9190->unk_78 = r34;
                 }
                 break;
+#endif
             case 240:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
@@ -812,6 +841,7 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 if (dword_4B9190)
                     dword_4B9190->sub_E75D0(0x57, r34);
                 break;
+#endif
             case 17:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
@@ -835,6 +865,7 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 {
                     dword_4B9190->sub_E74D0(0x20, &lv_30);
                     dword_4B9190->sub_E74D0(0x21, &lv_30);
+#ifndef CODFH_SP
                     dword_4B9190->sub_E74D0(0x31, &lv_30);
                     dword_4B9190->sub_E74D0(0x32, &lv_30);
                     dword_4B9190->sub_E74D0(0x33, &lv_30);
@@ -851,6 +882,7 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                     dword_4B9190->sub_E74D0(0x3E, &lv_30);
                     dword_4B9190->sub_E74D0(0x3F, &lv_30);
                     dword_4B9190->sub_E74D0(0x40, &lv_30);
+#endif
                 }
                 break;
             case 20:
@@ -880,29 +912,29 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 {
                     dword_4B9190->unk_54 = (RwUInt32)Width * w48.x;
                     dword_4B9190->unk_58 = (RwUInt32)Height * w48.y;
-                    dword_4B9190->sub_E7050(0x5A, dword_4B9190->unk_54, dword_4B9190->unk_58);
-                    dword_4B9190->sub_E7050(0x8A, dword_4B9190->unk_54, dword_4B9190->unk_58);
+                    dword_4B9190->sub_E7050(HUD_ID(0x5A), dword_4B9190->unk_54, dword_4B9190->unk_58);
+                    dword_4B9190->sub_E7050(HUD_ID(0x8A), dword_4B9190->unk_54, dword_4B9190->unk_58);
                 }
                 break;
             case 24:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E74D0(0x5B, &lv_30);
-                    dword_4B9190->sub_E74D0(0x5E, &lv_30);
-                    dword_4B9190->sub_E74D0(0x5C, &lv_30);
-                    dword_4B9190->sub_E74D0(0x5D, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x5B), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x5E), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x5C), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x5D), &lv_30);
                 }
                 break;
             case 29:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E74D0(0x5F, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x5F), &lv_30);
                 break;
             case 30:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E74D0(0x60, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x60), &lv_30);
                 break;
             case 26:
                 loc20->GetCommandData(lcl_38);
@@ -1089,102 +1121,102 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x7A, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x7A), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 54:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E74D0(0x7C, &lv_30);
-                    dword_4B9190->sub_E74D0(0x7D, &lv_30);
-                    dword_4B9190->sub_E74D0(0x7E, &lv_30);
-                    dword_4B9190->sub_E74D0(0x7F, &lv_30);
-                    dword_4B9190->sub_E74D0(0x7B, &lv_30);
-                    dword_4B9190->sub_E74D0(0x80, &lv_30);
-                    dword_4B9190->sub_E74D0(0x82, &lv_30);
-                    dword_4B9190->sub_E74D0(0x83, &lv_30);
-                    dword_4B9190->sub_E74D0(0x84, &lv_30);
-                    dword_4B9190->sub_E74D0(0x85, &lv_30);
-                    dword_4B9190->sub_E74D0(0x86, &lv_30);
-                    dword_4B9190->sub_E74D0(0x87, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x7C), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x7D), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x7E), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x7F), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x7B), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x80), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x82), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x83), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x84), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x85), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x86), &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x87), &lv_30);
                 }
                 break;
             case 55:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x81, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x81), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 56:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E74D0(0x62, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x62), &lv_30);
                 break;
             case 57:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x62, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x62), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 58:
                 loc20->GetCommandData(q28);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E5F60(0x62, q28);
+                    dword_4B9190->sub_E5F60(HUD_ID(0x62), q28);
                 break;
             case 59:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x63, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x63), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 60:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x64, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x64), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 61:
-                loc20->GetCommandData(dword_4B9190->unk_E0[100].unk_1E8);
+                loc20->GetCommandData(dword_4B9190->unk_E0[HUD_ID(100)].unk_1E8);
                 break;
             case 62:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x65, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x65), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 63:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E74D0(0x65, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x65), &lv_30);
                 break;
             case 64:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x66, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x66), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 65:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E74D0(0x67, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x67), &lv_30);
                 break;
             case 66:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E74D0(0x69, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x69), &lv_30);
                 break;
             case 67:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x69, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x69), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 68:
@@ -1195,7 +1227,7 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 r34.blue = (RwUInt8)(lcl_38 & 0xFF);
                 unk_4B8F34 = r34;
                 if (dword_4B9190)
-                    dword_4B9190->sub_E7270(0x69, &unk_4B8F34, &unk_4B8F34, &unk_4B8F38, &unk_4B8F38);
+                    dword_4B9190->sub_E7270(HUD_ID(0x69), &unk_4B8F34, &unk_4B8F34, &unk_4B8F38, &unk_4B8F38);
                 break;
             case 69:
                 loc20->GetCommandData(lcl_38);
@@ -1205,21 +1237,21 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 r34.blue = (RwUInt8)(lcl_38 & 0xFF);
                 unk_4B8F38 = r34;
                 if (dword_4B9190)
-                    dword_4B9190->sub_E7270(0x69, &unk_4B8F34, &unk_4B8F34, &unk_4B8F38, &unk_4B8F38);
+                    dword_4B9190->sub_E7270(HUD_ID(0x69), &unk_4B8F34, &unk_4B8F34, &unk_4B8F38, &unk_4B8F38);
                 break;
             case 70:
-                loc20->GetCommandData(dword_4B9190->unk_E0[105].unk_1E8);
+                loc20->GetCommandData(dword_4B9190->unk_E0[HUD_ID(105)].unk_1E8);
                 break;
             case 71:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E74D0(0x68, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x68), &lv_30);
                 break;
             case 72:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x68, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x68), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 73:
@@ -1229,54 +1261,54 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 r34.green = (RwUInt8)((lcl_38 & 0xFF00) >> 8);
                 r34.blue = (RwUInt8)(lcl_38 & 0xFF);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E7270(0x68, &r34, &r34, &r34, &r34);
+                    dword_4B9190->sub_E7270(HUD_ID(0x68), &r34, &r34, &r34, &r34);
                 break;
             case 74:
-                loc20->GetCommandData(dword_4B9190->unk_E0[104].unk_1E8);
+                loc20->GetCommandData(dword_4B9190->unk_E0[HUD_ID(104)].unk_1E8);
                 break;
             case 75:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x90, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x90), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 76:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x92, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
-                    dword_4B9190->sub_E7140(0x92, w48.z);
+                    dword_4B9190->sub_E7050(HUD_ID(0x92), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7140(HUD_ID(0x92), w48.z);
                 }
                 break;
             case 77:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E74D0(0x92, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x92), &lv_30);
                 break;
             case 78:
                 loc20->GetCommandData(q28);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E5F60(0x92, q28);
+                    dword_4B9190->sub_E5F60(HUD_ID(0x92), q28);
                 break;
             case 79:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x91, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7050(HUD_ID(0x91), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
                 }
                 break;
             case 80:
                 loc20->GetCommandData(lv_30);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E74D0(0x93, &lv_30);
+                    dword_4B9190->sub_E74D0(HUD_ID(0x93), &lv_30);
                 break;
             case 81:
                 loc20->GetCommandData(w48);
                 if (dword_4B9190)
                 {
-                    dword_4B9190->sub_E7050(0x93, (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
-                    dword_4B9190->sub_E7140(0x93, w48.z);
+                    dword_4B9190->sub_E7050(HUD_ID(0x93), (RwUInt32)Width * w48.x, (RwUInt32)Height * w48.y);
+                    dword_4B9190->sub_E7140(HUD_ID(0x93), w48.z);
                 }
                 break;
             case 82:
@@ -1286,15 +1318,19 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 r34.green = (RwUInt8)((lcl_38 & 0xFF00) >> 8);
                 r34.blue = (RwUInt8)(lcl_38 & 0xFF);
                 if (dword_4B9190)
-                    dword_4B9190->sub_E7200(0x93, r34.red, r34.green, r34.blue, r34.alpha);
+                    dword_4B9190->sub_E7200(HUD_ID(0x93), r34.red, r34.green, r34.blue, r34.alpha);
                 break;
             case 83:
-                loc20->GetCommandData(dword_4B9190->unk_E0[147].unk_1E8);
+                loc20->GetCommandData(dword_4B9190->unk_E0[HUD_ID(147)].unk_1E8);
                 break;
             case 84:
+#ifdef CODFH_SP
+                loc20->GetCommandData(unk_4B8EF4);
+#else
                 loc20->GetCommandData(w48);
                 unk_4B8EF4.x = (RwUInt32)Width * w48.x / 640.0f;
                 unk_4B8EF4.y = (RwUInt32)Height * w48.y / 480.0f;
+#endif
                 break;
             case 85:
                 loc20->GetCommandData(lcl_38);
@@ -1361,12 +1397,20 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 dword_4B8F4C = r34;
                 break;
             case 95:
+#ifdef CODFH_SP
+                loc20->GetCommandData(dword_4B8F5C);
+#else
                 loc20->GetCommandData(x4C);
                 dword_4B8F5C = x4C;
+#endif
                 break;
             case 94:
+#ifdef CODFH_SP // a float in single player, read straight in (SP 0x8A60A: a plain dword copy)
+                loc20->GetCommandData(dword_4B8F60);
+#else
                 loc20->GetCommandData(loc50);
                 dword_4B8F60 = loc50;
+#endif
                 break;
             case 96:
                 if (dword_4B9190)
@@ -1411,7 +1455,7 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 {
                     for (RwInt32 m_6C = 0; m_6C < 5; m_6C++)
                     {
-                        loc20->GetCommandData(dword_4B9190->unk_E0[m_6C + 0x8B].unk_1E8);
+                        loc20->GetCommandData(dword_4B9190->unk_E0[m_6C + HUD_ID(0x8B)].unk_1E8);
                     }
                 }
                 break;
@@ -1421,7 +1465,7 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                     loc20->GetCommandData(lv_30);
                     for (RwInt32 s70 = 0; s70 < 5; s70++)
                     {
-                        dword_4B9190->sub_E74D0(s70 + 0x8B, &lv_30);
+                        dword_4B9190->sub_E74D0(s70 + HUD_ID(0x8B), &lv_30);
                     }
                 }
                 break;
@@ -1892,12 +1936,18 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 r34.red = (RwUInt8)((lcl_38 & 0xFF0000) >> 16);
                 r34.green = (RwUInt8)((lcl_38 & 0xFF00) >> 8);
                 r34.blue = (RwUInt8)(lcl_38 & 0xFF);
+                // RenderWare's RwRGBARealFromRwRGBAMacro(&lv_10, &r34), spelled
+                // as its header spells it.
                 do
                 {
-                    lv_10.red = ((RwReal)r34.red) * ((RwReal)(1.0 / 255.0));
-                    lv_10.green = ((RwReal)r34.green) * ((RwReal)(1.0 / 255.0));
-                    lv_10.blue = ((RwReal)r34.blue) * ((RwReal)(1.0 / 255.0));
-                    lv_10.alpha = ((RwReal)r34.alpha) * ((RwReal)(1.0 / 255.0));
+                    (&lv_10)->red   =
+                        (((RwReal)(((&r34)->red))) * (   (RwReal)((1.0/255.0))));
+                    (&lv_10)->green =
+                        (((RwReal)(((&r34)->green))) * ( (RwReal)((1.0/255.0))));
+                    (&lv_10)->blue  =
+                        (((RwReal)(((&r34)->blue))) * (  (RwReal)((1.0/255.0))));
+                    (&lv_10)->alpha =
+                        (((RwReal)(((&r34)->alpha))) * ( (RwReal)((1.0/255.0))));
                 }
                 while (0);
                 unk_4B917C = lv_10;
@@ -1949,7 +1999,12 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 loc20->GetCommandData(r80);
                 r80.x = (RwUInt32)Width * 0.5f * r80.x;
                 r80.y = (RwUInt32)Height * 0.5f * r80.y;
+#ifdef CODFH_SP // shape: copied field by field, so both products are stored straight to the global (SP 0x8BBC6)
+                dword_4EBCF8.x = r80.x;
+                dword_4EBCF8.y = r80.y;
+#else
                 dword_4EBCF8 = r80;
+#endif
                 break;
             }
             case 183:
@@ -1959,7 +2014,12 @@ void CShellBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
                 loc20->GetCommandData(t88);
                 t88.x = (RwUInt32)Width * 0.5f * t88.x;
                 t88.y = (RwUInt32)Height * 0.5f * t88.y;
+#ifdef CODFH_SP // shape: copied field by field, so both products are stored straight to the global (SP 0x8BC30)
+                dword_4EBD08.x = t88.x;
+                dword_4EBD08.y = t88.y;
+#else
                 dword_4EBD08 = t88;
+#endif
                 break;
             }
             case 184:

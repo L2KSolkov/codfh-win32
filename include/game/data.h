@@ -245,10 +245,14 @@ extern RwChar Buffer[];
 // "FadeSubstreamVolume"'s arguments, kept in globals: the voice type
 // (dword_428A2C, -1 at first), the two volumes in percent (flt_439E70) and
 // fade times (dword_439E68), and a working volume (dword_428A28, a float).
+#ifndef CODFH_SP // file-static in single player (unit_0441B0: sub_5F950, SP 0x4E5A0)
 extern RwInt32 dword_428A2C;
 extern RwReal flt_439E70[2];
+#endif
 extern RwInt32 dword_439E68[2];
+#ifndef CODFH_SP // single player defines it static in unit_0441B0 (sub_5F950 drops a dead store, SP 0x4E5A0)
 extern RwReal dword_428A28;
+#endif
 #include "types/type_8A980.h"
 #include "types/type_DA0A0.h"
 // dword_4E5E40: the index-sound table; unk_08 lists 12-byte entries whose
@@ -306,6 +310,14 @@ struct type_4F28F0_38
 };
 struct type_4F28F0
 {
+#ifdef CODFH_SP // a constructor clearing unk_38: byte_4F2908 is static .data (SP 0x3285C8, -1 at +0x40)
+    // /O2 initializes it statically, with no initializer (multiplayer's is
+    // unk_4F2940's, unit_19AAB0).
+    type_4F28F0()
+    {
+        unk_38.clear();
+    }
+#endif
     RwInt32 unk_00;
     RwInt32 unk_04;
     RwInt32 unk_08;             // unk_10 is set (sub_19B000)
@@ -1258,5 +1270,16 @@ struct type_42A370
     RwReal unk_20;
 };
 extern type_42A370 byte_42A370[9];
+
+#ifdef CODFH_SP
+// A level's entry in PlayerTrigger::HandleAttributes' checkpoint table (single player, SP 0x84FB3):
+// its number, whether it carries the checkpoint's attributes over, and its chapter.
+struct sp_level_chapter
+{
+    RwInt32 level;
+    RwUInt8 carries;
+    RwUInt8 chapter;
+};
+#endif
 
 #endif

@@ -4,6 +4,11 @@
 
 #include "rw/batypes.h"
 #include "rw/ostypes.h"
+#ifdef CODFH_SP
+#define SP_HUD(mp, sp) (sp)
+#else
+#define SP_HUD(mp, sp) (mp)
+#endif
 #include "rws/cattributehandler.h"
 #include "rws/cclassfactory.h"
 #include "game/data.h"
@@ -52,21 +57,26 @@ RWS_REGISTERCLASS(CShellLevelBehaviorClass);
 // match: ?MakeNew@CShellLevelBehaviorClass@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000B6EB0
 // match: __ehhandler$?MakeNew@CShellLevelBehaviorClass@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300290
 // match: __ehhandler$?MakeNew@CShellLevelBehaviorClass@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030029F
+// sp-match: ?MakeNew@CShellLevelBehaviorClass@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0008C630
 RWS_DEFINE_MAKENEW(CShellLevelBehaviorClass)
 
 // match: ??0CShellLevelBehaviorClass@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000B6F30
+// sp-match: ??0CShellLevelBehaviorClass@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0008C320
 CShellLevelBehaviorClass::CShellLevelBehaviorClass(const RWS::CAttributePacket &attr)
 {
 }
 
 // match: ??_GCShellLevelBehaviorClass@@UAEPAXI@Z @ 0x000B6FC0
+// sp-match: ??_GCShellLevelBehaviorClass@@UAEPAXI@Z @ 0x0008C3D0
 
 // match: ??1CShellLevelBehaviorClass@@UAE@XZ @ 0x000B6FE0
 // match: __ehhandler$??1CShellLevelBehaviorClass@@UAE@XZ-0x8 @ 0x003002B0
 // match: __ehhandler$??1CShellLevelBehaviorClass@@UAE@XZ @ 0x003002B8
+// sp-match: ??1CShellLevelBehaviorClass@@UAE@XZ @ 0x0008C360
 // (Defined in the class, in CShellLevelBehaviorClass.h.)
 
 // match: ?HandleAttributes@CShellLevelBehaviorClass@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000B7060
+// sp-match: ?HandleAttributes@CShellLevelBehaviorClass@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0008C3E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void CShellLevelBehaviorClass::HandleAttributes(const RWS::CAttributePacket &attr)
 {
@@ -105,10 +115,10 @@ void CShellLevelBehaviorClass::HandleAttributes(const RWS::CAttributePacket &att
             var_18.blue = (RwUInt8)(var_1C & 0xFF);
             if (dword_4B9190)
             {
-                dword_4B9190->sub_E7200(0x5B, var_18.red, var_18.green, var_18.blue, var_18.alpha);
-                dword_4B9190->sub_E7200(0x5C, var_18.red, var_18.green, var_18.blue, var_18.alpha);
-                dword_4B9190->sub_E7200(0x5D, var_18.red, var_18.green, var_18.blue, var_18.alpha);
-                dword_4B9190->sub_E7200(0x5E, var_18.red, var_18.green, var_18.blue, var_18.alpha);
+                dword_4B9190->sub_E7200(SP_HUD(0x5B, 0x32), var_18.red, var_18.green, var_18.blue, var_18.alpha);
+                dword_4B9190->sub_E7200(SP_HUD(0x5C, 0x33), var_18.red, var_18.green, var_18.blue, var_18.alpha);
+                dword_4B9190->sub_E7200(SP_HUD(0x5D, 0x34), var_18.red, var_18.green, var_18.blue, var_18.alpha);
+                dword_4B9190->sub_E7200(SP_HUD(0x5E, 0x35), var_18.red, var_18.green, var_18.blue, var_18.alpha);
             }
             dword_4B8EF0.unk_38 = var_18;
             break;
@@ -138,6 +148,7 @@ void CShellLevelBehaviorClass::HandleAttributes(const RWS::CAttributePacket &att
 }
 
 // match: ??_ECShellLevelBehaviorClass@@WBI@AEPAXI@Z @ 0x000B7320
+// sp-match: ??_ECShellLevelBehaviorClass@@WBI@AEPAXI@Z @ 0x0008C3C0
 
 // Members /OPT:ICF folded into shared trivial bodies (config/aliases.txt): defined here for
 // the authentic link (PLAN M7); the placement link takes the shared bodies.

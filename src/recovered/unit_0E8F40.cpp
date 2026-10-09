@@ -19,10 +19,12 @@
 #include "types/soundbank.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: single player has no unreferenced 0.01f (its 16.666666f precedes the HUD texture name, SP 0x2E5340)
 // 0x003D8D58
 extern const RwReal flt_3D8D58 = 0.01f;
 // 0x003D8D5C
 extern const RwReal flt_3D8D5C = 0.01f;
+#endif
 // 0x003D8D60
 extern const RwReal flt_3D8D60 = 16.666666f;
 // 0x00429444
@@ -79,6 +81,9 @@ type_4B8EF0 dword_4B8EF0;
 // match: _$E2 @ 0x0030B500
 // match: _$E3 @ 0x0030E4A0
 // match: ??0type_4B8EF0@@QAE@XZ @ 0x000E8F40
+// sp-match: ??0type_4B8EF0@@QAE@XZ @ 0x000B33E0
+// sp-match: _$E2 @ 0x0021D580
+// sp-match: _$E3 @ 0x0021E830
 
 type_4B8EF0::type_4B8EF0()
 {
@@ -87,16 +92,32 @@ type_4B8EF0::type_4B8EF0()
 }
 
 // match: ??0type_E8F90@@QAE@XZ @ 0x000E8F90
+// sp-match: ??0type_E8F90@@QAE@XZ @ 0x000B2980
 
 // match: ??1type_4B8EF0@@QAE@XZ @ 0x000E9770
+// sp-match: ??1type_4B8EF0@@QAE@XZ @ 0x000B3490
 type_4B8EF0::~type_4B8EF0()
 {
     sub_E99E0();
 }
 
+#ifdef CODFH_SP
+void sub_19B0C0(RwInt32 arg_0);
+
+// sp-match: ?sp_sub_B34A0@@YA_NXZ @ 0x000B34A0
+// Sets the language to the first (English); true. Single player's front end calls it
+// (SP 0xA5A24, 0xA5CF6).
+bool sp_sub_B34A0()
+{
+    sub_19B0C0(0);
+    return true;
+}
+#endif
+
 // match: ?sub_E9790@type_4B8EF0@@QAEXHH@Z @ 0x000E9790
 // match: __ehhandler$?sub_E9790@type_4B8EF0@@QAEXHH@Z-0xF @ 0x00300F30
 // match: __ehhandler$?sub_E9790@type_4B8EF0@@QAEXHH@Z @ 0x00300F3F
+// sp-match: ?sub_E9790@type_4B8EF0@@QAEXHH@Z @ 0x000B2C10
 void type_4B8EF0::sub_E9790(RwInt32 arg_0, RwInt32 arg_4)
 {
     RwInt32 var_10;
@@ -131,6 +152,7 @@ void type_4B8EF0::sub_E9790(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_E99A0@type_4B8EF0@@QAEXXZ @ 0x000E99A0
+// sp-match: ?sub_E99A0@type_4B8EF0@@QAEXXZ @ 0x000B2D30
 void type_4B8EF0::sub_E99A0()
 {
     if (unk_2A4 & 4 && unk_2A0)
@@ -141,6 +163,7 @@ void type_4B8EF0::sub_E99A0()
 }
 
 // match: ?sub_E99E0@type_4B8EF0@@QAEXXZ @ 0x000E99E0
+// sp-match: ?sub_E99E0@type_4B8EF0@@QAEXXZ @ 0x000B3400
 void type_4B8EF0::sub_E99E0()
 {
     sub_EAB10();
@@ -165,6 +188,7 @@ void type_4B8EF0::sub_E99E0()
 }
 
 // match: ?sub_E9AD0@type_4B8EF0@@QAEHM@Z @ 0x000E9AD0
+// sp-match: ?sub_E9AD0@type_4B8EF0@@QAEHM@Z @ 0x000B2D50
 RwInt32 type_4B8EF0::sub_E9AD0(RwReal arg_0)
 {
     if (unk_2A0 && unk_2A0->unk_0C)
@@ -181,6 +205,7 @@ RwInt32 type_4B8EF0::sub_E9AD0(RwReal arg_0)
 }
 
 // match: ?sub_E9B50@type_4B8EF0@@QAEXXZ @ 0x000E9B50
+// sp-match: ?sub_E9B50@type_4B8EF0@@QAEXXZ @ 0x000B2DB0
 void type_4B8EF0::sub_E9B50()
 {
     if (unk_2A4 & 4 && unk_2A0 && unk_2A0->unk_0C)
@@ -195,6 +220,7 @@ void type_4B8EF0::sub_E9B50()
 }
 
 // match: ?sub_E9BE0@type_4B8EF0@@QAEXPBDPAURwV2d@@HMMM@Z @ 0x000E9BE0
+// sp-match: ?sub_E9BE0@type_4B8EF0@@QAEXPBDPAURwV2d@@HMMM@Z @ 0x000B2E10
 void type_4B8EF0::sub_E9BE0(const RwChar *arg_0, RwV2d *arg_4, RwInt32 arg_8, RwReal arg_C, RwReal arg_10,
                              RwReal arg_14)
 {
@@ -202,12 +228,17 @@ void type_4B8EF0::sub_E9BE0(const RwChar *arg_0, RwV2d *arg_4, RwInt32 arg_8, Rw
 }
 
 // match: ?sub_E9C20@type_4B8EF0@@QAEXXZ @ 0x000E9C20
+// sp-match: ?sub_E9C20@type_4B8EF0@@QAEXXZ @ 0x000B2E40
 void type_4B8EF0::sub_E9C20()
 {
     Rt2dFontSetPath(unk_2AC);
     if (unk_2A4 & 4)
     {
+#ifdef CODFH_SP // single player loads HUD.TXD, not HUD_MP.TXD (SP 0x2E5344)
+        unk_2A0->sub_DFB00("SHELL\\HUD\\INSTANCE\\XBOX\\HUD.TXD", "SHELL\\HUD\\INSTANCE\\XBOX\\F_HUD.TXD");
+#else
         unk_2A0->sub_DFB00("SHELL\\HUD\\INSTANCE\\XBOX\\HUD_MP.TXD", "SHELL\\HUD\\INSTANCE\\XBOX\\F_HUD.TXD");
+#endif
         sub_EAC60();
         sub_EAF30();
         sub_17C4A0();
@@ -215,12 +246,14 @@ void type_4B8EF0::sub_E9C20()
 }
 
 // match: ?sub_E9C80@type_4B8EF0@@QAEXI@Z @ 0x000E9C80
+// sp-match: ?sub_E9C80@type_4B8EF0@@QAEXI@Z @ 0x000B2E90
 void type_4B8EF0::sub_E9C80(RwUInt32 arg_0)
 {
     unk_2A4 = arg_0;
 }
 
 // match: ?sub_E9CA0@type_4B8EF0@@QAEXXZ @ 0x000E9CA0
+// sp-match: ?sub_E9CA0@type_4B8EF0@@QAEXXZ @ 0x000B2EA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_4B8EF0::sub_E9CA0()
 {
@@ -242,6 +275,9 @@ void type_4B8EF0::sub_E9CA0()
     var_114 = 0;
     var8 = 0;
     bp_4 = sub_19B060(sub_19B050());
+#ifdef CODFH_SP // single player has no game types: always the level's own picture (SP 0xB2EA0)
+    sprintf(var_110, "%s%s.txd", "SHELL\\LOAD\\", bp_4);
+#else
     switch (dword_4FB9E0.get_game_type())
     {
     case 1:
@@ -264,6 +300,7 @@ void type_4B8EF0::sub_E9CA0()
         sprintf(var_110, "%s%s.txd", "SHELL\\LOAD\\", bp_4);
         break;
     }
+#endif
     fp_C = sub_EA9C0(var_110);
     var_114 = sub_EA9C0("SHELL\\FEND\\INSTANCE\\XBOX\\LOADING.TXD");
     if (fp_C)
@@ -306,6 +343,7 @@ void type_4B8EF0::sub_E9CA0()
 }
 
 // match: ?sub_E9FB0@type_4B8EF0@@QAEXH@Z @ 0x000E9FB0
+// sp-match: ?sub_E9FB0@type_4B8EF0@@QAEXH@Z @ 0x000B3010
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_4B8EF0::sub_E9FB0(RwInt32 arg_0)
 {
@@ -560,9 +598,19 @@ RwRGBA &dword_4B8F50 = *(RwRGBA *)((RwUInt8 *)&dword_4B8EF0 + 0x60);
 // 0x004B8F54: dword_4B8EF0 + 0x64
 RwV2d &dword_4B8F54 = *(RwV2d *)((RwUInt8 *)&dword_4B8EF0 + 0x64);
 // 0x004B8F5C: dword_4B8EF0 + 0x6C
+// SP stores the pause fade duration and opacity as floats; keep those aliases
+// floating-point in the Win32 plain build so the HUD fade math reads them correctly.
+#ifdef CODFH_SP
+RwReal &dword_4B8F5C = *(RwReal *)((RwUInt8 *)&dword_4B8EF0 + 0x6C);
+#else
 RwInt32 &dword_4B8F5C = *(RwInt32 *)((RwUInt8 *)&dword_4B8EF0 + 0x6C);
+#endif
 // 0x004B8F60: dword_4B8EF0 + 0x70
+#ifdef CODFH_SP
+RwReal &dword_4B8F60 = *(RwReal *)((RwUInt8 *)&dword_4B8EF0 + 0x70);
+#else
 RwInt32 &dword_4B8F60 = *(RwInt32 *)((RwUInt8 *)&dword_4B8EF0 + 0x70);
+#endif
 // 0x004B8F64: dword_4B8EF0 + 0x74
 RwRGBA &dword_4B8F64 = *(RwRGBA *)((RwUInt8 *)&dword_4B8EF0 + 0x74);
 // 0x004B8F68: dword_4B8EF0 + 0x78

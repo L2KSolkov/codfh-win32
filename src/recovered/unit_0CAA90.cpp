@@ -38,9 +38,11 @@ RWS_REGISTERCLASS(LadderTrigger);
 // match: ?MakeNew@LadderTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000CAA90
 // match: __ehhandler$?MakeNew@LadderTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300A40
 // match: __ehhandler$?MakeNew@LadderTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00300A4F
+// sp-match: ?MakeNew@LadderTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00099F90
 RWS_DEFINE_MAKENEW(LadderTrigger)
 
 // match: ??0LadderTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000CAB10
+// sp-match: ??0LadderTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00099D70
 LadderTrigger::LadderTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     unk_C8 = 0;
@@ -51,21 +53,26 @@ LadderTrigger::LadderTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 }
 
 // match: ?vf_01C@LadderTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x000CABA0
+// sp-match: ?vf_01C@LadderTrigger@@UAEPAUtype_3DF8D8_04@@XZ @ 0x00099DC0
 
 // match: ??_GLadderTrigger@@UAEPAXI@Z @ 0x000CABC0
+// sp-match: ??_GLadderTrigger@@UAEPAXI@Z @ 0x00099F80
 
 // match: ??1LadderTrigger@@UAE@XZ @ 0x000CABE0
+// sp-match: ??1LadderTrigger@@UAE@XZ @ 0x00099DD0
 LadderTrigger::~LadderTrigger()
 {
 }
 
 // match: ?HandleAttributes@LadderTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000CAC10
+// sp-match: ?HandleAttributes@LadderTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00099DF0
 void LadderTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
 }
 
 // match: ?sub_CAC30@LadderTrigger@@QAEXPAUtype_3D3548@@@Z @ 0x000CAC30
+// sp-match: ?sub_CAC30@LadderTrigger@@QAEXPAUtype_3D3548@@@Z @ 0x00099E00
 void LadderTrigger::sub_CAC30(type_3D3548 *arg_0)
 {
     type_10F710 *var_4;
@@ -81,6 +88,7 @@ void LadderTrigger::sub_CAC30(type_3D3548 *arg_0)
 }
 
 // match: ?vf_028@LadderTrigger@@UAEHPAURwMatrixTag@@@Z @ 0x000CAC70
+// sp-match: ?vf_028@LadderTrigger@@UAEHPAURwMatrixTag@@@Z @ 0x00099E30
 RwInt32 LadderTrigger::vf_028(RwMatrix *arg_0)
 {
     RwV3d var_10;
@@ -133,6 +141,7 @@ RwInt32 LadderTrigger::vf_028(RwMatrix *arg_0)
 }
 
 // match: ??_ELadderTrigger@@WBI@AEPAXI@Z @ 0x000CAE10
+// sp-match: ??_ELadderTrigger@@WBI@AEPAXI@Z @ 0x00099F70
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

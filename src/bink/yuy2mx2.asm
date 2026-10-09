@@ -15,6 +15,7 @@ BINKYUY2MX SEGMENT PARA PUBLIC 'CODE'
 segstart:
 
 ; // match: _YUY2_mx2_4x2_MMX@4 @ 0x00354F40
+; // sp-match: _YUY2_mx2_4x2_MMX@4 @ 0x00264F40
 _YUY2_mx2_4x2_MMX@4 PROC PUBLIC
         push ebx
         push ebp

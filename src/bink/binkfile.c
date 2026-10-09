@@ -14,6 +14,7 @@
 #define BLOCK 0x4000
 
 // match: _BinkFileReadHeader@16 @ 0x00349BA0
+// sp-match: _BinkFileReadHeader@16 @ 0x00259BA0
 static U32 RADLINK BinkFileReadHeader(BINKIO PTR4 *bio, S32 offset, void PTR4 *dest, U32 size)
 {
   U32 amt;
@@ -42,6 +43,7 @@ static U32 RADLINK BinkFileReadHeader(BINKIO PTR4 *bio, S32 offset, void PTR4 *d
 }
 
 // match: _dosimulate @ 0x00349C30
+// sp-match: _dosimulate @ 0x00259C30
 static void dosimulate(BINKIO *bio, U32 amt, U32 start)
 {
   U32 ms = mult64anddiv(amt, 1000, BF(bio)->Simulate);
@@ -63,6 +65,7 @@ static void dosimulate(BINKIO *bio, U32 amt, U32 start)
 }
 
 // match: _BinkFileReadFrame@20 @ 0x00349CC0
+// sp-match: _BinkFileReadFrame@20 @ 0x00259CC0
 static U32 RADLINK BinkFileReadFrame(BINKIO PTR4 *bio, U32 frame, S32 offset, void PTR4 *dest, U32 size)
 {
   S32 suspended = 0;
@@ -181,12 +184,14 @@ static U32 RADLINK BinkFileReadFrame(BINKIO PTR4 *bio, U32 frame, S32 offset, vo
 }
 
 // match: _BinkFileGetBufferSize@8 @ 0x00349FA0
+// sp-match: _BinkFileGetBufferSize@8 @ 0x00259FA0
 static U32 RADLINK BinkFileGetBufferSize(BINKIO PTR4 *bio, U32 size)
 {
   return ((size + BLOCK - 1) / BLOCK) * BLOCK;
 }
 
 // match: _BinkFileSetInfo@20 @ 0x00349FC0
+// sp-match: _BinkFileSetInfo@20 @ 0x00259FC0
 static void RADLINK BinkFileSetInfo(BINKIO PTR4 *bio, void PTR4 *buf, U32 size, U32 filesize, U32 simulate)
 {
   if (bio->suspend_callback)
@@ -208,6 +213,7 @@ static void RADLINK BinkFileSetInfo(BINKIO PTR4 *bio, void PTR4 *buf, U32 size, 
 }
 
 // match: _BinkFileClose@4 @ 0x0034A020
+// sp-match: _BinkFileClose@4 @ 0x0025A020
 static void RADLINK BinkFileClose(BINKIO PTR4 *bio)
 {
   if (bio->suspend_callback)
@@ -219,6 +225,7 @@ static void RADLINK BinkFileClose(BINKIO PTR4 *bio)
 }
 
 // match: _BinkFileIdle@4 @ 0x0034A060
+// sp-match: _BinkFileIdle@4 @ 0x0025A060
 static U32 RADLINK BinkFileIdle(BINKIO PTR4 *bio)
 {
   U32 amt = 0;
@@ -278,6 +285,7 @@ static U32 RADLINK BinkFileIdle(BINKIO PTR4 *bio)
 }
 
 // match: _BinkFileOpen@12 @ 0x0034A1F0
+// sp-match: _BinkFileOpen@12 @ 0x0025A1F0
 RADEXPFUNC S32 RADEXPLINK BinkFileOpen(BINKIO PTR4 *bio, const char PTR4 *name, U32 flags)
 {
   memset(bio, 0, sizeof(BINKIO));

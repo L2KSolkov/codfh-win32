@@ -71,6 +71,10 @@ extern void sub_244AA0(void);
 extern void sub_2451F0(void);
 typedef RwBool (*rwaOpenFunc)(void);
 // Its data definitions (PLAN M5), in the image's address order.
+#ifdef CODFH_SP // the pair { 1, 0 } before the module table (SP 0x32A850, after rwavirtualvoiceobj's unk_42E318; InitRWAAudio stores RwaCoreOpen's result in its first word, SP 0x6958A)
+/* Multiplayer's copy is the tail of unit_23CC10's unk_42E548 (0x42E620), its [54] and [55]. */
+void *unk_42E620[2] = { (void *)0x1, 0 };
+#endif
 // 0x0042E628
 rwaModule unk_42E628[17] = {
     { sub_23E1C0, sub_23E220 },
@@ -141,6 +145,7 @@ RwUInt32 dword_5069FC;
 RwUInt32 dword_516C5C;
 
 // match: _sub_23E1C0 @ 0x0023E1C0
+// sp-match: _sub_23E1C0 @ 0x00150260
 RwBool
 sub_23E1C0(void)
 {
@@ -192,6 +197,7 @@ sub_23E1C0(void)
 // match: _unk_42E6D4 @ 0x0042E6D4
 
 // match: _sub_23E220 @ 0x0023E220
+// sp-match: _sub_23E220 @ 0x001502C0
 
 void
 sub_23E220(void)
@@ -208,6 +214,7 @@ extern RwMemoryFunctions *RwOsGetMemoryInterface(void);
 extern RwInt32 sub_242240(RwMemoryFunctions *memFuncs);
 
 // match: _sub_23E240 @ 0x0023E240
+// sp-match: _sub_23E240 @ 0x001502E0
 static RwBool
 sub_23E240(rwaModule *modules, RwUInt32 count, rwaModuleCallBack closeCallBack, rwaModuleCallBack openCallBack)
 {
@@ -279,6 +286,7 @@ extern rwaInstance *sub_23F140(rwaInstance *obj, RwBool skipSelf);
 extern void sub_23EBD0(void);
 
 // match: _sub_23E2E0 @ 0x0023E2E0
+// sp-match: _sub_23E2E0 @ 0x00150350
 RwBool
 sub_23E2E0(rwaModule *module, RwUInt32 index)
 {
@@ -296,6 +304,7 @@ sub_23E2E0(rwaModule *module, RwUInt32 index)
 }
 
 // match: _sub_23E320 @ 0x0023E320
+// sp-match: _sub_23E320 @ 0x00150390
 void
 sub_23E320(rwaModule *module, RwUInt32 index)
 {
@@ -314,6 +323,7 @@ extern rwaOpenFunc unk_42E6C8[];
 extern rwaOpenFunc unk_42E6D4[];
 
 // match: _RwaCoreUpdateStart @ 0x0023E340
+// sp-match: _RwaCoreUpdateStart @ 0x001503B0
 void
 RwaCoreUpdateStart(void)
 {
@@ -324,6 +334,7 @@ RwaCoreUpdateStart(void)
 }
 
 // match: _RwaCoreUpdateFinish @ 0x0023E370
+// sp-match: _RwaCoreUpdateFinish @ 0x001503E0
 void
 RwaCoreUpdateFinish(void)
 {
@@ -335,6 +346,7 @@ RwaCoreUpdateFinish(void)
 extern RwUInt32 dword_516C5C;
 
 // match: _sub_23E3A0 @ 0x0023E3A0
+// sp-match: _sub_23E3A0 @ 0x00150410
 RwBool
 sub_23E3A0(void)
 {
@@ -367,6 +379,7 @@ extern RwUInt32 dword_5069A8;
 extern RwUInt32 dword_5069AC;
 
 // match: _sub_23E420 @ 0x0023E420
+// sp-match: _sub_23E420 @ 0x00150450
 RwUInt32
 sub_23E420(RwUInt32 size)
 {
@@ -383,6 +396,7 @@ sub_23E420(RwUInt32 size)
 }
 
 // match: _sub_23E440 @ 0x0023E440
+// sp-match: _sub_23E440 @ 0x00150470
 RwInt32
 sub_23E440(RwInt32 format)
 {
@@ -423,6 +437,7 @@ extern void *RwaVirtualVoiceRegister(void);
 extern RwInt32 RwaListenerUnregister(void);
 
 // match: _RwaCoreOpen @ 0x0023E510
+// sp-match: _RwaCoreOpen @ 0x00150540
 RwBool
 RwaCoreOpen(RwMemoryFunctions *memoryFunctions, RwBool usingRwGraphics)
 {
@@ -461,6 +476,7 @@ extern RwUInt32 sub_244940(void);
 extern RwUInt32 sub_244960(void);
 
 // match: _RwaCoreUpdate @ 0x0023E5B0
+// sp-match: _RwaCoreUpdate @ 0x001505A0
 void
 RwaCoreUpdate(void)
 {
@@ -469,6 +485,7 @@ RwaCoreUpdate(void)
 }
 
 // match: _sub_23E5C0 @ 0x0023E5C0
+// sp-match: _sub_23E5C0 @ 0x001505B0
 RwBool
 sub_23E5C0(void)
 {
@@ -483,6 +500,7 @@ sub_23E5C0(void)
 }
 
 // match: _sub_23E600 @ 0x0023E600
+// sp-match: _sub_23E600 @ 0x001505F0
 void
 sub_23E600(void)
 {

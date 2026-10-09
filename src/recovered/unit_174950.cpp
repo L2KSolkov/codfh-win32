@@ -58,6 +58,8 @@ type_4E5E50 unk_4E5E50;
 // match: _$E2 @ 0x0030BE80
 // match: _$E4 @ 0x0030BEB0
 // match: _$E5 @ 0x0030E960
+// sp-match: _$E5 @ 0x0021ED20
+// sp-match: _$E4 @ 0x0021DDB0
 
 // A switch compiled to 0: an inline with no address and so no database
 // name, named for what it returns. Evidence: the camera's set-up tests it
@@ -68,6 +70,7 @@ inline RwInt32 always_0()
 }
 
 // match: ?sub_174950@@YAXXZ @ 0x00174950
+// sp-match: ?sub_174950@@YAXXZ @ 0x001101E0
 // Clears the index-sound table (the game loop's set-up).
 void sub_174950()
 {
@@ -77,18 +80,21 @@ void sub_174950()
 }
 
 // match: ?vf_0E0@type_3DD948@@UAEPAEXZ @ 0x00174980
+// sp-match: ?vf_0E0@type_3DD948@@UAEPAEXZ @ 0x00110FF0
 RwUInt8 *type_3DD948::vf_0E0()
 {
     return (RwUInt8 *)unk_424;
 }
 
 // match: ?vf_0EC@type_3DD948@@UAEXHH@Z @ 0x001749A0
+// sp-match: ?vf_0EC@type_3DD948@@UAEXHH@Z @ 0x00111000
 void type_3DD948::vf_0EC(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_424[arg_0] = (RwInt16)arg_4;
 }
 
 // match: ?vf_090@type_3DD948@@UAEPAUtype_6D380@@XZ @ 0x001749C0
+// sp-match: ?vf_090@type_3DD948@@UAEPAUtype_6D380@@XZ @ 0x00111020
 type_6D380 *type_3DD948::vf_090()
 {
     return (type_6D380 *)sub_67620(unk_3C8);
@@ -98,6 +104,8 @@ type_6D380 *type_3DD948::vf_090()
 // match: ??1type_3DD948@@UAE@XZ @ 0x00174A10
 // match: __ehhandler$??1type_3DD948@@UAE@XZ-0x16 @ 0x00301FD0
 // match: __ehhandler$??1type_3DD948@@UAE@XZ @ 0x00301FE6
+// sp-match: ??1type_3DD948@@UAE@XZ @ 0x00111050
+// sp-match: ??_Gtype_3DD948@@UAEPAXI@Z @ 0x00111030
 // vf_230, called directly as in any destructor, then the members' destructors and the
 // base's. Defined here, before the factory: the image has its EH handler first.
 type_3DD948::~type_3DD948()
@@ -108,6 +116,7 @@ type_3DD948::~type_3DD948()
 // match: ?sub_174A70@@YAPAUtype_3DD948@@PAURwV3d@@MPAUtype_3D3548@@@Z @ 0x00174A70
 // match: __ehhandler$?sub_174A70@@YAPAUtype_3DD948@@PAURwV3d@@MPAUtype_3D3548@@@Z-0x11 @ 0x00301FF0
 // match: __ehhandler$?sub_174A70@@YAPAUtype_3DD948@@PAURwV3d@@MPAUtype_3D3548@@@Z @ 0x00302001
+// sp-match: ?sub_174A70@@YAPAUtype_3DD948@@PAURwV3d@@MPAUtype_3D3548@@@Z @ 0x00111120
 type_3DD948 *sub_174A70(RwV3d *arg_0, RwReal arg_4, type_3D3548 *arg_8)
 {
     type_3DD948 *var_10;
@@ -122,6 +131,7 @@ type_3DD948 *sub_174A70(RwV3d *arg_0, RwReal arg_4, type_3D3548 *arg_8)
 // match: ??0type_3DD948@@QAE@PAURwV3d@@MPAUtype_3D3548@@@Z @ 0x00174B20
 // match: __ehhandler$??0type_3DD948@@QAE@PAURwV3d@@MPAUtype_3D3548@@@Z-0x16 @ 0x00302010
 // match: __ehhandler$??0type_3DD948@@QAE@PAURwV3d@@MPAUtype_3D3548@@@Z @ 0x00302026
+// sp-match: ??0type_3DD948@@QAE@PAURwV3d@@MPAUtype_3D3548@@@Z @ 0x001110A0
 type_3DD948::type_3DD948(RwV3d *arg_0, RwReal arg_4, type_3D3548 *arg_8)
 {
     unk_344.sub_144940(arg_8->get_unk_34C());
@@ -129,6 +139,7 @@ type_3DD948::type_3DD948(RwV3d *arg_0, RwReal arg_4, type_3D3548 *arg_8)
 }
 
 // match: ?sub_174BC0@type_3DD948@@QAEHPAURwV3d@@MPAUtype_3D3548@@@Z @ 0x00174BC0
+// sp-match: ?sub_174BC0@type_3DD948@@QAEHPAURwV3d@@MPAUtype_3D3548@@@Z @ 0x00110330
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3DD948::sub_174BC0(RwV3d *arg_0, RwReal arg_4, type_3D3548 *arg_8)
 {
@@ -240,6 +251,7 @@ RwInt32 type_3DD948::sub_174BC0(RwV3d *arg_0, RwReal arg_4, type_3D3548 *arg_8)
 }
 
 // match: ?vf_230@type_3DD948@@UAEXXZ @ 0x00175190
+// sp-match: ?vf_230@type_3DD948@@UAEXXZ @ 0x00110690
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Shuts it down once: its collision atomic taken off its frame and
 // released, its script object and performance player freed, its animation
@@ -273,12 +285,14 @@ void type_3DD948::vf_230()
 }
 
 // match: ?vf_1C4@type_3DD948@@UAEXH@Z @ 0x00175280
+// sp-match: ?vf_1C4@type_3DD948@@UAEXH@Z @ 0x00110730
 void type_3DD948::vf_1C4(RwInt32 arg_0)
 {
     unk_3B0 = 1;
 }
 
 // match: ?sub_1752A0@type_3DD948@@QAEXPAURwMatrixTag@@@Z @ 0x001752A0
+// sp-match: ?sub_1752A0@type_3DD948@@QAEXPAURwMatrixTag@@@Z @ 0x00110740
 void type_3DD948::sub_1752A0(RwMatrix *arg_0)
 {
     RwFrame *var_4;
@@ -289,6 +303,7 @@ void type_3DD948::sub_1752A0(RwMatrix *arg_0)
 }
 
 // match: ?vf_03C@type_3DD948@@UAEXM@Z @ 0x001752E0
+// sp-match: ?vf_03C@type_3DD948@@UAEXM@Z @ 0x00110760
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Moves the render camera by its mode (see types/type_3DD948.h), then the
 // base step.
@@ -354,12 +369,29 @@ void type_3DD948::vf_03C(RwReal arg_0)
             t34 = vf_098();
             if (t34)
             {
+#ifdef CODFH_SP
+                // shape: the time in a block-scoped local, sharing the second
+                // "IHaveArrived" send's slot and tail (SP 0x110955 jumps to 0x110BE2)
+                RwReal stk_38;
+
+#endif
                 stk_38 = deltaTime;
                 sub_6B5F0("IHaveArrived", (type_67620 *)t34, 0, 0, (RwInt32 *)(&stk_38), 1, 1, 0);
             }
         }
         else
         {
+#ifdef CODFH_SP
+            // shape: the blend's locals are scoped to this branch, so /O2 lays out
+            // the frame and schedules the matrix stores as SP 0x110760 does
+            RwV3d loc78;
+            RwV3d bp_6C;
+            RtQuat lv_60;
+            RtQuat var_4C;
+            RwReal lcl_50;
+            RwReal p3C;
+
+#endif
             lcl_50 = arg_0 * unk_410;
             if (lcl_50 < 0.0f)
                 lcl_50 = 0.0f;
@@ -437,6 +469,7 @@ void type_3DD948::vf_03C(RwReal arg_0)
 }
 
 // match: ?vf_04C@type_3DD948@@UAEXM@Z @ 0x00175AD0
+// sp-match: ?vf_04C@type_3DD948@@UAEXM@Z @ 0x00110C80
 // Its render step: the base's animation step; in mode 1 the render camera
 // on the entity's head bone (0x97); the shake; the object at unk_4E5E50
 // given the camera's matrix; the field of view.
@@ -487,12 +520,14 @@ void type_3DD948::vf_04C(RwReal arg_0)
 }
 
 // match: ?vf_044@type_3DD948@@UAEXM@Z @ 0x00175E30
+// sp-match: ?vf_044@type_3DD948@@UAEXM@Z @ 0x00106CB0
 void type_3DD948::vf_044(RwReal arg_0)
 {
     type_3D3548::vf_044(arg_0);
 }
 
 // match: ?sub_175E50@type_3DD948@@QAEXMMM@Z @ 0x00175E50
+// sp-match: ?sub_175E50@type_3DD948@@QAEXMMM@Z @ 0x00110EF0
 void type_3DD948::sub_175E50(RwReal arg_0, RwReal arg_4, RwReal arg_8)
 {
     type_10F710 *var_4;
@@ -509,12 +544,14 @@ void type_3DD948::sub_175E50(RwReal arg_0, RwReal arg_4, RwReal arg_8)
 }
 
 // match: ?vf_098@type_3DD948@@UAEPAUtype_3D2E7C@@XZ @ 0x00175EE0
+// sp-match: ?vf_098@type_3DD948@@UAEPAUtype_3D2E7C@@XZ @ 0x00110F60
 type_3D2E7C *type_3DD948::vf_098()
 {
     return (type_3D2E7C *)sub_67620(unk_3C4);
 }
 
 // match: ?sub_175F00@type_3DD948@@QAEXPAURwMatrixTag@@@Z @ 0x00175F00
+// sp-match: ?sub_175F00@type_3DD948@@QAEXPAURwMatrixTag@@@Z @ 0x00110F70
 void type_3DD948::sub_175F00(RwMatrix *arg_0)
 {
     unk_3D0.pos.x = arg_0->pos.x;
@@ -544,9 +581,13 @@ void *type_3DD948::operator new(RwUInt32 arg_0, void *arg_4)
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ??3type_3DD948@@SAXPAX@Z (folded into 0x19A750)
+// Single player's deleting destructor (SP 0x111030) calls it out of line: the
+// empty body here would let /O2 drop that call, so SP only declares it.
+#ifndef CODFH_SP
 void type_3DD948::operator delete(void * arg_0)
 {
 }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

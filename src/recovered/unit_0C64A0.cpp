@@ -35,21 +35,26 @@ RWS_REGISTERCLASS(StreamClumpTrigger);
 // match: ?MakeNew@StreamClumpTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000C64A0
 // match: __ehhandler$?MakeNew@StreamClumpTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x00300820
 // match: __ehhandler$?MakeNew@StreamClumpTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0030082F
+// sp-match: ?MakeNew@StreamClumpTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00096F80
 RWS_DEFINE_MAKENEW(StreamClumpTrigger)
 
 // match: ??0StreamClumpTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000C6520
+// sp-match: ??0StreamClumpTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00096E50
 StreamClumpTrigger::StreamClumpTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
 }
 
 // match: ??_GStreamClumpTrigger@@UAEPAXI@Z @ 0x000C6550
+// sp-match: ??_GStreamClumpTrigger@@UAEPAXI@Z @ 0x00096F70
 
 // match: ??1StreamClumpTrigger@@UAE@XZ @ 0x000C6570
+// sp-match: ??1StreamClumpTrigger@@UAE@XZ @ 0x00096E70
 StreamClumpTrigger::~StreamClumpTrigger()
 {
 }
 
 // match: ?HandleAttributes@StreamClumpTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000C65A0
+// sp-match: ?HandleAttributes@StreamClumpTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00096E90
 void StreamClumpTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
@@ -70,6 +75,7 @@ void StreamClumpTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 }
 
 // match: ?sub_C6650@StreamClumpTrigger@@QAEXXZ @ 0x000C6650
+// sp-match: ?sub_C6650@StreamClumpTrigger@@QAEXXZ @ 0x00096F20
 void StreamClumpTrigger::sub_C6650()
 {
     type_10F710 *var_4;
@@ -89,6 +95,7 @@ void StreamClumpTrigger::sub_C6650()
 }
 
 // match: ??_EStreamClumpTrigger@@WBI@AEPAXI@Z @ 0x000C66B0
+// sp-match: ??_EStreamClumpTrigger@@WBI@AEPAXI@Z @ 0x00096F60
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

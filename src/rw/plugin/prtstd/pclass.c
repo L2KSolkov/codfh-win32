@@ -165,6 +165,7 @@ _rpPrtStdPClassAdd(RpPrtStdParticleClass *pClassHead,
  * \see RpPrtStdPClassStreamGetSize
  */
 // match: _RpPrtStdPClassStreamGetSize @ 0x002EECE0
+// sp-match: _RpPrtStdPClassStreamGetSize @ 0x00209A70
 RwInt32
 RpPrtStdPClassStreamGetSize(RpPrtStdParticleClass * pClass __RWUNUSED__)
 {
@@ -215,6 +216,7 @@ RpPrtStdPClassStreamGetSize(RpPrtStdParticleClass * pClass __RWUNUSED__)
  * \see RpPrtStdGlobalDataGetStreamEmbedded
  */
 // match: _RpPrtStdPClassStreamWrite @ 0x002EECF0
+// sp-match: _RpPrtStdPClassStreamWrite @ 0x00209A80
 RpPrtStdParticleClass *
 RpPrtStdPClassStreamWrite(RpPrtStdParticleClass *pClass, RwStream *stream)
 {
@@ -261,6 +263,7 @@ RpPrtStdPClassStreamWrite(RpPrtStdParticleClass *pClass, RwStream *stream)
 // match: _rcsid @ 0x00419E48
 
 // match: _RpPrtStdPClassCreate @ 0x002EED40
+// sp-match: _RpPrtStdPClassCreate @ 0x002097D0
 RpPrtStdParticleClass *
 RpPrtStdPClassCreate( void )
 {
@@ -337,6 +340,7 @@ RpPrtStdPClassGetCallBack(RpPrtStdParticleClass *pClass,
  * \see RpPrtStdPropTabCreate
  */
 // match: _RpPrtStdPClassDestroy @ 0x002EEDA0
+// sp-match: _RpPrtStdPClassDestroy @ 0x00209830
 RwBool
 RpPrtStdPClassDestroy(RpPrtStdParticleClass *pClass)
 {
@@ -465,6 +469,7 @@ RpPrtStdPClassGetPropTab(RpPrtStdParticleClass *pClass,
  * \see RpPrtStdPropTabCreate
  */
 // match: _RpPrtStdPClassSetCallBack @ 0x002EEE50
+// sp-match: _RpPrtStdPClassSetCallBack @ 0x002098E0
 RpPrtStdParticleClass *
 RpPrtStdPClassSetCallBack(RpPrtStdParticleClass *pClass,
                                  RwInt32 numCallback,
@@ -532,6 +537,7 @@ RpPrtStdPClassSetCallBack(RpPrtStdParticleClass *pClass,
  * \see RpPrtStdPropTabCreate
  */
 // match: _RpPrtStdPClassSetPropTab @ 0x002EEEE0
+// sp-match: _RpPrtStdPClassSetPropTab @ 0x00209690
 RpPrtStdParticleClass *
 RpPrtStdPClassSetPropTab(RpPrtStdParticleClass *pClass,
                                       RpPrtStdPropertyTable *propTab)
@@ -583,6 +589,7 @@ RpPrtStdPClassSetPropTab(RpPrtStdParticleClass *pClass,
  * \see RpPrtStdPClassGetByPropTab
  */
 // match: _RpPrtStdPClassGet @ 0x002EEF20
+// sp-match: _RpPrtStdPClassGet @ 0x00209970
 RpPrtStdParticleClass *
 RpPrtStdPClassGet(RwInt32 id)
 {
@@ -629,6 +636,7 @@ RpPrtStdPClassGet(RwInt32 id)
  * \see RpPrtStdPClassGet
  */
 // match: _RpPrtStdPClassGetByPropTab @ 0x002EEF50
+// sp-match: _RpPrtStdPClassGetByPropTab @ 0x002099A0
 RpPrtStdParticleClass *
 RpPrtStdPClassGetByPropTab(RpPrtStdPropertyTable *propTab)
 {
@@ -719,6 +727,7 @@ RpPrtStdPClassGetByPropTab(RpPrtStdPropertyTable *propTab)
  * \see RpPrtStdPluginAttach
  */
 // match: _RpPrtStdPClassStreamRead @ 0x002EEF80
+// sp-match: _RpPrtStdPClassStreamRead @ 0x002099D0
 RpPrtStdParticleClass *
 RpPrtStdPClassStreamRead(RwStream *stream)
 {

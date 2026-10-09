@@ -11,6 +11,7 @@
 #include "game/gameloop.h"
 
 // match: ?UnLoadAsset@?A0x8c6de0eb@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00130170
+// sp-match: ?UnLoadAsset@?A0x8c6de0eb@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000E17F0
 namespace RWS
 {
    namespace
@@ -39,6 +40,7 @@ namespace RWS
 }
 
 // match: ?LoadAsset@?A0x8c6de0eb@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x001301F0
+// sp-match: ?LoadAsset@?A0x8c6de0eb@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000E1850
 namespace RWS
 {
    namespace
@@ -90,6 +92,7 @@ namespace RWS
 }
 
 // match: ?LoadEmbeddedAsset@?A0x8c6de0eb@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x001302E0
+// sp-match: ?LoadEmbeddedAsset@?A0x8c6de0eb@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000E18F0
 namespace RWS
 {
    namespace
@@ -157,6 +160,7 @@ namespace RWS
 }
 
 // match: ?RegisterStreamChunkHandlers@CResourceManager@RWS@@SAXXZ @ 0x00130440
+// sp-match: ?RegisterStreamChunkHandlers@CResourceManager@RWS@@SAXXZ @ 0x000E19F0
 void RWS::CResourceManager::RegisterStreamChunkHandlers(void)
    {
       CStreamHandler::RegisterChunkHandler(MAKECHUNKID (rwVENDORID_CRITERIONRM,
@@ -170,6 +174,7 @@ void RWS::CResourceManager::RegisterStreamChunkHandlers(void)
    }
 
 // match: ?UnRegisterStreamChunkHandlers@CResourceManager@RWS@@SAXXZ @ 0x00130480
+// sp-match: ?UnRegisterStreamChunkHandlers@CResourceManager@RWS@@SAXXZ @ 0x000E1A30
 void RWS::CResourceManager::UnRegisterStreamChunkHandlers(void)
    {
       CStreamHandler::UnRegisterChunkHandler(MAKECHUNKID (rwVENDORID_CRITERIONRM, strfunc_UnLoadAsset));

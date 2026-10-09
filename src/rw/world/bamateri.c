@@ -96,6 +96,7 @@ static RwUInt32 lastSeenExtraData;
 // match: __rpMaterialFreeListPreallocBlocks @ 0x00436BA0
 
 // match: __rpReadMaterialRights @ 0x002D86C0
+// sp-match: __rpReadMaterialRights @ 0x001F3190
 
 RwStream*
 _rpReadMaterialRights(RwStream *s,
@@ -125,6 +126,7 @@ _rpReadMaterialRights(RwStream *s,
 }
 
 // match: __rpWriteMaterialRights @ 0x002D8700
+// sp-match: __rpWriteMaterialRights @ 0x001F31D0
 RwStream*
 _rpWriteMaterialRights(RwStream *s,
                      RwInt32 len __RWUNUSED__,
@@ -156,6 +158,7 @@ _rpWriteMaterialRights(RwStream *s,
 }
 
 // match: __rpSizeMaterialRights @ 0x002D8740
+// sp-match: __rpSizeMaterialRights @ 0x001F3210
 RwInt32
 _rpSizeMaterialRights(const void *obj,
                     RwInt32 off __RWUNUSED__,
@@ -183,6 +186,7 @@ _rpSizeMaterialRights(const void *obj,
  * material doesn't have any surfaceProperties of it's own.
  */
 // match: __rpMaterialSetDefaultSurfaceProperties @ 0x002D8760
+// sp-match: __rpMaterialSetDefaultSurfaceProperties @ 0x001F3230
 void
 _rpMaterialSetDefaultSurfaceProperties(const RwSurfaceProperties *
                                       surfaceProps)
@@ -253,6 +257,7 @@ RpMaterialSetFreeListCreateParams(RwInt32 blockSize, RwInt32 numBlocksToPrealloc
  */
 
 // match: __rpMaterialOpen @ 0x002D87B0
+// sp-match: __rpMaterialOpen @ 0x001F3280
 void               *
 _rpMaterialOpen(void *instance, RwInt32 offset, RwInt32 __RWUNUSED__ size)
 {
@@ -289,6 +294,7 @@ _rpMaterialOpen(void *instance, RwInt32 offset, RwInt32 __RWUNUSED__ size)
  */
 
 // match: __rpMaterialClose @ 0x002D8800
+// sp-match: __rpMaterialClose @ 0x001F32D0
 void               *
 _rpMaterialClose(void *instance,
                  RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -344,6 +350,7 @@ _rpMaterialClose(void *instance,
  * \see RpWorldPluginAttach
  */
 // match: _RpMaterialCreate @ 0x002D8840
+// sp-match: _RpMaterialCreate @ 0x001F3310
 RpMaterial         *
 RpMaterialCreate(void)
 {
@@ -416,6 +423,7 @@ RpMaterialCreate(void)
  * \see RpWorldPluginAttach
  */
 // match: _RpMaterialDestroy @ 0x002D8AA0
+// sp-match: _RpMaterialDestroy @ 0x001F3570
 RwBool
 RpMaterialDestroy(RpMaterial *material)
 {
@@ -754,6 +762,7 @@ RpMaterialGetSurfaceProperties(const RpMaterial *material)
  * \see RpWorldPluginAttach
  */
 // match: _RpMaterialSetTexture @ 0x002D88E0
+// sp-match: _RpMaterialSetTexture @ 0x001F33B0
 RpMaterial *
 RpMaterialSetTexture(RpMaterial *material, RwTexture *texture)
 {
@@ -847,6 +856,7 @@ RpMaterialGetTexture(const RpMaterial *material)
  * \see RpWorldPluginAttach
  */
 // match: _RpMaterialRegisterPlugin @ 0x002D8910
+// sp-match: _RpMaterialRegisterPlugin @ 0x001F33E0
 RwInt32
 RpMaterialRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
                          RwPluginObjectConstructor constructCB,
@@ -891,6 +901,7 @@ RpMaterialRegisterPlugin(RwInt32 size, RwUInt32 pluginID,
  * \see RpWorldPluginAttach
  */
 // match: _RpMaterialRegisterPluginStream @ 0x002D8940
+// sp-match: _RpMaterialRegisterPluginStream @ 0x001F3410
 RwInt32
 RpMaterialRegisterPluginStream(RwUInt32 pluginID,
                                RwPluginDataChunkReadCallBack readCB,
@@ -1188,6 +1199,7 @@ _rpMaterialChunkInfoRead(RwStream * stream,
  * \see RpWorldPluginAttach
  */
 // match: _RpMaterialStreamRead @ 0x002D8B10
+// sp-match: _RpMaterialStreamRead @ 0x001F35E0
 RpMaterial         *
 RpMaterialStreamRead(RwStream * stream)
 {
@@ -1317,6 +1329,7 @@ RpMaterialStreamRead(RwStream * stream)
  * \see RpWorldPluginAttach
  */
 // match: _RpMaterialStreamGetSize @ 0x002D8970
+// sp-match: _RpMaterialStreamGetSize @ 0x001F3440
 RwUInt32
 RpMaterialStreamGetSize(const RpMaterial * material)
 {
@@ -1362,6 +1375,7 @@ RpMaterialStreamGetSize(const RpMaterial * material)
  *
  */
 // match: _RpMaterialStreamWrite @ 0x002D89B0
+// sp-match: _RpMaterialStreamWrite @ 0x001F3480
 const RpMaterial   *
 RpMaterialStreamWrite(const RpMaterial * material, RwStream * stream)
 {

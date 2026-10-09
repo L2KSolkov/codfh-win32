@@ -1,6 +1,6 @@
-// Split from unit_125490.cpp at 0x1279C0, where the image starts another object: its .rdata
-// begins at 0x3DA80C with its own 16.666666, the unreferenced constant every game object
-// starts its constants with, before sub_1279C0's literals (PLAN M7).
+// Split from unit_125490.cpp at 0x1279C0. Multiplayer's separate object starts its .rdata
+// with an unreferenced 16.666666 at 0x3DA80C; SP restores this pool word from datafill.asm because
+// its shared-code wrapper combines both units into one object.
 
 #include <math.h>
 #include <string.h>
@@ -40,14 +40,18 @@
 #include "types/animkey.h"
 #include "types/type_92430.h"
 
-// Its data definitions (PLAN M5), in the image's address order.
-// 0x003DA80C
+// Multiplayer match: this unreferenced constant is present at 0x003DA80C. The SP source object
+// omits it so the following 0x42E52F7D literal stays at 0x2E6674; datafill.asm restores it at
+// its separate pool address 0x2E6694.
+#ifndef CODFH_SP
 extern const RwReal flt_3DA80C = 16.666666f;
+#endif
 
 // match: ?flt_3DA80C@@3MB @ 0x003DA80C
 
 
 // match: ?sub_1279C0@@YAXPAURwV3d@@00MMHH@Z @ 0x001279C0
+// sp-match: ?sub_1279C0@@YAXPAURwV3d@@00MMHH@Z @ 0x000DCEF0
 // match: __real@c3160000 @ 0x003DA810
 // match: __real@c37f0000 @ 0x003DA814
 // match: __real@3f441893 @ 0x003DA818
@@ -71,7 +75,6 @@ void sub_1279C0(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal arg_C, RwReal a
     RwMatrix var_C0;
     RwMatrix var_100;
     RwReal var_104;
-    RwBBox var_11C;
     RwReal var_120;
     RwReal var_124;
     RwReal var_128;
@@ -82,7 +85,6 @@ void sub_1279C0(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal arg_C, RwReal a
     RwIm3DVertex *var_13C;
     RwReal var_140;
     RwReal var_144;
-    RwV3d var_150;
 
     if (arg_18 && dword_4B25B8 == 150)
     {
@@ -154,6 +156,8 @@ void sub_1279C0(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal arg_C, RwReal a
     var_104 = RwV3dDotProductMacro(arg_0, arg_4);
     if (!arg_18)
     {
+        RwBBox var_11C;
+
         var_1C *= flt_429BD8;
         var_11C.sup.x = var_48.unk_08.x + var_1C;
         var_11C.sup.y = var_48.unk_08.y + var_1C;
@@ -175,6 +179,27 @@ void sub_1279C0(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal arg_C, RwReal a
         var_130 = &dword_4B25C0[var_12C * 3];
         var_134 = &dword_4B25C0[var_12C * 3 + 1];
         var_138 = &dword_4B25C0[var_12C * 3 + 2];
+#ifdef CODFH_SP
+        // shape: SP 0xDD3D0 loads each product's operands in another order (and aligns the loop);
+        // volatile reads (SP_FRESH, ten) give it
+#define SP_FRESH(x) (*(volatile RwReal *)&(x))
+        if ((SP_FRESH(var_130->x) * arg_4->x + SP_FRESH(var_130->y) * arg_4->y + var_130->z * arg_4->z)
+                - var_104 < -150.0f)
+        {
+            continue;
+        }
+        if ((var_134->x * SP_FRESH(arg_4->x) + SP_FRESH(var_134->y) * SP_FRESH(arg_4->y)
+                + SP_FRESH(var_134->z) * arg_4->z) - var_104 < -150.0f)
+        {
+            continue;
+        }
+        if ((var_138->x * SP_FRESH(arg_4->x) + SP_FRESH(var_138->y) * SP_FRESH(arg_4->y)
+                + SP_FRESH(var_138->z) * arg_4->z) - var_104 < -150.0f)
+        {
+            continue;
+        }
+#undef SP_FRESH
+#else
         if (RwV3dDotProductMacro(var_130, arg_4) - var_104 < -150.0f)
         {
             continue;
@@ -187,8 +212,11 @@ void sub_1279C0(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal arg_C, RwReal a
         {
             continue;
         }
+#endif
         if (var_10->unk_04 < 350)
         {
+            RwV3d var_150;
+
             var_13C = &var_10->unk_00[var_10->unk_04 * 3];
             var_140 = 1.0f / arg_C;
             var_144 = 1.0f / arg_10;
@@ -214,6 +242,7 @@ void sub_1279C0(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal arg_C, RwReal a
     }
 }
 // match: ?sub_1283E0@@YAXPAURwBBox@@@Z @ 0x001283E0
+// sp-match: ?sub_1283E0@@YAXPAURwBBox@@@Z @ 0x000DBEF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Gathers the collision triangles in the box arg_0 that face up enough into
 // dword_4B25C0 (from 150, up to 350).
@@ -295,6 +324,7 @@ void sub_1283E0(RwBBox *arg_0)
     }
 }
 // match: ?sub_128770@@YAXXZ @ 0x00128770
+// sp-match: ?sub_128770@@YAXXZ @ 0x000DC190
 // Frees the shadows' triangle buffers.
 void sub_128770()
 {
@@ -312,6 +342,7 @@ void sub_128770()
     }
 }
 // match: ?sub_1287F0@@YAXXZ @ 0x001287F0
+// sp-match: ?sub_1287F0@@YAXXZ @ 0x000DC1D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws the shadows gathered this frame, kind by kind, and empties them.
 void sub_1287F0()
@@ -338,6 +369,7 @@ void sub_1287F0()
     }
 }
 // match: ?sub_1288D0@@YAXPAURwCamera@@I@Z @ 0x001288D0
+// sp-match: ?sub_1288D0@@YAXPAURwCamera@@I@Z @ 0x000DC270
 // The motion blur's draw, gone but for its strength's floor.
 void sub_1288D0(RwCamera *arg_0, RwUInt32 arg_4)
 {
@@ -413,6 +445,7 @@ void sub_1288F0(RwCamera *arg_0)
     dword_4CF548[3].emissiveColor = 0xFFFFFFFF;
 }
 // match: ?sub_128B00@@YAXPAURwCamera@@@Z @ 0x00128B00
+// sp-match: ?sub_128B00@@YAXPAURwCamera@@@Z @ 0x000DC290
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Runs the motion blur down by the frame's time and draws it (held while
 // dword_4CF788 is set).
@@ -453,6 +486,7 @@ void sub_128B00(RwCamera *arg_0)
     }
 }
 // match: ?sub_128C20@@YAXHMM@Z @ 0x00128C20
+// sp-match: ?sub_128C20@@YAXHMM@Z @ 0x000DC390
 // Sets the motion blur: its strength arg_0, how long it lasts arg_4 (not
 // shortened; nothing without a fall arg_8), and how long it falls.
 void sub_128C20(RwInt32 arg_0, RwReal arg_4, RwReal arg_8)
@@ -473,6 +507,7 @@ void sub_128C20(RwInt32 arg_0, RwReal arg_4, RwReal arg_8)
     }
 }
 // match: ?sub_128C80@@YAXMM@Z @ 0x00128C80
+// sp-match: ?sub_128C80@@YAXMM@Z @ 0x000DC3E0
 // Fades the fog distance to arg_0 over arg_4 seconds (at once without).
 void sub_128C80(RwReal arg_0, RwReal arg_4)
 {
@@ -489,6 +524,7 @@ void sub_128C80(RwReal arg_0, RwReal arg_4)
     }
 }
 // match: ?sub_128CD0@@YAXMM@Z @ 0x00128CD0
+// sp-match: ?sub_128CD0@@YAXMM@Z @ 0x000DC430
 // Fades the far clip to arg_0 over arg_4 seconds (at once without).
 void sub_128CD0(RwReal arg_0, RwReal arg_4)
 {
@@ -505,6 +541,7 @@ void sub_128CD0(RwReal arg_0, RwReal arg_4)
     }
 }
 // match: ?sub_128D30@@YAXXZ @ 0x00128D30
+// sp-match: ?sub_128D30@@YAXXZ @ 0x000DC490
 // Runs the fog distance's fade by the frame's time.
 void sub_128D30()
 {
@@ -527,6 +564,7 @@ void sub_128D30()
     }
 }
 // match: ?sub_128DB0@@YAXXZ @ 0x00128DB0
+// sp-match: ?sub_128DB0@@YAXXZ @ 0x000DC510
 // Runs the far clip's fade by the frame's time.
 void sub_128DB0()
 {
@@ -549,7 +587,54 @@ void sub_128DB0()
         }
     }
 }
+#ifdef CODFH_SP
+// Single player only (SP 0xDC5A0): draws the clump arg_0's atomics that are
+// to be drawn (at most 100) in reverse order.
+// sp-match: ?sp_sub_DC5A0@@YAXPAURpClump@@H@Z @ 0x000DC5A0
+void sp_sub_DC5A0(RpClump *arg_0, RwInt32 arg_4)
+{
+    RpAtomic *atomics[100];
+    RwInt32 count;
+    RwInt32 i;
+    RwLLLink *cur;
+    RwLLLink *end;
+    RpAtomic *atomic;
+
+    count = 0;
+    end = &arg_0->atomicList.link;
+    for (cur = end->next; cur != end; cur = cur->next)
+    {
+        atomic = (RpAtomic *)((RwUInt8 *)cur - offsetof(RpAtomic, inClumpLink));
+        if (RpAtomicGetFlags(atomic) & rpATOMICRENDER)
+        {
+            atomics[count++] = atomic;
+            if (count >= 100)
+                break;
+        }
+    }
+    for (i = count - 1; i >= 0; i--)
+    {
+        RwFrameGetLTM(RpAtomicGetFrame(atomics[i]));
+        AtomicDefaultRenderCallBack(atomics[i]);
+    }
+}
+
+// Single player only (SP 0xDD5E0): outside level 11, draws the clump
+// arg_0 in reverse order and returns 1.
+// sp-match: ?sp_sub_DD5E0@@YAHPAURpClump@@H@Z @ 0x000DD5E0
+RwInt32 sp_sub_DD5E0(RpClump *arg_0, RwInt32 arg_4)
+{
+    if (sub_19B050() != 11)
+    {
+        sp_sub_DC5A0(arg_0, arg_4);
+        return 1;
+    }
+    return 0;
+}
+#endif
+
 // match: ?sub_128E50@@YAXPAURpClump@@H@Z @ 0x00128E50
+// sp-match: ?sub_128E50@@YAXPAURpClump@@H@Z @ 0x000DD750
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws the clump arg_0's atomics that are to be drawn, straight through
 // RenderWare's default callback.
@@ -559,6 +644,11 @@ void sub_128E50(RpClump *arg_0, RwInt32 arg_4)
     RwLLLink *bp_8;
     RwLLLink *bp_4;
 
+#ifdef CODFH_SP
+    // Single player first tries the reverse-order draw (SP 0xDD75B).
+    if (sp_sub_DD5E0(arg_0, arg_4))
+        return;
+#endif
     bp_4 = arg_0->atomicList.link.next;
     bp_8 = &arg_0->atomicList.link;
     while (bp_4 != bp_8)
@@ -573,6 +663,7 @@ void sub_128E50(RpClump *arg_0, RwInt32 arg_4)
     }
 }
 // match: ?sub_128EB0@type_128EB0@@QAEXPAURpAtomic@@M@Z @ 0x00128EB0
+// sp-match: ?sub_128EB0@type_128EB0@@QAEXPAURpAtomic@@M@Z @ 0x000DD610
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_128EB0::sub_128EB0(RpAtomic *arg_0, RwReal arg_4)
 {
@@ -614,6 +705,7 @@ void type_128EB0::sub_128EB0(RpAtomic *arg_0, RwReal arg_4)
     }
 }
 // match: ?sub_128FA0@type_128EB0@@QAEXPAUtype_128EB0_04@@0@Z @ 0x00128FA0
+// sp-match: ?sub_128FA0@type_128EB0@@QAEXPAUtype_128EB0_04@@0@Z @ 0x000DC610
 // Puts the node arg_4 in the subtree arg_0, nearer to the left.
 void type_128EB0::sub_128FA0(type_128EB0_04 *arg_0, type_128EB0_04 *arg_4)
 {
@@ -641,6 +733,7 @@ void type_128EB0::sub_128FA0(type_128EB0_04 *arg_0, type_128EB0_04 *arg_4)
     }
 }
 // match: ?sub_129010@type_128EB0@@QAEXPAUtype_128EB0_04@@@Z @ 0x00129010
+// sp-match: ?sub_129010@type_128EB0@@QAEXPAUtype_128EB0_04@@@Z @ 0x000DC650
 void type_128EB0::sub_129010(type_128EB0_04 *arg_0)
 {
     RpAtomicCallBackRender var_4;
@@ -667,6 +760,7 @@ void type_128EB0::sub_129010(type_128EB0_04 *arg_0)
     }
 }
 // match: ?sub_1290A0@@YAPAURpWorldSector@@PAU1@PAX@Z @ 0x001290A0
+// sp-match: ?sub_1290A0@@YAPAURpWorldSector@@PAU1@PAX@Z @ 0x000DD7A0
 // The world pass's sector callback: draws the sector if the PVS shows it
 // (when asked to check).
 RpWorldSector *sub_1290A0(RpWorldSector *arg_0, void *arg_4)
@@ -691,6 +785,7 @@ RpWorldSector *sub_1290A0(RpWorldSector *arg_0, void *arg_4)
     return arg_0;
 }
 // match: ?sub_1290F0@@YAXPAURwCamera@@PAURpWorld@@H@Z @ 0x001290F0
+// sp-match: ?sub_1290F0@@YAXPAURwCamera@@PAURpWorld@@H@Z @ 0x000DD7E0
 // Draws the world arg_4's sectors in view (the PVS checked when arg_8 is
 // set), if the world is drawn at all.
 void sub_1290F0(RwCamera *arg_0, RpWorld *arg_4, RwInt32 arg_8)
@@ -706,6 +801,7 @@ void sub_1290F0(RwCamera *arg_0, RpWorld *arg_4, RwInt32 arg_8)
     }
 }
 // match: ?sub_129140@@YAXPAURwCamera@@PAURpWorld@@HHH@Z @ 0x00129140
+// sp-match: ?sub_129140@@YAXPAURwCamera@@PAURpWorld@@HHH@Z @ 0x000DD8B0
 // Draws the world arg_4 in a pass of its own (the PVS by arg_8, the
 // blending by arg_C, the alpha test by arg_10).
 void sub_129140(RwCamera *arg_0, RpWorld *arg_4, RwInt32 arg_8, RwInt32 arg_C,
@@ -720,6 +816,7 @@ void sub_129140(RwCamera *arg_0, RpWorld *arg_4, RwInt32 arg_8, RwInt32 arg_C,
     }
 }
 // match: ?sub_1291A0@@YAXHH@Z @ 0x001291A0
+// sp-match: ?sub_1291A0@@YAXHH@Z @ 0x000DD830
 // Sets the alpha test for a pass with blending (arg_0), without the depth
 // buffer's writes for the second (arg_4 1).
 void sub_1291A0(RwInt32 arg_0, RwInt32 arg_4)
@@ -728,6 +825,16 @@ void sub_1291A0(RwInt32 arg_0, RwInt32 arg_4)
     {
         RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTION, (void *)rwALPHATESTFUNCTIONGREATER);
         RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, (void *)dword_4F3080);
+#ifdef CODFH_SP
+        // Single player raises the reference to 150 for the second pass in
+        // level 38 (SP 0xDD857).
+        if (arg_4 == 2)
+        {
+            if (sub_19B050() == 38)
+                RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, (void *)150);
+        }
+        else
+#endif
         if (arg_4 == 1)
         {
             RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, (void *)0);
@@ -735,6 +842,7 @@ void sub_1291A0(RwInt32 arg_0, RwInt32 arg_4)
     }
 }
 // match: ?sub_1291E0@@YAXXZ @ 0x001291E0
+// sp-match: ?sub_1291E0@@YAXXZ @ 0x000DD8A0
 void sub_1291E0()
 {
     RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, (void *)1);

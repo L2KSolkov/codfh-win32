@@ -18,12 +18,14 @@
 #include "game/kujuui.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E88E4
 extern const RwReal flt_3E88E4 = 0.01f;
 // 0x003E88E8
 extern const RwReal flt_3E88E8 = 0.01f;
 // 0x003E88EC
 extern const RwReal flt_3E88EC = 16.666666f;
+#endif
 // 0x0042D294
 RwInt32 dword_42D294 = -1;
 // End of its data definitions.

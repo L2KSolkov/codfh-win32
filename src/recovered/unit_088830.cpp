@@ -33,6 +33,7 @@ extern const RwReal flt_3D4F34 = 16.666666f;
 // match: ??_C@_0L@FLNGNKIA@0x?$CFX?0?50x?$CFX?$AA@ @ 0x003D50CC
 
 // match: ??0type_8A980@@QAE@XZ @ 0x00088830
+// sp-match: ??0type_8A980@@QAE@XZ @ 0x0006DCE0
 type_8A980::type_8A980()
 {
     unk_04[0] = 0;
@@ -64,6 +65,7 @@ type_8A980::type_8A980()
 // Takes the virtual voice lists arg_0 (arg_4 only known by width): a voice
 // for each slot, each registered in dword_44C4E8.
 // match: ?sub_88950@type_8A980@@QAEXPAUtype_83A70@@H@Z @ 0x00088950
+// sp-match: ?sub_88950@type_8A980@@QAEXPAUtype_83A70@@H@Z @ 0x0006DD40
 void type_8A980::sub_88950(type_83A70 *arg_0, RwInt32 arg_4)
 {
     RwInt32 var_4;
@@ -191,6 +193,7 @@ void type_8A980::sub_88950(type_83A70 *arg_0, RwInt32 arg_4)
 // match: ??1type_8A980@@QAE@XZ @ 0x00088DA0
 // match: __ehhandler$??1type_8A980@@QAE@XZ-0xB @ 0x002FFA10
 // match: __ehhandler$??1type_8A980@@QAE@XZ @ 0x002FFA1B
+// sp-match: ??1type_8A980@@QAE@XZ @ 0x0006F1F0
 type_8A980::~type_8A980()
 {
     sub_88DF0();
@@ -198,6 +201,7 @@ type_8A980::~type_8A980()
 // Lets every voice go: lists 7 to 1 through sub_8A910, list 0's emitters
 // stopped and released first; then the pool and the banks this still holds.
 // match: ?sub_88DF0@type_8A980@@QAEXXZ @ 0x00088DF0
+// sp-match: ?sub_88DF0@type_8A980@@QAEXXZ @ 0x0006EE20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_8A980::sub_88DF0()
 {
@@ -386,6 +390,7 @@ void type_8A980::sub_88DF0()
 // Moves every playing voice of the lists to arg_0, telling the library of
 // those it holds a handle for.
 // match: ?sub_89540@type_8A980@@QAEXPAURwV3d@@@Z @ 0x00089540
+// sp-match: ?sub_89540@type_8A980@@QAEXPAURwV3d@@@Z @ 0x0006DFE0
 void type_8A980::sub_89540(RwV3d *arg_0)
 {
     RwInt32 var_4;
@@ -532,6 +537,7 @@ void type_8A980::sub_89540(RwV3d *arg_0)
 // next in turn, stopped for the taker (list 0 only gives one up when arg_4
 // is set or it was asked for as 0, not 8, and the vehicles only with arg_4).
 // match: ?sub_89B00@type_8A980@@QAEHHH@Z @ 0x00089B00
+// sp-match: ?sub_89B00@type_8A980@@QAEHHH@Z @ 0x0006E2C0
 RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
 {
     RwInt32 var_4;
@@ -544,10 +550,13 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E840)
             {
+#ifndef CODFH_SP
+                // single player compiles the debug print out (SP 0x6E2C0)
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("Dialog sound disabled in GlobalSounds!");
                 }
+#endif
                 return 0;
             }
             for (var_4 = 0; var_4 < unk_44[0]; var_4++)
@@ -578,10 +587,12 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E844)
             {
+#ifndef CODFH_SP
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("Foley sound disabled in GlobalSounds!");
                 }
+#endif
                 return 0;
             }
             for (var_4 = 0; var_4 < unk_44[1]; var_4++)
@@ -609,10 +620,12 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E848)
             {
+#ifndef CODFH_SP
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("WeaponsFire sound disabled in GlobalSounds!");
                 }
+#endif
                 return 0;
             }
             for (var_4 = 0; var_4 < unk_44[2]; var_4++)
@@ -640,10 +653,12 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E84C)
             {
+#ifndef CODFH_SP
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("Vehicles sound disabled in GlobalSounds!");
                 }
+#endif
                 return 0;
             }
             for (var_4 = 0; var_4 < unk_44[3]; var_4++)
@@ -674,10 +689,12 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E850)
             {
+#ifndef CODFH_SP
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("WeaponsFoley sound disabled in GlobalSounds!");
                 }
+#endif
                 return 0;
             }
             for (var_4 = 0; var_4 < unk_44[4]; var_4++)
@@ -705,10 +722,12 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E854)
             {
+#ifndef CODFH_SP
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("Debris sound disabled in GlobalSounds!");
                 }
+#endif
                 return 0;
             }
             for (var_4 = 0; var_4 < unk_44[5]; var_4++)
@@ -736,10 +755,12 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E858)
             {
+#ifndef CODFH_SP
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("Ambience1 sound disabled in GlobalSounds!");
                 }
+#endif
                 return 0;
             }
             for (var_4 = 0; var_4 < unk_44[6]; var_4++)
@@ -767,10 +788,12 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E85C)
             {
+#ifndef CODFH_SP
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("Ambience2 sound disabled in GlobalSounds!");
                 }
+#endif
                 return 0;
             }
             for (var_4 = 0; var_4 < unk_44[7]; var_4++)
@@ -801,6 +824,7 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
 // sound's are fixed tenths of it), ducked or scaled by the volumes unless
 // arg_10 is set, its loop flag and library parameters 2 and 3.
 // match: ?sub_8A440@type_8A980@@QAEHPAUtype_199010@@HHHH@Z @ 0x0008A440
+// sp-match: ?sub_8A440@type_8A980@@QAEHPAUtype_199010@@HHHH@Z @ 0x0006E7B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_8A980::sub_8A440(type_199010 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C,
                               RwInt32 arg_10)
@@ -892,13 +916,22 @@ RwInt32 type_8A980::sub_8A440(type_199010 *arg_0, RwInt32 arg_4, RwInt32 arg_8, 
     {
         slot_1C *= 1.0f - flt_44E5E8;
     }
+#ifndef CODFH_SP
+    // single player has no third ducking case (SP 0x6E7B0 tests two)
     else if (dword_44E89C == 2 && !arg_10)
     {
         slot_1C *= 1.0f - flt_44D4BC;
     }
+#endif
     if (dword_44E8B4 && !arg_10)
     {
+#ifdef CODFH_SP
+        // shape: the volume share in a local first, not reassociated (SP 0x6E7B0)
+        RwReal f = (100 - arg_0->unk_13) / 100.0f;
+        slot_1C *= f * (arg_0->unk_10 / 100.0f);
+#else
         slot_1C *= (100 - arg_0->unk_13) / 100.0f * (arg_0->unk_10 / 100.0f);
+#endif
     }
     if (slot_1C < 0.0f)
     {
@@ -951,6 +984,7 @@ RwInt32 type_8A980::sub_8A440(type_199010 *arg_0, RwInt32 arg_4, RwInt32 arg_8, 
     return var_18;
 }
 // match: ?sub_8A910@type_8A980@@QAEXH@Z @ 0x0008A910
+// sp-match: ?sub_8A910@type_8A980@@QAEXH@Z @ 0x0006EBE0
 void type_8A980::sub_8A910(RwInt32 arg_0)
 {
     if (arg_0)
@@ -963,6 +997,7 @@ void type_8A980::sub_8A910(RwInt32 arg_0)
     }
 }
 // match: ?sub_8A950@type_8A980@@SAHH@Z @ 0x0008A950
+// sp-match: ?sub_8A950@type_8A980@@SAHH@Z @ 0x0006EC10
 RwInt32 type_8A980::sub_8A950(RwInt32 arg_0)
 {
     if (arg_0 && arg_0 != -1)
@@ -974,6 +1009,7 @@ RwInt32 type_8A980::sub_8A950(RwInt32 arg_0)
 // Plays the sound under the key arg_0 for the entity arg_4 through its
 // alias, and moves the voice to arg_C.
 // match: ?sub_8A980@type_8A980@@QAEHPAUtype_3DF8D8_04@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x0008A980
+// sp-match: ?sub_8A980@type_8A980@@QAEHPAUtype_3DF8D8_04@@PAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x0006EC30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_8A980::sub_8A980(type_3DF8D8_04 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8,
                               RwV3d *arg_C, RwInt32 arg_10, RwInt32 arg_14)
@@ -1007,6 +1043,7 @@ RwInt32 type_8A980::sub_8A980(type_3DF8D8_04 *arg_0, type_3D3548 *arg_4, RwInt32
 }
 // The same for the entry arg_4 of an index alias.
 // match: ?sub_8AA70@type_8A980@@QAEHPAUtype_3DF8D8_04@@HPAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x0008AA70
+// sp-match: ?sub_8AA70@type_8A980@@QAEHPAUtype_3DF8D8_04@@HPAUtype_3D3548@@HPAURwV3d@@HH@Z @ 0x0006ED20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_8A980::sub_8AA70(type_3DF8D8_04 *arg_0, RwInt32 arg_4, type_3D3548 *arg_8,
                               RwInt32 arg_C, RwV3d *arg_10, RwInt32 arg_14, RwInt32 arg_18)

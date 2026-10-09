@@ -23,6 +23,7 @@ extern void *sub_243950(RwUInt32 size, RwUInt32 count, RwUInt32 align, RwInt32 a
                         void *freeList, RwUInt32 hint);
 
 // match: _sub_244220 @ 0x00244220
+// sp-match: _sub_244220 @ 0x001587B0
 RwBool
 sub_244220(void)
 {
@@ -40,6 +41,7 @@ sub_244220(void)
 }
 
 // match: _sub_244260 @ 0x00244260
+// sp-match: _sub_244260 @ 0x001587F0
 static void
 sub_244260(rwaPool *pool)
 {
@@ -50,6 +52,7 @@ sub_244260(rwaPool *pool)
 }
 
 // match: _sub_244280 @ 0x00244280
+// sp-match: _sub_244280 @ 0x00158810
 rwaPoolBlock *
 sub_244280(RwUInt32 size)
 {
@@ -68,6 +71,7 @@ sub_244280(RwUInt32 size)
 }
 
 // match: _sub_2442C0 @ 0x002442C0
+// sp-match: _sub_2442C0 @ 0x00158850
 void
 sub_2442C0(rwaPoolBlock *block)
 {
@@ -75,6 +79,7 @@ sub_2442C0(rwaPoolBlock *block)
 }
 
 // match: _sub_2442D0 @ 0x002442D0
+// sp-match: _sub_2442D0 @ 0x00158860
 void *
 sub_2442D0(rwaPoolBlock *block, RwUInt32 size, RwUInt32 alignment)
 {
@@ -138,6 +143,7 @@ sub_2442D0(rwaPoolBlock *block, RwUInt32 size, RwUInt32 alignment)
 
 
 // match: _sub_244360 @ 0x00244360
+// sp-match: _sub_244360 @ 0x001588F0
 void
 sub_244360(rwaPoolBlock *block, void *data)
 {
@@ -166,6 +172,7 @@ sub_244360(rwaPoolBlock *block, void *data)
 }
 
 // match: _sub_2443A0 @ 0x002443A0
+// sp-match: _sub_2443A0 @ 0x00158930
 RwBool
 sub_2443A0(rwaPoolBlock *block)
 {
@@ -173,6 +180,7 @@ sub_2443A0(rwaPoolBlock *block)
 }
 
 // match: _sub_2443C0 @ 0x002443C0
+// sp-match: _sub_2443C0 @ 0x00158950
 static rwaPoolBlock *
 sub_2443C0(rwaPool *pool)
 {
@@ -192,6 +200,7 @@ sub_2443C0(rwaPool *pool)
 }
 
 // match: _sub_2443F0 @ 0x002443F0
+// sp-match: _sub_2443F0 @ 0x00158980
 void
 sub_2443F0(rwaPool *pool)
 {
@@ -210,6 +219,7 @@ sub_2443F0(rwaPool *pool)
 }
 
 // match: _sub_244440 @ 0x00244440
+// sp-match: _sub_244440 @ 0x001589D0
 void *
 sub_244440(rwaPool *pool, RwUInt32 size)
 {
@@ -241,6 +251,7 @@ sub_244440(rwaPool *pool, RwUInt32 size)
 }
 
 // match: _sub_2444A0 @ 0x002444A0
+// sp-match: _sub_2444A0 @ 0x00158A30
 void
 sub_2444A0(rwaPool *pool, void *data)
 {
@@ -280,6 +291,7 @@ sub_2444A0(rwaPool *pool, void *data)
 }
 
 // match: _sub_244510 @ 0x00244510
+// sp-match: _sub_244510 @ 0x00158AA0
 void
 sub_244510(void)
 {
@@ -293,6 +305,7 @@ sub_244510(void)
 }
 
 // match: _sub_244550 @ 0x00244550
+// sp-match: _sub_244550 @ 0x00158AE0
 rwaPool *
 sub_244550(RwUInt32 size, RwUInt32 count, RwUInt32 alignment, RwUInt32 noBlocks, rwaPool *pool)
 {

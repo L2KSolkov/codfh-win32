@@ -521,6 +521,14 @@ struct type_10F710 : type_3D3548
     {
         vf_230();
     }
+#ifdef CODFH_SP
+    // Single player builds the player in entity memory (sp_sub_C85E0, SP 0xC85E0): its placement
+    // pair (sub_6CCF0's body, SP 0x122FF0) and plain operator delete, as the entities' (an EH
+    // frame for the constructor's unwind).
+    static void *operator new(RwUInt32 arg_0, void *arg_4);
+    static void operator delete(void *arg_0, void *arg_4);
+    static void operator delete(void *arg_0);
+#endif
 
     // Overrides (src/recovered/unit_0FD730.cpp).
     virtual void vf_038(RwReal arg_0);
@@ -645,7 +653,12 @@ struct type_10F710 : type_3D3548
     // ("SetPlayerHealthPercentage").
     // +0x240: bobs the view offset arg_0 for the time arg_4 as it walks
     // (sub_111220 with its trigger's unk_204 to unk_228).
+#ifdef CODFH_SP // vf_240, vf_250, vf_254, vf_258 are not virtual in single player: its vtable
+                // (SP 0x2E6070) ends at slot 0x244; SP 0xCDE70 calls vf_240 (0xCBE80) directly
+    void vf_240(RwV3d *arg_0, RwReal arg_4);
+#else
     virtual void vf_240(RwV3d *arg_0, RwReal arg_4);
+#endif
     virtual RwInt32 vf_244();
     // +0x248: whether the entity arg_0 is an ally it may target (not the one
     // vf_200 gives); +0x24C: whether it is an enemy.
@@ -653,14 +666,34 @@ struct type_10F710 : type_3D3548
     virtual RwInt32 vf_24C(type_3D3548 *arg_0);
     // Empty: folded (/OPT:ICF) into sub_15FB30. They take the time step:
     // the network player's defuse and plant (sub_1BA700, sub_1BA810).
+#ifdef CODFH_SP
+    void vf_250(RwReal arg_0);
+#else
     virtual void vf_250(RwReal arg_0);
+#endif
+#ifdef CODFH_SP
+    void vf_254(RwReal arg_0);
+#else
     virtual void vf_254(RwReal arg_0);
+#endif
     // +0x258 (sub_10DBD0): sways the weapon in hand for the time arg_0 by
     // its settings for the stance (blending a stance change), with the
     // sticks, and resets its clump's frame; it also ends its sound and
     // cooling states. Its last new slot: the second network player
     // overrides it (sub_1BBFB0).
+#ifdef CODFH_SP
+    void vf_258(RwReal arg_0);
+#else
     virtual void vf_258(RwReal arg_0);
+#endif
+#ifdef CODFH_SP
+    // Single player only: the weapon in hand's sub_117370, an inline VC keeps out of line
+    // (SP 0xBF990; sub_106A60 calls it, SP 0xC8680).
+    void sp_sub_BF990()
+    {
+        unk_1A48[unk_1AE4]->sub_117370();
+    }
+#endif
 
     RwUInt8 unk_3A8[0x8];
     RwInt32 *unk_3B0;           // set with unk_1C0 by sub_83850 (kind 7) at
@@ -725,7 +758,11 @@ struct type_10F710 : type_3D3548
     RwReal unk_4EC;
     RwReal unk_4F0;             // a sideways sway and its spring's
     RwReal unk_4F4;             // velocity (the second player's vf_240)
+#ifdef CODFH_SP
+    RwReal unk_4F8;             // the scope step: vf_240 tests and stores it as a float (SP 0xCC2CE)
+#else
     RwInt32 unk_4F8;
+#endif
     RwReal unk_4FC;             // the scope's sway angles, in degrees
     RwReal unk_500;             // (sub_1116A0), and its offsets from them
     RwReal unk_504;
@@ -814,7 +851,9 @@ struct type_10F710 : type_3D3548
     RwInt32 unk_1B0C;           // aiming with the second settings
     RwInt32 unk_1B10;           // set when a reload starts while aiming
     RwInt32 unk_1B14;           // cleared when a weapon is put away
+#ifndef CODFH_SP // MP +0x1B18; single player has none: its vf_03C (SP 0xCE6F0; MP 0x101550) and sub_FDC10 (SP 0xC4AF0) keep MP's +0x1B1C..+0x1B44 4 lower
     RwInt32 unk_1B18;           // cleared when the weapon has cooled
+#endif
     RwInt32 unk_1B1C;           // (vf_258) with unk_1B1C
     RwInt32 unk_1B20;           // set as a fire starts (the second
     RwInt32 unk_1B24;           // network player's step), with its count
@@ -888,7 +927,9 @@ struct type_10F710 : type_3D3548
     RwV3d unk_2168;             // point) set, by "PlayerEnterVehicleTransition"
     type_D48D0 unk_2174;
     struct type_10F710_2178 *unk_2178;  // its ladder ("SetLadderMovement")
+#ifndef CODFH_SP // MP +0x217C; single player has none: its vehicle setter (SP 0xC32A0; MP 0x10F8A0) writes MP's +0x2180/+0x2184 at +0x2178/+0x217C
     RwInt32 unk_217C;           // while set the launcher does not fire
+#endif
     type_D48D0 unk_2180;        // the vehicle it is in (sub_10F8A0)
     RwInt32 unk_2184;           // its seat
     struct type_4CFE30 *unk_2188;   // the vehicle trigger near it
@@ -1164,7 +1205,11 @@ struct type_10F710 : type_3D3548
     // only the widths are known.
     void sub_1116A0(RtQuat *arg_0, RwReal arg_4);
     // The inventory kind of weapon arg_0 (3 for others).
+#ifdef CODFH_SP // static in single player (SP 0xC1A60 is cdecl, ret)
+    static RwInt32 sub_1064C0(RwInt32 arg_0);
+#else
     RwInt32 sub_1064C0(RwInt32 arg_0);
+#endif
     // Whether the weapon of the pick-up arg_0 is streamed, requesting it if
     // not (1 for pick-ups that are not weapons, 0 without one).
     RwInt32 sub_106620(struct type_3D94B8 *arg_0);

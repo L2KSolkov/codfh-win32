@@ -149,6 +149,7 @@ QuatFromPositiveDiagMatrix(RtQuat * const qpQuat,
 // match: _rcsid @ 0x004198FC
 
 // match: _QuatFromXDiagDomMatrix @ 0x002E4CB0
+// sp-match: _QuatFromXDiagDomMatrix @ 0x001FF780
 static RtQuat      *
 QuatFromXDiagDomMatrix(RtQuat * const qpQuat,
                        const RwMatrix * const mpMatrix)
@@ -172,6 +173,7 @@ QuatFromXDiagDomMatrix(RtQuat * const qpQuat,
 }
 
 // match: _QuatFromYDiagDomMatrix @ 0x002E4D60
+// sp-match: _QuatFromYDiagDomMatrix @ 0x001FF830
 static RtQuat      *
 QuatFromYDiagDomMatrix(RtQuat * const qpQuat,
                        const RwMatrix * const mpMatrix)
@@ -194,6 +196,7 @@ QuatFromYDiagDomMatrix(RtQuat * const qpQuat,
 }
 
 // match: _QuatFromZDiagDomMatrix @ 0x002E4E10
+// sp-match: _QuatFromZDiagDomMatrix @ 0x001FF8E0
 static RtQuat      *
 QuatFromZDiagDomMatrix(RtQuat * const qpQuat,
                        const RwMatrix * const mpMatrix)
@@ -236,6 +239,7 @@ QuatFromZDiagDomMatrix(RtQuat * const qpQuat,
  * \see RtQuatConvertToMatrix
  */
 // match: _RtQuatConvertFromMatrix @ 0x002E4EC0
+// sp-match: _RtQuatConvertFromMatrix @ 0x001FF990
 RwBool
 RtQuatConvertFromMatrix(RtQuat * const qpQuat,
                         const RwMatrix * const mpMatrix)
@@ -283,6 +287,7 @@ RtQuatConvertFromMatrix(RtQuat * const qpQuat,
 }
 
 // match: _QuatRotate @ 0x002E4FE0
+// sp-match: _QuatRotate @ 0x001FFAB0
 static RtQuat      *
 QuatRotate(RtQuat * quat, const RwV3d * axis, RwReal angle)
 {
@@ -320,6 +325,7 @@ QuatRotate(RtQuat * quat, const RwV3d * axis, RwReal angle)
  *
  */
 // match: _RtQuatRotate @ 0x002E5030
+// sp-match: _RtQuatRotate @ 0x001FFB00
 RtQuat             *
 RtQuatRotate(RtQuat * quat,
              const RwV3d * axis, RwReal angle,
@@ -473,6 +479,7 @@ RtQuatQueryRotate(const RtQuat * quat, RwV3d * unitAxis, RwReal * angle)
  * \see RwV3dTransformVectors
  */
 // match: _RtQuatTransformVectors @ 0x002E52F0
+// sp-match: _RtQuatTransformVectors @ 0x001FFDC0
 RwV3d              *
 RtQuatTransformVectors(RwV3d * vectorsOut,
                        const RwV3d * vectorsIn,

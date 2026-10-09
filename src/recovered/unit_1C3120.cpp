@@ -18,12 +18,14 @@
 #include "types/type_1DDE20_mask.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E3494
 extern const RwReal flt_3E3494 = 0.01f;
 // 0x003E3498
 extern const RwReal flt_3E3498 = 0.01f;
 // 0x003E349C
 extern const RwReal flt_3E349C = 16.666666f;
+#endif
 // End of its data definitions.
 
 

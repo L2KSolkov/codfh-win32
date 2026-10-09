@@ -140,8 +140,10 @@ extern RwInt32 dword_44BA38;        // the schemes registered
 // sub_7FD10 frees them).
 extern type_16C2A0 dword_44BA54;    // "_animInterpolatorPool"
 extern type_16C2A0 dword_44BA74;    // "_animInterpolatorHeaderPool"
+#ifndef CODFH_SP // file-static in single player (unit_07CA20's second file)
 extern void *dword_44BA3C;
 extern void *dword_44BA40;
+#endif
 
 RwInt32 sub_7FC90();
 RwInt32 sub_7FD10();
@@ -205,7 +207,9 @@ struct type_7DCA0
 extern RwInt32 dword_428C10[];
 RwInt32 sub_7DE10();
 void sub_7DEB0(RwMatrixTag *arg_0, type_7CBD0 *arg_4, RwInt32 arg_8);
+#ifndef CODFH_SP // static in single player (src/recovered/unit_07CA20.cpp)
 void sub_7E230(RtQuat *arg_0, RwMatrixTag *arg_4, RwUInt8 arg_8);
+#endif
 void sub_7E3A0(type_7CBD0 *arg_0, type_7CBD0 *arg_4);
 RtAnimAnimation *sub_7DCA0(RtAnimAnimation *arg_0, RwStream *arg_4, type_7CBD0_hdr *arg_8);
 RtAnimAnimation *sub_7E870(RwStream *arg_0, RtAnimAnimation *arg_4, RwInt32 arg_8);
@@ -215,7 +219,9 @@ void sub_7D2F0(type_7CBD0 *arg_0, struct type_80300 *arg_4);
 void sub_7E420(type_7CBD0 *arg_0, type_7CBD0 *arg_4);
 // sub_7E990 writes an animation's frames (sub_7EAB0 their tracks).
 RwInt32 sub_7E990(RtAnimAnimation *arg_0, RwStream *arg_4);
+#ifndef CODFH_SP // static in single player (src/recovered/unit_07CA20.cpp)
 bool sub_7EAB0(RtAnimAnimation *arg_0, RwStream *arg_4, type_7CBD0_hdr *arg_8);
+#endif
 RwInt32 sub_7ECB0(RtAnimAnimation *arg_0);
 // sub_7EE30 reads an animation's arg_4 compressed pose keys into the memory
 // arg_8, filling its table of them (customData).

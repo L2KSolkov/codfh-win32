@@ -19,6 +19,7 @@ extern RwUInt32 sub_244980(void);
 extern RwUInt64 qword_507178;
 
 // match: _sub_244930 @ 0x00244930
+// sp-match: _sub_244930 @ 0x00156450
 void
 sub_244930(void)
 {
@@ -34,6 +35,7 @@ sub_244930(void)
 }
 
 // match: _sub_244940 @ 0x00244940
+// sp-match: _sub_244940 @ 0x00156460
 RwUInt32
 sub_244940(void)
 {
@@ -52,6 +54,7 @@ sub_244940(void)
 }
 
 // match: _sub_244960 @ 0x00244960
+// sp-match: _sub_244960 @ 0x00156480
 RwUInt32
 sub_244960(void)
 {
@@ -59,6 +62,7 @@ sub_244960(void)
 }
 
 // match: _sub_244970 @ 0x00244970
+// sp-match: _sub_244970 @ 0x00156490
 RwBool
 sub_244970(void)
 {
@@ -68,6 +72,7 @@ sub_244970(void)
 }
 
 // match: _sub_2449B0 @ 0x002449B0
+// sp-match: _sub_2449B0 @ 0x001564D0
 RwUInt32
 sub_2449B0(void)
 {
@@ -77,6 +82,7 @@ sub_2449B0(void)
 /* The UInt64 start is masked before comparison and arithmetic, as also
  * seen in Studio's rwad.dll RwaTimerStop at 0x1007E4B1. */
 // match: _sub_244980 @ 0x00244980
+// sp-match: _sub_244980 @ 0x001564A0
 RwUInt32
 sub_244980(void)
 {

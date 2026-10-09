@@ -76,7 +76,12 @@ struct type_173F50;
 struct RpWorld;
 RwTexDictionary *sub_1743E0(RwInt32 arg_0);
 RwBool sub_143C30(RwTexDictionary *arg_0);
+#ifdef CODFH_SP
+// Returns nothing in single player (SP 0xEE86B pops the argument into ecx).
+void sub_143C60();
+#else
 RwBool sub_143C60();
+#endif
 void sub_142A10();
 // RenderWare's memory interface (its first function, the allocator) as
 // sub_142A10 checks it: when it is sub_2DA220, sub_2DA340 runs. Only the

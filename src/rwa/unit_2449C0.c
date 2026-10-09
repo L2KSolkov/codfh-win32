@@ -42,6 +42,7 @@ extern void sub_245060(void *file, RwUInt32 bytes, RwInt32 status, RwInt32 event
                 rwaCacheClient *client);
 
 // match: _sub_2449C0 @ 0x002449C0
+// sp-match: _sub_2449C0 @ 0x001564E0
 static void
 sub_2449C0(void *file, rwaCacheClient *client, RwUInt32 bytes, RwInt32 status, RwInt32 event)
 {
@@ -50,6 +51,7 @@ sub_2449C0(void *file, rwaCacheClient *client, RwUInt32 bytes, RwInt32 status, R
 }
 
 // match: _sub_2449E0 @ 0x002449E0
+// sp-match: _sub_2449E0 @ 0x00156500
 void
 sub_2449E0(rwaCacheClient *client, RwUInt32 offset, rwaCacheCallBack callback, void *data)
 {
@@ -61,6 +63,7 @@ sub_2449E0(rwaCacheClient *client, RwUInt32 offset, rwaCacheCallBack callback, v
 }
 
 // match: _sub_244A20 @ 0x00244A20
+// sp-match: _sub_244A20 @ 0x00156540
 RwUInt32
 sub_244A20(rwaCacheClient *client)
 {
@@ -68,6 +71,7 @@ sub_244A20(rwaCacheClient *client)
 }
 
 // match: __rwaRwStreamCacheOpenModule @ 0x00244A30
+// sp-match: __rwaRwStreamCacheOpenModule @ 0x00156550
 RwBool
 _rwaRwStreamCacheOpenModule(void)
 {
@@ -87,6 +91,7 @@ _rwaRwStreamCacheOpenModule(void)
 }
 
 // match: _sub_244AA0 @ 0x00244AA0
+// sp-match: _sub_244AA0 @ 0x001565C0
 void
 sub_244AA0(void)
 {
@@ -99,6 +104,7 @@ sub_244AA0(void)
 }
 
 // match: _sub_244AF0 @ 0x00244AF0
+// sp-match: _sub_244AF0 @ 0x00156610
 static RwUInt32
 sub_244AF0(rwaCacheRequest *request)
 {
@@ -118,6 +124,7 @@ sub_244AF0(rwaCacheRequest *request)
 }
 
 // match: _sub_244B40 @ 0x00244B40
+// sp-match: _sub_244B40 @ 0x00156660
 void
 sub_244B40(void *file, RwUInt32 bytes, RwInt32 status, RwInt32 event, rwaCacheClient *client)
 {
@@ -270,6 +277,7 @@ sub_244B40(void *file, RwUInt32 bytes, RwInt32 status, RwInt32 event, rwaCacheCl
 }
 
 // match: _sub_244DC0 @ 0x00244DC0
+// sp-match: _sub_244DC0 @ 0x001568E0
 static void
 sub_244DC0(rwaCacheClient *client, RwUInt32 size, void *dest, rwaCacheCallBack callback,
            void *data)
@@ -305,6 +313,7 @@ sub_244DC0(rwaCacheClient *client, RwUInt32 size, void *dest, rwaCacheCallBack c
 }
 
 // match: _sub_244E70 @ 0x00244E70
+// sp-match: _sub_244E70 @ 0x00156990
 void
 sub_244E70(rwaCacheClient *client)
 {
@@ -353,6 +362,7 @@ sub_244E70(rwaCacheClient *client)
 }
 
 // match: _sub_244F60 @ 0x00244F60
+// sp-match: _sub_244F60 @ 0x00156A80
 void
 sub_244F60(rwaCacheClient *client)
 {
@@ -360,6 +370,7 @@ sub_244F60(rwaCacheClient *client)
 }
 
 // match: _sub_244F70 @ 0x00244F70
+// sp-match: _sub_244F70 @ 0x00156A90
 void
 sub_244F70(rwaCacheClient *client, void *dest, RwUInt32 size, rwaCacheCallBack callback,
            void *data)
@@ -371,6 +382,7 @@ sub_244F70(rwaCacheClient *client, void *dest, RwUInt32 size, rwaCacheCallBack c
 }
 
 // match: _sub_244FA0 @ 0x00244FA0
+// sp-match: _sub_244FA0 @ 0x00156AC0
 static void
 sub_244FA0(RwInt32 status, rwaCacheClient *client, RwInt32 event, void *file, RwUInt32 bytes)
 {
@@ -422,6 +434,7 @@ sub_244FA0(RwInt32 status, rwaCacheClient *client, RwInt32 event, void *file, Rw
 }
 
 // match: _sub_245060 @ 0x00245060
+// sp-match: _sub_245060 @ 0x00156B80
 void
 sub_245060(void *file, RwUInt32 bytes, RwInt32 status, RwInt32 event, rwaCacheClient *client)
 {
@@ -442,6 +455,7 @@ sub_245060(void *file, RwUInt32 bytes, RwInt32 status, RwInt32 event, rwaCacheCl
 }
 
 // match: _sub_2450C0 @ 0x002450C0
+// sp-match: _sub_2450C0 @ 0x00156BE0
 rwaCacheFile *
 sub_2450C0(rwaCacheFile *holder, rwaCacheClient *client, RwInt32 type, RwUInt32 unk04,
            const RwChar *name, rwaCacheCallBack volatile callback, void *data)
@@ -479,6 +493,7 @@ sub_2450C0(rwaCacheFile *holder, rwaCacheClient *client, RwInt32 type, RwUInt32 
 }
 
 // match: _sub_245130 @ 0x00245130
+// sp-match: _sub_245130 @ 0x00156C50
 void
 sub_245130(rwaCacheClient *client)
 {
@@ -491,6 +506,7 @@ sub_245130(rwaCacheClient *client)
 }
 
 // match: _sub_245160 @ 0x00245160
+// sp-match: _sub_245160 @ 0x00156C80
 void
 sub_245160(rwaCacheFile *holder, rwaCacheClient *client, RwUInt32 unk4C, RwUInt32 *header,
            rwaCacheCallBack callback, void *data)
@@ -506,6 +522,7 @@ sub_245160(rwaCacheFile *holder, rwaCacheClient *client, RwUInt32 unk4C, RwUInt3
 }
 
 // match: _sub_2451B0 @ 0x002451B0
+// sp-match: _sub_2451B0 @ 0x00156CD0
 void
 sub_2451B0(rwaCacheClient *client, void *dest, rwaCacheCallBack callback, void *data)
 {
@@ -516,6 +533,7 @@ sub_2451B0(rwaCacheClient *client, void *dest, rwaCacheCallBack callback, void *
 }
 
 // match: _sub_2451F0 @ 0x002451F0
+// sp-match: _sub_2451F0 @ 0x00159000
 RwBool
 sub_2451F0(void)
 {
@@ -523,12 +541,14 @@ sub_2451F0(void)
 }
 
 // match: _nullsub_6 @ 0x00245200
+// sp-match: _nullsub_6 @ 0x00159010
 void
 nullsub_6(void)
 {
 }
 
 // match: _sub_245210 @ 0x00245210
+// sp-match: _sub_245210 @ 0x00159020
 const RwChar *
 sub_245210(const RwChar *path)
 {

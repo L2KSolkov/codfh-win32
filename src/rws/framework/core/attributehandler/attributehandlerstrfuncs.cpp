@@ -32,6 +32,7 @@ namespace RWS
    namespace
    {
 // match: ?DeleteEntity@?A0xbaaaa58d@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00129D60
+// sp-match: ?DeleteEntity@?A0xbaaaa58d@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000DE120
       void DeleteEntity(RwChunkHeaderInfo &rChunkHeader, RwStream *pStream)
       {
          sub_12F0A0();
@@ -55,6 +56,7 @@ namespace RWS
       }
 
 // match: ?DeleteAllEntities@?A0xbaaaa58d@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00129E00
+// sp-match: ?DeleteAllEntities@?A0xbaaaa58d@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000DE190
       void DeleteAllEntities(RwChunkHeaderInfo &rChunkHeader, RwStream *pStream)
       {
          sub_12F0A0();
@@ -65,6 +67,7 @@ namespace RWS
       }
 
 // match: ?UpdateEntityAttributes@?A0xbaaaa58d@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00129E20
+// sp-match: ?UpdateEntityAttributes@?A0xbaaaa58d@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000DE1B0
       void UpdateEntityAttributes(RwChunkHeaderInfo &rChunkHeader, RwStream *pStream)
       {
          RwChar *buffer = static_cast<RwChar*>(RWS_OP_NEW(rChunkHeader.length));
@@ -86,6 +89,7 @@ namespace RWS
       }
 
 // match: ?CreateEntity@?A0xbaaaa58d@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00129EA0
+// sp-match: ?CreateEntity@?A0xbaaaa58d@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000DE210
       void CreateEntity(RwChunkHeaderInfo &rChunkHeader, RwStream *pStream)
       {
          sub_12F0A0();
@@ -130,6 +134,7 @@ namespace RWS
 }
 
 // match: ?HandleProfilerMessages@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x00129FB0
+// sp-match: ?HandleProfilerMessages@RWS@@YAXAAURwChunkHeaderInfo@@PAURwStream@@@Z @ 0x000DE2D0
 void RWS::HandleProfilerMessages(RwChunkHeaderInfo &rChunkHeader, RwStream *pStream)
    {
       RwInt32 Command, Child = 0;
@@ -139,6 +144,7 @@ void RWS::HandleProfilerMessages(RwChunkHeaderInfo &rChunkHeader, RwStream *pStr
    }
 
 // match: ?RegisterStreamChunkHandlers@CAttributeHandler@RWS@@SAXXZ @ 0x00129FF0
+// sp-match: ?RegisterStreamChunkHandlers@CAttributeHandler@RWS@@SAXXZ @ 0x000DE310
 void RWS::CAttributeHandler::RegisterStreamChunkHandlers(void)
    {
       CStreamHandler::RegisterChunkHandler(MAKECHUNKID (rwVENDORID_CRITERIONRM,
@@ -161,6 +167,7 @@ void RWS::CAttributeHandler::RegisterStreamChunkHandlers(void)
    }
 
 // match: ?UnRegisterStreamChunkHandlers@CAttributeHandler@RWS@@SAXXZ @ 0x0012A070
+// sp-match: ?UnRegisterStreamChunkHandlers@CAttributeHandler@RWS@@SAXXZ @ 0x000DE370
 void RWS::CAttributeHandler::UnRegisterStreamChunkHandlers(void)
    {
       CStreamHandler::UnRegisterChunkHandler(MAKECHUNKID (rwVENDORID_CRITERIONRM, strfunc_UpdateEntityAttributes));

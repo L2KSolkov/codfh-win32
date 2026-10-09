@@ -168,6 +168,7 @@ const RwInt32 datasize[] =
 // match: _datasize @ 0x00419BE0
 
 // match: _PTankAtomicInit @ 0x002E8D70
+// sp-match: _PTankAtomicInit @ 0x00203820
 static void        *
 PTankAtomicInit(void *object,
                     RwInt32 __RWUNUSED__ offset,
@@ -186,6 +187,7 @@ PTankAtomicInit(void *object,
  *****************************************************************************
  */
 // match: _PTankAtomicDestruct @ 0x002E8D90
+// sp-match: _PTankAtomicDestruct @ 0x00203840
 static void        *
 PTankAtomicDestruct(void *object,
                     RwInt32 __RWUNUSED__ offset,
@@ -236,6 +238,7 @@ PTankAtomicDestruct(void *object,
  * \see RwEngineStart
  */
 // match: _RpPTankPluginAttach @ 0x002E8DF0
+// sp-match: _RpPTankPluginAttach @ 0x002038A0
 RwBool
 RpPTankPluginAttach(void)
 {
@@ -269,6 +272,7 @@ RpPTankPluginAttach(void)
  *****************************************************************************
  */
 // match: _rpPTankAStructAlloc @ 0x002E8E40
+// sp-match: _rpPTankAStructAlloc @ 0x002038F0
 static RwBool
 rpPTankAStructAlloc(RpPTankAtomicExtPrv *ptankGlobal,
                     RwUInt32 dataFlags,RwUInt32 platFlags __RWUNUSED__)
@@ -508,6 +512,7 @@ rpPTankAStructAlloc(RpPTankAtomicExtPrv *ptankGlobal,
  *****************************************************************************
  */
 // match: _rpPTankSStructAlloc @ 0x002E9130
+// sp-match: _rpPTankSStructAlloc @ 0x00203BE0
 static RwBool
 rpPTankSStructAlloc(RpPTankAtomicExtPrv *ptankGlobal,
                     RwUInt32 dataFlags,RwUInt32 platFlags __RWUNUSED__)
@@ -749,6 +754,7 @@ rpPTankSStructAlloc(RpPTankAtomicExtPrv *ptankGlobal,
  *****************************************************************************
  */
 // match: _rpPTankValidateFlag @ 0x002E9400
+// sp-match: _rpPTankValidateFlag @ 0x00203EB0
 static RwUInt32
 rpPTankValidateFlag(RwUInt32 dataFlags)
 {
@@ -884,6 +890,7 @@ rpPTankValidateFlag(RwUInt32 dataFlags)
 
 
 // match: _rpPTankAtomicRenderCB @ 0x002E9570
+// sp-match: _rpPTankAtomicRenderCB @ 0x00204020
 static RpAtomic *
 rpPTankAtomicRenderCB(RpAtomic *atomic)
 {
@@ -953,6 +960,7 @@ rpPTankAtomicRenderCB(RpAtomic *atomic)
  * \see RpPTankAtomicDestroy
  */
 // match: _RpPTankAtomicCreate @ 0x002E9AF0
+// sp-match: _RpPTankAtomicCreate @ 0x002045A0
 RpAtomic*
 RpPTankAtomicCreate(RwInt32 maxParticleNum,
                 RwUInt32 dataFlags, RwUInt32 platFlags)
@@ -996,6 +1004,7 @@ RpPTankAtomicCreate(RwInt32 maxParticleNum,
  * \see RpPTankAtomicCreate
  */
 // match: __rpPTankAtomicCreateCustom @ 0x002E95D0
+// sp-match: __rpPTankAtomicCreateCustom @ 0x00204080
 RpAtomic*
 _rpPTankAtomicCreateCustom(RwInt32 maxParticleNum,
                 RwUInt32 dataFlags, RwUInt32 platFlags,
@@ -1131,6 +1140,7 @@ _rpPTankAtomicCreateCustom(RwInt32 maxParticleNum,
  * \see RpPTankAtomicCreate
  */
 // match: _RpPTankAtomicDestroy @ 0x002E98B0
+// sp-match: _RpPTankAtomicDestroy @ 0x00204360
 void
 RpPTankAtomicDestroy(RpAtomic *ptank)
 {
@@ -2153,6 +2163,7 @@ RpPTankAtomicGetConstantVtx4TexCoords(RpAtomic *atomic)
  * \see RpPTankAtomicGetDataFormat
  */
 // match: _RpPTankAtomicLock @ 0x002E98C0
+// sp-match: _RpPTankAtomicLock @ 0x00204370
 RwBool
 RpPTankAtomicLock(RpAtomic *atomic, RpPTankLockStruct *dst,
             RwUInt32 dataFlags, RpPTankLockFlags lockFlag)
@@ -2240,6 +2251,7 @@ RpPTankAtomicLock(RpAtomic *atomic, RpPTankLockStruct *dst,
  *
  */
 // match: _RpPTankAtomicUnlock @ 0x002E9AD0
+// sp-match: _RpPTankAtomicUnlock @ 0x00204580
 RpAtomic *
 RpPTankAtomicUnlock(RpAtomic *atomic)
 {

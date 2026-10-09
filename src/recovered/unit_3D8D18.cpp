@@ -28,8 +28,10 @@ const RwChar *off_429408[15] = {
 };
 // (defined after the table: VC7.1 emits data definitions last-defined first, and the
 // image has the constant first)
+#ifndef CODFH_SP // MP only: single player has no unreferenced 16.666666f here: the names follow sp_fendname's texts (SP 0x2E5304)
 // 0x003D8D18
 extern const RwReal flt_3D8D18 = 16.666666f;
+#endif
 // End of its data definitions.
 
 // Its data (PLAN M5): literals, constants and tables where the image has them.

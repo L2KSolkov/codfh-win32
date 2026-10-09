@@ -172,6 +172,7 @@ PrtStdEngineOpen( void * ptr,
 // match: _rcsid @ 0x00419D70
 
 // match: _PrtStdEngineClose @ 0x002EDFE0
+// sp-match: _PrtStdEngineClose @ 0x00208A90
 static void *
 PrtStdEngineClose( void * ptr,
                      RwInt32 offset __RWUNUSED__,
@@ -257,6 +258,7 @@ PrtStdEngineClose( void * ptr,
 /************************************************************************/
 
 // match: __rpPrtStdAtomicRender @ 0x002EE1F0
+// sp-match: __rpPrtStdAtomicRender @ 0x00208CA0
 static RpAtomic *
 _rpPrtStdAtomicRender(RpAtomic *atomic)
 {
@@ -292,6 +294,7 @@ PrtStdAtomicCtor(void *obj, RwInt32 offset, RwInt32 size __RWUNUSED__)
 }
 
 // match: _PrtStdAtomicDtor @ 0x002EE0B0
+// sp-match: _PrtStdAtomicDtor @ 0x00208B60
 static void *
 PrtStdAtomicDtor(void *obj, RwInt32 offset, RwInt32 size __RWUNUSED__)
 {
@@ -326,6 +329,7 @@ PrtStdAtomicDtor(void *obj, RwInt32 offset, RwInt32 size __RWUNUSED__)
 }
 
 // match: _PrtStdAtomicCopy @ 0x002EE0F0
+// sp-match: _PrtStdAtomicCopy @ 0x00208BA0
 static void *
 PrtStdAtomicCopy(void *dstObj,
                     const void *srcObj,
@@ -374,6 +378,7 @@ PrtStdAtomicCopy(void *dstObj,
  */
 
 // match: __rpPrtStdAtomicCountEmitters @ 0x002EE150
+// sp-match: __rpPrtStdAtomicCountEmitters @ 0x00208C00
 static RpPrtStdEmitter *
 _rpPrtStdAtomicCountEmitters(RpAtomic * atomic __RWUNUSED__,
                              RpPrtStdEmitter *emt, void *data)
@@ -393,6 +398,7 @@ _rpPrtStdAtomicCountEmitters(RpAtomic * atomic __RWUNUSED__,
 }
 
 // match: _PrtStdAtomicGetChunkSize @ 0x002EE210
+// sp-match: _PrtStdAtomicGetChunkSize @ 0x00208CC0
 static RwInt32
 PrtStdAtomicGetChunkSize(RpAtomic * atomic,
                             RwInt32 offset, RwInt32 size __RWUNUSED__)
@@ -420,6 +426,7 @@ PrtStdAtomicGetChunkSize(RpAtomic * atomic,
 }
 
 // match: _PrtStdAtomicReadChunk @ 0x002EE250
+// sp-match: _PrtStdAtomicReadChunk @ 0x00208D00
 static RwStream *
 PrtStdAtomicReadChunk(RwStream * stream,
                          RwInt32 len __RWUNUSED__,
@@ -461,6 +468,7 @@ PrtStdAtomicReadChunk(RwStream * stream,
 }
 
 // match: _PrtStdAtomicWriteChunk @ 0x002EE2D0
+// sp-match: _PrtStdAtomicWriteChunk @ 0x00208D80
 static RwStream *
 PrtStdAtomicWriteChunk(RwStream * stream,
                           RwInt32 len __RWUNUSED__,
@@ -514,6 +522,7 @@ PrtStdAtomicWriteChunk(RwStream * stream,
  *
  ************************************************************************/
 // match: __rpPrtStdStreamGetVersion @ 0x002EE160
+// sp-match: __rpPrtStdStreamGetVersion @ 0x00208C10
 RwInt32
 _rpPrtStdStreamGetVersion( void )
 {
@@ -540,6 +549,7 @@ _rpPrtStdStreamGetVersion( void )
  */
 
 // match: _RpPrtStdPluginAttach @ 0x002EE330
+// sp-match: _RpPrtStdPluginAttach @ 0x00208DE0
 RwBool
 RpPrtStdPluginAttach(void)
 {
@@ -751,6 +761,7 @@ RpPrtStdAtomicCreate(RpPrtStdEmitterClass *eClass,
  */
 
 // match: _RpPrtStdAtomicForAllEmitter @ 0x002EE170
+// sp-match: _RpPrtStdAtomicForAllEmitter @ 0x00208C20
 RpAtomic *
 RpPrtStdAtomicForAllEmitter(RpAtomic *atomic, RpPrtStdEmitterCallBack callback, void *data)
 {
@@ -875,6 +886,7 @@ RpPrtStdAtomicSetEmitter(RpAtomic *atomic, RpPrtStdEmitter *emt)
  * \see RpPrtStdAtomicSetEmitter
  */
 // match: _RpPrtStdAtomicAddEmitter @ 0x002EE1C0
+// sp-match: _RpPrtStdAtomicAddEmitter @ 0x00208C70
 RpAtomic *
 RpPrtStdAtomicAddEmitter(RpAtomic *atomic, RpPrtStdEmitter *emt)
 {

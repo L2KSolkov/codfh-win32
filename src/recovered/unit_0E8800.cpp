@@ -41,6 +41,12 @@ bool byte_4B8E9D;
 #ifndef CODFH_PLAIN
 bool byte_4B8E9E;
 #endif
+#ifdef CODFH_SP // single player's own (sp_sub_B1A10, sp_sub_B1A50, sp_sub_B1D40): its front end movie's loop and frame flags
+// SP 0x003B5817
+bool sp_byte_3B5817;
+// SP 0x003B5818
+bool sp_byte_3B5818;
+#endif
 // 0x004B8EA1
 bool byte_4B8EA1;
 // 0x004B8EA4
@@ -83,6 +89,7 @@ type_3DF8D8_04 unk_4B8ED0(0x44371DFE, 0x028566AB);
 // match: _$E14 @ 0x0030B4C0
 // match: _$E16 @ 0x0030B4E0
 // match: ?sub_E8800@@YAXXZ @ 0x000E8800
+// sp-match: ?sub_E8800@@YAXXZ @ 0x000B19B0
 
 void sub_E8800()
 {
@@ -94,6 +101,7 @@ void sub_E8800()
 }
 
 // match: ?sub_E8830@@YAXXZ @ 0x000E8830
+// sp-match: ?sub_E8830@@YAXXZ @ 0x000B19E0
 void sub_E8830()
 {
     byte_4B8E9C = false;
@@ -103,7 +111,47 @@ void sub_E8830()
     byte_4B8E9E = false;
 }
 
+#ifdef CODFH_SP
+// Single player's front end plays its background movie on unk_4B8C70 (sp_sub_B1D40): whether
+// it loops (sp_byte_3B5817), and set when a step showed no new frame (sp_byte_3B5818, cleared
+// by its draw, sp_sub_B1A50).
+
+// sp-match: ?sp_sub_B1A10@@YAXXZ @ 0x000B1A10
+// Steps the front end's movie: closes it at its end unless it loops.
+void sp_sub_B1A10()
+{
+    switch (unk_4B8C70.sub_19D720(sp_byte_3B5817))
+    {
+    case 1:
+        if (!sp_byte_3B5817)
+        {
+            unk_4B8C70.sub_19D5E0();
+        }
+        break;
+    case 2:
+        sp_byte_3B5818 = true;
+        break;
+    }
+}
+#endif
+
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_B1A50@@YAXPAURwCamera@@@Z @ 0x000B1A50
+// Draws the front end's movie on the camera arg_0 while it is open.
+void sp_sub_B1A50(RwCamera *arg_0)
+{
+    if (unk_4B8C70.unk_10C)
+    {
+        RwCameraBeginUpdate(arg_0);
+        unk_4B8C70.sub_19D810(arg_0, 1);
+        RwCameraEndUpdate(arg_0);
+    }
+    sp_byte_3B5818 = false;
+}
+#endif
+
 // match: ?sub_E8860@@YAX_N@Z @ 0x000E8860
+// sp-match: ?sub_E8860@@YAX_N@Z @ 0x000B1A90
 void sub_E8860(bool arg_0)
 {
     byte_4B88A8 = false;
@@ -120,6 +168,7 @@ void sub_E8860(bool arg_0)
 }
 
 // match: ?sub_E88B0@@YAX_N@Z @ 0x000E88B0
+// sp-match: ?sub_E88B0@@YAX_N@Z @ 0x000B1AD0
 void sub_E88B0(bool arg_0)
 {
     byte_4B88A8 = true;
@@ -138,7 +187,17 @@ void sub_E88B0(bool arg_0)
     }
 }
 
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_B1B20@@YAXXZ @ 0x000B1B20
+// Stops the front end's movie.
+void sp_sub_B1B20()
+{
+    unk_4B8C70.sub_19D5E0();
+}
+#endif
+
 // match: ?sub_E8910@@YAXXZ @ 0x000E8910
+// sp-match: ?sub_E8910@@YAXXZ @ 0x000B1E00
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_E8910()
 {
@@ -164,6 +223,7 @@ void sub_E8910()
 }
 
 // match: ?sub_E89E0@@YAXXZ @ 0x000E89E0
+// sp-match: ?sub_E89E0@@YAXXZ @ 0x000B1EC0
 void sub_E89E0()
 {
     type_3DF8D8 *var_22C;
@@ -185,6 +245,7 @@ void sub_E89E0()
 }
 
 // match: ?sub_E8AC0@@YAXPBDHHH@Z @ 0x000E8AC0
+// sp-match: ?sub_E8AC0@@YAXPBDHHH@Z @ 0x000B1F90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_E8AC0(const RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C)
 {
@@ -213,6 +274,7 @@ void sub_E8AC0(const RwChar *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C)
 }
 
 // match: ?sub_E8BA0@@YAXPBDPAURwCamera@@@Z @ 0x000E8BA0
+// sp-match: ?sub_E8BA0@@YAXPBDPAURwCamera@@@Z @ 0x000B1B30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_E8BA0(const RwChar *arg_0, RwCamera *arg_4)
 {
@@ -229,7 +291,9 @@ void sub_E8BA0(const RwChar *arg_0, RwCamera *arg_4)
     }
     if (!var_120.sub_19D640(arg_0, 1))
     {
+#ifndef CODFH_SP // single player compiles the debug print out
         sub_19A750("Failed to load movie for movie player. Bailing out!");
+#endif
         var_120.sub_19D5E0();
         return;
     }
@@ -280,6 +344,7 @@ void sub_E8BA0(const RwChar *arg_0, RwCamera *arg_4)
 }
 
 // match: ?sub_E8DB0@@YAXPAUTrigger_key@@@Z @ 0x000E8DB0
+// sp-match: ?sub_E8DB0@@YAXPAUTrigger_key@@@Z @ 0x000B2050
 void sub_E8DB0(Trigger_key *arg_0)
 {
     if (arg_0 && arg_0->unk_00 && arg_0->unk_04)
@@ -299,6 +364,7 @@ void sub_E8DB0(Trigger_key *arg_0)
 }
 
 // match: ?sub_E8E30@@YAXPAUTrigger_key@@@Z @ 0x000E8E30
+// sp-match: ?sub_E8E30@@YAXPAUTrigger_key@@@Z @ 0x000B20B0
 void sub_E8E30(Trigger_key *arg_0)
 {
     if (arg_0 && arg_0->unk_00 && arg_0->unk_04)
@@ -318,6 +384,7 @@ void sub_E8E30(Trigger_key *arg_0)
 }
 
 // match: ?sub_E8EB0@@YA_NPBD@Z @ 0x000E8EB0
+// sp-match: ?sub_E8EB0@@YA_NPBD@Z @ 0x000B1CB0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 bool sub_E8EB0(const RwChar *arg_0)
 {
@@ -336,6 +403,28 @@ bool sub_E8EB0(const RwChar *arg_0)
     }
     return false;
 }
+
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_B1D40@@YAXPBD_N@Z @ 0x000B1D40
+// Opens the movie arg_0 (in the language's folder when it has one) as the front end's
+// background, looping when arg_4 is set (SP 0xA53C9: "fend.bik").
+void sp_sub_B1D40(const RwChar *arg_0, bool arg_4)
+{
+    RwChar var_A0[0x20];
+    RwChar var_80[0x80];
+
+    sprintf(var_A0, "%s", dword_428E38[sub_19B0A0()]);
+    strupr(var_A0);
+    sprintf(var_80, "%s%s\\%s", "SHELL\\MOVIES\\", var_A0, arg_0);
+    if (!sub_E8EB0(var_80))
+    {
+        sprintf(var_80, "%s%s", "SHELL\\MOVIES\\", arg_0);
+    }
+    unk_4B8C70.sub_19D640(var_80, 0);
+    sub_E8860(false);
+    sp_byte_3B5817 = arg_4;
+}
+#endif
 
 
 #ifdef CODFH_PLAIN

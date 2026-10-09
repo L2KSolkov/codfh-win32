@@ -11,14 +11,19 @@
 #include "game/gameloop.h"
 #include "game/startup.h"
 #include "rws/memoryhandler.h"
+#ifdef CODFH_SP
+#include "game/savestate.h" // dword_4F45F8, for sub_D99F0
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
-// 0x003D7E28
+// 0x003D7E28 (single player's at SP 0x2E37B4)
 extern const RwReal flt_3D7E28 = 16.666666f;
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003D7E2C
 extern const RwReal flt_3D7E2C = 0.01f;
 // 0x003D7E30
 extern const RwReal flt_3D7E30 = 0.01f;
+#endif
 // 0x004292A0
 // RenderWare's memory functions (RWS's; the free one is its operator delete).
 RwMemoryFunctions off_4292A0 = { RWSMalloc, operator delete, RWSReAlloc, RWSCalloc };
@@ -45,6 +50,7 @@ RwInt32 dword_4FBA9C;
 // match: ?off_4292A0@@3URwMemoryFunctions@@A @ 0x004292A0
 
 // match: ?sub_D99F0@@YAHPAUtype_D9950@@@Z @ 0x000D99F0
+// sp-match: ?sub_D99F0@@YAHPAUtype_D9950@@@Z @ 0x000A4790
 
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_D99F0(type_D9950 *arg_0)
@@ -81,7 +87,11 @@ RwInt32 sub_D99F0(type_D9950 *arg_0)
                 Direct3D_SetPushBufferSize(0x400000, 0x8000); // not an address: a size
                 if (RwEngineStart())
                 {
+#ifdef CODFH_SP // single player shows the first frame only when the shell's settings ask (SP 0xA4862 tests dword_4F45F8->unk_10)
+                    if (!dword_4F4628 && dword_4F45F8->unk_10)
+#else
                     if (!dword_4F4628)
+#endif
                     {
                         local_10 = RWS::CameraHelper::CreateMainRasterCamera(Width, Height, ZDepth);
                         RwCameraShowRaster(local_10, 0, 0);
@@ -93,6 +103,12 @@ RwInt32 sub_D99F0(type_D9950 *arg_0)
                         var_1C.Orthogonal = 0.01f;
                         var_1C.Identity = 0.1f;
                         RwEngineSetMatrixTolerances(&var_1C);
+#if defined(CODFH_SP) && defined(CODFH_WIN32)
+                        // The Win32 keyboard is controller port 0. Initialize SP's default
+                        // profile before the first pad enumeration reads its control index;
+                        // the front end calls this same once-guarded setup later on Xbox.
+                        sub_19AD20();
+#endif
                         unk_4B9308.sub_EE590();
                         sub_83100();
                         sub_19A750();
@@ -101,7 +117,9 @@ RwInt32 sub_D99F0(type_D9950 *arg_0)
                         sub_19A750();
                         sub_82F50();
                         sub_19A750();
+#ifndef CODFH_SP // single player does not call it here (SP 0xA4790)
                         sub_1A2910();
+#endif
                         bp_8 = 1;
                     }
                     if (!bp_8)
@@ -123,6 +141,7 @@ RwInt32 sub_D99F0(type_D9950 *arg_0)
     return bp_8;
 }
 
+#ifndef CODFH_SP // MP only: multiplayer's game-loop exit (single player's loop, SP 0xA4930, never leaves); no twin in config/sp/shared.txt
 // match: ?sub_D9BC0@@YAXXZ @ 0x000D9BC0
 void sub_D9BC0()
 {
@@ -135,8 +154,15 @@ void sub_D9BC0()
     sub_19A750();
     sub_12F060(0);
 }
+#endif
+
+#ifdef CODFH_SP
+// Single player only (SP 0xA5C90), not yet in the source: one frame of the game.
+void sp_sub_A5C90();
+#endif
 
 // match: ?sub_D9C00@@YAXXZ @ 0x000D9C00
+// sp-match: ?sub_D9C00@@YAXXZ @ 0x000A4930
 void sub_D9C00()
 {
     RwInt32 var_4;
@@ -151,6 +177,13 @@ void sub_D9C00()
         dword_4B8888 = dword_4B888C;
     }
     sub_D9950();
+#ifdef CODFH_SP // single player runs its own frame (SP 0xA5C90) and then sub_D99B0, forever (SP 0xA4930)
+    for (;;)
+    {
+        sp_sub_A5C90();
+        sub_D99B0();
+    }
+#else
     sub_DA290();
     if (byte_4F61F0 || byte_4F61F1)
     {
@@ -186,6 +219,7 @@ void sub_D9C00()
             dword_4FBAA8 = 1;
         }
     }
+#endif
 }
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the

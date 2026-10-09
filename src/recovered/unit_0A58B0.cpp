@@ -40,11 +40,13 @@ RWS_REGISTERCLASS(CNPCWeaponBehavior);
 // match: ?MakeNew@CNPCWeaponBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000A58B0
 // match: __ehhandler$?MakeNew@CNPCWeaponBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x002FFF50
 // match: __ehhandler$?MakeNew@CNPCWeaponBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x002FFF5F
+// sp-match: ?MakeNew@CNPCWeaponBehavior@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x00081C90
 RWS_DEFINE_MAKENEW(CNPCWeaponBehavior)
 
 // match: ??0CNPCWeaponBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000A5930
 // match: __ehhandler$??0CNPCWeaponBehavior@@QAE@ABVCAttributePacket@RWS@@@Z-0x13 @ 0x002FFF70
 // match: __ehhandler$??0CNPCWeaponBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x002FFF83
+// sp-match: ??0CNPCWeaponBehavior@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00081120
 CNPCWeaponBehavior::CNPCWeaponBehavior(const RWS::CAttributePacket &attr)
 {
     unk_20 = -1;
@@ -52,10 +54,12 @@ CNPCWeaponBehavior::CNPCWeaponBehavior(const RWS::CAttributePacket &attr)
 }
 
 // match: ??_GCNPCWeaponBehavior@@UAEPAXI@Z @ 0x000A5A10
+// sp-match: ??_GCNPCWeaponBehavior@@UAEPAXI@Z @ 0x00081C80
 
 // match: ??1CNPCWeaponBehavior@@UAE@XZ @ 0x000A5A30
 // match: __ehhandler$??1CNPCWeaponBehavior@@UAE@XZ-0x2F @ 0x002FFF90
 // match: __ehhandler$??1CNPCWeaponBehavior@@UAE@XZ @ 0x002FFFBF
+// sp-match: ??1CNPCWeaponBehavior@@UAE@XZ @ 0x000811A0
 CNPCWeaponBehavior::~CNPCWeaponBehavior()
 {
     UnLinkMsg(iMsgSparkStartSystem);
@@ -63,6 +67,7 @@ CNPCWeaponBehavior::~CNPCWeaponBehavior()
 
 // Command 0 picks the settings; commands 1 to 75 fill them.
 // match: ?HandleAttributes@CNPCWeaponBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000A5AC0
+// sp-match: ?HandleAttributes@CNPCWeaponBehavior@@UAEXABVCAttributePacket@RWS@@@Z @ 0x00081210
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void CNPCWeaponBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 {
@@ -356,6 +361,7 @@ void CNPCWeaponBehavior::HandleAttributes(const RWS::CAttributePacket &attr)
 
 // On the message Id: marks its settings ready, once.
 // match: ?HandleEvents@CNPCWeaponBehavior@@UAEXAAVCMsg@RWS@@@Z @ 0x000A6BF0
+// sp-match: ?HandleEvents@CNPCWeaponBehavior@@UAEXAAVCMsg@RWS@@@Z @ 0x00081C30
 void CNPCWeaponBehavior::HandleEvents(RWS::CMsg &pMsg)
 {
     type_4D53F8 *var_4;
@@ -372,3 +378,4 @@ void CNPCWeaponBehavior::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ??_ECNPCWeaponBehavior@@WBI@AEPAXI@Z @ 0x000A6C40
+// sp-match: ??_ECNPCWeaponBehavior@@WBI@AEPAXI@Z @ 0x00081C70

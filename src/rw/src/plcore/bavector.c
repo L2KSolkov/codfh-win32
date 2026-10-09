@@ -433,6 +433,7 @@ InvSqrtTableCreate(void)
 // match: _rcsid @ 0x00416120
 
 // match: _VectorMultPoints @ 0x002A32F0
+// sp-match: _VectorMultPoints @ 0x001BE640
 static RwV3d *
 VectorMultPoints(RwV3d *pointsOut,
                  const RwV3d *pointsIn,
@@ -487,6 +488,7 @@ VectorMultPoints(RwV3d *pointsOut,
  */
 
 // match: _VectorMultPoint @ 0x002A3650
+// sp-match: _VectorMultPoint @ 0x001BE9A0
 static RwV3d *
 VectorMultPoint(RwV3d *pointOut,
                 const RwV3d *pointIn,
@@ -532,6 +534,7 @@ VectorMultPoint(RwV3d *pointOut,
  On exit    : point on success
  */
 // match: _VectorMultVectors @ 0x002A3700
+// sp-match: _VectorMultVectors @ 0x001BEA50
 static RwV3d *
 VectorMultVectors(RwV3d *pointsOut,
                   const RwV3d *pointsIn,
@@ -580,6 +583,7 @@ VectorMultVectors(RwV3d *pointsOut,
  On exit    : point on success
  */
 // match: _VectorMultVector @ 0x002A3A00
+// sp-match: _VectorMultVector @ 0x001BED50
 static RwV3d *
 VectorMultVector(RwV3d *pointOut,
                  const RwV3d *pointIn,
@@ -663,6 +667,7 @@ _rwVectorSetMultFn(rwVectorMultFn multPoint,
 #endif /* !defined(RWNOVECMULTFUNCS) */
 
 // match: __rwV3dNormalize @ 0x002A3AA0
+// sp-match: __rwV3dNormalize @ 0x001BEDF0
 RwReal
 _rwV3dNormalize(RwV3d * out, const RwV3d * in)
 {
@@ -704,6 +709,7 @@ _rwV3dNormalize(RwV3d * out, const RwV3d * in)
  *
  */
 // match: _RwV3dNormalize @ 0x002A3B70
+// sp-match: _RwV3dNormalize @ 0x001BEEC0
 RwReal
 RwV3dNormalize(RwV3d *out, const RwV3d *in)
 {
@@ -743,6 +749,7 @@ RwV3dNormalize(RwV3d *out, const RwV3d *in)
  *
  */
 // match: _RwV3dLength @ 0x002A3C70
+// sp-match: _RwV3dLength @ 0x001BEFC0
 RwReal
 RwV3dLength(const RwV3d * in)
 {
@@ -859,6 +866,7 @@ _rwInvSqrt(const RwReal num)
  *
  */
 // match: _RwV2dLength @ 0x002A3CD0
+// sp-match: _RwV2dLength @ 0x001BF020
 RwReal
 RwV2dLength(const RwV2d * in)
 {
@@ -893,6 +901,7 @@ RwV2dLength(const RwV2d * in)
  *
  */
 RwReal
+// sp-match: _RwV2dNormalize @ 0x001BF070
 RwV2dNormalize(RwV2d * out, const RwV2d * in)
 {
     RwReal              length = ((RwReal)0);
@@ -1432,6 +1441,7 @@ RwV3dCrossProduct(RwV3d *out, const RwV3d *ina, const RwV3d *inb)
  * \see RwV3dTransformVectors
  */
 // match: _RwV3dTransformPoint @ 0x002A3D20
+// sp-match: _RwV3dTransformPoint @ 0x001BF150
 RwV3d *
 RwV3dTransformPoint(RwV3d *pointOut,
                     const RwV3d *pointIn,
@@ -1475,6 +1485,7 @@ RwV3dTransformPoint(RwV3d *pointOut,
  * \see RwV3dTransformVectors
  */
 // match: _RwV3dTransformPoints @ 0x002A3D90
+// sp-match: _RwV3dTransformPoints @ 0x001BF1C0
 RwV3d *
 RwV3dTransformPoints(RwV3d *pointsOut,
                      const RwV3d *pointsIn,
@@ -1514,6 +1525,7 @@ RwV3dTransformPoints(RwV3d *pointsOut,
  * \see RwV3dTransformVectors
  */
 // match: _RwV3dTransformVector @ 0x002A3DC0
+// sp-match: _RwV3dTransformVector @ 0x001BF1F0
 RwV3d *
 RwV3dTransformVector(RwV3d *vectorOut,
                      const RwV3d *vectorIn,
@@ -1581,6 +1593,7 @@ RwV3dTransformVectors(RwV3d *vectorsOut,
  */
 
 // match: __rwVectorClose @ 0x002A3E20
+// sp-match: __rwVectorClose @ 0x001BF250
 void *
 _rwVectorClose(void *instance,
                RwInt32 __RWUNUSED__ offset, RwInt32 __RWUNUSED__ size)
@@ -1608,6 +1621,7 @@ _rwVectorClose(void *instance,
  */
 
 // match: __rwVectorOpen @ 0x002A3E30
+// sp-match: __rwVectorOpen @ 0x001BF260
 void *
 _rwVectorOpen(void *instance, RwInt32 offset, RwInt32 __RWUNUSED__ size)
 {

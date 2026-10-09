@@ -43,6 +43,7 @@ extern const RwReal flt_3DAC54 = 16.666666f;
 // match: __ehhandler$??1type_3DAC58@@UAE@XZ>1 @ 0x0041DAAC
 
 // match: ?sub_1331E0@@YAPAURpWorld@@XZ @ 0x001331E0
+// sp-match: ?sub_1331E0@@YAPAURpWorld@@XZ @ 0x000E3970
 
 // Makes the front end's world: empty, a million units across.
 RpWorld *sub_1331E0()
@@ -65,6 +66,9 @@ RpWorld *sub_1331E0()
 // match: ?sub_133230@@YAPAUtype_3DAC58@@PAUtype_712B0@@@Z @ 0x00133230
 // match: __ehhandler$?sub_133230@@YAPAUtype_3DAC58@@PAUtype_712B0@@@Z-0x19 @ 0x00301810
 // match: __ehhandler$?sub_133230@@YAPAUtype_3DAC58@@PAUtype_712B0@@@Z @ 0x00301829
+// sp-match: ?sub_133230@@YAPAUtype_3DAC58@@PAUtype_712B0@@@Z @ 0x000E4340
+// (its constructor, defined in the class: single player calls its out-of-line copy)
+// sp-match: ??0type_3DAC58@@QAE@PAUtype_712B0@@@Z @ 0x000E41D0
 type_3DAC58 *sub_133230(type_712B0 *arg_0)
 {
     type_3DAC58 *var_10;
@@ -79,12 +83,14 @@ type_3DAC58 *sub_133230(type_712B0 *arg_0)
             var_10 = 0;
         }
     }
+#ifndef CODFH_SP // single player compiles the debug print out
     else
     {
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
                    "location(%6.2f,%6.2f,%6.2f)",
                    arg_0->unk_90, arg_0->unk_94, arg_0->unk_98);
     }
+#endif
     return var_10;
 }
 
@@ -98,17 +104,29 @@ type_3DAC58 *sub_133230(type_712B0 *arg_0)
 // match: ?vf_180@type_3DAC58@@UAEXH@Z @ 0x00133420
 // match: ?vf_17C@type_3DAC58@@UAEMXZ @ 0x00133470
 // match: ?vf_0F4@type_3DAC58@@UAEPAUSplinePath@@XZ @ 0x00133490
+// sp-match: ?vf_0F4@type_3DAC58@@UAEPAUSplinePath@@XZ @ 0x000E42C0
+// sp-match: ?vf_09C@type_3DAC58@@UAEHXZ @ 0x000E4220
+// sp-match: ?vf_0A0@type_3DAC58@@UAEXI@Z @ 0x000E4230
+// sp-match: ?vf_124@type_3DAC58@@UAEXM@Z @ 0x000E4240
+// sp-match: ?vf_128@type_3DAC58@@UAEMXZ @ 0x000E4250
+// sp-match: ?vf_174@type_3DAC58@@UAEHXZ @ 0x000E4260
+// sp-match: ?vf_178@type_3DAC58@@UAEXH@Z @ 0x000E4270
+// sp-match: ?vf_180@type_3DAC58@@UAEXH@Z @ 0x000E4280
+// sp-match: ?vf_17C@type_3DAC58@@UAEMXZ @ 0x000E42B0
 
 // match: ??_Gtype_3DAC58@@UAEPAXI@Z @ 0x001334B0
 // match: ??1type_3DAC58@@UAE@XZ @ 0x001334E0
 // match: __ehhandler$??1type_3DAC58@@UAE@XZ-0x8 @ 0x00301840
 // match: __ehhandler$??1type_3DAC58@@UAE@XZ @ 0x00301848
+// sp-match: ??1type_3DAC58@@UAE@XZ @ 0x000E42F0
+// sp-match: ??_Gtype_3DAC58@@UAEPAXI@Z @ 0x000E42D0
 type_3DAC58::~type_3DAC58()
 {
     vf_230();
 }
 
 // match: ?vf_234@type_3DAC58@@UAEHPAUtype_712B0@@@Z @ 0x00133540
+// sp-match: ?vf_234@type_3DAC58@@UAEHPAUtype_712B0@@@Z @ 0x000E39B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3DAC58::vf_234(type_712B0 *arg_0)
 {
@@ -181,6 +199,7 @@ RwInt32 type_3DAC58::vf_234(type_712B0 *arg_0)
 }
 
 // match: ?vf_230@type_3DAC58@@UAEXXZ @ 0x00133910
+// sp-match: ?vf_230@type_3DAC58@@UAEXXZ @ 0x000E3C10
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Takes it down: its trigger's particle system where it stands when it was
 // destroyed, its AI object, and the trigger's key's entity.
@@ -216,13 +235,16 @@ void type_3DAC58::vf_230()
 }
 
 // match: ?vf_03C@type_3DAC58@@UAEXM@Z @ 0x00133A20
+// sp-match: ?vf_03C@type_3DAC58@@UAEXM@Z @ 0x000E3CD0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Moves it along its path by its speed (turning back at the ends, stopping
 // at the start or at the end by the path's mode), facing the next step, and
 // tells its scripts when it arrives.
 void type_3DAC58::vf_03C(RwReal arg_0)
 {
+#ifndef CODFH_SP // single player scopes it to its block (SP 0xE3CD0: sub esp 0x10, it shares a slot)
     RwReal var_1C;
+#endif
     RwInt32 var_18;
     RwInt32 var_14;
     RwReal lv_10;
@@ -235,10 +257,17 @@ void type_3DAC58::vf_03C(RwReal arg_0)
         var_18 = 0;
         lv_10 = unk_3B4;
         unk_3B4 += unk_3BC;
+#ifdef CODFH_SP // shape: SP 0xE3D11 compares in single precision (fcom) and copies the limit
+        if (unk_3B4 > unk_3C0)
+        {
+            unk_3B4 = unk_3C0;
+        }
+#else
         if ((RwDouble)unk_3B4 > (RwDouble)unk_3C0)
         {
             unk_3B4 = (RwReal)(RwDouble)unk_3C0;
         }
+#endif
         else if (unk_3B4 < 0.0f)
         {
             unk_3B4 = 0.0f;
@@ -264,6 +293,9 @@ void type_3DAC58::vf_03C(RwReal arg_0)
         vf_0D0(&var_C);
         if (var_14 != 0)
         {
+#ifdef CODFH_SP
+            RwReal var_1C;
+#endif
             var_1C = deltaTime;
             sub_6B5F0("IHaveArrived", (type_67620 *)(vf_098()), 0, 0, (RwInt32 *)(&var_1C), 1, 1, 0);
             sub_6B5F0("SplinePath_ArrivedATDestination", (type_67620 *)(vf_098()), 0, 0, 0, 0, 1, 0);
@@ -278,6 +310,7 @@ void type_3DAC58::vf_03C(RwReal arg_0)
 }
 
 // match: ?vf_064@type_3DAC58@@UAEHPAUtype_75600@@@Z @ 0x00133CD0
+// sp-match: ?vf_064@type_3DAC58@@UAEHPAUtype_75600@@@Z @ 0x000E3EC0
 // Hit by a bullet: by its trigger's flags (unk_104 bullets at all, unk_FC
 // and unk_100 from allies and enemies), off its health.
 RwInt32 type_3DAC58::vf_064(type_75600 *arg_0)
@@ -309,6 +342,7 @@ RwInt32 type_3DAC58::vf_064(type_75600 *arg_0)
 }
 
 // match: ?vf_068@type_3DAC58@@UAEHPAUtype_758F0@@@Z @ 0x00133E00
+// sp-match: ?vf_068@type_3DAC58@@UAEHPAUtype_758F0@@@Z @ 0x000E3FA0
 // Hit by an explosion: likewise (unk_108), telling the script where it came
 // from and whether in front.
 RwInt32 type_3DAC58::vf_068(type_758F0 *arg_0)
@@ -345,6 +379,7 @@ RwInt32 type_3DAC58::vf_068(type_758F0 *arg_0)
 }
 
 // match: ?vf_098@type_3DAC58@@UAEPAUtype_3D2E7C@@XZ @ 0x00133FD0
+// sp-match: ?vf_098@type_3DAC58@@UAEPAUtype_3D2E7C@@XZ @ 0x000E4110
 type_3D2E7C *type_3DAC58::vf_098()
 {
     return (type_3D2E7C *)sub_67620(unk_3B0);
@@ -352,6 +387,7 @@ type_3D2E7C *type_3DAC58::vf_098()
 
 // Whether arg_0 is its trigger's model's name.
 // match: ?vf_058@type_3DAC58@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x00133FF0
+// sp-match: ?vf_058@type_3DAC58@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x000E4120
 RwInt32 type_3DAC58::vf_058(type_3DF8D8_04 *arg_0)
 {
     SimpleMechanicTrigger *var_4;
@@ -363,6 +399,7 @@ RwInt32 type_3DAC58::vf_058(type_3DF8D8_04 *arg_0)
 }
 
 // match: ?vf_0F8@type_3DAC58@@UAEXM@Z @ 0x00134040
+// sp-match: ?vf_0F8@type_3DAC58@@UAEXM@Z @ 0x000E4150
 // Puts it at arg_0 (0 to 1) along its path.
 void type_3DAC58::vf_0F8(RwReal arg_0)
 {
@@ -393,9 +430,11 @@ void *type_3DAC58::operator new(RwUInt32 arg_0, void *arg_4)
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ??3type_3DAC58@@SAXPAX@Z (folded into 0x19A750)
+#ifndef CODFH_SP // single player keeps the call to the empty delete (SP 0xE42E0): its body is not in this object
 void type_3DAC58::operator delete(void * arg_0)
 {
 }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

@@ -45,12 +45,14 @@ extern const RwV3d stru_3E2918;
 #include "types/alfaobject.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E254C
 extern const RwReal flt_3E254C = 16.666666f;
 // 0x003E2550
 extern const RwReal flt_3E2550 = 0.01f;
 // 0x003E2554
 extern const RwReal flt_3E2554 = 0.01f;
+#endif
 // 0x004FBB00
 RpIntersection intersection;
 // End of its data definitions.

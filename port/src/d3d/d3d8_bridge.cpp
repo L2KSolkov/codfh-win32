@@ -430,6 +430,11 @@ extern "C" HRESULT WINAPI D3DDevice_GetRenderTarget(D3DSurface **pp)
     return D3D_OK;
 }
 
+extern "C" D3DSurface *WINAPI D3DDevice_GetRenderTarget2(void)
+{
+    return render_target;
+}
+
 extern "C" HRESULT WINAPI D3DDevice_GetDepthStencilSurface(D3DSurface **pp)
 {
     *pp = depth_target;
@@ -857,6 +862,15 @@ extern "C" void WINAPI D3DSurface_LockRect(D3DSurface *pThis, D3DLOCKED_RECT *pL
 
 extern "C" void WINAPI D3DSurface_UnlockRect(D3DSurface *pThis)
 {
+    if (pThis == &back_buffer.xb)
+    {
+        if (back_buffer_written && back_buffer.bits)
+        {
+            back_buffer_written = 0;
+            pdev_upload_frame(back_buffer.bits, back_buffer.pitch);
+        }
+        return;
+    }
     if (pThis && pThis->Parent)
         xdraw_texture_dirty(pThis->Parent);
 }

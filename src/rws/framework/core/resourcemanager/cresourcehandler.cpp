@@ -25,6 +25,7 @@
 // match: ?GetCResourceHandlerList@?A0xf2ed2e68@RWS@@YAAAV?$list@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@std@@XZ @ 0x0012F200
 // match: __ehhandler$?GetCResourceHandlerList@?A0xf2ed2e68@RWS@@YAAAV?$list@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@std@@XZ-0xE @ 0x00301710
 // match: __ehhandler$?GetCResourceHandlerList@?A0xf2ed2e68@RWS@@YAAAV?$list@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@std@@XZ @ 0x0030171E
+// sp-match: ?GetCResourceHandlerList@?A0xf2ed2e68@RWS@@YAAAV?$list@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@std@@XZ @ 0x000E1070
 
 namespace RWS
 {
@@ -40,6 +41,7 @@ namespace RWS
 }
 
 // match: ??0CResourceHandler@RWS@@QAE@XZ @ 0x0012F280
+// sp-match: ??0CResourceHandler@RWS@@QAE@XZ @ 0x000E1270
 RWS::CResourceHandler::CResourceHandler(void)
    {
       GetCResourceHandlerList().push_front(this);
@@ -47,12 +49,15 @@ RWS::CResourceHandler::CResourceHandler(void)
 
 // match: ??_GCResourceHandler@RWS@@UAEPAXI@Z @ 0x0012F2D0
 // match: ??1CResourceHandler@RWS@@UAE@XZ @ 0x0012F300
+// sp-match: ??1CResourceHandler@RWS@@UAE@XZ @ 0x000E10E0
+// sp-match: ??_GCResourceHandler@RWS@@UAEPAXI@Z @ 0x000E11B0
 RWS::CResourceHandler::~CResourceHandler(void)
    {
       GetCResourceHandlerList().remove(this);
    }
 
 // match: ?FindHandler@CResourceHandler@RWS@@SAPAV12@QBD@Z @ 0x0012F330
+// sp-match: ?FindHandler@CResourceHandler@RWS@@SAPAV12@QBD@Z @ 0x000E1100
 RWS::CResourceHandler *RWS::CResourceHandler::FindHandler(const RwChar * const psType)
    {
       CResourceHandlerList::iterator it = GetCResourceHandlerList().begin();
@@ -71,6 +76,7 @@ RWS::CResourceHandler *RWS::CResourceHandler::FindHandler(const RwChar * const p
    }
 
 // match: ?OpenAll@CResourceHandler@RWS@@SAXXZ @ 0x0012F3D0
+// sp-match: ?OpenAll@CResourceHandler@RWS@@SAXXZ @ 0x000E1150
 void RWS::CResourceHandler::OpenAll(void)
    {
       CResourceHandlerList::iterator it = GetCResourceHandlerList().begin();
@@ -84,6 +90,7 @@ void RWS::CResourceHandler::OpenAll(void)
    }
 
 // match: ?CloseAll@CResourceHandler@RWS@@SAXXZ @ 0x0012F460
+// sp-match: ?CloseAll@CResourceHandler@RWS@@SAXXZ @ 0x000E1180
 void RWS::CResourceHandler::CloseAll(void)
    {
       CResourceHandlerList::iterator it = GetCResourceHandlerList().begin();
@@ -109,3 +116,7 @@ void RWS::CResourceHandler::CloseAll(void)
 // match: ?_Incsize@?$list@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@std@@IAEXI@Z @ 0x0012F7F0
 // match: __ehhandler$?_Incsize@?$list@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@std@@IAEXI@Z-0x8 @ 0x00301750
 // match: __ehhandler$?_Incsize@?$list@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@std@@IAEXI@Z @ 0x00301758
+// sp-match: ?remove@?$list@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@std@@QAEXABQAVCResourceHandler@RWS@@@Z @ 0x000E1020
+// sp-match: ?_Buynode@?$list@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@std@@IAEPAU_Node@?$_List_nod@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@2@XZ @ 0x000E0FD0
+// sp-match: ?_Buynode@?$list@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@std@@IAEPAU_Node@?$_List_nod@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@2@PAU342@0ABQAVCResourceHandler@RWS@@@Z @ 0x000E0FF0
+// sp-match: ?_Incsize@?$list@PAVCResourceHandler@RWS@@V?$allocator@PAVCResourceHandler@RWS@@@std@@@std@@IAEXI@Z @ 0x000E11D0

@@ -16,6 +16,7 @@ RwInt32 dword_4B92D0;
 // The engine's memory functions' first two slots (include/rw/bamemory.h).
 
 // match: ?sub_EBF10@@YAHXZ @ 0x000EBF10
+// sp-match: ?sub_EBF10@@YAHXZ @ 0x000B50E0
 RwInt32 sub_EBF10()
 {
     dword_4B92D0 = RpClumpRegisterPlugin(0x14, 0x4210, sub_EC570, sub_EC620, sub_EC5C0);
@@ -23,6 +24,7 @@ RwInt32 sub_EBF10()
 }
 
 // match: ?sub_EBF40@@YAPAURpClump@@PAURwStream@@PAH@Z @ 0x000EBF40
+// sp-match: ?sub_EBF40@@YAPAURpClump@@PAURwStream@@PAH@Z @ 0x000B4C40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RpClump *sub_EBF40(RwStream *arg_0, RwInt32 *arg_4)
 {
@@ -30,7 +32,9 @@ RpClump *sub_EBF40(RwStream *arg_0, RwInt32 *arg_4)
     RpHAnimHierarchy *t20;
     RwUInt32 l1C;
     type_EBF40_04 *m_18;
+#ifndef CODFH_SP
     RwUInt32 ebp_14;
+#endif
     type_EC6C0 *lv_10;
     RpClump *slot_C;
     RwInt32 bp_8;
@@ -54,6 +58,10 @@ RpClump *sub_EBF40(RwStream *arg_0, RwInt32 *arg_4)
     {
         bp_4++;
         m_18 = 0;
+#ifdef CODFH_SP
+        // shape: the count is local to this block; SP 0xB4CB8 gives its slot to lv_10 later.
+        RwUInt32 ebp_14;
+#endif
         RwStreamReadInt32(arg_0, (RwInt32 *)&ebp_14, 4);
         m_18 = (type_EBF40_04 *)RwMalloc(ebp_14 * 0x50 + 0x10, 0x34251); // not an address: an allocation tag
         lv_10 = sub_EC6C0(slot_C);
@@ -101,6 +109,7 @@ RpClump *sub_EBF40(RwStream *arg_0, RwInt32 *arg_4)
 }
 
 // match: ?sub_EC1F0@@YAPAUtype_EC1F0@@PAURpClump@@H@Z @ 0x000EC1F0
+// sp-match: ?sub_EC1F0@@YAPAUtype_EC1F0@@PAURpClump@@H@Z @ 0x000B4E30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_EC1F0 *sub_EC1F0(RpClump *arg_0, RwInt32 arg_4)
 {
@@ -125,6 +134,7 @@ type_EC1F0 *sub_EC1F0(RpClump *arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_EC270@@YAPAURwV3d@@PAURpClump@@@Z @ 0x000EC270
+// sp-match: ?sub_EC270@@YAPAURwV3d@@PAURpClump@@@Z @ 0x000B4E80
 RwV3d *sub_EC270(RpClump *arg_0)
 {
     type_EC6C0 *var_4;
@@ -134,6 +144,7 @@ RwV3d *sub_EC270(RpClump *arg_0)
 }
 
 // match: ?sub_EC290@@YAHPAURpClump@@@Z @ 0x000EC290
+// sp-match: ?sub_EC290@@YAHPAURpClump@@@Z @ 0x000B4EA0
 RwInt32 sub_EC290(RpClump *arg_0)
 {
     type_EC6C0 *var_4;
@@ -152,6 +163,7 @@ RwInt32 *sub_EC2B0(RpClump *arg_0)
 }
 
 // match: ?sub_EC2D0@@YAHPAURpClump@@HHHH@Z @ 0x000EC2D0
+// sp-match: ?sub_EC2D0@@YAHPAURpClump@@HHHH@Z @ 0x000B5110
 RwInt32 sub_EC2D0(RpClump *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C, RwInt32 arg_10)
 {
     RpHAnimHierarchy *var_4;
@@ -161,6 +173,7 @@ RwInt32 sub_EC2D0(RpClump *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C, R
 }
 
 // match: ?sub_EC310@@YAHPAURpClump@@PAURpHAnimHierarchy@@PAURwMatrixTag@@HHH@Z @ 0x000EC310
+// sp-match: ?sub_EC310@@YAHPAURpClump@@PAURpHAnimHierarchy@@PAURwMatrixTag@@HHH@Z @ 0x000B4EC0
 // *arg_8 becomes the clump arg_0's tagged matrix arg_C in world space: the
 // tag's offset times its hierarchy node's matrix (the hierarchy's own with an
 // atomic from RWS::SkinHelper::FindFirstSkin, else the node frame's LTM; local-space matrices
@@ -222,6 +235,7 @@ RwInt32 sub_EC310(RpClump *arg_0, RpHAnimHierarchy *arg_4, RwMatrix *arg_8, RwIn
 }
 
 // match: ?sub_EC570@@YAPAXPAXHH@Z @ 0x000EC570
+// sp-match: ?sub_EC570@@YAPAXPAXHH@Z @ 0x000B5020
 void *sub_EC570(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_EC6C0 *var_4;
@@ -236,6 +250,7 @@ void *sub_EC570(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_EC5C0@@YAPAXPAXPBXHH@Z @ 0x000EC5C0
+// sp-match: ?sub_EC5C0@@YAPAXPAXPBXHH@Z @ 0x000B5040
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void *sub_EC5C0(void *arg_0, const void *arg_4, RwInt32 arg_8, RwInt32 arg_C)
 {
@@ -252,6 +267,7 @@ void *sub_EC5C0(void *arg_0, const void *arg_4, RwInt32 arg_8, RwInt32 arg_C)
 }
 
 // match: ?sub_EC620@@YAPAXPAXHH@Z @ 0x000EC620
+// sp-match: ?sub_EC620@@YAPAXPAXHH@Z @ 0x000B5080
 void *sub_EC620(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 {
     type_EC6C0 *var_4;
@@ -280,6 +296,7 @@ void *sub_EC620(void *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_EC6C0@@YAPAUtype_EC6C0@@PAURpClump@@@Z @ 0x000EC6C0
+// sp-match: ?sub_EC6C0@@YAPAUtype_EC6C0@@PAURpClump@@@Z @ 0x000B4C30
 type_EC6C0 *sub_EC6C0(RpClump *arg_0)
 {
     return RWPLUGINOFFSET(type_EC6C0, arg_0, dword_4B92D0);

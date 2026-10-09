@@ -20,6 +20,7 @@ initEntry(rwaNodeSetEntry *entry, RwUInt32 channel, RwUInt32 track, RwUInt32 kin
 }
 
 // match: _rwaStreamContainerCommandInitialize @ 0x00246D50
+// sp-match: _rwaStreamContainerCommandInitialize @ 0x0015ACA0
 rwaContainerCommand *
 rwaStreamContainerCommandInitialize(rwaContainerCommand *command)
 {
@@ -34,6 +35,7 @@ rwaStreamContainerCommandInitialize(rwaContainerCommand *command)
 /* The node set's entries for the tracks' channels: four per channel (kinds
  * 0 to 3, value 1.0); the number of entries, or 0 when they do not fit. */
 // match: _sub_246D70 @ 0x00246D70
+// sp-match: _sub_246D70 @ 0x0015ACC0
 RwUInt32
 sub_246D70(rwaNodeSetEntry *entries, RwUInt32 maxEntries, const rwaStreamInfo *info)
 {
@@ -68,6 +70,7 @@ sub_246D70(rwaNodeSetEntry *entries, RwUInt32 maxEntries, const rwaStreamInfo *i
     return n * 4;
 }
 // match: _sub_246E70 @ 0x00246E70
+// sp-match: _sub_246E70 @ 0x0015ADC0
 rwaContainerCommand *
 sub_246E70(rwaContainerCommand *command, const rwaContainerSource *source)
 {
@@ -80,6 +83,7 @@ sub_246E70(rwaContainerCommand *command, const rwaContainerSource *source)
     return command;
 }
 // match: _sub_246EA0 @ 0x00246EA0
+// sp-match: _sub_246EA0 @ 0x0015ADF0
 rwaContainerCommand *
 sub_246EA0(rwaContainerCommand *command, rwaPlaySettings *settings)
 {
@@ -88,6 +92,7 @@ sub_246EA0(rwaContainerCommand *command, rwaPlaySettings *settings)
     return command;
 }
 // match: _sub_246EB0 @ 0x00246EB0
+// sp-match: _sub_246EB0 @ 0x0015AE00
 RwBool
 sub_246EB0(rwaContainerCommand *command, RwReal rate, const rwaNodeSet *set)
 {
@@ -105,6 +110,7 @@ sub_246EB0(rwaContainerCommand *command, RwReal rate, const rwaNodeSet *set)
  * 0x100C04BA; void return and range initialization before the entry loop.
  * The gain arrives as raw 32-bit data, as declared by its caller in unit_23FAD0. */
 // match: _sub_246ED0 @ 0x00246ED0
+// sp-match: _sub_246ED0 @ 0x0015AE20
 void
 sub_246ED0(rwaContainerCommand *command, const rwaNodeSet *set, RwInt32 track, RwInt32 channel,
            RwInt32 kind, RwUInt32 value)
@@ -146,6 +152,7 @@ sub_246ED0(rwaContainerCommand *command, const rwaNodeSet *set, RwInt32 track, R
     command->flags |= 0x10;
 }
 // match: _sub_246F80 @ 0x00246F80
+// sp-match: _sub_246F80 @ 0x0015AED0
 rwaContainerCommand *
 sub_246F80(rwaContainerCommand *command, RwUInt32 value)
 {
@@ -154,6 +161,7 @@ sub_246F80(rwaContainerCommand *command, RwUInt32 value)
     return command;
 }
 // match: _sub_246F90 @ 0x00246F90
+// sp-match: _sub_246F90 @ 0x0015AEE0
 rwaContainerCommand *
 sub_246F90(rwaContainerCommand *command, RwInt32 mode)
 {
@@ -162,12 +170,14 @@ sub_246F90(rwaContainerCommand *command, RwInt32 mode)
     return command;
 }
 // match: _sub_246FB0 @ 0x00246FB0
+// sp-match: _sub_246FB0 @ 0x0015AF00
 void *
 sub_246FB0(RwUInt32 size, RwUInt32 unused)
 {
     return sub_242170(size, rwaMEMHINTDUR_EVENT | rwaID_80F);
 }
 // match: _sub_246FC0 @ 0x00246FC0
+// sp-match: _sub_246FC0 @ 0x0015AF10
 void
 sub_246FC0(void *mem, RwUInt32 unused)
 {

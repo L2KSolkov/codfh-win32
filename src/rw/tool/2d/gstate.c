@@ -68,6 +68,7 @@ Rt2dGlobalVars      Rt2dGlobals;
 // match: _rcsid @ 0x003EE34C
 
 // match: _PS2CameraEndUpdate2d @ 0x002561B0
+// sp-match: _PS2CameraEndUpdate2d @ 0x0016C0E0
 static RwCamera    *
 PS2CameraEndUpdate2d(RwCamera * camera)
 {
@@ -98,6 +99,7 @@ PS2CameraEndUpdate2d(RwCamera * camera)
  * \see Rt2dCTMPop
  */
 // match: _Rt2dCTMSetIdentity @ 0x002561C0
+// sp-match: _Rt2dCTMSetIdentity @ 0x0016C0F0
 RwBool
 Rt2dCTMSetIdentity(void)
 {
@@ -200,6 +202,7 @@ _rt2dCTMGetWinding(void)
  * \see Rt2dDeviceSetMetric
  */
 // match: _Rt2dDeviceGetStep @ 0x00256990
+// sp-match: _Rt2dDeviceGetStep @ 0x0016C9E0
 RwBool
 Rt2dDeviceGetStep(RwV2d * xstep, RwV2d * ystep, RwV2d * origin)
 {
@@ -341,6 +344,7 @@ Rt2dDeviceSetMetric(RwReal x, RwReal y, RwReal w, RwReal h)
  * \see Rt2dDeviceGetStep
  */
 // match: _Rt2dDeviceGetMetric @ 0x002562D0
+// sp-match: _Rt2dDeviceGetMetric @ 0x0016C200
 RwBool
 Rt2dDeviceGetMetric(RwReal * x, RwReal * y, RwReal * w, RwReal * h)
 {
@@ -357,6 +361,7 @@ Rt2dDeviceGetMetric(RwReal * x, RwReal * y, RwReal * w, RwReal * h)
 /****************************************************************************/
 
 // match: __rt2dGetTolerance @ 0x00256B00
+// sp-match: __rt2dGetTolerance @ 0x0016CB50
 RwReal
 _rt2dGetTolerance(void)
 {
@@ -399,6 +404,7 @@ _rt2dGetTolerance(void)
  * \see Rt2dPathFlatten
  */
 // match: _Rt2dDeviceSetFlat @ 0x00256320
+// sp-match: _Rt2dDeviceSetFlat @ 0x0016C250
 RwBool
 Rt2dDeviceSetFlat(RwReal r)
 {
@@ -590,6 +596,7 @@ Rt2dVisible(RwReal x, RwReal y, RwReal w, RwReal h)
  * \see Rt2dDeviceSetMetric
  */
 // match: _Rt2dDeviceSetLayerDepth @ 0x00256350
+// sp-match: _Rt2dDeviceSetLayerDepth @ 0x0016C280
 RwBool
 Rt2dDeviceSetLayerDepth(RwReal depth)
 {
@@ -628,6 +635,7 @@ Rt2dDeviceSetLayerDepth(RwReal depth)
  * \see Rt2dDeviceSetMetric
  */
 // match: _Rt2dDeviceSetCamera @ 0x00256380
+// sp-match: _Rt2dDeviceSetCamera @ 0x0016C2B0
 RwBool
 Rt2dDeviceSetCamera(RwCamera * cam)
 {
@@ -697,6 +705,7 @@ Rt2dDeviceSetCamera(RwCamera * cam)
  * \see Rt2dDeviceSetCamera
  */
 RwCamera *
+// sp-match: _Rt2dDeviceGetCamera @ 0x0016C3C0
 Rt2dDeviceGetCamera(void)
 {
     RWAPIFUNCTION(RWSTRING("Rt2dDeviceGetCamera"));
@@ -748,6 +757,7 @@ Rt2dSetPipelineFlags(RwUInt32 flags)
  * \see Rt2dDeviceSetCamera
  */
 // match: _Rt2dOpen @ 0x00256BB0
+// sp-match: _Rt2dOpen @ 0x0016CC00
 void
 Rt2dOpen(RwCamera * cam)
 {
@@ -790,6 +800,7 @@ Rt2dOpen(RwCamera * cam)
  * \see Rt2dOpen
  */
 // match: _Rt2dClose @ 0x00256BE0
+// sp-match: _Rt2dClose @ 0x0016CC30
 void
 Rt2dClose(void)
 {
@@ -813,6 +824,7 @@ Rt2dClose(void)
 
 /****************************************************************************/
 // match: __rt2dGstateClose @ 0x00256490
+// sp-match: __rt2dGstateClose @ 0x0016C3D0
 void
 _rt2dGstateClose(void)
 {
@@ -845,6 +857,7 @@ _rt2dGstateClose(void)
 
 /****************************************************************************/
 // match: __rt2dGstateOpen @ 0x002564F0
+// sp-match: __rt2dGstateOpen @ 0x0016C430
 RwBool
 _rt2dGstateOpen(void)
 {
@@ -954,6 +967,7 @@ Rt2dCTMRead(RwMatrix * result)
  * \see Rt2dCTMSetIdentity
  */
 // match: _Rt2dCTMPush @ 0x002566A0
+// sp-match: _Rt2dCTMPush @ 0x0016C5E0
 RwBool
 Rt2dCTMPush(void)
 {
@@ -977,6 +991,7 @@ Rt2dCTMPush(void)
 
 /****************************************************************************/
 RwBool
+// sp-match: __rt2dCTMPush @ 0x0016C640
 _rt2dCTMPush(RwMatrix *matrix)
 {
     const RwBool        result = (Rt2dGlobals.mtos < 31);
@@ -1014,6 +1029,7 @@ _rt2dCTMPush(RwMatrix *matrix)
 /****************************************************************************/
 
 RwBool
+// sp-match: __rt2dCTMSet @ 0x0016C6D0
 _rt2dCTMSet(RwMatrix *matrix)
 {
     const RwBool        result = (Rt2dGlobals.mtos < 31);
@@ -1057,6 +1073,7 @@ _rt2dCTMSet(RwMatrix *matrix)
  * \see Rt2dCTMSetIdentity
  */
 // match: _Rt2dCTMPop @ 0x00256700
+// sp-match: _Rt2dCTMPop @ 0x0016C740
 RwBool
 Rt2dCTMPop(void)
 {
@@ -1097,6 +1114,7 @@ Rt2dCTMPop(void)
  * \see Rt2dCTMSetIdentity
  */
 // match: _Rt2dCTMScale @ 0x00256730
+// sp-match: _Rt2dCTMScale @ 0x0016C770
 RwBool
 Rt2dCTMScale(RwReal x, RwReal y)
 {
@@ -1136,6 +1154,7 @@ Rt2dCTMScale(RwReal x, RwReal y)
  * \see Rt2dCTMSetIdentity
  */
 // match: _Rt2dCTMTranslate @ 0x00256790
+// sp-match: _Rt2dCTMTranslate @ 0x0016C7D0
 RwBool
 Rt2dCTMTranslate(RwReal x, RwReal y)
 {
@@ -1158,6 +1177,7 @@ Rt2dCTMTranslate(RwReal x, RwReal y)
 /****************************************************************************/
 
 // match: __rt2dCTMGet @ 0x002567F0
+// sp-match: __rt2dCTMGet @ 0x0016C830
 RwMatrix           *
 _rt2dCTMGet(void)
 {
@@ -1219,6 +1239,7 @@ _rt2dCTMGet(void)
 }
 
 RwMatrix           *
+// sp-match: __rt2dCTMGetDirect @ 0x0016C9D0
 _rt2dCTMGetDirect(void)
 {
     RWFUNCTION(RWSTRING("_rt2dCTMGetDirect"));

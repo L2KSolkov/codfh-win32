@@ -74,6 +74,7 @@ static D3DMATRIX projMatrix =
 // match: ?rwXbDriverDevice@?1??_rwDeviceGetHandle@@9@9 @ 0x004356C8
 
 // match: _RwXbSetSurfaceProperties @ 0x002B3490
+// sp-match: _RwXbSetSurfaceProperties @ 0x001CE8B0
 
 RwBool
 RwXbSetSurfaceProperties(const RwRGBA *color, const RwSurfaceProperties *surfaceProps,
@@ -113,6 +114,7 @@ RwXbSetSurfaceProperties(const RwRGBA *color, const RwSurfaceProperties *surface
 }
 
 // match: _XbFindDepth @ 0x002B35E0
+// sp-match: _XbFindDepth @ 0x001CEA00
 static RwInt32
 XbFindDepth(D3DFORMAT format)
 {
@@ -143,6 +145,7 @@ XbFindDepth(D3DFORMAT format)
 }
 
 // match: _XbFindRWFormat @ 0x002B3630
+// sp-match: _XbFindRWFormat @ 0x001CEA50
 static RwInt32
 XbFindRWFormat(D3DFORMAT format)
 {
@@ -184,6 +187,7 @@ XbFindRWFormat(D3DFORMAT format)
 }
 
 // match: _RwXboxDeviceConfigGetDefaultValues @ 0x002B36A0
+// sp-match: _RwXboxDeviceConfigGetDefaultValues @ 0x001CEAC0
 void
 RwXboxDeviceConfigGetDefaultValues(RwXboxDeviceConfig *deviceConfig)
 {
@@ -204,6 +208,7 @@ RwXboxDeviceConfigGetDefaultValues(RwXboxDeviceConfig *deviceConfig)
 }
 
 // match: _XbDeviceSystemOpen @ 0x002B3700
+// sp-match: _XbDeviceSystemOpen @ 0x001CEB20
 static RwBool
 XbDeviceSystemOpen(void *in)
 {
@@ -280,6 +285,7 @@ XbDeviceSystemOpen(void *in)
 }
 
 // match: _XbDeviceSystemStart @ 0x002B3880
+// sp-match: _XbDeviceSystemStart @ 0x001CECA0
 static RwBool
 XbDeviceSystemStart(void)
 {
@@ -319,6 +325,7 @@ XbDeviceSystemStart(void)
 }
 
 // match: __rwDeviceRegisterPlugin @ 0x002B3970
+// sp-match: __rwDeviceRegisterPlugin @ 0x001CED90
 RwBool
 _rwDeviceRegisterPlugin(void)
 {
@@ -326,6 +333,7 @@ _rwDeviceRegisterPlugin(void)
 }
 
 // match: __rwXbEnsureDefaultRenderTarget @ 0x002B3980
+// sp-match: __rwXbEnsureDefaultRenderTarget @ 0x001CEDA0
 void
 _rwXbEnsureDefaultRenderTarget(void)
 {
@@ -347,6 +355,7 @@ XbGetTopRaster(RwRaster *ra)
 
 /* Sets the camera's raster and Z raster as the render target and viewport. */
 // match: _XbCameraToRenderTarget @ 0x002B39A0
+// sp-match: _XbCameraToRenderTarget @ 0x001CEDC0
 static RwBool
 XbCameraToRenderTarget(const RwCamera *camera)
 {
@@ -421,6 +430,7 @@ XbCameraToRenderTarget(const RwCamera *camera)
 }
 
 // match: __rwXbCameraBeginUpdate @ 0x002B3A90
+// sp-match: __rwXbCameraBeginUpdate @ 0x001CEEB0
 RwBool
 _rwXbCameraBeginUpdate(void *out __RWUNUSED__, void *cameraIn, RwInt32 in __RWUNUSED__)
 {
@@ -502,6 +512,7 @@ _rwXbCameraBeginUpdate(void *out __RWUNUSED__, void *cameraIn, RwInt32 in __RWUN
 }
 
 // match: __rwXbCameraEndUpdate @ 0x002B3C60
+// sp-match: __rwXbCameraEndUpdate @ 0x001CF080
 RwBool
 _rwXbCameraEndUpdate(void *out __RWUNUSED__, void *cameraIn __RWUNUSED__,
                      RwInt32 in __RWUNUSED__)
@@ -514,6 +525,7 @@ _rwXbCameraEndUpdate(void *out __RWUNUSED__, void *cameraIn __RWUNUSED__,
 }
 
 // match: __rwXbRasterShowRaster @ 0x002B3C70
+// sp-match: __rwXbRasterShowRaster @ 0x001CF090
 RwBool
 _rwXbRasterShowRaster(void *raster __RWUNUSED__, void *inOut __RWUNUSED__, RwInt32 flags)
 {
@@ -540,6 +552,7 @@ _rwXbRasterShowRaster(void *raster __RWUNUSED__, void *inOut __RWUNUSED__, RwInt
 }
 
 // match: _RwXboxGetCurrentD3DDevice @ 0x002B3CC0
+// sp-match: _RwXboxGetCurrentD3DDevice @ 0x001CF0E0
 D3DDevice *
 RwXboxGetCurrentD3DDevice(void)
 {
@@ -548,6 +561,7 @@ RwXboxGetCurrentD3DDevice(void)
 
 /* Clears a sub-raster of a camera texture by drawing a quad over it. */
 // match: _XbClearWithQuads @ 0x002B3CD0
+// sp-match: _XbClearWithQuads @ 0x001CF0F0
 static void
 XbClearWithQuads(RwRaster *raster, D3DCOLOR packedColor, RwInt32 clearFlags)
 {
@@ -692,6 +706,7 @@ XbClearWithQuads(RwRaster *raster, D3DCOLOR packedColor, RwInt32 clearFlags)
 }
 
 // match: __rwXbCameraClear @ 0x002B4280
+// sp-match: __rwXbCameraClear @ 0x001CF6A0
 RwBool
 _rwXbCameraClear(void *camera, void *color, RwInt32 clearFlags)
 {
@@ -753,6 +768,7 @@ XbNullStandard(void *pOut __RWUNUSED__,
 }
 
 // match: _XbDeviceSystemStandards @ 0x002B4320
+// sp-match: _XbDeviceSystemStandards @ 0x001CF740
 static RwBool
 XbDeviceSystemStandards(void *out, void *inOut __RWUNUSED__,
                         RwInt32 numStandardsFunctions)
@@ -861,6 +877,7 @@ XbDeviceSystemStop(void)
 }
 
 // match: _XbSystem @ 0x002B4550
+// sp-match: _XbSystem @ 0x001CF970
 static RwBool
 XbSystem(RwInt32 request, void *out, void *inOut, RwInt32 in)
 {
@@ -1033,6 +1050,7 @@ XbSystem(RwInt32 request, void *out, void *inOut, RwInt32 in)
 }
 
 // match: __rwDeviceGetHandle @ 0x002B4850
+// sp-match: __rwDeviceGetHandle @ 0x001CFC70
 RwDevice *
 _rwDeviceGetHandle(void)
 {

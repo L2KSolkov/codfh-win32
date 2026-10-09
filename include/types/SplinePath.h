@@ -28,15 +28,32 @@
 #include "rws/linearallocationpolicy.h"
 #include "types/type_3DF8D8.h"
 
+#ifdef CODFH_SP
+// The game's debug print (game/functions.h), compiled out in ~SplinePath.
+void sub_19A750();
+#endif
+
 struct SplinePath : RWS::CAttributeHandler, RWS::LinearAllocationPolicy
 {
     RWS_MAKENEWCLASS(SplinePath);
     RWS_DECLARE_CLASSID(SplinePath);
 
     SplinePath(const RWS::CAttributePacket &attr);
+#ifdef CODFH_SP
+    // shape: single player keeps an EH frame around the empty destructor
+    // (SP 0x8E5B0: state -1 stored before the base's destructor) under /EHsc;
+    // a debug call the compiler removes as unreachable leaves it (MP's unit
+    // gets the frame from /EHa).
+    ~SplinePath()
+    {
+        if (0)
+            sub_19A750();
+    }
+#else
     ~SplinePath()
     {
     }
+#endif
 
     virtual void HandleAttributes(const RWS::CAttributePacket &attr);
     // Its system commands: an attached resource (the spline) goes to

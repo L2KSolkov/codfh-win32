@@ -10,6 +10,12 @@
 #include <stdio.h>
 #include "rw/badevice.h"
 
+#ifdef CODFH_SP
+// Single player uses the disc-error callback in these byte-count call slots;
+// nonzero results return immediately from the callback.
+void sp_sub_12C410(void *arg_0);
+#endif
+
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x004E22A8
 type_4E22A8 dword_4E22A8;
@@ -26,6 +32,7 @@ RwInt32 dword_4E23A8;
 // match: ??_C@_0CH@KNJNKPP@?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?$CK?5Seek?5retr@ @ 0x003DCD1C
 
 // match: ?sub_16C800@@YAIPBDI@Z @ 0x0016C800
+// sp-match: ?sub_16C800@@YAIPBDI@Z @ 0x0010A4A0
 
 RwUInt32 sub_16C800(const RwChar *arg_0, RwUInt32 arg_4)
 {
@@ -45,6 +52,7 @@ RwUInt32 sub_16C800(const RwChar *arg_0, RwUInt32 arg_4)
 }
 
 // match: ?sub_16C880@@YA_KPBD_K@Z @ 0x0016C880
+// sp-match: ?sub_16C880@@YA_KPBD_K@Z @ 0x0010A520
 RwUInt64 sub_16C880(const RwChar *arg_0, RwUInt64 arg_4)
 {
     RwChar var_408[0x400];
@@ -69,6 +77,7 @@ RwUInt64 sub_16C880(const RwChar *arg_0, RwUInt64 arg_4)
 }
 
 // match: ?sub_16C940@@YA_NXZ @ 0x0016C940
+// sp-match: ?sub_16C940@@YA_NXZ @ 0x0010AA40
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 bool sub_16C940()
 {
@@ -90,10 +99,18 @@ bool sub_16C940()
         return false;
     dword_4E22A8.unk_CC.rwfseek(bp_4->unk_BC, 0, 0);
     bp_8 = dword_4E22A8.unk_CC.rwfread(bp_4, 1, 0x80, bp_4->unk_BC);
+#ifdef CODFH_SP
+    sp_sub_12C410((void *)bp_8);
+#else
     sub_19A750((const RwChar *)bp_8);
+#endif
     bp_4->unk_C4 = (type_16CC10 *)RwMalloc(bp_4->unk_7C * sizeof(type_16CC10), 0x34250); // not an address: a memory hint
     bp_8 = dword_4E22A8.unk_CC.rwfread(bp_4->unk_C4, 1, bp_4->unk_7C * sizeof(type_16CC10), bp_4->unk_BC);
+#ifdef CODFH_SP
+    sp_sub_12C410((void *)bp_8);
+#else
     sub_19A750((const RwChar *)bp_8);
+#endif
     bp_4->unk_C8 = bp_4->unk_7C * sizeof(type_16CC10) + 0x80;
     var_C = RwOsGetFileInterface();
     var_C->rwfopen = sub_16CB00;
@@ -109,6 +126,7 @@ bool sub_16C940()
 }
 
 // match: ?sub_16CB00@@YAPAXPBD0@Z @ 0x0016CB00
+// sp-match: ?sub_16CB00@@YAPAXPBD0@Z @ 0x0010A780
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void *sub_16CB00(const RwChar *arg_0, const RwChar *arg_4)
 {
@@ -139,7 +157,10 @@ void *sub_16CB00(const RwChar *arg_0, const RwChar *arg_4)
     }
     else
     {
+#ifndef CODFH_SP
+        // Single player compiles the debug print out (SP 0x10A780).
         sub_19A750("Unable to locate %s in pack file - attempting to load off disk\n", arg_0);
+#endif
         var_10 = dword_4E22A8.unk_CC.rwfopen(arg_0, arg_4);
         return var_10;
     }
@@ -147,6 +168,7 @@ void *sub_16CB00(const RwChar *arg_0, const RwChar *arg_4)
 }
 
 // match: ?sub_16CC10@@YAPAUtype_16CC10@@PBD@Z @ 0x0016CC10
+// sp-match: ?sub_16CC10@@YAPAUtype_16CC10@@PBD@Z @ 0x0010A5C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The directory entry of the path arg_0 (after any drive), or 0.
 type_16CC10 *sub_16CC10(const RwChar *arg_0)
@@ -170,6 +192,7 @@ type_16CC10 *sub_16CC10(const RwChar *arg_0)
 }
 
 // match: ?sub_16CCC0@@YAHPAX@Z @ 0x0016CCC0
+// sp-match: ?sub_16CCC0@@YAHPAX@Z @ 0x0010A630
 RwInt32 sub_16CCC0(void *arg_0)
 {
     RwInt32 var_4 = (RwInt32)arg_0;
@@ -181,6 +204,7 @@ RwInt32 sub_16CCC0(void *arg_0)
 }
 
 // match: ?sub_16CD00@@YAIPAXII0@Z @ 0x0016CD00
+// sp-match: ?sub_16CD00@@YAIPAXII0@Z @ 0x0010A820
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 size_t sub_16CD00(void *arg_0, size_t arg_4, size_t arg_8, void *arg_C)
 {
@@ -194,7 +218,11 @@ size_t sub_16CD00(void *arg_0, size_t arg_4, size_t arg_8, void *arg_C)
     {
         size_t var_14 = dword_4E22A8.unk_CC.rwfread(arg_0, arg_4, arg_8, arg_C);
 
+#ifdef CODFH_SP
+        sp_sub_12C410((void *)var_14);
+#else
         sub_19A750((const RwChar *)var_14);
+#endif
         return var_14;
     }
     bp_4 = arg_4 * arg_8;
@@ -219,9 +247,16 @@ size_t sub_16CD00(void *arg_0, size_t arg_4, size_t arg_8, void *arg_C)
     {
         size_t var_18 = dword_4E22A8.unk_CC.rwfread(arg_0, 1, bp_4, dword_4E22A8.unk_BC);
 
+#ifdef CODFH_SP
+        sp_sub_12C410((void *)var_18);
+#else
         sub_19A750((const RwChar *)var_18);
+#endif
+#ifndef CODFH_SP
+        // Single player compiles the debug print out (SP 0x10A8DE goes straight on).
         if (var_18 != bp_4)
             sub_19A750("Read Error\n");
+#endif
         dword_4E22A8.unk_80[bp_8].unk_08 += bp_4;
         dword_4E22A8.unk_C8 += bp_4;
     }
@@ -229,6 +264,7 @@ size_t sub_16CD00(void *arg_0, size_t arg_4, size_t arg_8, void *arg_C)
 }
 
 // match: ?sub_16CE70@@YAPADPADHPAX@Z @ 0x0016CE70
+// sp-match: ?sub_16CE70@@YAPADPADHPAX@Z @ 0x0010A900
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwChar *sub_16CE70(RwChar *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -284,6 +320,7 @@ RwChar *sub_16CE70(RwChar *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: ?sub_16D070@@YAHPAXJH@Z @ 0x0016D070
+// sp-match: ?sub_16D070@@YAHPAXJH@Z @ 0x0010A660
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_16D070(void *arg_0, RwFileSeekOffset arg_4, RwInt32 arg_8)
 {
@@ -329,6 +366,7 @@ RwInt32 sub_16D070(void *arg_0, RwFileSeekOffset arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_16D1B0@@YAHPAX@Z @ 0x0016D1B0
+// sp-match: ?sub_16D1B0@@YAHPAX@Z @ 0x0010A720
 RwInt32 sub_16D1B0(void *arg_0)
 {
     RwInt32 var_4 = (RwInt32)arg_0;
@@ -339,6 +377,7 @@ RwInt32 sub_16D1B0(void *arg_0)
 }
 
 // match: ?sub_16D1E0@@YAHPBD@Z @ 0x0016D1E0
+// sp-match: ?sub_16D1E0@@YAHPBD@Z @ 0x0010A740
 RwBool sub_16D1E0(const RwChar *arg_0)
 {
     type_16CC10 *var_4 = sub_16CC10(arg_0);
@@ -347,6 +386,7 @@ RwBool sub_16D1E0(const RwChar *arg_0)
 }
 
 // match: ?sub_16D200@@YAIPAX@Z @ 0x0016D200
+// sp-match: ?sub_16D200@@YAIPAX@Z @ 0x0010A760
 // The size of the pack file open as arg_0.
 RwUInt32 sub_16D200(void *arg_0)
 {

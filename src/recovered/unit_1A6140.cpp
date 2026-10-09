@@ -13,10 +13,12 @@
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003E134C
 extern const RwReal flt_3E134C = 0.01f;
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003E1350
 extern const RwReal flt_3E1350 = 0.01f;
 // 0x003E1354
 extern const RwReal flt_3E1354 = 16.666666f;
+#endif
 // 0x004F6AF8
 #ifndef CODFH_PLAIN
 RwReal flt_4F6AF8;

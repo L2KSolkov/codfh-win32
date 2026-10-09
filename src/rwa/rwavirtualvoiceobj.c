@@ -305,6 +305,7 @@ RwUInt32 dword_5067FC;
 // match: _unk_42E318 @ 0x0042E318
 
 // match: _RwaStreamCreate @ 0x0023B750
+// sp-match: _RwaStreamCreate @ 0x0014F9D0
 
 RwInt32
 RwaStreamCreate(RwInt32 a, RwInt32 b, RwInt32 c, RwInt32 d, RwInt32 e)
@@ -313,6 +314,7 @@ RwaStreamCreate(RwInt32 a, RwInt32 b, RwInt32 c, RwInt32 d, RwInt32 e)
 }
 
 // match: _RwaListenerUnregister @ 0x0023B780
+// sp-match: _RwaListenerUnregister @ 0x0014FA00
 RwInt32
 RwaListenerUnregister(void)
 {
@@ -330,6 +332,7 @@ RwaListenerUnregister(void)
 }
 
 // match: _sub_23B7B0 @ 0x0023B7B0
+// sp-match: _sub_23B7B0 @ 0x0014FA30
 rwaEmitter *
 sub_23B7B0(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *flags)
 {
@@ -360,6 +363,7 @@ sub_23B7B0(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *flags)
 }
 
 // match: _sub_23B820 @ 0x0023B820
+// sp-match: _sub_23B820 @ 0x0014FAA0
 void
 sub_23B820(rwaEmitter *emitter)
 {
@@ -375,6 +379,7 @@ sub_23B820(rwaEmitter *emitter)
 }
 
 // match: _sub_23B850 @ 0x0023B850
+// sp-match: _sub_23B850 @ 0x0014FAD0
 rwaEmitter *
 sub_23B850(rwaEmitter *emitter)
 {
@@ -401,6 +406,7 @@ sub_23B850(rwaEmitter *emitter)
 }
 
 // match: _sub_23B8A0 @ 0x0023B8A0
+// sp-match: _sub_23B8A0 @ 0x0014FB20
 rwaEmitter *
 sub_23B8A0(rwaEmitter *emitter, RwUInt32 *value)
 {
@@ -410,6 +416,7 @@ sub_23B8A0(rwaEmitter *emitter, RwUInt32 *value)
 }
 
 // match: _SoundEmitter_Stop @ 0x0023B8B0
+// sp-match: _SoundEmitter_Stop @ 0x0014FB30
 void
 SoundEmitter_Stop(rwaEmitter *emitter, RwInt32 now)
 {
@@ -425,6 +432,7 @@ SoundEmitter_Stop(rwaEmitter *emitter, RwInt32 now)
 }
 
 // match: _sub_23B8F0 @ 0x0023B8F0
+// sp-match: _sub_23B8F0 @ 0x0014FB70
 void
 sub_23B8F0(rwaEmitter *emitter, rwaWave *wave)
 {
@@ -450,6 +458,7 @@ sub_23B8F0(rwaEmitter *emitter, rwaWave *wave)
 }
 
 // match: _sub_23B950 @ 0x0023B950
+// sp-match: _sub_23B950 @ 0x0014FBD0
 rwaEmitter *
 sub_23B950(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 {
@@ -459,6 +468,7 @@ sub_23B950(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 }
 
 // match: _sub_23B960 @ 0x0023B960
+// sp-match: _sub_23B960 @ 0x0014FBE0
 rwaEmitter *
 sub_23B960(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 {
@@ -468,6 +478,7 @@ sub_23B960(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 }
 
 // match: _sub_23B970 @ 0x0023B970
+// sp-match: _sub_23B970 @ 0x0014FBF0
 rwaEmitter *
 sub_23B970(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 {
@@ -477,6 +488,7 @@ sub_23B970(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 }
 
 // match: _sub_23B980 @ 0x0023B980
+// sp-match: _sub_23B980 @ 0x0014FC00
 rwaEmitter *
 sub_23B980(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 {
@@ -486,6 +498,7 @@ sub_23B980(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 }
 
 // match: _sub_23B990 @ 0x0023B990
+// sp-match: _sub_23B990 @ 0x0014FC10
 rwaEmitter *
 sub_23B990(rwaEmitter *emitter, const RwaUUID *param, const RwaV3d *value)
 {
@@ -500,6 +513,7 @@ sub_23B990(rwaEmitter *emitter, const RwaUUID *param, const RwaV3d *value)
 }
 
 // match: _sub_23B9D0 @ 0x0023B9D0
+// sp-match: _sub_23B9D0 @ 0x0014FC50
 rwaEmitter *
 sub_23B9D0(rwaEmitter *emitter, const RwaUUID *param, const RwaV3d *value)
 {
@@ -514,6 +528,7 @@ sub_23B9D0(rwaEmitter *emitter, const RwaUUID *param, const RwaV3d *value)
 }
 
 // match: _sub_23BA10 @ 0x0023BA10
+// sp-match: _sub_23BA10 @ 0x0014FC90
 rwaEmitter *
 sub_23BA10(rwaEmitter *emitter, const RwaUUID *param, RwaV3d *value)
 {
@@ -523,6 +538,7 @@ sub_23BA10(rwaEmitter *emitter, const RwaUUID *param, RwaV3d *value)
 }
 
 // match: _sub_23BA30 @ 0x0023BA30
+// sp-match: _sub_23BA30 @ 0x0014FCB0
 rwaEmitter *
 sub_23BA30(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 {
@@ -537,6 +553,7 @@ sub_23BA30(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 }
 
 // match: _sub_23BA60 @ 0x0023BA60
+// sp-match: _sub_23BA60 @ 0x0014FCE0
 rwaEmitter *
 sub_23BA60(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 {
@@ -546,6 +563,7 @@ sub_23BA60(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 }
 
 // match: _sub_23BA70 @ 0x0023BA70
+// sp-match: _sub_23BA70 @ 0x0014FCF0
 rwaEmitter *
 sub_23BA70(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 {
@@ -560,6 +578,7 @@ sub_23BA70(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 }
 
 // match: _sub_23BAA0 @ 0x0023BAA0
+// sp-match: _sub_23BAA0 @ 0x0014FD20
 rwaEmitter *
 sub_23BAA0(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 {
@@ -569,6 +588,7 @@ sub_23BAA0(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 }
 
 // match: _sub_23BAB0 @ 0x0023BAB0
+// sp-match: _sub_23BAB0 @ 0x0014FD30
 rwaEmitter *
 sub_23BAB0(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 {
@@ -583,6 +603,7 @@ sub_23BAB0(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 }
 
 // match: _sub_23BAE0 @ 0x0023BAE0
+// sp-match: _sub_23BAE0 @ 0x0014FD60
 rwaEmitter *
 sub_23BAE0(rwaEmitter *emitter, const RwaUUID *param, RwReal *value)
 {
@@ -592,6 +613,7 @@ sub_23BAE0(rwaEmitter *emitter, const RwaUUID *param, RwReal *value)
 }
 
 // match: _sub_23BAF0 @ 0x0023BAF0
+// sp-match: _sub_23BAF0 @ 0x0014FD70
 rwaEmitter *
 sub_23BAF0(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 {
@@ -606,6 +628,7 @@ sub_23BAF0(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 }
 
 // match: _sub_23BB20 @ 0x0023BB20
+// sp-match: _sub_23BB20 @ 0x0014FDA0
 rwaEmitter *
 sub_23BB20(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 {
@@ -615,6 +638,7 @@ sub_23BB20(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 }
 
 // match: _sub_23BB30 @ 0x0023BB30
+// sp-match: _sub_23BB30 @ 0x0014FDB0
 rwaEmitter *
 sub_23BB30(rwaEmitter *emitter, const RwaUUID *param, const RwInt32 *value)
 {
@@ -624,6 +648,7 @@ sub_23BB30(rwaEmitter *emitter, const RwaUUID *param, const RwInt32 *value)
 }
 
 // match: _sub_23BB50 @ 0x0023BB50
+// sp-match: _sub_23BB50 @ 0x0014FDD0
 rwaEmitter *
 sub_23BB50(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 {
@@ -633,6 +658,7 @@ sub_23BB50(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 }
 
 // match: _sub_23BB70 @ 0x0023BB70
+// sp-match: _sub_23BB70 @ 0x0014FDF0
 rwaEmitter *
 sub_23BB70(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 {
@@ -647,6 +673,7 @@ sub_23BB70(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 }
 
 // match: _sub_23BBA0 @ 0x0023BBA0
+// sp-match: _sub_23BBA0 @ 0x0014FE20
 rwaEmitter *
 sub_23BBA0(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 {
@@ -658,6 +685,7 @@ sub_23BBA0(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 }
 
 // match: _sub_23BBE0 @ 0x0023BBE0
+// sp-match: _sub_23BBE0 @ 0x0014FE60
 rwaEmitter *
 sub_23BBE0(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 {
@@ -679,6 +707,7 @@ sub_23BBE0(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 }
 
 // match: _sub_23BC20 @ 0x0023BC20
+// sp-match: _sub_23BC20 @ 0x0014FEA0
 rwaEmitter *
 sub_23BC20(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 {
@@ -688,6 +717,7 @@ sub_23BC20(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 }
 
 // match: _sub_23BC40 @ 0x0023BC40
+// sp-match: _sub_23BC40 @ 0x0014FEC0
 rwaEmitter *
 sub_23BC40(rwaEmitter *emitter, const RwaUUID *param, rwaWave *value)
 {
@@ -697,6 +727,7 @@ sub_23BC40(rwaEmitter *emitter, const RwaUUID *param, rwaWave *value)
 }
 
 // match: _sub_23BC60 @ 0x0023BC60
+// sp-match: _sub_23BC60 @ 0x0014FEE0
 rwaEmitter *
 sub_23BC60(rwaEmitter *emitter, const RwaUUID *param, void **value)
 {
@@ -706,6 +737,7 @@ sub_23BC60(rwaEmitter *emitter, const RwaUUID *param, void **value)
 }
 
 // match: _sub_23BC70 @ 0x0023BC70
+// sp-match: _sub_23BC70 @ 0x0014FEF0
 rwaEmitter *
 sub_23BC70(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 {
@@ -720,6 +752,7 @@ sub_23BC70(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 }
 
 // match: _sub_23BCA0 @ 0x0023BCA0
+// sp-match: _sub_23BCA0 @ 0x0014FF20
 rwaEmitter *
 sub_23BCA0(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 {
@@ -729,6 +762,7 @@ sub_23BCA0(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 }
 
 // match: _sub_23BCB0 @ 0x0023BCB0
+// sp-match: _sub_23BCB0 @ 0x0014FF30
 rwaEmitter *
 sub_23BCB0(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 {
@@ -738,6 +772,7 @@ sub_23BCB0(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 }
 
 // match: _sub_23BCC0 @ 0x0023BCC0
+// sp-match: _sub_23BCC0 @ 0x0014FF40
 rwaEmitter *
 sub_23BCC0(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 {
@@ -752,6 +787,7 @@ sub_23BCC0(rwaEmitter *emitter, const RwaUUID *param, const RwUInt32 *value)
 }
 
 // match: _sub_23BCF0 @ 0x0023BCF0
+// sp-match: _sub_23BCF0 @ 0x0014FF70
 rwaEmitter *
 sub_23BCF0(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 {
@@ -763,6 +799,7 @@ sub_23BCF0(rwaEmitter *emitter, const RwaUUID *param, RwUInt32 *value)
 extern rwaObjDef *RwaObjDefAssignID(rwaObjDef *def, const void *uuid, const void *textID);
 
 // match: _sub_23BD10 @ 0x0023BD10
+// sp-match: _sub_23BD10 @ 0x0014FF90
 static void
 sub_23BD10(rwaObjDef *def)
 {
@@ -787,6 +824,7 @@ extern void *RwaVirtualVoiceInterfaceRegister(void);
 extern rwaObjDef *sub_23D740(rwaObjDef *def, void *iface);
 
 // match: _RwaVirtualVoiceRegister @ 0x0023BF60
+// sp-match: _RwaVirtualVoiceRegister @ 0x001501E0
 rwaObjDef *
 RwaVirtualVoiceRegister(void)
 {

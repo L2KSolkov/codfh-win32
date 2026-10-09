@@ -17,10 +17,141 @@
 #include "game/gameloop.h"
 #include "game/savestate.h"
 #include "game/padlib.h"
+#ifdef CODFH_SP
+// single player's own full-screen and text helpers below
+#include "game/profiles.h"
+#include "game/waitscreen.h"
+#include "game/xboxlive.h"
+#include "game/fade.h"
+#include "game/frontend.h"
+#include "types/type_DA580.h"
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003E017C
 extern const RwReal flt_3E017C = 16.666666f;
+#ifdef CODFH_SP // single player's tables have 21 rows with other level numbers (SP 0x328770, 0x328A10, 0x328CB0, 0x328F50, 0x3291F0)
+// SP 0x00328770
+type_42B740 dword_42B740[21] = {
+    { 4, 1, 11, -1, -1, -1, -1, 0 },
+    { 10, 2, 16, 25, -1, -1, -1, 0 },
+    { 11, 3, 9, 4, 35, -1, -1, 0 },
+    { 9, 2, 24, 10, -1, -1, -1, 0 },
+    { 0, 3, 36, 19, 33, -1, -1, 0 },
+    { 1, 2, 20, 34, -1, -1, -1, 0 },
+    { 2, 4, 13, 21, 31, 29, -1, 0 },
+    { 3, 4, 14, 22, 32, 30, -1, 0 },
+    { 14, 1, 6, -1, -1, -1, -1, 0 },
+    { 13, 2, 7, 27, -1, -1, -1, 0 },
+    { 7, 1, 18, -1, -1, -1, -1, 0 },
+    { 15, 1, 3, -1, -1, -1, -1, 0 },
+    { 12, 1, 15, -1, -1, -1, -1, 0 },
+    { 6, 1, 38, -1, -1, -1, -1, 0 },
+    { 16, 1, 2, -1, -1, -1, -1, 0 },
+    { 17, 1, 0, -1, -1, -1, -1, 0 },
+    { 18, 1, 1, -1, -1, -1, -1, 0 },
+    { 19, 1, 5, -1, -1, -1, -1, 0 },
+    { 5, 1, 17, -1, -1, -1, -1, 0 },
+    { 8, 3, 23, 12, 39, -1, -1, 0 },
+    { -1, 1, -1, -1, -1, -1, -1, 0 },
+};
+// SP 0x00328A10
+type_42B740 dword_42BA20[21] = {
+    { 4, 1, 11, -1, -1, -1, -1, 0 },
+    { 10, 3, 14, 25, 29, -1, -1, 0 },
+    { 11, 2, 36, 35, -1, -1, -1, 0 },
+    { 9, 3, 13, 24, 30, -1, -1, 0 },
+    { 0, 4, 9, 4, 19, 33, -1, 0 },
+    { 1, 3, 10, 20, 34, -1, -1, 0 },
+    { 2, 3, 7, 21, 31, -1, -1, 0 },
+    { 3, 2, 22, 32, -1, -1, -1, 0 },
+    { 14, 1, 3, -1, -1, -1, -1, 0 },
+    { 13, 2, 16, 27, -1, -1, -1, 0 },
+    { 7, 2, 12, 38, -1, -1, -1, 0 },
+    { 15, 1, 6, -1, -1, -1, -1, 0 },
+    { 12, 1, -1, -1, -1, -1, -1, 0 },
+    { 6, 1, 18, -1, -1, -1, -1, 0 },
+    { 18, 1, 2, -1, -1, -1, -1, 0 },
+    { 19, 1, 0, -1, -1, -1, -1, 0 },
+    { 16, 1, 1, -1, -1, -1, -1, 0 },
+    { 17, 1, 5, -1, -1, -1, -1, 0 },
+    { 5, 1, 17, -1, -1, -1, -1, 0 },
+    { 8, 3, 15, 23, 39, -1, -1, 0 },
+    { -1, 1, -1, -1, -1, -1, -1, 0 },
+};
+// SP 0x00328CB0
+type_42B740 dword_42BD00[21] = {
+    { 4, 1, 11, -1, -1, -1, -1, 0 },
+    { 10, 2, 7, 25, -1, -1, -1, 0 },
+    { 11, 3, 9, 4, 35, -1, -1, 0 },
+    { 9, 2, 10, 24, -1, -1, -1, 0 },
+    { 0, 2, 19, 33, -1, -1, -1, 0 },
+    { 1, 2, 20, 34, -1, -1, -1, 0 },
+    { 2, 4, 14, 21, 31, 29, -1, 0 },
+    { 3, 4, 13, 22, 32, 30, -1, 0 },
+    { 14, 1, 3, -1, -1, -1, -1, 0 },
+    { 13, 2, 36, 27, -1, -1, -1, 0 },
+    { 7, 1, 18, -1, -1, -1, -1, 0 },
+    { 15, 1, 6, -1, -1, -1, -1, 0 },
+    { 12, 1, 16, -1, -1, -1, -1, 0 },
+    { 6, 2, 12, 38, -1, -1, -1, 0 },
+    { 18, 1, 2, -1, -1, -1, -1, 0 },
+    { 17, 1, 0, -1, -1, -1, -1, 0 },
+    { 16, 1, 1, -1, -1, -1, -1, 0 },
+    { 19, 1, 5, -1, -1, -1, -1, 0 },
+    { 5, 1, 17, -1, -1, -1, -1, 0 },
+    { 8, 3, 15, 23, 39, -1, -1, 0 },
+    { -1, 1, -1, -1, -1, -1, -1, 0 },
+};
+// SP 0x00328F50
+type_42B740 dword_42BFE0[21] = {
+    { 4, 1, 11, -1, -1, -1, -1, 0 },
+    { 10, 2, 13, 25, -1, -1, -1, 0 },
+    { 11, 3, 9, 4, 35, -1, -1, 0 },
+    { 9, 2, 10, 24, -1, -1, -1, 0 },
+    { 0, 3, 36, 19, 33, -1, -1, 0 },
+    { 1, 3, 18, 20, 34, -1, -1, 0 },
+    { 2, 3, 21, 31, 29, -1, -1, 0 },
+    { 3, 3, 22, 32, 30, -1, -1, 0 },
+    { 14, 1, 6, -1, -1, -1, -1, 0 },
+    { 13, 2, 15, 27, -1, -1, -1, 0 },
+    { 7, 1, 16, -1, -1, -1, -1, 0 },
+    { 15, 1, 3, -1, -1, -1, -1, 0 },
+    { 12, 1, 14, -1, -1, -1, -1, 0 },
+    { 6, 2, 12, 38, -1, -1, -1, 0 },
+    { 16, 1, 2, -1, -1, -1, -1, 0 },
+    { 17, 1, 0, -1, -1, -1, -1, 0 },
+    { 18, 1, 1, -1, -1, -1, -1, 0 },
+    { 19, 1, 5, -1, -1, -1, -1, 0 },
+    { 5, 1, 17, -1, -1, -1, -1, 0 },
+    { 8, 3, 7, 23, 39, -1, -1, 0 },
+    { -1, 1, -1, -1, -1, -1, -1, 0 },
+};
+// SP 0x003291F0
+type_42B740 dword_42C2C0[21] = {
+    { 4, 1, 11, -1, -1, -1, -1, 0 },
+    { 10, 2, 7, 25, -1, -1, -1, 0 },
+    { 11, 3, 9, 4, 35, -1, -1, 0 },
+    { 9, 3, 12, 38, 24, -1, -1, 0 },
+    { 0, 2, 19, 33, -1, -1, -1, 0 },
+    { 1, 2, 20, 34, -1, -1, -1, 0 },
+    { 2, 4, 14, 21, 31, 29, -1, 0 },
+    { 3, 4, 13, 22, 32, 30, -1, 0 },
+    { 14, 1, 6, -1, -1, -1, -1, 0 },
+    { 13, 2, 15, 27, -1, -1, -1, 0 },
+    { 7, 1, 16, -1, -1, -1, -1, 0 },
+    { 15, 1, 3, -1, -1, -1, -1, 0 },
+    { 12, 1, 36, -1, -1, -1, -1, 0 },
+    { 6, 1, 18, -1, -1, -1, -1, 0 },
+    { 18, 1, 2, -1, -1, -1, -1, 0 },
+    { 19, 1, 0, -1, -1, -1, -1, 0 },
+    { 16, 1, 1, -1, -1, -1, -1, 0 },
+    { 17, 1, 5, -1, -1, -1, -1, 0 },
+    { 5, 1, 17, -1, -1, -1, -1, 0 },
+    { 8, 3, 10, 23, 39, -1, -1, 0 },
+    { -1, 1, -1, -1, -1, -1, -1, 0 },
+};
+#else
 // 0x0042B740
 type_42B740 dword_42B740[23] = {
     { 4, 1, 11, -1, -1, -1, -1, 0 },
@@ -151,6 +282,7 @@ type_42B740 dword_42C2C0[23] = {
     { 21, 1, 36, -1, -1, -1, -1, 0 },
     { -1, 1, -1, -1, -1, -1, -1, 0 },
 };
+#endif
 // 0x004F2AAC
 type_42B740 *dword_4F2AAC[5];
 // 0x004F30C4
@@ -161,6 +293,10 @@ RwReal flt_4F30C8;
 RwReal flt_4F30CC;
 // 0x004F30D0
 RwInt32 dword_4F30D0;
+#ifdef CODFH_SP // single player's own (.bss): the pads' set-up sp_sub_129B50 hands the pad manager
+// SP 0x003B66A8
+RwInt32 sp_dword_3B66A8;
+#endif
 // End of its data definitions.
 
 
@@ -194,6 +330,7 @@ void sub_19B6D0(D3DSurface *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C, RwR
                 RwReal arg_18);
 
 // match: ?sub_19B0F0@@YAXXZ @ 0x0019B0F0
+// sp-match: ?sub_19B0F0@@YAXXZ @ 0x00129510
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Points dword_4F2AAC at the five tables and flags each row that has a
 // kind 5.
@@ -224,12 +361,14 @@ void sub_19B0F0()
 }
 
 // match: ?sub_19B1E0@@YAPAUtype_42B740@@H@Z @ 0x0019B1E0
+// sp-match: ?sub_19B1E0@@YAPAUtype_42B740@@H@Z @ 0x001295B0
 type_42B740 *sub_19B1E0(RwInt32 arg_0)
 {
     return dword_4F2AAC[arg_0];
 }
 
 // match: ?sub_19B1F0@@YAXH@Z @ 0x0019B1F0
+// sp-match: ?sub_19B1F0@@YAXH@Z @ 0x001295C0
 // Stops for good, after a message, when arg_0 is 0.
 void sub_19B1F0(RwInt32 arg_0)
 {
@@ -242,6 +381,7 @@ void sub_19B1F0(RwInt32 arg_0)
 }
 
 // match: ??0type_4F30A8@@QAE@XZ @ 0x0019B220
+// sp-match: ??0type_4F30A8@@QAE@XZ @ 0x001295E0
 type_4F30A8::type_4F30A8()
 {
     unk_00 = 1.0f;
@@ -253,6 +393,7 @@ type_4F30A8::type_4F30A8()
 }
 
 // match: ?sub_19B270@@YAXPAUtype_8F210@@@Z @ 0x0019B270
+// sp-match: ?sub_19B270@@YAXPAUtype_8F210@@@Z @ 0x00129610
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Scales the ambient's colour by dword_4F30A8's unk_00 and the lights' by
 // its unk_04, each channel kept below 1 (a dead reset first). The kept
@@ -286,10 +427,17 @@ void sub_19B270(type_8F210 *arg_0)
             arg_0->unk_10[0].unk_10.unk_04 = dword_4F30A8.unk_00 * arg_0->unk_10[0].unk_10.unk_04;
             arg_0->unk_10[0].unk_10.unk_08 = dword_4F30A8.unk_00 * arg_0->unk_10[0].unk_10.unk_08;
             arg_0->unk_10[0].unk_10.unk_0C = dword_4F30A8.unk_00 * arg_0->unk_10[0].unk_10.unk_0C;
+#ifdef CODFH_SP // shape: the constant on the left (SP 0x12965D fld 1.0; fcomp)
+            arg_0->unk_10[0].unk_10.unk_00 = 1.0f > arg_0->unk_10[0].unk_10.unk_00 ? (RwReal)(RwDouble)arg_0->unk_10[0].unk_10.unk_00 : 1.0f;
+            arg_0->unk_10[0].unk_10.unk_04 = 1.0f > arg_0->unk_10[0].unk_10.unk_04 ? (RwReal)(RwDouble)arg_0->unk_10[0].unk_10.unk_04 : 1.0f;
+            arg_0->unk_10[0].unk_10.unk_08 = 1.0f > arg_0->unk_10[0].unk_10.unk_08 ? (RwReal)(RwDouble)arg_0->unk_10[0].unk_10.unk_08 : 1.0f;
+            arg_0->unk_10[0].unk_10.unk_0C = 1.0f > arg_0->unk_10[0].unk_10.unk_0C ? (RwReal)(RwDouble)arg_0->unk_10[0].unk_10.unk_0C : 1.0f;
+#else
             arg_0->unk_10[0].unk_10.unk_00 = arg_0->unk_10[0].unk_10.unk_00 < 1.0f ? (RwReal)(RwDouble)arg_0->unk_10[0].unk_10.unk_00 : 1.0f;
             arg_0->unk_10[0].unk_10.unk_04 = arg_0->unk_10[0].unk_10.unk_04 < 1.0f ? (RwReal)(RwDouble)arg_0->unk_10[0].unk_10.unk_04 : 1.0f;
             arg_0->unk_10[0].unk_10.unk_08 = arg_0->unk_10[0].unk_10.unk_08 < 1.0f ? (RwReal)(RwDouble)arg_0->unk_10[0].unk_10.unk_08 : 1.0f;
             arg_0->unk_10[0].unk_10.unk_0C = arg_0->unk_10[0].unk_10.unk_0C < 1.0f ? (RwReal)(RwDouble)arg_0->unk_10[0].unk_10.unk_0C : 1.0f;
+#endif
         }
         if (dword_4F30A8.unk_04 != 1.0f)
         {
@@ -299,6 +447,16 @@ void sub_19B270(type_8F210 *arg_0)
                 arg_0->unk_10[l4 + 1].unk_10.unk_04 = dword_4F30A8.unk_04 * arg_0->unk_10[l4 + 1].unk_10.unk_04;
                 arg_0->unk_10[l4 + 1].unk_10.unk_08 = dword_4F30A8.unk_04 * arg_0->unk_10[l4 + 1].unk_10.unk_08;
                 arg_0->unk_10[l4 + 1].unk_10.unk_0C = dword_4F30A8.unk_04 * arg_0->unk_10[l4 + 1].unk_10.unk_0C;
+#ifdef CODFH_SP // shape: the constant on the left (SP 0x12965D fld 1.0; fcomp)
+                arg_0->unk_10[l4 + 1].unk_10.unk_00 =
+                    1.0f > arg_0->unk_10[l4 + 1].unk_10.unk_00 ? (RwReal)(RwDouble)arg_0->unk_10[l4 + 1].unk_10.unk_00 : 1.0f;
+                arg_0->unk_10[l4 + 1].unk_10.unk_04 =
+                    1.0f > arg_0->unk_10[l4 + 1].unk_10.unk_04 ? (RwReal)(RwDouble)arg_0->unk_10[l4 + 1].unk_10.unk_04 : 1.0f;
+                arg_0->unk_10[l4 + 1].unk_10.unk_08 =
+                    1.0f > arg_0->unk_10[l4 + 1].unk_10.unk_08 ? (RwReal)(RwDouble)arg_0->unk_10[l4 + 1].unk_10.unk_08 : 1.0f;
+                arg_0->unk_10[l4 + 1].unk_10.unk_0C =
+                    1.0f > arg_0->unk_10[l4 + 1].unk_10.unk_0C ? (RwReal)(RwDouble)arg_0->unk_10[l4 + 1].unk_10.unk_0C : 1.0f;
+#else
                 arg_0->unk_10[l4 + 1].unk_10.unk_00 =
                     arg_0->unk_10[l4 + 1].unk_10.unk_00 < 1.0f ? (RwReal)(RwDouble)arg_0->unk_10[l4 + 1].unk_10.unk_00 : 1.0f;
                 arg_0->unk_10[l4 + 1].unk_10.unk_04 =
@@ -307,12 +465,14 @@ void sub_19B270(type_8F210 *arg_0)
                     arg_0->unk_10[l4 + 1].unk_10.unk_08 < 1.0f ? (RwReal)(RwDouble)arg_0->unk_10[l4 + 1].unk_10.unk_08 : 1.0f;
                 arg_0->unk_10[l4 + 1].unk_10.unk_0C =
                     arg_0->unk_10[l4 + 1].unk_10.unk_0C < 1.0f ? (RwReal)(RwDouble)arg_0->unk_10[l4 + 1].unk_10.unk_0C : 1.0f;
+#endif
             }
         }
     }
 }
 
 // match: ?sub_19B650@@YAHPAX@Z @ 0x0019B650
+// sp-match: ?sub_19B650@@YAHPAX@Z @ 0x0006CEB0
 // Empty in this build: 0.
 RwInt32 sub_19B650(void *arg_0)
 {
@@ -323,6 +483,7 @@ RwInt32 sub_19B650(void *arg_0)
 }
 
 // match: ?sub_19B670@@YAXM@Z @ 0x0019B670
+// sp-match: ?sub_19B670@@YAXM@Z @ 0x0012A700
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws the back buffer over the screen again at 0.15 with alpha arg_0.
 void sub_19B670(RwReal arg_0)
@@ -331,6 +492,11 @@ void sub_19B670(RwReal arg_0)
     RwReal bp_8;
     D3DSurface *bp_4;
 
+#ifdef CODFH_SP
+    // single player skips the copy in level 1 for five seconds after the load (dword_4B8730) (SP 0x12A700)
+    if (sub_19B050() == 1 && (RWS::Time::GetTime() - dword_4B8730) / 1000 < 5)
+        return;
+#endif
     D3DDevice_GetBackBuffer(-1, D3DBACKBUFFER_TYPE_MONO, &bp_4);
     var_C = bp_4;
     bp_8 = 0.15f;
@@ -339,6 +505,7 @@ void sub_19B670(RwReal arg_0)
 }
 
 // match: ?sub_19B6D0@@YAXPAUD3DSurface@@MMMMMM@Z @ 0x0019B6D0
+// sp-match: ?sub_19B6D0@@YAXPAUD3DSurface@@MMMMMM@Z @ 0x001297C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Draws arg_0 over the screen (arg_4 by arg_8, its texture coordinates to
 // arg_C and arg_10) at the depth arg_14 with the alpha arg_18, blended, the
@@ -409,7 +576,50 @@ void sub_19B6D0(D3DSurface *arg_0, RwReal arg_4, RwReal arg_8, RwReal arg_C, RwR
     RwRenderStateSet(rwRENDERSTATEDESTBLEND, var_80);
 }
 
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_129AC0@@YAXH@Z @ 0x00129AC0
+// Shows message arg_0 and keeps drawing and reading the pads until it is
+// answered (single player's front end, SP 0xB0EED, and sp_sub_129B50).
+void sp_sub_129AC0(RwInt32 arg_0)
+{
+    dword_4F2B74 = 1;
+    dword_4F3078 = 0;
+    flt_4292C8 = 1.8f;
+    sub_187150((RwInt32)dword_4B88B0);
+    sub_186E70(arg_0, 0, 0);
+    while (dword_4B88AC)
+    {
+        sub_187B30();
+        unk_4B9308.sub_EE6D0();
+        sub_187150((RwInt32)dword_4B88B0);
+        RwRasterShowRaster(RwCameraGetRaster(dword_4B88B0), 0, 0);
+    }
+    flt_4292C8 = 1.0f;
+}
+
+RwInt32 sp_sub_12F120();
+
+// sp-match: ?sp_sub_129B50@@YAXXZ @ 0x00129B50
+// Once (dword_4F30B8, SP .bss 0x3EAE38; dword_4F30A8's +0xC, SP 0x3EAE34, is cleared with it):
+// hands the pads sp_dword_3B66A8, warns with message
+// 0x24 when the save drive lacks the space for a save (sp_sub_12F120), then
+// starts the Live manager (single player's front end, SP 0xAE1AE).
+void sp_sub_129B50()
+{
+    if (dword_4F30B8)
+        return;
+    *(RwInt32 *)&dword_4F30A8.unk_0C = 0;
+    dword_4F30B8 = 1;
+    unk_4B9308.sub_EEAA0(sp_dword_3B66A8);
+    dword_4B9E54 = 1;
+    if (sp_sub_12F120())
+        sp_sub_129AC0(0x24);
+    dword_4F3130.sp_sub_12BB50(0, 0);
+}
+#endif
+
 // match: ?sub_19B9E0@@YAMH@Z @ 0x0019B9E0
+// sp-match: ?sub_19B9E0@@YAMH@Z @ 0x00129BB0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The performance counter in seconds, and a stopwatch on it: arg_0 0
 // starts it (0), 6 reads it, 1 resumes it after a pause that 2 began, 3 and
@@ -446,7 +656,88 @@ RwReal sub_19B9E0(RwInt32 arg_0)
     return var_C;
 }
 
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_129C90@@YAXPAURwCamera@@M@Z @ 0x00129C90
+// Darkens the screen of the camera arg_0 with black at the alpha arg_4
+// (SP 0x12A9E0).
+void sp_sub_129C90(RwCamera *arg_0, RwReal arg_4)
+{
+    RwIm2DVertex v[4];
+    RwInt32 i;
+
+    if (RwCameraBeginUpdate(arg_0))
+    {
+        sub_125320();
+        sub_1253A0();
+        RwIm2DVertexSetScreenX(&v[0], 0.0f);
+        RwIm2DVertexSetScreenY(&v[0], 0.0f);
+        RwIm2DVertexSetScreenX(&v[1], 0.0f);
+        RwIm2DVertexSetScreenY(&v[1], (RwReal)(RwUInt32)Height);
+        RwIm2DVertexSetScreenX(&v[2], (RwReal)(RwUInt32)Width);
+        RwIm2DVertexSetScreenY(&v[2], (RwReal)(RwUInt32)Height);
+        RwIm2DVertexSetScreenX(&v[3], (RwReal)(RwUInt32)Width);
+        RwIm2DVertexSetScreenY(&v[3], 0.0f);
+        RwIm2DVertexSetU(&v[0], 0.0f, 1.0f);
+        RwIm2DVertexSetV(&v[0], 0.0f, 1.0f);
+        RwIm2DVertexSetU(&v[1], 0.0f, 1.0f);
+        RwIm2DVertexSetV(&v[1], 1.0f, 1.0f);
+        RwIm2DVertexSetU(&v[2], 1.0f, 1.0f);
+        RwIm2DVertexSetV(&v[2], 1.0f, 1.0f);
+        RwIm2DVertexSetU(&v[3], 1.0f, 1.0f);
+        RwIm2DVertexSetV(&v[3], 0.0f, 1.0f);
+        for (i = 0; i < 4; i++)
+        {
+            RwIm2DVertexSetScreenZ(&v[i], RwIm2DGetNearScreenZ());
+            RwIm2DVertexSetRecipCameraZ(&v[i], 1.0f / RwCameraGetNearClipPlane(arg_0));
+            RwIm2DVertexSetIntRGBA(&v[i], 0, 0, 0, (RwInt32)(arg_4 * 255.0f));
+        }
+        RwIm2DRenderPrimitive(rwPRIMTYPETRIFAN, v, 4);
+        sub_125410();
+        RwCameraEndUpdate(arg_0);
+    }
+}
+
+// sp-match: ?sp_sub_129DC0@@YAXPAURwV2d@@PBDMPAURwRGBA@@M@Z @ 0x00129DC0
+// Draws the text arg_4 at arg_0 in the message boxes' font (sub_1879F0's
+// style 1) at the scales arg_8 and arg_10, the colour arg_C, then puts the
+// scales back (SP 0x12B870's three, 0x12A900, sp_sub_129E50).
+void sp_sub_129DC0(RwV2d *arg_0, const RwChar *arg_4, RwReal arg_8, RwRGBA *arg_C, RwReal arg_10)
+{
+    RwReal var_4;
+    RwReal l8;
+
+    Rt2dCTMPush();
+    Rt2dCTMSetIdentity();
+    var_4 = 1.0f / (RwReal)(RwUInt32)Height;
+    Rt2dCTMScale(var_4, var_4);
+    flt_4292C8 = arg_8;
+    l8 = flt_42B478;
+    flt_42B478 = arg_10;
+    sub_1879F0(1, arg_0, arg_4, arg_C);
+    flt_4292C8 = 1.0f;
+    flt_42B478 = l8;
+    Rt2dCTMPop();
+}
+
+// sp-match: ?sp_sub_129E50@@YAXPAURwV2d@@PBDM@Z @ 0x00129E50
+// Draws the text arg_4 right-aligned arg_0->x from the screen's right edge
+// (its width at size 19) at the scale arg_8 (SP 0x12B870's two).
+void sp_sub_129E50(RwV2d *arg_0, const RwChar *arg_4, RwReal arg_8)
+{
+    RwV2d var_8;
+    RwReal l4;
+    RwReal width;
+
+    l4 = dword_4EBD2C->sub_DA7B0(arg_4, 19.0f);
+    width = (RwReal)(RwUInt32)Width;
+    var_8.x = width - arg_0->x - l4;
+    var_8.y = arg_0->y;
+    sp_sub_129DC0(&var_8, arg_4, arg_8, 0, 1.0f);
+}
+#endif
+
 // match: ?sub_19BAC0@@YAXPAURwCamera@@@Z @ 0x0019BAC0
+// sp-match: ?sub_19BAC0@@YAXPAURwCamera@@@Z @ 0x00129EC0
 // Clears the camera's image and depth to black, twice.
 void sub_19BAC0(RwCamera *arg_0)
 {
@@ -473,7 +764,65 @@ void sub_19BB40(const RwChar *arg_0, RwInt32 arg_4)
     sub_19A750(arg_0, arg_4);
 }
 
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_129F20@@YAHPBDPAD00H@Z @ 0x00129F20
+// The word before the button token at arg_10 in arg_0: when it is arg_8
+// (any case), writes arg_0 into arg_4 with it replaced by arg_C, lower-case
+// after the sentence's start, and a space before the token; whether it was
+// (sp_sub_12A1C0's).
+RwInt32 sp_sub_129F20(const RwChar *arg_0, RwChar *arg_4, const RwChar *arg_8, const RwChar *arg_C, RwInt32 arg_10)
+{
+    RwInt32 var_10;
+    RwInt32 var_C;
+    RwInt32 var_8;
+    RwInt32 bp_8;
+    RwInt32 r;
+
+    r = 0;
+    for (var_10 = arg_10 - 1; var_10 > 0; var_10--)
+    {
+        if (arg_0[var_10] != ' ')
+        {
+            var_C = -1;
+            for (var_8 = var_10; var_8 >= 0; var_8--)
+            {
+                if (var_8 == 0)
+                {
+                    var_C = 0;
+                    break;
+                }
+                if (arg_0[var_8] == ' ')
+                {
+                    var_C = var_8 + 1;
+                    break;
+                }
+            }
+            if (var_C != -1 && !_strnicmp(arg_0 + var_C, arg_8, strlen(arg_8)))
+            {
+                if (var_C > 0)
+                {
+                    strncpy(arg_4, arg_0, var_C);
+                    arg_4[var_C] = 0;
+                }
+                else
+                    *arg_4 = 0;
+                bp_8 = strlen(arg_4);
+                strcat(arg_4, arg_C);
+                strcat(arg_4, " ");
+                if (var_C > 0 && arg_4[bp_8] >= 'A' && arg_4[bp_8] <= 'Z')
+                    arg_4[bp_8] += 0x20;
+                strcat(arg_4, arg_0 + arg_10);
+                r = 1;
+            }
+            break;
+        }
+    }
+    return r;
+}
+#endif
+
 // match: ?sub_19BB60@@YAHPAD0PBD1H@Z @ 0x0019BB60
+// sp-match: ?sub_19BB60@@YAHPAD0PBD1H@Z @ 0x0012A070
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Writes arg_0 into arg_4 with its first arg_8 replaced by arg_C (arg_10:
 // arg_4 is also the text, copied first); whether arg_8 was found.
@@ -516,7 +865,47 @@ RwInt32 sub_19BB60(RwChar *arg_0, RwChar *arg_4, const RwChar *arg_8, const RwCh
     return var_C;
 }
 
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_12A1C0@@YAHPBDPADHH@Z @ 0x0012A1C0
+// Rewords the verb before the button token at arg_C for the button arg_8
+// (sub_EE7F0's number: 6 and 7 "Click", 8 to 11 "Press", 14 and 15 "Pull"
+// and "Hold"), then names the directional pad by the control set (the
+// state's unk_1C); whether any changed (sp_sub_12A3B0's).
+RwInt32 sp_sub_12A1C0(const RwChar *arg_0, RwChar *arg_4, RwInt32 arg_8, RwInt32 arg_C)
+{
+    RwInt32 r;
+
+    r = 0;
+    switch (arg_8)
+    {
+    case 6:
+    case 7:
+        r = sp_sub_129F20(arg_0, arg_4, "Press", "Click", arg_C);
+        r |= sp_sub_129F20(arg_0, arg_4, "Use", "Click", arg_C);
+        break;
+    case 14:
+    case 15:
+        r = sp_sub_129F20(arg_0, arg_4, "Press", "Pull", arg_C);
+        r |= sp_sub_129F20(arg_0, arg_4, "Hold", "Pull and hold", arg_C);
+        r |= sp_sub_129F20(arg_0, arg_4, "Holding", "Pulling and holding", arg_C);
+        break;
+    case 8:
+    case 9:
+    case 10:
+    case 11:
+        r = sp_sub_129F20(arg_0, arg_4, "Use", "Press", arg_C);
+        break;
+    }
+    if (dword_4F28F0->unk_1C != 1)
+        r |= sub_19BB60((RwChar *)arg_0, arg_4, "right or left directional", "pressing right or left directional", r);
+    else
+        r |= sub_19BB60((RwChar *)arg_0, arg_4, "right or left directional", "pressing $ce$ or $mc$", r);
+    return r;
+}
+#endif
+
 // match: ?sub_19BC70@@YAHPAD0@Z @ 0x0019BC70
+// sp-match: ?sub_19BC70@@YAHPAD0@Z @ 0x0012A2D0
 // "German" in arg_0 as "Deutsches", into arg_4.
 RwInt32 sub_19BC70(RwChar *arg_0, RwChar *arg_4)
 {
@@ -528,6 +917,7 @@ RwInt32 sub_19BC70(RwChar *arg_0, RwChar *arg_4)
 }
 
 // match: ?sub_19BCB0@@YAHPBDPAD@Z @ 0x0019BCB0
+// sp-match: ?sub_19BCB0@@YAHPBDPAD@Z @ 0x0012A2F0
 // Four Italian subtitles given in French instead, into arg_4; whether
 // arg_0 was one.
 RwInt32 sub_19BCB0(const RwChar *arg_0, RwChar *arg_4)
@@ -558,7 +948,63 @@ RwInt32 sub_19BCB0(const RwChar *arg_0, RwChar *arg_4)
     return var_4;
 }
 
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_12A3B0@@YAHPBDPAD@Z @ 0x0012A3B0
+// Copies the text arg_0 into arg_4, in the English game rewording the verb
+// before its first button token for the pad's binding (sp_sub_12A1C0);
+// outside it, 0 for a text with a token (SP 0x1158EE).
+RwInt32 sp_sub_12A3B0(const RwChar *arg_0, RwChar *arg_4)
+{
+    RwUInt32 var_14;
+    RwInt32 var_10;
+    RwChar var_C[5];
+    RwInt32 bp_8;
+    RwInt32 bp_4;
+
+    bp_8 = strlen(arg_0);
+    if (sub_19B0A0())
+    {
+        if (strchr(arg_0, '$'))
+            return 0;
+        strcpy(arg_4, arg_0);
+        return 1;
+    }
+    for (bp_4 = 0; bp_4 < bp_8; bp_4++)
+    {
+        if ((arg_0 + bp_4)[0] == '$' && (arg_0 + bp_4)[3] == '$')
+        {
+            var_C[0] = (arg_0 + bp_4)[0];
+            var_C[1] = (arg_0 + bp_4)[1];
+            var_C[2] = (arg_0 + bp_4)[2];
+            var_C[3] = (arg_0 + bp_4)[3];
+            var_C[4] = 0;
+            var_10 = -1;
+            for (var_14 = 0; var_14 < 20; var_14++)
+            {
+                if (!strcmp(var_C, unk_4292D0[var_14].unk_04))
+                {
+                    var_10 = unk_4292D0[var_14].unk_00;
+                    break;
+                }
+            }
+            if (var_10 != -1 && var_10 < 1000)
+            {
+                if (sub_19B050() == 7 && var_10 == 12)
+                    var_10 = 0x26;
+                var_10 = unk_4B9308.sub_EE7F0(var_10, 0);
+                if (sp_sub_12A1C0(arg_0, arg_4, var_10, bp_4))
+                    return 1;
+            }
+            break;
+        }
+    }
+    strcpy(arg_4, arg_0);
+    return 1;
+}
+#endif
+
 // match: ?sub_19BD80@@YAHPBD@Z @ 0x0019BD80
+// sp-match: ?sub_19BD80@@YAHPBD@Z @ 0x0012A550
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Whether arg_0 holds a "$ud$" token, outside the English game (none while
 // dword_4B88B0 is set).
@@ -590,6 +1036,7 @@ RwInt32 sub_19BD80(const RwChar *arg_0)
 }
 
 // match: ?sub_19BE30@@YAHPAUtype_19BE30@@@Z @ 0x0019BE30
+// sp-match: ?sub_19BE30@@YAHPAUtype_19BE30@@@Z @ 0x0012A5C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Marks in arg_0 which of the four controllers are in: how many are.
 RwInt32 sub_19BE30(type_19BE30 *arg_0)
@@ -611,7 +1058,43 @@ RwInt32 sub_19BE30(type_19BE30 *arg_0)
     return l4;
 }
 
+#ifdef CODFH_SP
+// sp-match: ?sp_sub_12A630@@YAHXZ @ 0x0012A630
+// When the shell said so (launch data unk_10), no pad is in (dword_42926C)
+// and dword_4B9E54 is set, makes the first controller that is in and was not
+// marked by sub_19BE30 the player's; whether one was (SP 0xA54E5).
+RwInt32 sp_sub_12A630()
+{
+    RwInt32 var_C;
+    RwInt32 bp_8;
+    RwInt32 r;
+
+    r = 0;
+    if (dword_4F45F8->unk_10 && !dword_42926C && dword_4B9E54)
+    {
+        bp_8 = -1;
+        for (var_C = 0; var_C < 4; var_C++)
+        {
+            if (dword_4F4638[var_C].unk_48 && !((type_19BE30 *)dword_4F45F8)->unk_690[var_C])
+            {
+                bp_8 = var_C;
+                break;
+            }
+        }
+        if (bp_8 != -1)
+        {
+            unk_4B9308.sub_EEAA0(bp_8);
+            unk_4B9308.unk_B54 = 0;
+            sub_187040();
+            r = 1;
+        }
+    }
+    return r;
+}
+#endif
+
 // match: ?sub_19BEA0@@YAHXZ @ 0x0019BEA0
+// sp-match: ?sub_19BEA0@@YAHXZ @ 0x0012A6B0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The language's index in another order (1 for English and the rest).
 RwInt32 sub_19BEA0()

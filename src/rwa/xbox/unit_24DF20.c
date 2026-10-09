@@ -174,6 +174,7 @@ extern const RwaUUID unk_3EDFA8;
 extern const RwaUUID unk_3EDFB8;
 
 // Its data definitions (PLAN M5), in the image's address order.
+#if !defined(CODFH_SP) || CODFH_SP_PART == 1 // single player: part 1, the output object (sp_unit_24DF20_1.c, after unit_24DA70: SP 0x163F60, data 0x32CB50)
 // 0x004302C0
 rwaMixBinLevel unk_4302C0[16] = {
     { 0x0, 0 },
@@ -375,6 +376,7 @@ RwBool dword_507D64;
 // match: _sub_24E3F0>16 @ 0x004305E8
 
 // match: _RwaStreamCreate_1 @ 0x0024DF20
+// sp-match: _RwaStreamCreate_1 @ 0x00163F60
 
 rwaInstance *
 RwaStreamCreate_1(rwaInstance *parent, void *params, RwUInt32 flags, void *allocFunc, void *data)
@@ -383,6 +385,7 @@ RwaStreamCreate_1(rwaInstance *parent, void *params, RwUInt32 flags, void *alloc
 }
 
 // match: _RwaListenerUnregister_0 @ 0x0024DF50
+// sp-match: _RwaListenerUnregister_0 @ 0x00163F90
 RwBool
 RwaListenerUnregister_0(void)
 {
@@ -400,6 +403,7 @@ RwaListenerUnregister_0(void)
 
 /* Converts mix bin gains to levels. */
 // match: _sub_24DF80 @ 0x0024DF80
+// sp-match: _sub_24DF80 @ 0x00163FC0
 void
 sub_24DF80(const rwaMixBinGains *gains, rwaMixBinLevel *levels)
 {
@@ -413,6 +417,7 @@ sub_24DF80(const rwaMixBinGains *gains, rwaMixBinLevel *levels)
 }
 
 // match: _sub_24DFC0 @ 0x0024DFC0
+// sp-match: _sub_24DFC0 @ 0x00164000
 static RwBool
 sub_24DFC0(const rwaI3DL2Listener *listener, void *dsound, RwUInt32 flags)
 {
@@ -443,6 +448,7 @@ sub_24DFC0(const rwaI3DL2Listener *listener, void *dsound, RwUInt32 flags)
 
 /* The default creation parameters. */
 // match: _sub_24E050 @ 0x0024E050
+// sp-match: _sub_24E050 @ 0x00164090
 static void *
 sub_24E050(void *obj, rwaXboxOutputParams *params)
 {
@@ -485,6 +491,7 @@ sub_24E050(void *obj, rwaXboxOutputParams *params)
 }
 
 // match: _sub_24E0E0 @ 0x0024E0E0
+// sp-match: _sub_24E0E0 @ 0x00164120
 RwInt32
 sub_24E0E0(rwaXboxOutput *obj, void *levels)
 {
@@ -492,6 +499,7 @@ sub_24E0E0(rwaXboxOutput *obj, void *levels)
 }
 
 // match: _sub_24E100 @ 0x0024E100
+// sp-match: _sub_24E100 @ 0x00164140
 void
 sub_24E100(rwaXboxOutput *obj, const rwaEffectData *effect)
 {
@@ -503,6 +511,7 @@ sub_24E100(rwaXboxOutput *obj, const rwaEffectData *effect)
 }
 
 // match: _sub_24E140 @ 0x0024E140
+// sp-match: _sub_24E140 @ 0x00164180
 RwInt32
 sub_24E140(rwaXboxOutput *obj, const rwaEffectData *effect)
 {
@@ -511,6 +520,7 @@ sub_24E140(rwaXboxOutput *obj, const rwaEffectData *effect)
 }
 
 // match: _sub_24E170 @ 0x0024E170
+// sp-match: _sub_24E170 @ 0x001641B0
 void
 sub_24E170(rwaXboxOutput *obj, RwReal value)
 {
@@ -525,6 +535,7 @@ rwaXboxOutputGetUnk04(rwaXboxOutput *obj)
 }
 
 // match: _sub_24E180 @ 0x0024E180
+// sp-match: _sub_24E180 @ 0x001641C0
 void
 sub_24E180(rwaXboxOutput *obj, rwaInstance *listener)
 {
@@ -540,6 +551,7 @@ sub_22C6E0(rwaXboxOutput *obj, RwInt32 value)
 }
 
 // match: _sub_24E190 @ 0x0024E190
+// sp-match: _sub_24E190 @ 0x001641D0
 rwaInstance *
 sub_24E190(rwaXboxOutput *obj)
 {
@@ -547,6 +559,7 @@ sub_24E190(rwaXboxOutput *obj)
 }
 
 // match: _sub_24E1A0 @ 0x0024E1A0
+// sp-match: _sub_24E1A0 @ 0x001641E0
 void
 sub_24E1A0(rwaXboxOutput *obj, const rwaI3DL2Listener *listener)
 {
@@ -555,6 +568,7 @@ sub_24E1A0(rwaXboxOutput *obj, const rwaI3DL2Listener *listener)
 }
 
 // match: _sub_24E1C0 @ 0x0024E1C0
+// sp-match: _sub_24E1C0 @ 0x00164200
 void
 sub_24E1C0(rwaXboxOutput *obj, rwaI3DL2Listener *listener)
 {
@@ -563,6 +577,7 @@ sub_24E1C0(rwaXboxOutput *obj, rwaI3DL2Listener *listener)
 
 /* The speaker mode DirectSound is set to. */
 // match: _sub_24E1E0 @ 0x0024E1E0
+// sp-match: _sub_24E1E0 @ 0x00164220
 RwUInt32
 sub_24E1E0(rwaXboxOutput *obj)
 {
@@ -590,6 +605,7 @@ sub_24E1E0(rwaXboxOutput *obj)
 }
 
 // match: _sub_24E230 @ 0x0024E230
+// sp-match: _sub_24E230 @ 0x00164270
 void *
 sub_24E230(rwaXboxOutput *obj, void *value)
 {
@@ -597,6 +613,7 @@ sub_24E230(rwaXboxOutput *obj, void *value)
 }
 
 // match: _sub_24E250 @ 0x0024E250
+// sp-match: _sub_24E250 @ 0x00164290
 RwUInt32
 sub_24E250(rwaXboxOutput *obj)
 {
@@ -605,6 +622,7 @@ sub_24E250(rwaXboxOutput *obj)
 }
 
 // match: _sub_24E270 @ 0x0024E270
+// sp-match: _sub_24E270 @ 0x001642B0
 rwaXboxOutput *
 sub_24E270(rwaXboxOutput *obj, const void *param, void *value)
 {
@@ -613,6 +631,7 @@ sub_24E270(rwaXboxOutput *obj, const void *param, void *value)
 }
 
 // match: _sub_24E290 @ 0x0024E290
+// sp-match: _sub_24E290 @ 0x001642D0
 rwaXboxOutput *
 sub_24E290(rwaXboxOutput *obj, const void *param, const rwaEffectData *value)
 {
@@ -621,6 +640,7 @@ sub_24E290(rwaXboxOutput *obj, const void *param, const rwaEffectData *value)
 }
 
 // match: _sub_24E2B0 @ 0x0024E2B0
+// sp-match: _sub_24E2B0 @ 0x001642F0
 rwaXboxOutput *
 sub_24E2B0(rwaXboxOutput *obj, const void *param, const rwaEffectData *value)
 {
@@ -629,6 +649,7 @@ sub_24E2B0(rwaXboxOutput *obj, const void *param, const rwaEffectData *value)
 }
 
 // match: _sub_24E2D0 @ 0x0024E2D0
+// sp-match: _sub_24E2D0 @ 0x00164310
 rwaXboxOutput *
 sub_24E2D0(rwaXboxOutput *obj, const void *param, const RwReal *value)
 {
@@ -637,6 +658,7 @@ sub_24E2D0(rwaXboxOutput *obj, const void *param, const RwReal *value)
 }
 
 // match: _sub_24E2F0 @ 0x0024E2F0
+// sp-match: _sub_24E2F0 @ 0x00162C00
 rwaXboxOutput *
 sub_24E2F0(rwaXboxOutput *obj, const void *param, RwReal *value)
 {
@@ -645,6 +667,7 @@ sub_24E2F0(rwaXboxOutput *obj, const void *param, RwReal *value)
 }
 
 // match: _sub_24E310 @ 0x0024E310
+// sp-match: _sub_24E310 @ 0x00164330
 rwaXboxOutput *
 sub_24E310(rwaXboxOutput *obj, const void *param, rwaInstance *value)
 {
@@ -653,6 +676,7 @@ sub_24E310(rwaXboxOutput *obj, const void *param, rwaInstance *value)
 }
 
 // match: _sub_24E330 @ 0x0024E330
+// sp-match: _sub_24E330 @ 0x00164350
 rwaXboxOutput *
 sub_24E330(rwaXboxOutput *obj, const void *param, rwaInstance **value)
 {
@@ -661,6 +685,7 @@ sub_24E330(rwaXboxOutput *obj, const void *param, rwaInstance **value)
 }
 
 // match: _sub_24E350 @ 0x0024E350
+// sp-match: _sub_24E350 @ 0x00164370
 rwaXboxOutput *
 sub_24E350(rwaXboxOutput *obj, const void *param, const rwaI3DL2Listener *value)
 {
@@ -669,6 +694,7 @@ sub_24E350(rwaXboxOutput *obj, const void *param, const rwaI3DL2Listener *value)
 }
 
 // match: _sub_24E370 @ 0x0024E370
+// sp-match: _sub_24E370 @ 0x00164390
 rwaXboxOutput *
 sub_24E370(rwaXboxOutput *obj, const void *param, rwaI3DL2Listener *value)
 {
@@ -677,6 +703,7 @@ sub_24E370(rwaXboxOutput *obj, const void *param, rwaI3DL2Listener *value)
 }
 
 // match: _sub_24E390 @ 0x0024E390
+// sp-match: _sub_24E390 @ 0x001643B0
 rwaXboxOutput *
 sub_24E390(rwaXboxOutput *obj, const void *param, RwUInt32 *value)
 {
@@ -685,6 +712,7 @@ sub_24E390(rwaXboxOutput *obj, const void *param, RwUInt32 *value)
 }
 
 // match: _sub_24E3B0 @ 0x0024E3B0
+// sp-match: _sub_24E3B0 @ 0x001643D0
 rwaXboxOutput *
 sub_24E3B0(rwaXboxOutput *obj, const void *param, void *value)
 {
@@ -693,6 +721,7 @@ sub_24E3B0(rwaXboxOutput *obj, const void *param, void *value)
 }
 
 // match: _sub_24E3D0 @ 0x0024E3D0
+// sp-match: _sub_24E3D0 @ 0x001643F0
 rwaXboxOutput *
 sub_24E3D0(rwaXboxOutput *obj, const void *param, RwUInt32 *value)
 {
@@ -702,6 +731,7 @@ sub_24E3D0(rwaXboxOutput *obj, const void *param, RwUInt32 *value)
 
 /* Downloads the effects image (path, or the standard one). */
 // match: _sub_24E3F0 @ 0x0024E3F0
+// sp-match: _sub_24E3F0 @ 0x00164410
 static RwBool
 sub_24E3F0(const RwChar *path, rwaXboxOutput *obj, RwUInt32 a, RwUInt32 b)
 {
@@ -755,6 +785,8 @@ sub_24E3F0(const RwChar *path, rwaXboxOutput *obj, RwUInt32 a, RwUInt32 b)
     return TRUE;
 }
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 2 // single player: part 2, the module tables (sp_unit_24DF20_2.c, before unit_24EC60: SP 0x32C668)
 /* The image has these after sub_24E050's and sub_24E3F0's local statics: defined
  * here, after them. */
 // 0x004305EC
@@ -809,7 +841,10 @@ rwaOpenFunc unk_430654[3] = {
     sub_245290,
 };
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 1
 // match: _sub_24E500 @ 0x0024E500
+// sp-match: _sub_24E500 @ 0x00164520
 static rwaXboxOutput *
 sub_24E500(rwaXboxOutput *obj, rwaInstance *parent, rwaXboxOutputParams *params)
 {
@@ -889,6 +924,7 @@ sub_24E500(rwaXboxOutput *obj, rwaInstance *parent, rwaXboxOutputParams *params)
 }
 
 // match: _sub_24E710 @ 0x0024E710
+// sp-match: _sub_24E710 @ 0x00164730
 void
 sub_24E710(rwaXboxOutput *obj, void *a, void *b)
 {
@@ -918,6 +954,7 @@ sub_24E710(rwaXboxOutput *obj, void *a, void *b)
 
 /* Applies what changed and lets DirectSound work. */
 // match: _sub_24E770 @ 0x0024E770
+// sp-match: _sub_24E770 @ 0x00164790
 static rwaXboxOutput *
 sub_24E770(rwaXboxOutput *obj)
 {
@@ -1004,6 +1041,7 @@ sub_24E770(rwaXboxOutput *obj)
 }
 
 // match: _sub_24E8E0 @ 0x0024E8E0
+// sp-match: _sub_24E8E0 @ 0x00164900
 static void
 sub_24E8E0(rwaObjDef *def)
 {
@@ -1020,6 +1058,7 @@ sub_24E8E0(rwaObjDef *def)
 }
 
 // match: _sub_24EB20 @ 0x0024EB20
+// sp-match: _sub_24EB20 @ 0x00164B40
 rwaObjDef *
 sub_24EB20(void)
 {
@@ -1037,6 +1076,7 @@ sub_24EB20(void)
 }
 
 // match: _sub_24EB50 @ 0x0024EB50
+// sp-match: _sub_24EB50 @ 0x00164B70
 rwaObjDef *
 sub_24EB50(void)
 {
@@ -1072,7 +1112,10 @@ sub_24EB50(void)
     return def;
 }
 
+#endif
+#if !defined(CODFH_SP) || CODFH_SP_PART == 2 // single player: part 2, the module open/close (sp_unit_24DF20_2.c, before unit_24EC60: SP 0x161BC0)
 // match: _sub_24EBD0 @ 0x0024EBD0
+// sp-match: _sub_24EBD0 @ 0x00161BC0
 RwBool
 sub_24EBD0(void)
 {
@@ -1087,6 +1130,7 @@ sub_24EBD0(void)
 }
 
 // match: _sub_24EC10 @ 0x0024EC10
+// sp-match: _sub_24EC10 @ 0x00161C00
 RwBool
 sub_24EC10(void)
 {
@@ -1100,3 +1144,4 @@ sub_24EC10(void)
 
     return TRUE;
 }
+#endif

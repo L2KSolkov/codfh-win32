@@ -32,6 +32,7 @@ RwInt32 dword_438E84;
 // match: ??_7type_3CE4B4@@6B@ @ 0x003CE4B4
 
 // match: ??0type_3CE4B4@@QAE@XZ @ 0x00033520
+// sp-match: ??0type_3CE4B4@@QAE@XZ @ 0x000282E0
 // symbol: ??_7type_3CE4B4@@6B@ = 0x003CE4B4
 // symbol: ?vf_008@type_3CE6D0@@UAEXXZ = 0x001E41C0
 type_3CE4B4::type_3CE4B4()
@@ -40,6 +41,8 @@ type_3CE4B4::type_3CE4B4()
 
 // match: ??_Gtype_3CE4B4@@UAEPAXI@Z @ 0x00033540
 // match: ??1type_3CE4B4@@UAE@XZ @ 0x00033560
+// sp-match: ??_Gtype_3CE4B4@@UAEPAXI@Z @ 0x00028590
+// sp-match: ??1type_3CE4B4@@UAE@XZ @ 0x00028310
 type_3CE4B4::~type_3CE4B4()
 {
 }
@@ -53,6 +56,7 @@ void type_3CE4B4::vf_004(type_3DF30 *arg_0)
 }
 
 // match: ?vf_008@type_3CE4B4@@UAEXXZ @ 0x000335B0
+// sp-match: ?vf_008@type_3CE4B4@@UAEXXZ @ 0x00028330
 void type_3CE4B4::vf_008()
 {
     type_3CE6D0::vf_008();
@@ -60,16 +64,26 @@ void type_3CE4B4::vf_008()
 }
 
 // match: ?vf_00C@type_3CE4B4@@UAEHMPAUtype_3D410@@@Z @ 0x000335D0
+// sp-match: ?vf_00C@type_3CE4B4@@UAEHMPAUtype_3D410@@@Z @ 0x00028ED0
 RwInt32 type_3CE4B4::vf_00C(RwReal arg_0, type_3D410 *arg_4)
 {
     type_3D3548 *var_4;
+#ifndef CODFH_SP // shape: single player reads the AI data's field straight from the call, into a loop-scoped local (SP 0x28ED0)
     RwUInt32 v8;
+#endif
     RwUInt32 stk_C;
+#ifndef CODFH_SP // shape: single player reads the AI data's field straight from the call, into a loop-scoped local (SP 0x28ED0)
     AIData *var_10;
+#endif
 
     for (var_4 = unk_08->unk_00; var_4 != 0; var_4 = var_4->vf_118()) {
+#ifdef CODFH_SP // shape: single player reads the AI data's field straight from the call, into a loop-scoped local (SP 0x28ED0)
+        RwUInt32 v8;
+        v8 = var_4->vf_120()->unk_574;
+#else
         var_10 = var_4->vf_120();
         v8 = var_10->unk_574;
+#endif
         stk_C = unk_18;
         if (v8 == stk_C)
             sub_33820(static_cast<type_3DBC78 *>(var_4), arg_4);
@@ -78,6 +92,7 @@ RwInt32 type_3CE4B4::vf_00C(RwReal arg_0, type_3D410 *arg_4)
 }
 
 // match: ?vf_018@type_3CE4B4@@UAEHPAUtype_3D3548@@@Z @ 0x00033660
+// sp-match: ?vf_018@type_3CE4B4@@UAEHPAUtype_3D3548@@@Z @ 0x000285A0
 RwInt32 type_3CE4B4::vf_018(type_3D3548 *arg_0)
 {
     if (((arg_0->unk_2C >> 18) & 1) != 0 || ((arg_0->unk_2C >> 7) & 1) != 0)
@@ -86,12 +101,14 @@ RwInt32 type_3CE4B4::vf_018(type_3D3548 *arg_0)
 }
 
 // match: ?vf_01C@type_3CE4B4@@UAEHPAUtype_3D3548@@@Z @ 0x000336A0
+// sp-match: ?vf_01C@type_3CE4B4@@UAEHPAUtype_3D3548@@@Z @ 0x000285C0
 RwInt32 type_3CE4B4::vf_01C(type_3D3548 *arg_0)
 {
     return sub_336C0(arg_0);
 }
 
 // match: sub_336C0 @ 0x000336C0
+// sp-match: sub_336C0 @ 0x00028340
 RwInt32 type_3CE4B4::sub_336C0(type_3D3548 *arg_0)
 {
     AIData *l4;
@@ -138,6 +155,7 @@ RwInt32 type_3CE4B4::sub_336C0(type_3D3548 *arg_0)
 }
 
 // match: sub_33820 @ 0x00033820
+// sp-match: sub_33820 @ 0x000285D0
 // Runs the member arg_0 through its action handlers (sub_12030, sub_12070)
 // by its current action unk_5C, then its unk_1430 order (vf_034).
 void type_3CE4B4::sub_33820(type_3DBC78 *arg_0, type_3D410 *arg_4)
@@ -327,12 +345,21 @@ void type_3CE4B4::sub_33820(type_3DBC78 *arg_0, type_3D410 *arg_4)
                                     ebp_40 = sub_12030(3, arg_0, (RwInt32)arg_4, 0);
                             }
                         } else if (local_3C == 0x13 || local_3C == 0xB) {
+#ifdef CODFH_SP // shape: frand_range kept out of line (SP 0x11080)
+                            if (var_38 != var_4->get_unk_F54()
+                                    && var_4->get_unk_57C() > (RwReal)(frand_range(5.0f, 15.0f) * 60.0f))
+#else
                             if (var_38 != var_4->get_unk_F54()
                                     && var_4->get_unk_57C() > lerp(5.0f, 15.0f, frand()) * 60.0f)
+#endif
                                 sub_12030(1, arg_0, (RwInt32)arg_4, 0);
                         } else if (var_38 != var_4->get_unk_F54()) {
                             if (var_4->get_unk_1178() <= 0.0f)
+#ifdef CODFH_SP // shape: frand_range kept out of line (SP 0x11080)
+                                var_4->unk_1178 = frand_range(30.0f, 120.0f) * 60.0f;
+#else
                                 var_4->unk_1178 = lerp(30.0f, 120.0f, frand()) * 60.0f;
+#endif
                             if (var_4->get_unk_57C() > var_4->get_unk_1178())
                                 sub_12030(1, arg_0, (RwInt32)arg_4, 0);
                         }
@@ -425,12 +452,14 @@ void type_3CE4B4::sub_33820(type_3DBC78 *arg_0, type_3D410 *arg_4)
 }
 
 // match: sub_34720 @ 0x00034720
+// sp-match: sub_34720 @ 0x0002C3F0
 RwInt32 type_3CE6D0::sub_34720(type_3DBC78 *arg_0, type_3D410 *arg_4)
 {
     return arg_4->sub_3DCD0(arg_0);
 }
 
 // match: ?vf_034@type_3CE4B4@@UAEHPAUtype_3DBC78@@PAUtype_3D410@@@Z @ 0x00034740
+// sp-match: ?vf_034@type_3CE4B4@@UAEHPAUtype_3DBC78@@PAUtype_3D410@@@Z @ 0x00028440
 RwInt32 type_3CE4B4::vf_034(type_3DBC78 *arg_0, type_3D410 *arg_4)
 {
     RwReal l14;
@@ -513,6 +542,7 @@ RwInt32 type_3CE4B4::vf_030()
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ?vf_004@type_3CE4F0@@UAEXPAUtype_3DF30@@@Z (folded into 0x33580)
+// sp-match: ?vf_004@type_3CE4F0@@UAEXPAUtype_3DF30@@@Z @ 0x00028320
 void type_3CE4F0::vf_004(struct type_3DF30 *arg_0)
 {
     unk_1C = 0;

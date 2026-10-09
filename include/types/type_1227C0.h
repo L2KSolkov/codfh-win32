@@ -116,7 +116,11 @@ struct type_1227C0
     RwV3d unk_54;               // the point it targets
     union
     {
+#ifdef CODFH_SP // a real in single player (SP 0xD84D2: fstp)
+        RwReal unk_60;
+#else
         RwInt32 unk_60;         // the target's spread ("PG_TargetPoint"'s
+#endif
         RwReal unk_60_r;        // argument 4, passed on as raw bits)
     };
     RwUInt8 unk_64[0xC];
@@ -190,8 +194,13 @@ struct type_1227C0
     // ("PG_TargetObjectByScript"); its firing stages on or off
     // ("PG_EnableFiringStages").
     void sub_121870();
+#ifdef CODFH_SP // the spread is a real in single player (SP 0xD83C0 passes its float copy)
+    void sub_1218A0(RwV3d *arg_0, RwReal arg_4);
+    void sub_121910(type_3DF8D8_04 *arg_0, RwReal arg_4);
+#else
     void sub_1218A0(RwV3d *arg_0, RwInt32 arg_4);
     void sub_121910(type_3DF8D8_04 *arg_0, RwInt32 arg_4);
+#endif
     RwInt32 sub_121960(type_3D3548 *arg_0);
     void sub_121A30(RwInt32 arg_0);
     // Its id (sub_121B30); its particle system arg_0 held at arg_4, which

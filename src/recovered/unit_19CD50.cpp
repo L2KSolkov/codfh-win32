@@ -13,10 +13,18 @@
 #include "game/functions.h"
 #include "game/clones.h"
 #include "rw/rwxbox.h"
+#ifdef CODFH_SP
+#include <xfont.h>
+#include <string.h>
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003E05DC
 extern const RwReal flt_3E05DC = 16.666666f;
+#ifdef CODFH_SP // single player's own (.bss): sp_sub_12C410's count
+// SP 0x003EB790
+RwInt32 sp_dword_3EB790;                // the times the disc error came up
+#endif
 
 // match: ?flt_3E05DC@@3MB @ 0x003E05DC
 
@@ -27,6 +35,7 @@ extern const RwReal flt_3E05DC = 16.666666f;
 // match: __real@41a570a4 @ 0x003E05EC
 // match: __real@3f8a617c @ 0x003E05F0
 // match: ??_C@_0BP@IPOJNPLF@Cant?5load?5Bink?5Movie?3?5?$CFs?5?9?9?5?$CFs?$AA@ @ 0x003E05F4
+// sp-match: ?sub_19CD50@@YAHXZ @ 0x0012C6C0
 RwInt32 sub_19CD50()
 {
     RwInt32 var_4;
@@ -37,6 +46,7 @@ RwInt32 sub_19CD50()
     return var_4;
 }
 // match: ?sub_19CD80@@YAHXZ @ 0x0019CD80
+// sp-match: ?sub_19CD80@@YAHXZ @ 0x0012C3D0
 // Mounts d: as RenderWare's default file system.
 RwInt32 sub_19CD80()
 {
@@ -46,10 +56,104 @@ RwInt32 sub_19CD80()
     dword_4F39D4 = RtXboxFSystemInit(5, "d:", "xbox");
     var_4 = RtFSManagerRegister(dword_4F39D4);
     RtFSManagerSetDefaultFileSystem(dword_4F39D4);
+#ifndef CODFH_SP
+    // Single player installs the pack file elsewhere (its call at SP 0xA5CFB), not here (SP 0x12C3D0).
     sub_16C940();
+#endif
     return var_4;
 }
+#ifdef CODFH_SP
+// The disc error's message in each language: off_42C5A4[6] on (unit_19CB20, SP .data 0x3294AC).
+extern const RwChar *off_42C5A4[13];
+extern RwRGBA dword_42B470[2];
+extern RwInt32 dword_428E14;
+void sub_1A20C0(const RwChar *arg_0, WCHAR *arg_4);
+
+// The disc error ("There is a problem with the disc you are using."): with
+// arg_0 0 and the loader running (dword_428E14), draws its lines in the
+// default font in the middle of the screen for ever; otherwise only notes it
+// (dword_4F39DC). Multiplayer's one-argument sub_19A750(void *) calls stand
+// where single player calls it (sub_19CDE0, SP 0x12C67B and 0x12C69F).
+// sp-match: ?sp_sub_12C410@@YAXPAX@Z @ 0x0012C410
+void sp_sub_12C410(void *arg_0)
+{
+    XFONT *var_C18;
+    RwCamera *var_C14;
+    D3DSurface *var_C10;
+    UINT var_C0C;
+    UINT var_C08;
+    RwChar var_C04[0x400];
+    RwChar var_804[0x400];
+    WCHAR var_404[0x200];
+    RwInt32 lang;
+    RwUInt32 y;
+    RwInt32 n;
+    RwInt32 i;
+    RwChar c;
+    RwUInt32 dy;
+    RwChar *p;
+
+    var_C18 = (XFONT *)dword_4F39F0;
+    lang = sub_19B0A0();
+    if (arg_0)
+        return;
+    if (dword_428E14)
+    {
+        sp_dword_3EB790++;
+        var_C14 = dword_4B88B0;
+        if (!var_C14)
+            var_C14 = (RwCamera *)dword_4E5C74;
+        strcpy(var_C04, off_42C5A4[6 + lang]);
+        if (var_C14)
+        {
+            var_C10 = D3DDevice_GetRenderTarget2();
+            for (;;)
+            {
+                do
+                    RwCameraClear(var_C14, dword_42B470, 3);
+                while (!RwCameraBeginUpdate(var_C14));
+                i = 0;
+                n = 0;
+                y = (RwUInt32)Height / 2 - 50;
+                var_C08 = var_C18->GetTextHeight();
+                p = var_C04;
+                for (;; i++)
+                {
+                    c = var_C04[i];
+                    if (c != '\n' && c != 0)
+                    {
+                        n++;
+                        continue;
+                    }
+                    strcpy(var_804, p);
+                    var_804[n] = 0;
+                    sub_1A20C0(var_804, var_404);
+                    var_C18->GetTextExtent(var_404, n, &var_C0C);
+                    var_C18->TextOut(var_C10, var_404, n, ((RwUInt32)Width - var_C0C) / 2, y);
+                    if (!c)
+                        break;
+                    dy = var_C08 * 4 / 3;
+                    y += dy;
+                    p = &var_C04[i + 1];
+                    while (*p == '\n')
+                    {
+                        i++;
+                        p++;
+                        y += dy;
+                    }
+                    n = 0;
+                }
+                RwCameraEndUpdate(var_C14);
+                RwRasterShowRaster(RwCameraGetRaster(var_C14), 0, 1);
+            }
+        }
+    }
+    dword_4F39DC = 1;
+}
+#endif
+
 // match: ?sub_19CDE0@@YAHPBD@Z @ 0x0019CDE0
+// sp-match: ?sub_19CDE0@@YAHPBD@Z @ 0x0012C5F0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Reads up to a million bytes of the file arg_0 ahead (none with the
 // shell's unk_10 set): whether it could.
@@ -75,7 +179,11 @@ RwInt32 sub_19CDE0(const RwChar *arg_0)
         bp_8 = ReadFile(lv_10, bp_4, var_C, &var_18, 0);
         if (!bp_8 || var_C != var_18)
         {
+#ifdef CODFH_SP
+            sp_sub_12C410(0);
+#else
             sub_19A750(0);
+#endif
             var_14 = 0;
         }
         CloseHandle(lv_10);
@@ -83,12 +191,17 @@ RwInt32 sub_19CDE0(const RwChar *arg_0)
     }
     else
     {
+#ifdef CODFH_SP
+        sp_sub_12C410(0);
+#else
         sub_19A750(0);
+#endif
         var_14 = 0;
     }
     return var_14;
 }
 // match: ?sub_19CEC0@@YAPAURwTexture@@PBD0@Z @ 0x0019CEC0
+// sp-match: ?sub_19CEC0@@YAPAURwTexture@@PBD0@Z @ 0x0012C6E0
 // The texture read callback: the DDS file first, else the callback before.
 RwTexture *sub_19CEC0(const RwChar *arg_0, const RwChar *arg_4)
 {
@@ -98,6 +211,7 @@ RwTexture *sub_19CEC0(const RwChar *arg_0, const RwChar *arg_4)
     return var_4 ? var_4 : dword_4F39E0(arg_0, arg_4);
 }
 // match: ?sub_19CF10@@YAHXZ @ 0x0019CF10
+// sp-match: ?sub_19CF10@@YAHXZ @ 0x0012C710
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Sets the gamma ramp from dword_4F30A8's gamma, the soft display filter
 // and the DDS read callback.
@@ -127,19 +241,49 @@ RwInt32 sub_19CF10()
     return 1;
 }
 // match: ?sub_19D020@@YAHXZ @ 0x0019D020
+// sp-match: ?sub_19D020@@YAHXZ @ 0x0012C7D0
 RwInt32 sub_19D020()
 {
     byte_4CF88C = 1;
+#ifdef CODFH_SP
+    // Single player sets the count by level (SP 0x12C7D7): 120 on levels 14 and 17,
+    // 110 on 30, 141 on 36, 170 on 37, else 10.
+    switch (sub_19B050())
+    {
+    case 14:
+    case 17:
+        dword_4F3080 = 120;
+        break;
+    case 30:
+        dword_4F3080 = 110;
+        break;
+    case 36:
+        dword_4F3080 = 141;
+        break;
+    case 37:
+        dword_4F3080 = 170;
+        break;
+    default:
+        dword_4F3080 = 10;
+    }
+#else
     dword_4F3080 = 10;
+#endif
     return 1;
 }
 // match: ?sub_19D040@@YAXXZ @ 0x0019D040
+// sp-match: ?sub_19D040@@YAXXZ @ 0x0012C870
 void sub_19D040()
 {
     if (dword_4F39DC)
+#ifdef CODFH_SP
+        sp_sub_12C410(0);
+#else
         sub_19A750(0);
+#endif
 }
 // match: ?sub_19D060@@YAXXZ @ 0x0019D060
+// sp-match: ?sub_19D060@@YAXXZ @ 0x0012C890
 // Puts the read callback before back.
 void sub_19D060()
 {
@@ -147,6 +291,7 @@ void sub_19D060()
 }
 extern RwReal dword_4F2B64;
 // match: ?sub_19D080@@YAXPAURwCamera@@@Z @ 0x0019D080
+// sp-match: ?sub_19D080@@YAXPAURwCamera@@@Z @ 0x0012C8A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The frame's end on the camera arg_0: the friends feature started or
 // ended when asked, the back buffer drawn over itself once at
@@ -212,6 +357,7 @@ void sub_19D080(RwCamera *arg_0)
     RwCameraEndUpdate(arg_0);
 }
 // match: ?sub_19D290@@YAHXZ @ 0x0019D290
+// sp-match: ?sub_19D290@@YAHXZ @ 0x0012CA70
 // Sets the FPU to truncate (keeping its control word) and opens the default
 // font.
 RwInt32 sub_19D290()
@@ -234,6 +380,7 @@ RwInt32 sub_19D290()
     var_8 = XFONT_OpenDefaultFont((XFONT **)&dword_4F39F0);
     return 1;
 }
+#ifndef CODFH_SP // MP only: multiplayer's game-loop exit (single player's loop, SP 0xA4930, never leaves); no twin in config/sp/shared.txt
 // match: ?sub_19D2D0@@YAXXZ @ 0x0019D2D0
 // Puts the FPU's control word back.
 void sub_19D2D0()
@@ -243,7 +390,9 @@ void sub_19D2D0()
     __asm fldcw word_4F39EC
     // end original __asm
 }
+#endif
 // match: _main @ 0x0019D2E0
+// sp-match: _main @ 0x0012CB50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The game's entry (mainXapiStartup calls it): the launch data (a title's
 // settings, a start from the debugger, or none), the save state, the
@@ -271,7 +420,10 @@ RwInt32 main()
             dword_4F30B8 = 1;
             unk_4B9308.sub_EEAA0(var_C->unk_24);
             dword_4F5A30 = dword_4F45F8->unk_394;
+#ifndef CODFH_SP
+            // Single player calls this elsewhere (SP 0xA5935), not from main (SP 0x12CB50).
             sub_1A2680(var_C);
+#endif
             break;
         case LDT_FROM_DEBUGGER_CMDLINE:
             memset(dword_4F45F8, 0, sizeof(type_4F45F8));
@@ -283,7 +435,10 @@ RwInt32 main()
     }
     else
         memset(dword_4F45F8, 0, sizeof(type_4F45F8));
+#ifndef CODFH_SP
+    // Single player calls this elsewhere (SP 0x12912F), not from main (SP 0x12CB50).
     sub_19AD20();
+#endif
     Width = 640;
     Height = 480;
     dword_4B87F0 = 32;
@@ -299,6 +454,7 @@ RwInt32 main()
     return bp_4;
 }
 // match: ?sub_19D470@@YAXPAUtype_4F4600@@@Z @ 0x0019D470
+// sp-match: ?sub_19D470@@YAXPAUtype_4F4600@@@Z @ 0x0012CAA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // RenderWare's device configuration for the television: 640 by 480, 60 Hz
 // (50 for PAL without its 60 Hz mode), and the widescreen, 480p and 720p
@@ -344,6 +500,7 @@ void sub_19D470(type_4F4600 *arg_0)
     arg_0->unk_1C |= 0x100;
 }
 // match: ?sub_19D580@type_19D580@@QAE_NXZ @ 0x0019D580
+// sp-match: ?sub_19D580@type_19D580@@QAE_NXZ @ 0x0012CC80
 bool type_19D580::sub_19D580()
 {
     unk_00 = 0;
@@ -357,6 +514,7 @@ bool type_19D580::sub_19D580()
     return unk_01;
 }
 // match: ?sub_19D5E0@type_19D580@@QAE_NXZ @ 0x0019D5E0
+// sp-match: ?sub_19D5E0@type_19D580@@QAE_NXZ @ 0x0012CCC0
 bool type_19D580::sub_19D5E0()
 {
     if (unk_84)
@@ -370,6 +528,7 @@ bool type_19D580::sub_19D5E0()
     return true;
 }
 // match: ?sub_19D640@type_19D580@@QAE_NPBDH@Z @ 0x0019D640
+// sp-match: ?sub_19D640@type_19D580@@QAE_NPBDH@Z @ 0x0012CD00
 bool type_19D580::sub_19D640(const RwChar *arg_0, RwInt32 arg_4)
 {
     RwChar var_108[0x100];
@@ -389,6 +548,7 @@ bool type_19D580::sub_19D640(const RwChar *arg_0, RwInt32 arg_4)
     return true;
 }
 // match: ?sub_19D720@type_19D580@@QAEH_N@Z @ 0x0019D720
+// sp-match: ?sub_19D720@type_19D580@@QAEH_N@Z @ 0x0012CDD0
 RwInt32 type_19D580::sub_19D720(bool arg_0)
 {
     if (unk_84)
@@ -415,9 +575,13 @@ RwInt32 type_19D580::sub_19D720(bool arg_0)
         unk_88++;
         return 0;
     }
-    return -1;
+    else
+    {
+        return -1;
+    }
 }
 // match: ?sub_19D810@type_19D580@@QAEXPAURwCamera@@H@Z @ 0x0019D810
+// sp-match: ?sub_19D810@type_19D580@@QAEXPAURwCamera@@H@Z @ 0x0012CE60
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Copies the frame into the back buffer (all of it, 32 bits a pixel).
 void type_19D580::sub_19D810(RwCamera *arg_0, RwInt32 arg_4)
@@ -429,20 +593,24 @@ void type_19D580::sub_19D810(RwCamera *arg_0, RwInt32 arg_4)
     D3DDevice_GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &var_10);
     var_10->LockRect(&var_C, 0, D3DLOCK_TILED);
     bp_4 = BinkCopyToBuffer(unk_84, var_C.pBits, var_C.Pitch, unk_84->Height, 0, 0, 0x80000003);
+    var_10->UnlockRect();
     var_10->Release();
 }
 // match: ?sub_19D890@type_19D580@@QAEX_N@Z @ 0x0019D890
+// sp-match: ?sub_19D890@type_19D580@@QAEX_N@Z @ 0x0012CEB0
 void type_19D580::sub_19D890(bool arg_0)
 {
     if (unk_84)
         BinkPause(unk_84, arg_0);
 }
 // match: ?sub_19D8C0@type_19D580@@QAEHXZ @ 0x0019D8C0
+// sp-match: ?sub_19D8C0@type_19D580@@QAEHXZ @ 0x0012CED0
 RwInt32 type_19D580::sub_19D8C0()
 {
     return BinkWait(unk_84);
 }
 // match: ?sub_19D8E0@type_19D580@@QAEXHH@Z @ 0x0019D8E0
+// sp-match: ?sub_19D8E0@type_19D580@@QAEXHH@Z @ 0x0012CEE0
 // Sets track arg_0's volume full (arg_4) or off.
 void type_19D580::sub_19D8E0(RwInt32 arg_0, RwInt32 arg_4)
 {

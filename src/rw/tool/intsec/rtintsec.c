@@ -183,6 +183,7 @@ RtIntersectionLineTriangle(const RwV3d * lineStart,
 // match: _rcsid @ 0x00417530
 
 // match: _RtIntersectionSphereTriangle @ 0x002C3C70
+// sp-match: _RtIntersectionSphereTriangle @ 0x001DF070
 RwBool
 RtIntersectionSphereTriangle(const RwSphere * sphere,
                              const RwV3d * v0,
@@ -465,6 +466,7 @@ RtIntersectionSphereTriangle(const RwSphere * sphere,
  * \return Returns TRUE if an intersection is found, or FALSE otherwise.
  */
 // match: _RtIntersectionBBoxTriangle @ 0x002C44C0
+// sp-match: _RtIntersectionBBoxTriangle @ 0x001DF8C0
 RwBool
 RtIntersectionBBoxTriangle(const RwBBox * bbox,
                            const RwV3d * v0,

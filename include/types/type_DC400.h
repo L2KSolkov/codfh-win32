@@ -80,6 +80,19 @@ extern RwReal flt_4B8F14;
 // the database's constructor sub_1FF260 is type_1FF250's).
 struct type_1FF250;
 
+// The HUD's counts: MP's, and single player's (CODFH_SP). Single player's HUD is 0xF420 bytes
+// (SP 0xB2CDA allocates it; MP's is 0x1A500): 101 items of 0x260 bytes from +0x80 (their
+// children 16; SP 0xA7A20 indexes them by 0x260 and its tail starts at +0xF060), one objective
+// pointer angle (its set-up, SP 0xAC7D0, clears four fields before the 15 marker angles where
+// MP's clears five) and 10 name labels (its constructor, SP 0xA99B0, builds ten of 0x30 bytes).
+#ifdef CODFH_SP // SP 0xA99B0, 0xAC7D0
+enum { type_DC400_items = 101, type_DC400_children = 20, type_DC400_D8 = 1,
+       type_DC400_objectives = 1, type_DC400_labels = 10 };
+#else // MP 0xDC400, 0xDC5F0
+enum { type_DC400_items = 151, type_DC400_children = 40, type_DC400_D8 = 2,
+       type_DC400_objectives = 2, type_DC400_labels = 16 };
+#endif
+
 // The HUD's items (0x2C0 bytes; 151 of them from +0xE0): a quad (unk_118,
 // drawn with the texture's raster unk_114), a frame matrix (unk_1A0), up to
 // 40 children (unk_204) and their text settings (unk_2B0 on, unk_2B4 the
@@ -115,14 +128,17 @@ struct type_DC400_E0
                                 // shell's command 101 sets it whole)
     RwV3d unk_1F4;
     type_DC400_E0 *unk_200;     // its parent
-    type_DC400_E0 *unk_204[40]; // its children (unk_2A4 of them)
+    type_DC400_E0 *unk_204[type_DC400_children]; // its children (unk_2A4 of them)
     RwInt32 unk_2A4;
     RwInt32 unk_2A8;
     RwInt32 unk_2AC;
+#ifndef CODFH_SP // MP only: single player's item has 20 children and no +0x2B0..+0x2BF (SP 0xAC7D0
+                 // clears unk_204[20], then unk_2A4 at +0x254; SP 0xA8C20, 0xA94F0, 0xA98B0)
     RwInt32 unk_2B0;
     RwInt32 unk_2B4;
     RwReal unk_2B8;             // item 80's blink time (sub_DD1C0)
     RwInt32 unk_2BC;
+#endif
 };
 
 // Two places of the HUD's items (type_DC400::unk_14): one taken when the
@@ -143,6 +159,7 @@ struct type_DC400
     type_DC400_14 unk_14[4];
     RwReal unk_54;              // the crosshair's place (the player's
     RwReal unk_58;              // sub_100680 draws it there)
+#ifndef CODFH_SP // MP +0x5C..+0xB7; single player has none of them: its unk_B8 is at +0x5C (SP 0xAAD20 compares it there, MP 0xDFE00's +0xB8) and its later members sit 0x5C lower
     RwReal unk_5C;
     RwRGBA unk_60[5];           // the objectives' states' colours (sub_E7D00)
     RwRGBA unk_74;              // colours the shell's commands set
@@ -156,6 +173,7 @@ struct type_DC400
     RwInt32 unk_94;
     RwTexture *unk_98[4];       // the CTF teams' icons (sub_E0E90)
     RwTexture *unk_A8[4];       // and their flags' icons
+#endif
     RwReal unk_B8;
     RwInt32 unk_BC;
     RwInt32 unk_C0;
@@ -164,8 +182,8 @@ struct type_DC400
     RwInt32 unk_CC;
     RwInt32 unk_D0;
     RwReal unk_D4;              // the radar's heading (sub_E4030)
-    RwInt32 unk_D8[2];
-    type_DC400_E0 unk_E0[151];
+    RwInt32 unk_D8[type_DC400_D8];
+    type_DC400_E0 unk_E0[type_DC400_items];
     RwInt32 unk_1A020;
     RwTexDictionary *unk_1A024;
     type_DA580 *unk_1A028;      // the HUD's font
@@ -177,7 +195,7 @@ struct type_DC400
     RwReal unk_1A040;           // the radar's heading, its target (sub_E4030)
     RwReal unk_1A044;           // and its smoothed value
     RwReal unk_1A048;           // its smoothing rate
-    RwReal unk_1A04C[2];        // the objectives' pointers' angles
+    RwReal unk_1A04C[type_DC400_objectives]; // the objectives' pointers' angles
     RwReal unk_1A054[15];       // the markers' pointers' angles
     RwInt32 unk_1A090[6];
     RwInt32 unk_1A0A8;
@@ -202,15 +220,24 @@ struct type_DC400
     RwReal unk_1A160;           // item 2's scroll time (sub_E5480)
     RwChar unk_1A164[0x40];     // item 2's text before its colon
     RwInt32 unk_1A1A4;          // the buddy's icon (sub_DFF40)
-    type_DC530 unk_1A1A8[16];
+    type_DC530 unk_1A1A8[type_DC400_labels];
     RwInt32 unk_1A4A8;
     RwReal unk_1A4AC;
+#ifndef CODFH_SP // MP only: single player makes no in-game screens (kujuUI), its later members sit 4 lower
     type_1FF250 *unk_1A4B0;
+#endif
+#ifdef CODFH_SP // a float in single player (SP 0xACDB0 and 0xA81E0 load it with fld at +0xF3CC)
+    RwReal unk_1A4B4;
+#else
     RwInt32 unk_1A4B4;
+#endif
     RwUInt8 unk_1A4B8;
     RwUInt8 unk_1A4B9[3];
     RwInt32 unk_1A4BC;
     RwChar unk_1A4C0[0x40];     // the HUD font's name (sub_E52B0)
+#ifdef CODFH_SP // single player's HUD is 0xF420 bytes (SP 0xB2CDA allocates it): 8 more after the name
+    RwUInt8 unk_sp_F418[0x8];
+#endif
 
     type_DC400();
     ~type_DC400();
@@ -218,6 +245,13 @@ struct type_DC400
     RwInt32 sub_DC5F0(RwCamera *arg_0);
     void sub_DEB80(RwInt32 arg_0);
     void sub_DEEB0(RwInt32 arg_0);
+#ifdef CODFH_SP
+    // Single player only: the pause screen's parts sub_DF000 draws (SP 0xA81E0, 0xA7FB0).
+    void sp_sub_A81E0();
+    void sp_sub_A7FB0();
+    // Single player only (SP 0xA9E00).
+    void sp_sub_A9E00(RwInt32 arg_0);
+#endif
     void sub_DEEF0(RwInt32 arg_0);
     // Sets item arg_0's colour unk_34 (items 0 to 150 only).
     void sub_E7480(RwInt32 arg_0, RwRGBAReal *arg_4);
@@ -1363,6 +1397,7 @@ inline void clear_hud_unk_1A160()
     type_DC400 *h = dword_4B9190;
     h->unk_1A160 = 0;
 }
+#ifndef CODFH_SP // MP only: single player's HUD has no unk_90
 // The same for the HUD's unk_90 (its letterbox bars) set to 1: no address,
 // so no database name; named for the field it sets. Evidence: the
 // multiplayer manager's view changes (sub_1AB440) store through a
@@ -1378,6 +1413,7 @@ inline void clear_hud_unk_90()
     type_DC400 *h = dword_4B9190;
     h->unk_90 = 0;
 }
+#endif
 
 // Settings the shell's commands set (CShellBehaviorClass::HandleAttributes,
 // sub_B0980), by the kind of value each command hands over: the HUD's and
@@ -1439,12 +1475,24 @@ extern RwV2d &dword_4B8F54;
 extern RwV2d dword_4B8F54;
 #endif
 #ifdef CODFH_PLAIN
+#ifdef CODFH_SP
+extern RwReal &dword_4B8F5C;
+#else
 extern RwInt32 &dword_4B8F5C;
+#endif
+#elif defined(CODFH_SP) // a float in single player (SP 0x3B58AC: fcomp and fdiv in SP 0xACDB0, 0xA81E0)
+extern RwReal dword_4B8F5C;
 #else
 extern RwInt32 dword_4B8F5C;
 #endif
 #ifdef CODFH_PLAIN
+#ifdef CODFH_SP
+extern RwReal &dword_4B8F60;
+#else
 extern RwInt32 &dword_4B8F60;
+#endif
+#elif defined(CODFH_SP) // a float in single player (SP 0x3B58B0: fld and fmul in SP 0xA81E0)
+extern RwReal dword_4B8F60;
 #else
 extern RwInt32 dword_4B8F60;
 #endif

@@ -236,6 +236,18 @@ extern const RwReal flt_3D9480;   // astarpathfinder.cpp
 // match: _$E15 @ 0x0030DC40
 // match: ??_H@YGXPAXIHP6EPAX0@Z@Z @ 0x00012000
 // match: sub_12030 @ 0x00012030
+// sp-match: sub_12030 @ 0x000110B0
+// sp-match: ??_H@YGXPAXIHP6EPAX0@Z@Z @ 0x00011050
+// sp-match: _$E2 @ 0x0021C160
+// sp-match: _$E5 @ 0x0021C190
+// sp-match: _$E8 @ 0x0021C1B0
+// sp-match: _$E11 @ 0x0021C1D0
+// sp-match: _$E14 @ 0x0021C1F0
+// sp-match: _$E3 @ 0x0021E020
+// sp-match: _$E6 @ 0x0021E040
+// sp-match: _$E9 @ 0x0021E050
+// sp-match: _$E12 @ 0x0021E060
+// sp-match: _$E15 @ 0x0021E070
 
 RwInt32 sub_12030(RwInt32 arg_0, type_3DBC78 *arg_4, RwInt32 arg_8, void *arg_C)
 {
@@ -249,6 +261,7 @@ RwInt32 sub_12030(RwInt32 arg_0, type_3DBC78 *arg_4, RwInt32 arg_8, void *arg_C)
 }
 
 // match: sub_12070 @ 0x00012070
+// sp-match: sub_12070 @ 0x000110E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_12070(type_3DBC78 *arg_0, RwInt32 arg_4)
 {
@@ -264,6 +277,7 @@ RwInt32 sub_12070(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_120D0 @ 0x000120D0
+// sp-match: sub_120D0 @ 0x00011120
 // Record 4's first handler in unk_427408; only reached through the table.
 RwInt32 sub_120D0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -277,6 +291,7 @@ RwInt32 sub_120D0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_12130 @ 0x00012130
+// sp-match: sub_12130 @ 0x00011170
 // Record 20's first handler in unk_427408; only reached through the table.
 RwInt32 sub_12130(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -289,6 +304,7 @@ RwInt32 sub_12130(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_12170 @ 0x00012170
+// sp-match: sub_12170 @ 0x000111A0
 // Record 34's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_12170(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -317,6 +333,7 @@ RwInt32 sub_12170(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_12290 @ 0x00012290
+// sp-match: sub_12290 @ 0x00011280
 // Record 1's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_12290(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -359,6 +376,7 @@ RwInt32 sub_12290(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_12420 @ 0x00012420
+// sp-match: sub_12420 @ 0x00011390
 // Record 31's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_12420(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -404,6 +422,7 @@ RwInt32 sub_12420(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_125B0 @ 0x000125B0
+// sp-match: sub_125B0 @ 0x000114A0
 // Record 35's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_125B0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -429,6 +448,7 @@ RwInt32 sub_125B0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_126B0 @ 0x000126B0
+// sp-match: sub_126B0 @ 0x00011570
 // Record 32's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_126B0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -462,6 +482,7 @@ RwInt32 sub_126B0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_127D0 @ 0x000127D0
+// sp-match: sub_127D0 @ 0x00011650
 // Record 24's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_127D0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -503,6 +524,7 @@ RwInt32 sub_127D0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_12970 @ 0x00012970
+// sp-match: sub_12970 @ 0x00011780
 // Record 2's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_12970(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -536,6 +558,7 @@ RwInt32 sub_12970(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_12B20 @ 0x00012B20
+// sp-match: sub_12B20 @ 0x000118C0
 // Record 3's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_12B20(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -570,11 +593,19 @@ RwInt32 sub_12B20(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
         if (l4->sub_205E0(var_8->sub_CD550(), 0.0f) == 0) {
             lC = l4->sub_20570(arg_0->sub_CD550());
             loc28 = l4->unk_13B4;
+#ifdef CODFH_SP // shape: single player compares the other way round (SP 0x118C0)
+            if (lC > loc28 + -175.0f)
+#else
             if (loc28 + -175.0f < lC)
+#endif
                 return 0;
             if (l4->sub_228A0() == 0) {
+#ifdef CODFH_SP // single player calls frand_range out of line (SP 0x118C0 calls SP 0x11080)
+                local_10 = frand_range(1.0f, 5.0f) * 60.0f;
+#else
                 var_2C = RpRandom() * (1.0f / 2147483648.0f);
                 local_10 = lerp(1.0f, 5.0f, var_2C) * 60.0f;
+#endif
                 l4->unk_13E0 = local_10;
                 return 0;
             }
@@ -599,6 +630,7 @@ RwInt32 sub_12B20(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_12DC0 @ 0x00012DC0
+// sp-match: sub_12DC0 @ 0x00011AA0
 // Record 5's first handler in unk_427408; only reached through the table.
 RwInt32 sub_12DC0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -614,6 +646,7 @@ RwInt32 sub_12DC0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_12E50 @ 0x00012E50
+// sp-match: sub_12E50 @ 0x00011B20
 // Record 6's first handler in unk_427408; only reached through the table.
 RwInt32 sub_12E50(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -631,6 +664,7 @@ RwInt32 sub_12E50(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_12EF0 @ 0x00012EF0
+// sp-match: sub_12EF0 @ 0x00011BB0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Record 7's first handler in unk_427408; only reached through the table.
 RwInt32 sub_12EF0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -651,6 +685,7 @@ RwInt32 sub_12EF0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_12FA0 @ 0x00012FA0
+// sp-match: sub_12FA0 @ 0x00011C50
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Record 8's first handler in unk_427408; only reached through the table.
 RwInt32 sub_12FA0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -671,6 +706,7 @@ RwInt32 sub_12FA0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13050 @ 0x00013050
+// sp-match: sub_13050 @ 0x00011CF0
 // Record 29's first handler in unk_427408; only reached through the table.
 RwInt32 sub_13050(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -688,6 +724,7 @@ RwInt32 sub_13050(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_130F0 @ 0x000130F0
+// sp-match: sub_130F0 @ 0x00011D80
 // Record 9's first handler in unk_427408; only reached through the table.
 RwInt32 sub_130F0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -701,6 +738,7 @@ RwInt32 sub_130F0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13150 @ 0x00013150
+// sp-match: sub_13150 @ 0x00011DD0
 // Record 10's first handler in unk_427408; only reached through the table.
 RwInt32 sub_13150(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -716,6 +754,7 @@ RwInt32 sub_13150(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_131C0 @ 0x000131C0
+// sp-match: sub_131C0 @ 0x00011E40
 // Record 11's first handler in unk_427408; only reached through the table.
 RwInt32 sub_131C0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -736,6 +775,7 @@ RwInt32 sub_131C0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13260 @ 0x00013260
+// sp-match: sub_13260 @ 0x00011ED0
 // Record 12's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_13260(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -758,6 +798,7 @@ RwInt32 sub_13260(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13320 @ 0x00013320
+// sp-match: sub_13320 @ 0x00011F70
 // Record 13's first handler in unk_427408; only reached through the table.
 RwInt32 sub_13320(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -771,6 +812,7 @@ RwInt32 sub_13320(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13380 @ 0x00013380
+// sp-match: sub_13380 @ 0x00011FC0
 // Record 14's first handler in unk_427408; only reached through the table.
 RwInt32 sub_13380(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -784,6 +826,7 @@ RwInt32 sub_13380(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_133E0 @ 0x000133E0
+// sp-match: sub_133E0 @ 0x00012010
 // Record 15's first handler in unk_427408; only reached through the table.
 RwInt32 sub_133E0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -799,6 +842,7 @@ RwInt32 sub_133E0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13450 @ 0x00013450
+// sp-match: sub_13450 @ 0x00012080
 // Record 16's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_13450(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -822,6 +866,7 @@ RwInt32 sub_13450(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13510 @ 0x00013510
+// sp-match: sub_13510 @ 0x00012120
 // Record 17's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_13510(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -844,6 +889,7 @@ RwInt32 sub_13510(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_135D0 @ 0x000135D0
+// sp-match: sub_135D0 @ 0x000121C0
 // Record 18's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_135D0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -874,6 +920,7 @@ RwInt32 sub_135D0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_136C0 @ 0x000136C0
+// sp-match: sub_136C0 @ 0x00012260
 // Record 19's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_136C0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -909,6 +956,7 @@ RwInt32 sub_136C0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13830 @ 0x00013830
+// sp-match: sub_13830 @ 0x00012380
 // Record 21's first handler in unk_427408; only reached through the table.
 RwInt32 sub_13830(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -931,6 +979,7 @@ RwInt32 sub_13830(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13900 @ 0x00013900
+// sp-match: sub_13900 @ 0x00012420
 // Record 22's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its third argument points at the point to advance to.
@@ -953,6 +1002,7 @@ RwInt32 sub_13900(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_139C0 @ 0x000139C0
+// sp-match: sub_139C0 @ 0x000124C0
 // Record 23's first handler in unk_427408; only reached through the table.
 RwInt32 sub_139C0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -970,6 +1020,7 @@ RwInt32 sub_139C0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13A60 @ 0x00013A60
+// sp-match: sub_13A60 @ 0x00012550
 // Record 28's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Its third argument points at the point to advance to.
@@ -992,6 +1043,7 @@ RwInt32 sub_13A60(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13B20 @ 0x00013B20
+// sp-match: sub_13B20 @ 0x000125F0
 // Record 27's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_13B20(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -1019,6 +1071,7 @@ RwInt32 sub_13B20(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13C20 @ 0x00013C20
+// sp-match: sub_13C20 @ 0x000126B0
 // Record 25's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_13C20(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -1061,6 +1114,7 @@ RwInt32 sub_13C20(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13DC0 @ 0x00013DC0
+// sp-match: sub_13DC0 @ 0x000127D0
 // Record 26's first handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_13DC0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
@@ -1090,6 +1144,7 @@ RwInt32 sub_13DC0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13EC0 @ 0x00013EC0
+// sp-match: sub_13EC0 @ 0x00012880
 // Record 30's first handler in unk_427408; only reached through the table.
 RwInt32 sub_13EC0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -1107,6 +1162,7 @@ RwInt32 sub_13EC0(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_13F60 @ 0x00013F60
+// sp-match: sub_13F60 @ 0x00012910
 // Record 33's first handler in unk_427408; only reached through the table.
 RwInt32 sub_13F60(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 {
@@ -1126,6 +1182,7 @@ RwInt32 sub_13F60(type_3DBC78 *arg_0, RwInt32 arg_4, void *arg_8)
 }
 
 // match: sub_14020 @ 0x00014020
+// sp-match: sub_14020 @ 0x000129B0
 // Record 33's second handler in unk_427408; only reached through the table.
 RwInt32 sub_14020(type_3DBC78 *arg_0, RwInt32 arg_4)
 {
@@ -1148,6 +1205,7 @@ RwInt32 sub_14020(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_140D0 @ 0x000140D0
+// sp-match: sub_140D0 @ 0x00013390
 // Record 1's second handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_140D0(type_3DBC78 *arg_0, RwInt32 arg_4)
@@ -1180,7 +1238,11 @@ RwInt32 sub_140D0(type_3DBC78 *arg_0, RwInt32 arg_4)
     return 1;
 }
 
+// (type_3DAFC8::has_grenade_in_hand, an inline single player keeps out of line: sub_141E0 and
+// sub_14AA0 call it, SP 0x12A98 and 0x12D68)
+// sp-match: ?has_grenade_in_hand@type_3DAFC8@@QAEHXZ @ 0x00011020
 // match: sub_141E0 @ 0x000141E0
+// sp-match: sub_141E0 @ 0x00012A30
 // Record 31's second handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_141E0(type_3DBC78 *arg_0, RwInt32 arg_4)
@@ -1202,11 +1264,16 @@ RwInt32 sub_141E0(type_3DBC78 *arg_0, RwInt32 arg_4)
     if (arg_0->vf_008() != 0 && arg_0->vf_008()->unk_624.sub_D4910() != 0)
         return 0;
     if (l4->unk_58 == 3) {
+#ifdef CODFH_SP // shape: single player calls has_grenade_in_hand out of line (SP 0x12A30 calls SP 0x11020)
+        if (arg_0->vf_008() != 0 && arg_0->vf_008()->has_grenade_in_hand())
+            return 1;
+#else
         if (arg_0->vf_008() != 0) {
             var18 = arg_0->vf_008();
             if ((var18->unk_4E0.sub_15EF80() == 8 && (local_14 = var18->unk_4E0.unk_00) != 0) != 0)
                 return 1;
         }
+#endif
         if ((var8 = &l4->unk_12F4) != 0
                 && l4->sub_279B0(var8, l4->unk_1374.sub_D4910(), 0) != 0) {
             v10 = l4->unk_1374.sub_D4910();
@@ -1221,6 +1288,7 @@ RwInt32 sub_141E0(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14340 @ 0x00014340
+// sp-match: sub_14340 @ 0x000136B0
 // Record 24's second handler in unk_427408; only reached through the table.
 RwInt32 sub_14340(type_3DBC78 *arg_0, RwInt32 arg_4)
 {
@@ -1243,6 +1311,7 @@ RwInt32 sub_14340(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_143E0 @ 0x000143E0
+// sp-match: sub_143E0 @ 0x00013450
 // Record 2's second handler in unk_427408; only reached through the table.
 RwInt32 sub_143E0(type_3DBC78 *arg_0, RwInt32 arg_4)
 {
@@ -1265,6 +1334,7 @@ RwInt32 sub_143E0(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14480 @ 0x00014480
+// sp-match: sub_14480 @ 0x000134C0
 // Record 3's second handler in unk_427408; only reached through the table.
 RwInt32 sub_14480(type_3DBC78 *arg_0, RwInt32 arg_4)
 {
@@ -1288,6 +1358,7 @@ RwInt32 sub_14480(type_3DBC78 *arg_0, RwInt32 arg_4)
 
 
 // match: sub_14520 @ 0x00014520
+// sp-match: sub_14520 @ 0x00012B90
 // Record 15's second handler in unk_427408; only reached through the table.
 RwInt32 sub_14520(type_3DBC78 *arg_0, RwInt32 arg_4)
 {
@@ -1304,6 +1375,7 @@ RwInt32 sub_14520(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14570 @ 0x00014570
+// sp-match: sub_14570 @ 0x00013530
 // Record 12's second handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_14570(type_3DBC78 *arg_0, RwInt32 arg_4)
@@ -1327,6 +1399,7 @@ RwInt32 sub_14570(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14600 @ 0x00014600
+// sp-match: sub_14600 @ 0x00012B60
 // Record 32's second handler in unk_427408; only reached through the table.
 RwInt32 sub_14600(type_3DBC78 *arg_0, RwInt32 arg_4)
 {
@@ -1343,6 +1416,7 @@ RwInt32 sub_14600(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14650 @ 0x00014650
+// sp-match: sub_14650 @ 0x00013590
 // Record 17's second handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_14650(type_3DBC78 *arg_0, RwInt32 arg_4)
@@ -1366,6 +1440,7 @@ RwInt32 sub_14650(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_146E0 @ 0x000146E0
+// sp-match: sub_146E0 @ 0x000135F0
 // Record 18's second handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_146E0(type_3DBC78 *arg_0, RwInt32 arg_4)
@@ -1389,6 +1464,7 @@ RwInt32 sub_146E0(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14770 @ 0x00014770
+// sp-match: sub_14770 @ 0x00013650
 // Record 19's second handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_14770(type_3DBC78 *arg_0, RwInt32 arg_4)
@@ -1412,6 +1488,7 @@ RwInt32 sub_14770(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14800 @ 0x00014800
+// sp-match: sub_14800 @ 0x00012BC0
 // Record 21's second handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_14800(type_3DBC78 *arg_0, RwInt32 arg_4)
@@ -1452,6 +1529,7 @@ RwInt32 sub_14800(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14930 @ 0x00014930
+// sp-match: sub_14930 @ 0x00012C90
 // Record 28's second handler in unk_427408; only reached through the table.
 RwInt32 sub_14930(type_3DBC78 *arg_0, RwInt32 arg_4)
 {
@@ -1474,6 +1552,7 @@ RwInt32 sub_14930(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_149D0 @ 0x000149D0
+// sp-match: sub_149D0 @ 0x00013720
 // Record 27's second handler in unk_427408; only reached through the table.
 RwInt32 sub_149D0(type_3DBC78 *arg_0, RwInt32 arg_4)
 {
@@ -1502,6 +1581,7 @@ RwInt32 sub_149D0(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14AA0 @ 0x00014AA0
+// sp-match: sub_14AA0 @ 0x00012D00
 // Record 25's second handler in unk_427408; only reached through the table.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_14AA0(type_3DBC78 *arg_0, RwInt32 arg_4)
@@ -1522,11 +1602,16 @@ RwInt32 sub_14AA0(type_3DBC78 *arg_0, RwInt32 arg_4)
     if (arg_0->vf_008() != 0 && arg_0->vf_008()->unk_624.sub_D4910() != 0)
         return 0;
     if (var_4->unk_58 == 3) {
+#ifdef CODFH_SP // shape: single player calls has_grenade_in_hand out of line (SP 0x12D00 calls SP 0x11020)
+        if (arg_0->vf_008() != 0 && arg_0->vf_008()->has_grenade_in_hand())
+            return 1;
+#else
         if (arg_0->vf_008() != 0) {
             var_10 = arg_0->vf_008();
             if ((var_10->unk_4E0.sub_15EF80() == 8 && (local_C = var_10->unk_4E0.unk_00) != 0) != 0)
                 return 1;
         }
+#endif
         loc8 = var_4->unk_F60;
         if (loc8 != 0) {
             if (loc8->unk_04 == 0x11 && arg_0->vf_008() != 0) {
@@ -1543,6 +1628,7 @@ RwInt32 sub_14AA0(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14C10 @ 0x00014C10
+// sp-match: sub_14C10 @ 0x00012B10
 // Record 30's second handler in unk_427408; only reached through the table.
 RwInt32 sub_14C10(type_3DBC78 *arg_0, RwInt32 arg_4)
 {
@@ -1561,6 +1647,7 @@ RwInt32 sub_14C10(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14C80 @ 0x00014C80
+// sp-match: sub_14C80 @ 0x00012DF0
 // Record 26's second handler in unk_427408; only reached through the table.
 RwInt32 sub_14C80(type_3DBC78 *arg_0, RwInt32 arg_4)
 {
@@ -1569,6 +1656,7 @@ RwInt32 sub_14C80(type_3DBC78 *arg_0, RwInt32 arg_4)
     return 1;
 }
 // match: sub_14CC0 @ 0x00014CC0
+// sp-match: sub_14CC0 @ 0x00012E30
 // Called by sub_140D0, sub_14340 and sub_149D0.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_14CC0(type_3DBC78 *arg_0, RwInt32 arg_4)
@@ -1601,6 +1689,7 @@ RwInt32 sub_14CC0(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14DF0 @ 0x00014DF0
+// sp-match: sub_14DF0 @ 0x00012EF0
 // Called by sub_143E0.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_14DF0(type_3DBC78 *arg_0, RwInt32 arg_4)
@@ -1621,6 +1710,7 @@ RwInt32 sub_14DF0(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_14EA0 @ 0x00014EA0
+// sp-match: sub_14EA0 @ 0x00012F60
 // Called by sub_14480.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_14EA0(type_3DBC78 *arg_0, RwInt32 arg_4)
@@ -1645,7 +1735,7 @@ RwInt32 sub_14EA0(type_3DBC78 *arg_0, RwInt32 arg_4)
     if ((var_4->unk_49C & 0x2000) != 0) {
         var_10 = var_4->sub_20570(arg_0->sub_CD550());
         lv_14 = var_4->unk_13B4;
-        if (lv_14 + -100.0f < var_10 && var_4->sub_205E0(local_C->sub_CD550(), 0.0f) == 0) {
+        if (var_10 > lv_14 + -100.0f && var_4->sub_205E0(local_C->sub_CD550(), 0.0f) == 0) {
             var_4->unk_13E0 = 2700.0f;
             return 0;
         }
@@ -1683,6 +1773,7 @@ RwInt32 sub_14EA0(type_3DBC78 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_150F0 @ 0x000150F0
+// sp-match: sub_150F0 @ 0x000130E0
 // Called by sub_14570 and sub_14650 with the entity's vf_010 entity.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_150F0(type_3D3548 *arg_0, RwInt32 arg_4)
@@ -1704,6 +1795,7 @@ RwInt32 sub_150F0(type_3D3548 *arg_0, RwInt32 arg_4)
     return 1;
 }
 // match: sub_15190 @ 0x00015190
+// sp-match: sub_15190 @ 0x00013150
 // Called by sub_146E0 with the entity's vf_014 entity.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_15190(type_3DC048 *arg_0, RwInt32 arg_4)
@@ -1736,6 +1828,7 @@ RwInt32 sub_15190(type_3DC048 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_152A0 @ 0x000152A0
+// sp-match: sub_152A0 @ 0x00013210
 // Called by sub_14770 with the entity's vf_014 entity.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_152A0(type_3DC048 *arg_0, RwInt32 arg_4)
@@ -1761,6 +1854,7 @@ RwInt32 sub_152A0(type_3DC048 *arg_0, RwInt32 arg_4)
     return 1;
 }
 // match: sub_15370 @ 0x00015370
+// sp-match: sub_15370 @ 0x000132A0
 // Called from other units (sub_33820, sub_3A9C0, sub_3AC40), which pass a
 // third argument (0) that the body never reads.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).

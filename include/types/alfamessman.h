@@ -111,8 +111,15 @@ void sub_6B510();
 // Registers the callback arg_4 (kind 2) for the object arg_0 (arg_8 its
 // argument), on the message arg_C of the script arg_10 with the flags arg_14;
 // ends a registration.
+#ifdef CODFH_SP
+// Single player's arg_10 is unsigned: its callers zero-extend the script
+// number they pass (movzx at SP 0x92410, 0x92530 and 0x7CB31).
+type_6B960 *sub_6BAE0(RwInt32 arg_0, RwUInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C, RwUInt8 arg_10,
+                      RwInt8 arg_14);
+#else
 type_6B960 *sub_6BAE0(RwInt32 arg_0, RwUInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C, RwInt8 arg_10,
                       RwInt8 arg_14);
+#endif
 void sub_6BC40(type_6B960 *arg_0);
 // A registration's flags from two nibbles: an inline with no address and so
 // no database name, named for what it builds. Evidence: VehicleEnterExitTrigger

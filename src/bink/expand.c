@@ -332,6 +332,7 @@ U8 *huff4decodes[16] = {
 void ReadHuffTable(VARBITS *vb, U8 **decode, U32 *reads, U8 *tab);
 
 // match: _StartReadHuff8Bundle @ 0x00346870
+// sp-match: _StartReadHuff8Bundle @ 0x00256870
 void StartReadHuff8Bundle(BUNDLE *b, VARBITS *vb, HUFF8 *h)
 {
   U32 i;
@@ -352,6 +353,7 @@ static U32 getbunsize(U32 width, U32 extra, U32 bits, U32 per)
 }
 
 // match: _ExpandBundleSizes@8 @ 0x00347AA0
+// sp-match: _ExpandBundleSizes@8 @ 0x00257AA0
 RADEXPFUNC void RADEXPLINK ExpandBundleSizes(BUNDLEPOINTERS *bunp, U32 width)
 {
   bunp->typeptr = (void *)getbunsize(width, 512, 4, 1);
@@ -368,6 +370,7 @@ RADEXPFUNC void RADEXPLINK ExpandBundleSizes(BUNDLEPOINTERS *bunp, U32 width)
 
 
 // match: _CheckReadHuff4Bundle @ 0x003470F0
+// sp-match: _CheckReadHuff4Bundle @ 0x002570F0
 
 void CheckReadHuff4Bundle(BUNDLE *b, VARBITS *vb)
 {
@@ -402,6 +405,7 @@ void CheckReadHuff4Bundle(BUNDLE *b, VARBITS *vb)
 }
 
 // match: _CheckReadHuff4SBundle @ 0x00347500
+// sp-match: _CheckReadHuff4SBundle @ 0x00257500
 void CheckReadHuff4SBundle(BUNDLE *b, VARBITS *vb)
 {
   if (b->cur == b->end) {
@@ -440,6 +444,7 @@ void CheckReadHuff4SBundle(BUNDLE *b, VARBITS *vb)
 }
 
 // match: _CheckReadRLEHuff4Bundle @ 0x003468E0
+// sp-match: _CheckReadRLEHuff4Bundle @ 0x002568E0
 void CheckReadRLEHuff4Bundle(BUNDLE *b, VARBITS *vb)
 {
   if (b->cur == b->end) {
@@ -494,6 +499,7 @@ void CheckReadRLEHuff4Bundle(BUNDLE *b, VARBITS *vb)
 }
 
 // match: _CheckReadHuff8Bundle @ 0x00346B60
+// sp-match: _CheckReadHuff8Bundle @ 0x00256B60
 void CheckReadHuff8Bundle(BUNDLE *b, VARBITS *vb, HUFF8 *h)
 {
   if (b->cur == b->end) {
@@ -531,6 +537,7 @@ void CheckReadHuff8Bundle(BUNDLE *b, VARBITS *vb, HUFF8 *h)
 }
 
 // match: _NewCheckReadHuff8Bundle @ 0x00346E30
+// sp-match: _NewCheckReadHuff8Bundle @ 0x00256E30
 void NewCheckReadHuff8Bundle(BUNDLE *b, VARBITS *vb, HUFF8 *h)
 {
   if (b->cur == b->end) {
@@ -587,6 +594,7 @@ static __inline void radmemset16(void *dest, U16 value, U32 count)
 }
 
 // match: _CheckReadDelta16Bundle @ 0x00347780
+// sp-match: _CheckReadDelta16Bundle @ 0x00257780
 void CheckReadDelta16Bundle(BUNDLE *b, VARBITS *vb)
 {
   if (b->cur == b->end) {

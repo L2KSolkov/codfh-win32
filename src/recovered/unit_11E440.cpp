@@ -28,7 +28,11 @@ extern const RwReal flt_3DA6BC = 16.666666f;
 
 
 // As the bullets' kind's (unit_11DB10): clears flag 2 when arg_2 holds.
+#ifdef CODFH_SP // single player's inline member (SP 0xD5B40; expanded for a constant argument)
+#define PG_FLAG2(p, on) ((p)->sp_sub_D5B40(on))
+#else
 #define PG_FLAG2(p, on) ((on) ? ((p)->unk_28 &= ~2) : ((p)->unk_28 |= 2))
+#endif
 
 // Its data (PLAN M5): literals, constants and tables where the image has them.
 // match: ?flt_3DA6BC@@3MB @ 0x003DA6BC
@@ -39,12 +43,14 @@ extern const RwReal flt_3DA6BC = 16.666666f;
 // match: ??0type_11E440@@QAE@XZ @ 0x0011E440
 // match: __ehhandler$??0type_11E440@@QAE@XZ-0x8 @ 0x003014F0
 // match: __ehhandler$??0type_11E440@@QAE@XZ @ 0x003014F8
+// sp-match: ??0type_11E440@@QAE@XZ @ 0x000D6770
 
 type_11E440::type_11E440()
 {
 }
 
 // match: ??0type_11E4A0@@QAE@XZ @ 0x0011E4A0
+// sp-match: ??0type_11E4A0@@QAE@XZ @ 0x000D61B0
 // A shell's settings: kind 2, the rest clear.
 type_11E4A0::type_11E4A0()
 {
@@ -62,14 +68,17 @@ type_11E4A0::type_11E4A0()
 }
 
 // match: ??_Gtype_11E440@@UAEPAXI@Z @ 0x0011E540
+// sp-match: ??_Gtype_11E440@@UAEPAXI@Z @ 0x000D6790
 // (Its scalar deleting destructor, compiler-written; the bullets' kind's,
 // identical, folds into this one.)
 
 // match: ??1type_11E440@@UAE@XZ @ 0x0011E560
+// sp-match: ??1type_11E440@@UAE@XZ @ 0x000D61A0
 // (Its destructor, compiler-written; the bullets' kind's, identical, folds
 // into this one.)
 
 // match: ?vf_004@type_11E440@@UAEXPAVProjectileGeneratorTrigger@@@Z @ 0x0011E580
+// sp-match: ?vf_004@type_11E440@@UAEXPAVProjectileGeneratorTrigger@@@Z @ 0x000D6220
 // Sets it up from its trigger, which then holds it.
 void type_11E440::vf_004(ProjectileGeneratorTrigger *arg_0)
 {
@@ -82,6 +91,7 @@ void type_11E440::vf_004(ProjectileGeneratorTrigger *arg_0)
 }
 
 // match: ?vf_008@type_11E440@@UAEXXZ @ 0x0011E5E0
+// sp-match: ?vf_008@type_11E440@@UAEXXZ @ 0x000D6260
 // Stops it, and its trigger lets it go.
 void type_11E440::vf_008()
 {
@@ -96,6 +106,7 @@ void type_11E440::vf_008()
 }
 
 // match: ?vf_00C@type_11E440@@UAEXPAVProjectileGeneratorTrigger@@@Z @ 0x0011E620
+// sp-match: ?vf_00C@type_11E440@@UAEXPAVProjectileGeneratorTrigger@@@Z @ 0x000D6280
 // Its shells' settings from its trigger: kind 7, or with the trigger's
 // unk_1CC set kind 8, whose object is the trigger's unk_1D0.
 void type_11E440::vf_00C(ProjectileGeneratorTrigger *arg_0)
@@ -138,6 +149,7 @@ void type_11E440::vf_00C(ProjectileGeneratorTrigger *arg_0)
 }
 
 // match: ?vf_010@type_11E440@@UAEXM@Z @ 0x0011E830
+// sp-match: ?vf_010@type_11E440@@UAEXM@Z @ 0x000D5D10
 // The base's update; the bullets' kind's, identical, folds into this one.
 void type_11E440::vf_010(RwReal arg_0)
 {
@@ -145,6 +157,7 @@ void type_11E440::vf_010(RwReal arg_0)
 }
 
 // match: ?vf_024@type_11E440@@UAEHXZ @ 0x0011E850
+// sp-match: ?vf_024@type_11E440@@UAEHXZ @ 0x000D63F0
 // Lobs a shell (0x1001, or 0x1002 for the trigger's unk_DC 2) from its
 // barrel, turret or parent onto the point it aims at, keeping its flight
 // time (unk_150.unk_98), with its muzzle particle systems, and tells its
@@ -230,7 +243,11 @@ RwInt32 type_11E440::vf_024()
         }
         else if (var_8->unk_104 < 100)
         {
+#ifdef CODFH_SP // shape: no copy in var_BC (as SP 0xD5D20)
+            PG_FLAG2(var_B4, var_8->unk_104 >= RpRandom() % 101);
+#else
             PG_FLAG2(var_B4, (var_BC = var_8->unk_104 >= RpRandom() % 101));
+#endif
         }
     }
     if (var_8->unk_1E4)

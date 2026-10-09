@@ -36,6 +36,7 @@ extern const RwReal flt_3DE0C4 = 16.666666f;
 // match: ??_C@_0BE@EJHMDLGH@m_freePulseZoneList?$AA@ @ 0x003DE0C8
 
 // match: ?sub_17E290@@YAXXZ @ 0x0017E290
+// sp-match: ?sub_17E290@@YAXXZ @ 0x00116A30
 // Sets the zones up: their pool, list and handles.
 void sub_17E290()
 {
@@ -45,6 +46,7 @@ void sub_17E290()
     dword_4E7370 = 0;
 }
 // match: ?sub_17E2E0@@YAXXZ @ 0x0017E2E0
+// sp-match: ?sub_17E2E0@@YAXXZ @ 0x00116C50
 // Drops every zone and handle.
 void sub_17E2E0()
 {
@@ -53,6 +55,7 @@ void sub_17E2E0()
     dword_4E7370 = 0;
 }
 // match: ?sub_17E310@@YAXXZ @ 0x0017E310
+// sp-match: ?sub_17E310@@YAXXZ @ 0x00116C70
 // Drops every zone and shuts the pool down.
 void sub_17E310()
 {
@@ -60,6 +63,7 @@ void sub_17E310()
     dword_4E7378.sub_16C4D0(true);
 }
 // match: ?sub_17E330@@YAXM@Z @ 0x0017E330
+// sp-match: ?sub_17E330@@YAXM@Z @ 0x00116C90
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Runs every zone for arg_0 frames, dropping those that are done.
 void sub_17E330(RwReal arg_0)
@@ -85,6 +89,7 @@ void sub_17E330(RwReal arg_0)
 // match: __ehhandler$?sub_17E3A0@@YA?AUtype_17E3A0@@PAVTrigger@@@Z-0x11 @ 0x00302200
 // match: __ehhandler$?sub_17E3A0@@YA?AUtype_17E3A0@@PAVTrigger@@@Z @ 0x00302211
 // match: ?sub_17E3A0@@YA?AUtype_17E3A0@@PAVTrigger@@@Z @ 0x0017E3A0
+// sp-match: ?sub_17E3A0@@YA?AUtype_17E3A0@@PAVTrigger@@@Z @ 0x00116B30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_17E3A0 sub_17E3A0(Trigger *arg_0)
 {
@@ -102,6 +107,7 @@ type_17E3A0 sub_17E3A0(Trigger *arg_0)
     return var_14->get_unk_B0();
 }
 // match: ?sub_17E470@@YAXPAUtype_17DB90@@@Z @ 0x0017E470
+// sp-match: ?sub_17E470@@YAXPAUtype_17DB90@@@Z @ 0x00116BC0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_17E470(type_17DB90 *arg_0)
 {
@@ -133,6 +139,7 @@ void sub_17E470(type_17DB90 *arg_0)
     dword_4E7378.sub_16C710(arg_0);
 }
 // match: ?sub_17E510@@YAXXZ @ 0x0017E510
+// sp-match: ?sub_17E510@@YAXXZ @ 0x00116C20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void sub_17E510()
 {
@@ -150,6 +157,7 @@ void sub_17E510()
     dword_4E7374 = 0;
 }
 // match: ?sub_17E560@@YAHPAUtype_17DB90@@@Z @ 0x0017E560
+// sp-match: ?sub_17E560@@YAHPAUtype_17DB90@@@Z @ 0x00116A70
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 sub_17E560(type_17DB90 *arg_0)
 {
@@ -177,12 +185,14 @@ RwInt32 sub_17E560(type_17DB90 *arg_0)
     return bp_8.unk_00;
 }
 // match: ?sub_17E620@@YAXUtype_17E3A0@@@Z @ 0x0017E620
+// sp-match: ?sub_17E620@@YAXUtype_17E3A0@@@Z @ 0x00116AF0
 void sub_17E620(type_17E3A0 arg_0)
 {
     dword_4E7268[arg_0.unk_00_w].unk_00.unk_00 = 0;
     dword_4E7268[arg_0.unk_00_w].unk_04 = 0;
 }
 // match: ?sub_17E650@@YAPAUtype_17DB90@@Utype_17E3A0@@@Z @ 0x0017E650
+// sp-match: ?sub_17E650@@YAPAUtype_17DB90@@Utype_17E3A0@@@Z @ 0x00116B10
 type_17DB90 *sub_17E650(type_17E3A0 arg_0)
 {
     if (dword_4E7268[arg_0.unk_00_w].unk_00.unk_00 == arg_0.unk_00)

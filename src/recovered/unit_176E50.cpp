@@ -46,7 +46,14 @@
 // 0x003DDB90
 extern const RwReal flt_3DDB90 = 16.666666f;
 // 0x0042A048
+#ifdef CODFH_SP
+// Internal to this file in single player: SP 0x113F80 loads it ahead of
+// stores through `this`, which /O2 does only for a static whose address is
+// never taken.
+static RwReal dword_42A048 = -2.0f;
+#else
 RwReal dword_42A048 = -2.0f;
+#endif
 // 0x0042A050
 RwInt32 dword_42A050[26] = { -1, 0, 1, 2, 3, 3, 3, 6, 6, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0 };
 // 0x0042A0B8
@@ -173,6 +180,7 @@ extern RwInt32 dword_4E6F24;
 // match: ?sub_176E50@@YAPAUtype_3D3548@@PAVGimpTrigger@@@Z @ 0x00176E50
 // match: __ehhandler$?sub_176E50@@YAPAUtype_3D3548@@PAVGimpTrigger@@@Z-0x11 @ 0x00302090
 // match: __ehhandler$?sub_176E50@@YAPAUtype_3D3548@@PAVGimpTrigger@@@Z @ 0x003020A1
+// sp-match: ?sub_176E50@@YAPAUtype_3D3548@@PAVGimpTrigger@@@Z @ 0x001153A0
 
 // Builds the gimp for the trigger arg_0, or warns that there is no entity
 // memory for it.
@@ -187,16 +195,20 @@ type_3D3548 *sub_176E50(GimpTrigger *arg_0)
             sub_D5A60(var_10, 0);
             var_10 = 0;
         }
-    } else
+    }
+#ifndef CODFH_SP
+    else
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
                    "location(%6.2f,%6.2f,%6.2f)",
                    arg_0->unk_90, arg_0->unk_94, arg_0->unk_98);
+#endif
     return var_10;
 }
 
 // match: ??0type_3DDB98@@QAE@PAVGimpTrigger@@@Z @ 0x00176F60
 // match: __ehhandler$??0type_3DDB98@@QAE@PAVGimpTrigger@@@Z-0x40 @ 0x003020B0
 // match: __ehhandler$??0type_3DDB98@@QAE@PAVGimpTrigger@@@Z @ 0x003020F0
+// sp-match: ??0type_3DDB98@@QAE@PAVGimpTrigger@@@Z @ 0x00115070
 // (Defined in the class.)
 
 // What the gimp's set-up matches its definition and head against (as the
@@ -208,21 +220,26 @@ extern RwUInt32 dword_42A36C;
 extern RwInt32 dword_42A050[];
 extern type_7CBD0_t flt_428A50[];
 // The gimp's unk_108 at first (-2).
+#ifndef CODFH_SP
 extern RwReal dword_42A048;
+#endif
 
 // match: ?vf_160@type_3DDB98@@UAEHXZ @ 0x00177040
+// sp-match: ?vf_160@type_3DDB98@@UAEHXZ @ 0x000EC080
 RwInt32 type_3DDB98::vf_160()
 {
     return unk_3E0.sub_15EF80();
 }
 
 // match: ?vf_094@type_3DDB98@@UAEXI@Z @ 0x00177060
+// sp-match: ?vf_094@type_3DDB98@@UAEXI@Z @ 0x00115100
 void type_3DDB98::vf_094(RwUInt32 arg_0)
 {
     unk_6A4 = arg_0;
 }
 
 // match: ?Collision_DispatchAtomicIntersectionsBySelectorFlag@type_3DDB98@@UAEXPAURpAtomic@@PAURpIntersection@@PAUtype_93700@@@Z @ 0x00177080
+// sp-match: ?Collision_DispatchAtomicIntersectionsBySelectorFlag@type_3DDB98@@UAEXPAURpAtomic@@PAURpIntersection@@PAUtype_93700@@@Z @ 0x00115110
 void type_3DDB98::Collision_DispatchAtomicIntersectionsBySelectorFlag(RpAtomic *arg_0, RpIntersection *arg_4,
                                                                     type_93700 *arg_8)
 {
@@ -231,78 +248,91 @@ void type_3DDB98::Collision_DispatchAtomicIntersectionsBySelectorFlag(RpAtomic *
 }
 
 // match: ?vf_0F0@type_3DDB98@@UAEPACXZ @ 0x001770A0
+// sp-match: ?vf_0F0@type_3DDB98@@UAEPACXZ @ 0x00115130
 RwInt8 *type_3DDB98::vf_0F0()
 {
     return unk_748;
 }
 
 // match: ?vf_1AC@type_3DDB98@@UAEXH@Z @ 0x001770C0
+// sp-match: ?vf_1AC@type_3DDB98@@UAEXH@Z @ 0x00115140
 void type_3DDB98::vf_1AC(RwInt32 arg_0)
 {
     ((GimpTrigger *)get_unk_34C())->unk_118 = arg_0;
 }
 
 // match: ?vf_09C@type_3DDB98@@UAEHXZ @ 0x001770F0
+// sp-match: ?vf_09C@type_3DDB98@@UAEHXZ @ 0x00115160
 RwInt32 type_3DDB98::vf_09C()
 {
     return unk_6A0;
 }
 
 // match: ?vf_0A0@type_3DDB98@@UAEXI@Z @ 0x00177110
+// sp-match: ?vf_0A0@type_3DDB98@@UAEXI@Z @ 0x00115170
 void type_3DDB98::vf_0A0(RwUInt32 arg_0)
 {
     unk_6A0 = arg_0;
 }
 
 // match: ?vf_088@type_3DDB98@@UAEXH@Z @ 0x00177130
+// sp-match: ?vf_088@type_3DDB98@@UAEXH@Z @ 0x00115180
 void type_3DDB98::vf_088(RwInt32 arg_0)
 {
     unk_6B0 = arg_0;
 }
 
 // match: ?vf_0E0@type_3DDB98@@UAEPAEXZ @ 0x00177150
+// sp-match: ?vf_0E0@type_3DDB98@@UAEPAEXZ @ 0x00115190
 RwUInt8 *type_3DDB98::vf_0E0()
 {
     return (RwUInt8 *)unk_6A8;
 }
 
 // match: ?vf_12C@type_3DDB98@@UAEXH@Z @ 0x00177170
+// sp-match: ?vf_12C@type_3DDB98@@UAEXH@Z @ 0x001151B0
 void type_3DDB98::vf_12C(RwInt32 arg_0)
 {
     unk_760 = (unk_760 & ~1) | (arg_0 != 0);
 }
 
 // match: ?vf_234@type_3DDB98@@UAEXH@Z @ 0x001771A0
+// sp-match: ?vf_234@type_3DDB98@@UAEXH@Z @ 0x001151D0
 void type_3DDB98::vf_234(RwInt32 arg_0)
 {
     unk_760 = (unk_760 & ~6) | (arg_0 ? 2 : 0);
 }
 
 // match: ?vf_238@type_3DDB98@@UAEXH@Z @ 0x001771D0
+// sp-match: ?vf_238@type_3DDB98@@UAEXH@Z @ 0x001151F0
 void type_3DDB98::vf_238(RwInt32 arg_0)
 {
     unk_760 = (unk_760 & ~6) | (arg_0 ? 4 : 0);
 }
 
 // match: ?vf_0F4@type_3DDB98@@UAEPAUSplinePath@@XZ @ 0x00177200
+// sp-match: ?vf_0F4@type_3DDB98@@UAEPAUSplinePath@@XZ @ 0x00115210
 SplinePath *type_3DDB98::vf_0F4()
 {
     return unk_734;
 }
 
 // match: ?vf_174@type_3DDB98@@UAEHXZ @ 0x00177220
+// sp-match: ?vf_174@type_3DDB98@@UAEHXZ @ 0x00115220
 RwInt32 type_3DDB98::vf_174()
 {
     return unk_740;
 }
 
 // match: ?vf_178@type_3DDB98@@UAEXH@Z @ 0x00177240
+// sp-match: ?vf_178@type_3DDB98@@UAEXH@Z @ 0x00115230
 void type_3DDB98::vf_178(RwInt32 arg_0)
 {
     unk_740 = arg_0;
 }
 
 // match: ?vf_180@type_3DDB98@@UAEXH@Z @ 0x00177260
+// sp-match: ?vf_180@type_3DDB98@@UAEXH@Z @ 0x00115240
 void type_3DDB98::vf_180(RwInt32 arg_0)
 {
     unk_740 += arg_0;
@@ -311,18 +341,21 @@ void type_3DDB98::vf_180(RwInt32 arg_0)
 }
 
 // match: ?vf_17C@type_3DDB98@@UAEMXZ @ 0x001772B0
+// sp-match: ?vf_17C@type_3DDB98@@UAEMXZ @ 0x00115270
 RwReal type_3DDB98::vf_17C()
 {
     return (RwReal)unk_740 / unk_744;
 }
 
 // match: ?vf_0AC@type_3DDB98@@UAEHXZ @ 0x001772D0
+// sp-match: ?vf_0AC@type_3DDB98@@UAEHXZ @ 0x00115280
 RwInt32 type_3DDB98::vf_0AC()
 {
     return unk_754;
 }
 
 // match: ?vf_0B0@type_3DDB98@@UAEXHH@Z @ 0x001772F0
+// sp-match: ?vf_0B0@type_3DDB98@@UAEXHH@Z @ 0x00115290
 void type_3DDB98::vf_0B0(RwInt32 arg_0, RwInt32 arg_4)
 {
     unk_754 = arg_0;
@@ -330,30 +363,40 @@ void type_3DDB98::vf_0B0(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?vf_0B4@type_3DDB98@@UAEXXZ @ 0x00177320
+// sp-match: ?vf_0B4@type_3DDB98@@UAEXXZ @ 0x001152B0
 void type_3DDB98::vf_0B4()
 {
     unk_758 = unk_6B4[3];
 }
 
 // match: ?vf_1F0@type_3DDB98@@UAEMXZ @ 0x00177340
+// sp-match: ?vf_1F0@type_3DDB98@@UAEMXZ @ 0x000EC0B0
+
 RwReal type_3DDB98::vf_1F0()
 {
+#ifdef CODFH_SP
+    return unk_3E0.sub_15EDE0() * get_4F28C0();
+#else
     return unk_3E0.sub_15EDE0() * 1.0f;
+#endif
 }
 
 // match: ?vf_23C@type_3DDB98@@UAEHXZ @ 0x00177360
+// sp-match: ?vf_23C@type_3DDB98@@UAEHXZ @ 0x001152C0
 RwInt32 type_3DDB98::vf_23C()
 {
     return unk_75C;
 }
 
 // match: ?vf_240@type_3DDB98@@UAEXH@Z @ 0x00177380
+// sp-match: ?vf_240@type_3DDB98@@UAEXH@Z @ 0x001152D0
 void type_3DDB98::vf_240(RwInt32 arg_0)
 {
     unk_75C = arg_0;
 }
 
 // match: ?sub_1774C0@type_3DDB98@@QAEHPAVGimpTrigger@@@Z @ 0x001774C0
+// sp-match: ?sub_1774C0@type_3DDB98@@QAEHPAVGimpTrigger@@@Z @ 0x00113F80
 // Its set-up from its trigger arg_0, as the soldier's (type_3DAFC8's
 // sub_135430): the base's set-up, its health, flags and fields; its
 // definition's body and head (without all three it is left inert, flagged
@@ -589,9 +632,15 @@ RwInt32 type_3DDB98::sub_1774C0(GimpTrigger *arg_0)
                 var_110.z += unk_4E0[var_114].unk_00.z;
                 var_114 = dword_42A050[var_114];
             }
+#ifdef CODFH_SP // shape: plain assignments schedule the loop's stores as SP 0x113F80 does
+            unk_4E0[var_F0].unk_00.x = unk_4E0[var_F0].unk_00.x - (var_110.x + flt_428A50[var_F0].unk_00.x);
+            unk_4E0[var_F0].unk_00.y = unk_4E0[var_F0].unk_00.y - (var_110.y + flt_428A50[var_F0].unk_00.y);
+            unk_4E0[var_F0].unk_00.z = unk_4E0[var_F0].unk_00.z - (var_110.z + flt_428A50[var_F0].unk_00.z);
+#else
             unk_4E0[var_F0].unk_00.x -= var_110.x + flt_428A50[var_F0].unk_00.x;
             unk_4E0[var_F0].unk_00.y -= var_110.y + flt_428A50[var_F0].unk_00.y;
             unk_4E0[var_F0].unk_00.z -= var_110.z + flt_428A50[var_F0].unk_00.z;
+#endif
         }
     }
     else
@@ -602,9 +651,11 @@ RwInt32 type_3DDB98::sub_1774C0(GimpTrigger *arg_0)
             unk_4E0[var_118].unk_00.x = 0.0f;
             unk_4E0[var_118].unk_00.y = 0.0f;
             unk_4E0[var_118].unk_00.z = 0.0f;
+#ifndef CODFH_SP
             sub_19A750("%2d %4d { %9.6f, %9.6f, %9.6f }, \n", var_118,
                        unk_28C->get_unk_18()->pNodeInfo[var_118].nodeID, var_EC[var_118].pos.x,
                        var_EC[var_118].pos.y, var_EC[var_118].pos.z);
+#endif
         }
     }
     strncpy(var_160, "FA_QO1A2K_IdleMask", 0x1F);
@@ -619,7 +670,9 @@ RwInt32 type_3DDB98::sub_1774C0(GimpTrigger *arg_0)
     else
     {
         unk_298 = 0;
+#ifndef CODFH_SP
         sub_19A750("WARNING: No idle face anim loaded for level!\n");
+#endif
     }
     if (!unk_88_1)
         unk_88 |= 2;
@@ -665,10 +718,13 @@ RwInt32 type_3DDB98::sub_1774C0(GimpTrigger *arg_0)
 // match: ??1type_3DDB98@@UAE@XZ @ 0x001773D0
 // match: __ehhandler$??1type_3DDB98@@UAE@XZ-0x50 @ 0x00302100
 // match: __ehhandler$??1type_3DDB98@@UAE@XZ @ 0x00302150
+// sp-match: ??1type_3DDB98@@UAE@XZ @ 0x00115300
+// sp-match: ??_Gtype_3DDB98@@UAEPAXI@Z @ 0x001152E0
 // (Defined in the class: vf_230, called directly as in any destructor,
 // then the members' destructors and the base's.)
 
 // match: ?sub_178640@type_3DDB98@@QAEXPAUSplinePath@@@Z @ 0x00178640
+// sp-match: ?sub_178640@type_3DDB98@@QAEXPAUSplinePath@@@Z @ 0x00111C30
 void type_3DDB98::sub_178640(SplinePath *arg_0)
 {
     unk_734 = arg_0;
@@ -689,6 +745,7 @@ void type_3DDB98::sub_178640(SplinePath *arg_0)
 }
 
 // match: ?vf_230@type_3DDB98@@UAEXXZ @ 0x00178770
+// sp-match: ?vf_230@type_3DDB98@@UAEXXZ @ 0x00111CF0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Shuts it down once: its clumps, collision, weapon, animations, sounds,
 // performance player and script object released, and its trigger's object
@@ -707,6 +764,16 @@ void type_3DDB98::vf_230()
         vf_228();
         if (unk_3E0.get_unk_00() && valid_weapon_type(unk_3E0.unk_04))
             unk_3E0.sub_15D360();
+#ifdef CODFH_SP // shape: SP 0x111CF0 releases them through an inline
+        if (unk_280)
+        {
+            release_anim(unk_280);
+        }
+        if (unk_288)
+        {
+            release_anim(unk_288);
+        }
+#else
         if (unk_280)
         {
             sub_78870(unk_280);
@@ -717,6 +784,7 @@ void type_3DDB98::vf_230()
             sub_78870(unk_288);
             unk_288 = 0;
         }
+#endif
         sub_8B840(this);
         bp_4 = vf_098();
         if (vf_090())
@@ -739,6 +807,7 @@ void type_3DDB98::vf_230()
 }
 
 // match: ?vf_03C@type_3DDB98@@UAEXM@Z @ 0x00178930
+// sp-match: ?vf_03C@type_3DDB98@@UAEXM@Z @ 0x00114950
 // Its logic for the time arg_0: the base's; its second animation's
 // translations offset by unk_4E0 and two of its bones copied from the
 // primary's; along its spline or to its point (sub_179530) unless it
@@ -835,6 +904,7 @@ void type_3DDB98::vf_03C(RwReal arg_0)
 }
 
 // match: ?vf_04C@type_3DDB98@@UAEXM@Z @ 0x00178DA0
+// sp-match: ?vf_04C@type_3DDB98@@UAEXM@Z @ 0x00114BF0
 // After the base's update for the time arg_0: its props (unk_35C) and its
 // body (unk_6CC, bone 0x1C4) follow its frame or bones, and its atomic's
 // centre its root bone's height; its second animation's speed (2 with
@@ -1054,6 +1124,7 @@ void type_3DDB98::vf_04C(RwReal arg_0)
 }
 
 // match: ?sub_179530@type_3DDB98@@QAEXXZ @ 0x00179530
+// sp-match: ?sub_179530@type_3DDB98@@QAEXXZ @ 0x00111E10
 // Moves it along its spline path by its speed (at an end the path turns
 // back, wraps or is done), facing its point ahead; or, with flag 1, steps
 // it along the path towards its goto point until within 75 of it, set on
@@ -1063,7 +1134,9 @@ void type_3DDB98::vf_04C(RwReal arg_0)
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void type_3DDB98::sub_179530()
 {
+#ifndef CODFH_SP
     RwReal v6C;
+#endif
     type_92430 var_68;
     RwV3d local_3C;
     RwV3d v30;
@@ -1082,9 +1155,15 @@ void type_3DDB98::sub_179530()
     {
         slot_1C = unk_154.z;
         v20 = slot_1C / vf_0F4()->unk_24;
+#ifdef CODFH_SP // shape: SP 0x111E10 compares the floats
+        unk_6E4 += v20 * unk_730;
+        if (unk_6E4 > unk_738)
+            unk_6E4 = unk_738;
+#else
         unk_6E4 += v20 * unk_730;
         if ((RwDouble)unk_6E4 > (RwDouble)unk_738)
             unk_6E4 = (RwReal)(RwDouble)unk_738;
+#endif
         else if (unk_6E4 < 0.0f)
             unk_6E4 = 0;
         if (unk_6E4 >= unk_738 || unk_6E4 <= 0.0f)
@@ -1124,9 +1203,15 @@ void type_3DDB98::sub_179530()
         {
             if (unk_760 & 2)
             {
+#ifdef CODFH_SP // shape: SP 0x111E10 compares the floats
+                unk_6E4 += unk_768;
+                if (unk_6E4 > unk_738)
+                    unk_6E4 = unk_738;
+#else
                 unk_6E4 += unk_768;
                 if ((RwDouble)unk_6E4 > (RwDouble)unk_738)
                     unk_6E4 = (RwReal)(RwDouble)unk_738;
+#endif
                 else if (unk_6E4 < 0.0f)
                     unk_6E4 = 0;
                 if (unk_6E4 >= unk_738)
@@ -1171,7 +1256,11 @@ void type_3DDB98::sub_179530()
     }
     if (local_14)
     {
+#ifdef CODFH_SP // shape: block-scoped, SP 0x111E10 shares its slot with local_10
+        RwReal v6C = deltaTime;
+#else
         v6C = deltaTime;
+#endif
         sub_6B5F0("IHaveArrived", (type_67620 *)(vf_098()), 0, 0, (RwInt32 *)(&v6C), 1, 1, 0);
         sub_6B5F0("SplinePath_ArrivedATDestination", (type_67620 *)(vf_098()), 0, 0, 0, 0, 1, 0);
     }
@@ -1180,6 +1269,7 @@ void type_3DDB98::sub_179530()
 }
 
 // match: ?vf_224@type_3DDB98@@UAE_NPAUtype_3DF8D8@@HPAH@Z @ 0x00179A50
+// sp-match: ?vf_224@type_3DDB98@@UAE_NPAUtype_3DF8D8@@HPAH@Z @ 0x001121C0
 // The base's set-up of its model from the definition arg_0, then its
 // atomic's bounding radius (100) and flags, and its weapon class.
 bool type_3DDB98::vf_224(type_3DF8D8 *arg_0, RwInt32 arg_4, RwInt32 *arg_8)
@@ -1197,6 +1287,7 @@ bool type_3DDB98::vf_224(type_3DF8D8 *arg_0, RwInt32 arg_4, RwInt32 *arg_8)
 }
 
 // match: ?sub_179AB0@type_3DDB98@@QAEXPAURpClump@@@Z @ 0x00179AB0
+// sp-match: ?sub_179AB0@type_3DDB98@@QAEXPAURpClump@@@Z @ 0x00112200
 // Holds a copy of the clump arg_0 (its body) in unk_6CC (none for 0), its
 // hierarchy updating its modelling matrices (as the soldier's sub_13ACE0).
 void type_3DDB98::sub_179AB0(RpClump *arg_0)
@@ -1223,6 +1314,7 @@ void type_3DDB98::sub_179AB0(RpClump *arg_0)
 }
 
 // match: ?sub_179B70@type_3DDB98@@QAEXPAURpClump@@@Z @ 0x00179B70
+// sp-match: ?sub_179B70@type_3DDB98@@QAEXPAURpClump@@@Z @ 0x00112270
 // Holds a copy of the clump arg_0 (its head) in unk_6D8 at the identity
 // (none for 0; as the soldier's sub_13ADA0).
 void type_3DDB98::sub_179B70(RpClump *arg_0)
@@ -1253,6 +1345,7 @@ void type_3DDB98::sub_179B70(RpClump *arg_0)
 // match: ?sub_179C10@@YAHPAUtype_F2FF0@@@Z @ 0x00179C10
 // match: __ehhandler$?sub_179C10@@YAHPAUtype_F2FF0@@@Z-0x8 @ 0x00302160
 // match: __ehhandler$?sub_179C10@@YAHPAUtype_F2FF0@@@Z @ 0x00302168
+// sp-match: ?sub_179C10@@YAHPAUtype_F2FF0@@@Z @ 0x001122E0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A particle system's callback while it follows a gimp (set by vf_170's
 // 0x516): its matrix at the gimp's bone arg_0->unk_158 (in its clump, its
@@ -1299,6 +1392,7 @@ RwInt32 sub_179C10(type_F2FF0 *arg_0)
 }
 
 // match: ?vf_170@type_3DDB98@@UAEXHHHH@Z @ 0x00179DD0
+// sp-match: ?vf_170@type_3DDB98@@UAEXHHHH@Z @ 0x001123E0
 // Its handler for the message arg_0 with the data arg_4 (unless its flag
 // 13 of unk_88 is set), as the soldier's: 1 replays its own animation when
 // its face player loops; 0xB54 plays the animation of *arg_4; 0x516 spawns
@@ -1309,11 +1403,15 @@ RwInt32 sub_179C10(type_F2FF0 *arg_0)
 // 0xA28 that vehicle's vision; the rest go to the base with no player.
 void type_3DDB98::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C)
 {
+#ifndef CODFH_SP // SP declares these in their cases
     RwInt32 var_C;
     RwInt32 var_10;
+#endif
     type_13AE40_msg *var_14;
+#ifndef CODFH_SP
     RwInt32 var_18;
     RwInt32 var_1C;
+#endif
     type_13AE40_msg *var_20;
     type_F2FF0 *var_24;
     RpHAnimHierarchy *var_28;
@@ -1343,6 +1441,42 @@ void type_3DDB98::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
         return;
     switch ((RwUInt32)arg_0)
     {
+#ifdef CODFH_SP // shape: SP 0x1123E0 shares the two cases' slots
+    case 1:
+    {
+        RwInt32 var_C;
+        RwInt32 var_10;
+        if (((type_7C8D0 *)arg_C)->unk_12 & 2)
+        {
+            if (unk_298 && unk_298 != arg_8 && sub_77B70(unk_298, (void **)(&var_10), (void **)(&var_C)))
+            {
+                unk_28C->sub_794C0(0.1f);
+                unk_28C->sub_796A0((RtAnimAnimation *)var_10, unk_298, 0, (type_783F0 *)var_C, 0, 1.0f,
+                                   1.0f);
+                unk_694 = 0;
+            }
+        }
+        else
+        {
+            type_3D3548::vf_170(arg_0, arg_4, arg_8, 0);
+        }
+        break;
+    }
+    case 0xB54:
+    {
+        RwInt32 var_18;
+        RwInt32 var_1C;
+        var_14 = (type_13AE40_msg *)arg_4;
+        if (sub_77B70(var_14->unk_00, (void **)(&var_1C), (void **)(&var_18)))
+        {
+            unk_28C->sub_794C0(0.1f);
+            unk_28C->sub_796A0((RtAnimAnimation *)var_1C, var_14->unk_00, 0, (type_783F0 *)var_18, 0, 1.0f,
+                               1.0f);
+            unk_694 = 8;
+        }
+        break;
+    }
+#else
     case 1:
         if (((type_7C8D0 *)arg_C)->unk_12 & 2)
         {
@@ -1369,6 +1503,7 @@ void type_3DDB98::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
             unk_694 = 8;
         }
         break;
+#endif
     case 0x516:
         var_20 = (type_13AE40_msg *)arg_4;
         var_24 = 0;
@@ -1514,6 +1649,7 @@ void type_3DDB98::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
 }
 
 // match: ?vf_054@type_3DDB98@@UAEXH@Z @ 0x0017A520
+// sp-match: ?vf_054@type_3DDB98@@UAEXH@Z @ 0x001128F0
 // Its render (unless its trigger hides it by bit 11 of unk_24, or gimps
 // are hidden): its clump and its body's and head's as the base renders its
 // clump (faded while unk_28_18 is set), with the cull mode flipped while
@@ -1603,18 +1739,21 @@ void type_3DDB98::vf_054(RwInt32 arg_0)
 }
 
 // match: ?vf_098@type_3DDB98@@UAEPAUtype_3D2E7C@@XZ @ 0x0017A800
+// sp-match: ?vf_098@type_3DDB98@@UAEPAUtype_3D2E7C@@XZ @ 0x00112B10
 type_3D2E7C *type_3DDB98::vf_098()
 {
     return (type_3D2E7C *)sub_67620(unk_6A0);
 }
 
 // match: ?vf_090@type_3DDB98@@UAEPAUtype_6D380@@XZ @ 0x0017A820
+// sp-match: ?vf_090@type_3DDB98@@UAEPAUtype_6D380@@XZ @ 0x00112B20
 struct type_6D380 *type_3DDB98::vf_090()
 {
     return (type_6D380 *)sub_67620(unk_6A4);
 }
 
 // match: ?sub_17A840@type_3DDB98@@QAEXHH@Z @ 0x0017A840
+// sp-match: ?sub_17A840@type_3DDB98@@QAEXHH@Z @ 0x00112B30
 // "EnableWeaponRender": shows (arg_4 set) or hides its weapon's model
 // (arg_0 0; it has no grenade).
 void type_3DDB98::sub_17A840(RwInt32 arg_0, RwInt32 arg_4)
@@ -1629,6 +1768,7 @@ void type_3DDB98::sub_17A840(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?vf_058@type_3DDB98@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x0017A8B0
+// sp-match: ?vf_058@type_3DDB98@@UAEHPAUtype_3DF8D8_04@@@Z @ 0x00112B70
 // Whether arg_0 is one of the keys (0 to 2) of its definition's model
 // objects (as the soldier's).
 RwInt32 type_3DDB98::vf_058(type_3DF8D8_04 *arg_0)
@@ -1679,6 +1819,7 @@ RwInt32 type_3DDB98::vf_058(type_3DF8D8_04 *arg_0)
 }
 
 // match: ?vf_07C@type_3DDB98@@UAEHCPAURpIntersection@@PAMH@Z @ 0x0017AAD0
+// sp-match: ?vf_07C@type_3DDB98@@UAEHCPAURpIntersection@@PAMH@Z @ 0x00112D20
 // The line (arg_0 1) or sphere of arg_4 against its bone boxes (13 of
 // them while its animation drives it, else one box 30 across, as high as
 // its stance puts its head); -1 for a miss or while unk_88_1 is clear (as
@@ -1760,6 +1901,7 @@ RwInt32 type_3DDB98::vf_07C(RwInt8 arg_0, RpIntersection *arg_4, RwReal *arg_8, 
 }
 
 // match: ?sub_17AD60@@YAXPAUtype_7C8D0@@@Z @ 0x0017AD60
+// sp-match: ?sub_17AD60@@YAXPAUtype_7C8D0@@@Z @ 0x00112F20
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The dying face: one of the four death animations at random on the
 // animation arg_0 (the soldier's too, sub_13C490).
@@ -1777,13 +1919,16 @@ void sub_17AD60(type_7C8D0 *arg_0)
         arg_0->sub_794C0(0.1f);
         arg_0->sub_796A0((RtAnimAnimation *)var_10, bp_4, 0, (type_783F0 *)bp_8, 0, 1.0f, 1.0f);
     }
+#ifndef CODFH_SP
     else
     {
         sub_19A750("WARNING: No Death face anim loaded for level!\n");
     }
+#endif
 }
 
 // match: ?sub_17ADF0@@YAXPAUtype_7C8D0@@@Z @ 0x0017ADF0
+// sp-match: ?sub_17ADF0@@YAXPAUtype_7C8D0@@@Z @ 0x00112FA0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // The hurt face: one of the five hit animations at random (with the same
 // warning).
@@ -1802,13 +1947,16 @@ void sub_17ADF0(type_7C8D0 *arg_0)
         arg_0->sub_794C0(0.1f);
         arg_0->sub_796A0((RtAnimAnimation *)var_10, bp_4, 0, (type_783F0 *)bp_8, 0, 1.0f, 1.0f);
     }
+#ifndef CODFH_SP
     else
     {
         sub_19A750("WARNING: No Death face anim loaded for level!\n");
     }
+#endif
 }
 
 // match: ?sub_17AE80@type_3DDB98@@QAEXH@Z @ 0x0017AE80
+// sp-match: ?sub_17AE80@type_3DDB98@@QAEXH@Z @ 0x00113020
 // Takes arg_0 damage: unless already hurt (1) or dying (2), it dies or is
 // hurt, through its second animation; with cheat flag 4 it shrinks with
 // its health (to a third; as the soldier's sub_13C490).
@@ -1837,6 +1985,7 @@ void type_3DDB98::sub_17AE80(RwInt32 arg_0)
 }
 
 // match: ?vf_064@type_3DDB98@@UAEHPAUtype_75600@@@Z @ 0x0017AF90
+// sp-match: ?vf_064@type_3DDB98@@UAEHPAUtype_75600@@@Z @ 0x001130D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // A bullet (only while its trigger lets bullets hurt it, and not from a
 // side its trigger shields it from): its hit-death values (with a
@@ -1927,6 +2076,7 @@ RwInt32 type_3DDB98::vf_064(type_75600 *arg_0)
 }
 
 // match: ?vf_06C@type_3DDB98@@UAEHPAUtype_3D3548@@@Z @ 0x0017B3B0
+// sp-match: ?vf_06C@type_3DDB98@@UAEHPAUtype_3D3548@@@Z @ 0x001133C0
 // A collision with the entity arg_0: from a type_3DA6C0 whose vf_244 is 1,
 // its hit-death values (0x49 or 0x4A by whether it faces the entity), 1000
 // damage, and its scripts told as for a bullet (as the soldier's).
@@ -1965,14 +2115,17 @@ RwInt32 type_3DDB98::vf_06C(type_3D3548 *arg_0)
 }
 
 // match: ?vf_060@type_3DDB98@@UAEHPAUtype_3D3548@@@Z @ 0x0017B580
+// sp-match: ?vf_060@type_3DDB98@@UAEHPAUtype_3D3548@@@Z @ 0x00113540
 // A touch by the entity arg_0 (none while it rides or is dead: flags 9 and
 // 0). A vehicle (kind bits 0x40080) runs it over: its hit-death values,
 // 1000 damage and its scripts told as for a bullet. Anything else pushes it
 // (or, with flag 19 of unk_28, it pushes them) out of their overlap.
 RwInt32 type_3DDB98::vf_060(type_3D3548 *arg_0)
 {
+#ifndef CODFH_SP // shape: SP 0x113540 declares these in the branches (they share slots)
     RwV3d var_44;
     RwV3d l38;
+#endif
     RwReal *lcl_2C;
     RwReal local_28;
     RwReal local_24;
@@ -1980,13 +2133,18 @@ RwInt32 type_3DDB98::vf_060(type_3D3548 *arg_0)
     RwInt32 var_1C;
     RwV3d *local_18;
     RwV3d *local_14;
+#ifndef CODFH_SP
     RwV3d local_10;
+#endif
     RwReal var_4;
 
     if (unk_28_9 || unk_28_0)
         return 0;
     if ((arg_0->unk_2C & 0x3FFFFF0) & 0x40080) // not an address: entity kind bits
     {
+#ifdef CODFH_SP
+        RwV3d local_10;
+#endif
         local_14 = sub_CD550();
         local_18 = arg_0->sub_CD550();
         RwV3dSubMacro(&local_10, local_18, local_14);
@@ -2010,6 +2168,10 @@ RwInt32 type_3DDB98::vf_060(type_3D3548 *arg_0)
     }
     else
     {
+#ifdef CODFH_SP
+        RwV3d var_44;
+        RwV3d l38;
+#endif
         lcl_2C = arg_0->vf_0C4();
         local_20 = vf_0C4();
         RwV3dSubMacro(&var_44, (RwV3d *)lcl_2C, (RwV3d *)local_20);
@@ -2039,6 +2201,7 @@ RwInt32 type_3DDB98::vf_060(type_3D3548 *arg_0)
 }
 
 // match: ?vf_068@type_3DDB98@@UAEHPAUtype_758F0@@@Z @ 0x0017B910
+// sp-match: ?vf_068@type_3DDB98@@UAEHPAUtype_758F0@@@Z @ 0x00113830
 // An explosion that reaches it (while its trigger lets explosions hurt it):
 // the damage (falling off to its radius, or by its settings' inner radius;
 // 1 returned when out of range), then its hit-death values (with a
@@ -2120,6 +2283,7 @@ RwInt32 type_3DDB98::vf_068(type_758F0 *arg_0)
 }
 
 // match: ?vf_0E4@type_3DDB98@@UAEHH@Z @ 0x0017BCF0
+// sp-match: ?vf_0E4@type_3DDB98@@UAEHH@Z @ 0x00113B00
 // Its trigger's scene value arg_0.
 RwInt32 type_3DDB98::vf_0E4(RwInt32 arg_0)
 {
@@ -2130,6 +2294,7 @@ RwInt32 type_3DDB98::vf_0E4(RwInt32 arg_0)
 }
 
 // match: ?vf_0EC@type_3DDB98@@UAEXHH@Z @ 0x0017BD20
+// sp-match: ?vf_0EC@type_3DDB98@@UAEXHH@Z @ 0x00113B20
 // Sets its scene value arg_0 to arg_4 ("SetSceneValue").
 void type_3DDB98::vf_0EC(RwInt32 arg_0, RwInt32 arg_4)
 {
@@ -2137,6 +2302,7 @@ void type_3DDB98::vf_0EC(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?vf_0E8@type_3DDB98@@UAEHXZ @ 0x0017BD40
+// sp-match: ?vf_0E8@type_3DDB98@@UAEHXZ @ 0x00113B40
 // How many scene values its trigger sets.
 RwInt32 type_3DDB98::vf_0E8()
 {
@@ -2155,12 +2321,14 @@ RwInt32 type_3DDB98::vf_0E8()
 }
 
 // match: ?vf_078@type_3DDB98@@UAEXXZ @ 0x0017BDA0
+// sp-match: ?vf_078@type_3DDB98@@UAEXXZ @ 0x00113B60
 void type_3DDB98::vf_078()
 {
     sub_8D580(unk_284->get_unk_18(), 1);
 }
 
 // match: ?sub_17BDD0@type_3DDB98@@QAEXPAUtype_15CCE0@@HH@Z @ 0x0017BDD0
+// sp-match: ?sub_17BDD0@type_3DDB98@@QAEXPAUtype_15CCE0@@HH@Z @ 0x00113B80
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 // Puts the weapon arg_0's model in its hand: at the bone arg_4 while its
 // animation drives it, else at its frame; then the weapon's state arg_8
@@ -2195,6 +2363,7 @@ void type_3DDB98::sub_17BDD0(type_15CCE0 *arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?vf_0F8@type_3DDB98@@UAEXM@Z @ 0x0017BEB0
+// sp-match: ?vf_0F8@type_3DDB98@@UAEXM@Z @ 0x00113C00
 // Moves it to the point arg_0 of the way along its spline path.
 void type_3DDB98::vf_0F8(RwReal arg_0)
 {
@@ -2209,12 +2378,14 @@ void type_3DDB98::vf_0F8(RwReal arg_0)
 }
 
 // match: ?sub_17BF10@type_3DDB98@@QAEXPAURwV3d@@@Z @ 0x0017BF10
+// sp-match: ?sub_17BF10@type_3DDB98@@QAEXPAURwV3d@@@Z @ 0x00113C50
 void type_3DDB98::sub_17BF10(RwV3d *arg_0)
 {
     unk_778 = *arg_0;
 }
 
 // match: ?vf_08C@type_3DDB98@@UAEPAEHH@Z @ 0x0017BF40
+// sp-match: ?vf_08C@type_3DDB98@@UAEPAEHH@Z @ 0x00113C70
 // Its performance values (arg_4 1: the special idle ones), or for arg_0 set
 // those of its performance kind.
 RwUInt8 *type_3DDB98::vf_08C(RwInt32 arg_0, RwInt32 arg_4)
@@ -2232,6 +2403,7 @@ RwUInt8 *type_3DDB98::vf_08C(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ?sub_17BF90@type_3DDB98@@QAEXPAURwV3d@@M@Z @ 0x0017BF90
+// sp-match: ?sub_17BF90@type_3DDB98@@QAEXPAURwV3d@@M@Z @ 0x00113CA0
 // "SendFlying": unless it flies already, it flies (unk_73C 1, gravity on)
 // away from the point *arg_0, launched at an angle and a speed from the
 // strength arg_4 (at least 200) and the distance, in its own frame (as the
@@ -2272,7 +2444,12 @@ void type_3DDB98::sub_17BF90(RwV3d *arg_0, RwReal arg_4)
         var_1C = RwV3dLength((RwV3d *)&var_14);
         if (var_1C > 0.001f)
         {
+#ifdef CODFH_SP // shape: SP 0x113CA0
+            var_20 = (arg_4 * flt_429C9C - var_1C) / arg_4;
+            var_20 = var_20 * (flt_429CA0 / flt_429C9C);
+#else
             var_20 = (arg_4 * flt_429C9C - var_1C) / arg_4 * (flt_429CA0 / flt_429C9C);
+#endif
             var_24 = flt_429C98 + var_20;
             var_2C = tan(var_24 * rwPI / 180.0f);
             var_30 = var_2C * var_1C;
@@ -2301,6 +2478,7 @@ void type_3DDB98::sub_17BF90(RwV3d *arg_0, RwReal arg_4)
 }
 
 // match: ?vf_1C4@type_3DDB98@@UAEXH@Z @ 0x0017C260
+// sp-match: ?vf_1C4@type_3DDB98@@UAEXH@Z @ 0x00113E90
 // Landing from a flight (unk_73C): on the ground (arg_0) it stops, or
 // against a wall it drops; its scripts are told (as the soldier's).
 void type_3DDB98::vf_1C4(RwInt32 arg_0)
@@ -2326,6 +2504,7 @@ void type_3DDB98::vf_1C4(RwInt32 arg_0)
 }
 
 // match: ?vf_210@type_3DDB98@@UAEXPAUtype_D05C0@@@Z @ 0x0017C370
+// sp-match: ?vf_210@type_3DDB98@@UAEXPAUtype_D05C0@@@Z @ 0x00113F40
 // Raises the step (a quarter of it while flying) with flags 3 and 5 set
 // and 7 clear.
 void type_3DDB98::vf_210(type_D05C0 *arg_0)
@@ -2340,6 +2519,7 @@ void type_3DDB98::vf_210(type_D05C0 *arg_0)
 }
 
 // type_3DDB98's vf_0BC: type_3DAFC8's code (ICF folded them, at 0x13C120).
+// sp-match: ?vf_0BC@type_3DDB98@@UAEHXZ @ 0x00112CA0
 RwInt32 type_3DDB98::vf_0BC()
 {
     switch (vf_0AC())
@@ -2391,9 +2571,13 @@ void *type_3DDB98::operator new(RwUInt32 arg_0, void *arg_4)
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ??3type_3DDB98@@SAXPAX@Z (folded into 0x19A750)
+// Single player's deleting destructor (SP 0x1152E0) calls it out of line: the
+// empty body here would let /O2 drop that call, so SP only declares it.
+#ifndef CODFH_SP
 void type_3DDB98::operator delete(void * arg_0)
 {
 }
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.

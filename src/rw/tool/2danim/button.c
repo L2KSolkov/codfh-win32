@@ -70,6 +70,7 @@ static const char rcsid[] = "@@@@(#)$Id: //RenderWare/RW36Active/rwsdk/tool/2dan
  */
 
 Rt2dButton *
+// sp-match: __rt2dButtonInit @ 0x00173400
 _rt2dButtonInit(Rt2dButton *button)
 {
     RwInt32         i;
@@ -112,6 +113,7 @@ _rt2dButtonDestruct(Rt2dButton *button)
 /****************************************************************************/
 
 Rt2dButton *
+// sp-match: __rt2dButtonCreate @ 0x00173490
 _rt2dButtonCreate(void)
 {
     Rt2dButton         *button;
@@ -183,6 +185,7 @@ _rt2dButtonStreamGetSize(Rt2dMaestro *maestro __RWUNUSED__,
 }
 
 Rt2dButton *
+// sp-match: __rt2dButtonStreamRead @ 0x001734E0
 _rt2dButtonStreamRead(Rt2dMaestro *maestro __RWUNUSED__,
                         Rt2dButton *button, RwStream *stream,
                       RwInt32 stateCount __RWUNUSED__ , RwInt32 transCount)
@@ -314,6 +317,7 @@ _rt2dMaestroButtonsStreamGetSize(Rt2dMaestro *maestro)
 }
 
 Rt2dMaestro *
+// sp-match: __rt2dMaestroButtonsStreamRead @ 0x00173790
 _rt2dMaestroButtonsStreamRead(Rt2dMaestro *maestro, RwStream *stream)
 {
     RwInt32                 numButtons, numStates, numTransitions;
@@ -469,6 +473,7 @@ _rt2dMaestroButtonsStreamWrite(Rt2dMaestro *maestro, RwStream *stream)
 }
 
 Rt2dMaestro *
+// sp-match: __rt2dMaestroCreateButtons @ 0x00173560
 _rt2dMaestroCreateButtons(Rt2dMaestro *maestro)
 {
     Rt2dMaestro            *result;
@@ -492,6 +497,7 @@ _rt2dMaestroCreateButtons(Rt2dMaestro *maestro)
 // match: _rcsid @ 0x003EE788
 
 // match: __rt2dMaestroDestroyButtons @ 0x00257A00
+// sp-match: __rt2dMaestroDestroyButtons @ 0x00173580
 Rt2dMaestro *
 _rt2dMaestroDestroyButtons(Rt2dMaestro *maestro)
 {
@@ -510,6 +516,7 @@ _rt2dMaestroDestroyButtons(Rt2dMaestro *maestro)
 }
 
 Rt2dButton *
+// sp-match: __rt2dMaestroGetButtonByIndex @ 0x001735A0
 _rt2dMaestroGetButtonByIndex(Rt2dMaestro *maestro, RwInt32 index)
 {
     Rt2dButton              *button;
@@ -599,6 +606,7 @@ Rt2dMaestroAddButton(Rt2dMaestro *maestro, RwInt32 strLabelIdx, RwInt32 objectId
 /****************************************************************************/
 
 Rt2dStateTransData *
+// sp-match: __rt2dStateTransTableInit @ 0x001735B0
 _rt2dStateTransTableInit(Rt2dStateTransData stateTransTable[2][2][2][2])
 {
     RWFUNCTION(RWSTRING("_rt2dStateTransTableInit"));
@@ -732,6 +740,7 @@ _rt2dStateTransTableInit(Rt2dStateTransData stateTransTable[2][2][2][2])
 }
 
 Rt2dButton *
+// sp-match: __rt2dButtonReset @ 0x00173700
 _rt2dButtonReset(Rt2dButton *button, Rt2dObject *scene)
 {
     RWFUNCTION(RWSTRING("_rt2dButtonReset"));

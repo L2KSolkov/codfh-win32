@@ -10,6 +10,7 @@
 #include "types/AIData.h"
 #include "types/type_3D410.h"
 #include "types/type_3D3548.h"
+#include "sp/sp_target.h"   // sub_3DE00 in single player
 #include "types/type_10F710.h"
 #include "types/type_3DF30.h"
 
@@ -46,6 +47,7 @@ type_427660 dword_427660[2] = {
 // match: ??0type_3D410@@QAE@XZ @ 0x0003D410
 // match: __ehhandler$??0type_3D410@@QAE@XZ-0x16 @ 0x002FF6D0
 // match: __ehhandler$??0type_3D410@@QAE@XZ @ 0x002FF6E6
+// sp-match: ??0type_3D410@@QAE@XZ @ 0x0002ECF0
 
 type_3D410::type_3D410()
 {
@@ -57,6 +59,7 @@ type_3D410::type_3D410()
 }
 
 // match: sub_3D4C0 @ 0x0003D4C0
+// sp-match: sub_3D4C0 @ 0x0002E8C0
 void type_3D410::sub_3D4C0(type_3DF30 *arg_0)
 {
     RwInt32 local_8;
@@ -84,6 +87,7 @@ void type_3D410::sub_3D4C0(type_3DF30 *arg_0)
 }
 
 // match: sub_3D5F0 @ 0x0003D5F0
+// sp-match: sub_3D5F0 @ 0x0002ED70
 void type_3D410::sub_3D5F0(RwReal arg_0)
 {
     RwInt32 var_4;
@@ -99,6 +103,7 @@ void type_3D410::sub_3D5F0(RwReal arg_0)
 }
 
 // match: sub_3D6B0 @ 0x0003D6B0
+// sp-match: sub_3D6B0 @ 0x0002EF00
 void type_3D410::sub_3D6B0(RwReal arg_0)
 {
     type_3D410_11C *local_8;
@@ -112,6 +117,7 @@ void type_3D410::sub_3D6B0(RwReal arg_0)
 }
 
 // match: sub_3D700 @ 0x0003D700
+// sp-match: sub_3D700 @ 0x0002E950
 // Runs the periodic update arg_0 on the context arg_4.
 void sub_3D700(RwInt32 arg_0, type_3D410 *arg_4)
 {
@@ -119,6 +125,7 @@ void sub_3D700(RwInt32 arg_0, type_3D410 *arg_4)
 }
 
 // match: sub_3D720 @ 0x0003D720
+// sp-match: sub_3D720 @ 0x0002EDE0
 type_3D410_11C *type_3D410::sub_3D720(RwInt32 arg_0)
 {
     type_3D3548 *var_4;
@@ -130,6 +137,7 @@ type_3D410_11C *type_3D410::sub_3D720(RwInt32 arg_0)
 }
 
 // match: sub_3D760 @ 0x0003D760
+// sp-match: sub_3D760 @ 0x0002E970
 // The candidate record arg_4, cleared unless it already holds arg_0.
 type_3D410_11C *type_3D410::sub_3D760(type_3D3548 *arg_0, RwInt32 arg_4)
 {
@@ -141,6 +149,7 @@ type_3D410_11C *type_3D410::sub_3D760(type_3D3548 *arg_0, RwInt32 arg_4)
 }
 
 // match: sub_3D7D0 @ 0x0003D7D0
+// sp-match: sub_3D7D0 @ 0x0002E9B0
 // Periodic update 0: rebuilds the context arg_4's target records from each
 // member's AI records it can see (sub_18F00), its unk_1390 entity and, for a
 // player, the player's target of another side; counts the seen targets
@@ -217,6 +226,7 @@ void sub_3D7D0(RwInt32 arg_0, type_3D410 *arg_4)
 }
 
 // match: sub_3DB40 @ 0x0003DB40
+// sp-match: sub_3DB40 @ 0x0002EBC0
 // Periodic update 1: carries the targets over into the candidate records
 // (a new one flagged in unk_08; one no longer seen dropped after 8 updates)
 // and counts in unk_08 the candidates in a group other than this one's
@@ -266,6 +276,7 @@ void sub_3DB40(RwInt32 arg_0, type_3D410 *arg_4)
 }
 
 // match: sub_3DCD0 @ 0x0003DCD0
+// sp-match: sub_3DCD0 @ 0x0002EE10
 RwInt32 type_3D410::sub_3DCD0(type_3D3548 *arg_0)
 {
     RwInt32 var_1C;
@@ -304,7 +315,9 @@ RwInt32 type_3D410::sub_3DCD0(type_3D3548 *arg_0)
     return 0;
 }
 
+#ifndef CODFH_SP // single player's is a static inline (sp/sp_target.h; SP 0x28F30)
 // match: sub_3DE00 @ 0x0003DE00
+// sp-match: sub_3DE00 @ 0x00028F30
 RwInt32 sub_3DE00(type_3D3548 *arg_0, type_3D3548 *arg_4)
 {
     if (byte_4C1940 != 0 && arg_4 != 0 && ((arg_4->unk_2C >> 4) & 1) != 0)
@@ -317,6 +330,7 @@ RwInt32 sub_3DE00(type_3D3548 *arg_0, type_3D3548 *arg_4)
         return 1;
     return 0;
 }
+#endif
 
 // Functions /OPT:ICF folded into the shared empty body (pDtor, 0x1E41C0) and
 // into its caller (0x39440); defined for the authentic link (PLAN M7).

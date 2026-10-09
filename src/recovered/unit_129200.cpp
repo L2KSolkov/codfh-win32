@@ -37,9 +37,13 @@ type_3DA848 dword_4CF7D4;
 // match: ?off_429C04@@3PBDB @ 0x00429C04
 // match: ?off_429C08@@3PBDB @ 0x00429C08
 
+// sp-match: ??1type_3DA848@@UAE@XZ @ 0x000DD920
+// (Implicit: single player keeps this file's copy, the copy multiplayer folds into 0x130600.)
+
 // match: _$E2 @ 0x0030B7F0
 // match: _$E3 @ 0x0030E600
 // match: ?Load@type_3DA848@@UAEPAXPBD00PAURwStream@@IAAI@Z @ 0x00129200
+// sp-match: ?Load@type_3DA848@@UAEPAXPBD00PAURwStream@@IAAI@Z @ 0x000DDA40
 
 void *type_3DA848::Load(const RwChar *psName, const RwChar *psType, const RwChar *psResourcePath,
                         RwStream *pStream, RwUInt32 uiStreamSize, RwUInt32 &uiResourceSize)
@@ -59,6 +63,7 @@ void *type_3DA848::Load(const RwChar *psName, const RwChar *psType, const RwChar
 }
 
 // match: ?UnLoad@type_3DA848@@UAEHPBDPAX@Z @ 0x00129270
+// sp-match: ?UnLoad@type_3DA848@@UAEHPBDPAX@Z @ 0x000DD930
 // A data file stays; a kind 3 script file's imports are released and it is
 // freed.
 RwBool type_3DA848::UnLoad(const RwChar *pStrType, void *pResource)
@@ -87,6 +92,7 @@ RwBool type_3DA848::UnLoad(const RwChar *pStrType, void *pResource)
 }
 
 // match: ?IsHandled@type_3DA848@@UAEHPBD@Z @ 0x00129300
+// sp-match: ?IsHandled@type_3DA848@@UAEHPBD@Z @ 0x000DD990
 RwBool type_3DA848::IsHandled(const RwChar *psType)
 {
     if (!_strcmpi(psType, off_429C04))
@@ -101,6 +107,7 @@ RwBool type_3DA848::IsHandled(const RwChar *psType)
 }
 
 // match: ?sub_129350@type_3DA848@@QAEPAXPAURwStream@@I@Z @ 0x00129350
+// sp-match: ?sub_129350@type_3DA848@@QAEPAXPAURwStream@@I@Z @ 0x000DD9D0
 void *type_3DA848::sub_129350(RwStream *arg_0, RwUInt32 arg_4)
 {
     RwChar *var_4;
@@ -112,6 +119,7 @@ void *type_3DA848::sub_129350(RwStream *arg_0, RwUInt32 arg_4)
 }
 
 // match: ?sub_1293A0@type_3DA848@@QAEPAXPAURwStream@@I@Z @ 0x001293A0
+// sp-match: ?sub_1293A0@type_3DA848@@QAEPAXPAURwStream@@I@Z @ 0x000DDA00
 // Reads a script file, relocated; a kind 3 file's imports resolved.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void *type_3DA848::sub_1293A0(RwStream *arg_0, RwUInt32 arg_4)
@@ -134,6 +142,7 @@ void *type_3DA848::sub_1293A0(RwStream *arg_0, RwUInt32 arg_4)
 }
 
 // match: ??0type_3DA848@@QAE@XZ @ 0x00129410
+// sp-match: ??0type_3DA848@@QAE@XZ @ 0x000DD900
 // Out of line for dword_4CF7D4's dynamic initializer.
 type_3DA848::type_3DA848()
 {

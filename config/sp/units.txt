@@ -1,0 +1,219 @@
+# Units the single-player build compiles (tools/ibuild.py --target sp).
+# `- GLOB` leaves units out, `+ GLOB` takes them back; the last matching line
+# wins; every unit not named is built. SP1 recovers the full list; until then
+# only units known to be multiplayer-only are left out.
+#
+# the knet network layer: its strings are only in the MP image (docs/PLAN_SP.md)
+- src/COD/SHARED/network/*
+# the multiplayer image's M7 link fill and section order (MP's own XBE layout)
+- src/xbe/*
+# multiplayer game-mode units (flags, bomb sites): none of their functions has a
+# single-player twin (config/sp/shared.txt), and they call type_3D3548's vf_05C, a slot
+# single player's entity base does not have
+- src/recovered/unit_1A4920.cpp
+# the network player (unit_1B7B20, 95 functions; unit_1BAA90, 27): none has a single-player
+# twin, and they use type_10F710 members single player lacks (unk_1B0C, unk_217C)
+- src/recovered/unit_1B7B20.cpp
+- src/recovered/unit_1BAA90.cpp
+# SP6: the multiplayer game and network layer (cNetController, its settings, teams, vote,
+# messages and queue, cNet* behaviours, cXboxLiveNetGame, sockets, sessions): no MP
+# function of these has a single-player twin (config/sp/shared.txt) and none holds a row
+# (build/sp/sp6/objects.tsv: mp-only)
+- src/recovered/unit_1A3BE0.cpp
+- src/recovered/unit_1A3D50.cpp
+- src/recovered/unit_1A8B20.cpp
+- src/recovered/unit_1B4470.cpp
+- src/recovered/unit_1B46B0.cpp
+- src/recovered/unit_1B6FE0.cpp
+- src/recovered/unit_1B79E0.cpp
+- src/recovered/unit_1BD340.cpp
+- src/recovered/unit_1BD6A0.cpp
+- src/recovered/unit_1BD930.cpp
+- src/recovered/unit_1BE0B0.cpp
+- src/recovered/unit_1BEBB0.cpp
+- src/recovered/unit_1C0830.cpp
+- src/recovered/unit_1C2120.cpp
+- src/recovered/unit_1C2440.cpp
+- src/recovered/unit_1C2AB0.cpp
+- src/recovered/unit_1C2F90.cpp
+- src/recovered/unit_1C3120.cpp
+- src/recovered/unit_1C3D20.cpp
+- src/recovered/unit_1C5AC0.cpp
+- src/recovered/unit_1C6AC0.cpp
+- src/recovered/unit_1CCC00.cpp
+- src/recovered/unit_1D0100.cpp
+- src/recovered/unit_1D4AB0.cpp
+- src/recovered/unit_1D5190.cpp
+- src/recovered/unit_1D5D30.cpp
+- src/recovered/unit_1D7A50.cpp
+- src/recovered/unit_1D7CE0.cpp
+- src/recovered/unit_1D8370.cpp
+- src/recovered/unit_1DBF50.cpp
+- src/recovered/unit_1DC6C0.cpp
+- src/recovered/unit_1DDBE0.cpp
+- src/recovered/unit_1DDCC0.cpp
+# SP6: kujuUI, the multiplayer front end's widget library (0x1DFBB0-0x1FA180): no twin, no row
+- src/recovered/unit_1DFBB0.cpp
+- src/recovered/unit_1DFF50.cpp
+- src/recovered/unit_1E0670.cpp
+- src/recovered/unit_1E09A0.cpp
+- src/recovered/unit_1E0DA0.cpp
+- src/recovered/unit_1E2160.cpp
+- src/recovered/unit_1E2BC0.cpp
+- src/recovered/unit_1E4250.cpp
+- src/recovered/unit_1E4D30.cpp
+- src/recovered/unit_1E5280.cpp
+- src/recovered/unit_1E62C0.cpp
+- src/recovered/unit_1E72C0.cpp
+- src/recovered/unit_1E76A0.cpp
+- src/recovered/unit_1E7C40.cpp
+- src/recovered/unit_1E9F60.cpp
+- src/recovered/unit_1EBE50.cpp
+- src/recovered/unit_1EC490.cpp
+- src/recovered/unit_1ECBD0.cpp
+- src/recovered/unit_1EEAD0.cpp
+- src/recovered/unit_1EECE0.cpp
+- src/recovered/unit_1EF040.cpp
+- src/recovered/unit_1EF1E0.cpp
+- src/recovered/unit_1EFDA0.cpp
+- src/recovered/unit_1F00E0.cpp
+- src/recovered/unit_1F0230.cpp
+- src/recovered/unit_1F0410.cpp
+- src/recovered/unit_1F07C0.cpp
+- src/recovered/unit_1F0AE0.cpp
+- src/recovered/unit_1F1040.cpp
+- src/recovered/unit_1F1420.cpp
+- src/recovered/unit_1F26B0.cpp
+- src/recovered/unit_1F2920.cpp
+- src/recovered/unit_1F4D00.cpp
+- src/recovered/unit_1F5D70.cpp
+- src/recovered/unit_1F76E0.cpp
+- src/recovered/unit_1F7A20.cpp
+- src/recovered/unit_1F81E0.cpp
+- src/recovered/unit_1F8BF0.cpp
+- src/recovered/unit_1F90E0.cpp
+# SP6: the Live menus and in-game multiplayer pages (0x1FA180-0x22B000): no twin, no row
+- src/recovered/unit_1FA6E0.cpp
+- src/recovered/unit_1FBBF0.cpp
+- src/recovered/unit_1FC320.cpp
+- src/recovered/unit_1FF250.cpp
+- src/recovered/unit_200960.cpp
+- src/recovered/unit_200B90.cpp
+- src/recovered/unit_203D80.cpp
+- src/recovered/unit_2053C0.cpp
+- src/recovered/unit_206190.cpp
+- src/recovered/unit_2062B0.cpp
+- src/recovered/unit_206D10.cpp
+- src/recovered/unit_207160.cpp
+- src/recovered/unit_2098F0.cpp
+- src/recovered/unit_209BF0.cpp
+- src/recovered/unit_209D00.cpp
+- src/recovered/unit_209E00.cpp
+- src/recovered/unit_20A670.cpp
+- src/recovered/unit_20A7B0.cpp
+- src/recovered/unit_20AA10.cpp
+- src/recovered/unit_20B570.cpp
+- src/recovered/unit_20B9D0.cpp
+- src/recovered/unit_20C2F0.cpp
+- src/recovered/unit_20C470.cpp
+- src/recovered/unit_20E850.cpp
+- src/recovered/unit_20EB30.cpp
+- src/recovered/unit_20EE00.cpp
+- src/recovered/unit_210180.cpp
+- src/recovered/unit_211680.cpp
+- src/recovered/unit_212A80.cpp
+- src/recovered/unit_213680.cpp
+- src/recovered/unit_214A90.cpp
+- src/recovered/unit_215740.cpp
+- src/recovered/unit_215D40.cpp
+- src/recovered/unit_215F30.cpp
+- src/recovered/unit_216130.cpp
+- src/recovered/unit_216440.cpp
+- src/recovered/unit_216760.cpp
+- src/recovered/unit_216990.cpp
+- src/recovered/unit_216C10.cpp
+- src/recovered/unit_216D20.cpp
+- src/recovered/unit_217670.cpp
+- src/recovered/unit_2179E0.cpp
+- src/recovered/unit_217CD0.cpp
+- src/recovered/unit_2181E0.cpp
+- src/recovered/unit_218DD0.cpp
+- src/recovered/unit_218F40.cpp
+- src/recovered/unit_219010.cpp
+- src/recovered/unit_219C20.cpp
+- src/recovered/unit_219D10.cpp
+- src/recovered/unit_219F60.cpp
+- src/recovered/unit_21A5E0.cpp
+- src/recovered/unit_21CB10.cpp
+- src/recovered/unit_21CE60.cpp
+- src/recovered/unit_21D0D0.cpp
+- src/recovered/unit_21D7C0.cpp
+- src/recovered/unit_21DFE0.cpp
+- src/recovered/unit_21EB30.cpp
+- src/recovered/unit_2207A0.cpp
+- src/recovered/unit_220C40.cpp
+- src/recovered/unit_221590.cpp
+- src/recovered/unit_2220E0.cpp
+- src/recovered/unit_2225E0.cpp
+- src/recovered/unit_222960.cpp
+- src/recovered/unit_223280.cpp
+- src/recovered/unit_225220.cpp
+- src/recovered/unit_2261C0.cpp
+- src/recovered/unit_22AF50.cpp
+# SP6: helpers only the multiplayer code above uses (the out-of-line text constructor, the
+# null-safe string, the log, the assertion report, the localised text dictionary, the
+# pooled list, peer masks): no twin, no row
+- src/recovered/unit_0E87E0.cpp
+- src/recovered/unit_1A5E10.cpp
+- src/recovered/unit_1AFF40.cpp
+- src/recovered/unit_1C7EE0.cpp
+- src/recovered/unit_1C8110.cpp
+- src/recovered/unit_1C8A30.cpp
+- src/recovered/unit_1CA890.cpp
+- src/recovered/unit_1D4290.cpp
+- src/recovered/unit_1D48B0.cpp
+- src/recovered/unit_1FA180.cpp
+- src/recovered/unit_30EA80.cpp
+# SP6: data-only multiplayer objects (their code dropped by /OPT:REF; the data is the
+# network player's, the localisation folders', the peers' tables): no row
+- src/recovered/unit_3E24C0.cpp
+- src/recovered/unit_3E3D24.cpp
+- src/recovered/unit_3E66D8.cpp
+# SP6: multiplayer units whose only single-player rows were identical tiny bodies the
+# link folded or that equal another's but for their relocations (vf_008 returning 0, empty
+# destructors, std::vector copies, pooled strings, the net triggers' MakeNew = PlayerTrigger's
+# and SoldierTrigger's):
+# those rows belong to the single-player objects whose copies the link keeps (the
+# pipeline places them there once these are left out)
+- src/recovered/unit_1A2A80.cpp
+- src/recovered/unit_1A6140.cpp
+- src/recovered/unit_1BE4D0.cpp
+- src/recovered/unit_1C06E0.cpp
+- src/recovered/unit_1C0910.cpp
+- src/recovered/unit_1C5700.cpp
+- src/recovered/unit_1C60A0.cpp
+- src/recovered/unit_1C8DF0.cpp
+- src/recovered/unit_1C9B40.cpp
+- src/recovered/unit_1CADA0.cpp
+- src/recovered/unit_1CBC80.cpp
+- src/recovered/unit_1E0F80.cpp
+- src/recovered/unit_1E3430.cpp
+- src/recovered/unit_1E37A0.cpp
+- src/recovered/unit_1E6B50.cpp
+- src/recovered/unit_1E7490.cpp
+- src/recovered/unit_1E8350.cpp
+- src/recovered/unit_1ED730.cpp
+- src/recovered/unit_1EE870.cpp
+- src/recovered/unit_1F5870.cpp
+- src/recovered/unit_1F5A50.cpp
+- src/recovered/unit_1FB520.cpp
+- src/recovered/unit_204020.cpp
+- src/recovered/unit_2049D0.cpp
+- src/recovered/unit_2097E0.cpp
+- src/recovered/unit_215B40.cpp
+- src/recovered/unit_217F40.cpp
+- src/recovered/unit_21D470.cpp
+- src/recovered/unit_221780.cpp
+- src/recovered/unit_222350.cpp
+- src/recovered/unit_228D70.cpp
+- src/recovered/unit_22AE00.cpp

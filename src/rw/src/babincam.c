@@ -84,6 +84,7 @@ static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/src/babinca
 // match: _rcsid @ 0x0041ABB0
 
 // match: _RwCameraRegisterPluginStream @ 0x002FEFA0
+// sp-match: _RwCameraRegisterPluginStream @ 0x00219790
 RwInt32
 RwCameraRegisterPluginStream(RwUInt32 pluginID,
                              RwPluginDataChunkReadCallBack readCB,
@@ -283,6 +284,7 @@ RwCameraStreamWrite(const RwCamera *camera, RwStream *stream)
  *
  */
 // match: _RwCameraStreamRead @ 0x002FEFD0
+// sp-match: _RwCameraStreamRead @ 0x002197C0
 RwCamera *
 RwCameraStreamRead(RwStream *stream)
 {

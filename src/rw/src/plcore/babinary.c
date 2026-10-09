@@ -109,6 +109,7 @@ struct __rwMark
 // match: _rcsid @ 0x004162D0
 
 // match: _ChunkIsComplex @ 0x002A7470
+// sp-match: _ChunkIsComplex @ 0x001C28A0
 static              RwBool
 ChunkIsComplex(RwChunkHeaderInfo * chunkHeaderInfo)
 {
@@ -250,6 +251,7 @@ ChunkIsComplex(RwChunkHeaderInfo * chunkHeaderInfo)
  */
 
 // match: __rwStreamReadChunkHeader @ 0x002A74F0
+// sp-match: __rwStreamReadChunkHeader @ 0x001C2920
 RwBool
 _rwStreamReadChunkHeader(RwStream * stream, RwUInt32 * type,
                          RwUInt32 * length, RwUInt32 * version,
@@ -324,6 +326,7 @@ _rwStreamReadChunkHeader(RwStream * stream, RwUInt32 * type,
 }
 
 // match: __rwStreamWriteVersionedChunkHeader @ 0x002A75B0
+// sp-match: __rwStreamWriteVersionedChunkHeader @ 0x001C29E0
 RwStream           *
 _rwStreamWriteVersionedChunkHeader(RwStream * stream, RwInt32 type,
                                    RwInt32 size, RwUInt32 version,
@@ -391,6 +394,7 @@ _rwStreamWriteVersionedChunkHeader(RwStream * stream, RwInt32 type,
  * \see RwCorePluginID
  */
 // match: _RwStreamFindChunk @ 0x002A7610
+// sp-match: _RwStreamFindChunk @ 0x001C2A40
 RwBool
 RwStreamFindChunk(RwStream * stream, RwUInt32 type, RwUInt32 * lengthOut,
                   RwUInt32 * versionOut)
@@ -781,6 +785,7 @@ RwMemFloat32ToReal(void *mem, RwUInt32 size)
  *
  */
 // match: _RwStreamWriteReal @ 0x002A7710
+// sp-match: _RwStreamWriteReal @ 0x001C2B40
 RwStream *
 RwStreamWriteReal(RwStream *stream, const RwReal *reals, RwUInt32 numBytes)
 {
@@ -834,6 +839,7 @@ RwStreamWriteReal(RwStream *stream, const RwReal *reals, RwUInt32 numBytes)
  *
  */
 // match: _RwStreamWriteInt32 @ 0x002A77A0
+// sp-match: _RwStreamWriteInt32 @ 0x001C2BD0
 RwStream *
 RwStreamWriteInt32(RwStream *stream, const RwInt32 *ints, RwUInt32 numBytes)
 {
@@ -947,6 +953,7 @@ RwStreamWriteInt16(RwStream *stream, const RwInt16 *ints, RwUInt32 numBytes)
  *
  */
 // match: _RwStreamReadInt16 @ 0x002A77C0
+// sp-match: _RwStreamReadInt16 @ 0x001C2BF0
 RwStream *
 RwStreamReadInt16(RwStream *stream, RwInt16 *ints, RwUInt32 numBytes)
 {
@@ -1067,6 +1074,7 @@ RwStreamReadInt32(RwStream *stream, RwInt32 *ints, RwUInt32 numBytes)
  * \see RwStreamRead
  */
 // match: _RwStreamReadChunkHeaderInfo @ 0x002A7810
+// sp-match: _RwStreamReadChunkHeaderInfo @ 0x001C2C40
 RwStream           *
 RwStreamReadChunkHeaderInfo(RwStream * stream,
                             RwChunkHeaderInfo * chunkHeaderInfo)

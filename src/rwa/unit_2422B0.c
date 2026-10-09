@@ -102,7 +102,11 @@ const RwaUUID *unk_42F7A0[9] = {
 };
 // 0x0042F7C4
 /* Not referenced by name (the codecs' table ends at nine). */
+#ifdef CODFH_SP /* four words: unit_245240's unk_42FA10 follows at SP 0x32BC80 (SP 0x32BC70) */
+RwUInt32 unk_42F7C4[4] = { 0x200 };
+#else
 RwUInt32 unk_42F7C4[5] = { 0x200 };
+#endif
 // 0x00506FFC
 RwaWave *dword_506FFC;
 // 0x00507000
@@ -118,6 +122,7 @@ RwUInt32 dword_507000;
 // match: _unk_42F7C4 @ 0x0042F7C4
 
 // match: _sub_2422B0 @ 0x002422B0
+// sp-match: _sub_2422B0 @ 0x00156D10
 
 RwBool
 sub_2422B0(void)
@@ -133,6 +138,7 @@ sub_2422B0(void)
 }
 
 // match: _sub_2422E0 @ 0x002422E0
+// sp-match: _sub_2422E0 @ 0x00156D40
 void
 sub_2422E0(void)
 {
@@ -141,6 +147,7 @@ sub_2422E0(void)
 }
 
 // match: _sub_242300 @ 0x00242300
+// sp-match: _sub_242300 @ 0x00156D60
 static void
 sub_242300(RwaWave *wave)
 {
@@ -167,6 +174,7 @@ sub_242300(RwaWave *wave)
 }
 
 // match: _sub_242350 @ 0x00242350
+// sp-match: _sub_242350 @ 0x00156DB0
 static void
 sub_242350(RwaWave *wave, const RwaWaveFormat *format, RwaWaveFormat *target)
 {
@@ -223,6 +231,7 @@ sub_242350(RwaWave *wave, const RwaWaveFormat *format, RwaWaveFormat *target)
 }
 
 // match: _sub_242460 @ 0x00242460
+// sp-match: _sub_242460 @ 0x00156EC0
 RwaWave *
 sub_242460(RwaWaveDef *waveDef, rwaInstance *state, void *a, void *b, RwBool mono,
            RwaWave *wave)
@@ -265,6 +274,7 @@ sub_242460(RwaWaveDef *waveDef, rwaInstance *state, void *a, void *b, RwBool mon
 }
 
 // match: _sub_242510 @ 0x00242510
+// sp-match: _sub_242510 @ 0x00156F70
 void
 sub_242510(RwaWave *wave)
 {
@@ -281,6 +291,7 @@ sub_242510(RwaWave *wave)
 }
 
 // match: _sub_242550 @ 0x00242550
+// sp-match: _sub_242550 @ 0x00156FB0
 void
 sub_242550(RwaWave *wave, RwBool set)
 {
@@ -295,6 +306,7 @@ sub_242550(RwaWave *wave, RwBool set)
 }
 
 // match: _sub_242570 @ 0x00242570
+// sp-match: _sub_242570 @ 0x00156FD0
 RwBool
 sub_242570(RwaWave *wave)
 {
@@ -311,6 +323,7 @@ sub_242570(RwaWave *wave)
 }
 
 // match: _sub_242590 @ 0x00242590
+// sp-match: _sub_242590 @ 0x00156FF0
 void
 sub_242590(RwaWave *wave)
 {
@@ -343,6 +356,7 @@ sub_242590(RwaWave *wave)
 }
 
 // match: _sub_242670 @ 0x00242670
+// sp-match: _sub_242670 @ 0x001570D0
 RwaWave *
 sub_242670(RwaWaveDef *waveDef, void *params, const RwaWaveFormat *format,
            RwaWaveFormat *target, RwBool mono, RwaWave *wave)
@@ -434,6 +448,7 @@ sub_242670(RwaWaveDef *waveDef, void *params, const RwaWaveFormat *format,
 }
 
 // match: _sub_242810 @ 0x00242810
+// sp-match: _sub_242810 @ 0x00157270
 RwaWave *
 sub_242810(RwaWave *wave, RwUInt32 offset, void *buffer, RwUInt32 size)
 {

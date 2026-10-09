@@ -136,6 +136,7 @@ static RwInt32      mipmapKLTextureStreamOffset = 0;
 // match: _mipmapKLDefault @ 0x00435340
 
 // match: _MipmapKLOpen @ 0x002A30C0
+// sp-match: _MipmapKLOpen @ 0x00184800
 
 static void *
 MipmapKLOpen( void *instance,
@@ -151,6 +152,7 @@ MipmapKLOpen( void *instance,
 }
 
 // match: _MipmapKLClose @ 0x002A30D0
+// sp-match: _MipmapKLClose @ 0x00184810
 static void *
 MipmapKLClose( void *instance,
                RwInt32 offset __RWUNUSED__,
@@ -167,6 +169,7 @@ MipmapKLClose( void *instance,
 /*--- Plugin Texture Functions ---*/
 
 // match: _MipmapKLConstruct @ 0x002A30E0
+// sp-match: _MipmapKLConstruct @ 0x00184820
 static void *
 MipmapKLConstruct( void *object,
                    RwInt32 offset __RWUNUSED__,
@@ -197,6 +200,7 @@ MipmapKLDestruct( void *object,
 }
 
 // match: _MipmapKLCopy @ 0x002A3100
+// sp-match: _MipmapKLCopy @ 0x00184840
 static void *
 MipmapKLCopy( void *destinationObject,
               const void *sourceObject,
@@ -225,6 +229,7 @@ MipmapKLCopy( void *destinationObject,
 /*--- Plugin Texture Stream Functions ---*/
 
 // match: _MipmapKLRead @ 0x002A3120
+// sp-match: _MipmapKLRead @ 0x00184860
 static RwStream *
 MipmapKLRead( RwStream *stream,
               RwInt32 binaryLength __RWUNUSED__,
@@ -250,6 +255,7 @@ MipmapKLRead( RwStream *stream,
 }
 
 // match: _MipmapKLWrite @ 0x002A3170
+// sp-match: _MipmapKLWrite @ 0x001848B0
 static RwStream *
 MipmapKLWrite( RwStream *stream,
                RwInt32 binaryLength __RWUNUSED__,
@@ -275,6 +281,7 @@ MipmapKLWrite( RwStream *stream,
 }
 
 // match: _MipmapKLGetSize @ 0x002A31C0
+// sp-match: _MipmapKLGetSize @ 0x00184900
 static RwInt32
 MipmapKLGetSize( const void *object __RWUNUSED__,
                  RwInt32 offsetInObject __RWUNUSED__,
@@ -689,6 +696,7 @@ RpMipmapKLTextureGetL(RwTexture *tex)
  *
  */
 // match: _RpMipmapKLPluginAttach @ 0x002A31F0
+// sp-match: _RpMipmapKLPluginAttach @ 0x00184930
 RwBool
 RpMipmapKLPluginAttach(void)
 {

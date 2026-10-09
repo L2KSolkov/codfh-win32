@@ -46,11 +46,13 @@ RWS_REGISTERCLASS(SoldierTrigger);
 // match: ?MakeNew@SoldierTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x000B7AA0
 // match: __ehhandler$?MakeNew@SoldierTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z-0xF @ 0x003002F0
 // match: __ehhandler$?MakeNew@SoldierTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x003002FF
+// sp-match: ?MakeNew@SoldierTrigger@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z @ 0x0008D860
 RWS_DEFINE_MAKENEW(SoldierTrigger)
 
 // match: ??0SoldierTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x000B7B20
 // match: __ehhandler$??0SoldierTrigger@@QAE@ABVCAttributePacket@RWS@@@Z-0x16 @ 0x00300310
 // match: __ehhandler$??0SoldierTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x00300326
+// sp-match: ??0SoldierTrigger@@QAE@ABVCAttributePacket@RWS@@@Z @ 0x0008CB60
 SoldierTrigger::SoldierTrigger(const RWS::CAttributePacket &attr) : Trigger(attr)
 {
     RwInt32 r10;
@@ -110,10 +112,12 @@ SoldierTrigger::SoldierTrigger(const RWS::CAttributePacket &attr) : Trigger(attr
 }
 
 // match: ??_GSoldierTrigger@@UAEPAXI@Z @ 0x000B7F30
+// sp-match: ??_GSoldierTrigger@@UAEPAXI@Z @ 0x0008D850
 
 // match: ??1SoldierTrigger@@UAE@XZ @ 0x000B7F50
 // match: __ehhandler$??1SoldierTrigger@@UAE@XZ-0x16 @ 0x00300330
 // match: __ehhandler$??1SoldierTrigger@@UAE@XZ @ 0x00300346
+// sp-match: ??1SoldierTrigger@@UAE@XZ @ 0x0008CD90
 SoldierTrigger::~SoldierTrigger()
 {
     if (unk_198)
@@ -127,10 +131,13 @@ SoldierTrigger::~SoldierTrigger()
 
 // Commands 4 and 5 first, then the rest.
 // match: ?HandleAttributes@SoldierTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x000B8000
+// sp-match: ?HandleAttributes@SoldierTrigger@@UAEXABVCAttributePacket@RWS@@@Z @ 0x0008CE30
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void SoldierTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 {
     Trigger::HandleAttributes(attr);
+#ifdef CODFH_SP // shape: SP 0x8CE30 reuses the first iterator's slot: it is block-scoped
+    {
     RWS::CAttributeCommandIterator stk_14(attr, RWS_CLASSID_OF(SoldierTrigger));
     while (!stk_14.IsFinished())
     {
@@ -145,6 +152,23 @@ void SoldierTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
         }
         ++stk_14;
     }
+    }
+#else
+    RWS::CAttributeCommandIterator stk_14(attr, RWS_CLASSID_OF(SoldierTrigger));
+    while (!stk_14.IsFinished())
+    {
+        switch (stk_14->GetCommandId())
+        {
+        case 4:
+            unk_16C = stk_14->GetAs_RwInt32();
+            break;
+        case 5:
+            unk_170 = stk_14->GetAs_RwInt32();
+            break;
+        }
+        ++stk_14;
+    }
+#endif
     RWS::CAttributeCommandIterator var8(attr, RWS_CLASSID_OF(SoldierTrigger));
     RwInt32 local_C;
     RwChar var_98[0x80];
@@ -430,6 +454,7 @@ void SoldierTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
 // On iMsgStartSystem it finds its weapons' settings and registers their
 // names; on dword_4B67C0 it restores the number it may spawn.
 // match: ?HandleEvents@SoldierTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x000B8DD0
+// sp-match: ?HandleEvents@SoldierTrigger@@UAEXAAVCMsg@RWS@@@Z @ 0x0008D620
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void SoldierTrigger::HandleEvents(RWS::CMsg &pMsg)
 {
@@ -468,6 +493,7 @@ void SoldierTrigger::HandleEvents(RWS::CMsg &pMsg)
 }
 
 // match: ?vf_020@SoldierTrigger@@UAEPAUtype_3D3548@@XZ @ 0x000B8EC0
+// sp-match: ?vf_020@SoldierTrigger@@UAEPAUtype_3D3548@@XZ @ 0x0008D6C0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 type_3D3548 *SoldierTrigger::vf_020()
 {
@@ -504,6 +530,7 @@ type_3D3548 *SoldierTrigger::vf_020()
 }
 
 // match: ?sub_B8F80@SoldierTrigger@@QAEXPAUtype_3D2E7C@@@Z @ 0x000B8F80
+// sp-match: ?sub_B8F80@SoldierTrigger@@QAEXPAUtype_3D2E7C@@@Z @ 0x0008D730
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 void SoldierTrigger::sub_B8F80(type_3D2E7C *arg_0)
 {
@@ -522,6 +549,7 @@ void SoldierTrigger::sub_B8F80(type_3D2E7C *arg_0)
 }
 
 // match: ?vf_018@SoldierTrigger@@UAEHXZ @ 0x000B9010
+// sp-match: ?vf_018@SoldierTrigger@@UAEHXZ @ 0x0008D7A0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 SoldierTrigger::vf_018()
 {
@@ -550,6 +578,7 @@ RwInt32 SoldierTrigger::vf_018()
 }
 
 // match: ?vf_010@SoldierTrigger@@UAEXHH@Z @ 0x000B90A0
+// sp-match: ?vf_010@SoldierTrigger@@UAEXHH@Z @ 0x0008D800
 void SoldierTrigger::vf_010(RwInt32 arg_0, RwInt32 arg_4)
 {
     if (arg_0)
@@ -570,11 +599,13 @@ void SoldierTrigger::vf_010(RwInt32 arg_0, RwInt32 arg_4)
 }
 
 // match: ??_ESoldierTrigger@@WBI@AEPAXI@Z @ 0x000B9100
+// sp-match: ??_ESoldierTrigger@@WBI@AEPAXI@Z @ 0x0008D840
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ?vf_014@SoldierTrigger@@UAEHXZ (folded into 0x1C9090)
+// sp-match: ?vf_014@SoldierTrigger@@UAEHXZ @ 0x0007E3F0
 RwInt32 SoldierTrigger::vf_014()
 {
     return unk_100;

@@ -81,6 +81,7 @@ DXT1BlockHasAlpha(const DXTColBlock *pColorBlock)
 // match: _rcsid @ 0x00416AD8
 
 // match: _DXT1BlockNonSquareHasAlpha @ 0x002B2420
+// sp-match: _DXT1BlockNonSquareHasAlpha @ 0x001CD840
 static __inline RwBool
 DXT1BlockNonSquareHasAlpha(const DXTColBlock *pColorBlock, RwInt32 width, RwInt32 height)
 {
@@ -109,6 +110,7 @@ DXT1BlockNonSquareHasAlpha(const DXTColBlock *pColorBlock, RwInt32 width, RwInt3
 }
 
 // match: __rwXboxDXT1HasAlpha @ 0x002B2470
+// sp-match: __rwXboxDXT1HasAlpha @ 0x001CD890
 RwUInt8
 _rwXboxDXT1HasAlpha(RwRaster *raster)
 {
@@ -201,6 +203,7 @@ _rwXboxDXT1HasAlpha(RwRaster *raster)
 
 /* Reads the DDS file fullPathName into a texture called name. */
 // match: _XboxDXTTextureRead @ 0x002B25D0
+// sp-match: _XboxDXTTextureRead @ 0x001CD9F0
 static RwTexture *
 XboxDXTTextureRead(const RwChar *name, const RwChar *fullPathName)
 {
@@ -592,6 +595,7 @@ XboxDXTTextureRead(const RwChar *name, const RwChar *fullPathName)
 }
 
 // match: _RwXboxDDSTextureRead @ 0x002B2C00
+// sp-match: _RwXboxDDSTextureRead @ 0x001CE020
 RwTexture *
 RwXboxDDSTextureRead(const RwChar *name, const RwChar *maskname __RWUNUSED__)
 {

@@ -43,8 +43,10 @@
 extern const RwReal flt_3D51B4 = 16.666666f;
 // 0x003D51B8
 extern const RwReal flt_3D51B8 = 16.666666f;
+#ifndef CODFH_SP // single player has no unreferenced 0.0f: type_3D51C0's vtable follows the two 16.666666f (SP 0x2E1950, 0x2E1958)
 // 0x003D51BC
 extern const RwReal flt_3D51BC = 0.0f;
+#endif
 // 0x004B8690
 #ifndef CODFH_PLAIN
 type_3D3548 *dword_4B8690;
@@ -82,6 +84,12 @@ RWS::CEventId dword_4B67B0;
 // match: _$E6 @ 0x0030DF40
 // match: _$E8 @ 0x0030A490
 // match: _$E9 @ 0x0030DF50
+// sp-match: _$E9 @ 0x0021E370
+// sp-match: _$E2 @ 0x0021C7E0
+// sp-match: _$E5 @ 0x0021C800
+// sp-match: _$E8 @ 0x0021C820
+// sp-match: _$E3 @ 0x0021E350
+// sp-match: _$E6 @ 0x0021E360
 
 
 // The registration initializers pass these exact exits to atexit.
@@ -91,6 +99,7 @@ RWS::CEventId dword_4B67B0;
 // match: ?sub_9AD40@@YAPAUtype_3D51C0@@PAUtype_712B0@@@Z @ 0x0009AD40
 // match: __ehhandler$?sub_9AD40@@YAPAUtype_3D51C0@@PAUtype_712B0@@@Z-0x11 @ 0x002FFA30
 // match: __ehhandler$?sub_9AD40@@YAPAUtype_3D51C0@@PAUtype_712B0@@@Z @ 0x002FFA41
+// sp-match: ?sub_9AD40@@YAPAUtype_3D51C0@@PAUtype_712B0@@@Z @ 0x0007A670
 type_3D51C0 *sub_9AD40(type_712B0 *arg_0)
 {
     type_3D51C0 *var_10;
@@ -105,42 +114,53 @@ type_3D51C0 *sub_9AD40(type_712B0 *arg_0)
             var_10 = 0;
         }
     }
+#ifndef CODFH_SP // the warning is compiled out in single player (SP 0x7A670)
     else
     {
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
                    "location(%6.2f,%6.2f,%6.2f)",
                    arg_0->unk_90, arg_0->unk_94, arg_0->unk_98);
     }
+#endif
     return var_10;
 }
 
 // match: ??0type_3D51C0@@QAE@PAUtype_712B0@@@Z @ 0x0009AE50
 // match: __ehhandler$??0type_3D51C0@@QAE@PAUtype_712B0@@@Z-0x24 @ 0x002FFA50
 // match: __ehhandler$??0type_3D51C0@@QAE@PAUtype_712B0@@@Z @ 0x002FFA74
+// sp-match: ??0type_3D51C0@@QAE@PAUtype_712B0@@@Z @ 0x0007A4F0
 // (Defined in the class, in type_3D51C0.h.)
 
 // match: ?vf_09C@type_3D51C0@@UAEHXZ @ 0x0009AF10
+// sp-match: ?vf_09C@type_3D51C0@@UAEHXZ @ 0x0007AE50
 
 // match: ?vf_0A0@type_3D51C0@@UAEXI@Z @ 0x0009AF30
+// sp-match: ?vf_0A0@type_3D51C0@@UAEXI@Z @ 0x0007A570
 
 // match: ?vf_0E0@type_3D51C0@@UAEPAEXZ @ 0x0009AF50
+// sp-match: ?vf_0E0@type_3D51C0@@UAEPAEXZ @ 0x0007A580
 
 // match: ?vf_0EC@type_3D51C0@@UAEXHH@Z @ 0x0009AF70
+// sp-match: ?vf_0EC@type_3D51C0@@UAEXHH@Z @ 0x0007A590
 
 // match: ?vf_094@type_3D51C0@@UAEXI@Z @ 0x0009AF90
+// sp-match: ?vf_094@type_3D51C0@@UAEXI@Z @ 0x0007A5B0
 
 // match: ??_Gtype_3D51C0@@UAEPAXI@Z @ 0x0009AFB0
+// sp-match: ??_Gtype_3D51C0@@UAEPAXI@Z @ 0x0007A5C0
 // (Its scalar deleting destructor, compiler-written.)
 
 // match: ??1type_3D51C0@@UAE@XZ @ 0x0009AFE0
 // match: __ehhandler$??1type_3D51C0@@UAE@XZ-0x34 @ 0x002FFA80
 // match: __ehhandler$??1type_3D51C0@@UAE@XZ @ 0x002FFAB4
+// sp-match: ??1type_3D51C0@@UAE@XZ @ 0x0007A5E0
 type_3D51C0::~type_3D51C0()
 {
     vf_230();
 }
 
 // match: ?vf_234@type_3D51C0@@UAEHPAUtype_712B0@@@Z @ 0x0009B0B0
+// sp-match: ?vf_234@type_3D51C0@@UAEHPAUtype_712B0@@@Z @ 0x0007A0D0
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
 RwInt32 type_3D51C0::vf_234(type_712B0 *arg_0)
 {
@@ -201,6 +221,7 @@ RwInt32 type_3D51C0::vf_234(type_712B0 *arg_0)
 }
 
 // match: ?sub_9B2C0@type_3D3548@@QAEXH@Z @ 0x0009B2C0
+// sp-match: ?sub_9B2C0@type_3D3548@@QAEXH@Z @ 0x0007A240
 // "Custom_SetAnimatedObject": for an entity in a custom trigger (kind 0xB),
 // drops its current object and animation, then takes on the trigger's
 // animated object arg_0 (a kind-3 object) with a new animation player over
@@ -248,6 +269,7 @@ void type_3D3548::sub_9B2C0(RwInt32 arg_0)
 }
 
 // match: ?sub_9B430@type_3D3548@@QAEXH@Z @ 0x0009B430
+// sp-match: ?sub_9B430@type_3D3548@@QAEXH@Z @ 0x0007A320
 // "Custom_SetObject": likewise with the trigger's object arg_0, without an
 // animation.
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -279,6 +301,7 @@ void type_3D3548::sub_9B430(RwInt32 arg_0)
 
 // Takes it down: its script object, its animation and its objects.
 // match: ?vf_230@type_3D51C0@@UAEXXZ @ 0x0009B510
+// sp-match: ?vf_230@type_3D51C0@@UAEXXZ @ 0x0007A3A0
 void type_3D51C0::vf_230()
 {
     if (unk_3D8)
@@ -302,6 +325,7 @@ void type_3D51C0::vf_230()
 }
 
 // match: ?vf_054@type_3D51C0@@UAEXH@Z @ 0x0009B5F0
+// sp-match: ?vf_054@type_3D51C0@@UAEXH@Z @ 0x0007A430
 void type_3D51C0::vf_054(RwInt32 arg_0)
 {
     type_3D3548::vf_054(arg_0);
@@ -309,6 +333,7 @@ void type_3D51C0::vf_054(RwInt32 arg_0)
 
 // A bullet from a player tells its script.
 // match: ?vf_064@type_3D51C0@@UAEHPAUtype_75600@@@Z @ 0x0009B610
+// sp-match: ?vf_064@type_3D51C0@@UAEHPAUtype_75600@@@Z @ 0x0007A440
 RwInt32 type_3D51C0::vf_064(type_75600 *arg_0)
 {
     RwInt32 var_4;
@@ -335,6 +360,7 @@ RwInt32 type_3D51C0::vf_064(type_75600 *arg_0)
 }
 
 // match: ?vf_090@type_3D51C0@@UAEPAUtype_6D380@@XZ @ 0x0009B6E0
+// sp-match: ?vf_090@type_3D51C0@@UAEPAUtype_6D380@@XZ @ 0x0007A4E0
 type_6D380 *type_3D51C0::vf_090()
 {
     return (type_6D380 *)sub_67620(unk_3D0);
@@ -445,9 +471,13 @@ void *type_3D5658::operator new(RwUInt32 arg_0, void *arg_4)
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
 // ??3type_3D51C0@@SAXPAX@Z (folded into 0x19A750)
+// Single player's deleting destructor (SP 0x7A5C0) calls it out of line: the
+// empty body here would let /O2 drop that call, so SP only declares it.
+#ifndef CODFH_SP
 void type_3D51C0::operator delete(void * arg_0)
 {
 }
+#endif
 
 // ??3type_3D5400@@SAXPAX@Z (folded into 0x19A750)
 void type_3D5400::operator delete(void * arg_0)

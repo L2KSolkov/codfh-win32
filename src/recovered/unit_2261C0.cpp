@@ -18,12 +18,14 @@
 #include "game/parsedfile.h"
 
 // Its data definitions (PLAN M5), in the image's address order.
+#ifndef CODFH_SP // MP only: unreferenced constants single player does not emit (not in default.xbe; /O2 keeps them only while they are external)
 // 0x003EAD50
 extern const RwReal flt_3EAD50 = 0.01f;
 // 0x003EAD54
 extern const RwReal flt_3EAD54 = 0.01f;
 // 0x003EAD58
 extern const RwReal flt_3EAD58 = 16.666666f;
+#endif
 // 0x0042D2F8: the UIX wave and sound banks (their literals come after the skin's, as
 // globals defined before it).
 const RwChar *dword_42D2F8 = "d:\\Media\\UIXDefault.xwb";
