@@ -19,9 +19,6 @@
 #include "rw/batextur.h"
 #include "rw/badevice.h"
 #include "rw/rt2d.h"
-#ifdef CODFH_WIN32
-#include "port_mouse.h"
-#endif
 #include "game/data.h"
 #include "game/gameloop.h"
 #include "game/xboxlive.h"
@@ -44,6 +41,7 @@
 #if defined(CODFH_WIN32)
 extern "C" void plog(const RwChar *fmt, ...);
 extern "C" volatile RwUInt32 port_frame;
+extern "C" RwInt32 port_sp_menu_mouse(void *maestro);
 #endif
 
 extern "C" RwMatrix *Rt2dObjectGetLTM(Rt2dObject *object);
@@ -120,9 +118,6 @@ type_sp_AD970::~type_sp_AD970()
 // sp-match: ?sp_sub_AD990@type_sp_AD970@@QAE_NPAURwCamera@@@Z @ 0x000AD990
 bool type_sp_AD970::sp_sub_AD990(RwCamera *arg_0)
 {
-#ifdef CODFH_WIN32
-    port_menu_mouse_reset();
-#endif
     RwChar path[0x80];
     RwUInt64 defaults = ((RwUInt64)(RwUInt32)arg_0 << 32) | 0xFFFFFFFFui64;
     sp_path_encoding context;
@@ -159,9 +154,6 @@ bool type_sp_AD970::sp_sub_AD990(RwCamera *arg_0)
 // sp-match: ?sp_sub_ADA70@type_sp_AD970@@QAEXXZ @ 0x000ADA70
 void type_sp_AD970::sp_sub_ADA70()
 {
-#ifdef CODFH_WIN32
-    port_menu_mouse_hide();
-#endif
     unk_06 = false;
     if (unk_180)
     {
@@ -175,7 +167,6 @@ void type_sp_AD970::sp_sub_ADA70()
     }
     if (unk_17C)
     {
-        sp_profileMouseMaestroDestroyed(unk_17C);
         Rt2dMaestroDestroy(unk_17C);
         unk_17C = 0;
     }
@@ -655,35 +646,36 @@ void type_sp_AD970::sp_sub_AE0D0(RwReal arg_0)
             sp_flt_3B4828[i] = v;
         }
 #ifdef CODFH_WIN32
-        /* Feed the pointer into RenderWare's native pick-region button state machine. */
-        RwInt32 mouseX, mouseY, mouseButton;
-        RwInt32 mouse = port_menu_mouse_poll(&mouseX, &mouseY, &mouseButton);
-        Rt2dMessage mouseMessages[2];
-        RwInt32 mouseMessageCount = 0;
-        if (mouse & PORT_MENU_MOUSE_MOVE)
+        // The mouse (port/src/spmenumouse.cpp): the item pointed at gets the focus, the d-pad's
+        // presses (its buttons' labels) moving it there; a click on the title's prompt is Start.
+        switch (port_sp_menu_mouse(unk_17C))
         {
-            mouseMessages[mouseMessageCount].messageType = 10; /* MOUSEMOVETO */
-            mouseMessages[mouseMessageCount].index = -1;
-            mouseMessages[mouseMessageCount].intParam1 = mouseX;
-            mouseMessages[mouseMessageCount].intParam2 = mouseY;
-            mouseMessageCount++;
+        case 1:
+            data[0] = unk_14C;
+            break;
+        case 2:
+            data[0] = unk_150;
+            break;
+        case 3:
+            data[0] = unk_154;
+            break;
+        case 4:
+            data[0] = unk_158;
+            break;
+        case 5:
+            data[0] = unk_168;
+            break;
+        default:
+            data[0] = -1;
+            break;
         }
-        if (mouse & PORT_MENU_MOUSE_BUTTON)
+        if (data[0] != -1)
         {
-            mouseMessages[mouseMessageCount].messageType = 11; /* MOUSEBUTTONSTATE */
-            mouseMessages[mouseMessageCount].index = -1;
-            mouseMessages[mouseMessageCount].intParam1 = mouseButton;
-            mouseMessages[mouseMessageCount].intParam2 = 0;
-            mouseMessageCount++;
-        }
-        if (mouseMessageCount)
-            Rt2dMaestroPostMessages(unk_17C, mouseMessages, mouseMessageCount);
-        /* The title's Press Start prompt has no pick region in its animation. Preserve its
-           controller Start transition as a mouse fallback on screens that expose btnStart. */
-        if ((mouse & PORT_MENU_MOUSE_BUTTON) && mouseButton && (RwUInt32)unk_168 != 0xFFFFFFFFu)
-        {
-            data[0] = dword_4F3130.sp_sub_12AAD0() ? 0 : unk_168;
             data[1] = 0x40;
+            if (dword_4F3130.sp_sub_12AAD0())
+            {
+                data[0] = 0;
+            }
             Rt2dMaestroForAllVisibleAnimations(unk_17C, sp_sub_ADDF0, data);
         }
 #endif

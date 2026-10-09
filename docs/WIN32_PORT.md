@@ -27,12 +27,24 @@ as the data root:
 
     CODFH_DATA=D:\CODFH_DUMP build/port/codfh.exe [-map <n|name>] [-gametype DM|TDM|CTF|SD|SUP]
 
-The SP-on-Win32 branch adds a separate selection and output directory: `python
-tools/portbuild.py --sp --link` builds the SP front end and campaign as `build/port_sp/codfh.exe`;
-`config/sp/units.txt` selects SP implementations and `src/sp/units` supplies the split wrappers.
-The Win32 Live UI and voice bridges still report offline/no-device. The SP build has been checked
-at 509 compiled units and a link with no unresolved symbols; this checkout has no game data, so
-runtime gameplay still needs a user-provided data root.
+Single player (merged from the sp-win32 branch) has its own unit selection and output directory:
+`python tools/portbuild.py --sp` builds the SP front end and campaign as `build/port_sp/codfh.exe`
+(519 units; `config/sp/units.txt` selects SP implementations, `src/sp/units` supplies the split
+wrappers; `-main-menu` skips Press Start and picks the first saved profile). `src/sp` is single
+player's only: the multiplayer builds and the gate's image compile leave it out. The Live UI and
+voice bridges report offline/no-device.
+
+SP's menus have the multiplayer menus' mouse (`port/src/spmenumouse.cpp`, the window's messages and
+the pad's buttons shared with `menumouse.cpp`): pointing at an item focuses it, a click chooses it
+(A), a click on a setting's value changes it (its right half forward, its left half back), the
+right button goes back, the wheel moves up and down; a click on the title's Press START is Start.
+The menus are Rt2d maestro movies whose only buttons are the pad's (pick regions off the stage), so
+RenderWare's own maestro mouse has nothing to point at: the items are found from the movie's
+visible strings (each drawn in two or more copies in one place, the focused one in a copy more,
+its highlight layer's), and the focus is moved to the item pointed at with the movie's own
+btnUp/btnDown (btnLeft/btnRight) presses, one at a time, until the highlight is on it.
+`CODFH_SPDUMP=n` logs each screen's items and focus every 40 frames from frame n;
+`CODFH_SPMOUSE="frame:x:y[:c],..."` points (and clicks) at frame coordinates, for testing.
 
 | Workstream | State | Checked by |
 |---|---|---|

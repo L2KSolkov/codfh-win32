@@ -114,7 +114,6 @@ extern Rt2dMaestro *Rt2dMaestroPostMessages(Rt2dMaestro *maestro, Rt2dMessage *m
 extern Rt2dMaestro *Rt2dMaestroProcessMessages(Rt2dMaestro *maestro);
 extern Rt2dMessage *Rt2dMessageHandlerDefaultCallBack(Rt2dMaestro *maestro,
                                                       Rt2dMessage *message);
-extern void sp_profileMouseMaestroDestroyed(Rt2dMaestro *maestro);
 extern Rt2dStringLabel *Rt2dMaestroFindStringLabel(Rt2dMaestro *maestro, RwInt32 entityType,
                                                    const RwChar *lookupName, RwInt32 *index);
 // The image's Rt2d library keeps a user pointer in its maestro (+0x158, the word

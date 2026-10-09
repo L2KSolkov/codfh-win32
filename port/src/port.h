@@ -8,7 +8,6 @@
 #define PORT_PORT_H
 
 #include <stdarg.h>
-#include "port_mouse.h"
 
 #ifdef __cplusplus
 extern "C" {
