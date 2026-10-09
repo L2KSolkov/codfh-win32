@@ -16,6 +16,11 @@
 #include "game/gameloop.h"
 #include "types/type_DA580.h"
 
+#if defined(CODFH_WIN32)
+#include <windows.h>
+extern "C" void plog(const char *fmt, ...);
+#endif
+
 #ifdef CODFH_SP
 // Static in single player: sub_DBB80 passes arg_4 in eax (SP 0xA7063).
 static void sub_DC0D0(RwRaster *arg_0, RwV2d *arg_4, RwReal arg_8, RwReal arg_C, Rt2dBrush *arg_10);
@@ -315,6 +320,10 @@ void type_DA580::sub_DAB00(const RwChar *arg_0, RwV2d *arg_4, RwRGBA *arg_8, RwR
     RwInt32 local_810;
     const RwChar *var_80C;
     RwChar v808[0x800];
+#if defined(CODFH_WIN32)
+    static int trace = -1;
+    static int trace_count;
+#endif
 
     var_814 = unk_00;
     if (arg_10)
@@ -337,9 +346,30 @@ void type_DA580::sub_DAB00(const RwChar *arg_0, RwV2d *arg_4, RwRGBA *arg_8, RwR
     }
     Rt2dBrushSetRGBA(brush, arg_8, arg_8, arg_8, arg_8);
     local_810 = sub_19BD80(arg_0);
+#if defined(CODFH_WIN32)
+    {
+        if (trace < 0)
+        {
+            char enabled[2];
+            trace = GetEnvironmentVariableA("CODFH_FONTTRACE", enabled, sizeof(enabled)) ? 1 : 0;
+        }
+        if (trace && trace_count < 24 && strstr(arg_0, "Single Player"))
+        {
+            trace_count++;
+            plog("font wrapper[%d] text='%s' font=%p show=%p isOutline=%d local=%d height=%g anchor=%g,%g", trace_count,
+                arg_0, unk_00, unk_00 ? unk_00->fontshowCB : NULL,
+                unk_00 ? unk_00->isOutline : -1, local_810, arg_C, arg_4->x, arg_4->y);
+        }
+    }
+#endif
     if (!local_810)
     {
         sub_DB620(var_80C, arg_C, arg_4);
+#if defined(CODFH_WIN32)
+        if (trace && trace_count <= 24 && strstr(arg_0, "Single Player"))
+            plog("font wrapper show text='%s' font=%p callback=%p prepared='%s' anchor=%g,%g", arg_0, unk_00,
+                unk_00 ? unk_00->fontshowCB : NULL, var_80C, arg_4->x, arg_4->y);
+#endif
         Rt2dFontShow(unk_00, var_80C, arg_C, arg_4, brush);
     }
     sub_DBA10(var_80C);
