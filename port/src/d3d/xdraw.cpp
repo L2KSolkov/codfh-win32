@@ -1859,6 +1859,26 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
                             const float *C = d.vsConstants + (96 + r) * 4;
                             plog("  c[%d] %g %g %g %g", r, C[0], C[1], C[2], C[3]);
                         }
+                    if ((int)id == detail && !xs.programmable && xs.streams[0])
+                    {
+                        const float *src = (const float *)(ULONG_PTR)(xs.streams[0]->Data | 0x80000000) + (size_t)first * xs.strides[0] / sizeof(float);
+                        float p[4] = {src[0], src[1], src[2], 1.0f};
+                        const int transforms[3] = {D3DTS_WORLD, D3DTS_VIEW, D3DTS_PROJECTION};
+                        const char *names[3] = {"world", "view", "projection"};
+                        for (int m = 0; m < 3; m++)
+                        {
+                            float q[4];
+                            const D3DMATRIX &matrix = xs.transforms[transforms[m]];
+                            for (int row = 0; row < 4; row++)
+                                q[row] = p[0] * matrix.m[0][row] + p[1] * matrix.m[1][row] +
+                                         p[2] * matrix.m[2][row] + p[3] * matrix.m[3][row];
+                            memcpy(p, q, sizeof(p));
+                            plog("  %s position %g %g %g %g", names[m], p[0], p[1], p[2], p[3]);
+                        }
+                        if (p[3] != 0.0f)
+                            plog("  transformed screen position %g,%g", p[0] / p[3] * 320.0f + 320.0f,
+                                 -p[1] / p[3] * 240.0f + 240.0f);
+                    }
                 }
             }
         }
