@@ -345,6 +345,19 @@ void sp_sub_A5340(RwCamera *arg_0)
     sub_857B0(deltaTime);
     sub_19A750();
     sp_dword_3B4740++;
+#if defined(CODFH_WIN32)
+    // The Win32 port does not yet composite the front-end's looping Bink
+    // background with the 2D maestro. Keep the screen animation state moving,
+    // but leave the maestro visible while page transitions are in progress.
+    if (sp_byte_3B474C)
+    {
+        sp_sub_B1B20();
+    }
+    sp_byte_3B474C = false;
+    sp_byte_3B4820 = false;
+    sp_byte_3B4821 = false;
+    stop = false;
+#else
     if (sp_byte_3B4820)
     {
         stop = sp_byte_3B4821;
@@ -375,6 +388,7 @@ void sp_sub_A5340(RwCamera *arg_0)
         sp_byte_3B474C = false;
         sp_sub_B1B20();
     }
+#endif
     show = true;
     if (sp_byte_3B474C)
     {
