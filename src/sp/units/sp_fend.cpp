@@ -56,7 +56,7 @@ extern Rt2dObject *Rt2dSceneCreate(void);
 extern Rt2dObject *Rt2dSceneLock(Rt2dObject *scene);
 extern Rt2dObject *Rt2dSceneUnlock(Rt2dObject *scene);
 extern RwInt32 Rt2dSceneGetChildCount(Rt2dObject *scene);
-extern Rt2dObject *Rt2dSceneGetNewChildScene(Rt2dObject *scene);
+extern Rt2dObject *Rt2dSceneGetChildByIndex(Rt2dObject *scene, RwInt32 index);
 extern Rt2dObject *Rt2dSceneGetNewChildPickRegion(Rt2dObject *scene);
 extern Rt2dObject *Rt2dSceneAddChild(Rt2dObject *scene, Rt2dObject *child);
 extern Rt2dPath *Rt2dPickRegionGetPath(Rt2dObject *pickRegion);
@@ -687,7 +687,6 @@ static bool sp_addProfilePickRegions(type_sp_AE5D0 *menu)
         RwInt32 actionList[32];
         Rt2dMessage urlMessage;
         Rt2dObject *buttonScene = Rt2dSceneCreate();
-        Rt2dObject *pickScene;
         Rt2dObject *pickRegion;
         RwMatrix *textMatrix;
 
@@ -707,14 +706,7 @@ static bool sp_addProfilePickRegions(type_sp_AE5D0 *menu)
             actionList[i] = -1;
         actionList[0] = messageList;
 
-        if (!Rt2dSceneLock(buttonScene))
-            return false;
-        pickScene = Rt2dSceneGetNewChildScene(buttonScene);
-        Rt2dSceneUnlock(buttonScene);
-        if (!pickScene || !Rt2dSceneLock(pickScene))
-            return false;
-        pickRegion = Rt2dSceneGetNewChildPickRegion(pickScene);
-        Rt2dSceneUnlock(pickScene);
+        pickRegion = Rt2dSceneGetNewChildPickRegion(buttonScene);
         if (!pickRegion)
             return false;
 
@@ -725,6 +717,8 @@ static bool sp_addProfilePickRegions(type_sp_AE5D0 *menu)
             !Rt2dObjectMTMTranslate(buttonScene, textMatrix->pos.x, textMatrix->pos.y))
             return false;
 
+        /* Unlock the region's parent before attaching it to the live maestro scene. */
+        Rt2dSceneUnlock(buttonScene);
         if (!Rt2dSceneLock(rootScene))
             return false;
         Rt2dSceneAddChild(rootScene, buttonScene);
@@ -739,6 +733,12 @@ static bool sp_addProfilePickRegions(type_sp_AE5D0 *menu)
             if (!cel || !Rt2dCelAddButtonIndex(cel, buttonIndex, NULL))
                 return false;
         }
+        /* Scene unlock moves child objects into the scene's packed list. Refresh the
+           pointers after both unlocks so later visibility changes target live objects. */
+        buttonScene = Rt2dSceneGetChildByIndex(rootScene, objectIndex);
+        pickRegion = buttonScene ? Rt2dSceneGetChildByIndex(buttonScene, 0) : NULL;
+        if (!pickRegion)
+            return false;
         sp_profilePickRegions[slot] = pickRegion;
         sp_profilePickUrls[slot] = urlLabel;
     }
