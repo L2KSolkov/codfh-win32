@@ -38,6 +38,11 @@
 #include "xbox/xapi.h"
 #include "sp/sp_fend.h"
 
+#if defined(CODFH_WIN32)
+extern "C" void plog(const char *fmt, ...);
+extern "C" volatile unsigned port_frame;
+#endif
+
 // Its data definitions (PLAN SP5), in the image's address order (its .data is defined
 // further down, where the image's order puts it).
 // SP 0x002E414C
@@ -360,6 +365,22 @@ Rt2dFont *sp_sub_ADF80(Rt2dFont *arg_0, const RwChar *arg_4, RwReal arg_8, RwV2d
 {
     RwInt32 len;
     RwRGBA c;
+
+#if defined(CODFH_WIN32)
+    static RwInt32 trace = -1;
+    static RwInt32 trace_count;
+    if (trace < 0)
+    {
+        RwChar enabled[2];
+        trace = GetEnvironmentVariableA("CODFH_FONTTRACE", enabled, sizeof(enabled)) ? 1 : 0;
+    }
+    if (trace && port_frame >= 1500 && trace_count++ < 32)
+    {
+        plog("frontend text[%d] font=%p text='%s' height=%g brush=%p colour=%u,%u,%u,%u", trace_count, arg_0,
+             arg_4, arg_8, arg_10, (RwUInt8)arg_10->bottom.col.red, (RwUInt8)arg_10->bottom.col.green,
+             (RwUInt8)arg_10->bottom.col.blue, (RwUInt8)arg_10->bottom.col.alpha);
+    }
+#endif
 
     if (!strcmp(arg_4, "    Single Player"))
     {
