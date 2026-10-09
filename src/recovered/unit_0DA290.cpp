@@ -1097,7 +1097,12 @@ void sp_sub_A60B0()
     dword_4B8924 = 0;
     memset(sp_byte_3B4770, 0, sizeof(sp_byte_3B4770));
     strcpy(sp_byte_3B4770, "Intro.bik");
+#if defined(CODFH_WIN32)
+    // Keep the title/menu visible while the Win32 port's Bink overlay path is incomplete.
+    sp_byte_3B47B1 = false;
+#else
     sp_byte_3B47B1 = true;
+#endif
 }
 
 // Turns the attract movie off (the idle time cleared before the name, as
