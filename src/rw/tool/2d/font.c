@@ -261,8 +261,45 @@ rt2dFontShowOutline(Rt2dFont * font,
     RwUInt8             charMask;
     rt2dCharRect        *charMap;
     RwInt32             character, charStride, charCode, uCharOffset, uCharShift0, uCharShift1;
+#if defined(CODFH_WIN32)
+    static RwInt32 trace = -1;
+    static RwInt32 traceCount;
+#endif
 
     RWFUNCTION(RWSTRING("rt2dFontShowOutline"));
+
+#if defined(CODFH_WIN32)
+    if (trace < 0)
+    {
+        RwChar enabled[2];
+        trace = GetEnvironmentVariableA("CODFH_FONTTRACE", enabled, sizeof(enabled)) ? 1 : 0;
+    }
+    if (trace && traceCount < 8 && string && strstr(string, "Single Player"))
+    {
+        RwInt32 i;
+        rt2dCharRect *traceMap = font ? (rt2dCharRect *)rwSListGetArray(font->charMap) : NULL;
+        traceCount++;
+        plog("font outline[%d] font=%p outline=%d flag=%x height=%g baseline=%g chars=%d map=%p callback=%p text='%s' anchor=%g,%g scale=%g", traceCount,
+            font, font ? font->isOutline : -1, font ? font->flag : 0, font ? font->height : 0,
+            font ? font->baseline : 0, font ? font->charCount : 0, traceMap,
+            font ? font->fontshowCB : NULL, string, anchor->x, anchor->y, height);
+        for (i = 0; i < (RwInt32)strlen(string) && i < 32; i++)
+        {
+            RwInt32 code;
+            FontCharGetCode(code, (RwUInt8)string[i], font);
+            if (code >= 0)
+            {
+                rt2dCharRect *cr = &traceMap[code];
+                plog("font outline glyph[%d] char=%u code=%d rect=%p path=%p tex=%p width=%g", i,
+                    (RwUInt8)string[i], code, cr, cr->path, cr->tex, cr->width);
+            }
+            else
+            {
+                plog("font outline glyph[%d] char=%u unmapped", i, (RwUInt8)string[i]);
+            }
+        }
+    }
+#endif
 
     layerDepth = Rt2dGlobals.layerDepth;
 
@@ -312,6 +349,10 @@ rt2dFontShowOutline(Rt2dFont * font,
 
                 if (cr->tex == NULL)
                 {
+#if defined(CODFH_WIN32)
+                    if (trace && traceCount <= 8 && string && strstr(string, "Single Player"))
+                        plog("font outline stroke char=%d path=%p", character, cr->path);
+#endif
                     Rt2dPathStroke(cr->path, brush);
                     Rt2dCTMTranslate(cr->width + font->intergap, ((RwReal) 0));
                 }
