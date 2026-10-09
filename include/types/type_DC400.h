@@ -1475,14 +1475,22 @@ extern RwV2d &dword_4B8F54;
 extern RwV2d dword_4B8F54;
 #endif
 #ifdef CODFH_PLAIN
+#ifdef CODFH_SP
+extern RwReal &dword_4B8F5C;
+#else
 extern RwInt32 &dword_4B8F5C;
+#endif
 #elif defined(CODFH_SP) // a float in single player (SP 0x3B58AC: fcomp and fdiv in SP 0xACDB0, 0xA81E0)
 extern RwReal dword_4B8F5C;
 #else
 extern RwInt32 dword_4B8F5C;
 #endif
 #ifdef CODFH_PLAIN
+#ifdef CODFH_SP
+extern RwReal &dword_4B8F60;
+#else
 extern RwInt32 &dword_4B8F60;
+#endif
 #elif defined(CODFH_SP) // a float in single player (SP 0x3B58B0: fld and fmul in SP 0xA81E0)
 extern RwReal dword_4B8F60;
 #else

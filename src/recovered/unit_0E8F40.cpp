@@ -594,9 +594,19 @@ RwRGBA &dword_4B8F50 = *(RwRGBA *)((RwUInt8 *)&dword_4B8EF0 + 0x60);
 // 0x004B8F54: dword_4B8EF0 + 0x64
 RwV2d &dword_4B8F54 = *(RwV2d *)((RwUInt8 *)&dword_4B8EF0 + 0x64);
 // 0x004B8F5C: dword_4B8EF0 + 0x6C
+// SP stores the pause fade duration and opacity as floats; keep those aliases
+// floating-point in the Win32 plain build so the HUD fade math reads them correctly.
+#ifdef CODFH_SP
+RwReal &dword_4B8F5C = *(RwReal *)((RwUInt8 *)&dword_4B8EF0 + 0x6C);
+#else
 RwInt32 &dword_4B8F5C = *(RwInt32 *)((RwUInt8 *)&dword_4B8EF0 + 0x6C);
+#endif
 // 0x004B8F60: dword_4B8EF0 + 0x70
+#ifdef CODFH_SP
+RwReal &dword_4B8F60 = *(RwReal *)((RwUInt8 *)&dword_4B8EF0 + 0x70);
+#else
 RwInt32 &dword_4B8F60 = *(RwInt32 *)((RwUInt8 *)&dword_4B8EF0 + 0x70);
+#endif
 // 0x004B8F64: dword_4B8EF0 + 0x74
 RwRGBA &dword_4B8F64 = *(RwRGBA *)((RwUInt8 *)&dword_4B8EF0 + 0x74);
 // 0x004B8F68: dword_4B8EF0 + 0x78
