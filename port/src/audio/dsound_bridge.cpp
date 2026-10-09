@@ -7,9 +7,10 @@
  * play and a loop region) at its frequency: PCM 8/16 or Xbox ADPCM (36 bytes per channel per 64
  * samples, IMA steps), resampled linearly. Its volume and mix-bin levels are hundredths of a dB.
  * 2D voices go out through mix bins 0-5 (front, centre, back: folded to stereo); 3D voices are
- * attenuated by distance (inverse, with the rolloff factor) and panned from their position
- * relative to the listener. A voice routed to another (SetOutputBuffer) mixes into that one's
- * input, which then plays as a source of its own. Play cursors come from the mixer.
+ * attenuated by distance (inverse, with the rolloff factor; by the buffer's rolloff curve when it
+ * has one) and panned from their position relative to the listener. A voice routed to another
+ * (SetOutputBuffer) mixes into that one's input, which then plays as a source of its own. Play
+ * cursors come from the mixer.
  *
  * The DSP image's I3DL2 reverb is a software one (a Freeverb-style network tuned from the
  * listener's settings), fed by the reverb mix bin (10) and the 3D voices' room sends.
@@ -104,6 +105,11 @@ struct Voice
     V3 position;
     float minDistance, maxDistance, rolloff;
     DWORD mode3D;           /* 0 normal, 1 head-relative, 2 disabled */
+    /* SetRolloffCurve's: amplitudes evenly spaced from the minimum distance to the maximum, in
+       place of the inverse-distance rolloff (RenderWare Audio sets {1}: it attenuates by distance
+       itself, through the volume) */
+    float curve[32];
+    int curvePoints;
     Voice *target;
     /* a mix-in voice's input, one block, per channel */
     float input[2][BLOCK];
@@ -241,7 +247,19 @@ static void voice_gains(const Voice *v, float g[2][2], float *send)
         float d = sqrtf(rel.x * rel.x + rel.y * rel.y + rel.z * rel.z) * distance_factor;
         float mind = v->minDistance > 0 ? v->minDistance : 1;
         float dd = d < mind ? mind : (v->maxDistance > 0 && d > v->maxDistance ? v->maxDistance : d);
-        float att = mind / (mind + (dd - mind) * rolloff_factor * (v->rolloff > 0 ? v->rolloff : 1));
+        float att;
+        if (v->curvePoints)
+        {
+            float span = v->maxDistance > mind ? v->maxDistance - mind : 0;
+            float at = span > 0 ? (dd - mind) / span * (v->curvePoints - 1) : 0;
+            int i = (int)at;
+            if (i >= v->curvePoints - 1)
+                att = v->curve[v->curvePoints - 1];
+            else
+                att = v->curve[i] + (v->curve[i + 1] - v->curve[i]) * (at - i);
+        }
+        else
+            att = mind / (mind + (dd - mind) * rolloff_factor * (v->rolloff > 0 ? v->rolloff : 1));
         /* the listener's right: top x front (DirectSound's left-handed axes) */
         V3 t = listener_top, f = listener_front;
         V3 right = {t.y * f.z - t.z * f.y, t.z * f.x - t.x * f.z, t.x * f.y - t.y * f.x};
@@ -686,12 +704,16 @@ extern "C" RwInt32 __stdcall IDirectSound_SetDopplerFactor(void *, RwReal, RwUIn
 
 extern "C" RwInt32 __stdcall IDirectSound_SetDistanceFactor(void *, RwReal f, RwUInt32)
 {
+    if (f != distance_factor)
+        plog("audio: distance factor %g", f);
     distance_factor = f > 0 ? f : 1;
     return S_OK;
 }
 
 extern "C" RwInt32 __stdcall IDirectSound_SetRolloffFactor(void *, RwReal f, RwUInt32)
 {
+    if (f != rolloff_factor)
+        plog("audio: rolloff factor %g", f);
     rolloff_factor = f >= 0 ? f : 1;
     return S_OK;
 }
@@ -809,6 +831,26 @@ extern "C" RwInt32 __stdcall IDirectSoundBuffer_Play(void *buffer, RwUInt32, RwU
              v->frequency, v->flags, v->data, v->size, v->playOffset, v->playLength, v->loopOffset, v->loopLength,
              v->volume, v->nbins, v->target, (flags & DSBPLAY_LOOPING) ? " looping" : "");
     }
+    /* CODFH_AUDIOTRACE=1: every play, with its 3D state, mix bins and gains to the output */
+    static int trace = -1;
+    if (trace < 0)
+    {
+        char e[4];
+        trace = GetEnvironmentVariableA("CODFH_AUDIOTRACE", e, sizeof(e)) ? 1 : 0;
+    }
+    if (trace)
+    {
+        float g[2][2], sg;
+        char bins[160] = "";
+        LOCKED(voice_gains(v, g, &sg));
+        for (int i = 0; i < v->nbins; i++)
+            _snprintf(bins + strlen(bins), sizeof(bins) - strlen(bins) - 1, " %lu:%ld", v->bins[i].bin, v->bins[i].level);
+        float dx = v->position.x - listener_pos.x, dy = v->position.y - listener_pos.y, dz = v->position.z - listener_pos.z;
+        plog("audio trace: frame %u play %p size %lu tag 0x%X freq %lu vol %ld 3d %d mode %lu dist %.1f min %.1f max %.1f "
+             "bins%s target %p gain %.3f/%.3f send %.3f", port_frame, v, v->playLength ? v->playLength : v->size,
+             v->format.formatTag, v->frequency, v->volume, v->is3D, v->mode3D, sqrtf(dx * dx + dy * dy + dz * dz),
+             v->minDistance, v->maxDistance, bins, v->target, g[0][0] + g[1][0], g[0][1] + g[1][1], sg);
+    }
     LOCKED({
         if (flags & DSBPLAY_FROMSTART)
             v->pos = v->playOffset / frame_bytes(v);
@@ -837,8 +879,15 @@ extern "C" RwInt32 __stdcall IDirectSoundBuffer_SetOutputBuffer(void *buffer, vo
     return S_OK;
 }
 
-extern "C" RwInt32 __stdcall IDirectSoundBuffer_SetRolloffCurve(void *, const RwReal *, RwUInt32, RwUInt32)
+extern "C" RwInt32 __stdcall IDirectSoundBuffer_SetRolloffCurve(void *buffer, const RwReal *points, RwUInt32 count,
+                                                                RwUInt32)
 {
+    Voice *v = (Voice *)buffer;
+    LOCKED({
+        v->curvePoints = points ? (int)(count < 32 ? count : 32) : 0;
+        for (int i = 0; i < v->curvePoints; i++)
+            v->curve[i] = points[i];
+    });
     return S_OK;
 }
 
