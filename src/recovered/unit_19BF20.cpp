@@ -1058,13 +1058,27 @@ void type_4F3130::sp_sub_12B440(type_4F3130_texts *arg_0)
         count = arg_0->unk_08 + 1;
         break;
     case 5:
+#ifdef CODFH_WIN32
+        // The Win32 port has no Xbox Live sign-in UI; don't show the generic
+        // failure status on the front end.
+        count = arg_0->unk_08;
+        break;
+#else
         strcpy(unk_768, dword_4F6178[11]);
         count = arg_0->unk_08 + 1;
         break;
+#endif
     default:
+#ifdef CODFH_WIN32
+        // The initial Live state is unsupported on Win32 and otherwise
+        // renders the same misleading sign-in failure status.
+        count = arg_0->unk_08;
+        break;
+#else
         strcpy(unk_768, dword_4F6178[11]);
         count = arg_0->unk_08 + 1;
         break;
+#endif
     }
     arg_0->unk_00[1] = unk_7E8;
     arg_0->unk_00[0] = unk_768;
