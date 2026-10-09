@@ -15,6 +15,9 @@
 #include "game/frontend.h"
 #include "types/type_4B8EF0.h"
 #include "types/soundbank.h"
+#if defined(CODFH_SP) && defined(CODFH_WIN32)
+extern "C" void port_cli_frame(void);
+#endif
 #ifdef CODFH_SP
 #include <string.h>
 #include "rw/baframe.h"
@@ -449,6 +452,10 @@ void sp_sub_A5340(RwCamera *arg_0)
     {
         sp_sub_B1A10();
     }
+#ifdef CODFH_WIN32
+    // Run pending SP command-line level selection from the live front-end frame.
+    port_cli_frame();
+#endif
     if (dword_4B88AC)
     {
         sub_187B30();

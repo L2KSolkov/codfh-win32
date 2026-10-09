@@ -1,5 +1,6 @@
 /*
- * Command-line level loading for the port: codfh.exe -map <name|number> [-gametype DM|TDM|CTF|SD|SUP]
+ * Command-line level loading for the port: codfh.exe -map <name|number>
+ * (MP additionally accepts -gametype DM|TDM|CTF|SD|SUP and -name <session name>).
  * [-name <session name>] hosts a System Link game on that level as soon as the front end's menus
  * are up, as the create-match page's Start Session does (type_2053C0::sub_205A40): the settings
  * copy's game type and level, the server name, startServer, then the menus closed.
@@ -20,6 +21,10 @@
 #include "game/ingamemenu.h"
 #include "game/gameloop.h"
 #include "game/data.h"
+#ifdef CODFH_SP
+#include "sp/sp_fend.h"
+extern type_sp_AE5D0 *sp_dword_3B4724;
+#endif
 
 #include "port.h"
 
@@ -90,6 +95,26 @@ static int contains_nocase(const char *hay, const char *needle)
     return 0;
 }
 
+#ifdef CODFH_SP
+/* The SP command uses the campaign list's zero-based index; names are the
+   game's L_1_1, L_1_1_B, ... identifiers from sub_19B060. */
+static int sp_map_level(const char *map)
+{
+    char *end;
+    long index = strtol(map, &end, 10);
+    if (*map && !*end)
+        return index >= 0 && index < 38 ? (int)index + 1 : -1;
+
+    for (int level = 1; level <= 38; level++)
+    {
+        const char *name = sub_19B060(level);
+        if (name && contains_nocase(name, map))
+            return level;
+    }
+    return -1;
+}
+#endif
+
 /* Run after each frame is presented: -movie once the game has a camera (a level is loaded; the
    movie player draws through it), outside the movie's own frames. */
 extern "C" void port_cli_present(void)
@@ -152,10 +177,25 @@ extern "C" void port_cli_frame(void)
     dword_42D28C = 3;
     sub_1FC310()->sub_1FBE20();
 #else
-    if (cli_pending)
+    if (!cli_pending || !dword_4F28F0 || !sp_dword_3B4724)
+        return;
+
+    cli_pending = 0;
+    plog("SP campaign levels (index: name):");
+    for (RwInt32 i = 0; i < 38; i++)
+        plog("  %2d: %s", i, sub_19B060(i + 1));
+
+    int level = sp_map_level(cli_map);
+    if (level < 0)
     {
-        plog("command line: -map is only available in the multiplayer port");
-        cli_pending = 0;
+        plog("command line: no SP level matches \"%s\"", cli_map);
+        return;
     }
+    plog("command line: starting SP level %s (index %d, game level %d)",
+         sub_19B060(level), level - 1, level);
+    sub_D8CC0(level);
+    /* The SP front end owns a blocking frame loop. Leave it so the shared
+       game-loop fade callback can finish and consume the level change. */
+    sp_dword_3B4724->unk_04 = true;
 #endif
 }
