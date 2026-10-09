@@ -1687,7 +1687,7 @@ _rpXboxDefaultInstance(RpXboxVtxFmt *fmt,
                                  texCoordSets[fmt->bnt - 1], instancedHeader,
                                  numVertices, instancedHeader->stride);
         }
-        else
+        else if (packedNormals)
         {
             _rpXboxVtxFmtInstBNTComp(lockedVertexBuffer, positions, packedNormals,
                                      texCoordSets[fmt->bnt - 1], instancedHeader,
