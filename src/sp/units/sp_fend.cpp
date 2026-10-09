@@ -75,6 +75,11 @@ extern Rt2dCelList *Rt2dMaestroGetCelListByIndex(Rt2dMaestro *maestro, RwInt32 i
 extern RwInt32 Rt2dAnimGetNumberOfKeyFrames(Rt2dAnim *anim);
 extern Rt2dCel *_rt2dCelListGetCelByIndex(Rt2dCelList *celList, RwInt32 index);
 extern Rt2dCel *Rt2dCelAddButtonIndex(Rt2dCel *cel, RwInt32 buttonIndex, RwInt32 *index);
+#ifdef CODFH_WIN32
+extern int port_cli_auto_main_menu_start(void);
+extern int port_cli_auto_main_menu_profile_pending(void);
+extern void port_cli_auto_main_menu_finish(int slot);
+#endif
 }
 
 // Its data definitions (PLAN SP5): single player's own .bss, in the image's address order (its
@@ -778,6 +783,12 @@ extern "C" void sp_profileMouseMaestroDestroyed(Rt2dMaestro *maestro)
 void type_sp_AE5D0::sp_sub_AF7A0(RwReal arg_0)
 {
 #ifdef CODFH_WIN32
+    /* Use the front end's normal button message to advance the title screen. */
+    if (port_cli_auto_main_menu_start())
+    {
+        RwInt32 data[2] = {unk_168, 0x40};
+        Rt2dMaestroForAllVisibleAnimations(unk_17C, sp_sub_ADDF0, data);
+    }
     if (sp_profilePickPending)
     {
         if (sp_addProfilePickRegions(this))
@@ -1662,7 +1673,8 @@ void type_sp_AE5D0::vf_000(RwInt32 arg_0)
     else if (arg_0 == unk_494) // enteringProfileSelect
     {
 #ifdef CODFH_WIN32
-        sp_profilePickPending = true;
+        const bool autoSelectFirstProfile = port_cli_auto_main_menu_profile_pending() != 0;
+        sp_profilePickPending = !autoSelectFirstProfile;
 #endif
         if (unk_7CF)
         {
@@ -1671,6 +1683,30 @@ void type_sp_AE5D0::vf_000(RwInt32 arg_0)
             sub_E88B0(true);
             unk_7D0 = false;
         }
+#ifdef CODFH_WIN32
+        if (autoSelectFirstProfile)
+        {
+            RwInt32 slot;
+            for (slot = 0; slot < 4; slot++)
+            {
+                const RwChar *name = Rt2dObjectStringGetText(unk_610[slot][0]);
+                if (name && strcmp(name, unk_7C0))
+                    break;
+            }
+            if (slot < 4)
+            {
+                type_sp_ADF20 selection = sp_sub_ADF20("/imcProfileSelection/");
+                Rt2dAnimGotoKeyFrameListByIndex(selection.unk_00, selection.unk_04, slot);
+                vf_000(unk_49C);
+            }
+            else
+            {
+                /* Keep mouse picking available if there is no profile to auto-select. */
+                sp_profilePickPending = true;
+            }
+            port_cli_auto_main_menu_finish(slot < 4 ? slot : -1);
+        }
+#endif
     }
     else if (arg_0 == unk_498) // enableMemCardMonitoring
     {

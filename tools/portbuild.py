@@ -185,6 +185,24 @@ def main():
         srcs = [s for s in srcs if any(fnmatch.fnmatch(s, p) for p in only)]
     jobs = [(s, obj_of(s), unit_flags(s, rules)) for s in srcs]
     os.makedirs(OBJ, exist_ok=True)
+    if SINGLE_PLAYER:
+        launcher = r'''@echo off
+setlocal
+rem Override CODFH_DATA before launching to use a different extracted game-data folder.
+rem -main-menu skips Press Start and selects the first saved profile; -no-main-menu opts out.
+if not defined CODFH_DATA set "CODFH_DATA=D:\CODFH_DUMP"
+if not exist "%CODFH_DATA%\" (
+    echo Game data folder not found: "%CODFH_DATA%"
+    echo Set CODFH_DATA to the folder containing the extracted game data and try again.
+    exit /b 1
+)
+pushd "%~dp0"
+"%~dp0codfh.exe" -main-menu %*
+set "GAME_EXIT=%ERRORLEVEL%"
+popd
+endlocal & exit /b %GAME_EXIT%
+'''
+        open(os.path.join(OUT, 'launch.bat'), 'w', encoding='ascii', newline='\r\n').write(launcher)
     with concurrent.futures.ThreadPoolExecutor(jobs_n) as pool:
         results = list(pool.map(compile_unit, jobs))
 

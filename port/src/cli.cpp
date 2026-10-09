@@ -1,5 +1,7 @@
 /*
  * Command-line level loading for the port: codfh.exe -map <name|number>
+ * The SP front end also accepts -main-menu to skip Press Start and select the first saved
+ * profile, or -no-main-menu to keep the normal title flow.
  * (MP additionally accepts -gametype DM|TDM|CTF|SD|SUP and -name <session name>).
  * [-name <session name>] hosts a System Link game on that level as soon as the front end's menus
  * are up, as the create-match page's Start Session does (type_2053C0::sub_205A40): the settings
@@ -30,6 +32,9 @@ extern type_sp_AE5D0 *sp_dword_3B4724;
 
 static char cli_map[64], cli_type[16], cli_name[64], cli_movie[64];
 static int cli_pending;
+#ifdef CODFH_SP
+static int cli_auto_main_menu_phase;
+#endif
 
 /* Reads the options from the command line (WinMain). */
 extern "C" void port_cli_parse(const char *cmd)
@@ -60,22 +65,62 @@ extern "C" void port_cli_parse(const char *cmd)
         if (*p)
             *p++ = 0;
     }
-    for (int i = 0; i + 1 < argc; i++)
+    for (int i = 0; i < argc; i++)
     {
-        if (!_stricmp(argv[i], "-map"))
+        if (!_stricmp(argv[i], "-map") && i + 1 < argc)
             strncpy(cli_map, argv[++i], sizeof(cli_map) - 1);
-        else if (!_stricmp(argv[i], "-gametype"))
+        else if (!_stricmp(argv[i], "-gametype") && i + 1 < argc)
             strncpy(cli_type, argv[++i], sizeof(cli_type) - 1);
-        else if (!_stricmp(argv[i], "-name"))
+        else if (!_stricmp(argv[i], "-name") && i + 1 < argc)
             strncpy(cli_name, argv[++i], sizeof(cli_name) - 1);
-        else if (!_stricmp(argv[i], "-movie"))
+        else if (!_stricmp(argv[i], "-movie") && i + 1 < argc)
             strncpy(cli_movie, argv[++i], sizeof(cli_movie) - 1);
+#ifdef CODFH_SP
+        else if (!_stricmp(argv[i], "-main-menu"))
+            cli_auto_main_menu_phase = 1;
+        else if (!_stricmp(argv[i], "-no-main-menu"))
+            cli_auto_main_menu_phase = 0;
+#endif
     }
     cli_pending = cli_map[0] != 0;
+#ifdef CODFH_SP
+    /* Direct level startup takes precedence when both options are present. */
+    if (cli_pending)
+        cli_auto_main_menu_phase = 0;
+    if (cli_auto_main_menu_phase)
+        plog("command line: skip Press Start and select the first saved profile");
+#endif
     if (cli_pending)
         plog("command line: map %s, game type %s, session %s", cli_map, cli_type[0] ? cli_type : "DM",
              cli_name[0] ? cli_name : "(default)");
 }
+
+#ifdef CODFH_SP
+/* The SP front end consumes these in its normal menu and profile-selection callbacks. */
+extern "C" int port_cli_auto_main_menu_start(void)
+{
+    if (cli_auto_main_menu_phase != 1)
+        return 0;
+    cli_auto_main_menu_phase = 2;
+    return 1;
+}
+
+extern "C" int port_cli_auto_main_menu_profile_pending(void)
+{
+    return cli_auto_main_menu_phase == 2;
+}
+
+extern "C" void port_cli_auto_main_menu_finish(int slot)
+{
+    if (cli_auto_main_menu_phase != 2)
+        return;
+    cli_auto_main_menu_phase = 0;
+    if (slot >= 0)
+        plog("command line: selecting profile slot %d", slot + 1);
+    else
+        plog("command line: no saved profile found; leaving profile selection open");
+}
+#endif
 
 static int game_type_bits(const char *t)
 {
