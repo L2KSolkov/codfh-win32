@@ -274,7 +274,7 @@ rt2dFontShowOutline(Rt2dFont * font,
         RwChar enabled[2];
         trace = GetEnvironmentVariableA("CODFH_FONTTRACE", enabled, sizeof(enabled)) ? 1 : 0;
     }
-    if (trace && traceCount < 8 && string && strstr(string, "Single Player"))
+    if (trace && traceCount < 8 && string && font)
     {
         RwInt32 i;
         rt2dCharRect *traceMap = font ? (rt2dCharRect *)rwSListGetArray(font->charMap) : NULL;
@@ -283,19 +283,22 @@ rt2dFontShowOutline(Rt2dFont * font,
             font, font ? font->isOutline : -1, font ? font->flag : 0, font ? font->height : 0,
             font ? font->baseline : 0, font ? font->charCount : 0, traceMap,
             font ? font->fontshowCB : NULL, string, anchor->x, anchor->y, height);
-        for (i = 0; i < (RwInt32)strlen(string) && i < 32; i++)
+        for (i = 0; i < 32; i++)
         {
             RwInt32 code;
-            FontCharGetCode(code, (RwUInt8)string[i], font);
+            RwInt32 character = (font->flag & rtFONTFLAG_UNICODE) ? ((const RwUInt16 *)string)[i] : ((const RwUInt8 *)string)[i];
+            if (!character)
+                break;
+            FontCharGetCode(code, character, font);
             if (code >= 0)
             {
                 rt2dCharRect *cr = &traceMap[code];
                 plog("font outline glyph[%d] char=%u code=%d rect=%p path=%p tex=%p width=%g", i,
-                    (RwUInt8)string[i], code, cr, cr->path, cr->tex, cr->width);
+                    character, code, cr, cr->path, cr->tex, cr->width);
             }
             else
             {
-                plog("font outline glyph[%d] char=%u unmapped", i, (RwUInt8)string[i]);
+                plog("font outline glyph[%d] char=%u unmapped", i, character);
             }
         }
     }
@@ -350,7 +353,7 @@ rt2dFontShowOutline(Rt2dFont * font,
                 if (cr->tex == NULL)
                 {
 #if defined(CODFH_WIN32)
-                    if (trace && traceCount <= 8 && string && strstr(string, "Single Player"))
+                    if (trace && traceCount <= 8 && string)
                         plog("font outline stroke char=%d path=%p", character, cr->path);
 #endif
                     Rt2dPathStroke(cr->path, brush);
@@ -402,7 +405,7 @@ rt2dFontShowBitmap(Rt2dFont * font,
             RwChar enabled[2];
             trace = GetEnvironmentVariableA("CODFH_FONTTRACE", enabled, sizeof(enabled)) ? 1 : 0;
         }
-        if (trace && traceCount < 8 && string && strstr(string, "Single Player"))
+        if (trace && traceCount < 8 && string && font)
         {
             RwInt32 i;
             rt2dCharRect *traceMap = font ? (rt2dCharRect *)rwSListGetArray(font->charMap) : NULL;
@@ -411,21 +414,24 @@ rt2dFontShowBitmap(Rt2dFont * font,
                 font, font ? font->isOutline : -1, font ? font->flag : 0, font ? font->height : 0,
                 font ? font->baseline : 0, font ? font->charCount : 0, traceMap,
                 font ? font->fontshowCB : NULL, string, anchor->x, anchor->y, height);
-            for (i = 0; i < (RwInt32)strlen(string) && i < 32; i++)
+            for (i = 0; i < 32; i++)
             {
                 RwInt32 code;
-                FontCharGetCode(code, (RwUInt8)string[i], font);
+                RwInt32 character = (font->flag & rtFONTFLAG_UNICODE) ? ((const RwUInt16 *)string)[i] : ((const RwUInt8 *)string)[i];
+                if (!character)
+                    break;
+                FontCharGetCode(code, character, font);
                 if (code >= 0)
                 {
                     rt2dCharRect *cr = &traceMap[code];
                     plog("font glyph[%d] char=%u code=%d rect=%p tex=%p raster=%p width=%g uv=%g,%g-%g,%g", i,
-                        (RwUInt8)string[i], code, cr, cr->tex,
+                        character, code, cr, cr->tex,
                         cr->tex ? RwTextureGetRaster(cr->tex) : NULL, cr->width,
                         cr->uv[0].x, cr->uv[0].y, cr->uv[1].x, cr->uv[1].y);
                 }
                 else
                 {
-                    plog("font glyph[%d] char=%u unmapped", i, (RwUInt8)string[i]);
+                    plog("font glyph[%d] char=%u unmapped", i, character);
                 }
             }
         }
@@ -510,7 +516,7 @@ rt2dFontShowBitmap(Rt2dFont * font,
                             ctm, rwIM3D_VERTEXUV | rwIM3D_NOCLIP))
                         {
 #if defined(CODFH_WIN32)
-                            if (trace && traceCount <= 8 && string && strstr(string, "Single Player"))
+                            if (trace && traceCount <= 8 && string)
                                 plog("font submit mid vertices=%d indices=%d tex=%p raster=%p", (int)(vdst - Rt2dGlobals.brushVertexCache), vindex, currTex, currTex ? RwTextureGetRaster(currTex) : NULL);
 #endif
                             RwIm3DRenderIndexedPrimitive
@@ -667,7 +673,7 @@ rt2dFontShowBitmap(Rt2dFont * font,
                     vdst - Rt2dGlobals.brushVertexCache, ctm, rwIM3D_VERTEXUV | rwIM3D_NOCLIP))
             {
 #if defined(CODFH_WIN32)
-                if (trace && traceCount <= 8 && string && strstr(string, "Single Player"))
+                if (trace && traceCount <= 8 && string)
                     plog("font submit end vertices=%d indices=%d tex=%p raster=%p", (int)(vdst - Rt2dGlobals.brushVertexCache), vindex, currTex, currTex ? RwTextureGetRaster(currTex) : NULL);
 #endif
                 RwIm3DRenderIndexedPrimitive(rwPRIMTYPETRILIST, Rt2dGlobals.fonttopo, vindex);

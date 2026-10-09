@@ -323,6 +323,7 @@ void type_DA580::sub_DAB00(const RwChar *arg_0, RwV2d *arg_4, RwRGBA *arg_8, RwR
 #if defined(CODFH_WIN32)
     static int trace = -1;
     static int trace_count;
+    static int show_trace_count;
 #endif
 
     var_814 = unk_00;
@@ -366,9 +367,12 @@ void type_DA580::sub_DAB00(const RwChar *arg_0, RwV2d *arg_4, RwRGBA *arg_8, RwR
     {
         sub_DB620(var_80C, arg_C, arg_4);
 #if defined(CODFH_WIN32)
-        if (trace && trace_count <= 24 && strstr(arg_0, "Single Player"))
+        if (trace && show_trace_count < 8 && strstr(arg_0, "Single Player"))
+        {
+            show_trace_count++;
             plog("font wrapper show text='%s' font=%p callback=%p prepared='%s' anchor=%g,%g", arg_0, unk_00,
                 unk_00 ? unk_00->fontshowCB : NULL, var_80C, arg_4->x, arg_4->y);
+        }
 #endif
         Rt2dFontShow(unk_00, var_80C, arg_C, arg_4, brush);
     }
