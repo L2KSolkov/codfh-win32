@@ -395,6 +395,11 @@ void sub_68250()
 // sp-match: sub_68310 @ 0x0005A4F0
 // Runs the script arg_0 until an opcode halts it, then stores its state
 // back unless it ended; the VM's state is restored around it.
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigtools.cpp: the VM tab's snapshot of the script that halted last; the
+// overlay draws between runs, when the VM's state is the idle one again)
+void TrigWebVmSnapshot();
+#endif
 void sub_68310(type_67620 *arg_0)
 {
     type_67620 *stk_18;
@@ -422,6 +427,9 @@ void sub_68310(type_67620 *arg_0)
         void (*local_20)() = dword_4491C0[var_19];
         local_20();
     }
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigWebVmSnapshot();
+#endif
     if (byte_449325 == 0) {
         arg_0->vf_018(dword_449320);
         arg_0->vf_01C(dword_449318);

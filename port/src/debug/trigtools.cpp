@@ -11,7 +11,8 @@
 //   Triggers    the handle table, nearest first: teleport, spawn soldiers
 //   Objectives  the checkpoint and global script registers, the objectives
 //   Scripts     the script pools and live state machines
-//   VM          the level-script VM's registers, code and stacks
+//   VM          the level-script VM's registers, code and stacks, as the last
+//               script to run halted (the overlay draws between runs)
 //   Sections    the section slots, and a section load into one
 //   Loading     the loading queue (AsynchLoadingQueue)
 //   Memory      the section arenas and the script pools
@@ -1772,21 +1773,83 @@ static void TabScripts()
 
 // ---- VM ----
 
+// The VM's state as the last script to run halted (TrigWebVmSnapshot, from
+// the VM's run, sub_68310, before it puts its own state back: the overlay
+// draws between runs, when the registers are the idle ones): the registers,
+// the code around the code pointer and the top of the stack, copied then.
+struct TrigWebVm
+{
+    RwUInt32 dwFrame;
+    RwUInt32 dwRuns;
+    RwUInt32 dwIp, dwSp, dwFp, dwFourth, dwObj;
+    RwUInt8 bHalt, bYielded;
+    RwUInt32 adwCode[16];       // from the code pointer - 4 words
+    RwUInt8 abCode[16];         // which read
+    RwUInt32 adwStack[16];      // from the stack pointer down
+    RwInt32 nStack;
+    RwUInt32 dwObjCode, dwObjStack, dwObjFrame;
+};
+static TrigWebVm s_vm;
+static RwBool s_bVmFreeze;
+extern "C" volatile unsigned port_frame;
+
+void TrigWebVmSnapshot()
+{
+    RwInt32 i;
+
+    if (s_bVmFreeze)
+        return;
+    s_vm.dwRuns++;
+    s_vm.dwFrame = port_frame;
+    s_vm.dwIp = (RwUInt32)dword_449320;
+    s_vm.dwSp = (RwUInt32)dword_449318;
+    s_vm.dwFp = (RwUInt32)dword_44931C;
+    s_vm.dwFourth = (RwUInt32)dword_4492E0;
+    s_vm.dwObj = (RwUInt32)dword_449328;
+    s_vm.bHalt = byte_449324;
+    s_vm.bYielded = byte_449325;
+    for (i = 0; i < 16; i++)
+        s_vm.abCode[i] = s_vm.dwIp && ReadU32((void *)(s_vm.dwIp + (i - 4) * 4), &s_vm.adwCode[i]);
+    s_vm.nStack = 0;
+    for (i = 0; s_vm.dwSp && i < 16; i++)
+    {
+        if (!ReadU32((void *)(s_vm.dwSp - i * 4), &s_vm.adwStack[i]))
+            break;
+        s_vm.nStack++;
+    }
+    s_vm.dwObjCode = s_vm.dwObjStack = s_vm.dwObjFrame = 0;
+    if (s_vm.dwObj)
+    {
+        ReadU32(&((type_3D2DB8 *)s_vm.dwObj)->unk_68, &s_vm.dwObjCode);
+        ReadU32(&((type_3D2DB8 *)s_vm.dwObj)->unk_6C, &s_vm.dwObjStack);
+        ReadU32(&((type_3D2DB8 *)s_vm.dwObj)->unk_70, &s_vm.dwObjFrame);
+    }
+}
+
 static void TabVm()
 {
-    RwUInt32 dwIp, dwSp, dwObj, dwTop, dwFrame, dw;
+    RwUInt32 dwTop, dwFrame, dw;
     RwInt32 i, nCall = CallOpcode();
     RwChar szName[64];
 
-    if (ImGui::CollapsingHeader("Registers", ImGuiTreeNodeFlags_DefaultOpen) && BeginRows("regs"))
+    if (s_vm.dwRuns == 0)
     {
-        RowU32("code pointer (dword_449320)", &dword_449320, TRUE);
-        RowU32("stack pointer (dword_449318)", &dword_449318, TRUE);
-        RowU32("frame pointer (dword_44931C)", &dword_44931C, TRUE);
-        RowU32("fourth word (dword_4492E0)", &dword_4492E0, TRUE);
-        RowU32("script object (dword_449328)", &dword_449328, TRUE);
-        RowU32("halt (byte_449324)", &byte_449324, FALSE);
-        RowU32("yielded (byte_449325)", &byte_449325, FALSE);
+        ImGui::Text("No script has run yet.");
+        return;
+    }
+    Check("freeze (keep this snapshot)", &s_bVmFreeze);
+    ImGui::SameLine();
+    ImGui::TextDisabled("the script that halted last, frame %u (now %u); %u runs seen", s_vm.dwFrame, port_frame,
+                        s_vm.dwRuns);
+    if (ImGui::CollapsingHeader("Registers, as it halted", ImGuiTreeNodeFlags_DefaultOpen) && BeginRows("regs"))
+    {
+        Row("code pointer (dword_449320)", "0x%08X", s_vm.dwIp);
+        Row("stack pointer (dword_449318)", "0x%08X", s_vm.dwSp);
+        Row("frame pointer (dword_44931C)", "0x%08X", s_vm.dwFp);
+        Row("fourth word (dword_4492E0)", "0x%08X", s_vm.dwFourth);
+        Row("script object (dword_449328)", "0x%08X", s_vm.dwObj);
+        Row("halt (byte_449324)", "%d", s_vm.bHalt);
+        Row("yielded (byte_449325)", "%d", s_vm.bYielded);
         RowU32("commands (NumOfElements)", &NumOfElements, FALSE);
         Row("call opcode", "%d", nCall);
         ImGui::EndTable();
@@ -1796,53 +1859,44 @@ static void TabVm()
     // byte) and, for the call opcode, the command (the high half).
     if (ImGui::CollapsingHeader("Code", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (ReadU32(&dword_449320, &dwIp) && dwIp)
+        for (i = 0; i < 16; i++)
         {
-            for (i = -4; i < 12; i++)
-            {
-                RwUInt32 dwAddr = dwIp + i * 4;
-
-                if (!ReadU32((void *)dwAddr, &dw))
-                    continue;
-                szName[0] = 0;
-                if ((RwInt32)(dw & 0xFF) == nCall)
-                    CommandName((RwInt16)(dw >> 16), szName);
-                ImGui::Text("0x%08X%s  %08X  op %3u  %s", dwAddr, i == 0 ? " <" : "  ", dw, dw & 0xFF, szName);
-            }
+            if (!s_vm.abCode[i])
+                continue;
+            dw = s_vm.adwCode[i];
+            szName[0] = 0;
+            if ((RwInt32)(dw & 0xFF) == nCall)
+                CommandName((RwInt16)(dw >> 16), szName);
+            ImGui::Text("0x%08X%s  %08X  op %3u  %s", s_vm.dwIp + (i - 4) * 4, i == 4 ? " <" : "  ", dw, dw & 0xFF,
+                        szName);
         }
-        else
-            ImGui::Text("not running");
     }
 
-    // The current script object's saved state.
+    // The script object's saved state (now: the run stored it back).
     if (ImGui::CollapsingHeader("Script object", ImGuiTreeNodeFlags_DefaultOpen) && BeginRows("obj"))
     {
-        if (ReadU32(&dword_449328, &dwObj) && dwObj)
+        if (s_vm.dwObj)
         {
-            Row("object", "0x%08X", dwObj);
-            RowU32("vtable", (void *)dwObj, TRUE);
-            RowU32("saved code (unk_68)", &((type_3D2DB8 *)dwObj)->unk_68, TRUE);
-            RowU32("saved stack (unk_6C)", &((type_3D2DB8 *)dwObj)->unk_6C, TRUE);
-            RowU32("saved frame (unk_70)", &((type_3D2DB8 *)dwObj)->unk_70, TRUE);
+            Row("object", "0x%08X", s_vm.dwObj);
+            RowU32("vtable", (void *)s_vm.dwObj, TRUE);
+            Row("saved code (unk_68)", "0x%08X", s_vm.dwObjCode);
+            Row("saved stack (unk_6C)", "0x%08X", s_vm.dwObjStack);
+            Row("saved frame (unk_70)", "0x%08X", s_vm.dwObjFrame);
         }
         else
             Row("object", "none");
         ImGui::EndTable();
     }
 
-    // The VM's stack, from the stack pointer down.
-    if (ImGui::CollapsingHeader("Stack (from dword_449318)") && ReadU32(&dword_449318, &dwSp) && dwSp)
+    // The VM's stack, from the stack pointer down, as it halted.
+    if (ImGui::CollapsingHeader("Stack (from the stack pointer)"))
     {
-        for (i = 0; i < 16; i++)
-        {
-            if (!ReadU32((void *)(dwSp - i * 4), &dw))
-                break;
-            ImGui::Text("sp-%-3d 0x%08X %d", i * 4, dw, (RwInt32)dw);
-        }
+        for (i = 0; i < s_vm.nStack; i++)
+            ImGui::Text("sp-%-3d 0x%08X %d", i * 4, s_vm.adwStack[i], (RwInt32)s_vm.adwStack[i]);
     }
 
-    // The message argument stack (dword_4493FC frame, dword_4493F8 top).
-    if (ImGui::CollapsingHeader("Message argument stack") && ReadU32(&dword_4493F8, &dwTop) &&
+    // The message argument stack (dword_4493FC frame, dword_4493F8 top), now.
+    if (ImGui::CollapsingHeader("Message argument stack (now)") && ReadU32(&dword_4493F8, &dwTop) &&
         ReadU32(&dword_4493FC, &dwFrame))
     {
         ImGui::Text("base 0x%08X, frame 0x%08X, top 0x%08X", (RwUInt32)unk_4498D4, dwFrame, dwTop);
