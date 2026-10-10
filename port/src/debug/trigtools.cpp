@@ -15,13 +15,15 @@
 //   Sections    the section slots, and a section load into one
 //   Loading     the loading queue (AsynchLoadingQueue)
 //   Memory      the section arenas and the script pools
-//   HUD         the HUD's 151 items, shown or hidden
+//   HUD         the HUD's items (151, single player's 101), shown or hidden
 // (Not the patch's /map and /levels: the second loads a single-player level
 // into the multiplayer build, which its other hooks are for.)
 // The overlay draws from the device's Present, on the game's thread, after
 // the frame; what changes the game (a section load, a give, a teleport, a
 // spawn) is handed to the main loop (TrigWebTick, from sub_D7880) as the
-// pages did. Reads stay guarded (__try): a "?" for what is not there.
+// pages did. Reads stay guarded (__try): a "?" for what is not there. The
+// structures are read by their fields (the headers lay them out for single
+// player too, under CODFH_SP), the tables by the sizes both builds share.
 
 #ifdef CODFH_DRAW_TRIGGERS
 
@@ -1720,20 +1722,21 @@ static void TabScripts()
     {
         RwUInt32 dwObj = dwBase + i * nStride, dwHandle, dwLine, dwFile, dwCodePtr, dwState, dwOwner, dwParent;
         RwUInt32 dwStateIndex = (RwUInt32)-1;
+        type_3D2DB8 *pMachine = (type_3D2DB8 *)dwObj;
 
         if (s_abFree[i])
             continue;
-        if (!ReadU32((void *)(dwObj + 0x04), &dwHandle) || !ReadU32((void *)(dwObj + 0x08), &dwLine)
-            || !ReadU32((void *)(dwObj + 0x0C), &dwFile) || !ReadU32((void *)(dwObj + 0x68), &dwCodePtr)
-            || !ReadU32((void *)(dwObj + 0x6C), &dwState) || !ReadU32((void *)(dwObj + 0x7C), &dwOwner)
-            || !ReadU32((void *)(dwObj + 0x88), &dwParent))
+        if (!ReadU32(&pMachine->unk_04, &dwHandle) || !ReadU32(&pMachine->unk_08, &dwLine)
+            || !ReadU32(&pMachine->unk_0C, &dwFile) || !ReadU32(&pMachine->unk_68, &dwCodePtr)
+            || !ReadU32(&pMachine->unk_6C, &dwState) || !ReadU32(&pMachine->unk_7C, &dwOwner)
+            || !ReadU32(&pMachine->unk_88, &dwParent))
             continue;
         // the state record's index (type_3D2DB8_6C::unk_10)
         if (dwState)
         {
             RwUInt32 dw;
 
-            if (ReadU32((void *)(dwState + 0x10), &dw))
+            if (ReadU32(&((type_3D2DB8_6C *)dwState)->unk_10, &dw))
                 dwStateIndex = (RwInt16)(dw & 0xFFFF);
         }
         // the file: a name when it reads as text, else the number
@@ -1818,9 +1821,9 @@ static void TabVm()
         {
             Row("object", "0x%08X", dwObj);
             RowU32("vtable", (void *)dwObj, TRUE);
-            RowU32("saved code (+0x68)", (void *)(dwObj + 0x68), TRUE);
-            RowU32("saved stack (+0x6C)", (void *)(dwObj + 0x6C), TRUE);
-            RowU32("saved frame (+0x70)", (void *)(dwObj + 0x70), TRUE);
+            RowU32("saved code (unk_68)", &((type_3D2DB8 *)dwObj)->unk_68, TRUE);
+            RowU32("saved stack (unk_6C)", &((type_3D2DB8 *)dwObj)->unk_6C, TRUE);
+            RowU32("saved frame (unk_70)", &((type_3D2DB8 *)dwObj)->unk_70, TRUE);
         }
         else
             Row("object", "none");
@@ -2015,7 +2018,7 @@ static void TabEntities()
         if (!ReadU32(&dword_4B6A00[i].unk_00, &dwHandle) || !ReadU32(&dword_4B6A00[i].unk_04, &dwEntity)
             || dwEntity == 0)
             continue;
-        if (!ReadU32((RwUInt8 *)dwEntity + 0x2C, &dwBits))
+        if (!ReadU32(&((type_3D3548 *)dwEntity)->unk_2C, &dwBits))
             continue;
         nLive++;
         if (s_anFilters[s_nFilter] > 0 && !(dwBits & s_anFilters[s_nFilter]))
@@ -2108,12 +2111,12 @@ static void TabObjectives()
             ReadU32(&p->unk_00, &dwObj);
             if (dwObj)
             {
-                ReadU32((RwUInt8 *)dwObj + 4, &dwK0);
-                ReadU32((RwUInt8 *)dwObj + 8, &dwK1);
+                ReadU32(&((type_3DF8D8_base *)dwObj)->unk_04, &dwK0);
+                ReadU32((RwUInt8 *)&((type_3DF8D8_base *)dwObj)->unk_04 + 4, &dwK1);
             }
             ReadU32(&p->unk_40, &dwMarks);
             ReadF32(&p->unk_0C, &fNag);
-            ReadU32((RwUInt8 *)p + 0x54, &dwNext);
+            ReadU32(&p->unk_54, &dwNext);
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             ImGui::Text("%d", i);
@@ -2321,8 +2324,8 @@ static void TabHud()
         ImGui::Text("No HUD.");
         return;
     }
-    ImGui::TextDisabled("The HUD's 151 items (type_DC400_E0); visibility set here holds only for items the "
-                        "per-frame update does not drive.");
+    ImGui::TextDisabled("The HUD's %d items (type_DC400_E0); visibility set here holds only for items the "
+                        "per-frame update does not drive.", (RwInt32)type_DC400_items);
     if (!ImGui::BeginTable("hud", 8, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg))
         return;
     {
@@ -2332,7 +2335,7 @@ static void TabHud()
             ImGui::TableSetupColumn(s_apszCols[i]);
         ImGui::TableHeadersRow();
     }
-    for (i = 0; i < 151; i++)
+    for (i = 0; i < type_DC400_items; i++)
     {
         type_DC400_E0 *pItem = &((type_DC400 *)dwHud)->unk_E0[i];
         RwChar szName[0x24], szText[0x84];
