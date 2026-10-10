@@ -21,6 +21,12 @@ window), comes with it; --no-debug-tools leaves them out.
 objects): every unit compiled with CODFH_DEDICATED too, which the port layer reads (no window,
 device, audio output or local input; it hosts from the command line and never plays).
 
+Builds are incremental: each object keeps, in a .dep file beside it, the command that compiled it
+and the project headers it read (cl's /showIncludes); a unit is compiled again only when its source
+or one of those headers is newer than its object, or its command changed (flags, defines). A unit
+that fails is compiled again next time. The link runs when an object is newer than the executable.
+--full compiles every unit; --only's units are always compiled.
+
 Bink (W6) is the Xbox library as the tree has it: its C, and its image transcriptions (.asm,
 assembled with ml.exe: the code is 32-bit x86 with symbolic relocations, so it runs as is).
 """
@@ -32,6 +38,7 @@ import os
 import re
 import subprocess
 import sys
+import json
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
@@ -39,6 +46,7 @@ SINGLE_PLAYER = '--sp' in sys.argv[1:]
 OUT = os.path.join(ROOT, 'build', 'port_sp' if SINGLE_PLAYER else 'port')
 OBJ = os.path.join(OUT, 'obj')
 EXE = 'codfh.exe'
+FORCE = False
 
 VS = os.environ.get('CODFH_VS', r'C:\Program Files\Microsoft Visual Studio\18\Enterprise')
 MSVC_VER = os.environ.get('CODFH_MSVC', '14.51.36231')
@@ -143,16 +151,40 @@ def unit_flags(src, rules):
     return eh + kept
 
 
+def up_to_date(src, obj, cmd):
+    """Whether obj is newer than src and every header its .dep names, compiled by cmd."""
+    try:
+        dep = json.load(open(obj + '.dep', encoding='utf-8'))
+        if dep.get('cmd') != cmd:
+            return False
+        built = os.path.getmtime(obj)
+        return all(os.path.getmtime(f) <= built for f in [src] + dep.get('deps', []))
+    except (OSError, ValueError):
+        return False
+
+
+def write_dep(obj, cmd, deps):
+    """Records how obj was built (cmd None: it failed, so the next build compiles it again)."""
+    with open(obj + '.dep', 'w', encoding='utf-8') as f:
+        json.dump({'cmd': cmd, 'deps': deps}, f)
+
+
+INCLUDE_NOTE = re.compile(r'^Note: including file:\s*(.*)$')
+
+
 def compile_unit(job):
     src, obj, flags = job
     os.makedirs(os.path.dirname(obj), exist_ok=True)
     if src.endswith('.asm'):
         ml = os.path.join(os.path.dirname(CL), 'ml.exe')
         cmd = [ml, '/c', '/nologo', '/coff', '/Zi', '/I' + os.path.dirname(src), '/Fo' + obj, src]
+        if not FORCE and up_to_date(src, obj, cmd):
+            return src, 0, '', True
         r = subprocess.run(cmd, capture_output=True, text=True, errors='replace')
         out = r.stdout + r.stderr
+        write_dep(obj, cmd if r.returncode == 0 else None, [])
         # (ml's errors read "error A2xxx"; reported as the compiler's for the summary)
-        return src, r.returncode, out.replace(': error A', ': error C')
+        return src, r.returncode, out.replace(': error A', ': error C'), False
     lang = '/TC' if src.endswith('.c') else '/TP'
     include_dirs = ['/Iport/include', '/Iinclude']
     if SINGLE_PLAYER and src.startswith('src/sp/units/'):
@@ -167,18 +199,33 @@ def compile_unit(job):
         extra = ['/I' + IMGUI_DIR] if src.startswith('port/src/') else []
         cmd = ([CL] + PORT_FLAGS + (['/DCODFH_SP'] if SINGLE_PLAYER else []) + flags + [lang] + include_dirs + extra
                + ['/Fo' + obj, '/Fd' + os.path.join(OBJ, 'port.pdb'), src])
+    if not FORCE and up_to_date(src, obj, cmd):
+        return src, 0, '', True
     env = dict(os.environ)
     env['INCLUDE'] = ';'.join(SYSTEM_INCLUDES)
     env['LIB'] = ';'.join(SYSTEM_LIBS)
     env['PATH'] = os.path.dirname(CL) + os.pathsep + os.path.join(MSVC, 'bin', 'Hostx64', 'x64') + \
         os.pathsep + env['PATH']
-    r = subprocess.run(cmd, capture_output=True, text=True, errors='replace', env=env)
-    return src, r.returncode, r.stdout + r.stderr
+    # (the headers it reads, from /showIncludes: the project's only, the toolchain's do not change)
+    r = subprocess.run(cmd[:1] + ['/showIncludes'] + cmd[1:], capture_output=True, text=True, errors='replace',
+                       env=env)
+    deps, lines = set(), []
+    for line in (r.stdout + r.stderr).splitlines():
+        m = INCLUDE_NOTE.match(line)
+        if not m:
+            lines.append(line)
+            continue
+        path = os.path.normpath(m.group(1).strip())
+        if path.lower().startswith(ROOT.lower()):
+            deps.add(path)
+    write_dep(obj, cmd if r.returncode == 0 else None, sorted(deps))
+    return src, r.returncode, '\n'.join(lines) + ('\n' if lines else ''), False
 
 
 def main():
-    global OUT, OBJ, EXE, SINGLE_PLAYER
+    global OUT, OBJ, EXE, SINGLE_PLAYER, FORCE
     args = sys.argv[1:]
+    FORCE = '--full' in args
     SINGLE_PLAYER = '--sp' in args
     args = [arg for arg in args if arg != '--sp']
     if '--dedicated' in args:
@@ -220,6 +267,9 @@ def main():
     if only:
         srcs = [s for s in srcs if any(fnmatch.fnmatch(s, p) for p in only)]
     jobs = [(s, obj_of(s), unit_flags(s, rules)) for s in srcs]
+    # (--only's units are compiled whatever their objects say)
+    if only:
+        FORCE = True
     os.makedirs(OBJ, exist_ok=True)
     if SINGLE_PLAYER:
         launcher = r'''@echo off
@@ -249,7 +299,10 @@ endlocal & exit /b %GAME_EXIT%
     headers = collections.Counter()
     idents = collections.Counter()
     per_unit = {}
-    for src, rc, out in results:
+    skipped = sum(1 for r in results if r[3])
+    for src, rc, out, skip in results:
+        if skip:
+            continue
         log.append('==== %s (exit %d)\n%s' % (src, rc, out))
         errs = [l for l in out.splitlines() if re.search(r'\b(error|fatal error) C\d+', l)]
         per_unit[src] = len(errs)
@@ -281,11 +334,21 @@ endlocal & exit /b %GAME_EXIT%
     md += ['| %s | %d |' % (s, per_unit[s]) for s in sorted(failed, key=lambda s: -per_unit[s])]
     open(os.path.join(OUT, 'errors.md'), 'w', encoding='utf-8').write('\n'.join(md) + '\n')
     rel = os.path.relpath(OUT, ROOT).replace(os.sep, '/')
-    print('%d units: %d compile, %d fail (%s/errors.md, %s/compile.log)' % (
-        len(results), len(results) - len(failed), len(failed), rel, rel))
-    # (--link: link after a partial compile, with the other units' objects as they are)
+    print('%d units: %d compile, %d fail, %d up to date (%s/errors.md, %s/compile.log)' % (
+        len(results), len(results) - len(failed) - skipped, len(failed), skipped, rel, rel))
+    # (--link: link after a partial compile, with the other units' objects as they are; not when
+    # the executable is newer than every object)
     if not failed and (not only or '--link' in args):
-        link(every)
+        exe = os.path.join(OUT, EXE)
+        try:
+            newest = max(os.path.getmtime(o) for o in every)
+            current = os.path.getmtime(exe) >= newest
+        except (OSError, ValueError):
+            current = False
+        if current and not FORCE:
+            print('link: up to date (%s is newer than every object)' % os.path.relpath(exe, ROOT).replace(os.sep, '/'))
+        else:
+            link(every)
 
 
 LIBS = ['kernel32.lib', 'user32.lib', 'gdi32.lib', 'winmm.lib', 'd3d11.lib', 'dxgi.lib', 'd3dcompiler.lib', 'xaudio2.lib', 'ws2_32.lib',

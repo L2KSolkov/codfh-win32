@@ -22,8 +22,10 @@ Companion documents:
 ## Port status (2026-10-05)
 
 The port builds, runs and plays: `python tools/portbuild.py` compiles every unit under `src/`
-(Bink included) and `port/src`, and links `build/port/codfh.exe`. Run it with the disc's files
-as the data root:
+(Bink included) and `port/src`, and links `build/port/codfh.exe`. It is incremental: a unit is
+compiled again only when its source, a project header it reads or its command changed (each
+object's `.dep`), the link only when an object is newer than the executable; `--full` rebuilds
+everything. Run it with the disc's files as the data root:
 
     CODFH_DATA=D:\CODFH_DUMP build/port/codfh.exe [-map <n|name>] [-gametype DM|TDM|CTF|SD|SUP]
 
