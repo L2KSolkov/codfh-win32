@@ -62,6 +62,7 @@
 #include "types/type_4D1DB8.h"
 #include "game/data.h"
 #include "types/type_4C00E8.h"
+#include "rws/debugswitches.h"
 
 #include "../../third_party/imgui/imgui.h"
 
@@ -1910,12 +1911,195 @@ void TrigWebVmSnapshot()
     }
 }
 
+// The script debugger's reports (sub_6A970, a message delivered; sub_6B060,
+// a script object's line: "Line Changed", "Print Int", "Script Assert" and
+// the like), which the release build builds and never prints: the last 512,
+// newest last. The settings deciding which it makes are CDebugScript's
+// (unit_042F40), shown under "Script debugger".
+#define TRIGWEB_REPORTS 512
+#define TRIGWEB_REPORT 200
+static RwChar s_aszReport[TRIGWEB_REPORTS][TRIGWEB_REPORT];
+static RwUInt32 s_adwReportFrame[TRIGWEB_REPORTS];
+static RwUInt32 s_dwReports;
+static RwBool s_bReportPause, s_bReportLines = TRUE, s_bReportFollow = TRUE;
+static RwChar s_szReportFilter[64];
+static CRITICAL_SECTION s_csReport;
+static LONG s_nReportInit;
+
+static void ReportLock()
+{
+    if (InterlockedCompareExchange(&s_nReportInit, 1, 0) == 0)
+    {
+        InitializeCriticalSection(&s_csReport);
+        s_nReportInit = 2;
+    }
+    while (s_nReportInit != 2)
+        Sleep(0);
+    EnterCriticalSection(&s_csReport);
+}
+
+void TrigWebScriptReport(const RwChar *pszWhat, const RwChar *pszLine)
+{
+    RwChar *psz;
+    size_t n;
+
+    if (s_bReportPause || pszLine == NULL)
+        return;
+    if (!s_bReportLines && strstr(pszLine, "Line Changed") != NULL)
+        return;
+    ReportLock();
+    psz = s_aszReport[s_dwReports % TRIGWEB_REPORTS];
+    s_adwReportFrame[s_dwReports % TRIGWEB_REPORTS] = port_frame;
+    if (pszWhat)
+        _snprintf(psz, TRIGWEB_REPORT, "%s: %s", pszWhat, pszLine);
+    else
+        _snprintf(psz, TRIGWEB_REPORT, "%s", pszLine);
+    psz[TRIGWEB_REPORT - 1] = 0;
+    n = strlen(psz);
+    while (n && (psz[n - 1] == '\n' || psz[n - 1] == '\r'))
+        psz[--n] = 0;
+    s_dwReports++;
+    LeaveCriticalSection(&s_csReport);
+}
+
+static RwBool ReportHas(const RwChar *psz, const RwChar *pszPart)
+{
+    size_t n = strlen(pszPart);
+
+    for (; *psz; psz++)
+        if (_strnicmp(psz, pszPart, n) == 0)
+            return TRUE;
+    return FALSE;
+}
+
+static void CheckInt(const RwChar *pszLabel, RwInt32 *pn)
+{
+    bool b = *pn != 0;
+
+    if (ImGui::Checkbox(pszLabel, &b))
+        *pn = b;
+}
+
+// The debug switches (RWS::DebugSwitches): the ones the game reads named.
+static const RwChar *SwitchName(RwInt32 n)
+{
+    switch (n)
+    {
+    case 0x15:
+        return "no soldiers or tanks created (the scripts' CreateSoldier, CreateTank)";
+    case 0x19:
+        return "CDebugScript's command 13 (nothing reads it)";
+    }
+    return NULL;
+}
+
+static void VmDebugger()
+{
+    RwInt32 i, nFirst, nCount;
+    RwChar szName[0x20];
+
+    if (!ImGui::CollapsingHeader("Script debugger (CDebugScript's settings)"))
+        return;
+    ImGui::TextDisabled("Which reports the game makes; it prints none, they go to the log below.");
+    CheckInt("report every script object's lines (dword_44928C)", &dword_44928C);
+    CheckInt("report task objects' lines (dword_4492A8)", &dword_4492A8);
+    CheckInt("report every message delivered (dword_449294)", &dword_449294);
+    CheckInt("report one-argument messages (dword_4492B0)", &dword_4492B0);
+    CheckInt("only objects with a name (dword_449310)", &dword_449310);
+    memcpy(szName, String, sizeof(szName));
+    szName[sizeof(szName) - 1] = 0;
+    if (ImGui::InputText("only this name or ID (String; empty: any)", szName, sizeof(szName)))
+    {
+        memcpy(String, szName, sizeof(szName));
+        byte_44930C = String[0] >= '0' && String[0] <= '9' ? 1 : 0;
+    }
+    ImGui::SameLine();
+    ImGui::TextDisabled(byte_44930C ? "(an ID)" : "(a name)");
+
+    if (ImGui::TreeNode("Debug switches (RWS::DebugSwitches)"))
+    {
+        for (i = 0; i < RWS::DebugSwitches::m_last; i++)
+        {
+            const RwChar *pszName = SwitchName(i);
+            RwChar szLabel[96];
+            bool b = RWS::DebugSwitches::GetSwitch(i);
+
+            if (pszName == NULL && !b)
+                continue;
+            _snprintf(szLabel, sizeof(szLabel), "0x%02X %s", i, pszName ? pszName : "");
+            szLabel[sizeof(szLabel) - 1] = 0;
+            if (ImGui::Checkbox(szLabel, &b))
+                RWS::DebugSwitches::SetSwitch(i, b);
+        }
+        {
+            static RwInt32 s_nSwitch;
+
+            ImGui::SetNextItemWidth(120.0f);
+            ImGui::InputInt("##switch", &s_nSwitch);
+            if (s_nSwitch < 0)
+                s_nSwitch = 0;
+            if (s_nSwitch >= RWS::DebugSwitches::m_last)
+                s_nSwitch = RWS::DebugSwitches::m_last - 1;
+            ImGui::SameLine();
+            if (ImGui::Button("set"))
+                RWS::DebugSwitches::SetSwitch(s_nSwitch, true);
+            ImGui::SameLine();
+            if (ImGui::Button("clear"))
+                RWS::DebugSwitches::SetSwitch(s_nSwitch, false);
+            ImGui::SameLine();
+            ImGui::TextDisabled("any switch by number (the set ones are listed)");
+        }
+        ImGui::TreePop();
+    }
+
+    ImGui::SeparatorText("Reports");
+    Check("pause", &s_bReportPause);
+    ImGui::SameLine();
+    Check("line changes", &s_bReportLines);
+    ImGui::SameLine();
+    Check("follow", &s_bReportFollow);
+    ImGui::SameLine();
+    if (ImGui::Button("clear##reports"))
+    {
+        ReportLock();
+        s_dwReports = 0;
+        LeaveCriticalSection(&s_csReport);
+    }
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(200.0f);
+    ImGui::InputText("filter##reports", s_szReportFilter, sizeof(s_szReportFilter));
+    ImGui::SameLine();
+    ImGui::TextDisabled("%u made", s_dwReports);
+    if (ImGui::BeginChild("reports", ImVec2(0.0f, 260.0f), ImGuiChildFlags_Borders,
+                          ImGuiWindowFlags_HorizontalScrollbar))
+    {
+        ReportLock();
+        nCount = s_dwReports < TRIGWEB_REPORTS ? (RwInt32)s_dwReports : TRIGWEB_REPORTS;
+        nFirst = (RwInt32)(s_dwReports - nCount);
+        for (i = 0; i < nCount; i++)
+        {
+            RwUInt32 dw = (RwUInt32)(nFirst + i) % TRIGWEB_REPORTS;
+
+            if (s_szReportFilter[0] && !ReportHas(s_aszReport[dw], s_szReportFilter))
+                continue;
+            ImGui::TextDisabled("%6u", s_adwReportFrame[dw]);
+            ImGui::SameLine();
+            ImGui::TextUnformatted(s_aszReport[dw]);
+        }
+        LeaveCriticalSection(&s_csReport);
+        if (s_bReportFollow && !s_bReportPause && ImGui::GetScrollY() >= ImGui::GetScrollMaxY() - 20.0f)
+            ImGui::SetScrollHereY(1.0f);
+    }
+    ImGui::EndChild();
+}
+
 static void TabVm()
 {
     RwUInt32 dwTop, dwFrame, dw;
     RwInt32 i, nCall = CallOpcode();
     RwChar szName[64];
 
+    VmDebugger();
     if (s_vm.dwRuns == 0)
     {
         ImGui::Text("No script has run yet.");

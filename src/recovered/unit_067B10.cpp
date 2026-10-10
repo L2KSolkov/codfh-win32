@@ -1663,6 +1663,11 @@ type_4492EC *sub_6A950(RwInt32 arg_0)
 
 // The messages the debugger never reports (AllBurstsFinished and the like).
 extern const RwChar *Str2[5];
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigtools.cpp: the VM tab's log of the debugger's reports, whose
+// prints the release build compiled out; pszWhat the report's caption or 0)
+void TrigWebScriptReport(const RwChar *pszWhat, const RwChar *pszLine);
+#endif
 
 // match: sub_6A970 @ 0x0006A970
 // sp-match: sub_6A970 @ 0x000597F0
@@ -1781,11 +1786,17 @@ void sub_6A970(type_42E00 *arg_0, type_6B960 *arg_4, const RwChar *arg_8)
     strcat(lcl_208, ", Sender: ");
     if (frm_214 != 0) {
         strcat(lcl_208, (const RwChar *)frm_214->unk_14);
+#ifdef CODFH_DRAW_TRIGGERS
+        TrigWebScriptReport(arg_8, lcl_208);
+#endif
         return;
     }
     lcl_3BC = get_performance_map(arg_0->unk_10);
     if (lcl_3BC == 0) {
         strcat(lcl_208, "Engine");
+#ifdef CODFH_DRAW_TRIGGERS
+        TrigWebScriptReport(arg_8, lcl_208);
+#endif
         return;
     }
     if (frm_218 == 0) {
@@ -1797,10 +1808,16 @@ void sub_6A970(type_42E00 *arg_0, type_6B960 *arg_4, const RwChar *arg_8)
         } else {
             strcat(lcl_208, "Anim Opcode");
         }
+#ifdef CODFH_DRAW_TRIGGERS
+        TrigWebScriptReport(arg_8, lcl_208);
+#endif
         return;
     }
     sprintf(t4C8, "%i", frm_218->get_unk_24());
     strcat(lcl_208, t4C8);
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigWebScriptReport(arg_8, lcl_208);
+#endif
 }
 
 // match: sub_6B060 @ 0x0006B060
@@ -1885,6 +1902,13 @@ bool sub_6B060(type_67620 *arg_0, const RwChar *arg_4, bool arg_8)
                     arg_0->vf_024()->get_unk_24_d(), arg_4, dword_4B87D8);
 #endif
     }
+#ifdef CODFH_DRAW_TRIGGERS
+#ifdef CODFH_SP
+    TrigWebScriptReport(0, fp_858);
+#else
+    TrigWebScriptReport(0, o4C != 0 ? fp_858 : m_1058);
+#endif
+#endif
     return true;
 }
 
