@@ -46,6 +46,10 @@
 #include "types/type_4E5D30.h"
 #include "game/padlib.h"
 #include "game/worldmgr.h"
+#include "types/type_4C00E8.h"
+#include "types/type_F8350.h"
+
+extern type_4C00E8 unk_4C00E8;
 
 // A world sector as RenderWare 3.7.2 lays it out (include/rw/sdk/rpworld.h;
 // the game reads boundingBox at +0x48 the same way, type_8F8C0), from the
@@ -129,7 +133,7 @@ static RwIm3DVertex s_aTextVerts[TRIGDRAW_MAXCHARS * 6];
 
 // Switches, set from the overlay's Drawing tab (trigtools.cpp): draw at all
 // (off until asked for: the environment's CODFH_TRIGGERS=1 starts with it on,
-// 2 with the collision too),
+// 2 with the collision too; CODFH_PATHNODES=1 the path nodes),
 // the draw distance from the camera (0 = unlimited), and draw through
 // walls (z test off).
 RwBool g_bTrigDrawEnabled = FALSE;
@@ -290,14 +294,13 @@ const RwChar *TrigDrawKindName(Trigger *pTrigger)
     return s_szKind;
 }
 
-// Writes the trigger's type at its centre (the matrix's position), facing
-// the camera whose matrix is pCamLtm: a quad per character with the
-// charset's glyph cell as its texture, tinted dwColour. The characters are
-// g_fTrigDrawTextScale of the distance high.
-static void TrigDrawLabel(Trigger *pTrigger, const RwMatrix *pCamLtm, RwUInt32 dwColour)
+// Writes pszText centred at *pvAt, facing the camera whose matrix is
+// pCamLtm: a quad per character with the charset's glyph cell as its
+// texture, tinted dwColour. The characters are g_fTrigDrawTextScale of the
+// distance high.
+static void TrigDrawText(const RwChar *pszText, const RwV3d *pvAt, const RwMatrix *pCamLtm, RwUInt32 dwColour)
 {
     RtCharsetDesc desc;
-    const RwChar *pszText = TrigDrawKindName(pTrigger);
     RwInt32 nChars = (RwInt32)strlen(pszText);
     RwV3d vCentre, vRight, vUp, vCorner, vP0, vP1, vP2, vP3;
     RwReal fDist, fH, fW, fRasW, fRasH, fU0, fV0, fU1, fV1;
@@ -310,9 +313,7 @@ static void TrigDrawLabel(Trigger *pTrigger, const RwMatrix *pCamLtm, RwUInt32 d
         return;
     if (nChars > TRIGDRAW_MAXCHARS)
         nChars = TRIGDRAW_MAXCHARS;
-    vCentre.x = pTrigger->unk_90;
-    vCentre.y = pTrigger->unk_94;
-    vCentre.z = pTrigger->unk_98;
+    vCentre = *pvAt;
     fDist = (RwReal)sqrt((vCentre.x - pCamLtm->pos.x) * (vCentre.x - pCamLtm->pos.x)
                          + (vCentre.y - pCamLtm->pos.y) * (vCentre.y - pCamLtm->pos.y)
                          + (vCentre.z - pCamLtm->pos.z) * (vCentre.z - pCamLtm->pos.z));
@@ -383,6 +384,233 @@ static void TrigDrawLabel(Trigger *pTrigger, const RwMatrix *pCamLtm, RwUInt32 d
     {
         RwIm3DRenderPrimitive(rwPRIMTYPETRILIST);
         RwIm3DEnd();
+    }
+}
+
+// Writes the trigger's type at its centre (the matrix's position).
+static void TrigDrawLabel(Trigger *pTrigger, const RwMatrix *pCamLtm, RwUInt32 dwColour)
+{
+    RwV3d vCentre;
+
+    vCentre.x = pTrigger->unk_90;
+    vCentre.y = pTrigger->unk_94;
+    vCentre.z = pTrigger->unk_98;
+    TrigDrawText(TrigDrawKindName(pTrigger), &vCentre, pCamLtm, dwColour);
+}
+
+// ---- the path nodes ----
+
+// The AI's path-node graph (unk_4C00E8, which sub_F8350 loads from the
+// level's GodData: the cfh-web-suite's PATHFINDING.md): each node a marker
+// (a cross and a post) coloured by its stored type, its links lines to the
+// nodes they name (two 12-bit node IDs a link word, bits 24 and 25 their
+// traversal flags: a link with a flag set, which the A* expansion skips, is
+// red), and with labels the node's ID and type. Within the path range of
+// the camera; a type filter keeps one type (and the links between its
+// nodes). The graph is the level's: multiplayer maps have none.
+RwBool g_bTrigDrawPathNodes = FALSE;
+RwBool g_bTrigDrawPathLinks = TRUE;
+RwBool g_bTrigDrawPathLabels = FALSE;
+RwReal g_fTrigDrawPathRange = 3000.0f;
+RwInt32 g_nTrigDrawPathType = -1;           // -1 all
+RwInt32 g_nTrigDrawPathShown, g_nTrigDrawPathLinksShown;
+
+#define TRIGDRAW_PATHVERTS  4000
+static RwIm3DVertex s_aPathVerts[TRIGDRAW_PATHVERTS];
+static RwInt32 s_nPathVerts;
+
+// The stored types' names (the cfh-web-suite's node_types.py, AI_NODE_TYPES.md).
+static const RwChar *const s_apszPathTypes[20] =
+{
+    "unidentified", "waypoint", "door control", "cover corner +X", "cover corner -X", "over-top cover A",
+    "height waypoint 6", "door staging -X", "door staging +X", "over-top cover B", "height waypoint 10",
+    "cover 100", "cover 200", "cover 188", "free combat", "facing marker 15", "facing marker 16",
+    "mounted weapon", "alarm", "persistent cover"
+};
+
+const RwChar *TrigDrawPathTypeName(RwInt32 nType)
+{
+    return nType >= 0 && nType < 20 ? s_apszPathTypes[nType] : "?";
+}
+
+static const RwUInt32 s_adwPathColours[8] =
+{
+    0x0040FF40, 0x00FFFF40, 0x0040C0FF, 0x00FF8040, 0x00FF40FF, 0x0040FFFF, 0x00FFFFFF, 0x00C080FF
+};
+
+static RwUInt32 TrigDrawPathColour(RwInt32 nType)
+{
+    if (nType == 1)
+        return 0xC060FF60;      // the waypoints, most of the graph
+    return 0xE0000000 | s_adwPathColours[(RwUInt32)nType & 7];
+}
+
+static void TrigDrawPathFlush()
+{
+    if (s_nPathVerts == 0)
+        return;
+    if (RwIm3DTransform(s_aPathVerts, s_nPathVerts, NULL, rwIM3D_VERTEXXYZ | rwIM3D_VERTEXRGBA))
+    {
+        RwIm3DRenderPrimitive(rwPRIMTYPELINELIST);
+        RwIm3DEnd();
+    }
+    s_nPathVerts = 0;
+}
+
+static void TrigDrawPathLine(const RwV3d *pA, const RwV3d *pB, RwUInt32 dwColour)
+{
+    if (s_nPathVerts + 2 > TRIGDRAW_PATHVERTS)
+        TrigDrawPathFlush();
+    RwIm3DVertexSetPos(&s_aPathVerts[s_nPathVerts], pA->x, pA->y, pA->z);
+    s_aPathVerts[s_nPathVerts].color = dwColour;
+    RwIm3DVertexSetPos(&s_aPathVerts[s_nPathVerts + 1], pB->x, pB->y, pB->z);
+    s_aPathVerts[s_nPathVerts + 1].color = dwColour;
+    s_nPathVerts += 2;
+}
+
+// Node nId, or NULL (0 is the null node).
+static type_F8350 *TrigDrawPathNode(RwInt32 nId)
+{
+    if (nId <= 0 || nId >= unk_4C00E8.unk_08 || unk_4C00E8.unk_2C == NULL)
+        return NULL;
+    return unk_4C00E8.unk_2C[nId];
+}
+
+// The node's link words: from +0x1C, or +0x2C with its orientation (flag bit 0).
+static const RwUInt32 *TrigDrawPathLinks(type_F8350 *pNode)
+{
+    return (const RwUInt32 *)((const RwUInt8 *)pNode + (pNode->unk_00_0 ? 0x2C : 0x1C));
+}
+
+static RwBool TrigDrawPathNear(const RwV3d *pv, const RwV3d *pvCam)
+{
+    RwReal fDX = pv->x - pvCam->x, fDY = pv->y - pvCam->y, fDZ = pv->z - pvCam->z;
+
+    return g_fTrigDrawPathRange <= 0.0f
+        || fDX * fDX + fDY * fDY + fDZ * fDZ <= g_fTrigDrawPathRange * g_fTrigDrawPathRange;
+}
+
+// Whether node nTo links back to nFrom (a two-way link is drawn once).
+static RwBool TrigDrawPathLinksTo(RwInt32 nFrom, RwInt32 nTo)
+{
+    type_F8350 *pNode = TrigDrawPathNode(nTo);
+    const RwUInt32 *p;
+    RwInt32 i;
+
+    if (pNode == NULL)
+        return FALSE;
+    p = TrigDrawPathLinks(pNode);
+    for (i = 0; i < 64; i++, p++)
+    {
+        RwInt32 nA = (RwInt32)(*p & 0xFFF), nB = (RwInt32)((*p >> 12) & 0xFFF);
+
+        if (nA == 0)
+            break;
+        if (nA == nFrom || nB == nFrom)
+            return TRUE;
+        if (nB == 0)
+            break;
+    }
+    return FALSE;
+}
+
+// Draws the graph near the camera at pvCam (with the camera's matrix for the labels).
+static void TrigDrawPaths(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    RwInt32 nId, nCount = unk_4C00E8.unk_08, i, k;
+
+    g_nTrigDrawPathShown = g_nTrigDrawPathLinksShown = 0;
+    if (!unk_4C00E8.unk_64 || unk_4C00E8.unk_2C == NULL || nCount <= 1)
+        return;
+    if (nCount > 4096)
+        nCount = 4096;
+    s_nPathVerts = 0;
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (nId = 1; nId < nCount; nId++)
+    {
+        type_F8350 *pNode = TrigDrawPathNode(nId);
+        RwV3d vAt, vA, vB;
+        RwUInt32 dwColour;
+        const RwUInt32 *p;
+
+        if (pNode == NULL || !TrigDrawPathNear(&pNode->unk_10, pvCam))
+            continue;
+        if (g_nTrigDrawPathType >= 0 && pNode->unk_04 != g_nTrigDrawPathType)
+            continue;
+        g_nTrigDrawPathShown++;
+        vAt = pNode->unk_10;
+        dwColour = TrigDrawPathColour(pNode->unk_04);
+        // the marker: a cross at the node and a post up from it
+        vA = vAt;
+        vB = vAt;
+        vA.x -= 25.0f;
+        vB.x += 25.0f;
+        TrigDrawPathLine(&vA, &vB, dwColour);
+        vA = vAt;
+        vB = vAt;
+        vA.z -= 25.0f;
+        vB.z += 25.0f;
+        TrigDrawPathLine(&vA, &vB, dwColour);
+        vB = vAt;
+        vB.y += 60.0f;
+        TrigDrawPathLine(&vAt, &vB, dwColour);
+        if (!g_bTrigDrawPathLinks)
+            continue;
+        // the links: each two-way one once (from the lower ID), one-way ones always
+        p = TrigDrawPathLinks(pNode);
+        for (i = 0; i < 64; i++, p++)
+        {
+            for (k = 0; k < 2; k++)
+            {
+                RwInt32 nTo = (RwInt32)((*p >> (k * 12)) & 0xFFF);
+                RwBool bBlocked = ((*p >> (24 + k)) & 1) != 0;
+                type_F8350 *pTo;
+
+                if (nTo == 0)
+                    break;
+                pTo = TrigDrawPathNode(nTo);
+                if (pTo == NULL)
+                    continue;
+                if (g_nTrigDrawPathType >= 0 && pTo->unk_04 != g_nTrigDrawPathType)
+                    continue;
+                if (nTo < nId && TrigDrawPathLinksTo(nId, nTo) && TrigDrawPathNear(&pTo->unk_10, pvCam))
+                    continue;
+                vA = vAt;
+                vA.y += 10.0f;
+                vB = pTo->unk_10;
+                vB.y += 10.0f;
+                TrigDrawPathLine(&vA, &vB, bBlocked ? 0xE0FF3030 : 0x9080C0FF);
+                g_nTrigDrawPathLinksShown++;
+            }
+            if (k < 2)
+                break;
+        }
+    }
+    TrigDrawPathFlush();
+    // the labels: the node's ID and type, within a third of the range
+    if (g_bTrigDrawPathLabels && TrigDrawCharset() != NULL)
+    {
+        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+        for (nId = 1; nId < nCount; nId++)
+        {
+            type_F8350 *pNode = TrigDrawPathNode(nId);
+            RwV3d vAt, vD;
+            RwChar szText[TRIGDRAW_MAXCHARS];
+
+            if (pNode == NULL || (g_nTrigDrawPathType >= 0 && pNode->unk_04 != g_nTrigDrawPathType))
+                continue;
+            vD.x = pNode->unk_10.x - pvCam->x;
+            vD.y = pNode->unk_10.y - pvCam->y;
+            vD.z = pNode->unk_10.z - pvCam->z;
+            if (vD.x * vD.x + vD.y * vD.y + vD.z * vD.z > g_fTrigDrawPathRange * g_fTrigDrawPathRange / 9.0f)
+                continue;
+            vAt = pNode->unk_10;
+            vAt.y += 80.0f;
+            _snprintf(szText, sizeof(szText) - 1, "%d %s", nId, TrigDrawPathTypeName(pNode->unk_04));
+            szText[sizeof(szText) - 1] = 0;
+            TrigDrawText(szText, &vAt, pCamLtm, 0xFF000000 | TrigDrawPathColour(pNode->unk_04));
+        }
+        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
     }
 }
 
@@ -732,8 +960,11 @@ void TrigDrawAll(RwCamera *pCamera)
             g_bTrigDrawEnabled = TRUE;
         if (s_nStart >= 2)
             g_bTrigDrawCollision = TRUE;
+        // (CODFH_PATHNODES=1: the path nodes, with their labels)
+        if (GetEnvironmentVariableA("CODFH_PATHNODES", NULL, 0))
+            g_bTrigDrawPathNodes = g_bTrigDrawPathLabels = TRUE;
     }
-    if (!g_bTrigDrawEnabled || pCamera == NULL)
+    if ((!g_bTrigDrawEnabled && !g_bTrigDrawPathNodes) || pCamera == NULL)
         return;
     pCamLtm = RwFrameGetLTM(RwCameraGetFrame(pCamera));
     vCam = pCamLtm->pos;
@@ -760,14 +991,20 @@ void TrigDrawAll(RwCamera *pCamera)
         TrigDrawCollision(&vCam);
     }
     RwRenderStateSet(rwRENDERSTATEZTESTENABLE, (void *)(g_bTrigDrawSeeThrough ? FALSE : TRUE));
+    if (g_bTrigDrawPathNodes)
+        TrigDrawPaths(&vCam, pCamLtm);
+    if (!g_bTrigDrawEnabled)
+        i = dword_429D00 + 1;
+    else
+        i = 0;
 
-    for (i = 0; i <= dword_429D00 && i < 2000; i++)
+    for (; i <= dword_429D00 && i < 2000; i++)
     {
         pTrigger = (Trigger *)dword_4CFE30[i];
         if (pTrigger != NULL && TrigDrawInRange(pTrigger, &vCam))
             TrigDrawOne(pTrigger);
     }
-    if (g_bTrigDrawLabels && TrigDrawCharset() != NULL)
+    if (g_bTrigDrawEnabled && g_bTrigDrawLabels && TrigDrawCharset() != NULL)
     {
         RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
         for (i = 0; i <= dword_429D00 && i < 2000; i++)

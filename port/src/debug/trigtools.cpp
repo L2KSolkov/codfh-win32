@@ -2,8 +2,8 @@
 // overlay): the plain build's research web pages (research/trigweb.cpp in
 // C:\codfh-patches\plain-build\draw-triggers.patch) as tabs of an overlay
 // window, live state read straight from memory and the pages' actions:
-//   Drawing     trigdraw.cpp's switches (triggers, collision, noclip, the free
-//               camera) and
+//   Drawing     trigdraw.cpp's switches (triggers, collision, the AI's path
+//               nodes, noclip, the free camera) and
 //               the game's own debug menu
 //   Player      the local player (sub_1745A0(0), a type_10F710)
 //   Inventory   health, the inventory and the 39 weapons, with gives
@@ -61,6 +61,7 @@
 #include <stddef.h>
 #include "types/type_4D1DB8.h"
 #include "game/data.h"
+#include "types/type_4C00E8.h"
 
 #include "../../third_party/imgui/imgui.h"
 
@@ -82,6 +83,13 @@ extern RwReal g_fTrigDrawTextScale;
 extern RwReal g_fTrigDrawCollisionRange;
 extern RwReal g_fTrigDrawCollisionLift;
 extern RwBool g_bTrigDrawFreeCam;
+extern RwBool g_bTrigDrawPathNodes;
+extern RwBool g_bTrigDrawPathLinks;
+extern RwBool g_bTrigDrawPathLabels;
+extern RwReal g_fTrigDrawPathRange;
+extern RwInt32 g_nTrigDrawPathType;
+extern RwInt32 g_nTrigDrawPathShown, g_nTrigDrawPathLinksShown;
+const RwChar *TrigDrawPathTypeName(RwInt32 nType);
 extern RwReal g_fTrigDrawFreeCamSpeed;
 extern RwReal g_fTrigDrawFreeCamLook;
 const RwChar *TrigDrawKindName(Trigger *pTrigger);
@@ -926,6 +934,44 @@ static void TabDrawing()
     Check("draw the collision worlds", &g_bTrigDrawCollision);
     ImGui::SliderFloat("collision draw distance", &g_fTrigDrawCollisionRange, 5.0f, 200.0f, "%.0f");
     ImGui::SliderFloat("collision lift along the normal", &g_fTrigDrawCollisionLift, 0.0f, 0.5f, "%.3f");
+    ImGui::Separator();
+    Check("draw the AI's path nodes", &g_bTrigDrawPathNodes);
+    ImGui::SameLine();
+    Check("their links", &g_bTrigDrawPathLinks);
+    ImGui::SameLine();
+    Check("their IDs and types", &g_bTrigDrawPathLabels);
+    ImGui::SliderFloat("path node draw distance (0 unlimited)", &g_fTrigDrawPathRange, 0.0f, 20000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    {
+        RwChar szType[48];
+        RwInt32 t;
+
+        if (g_nTrigDrawPathType < 0)
+            strcpy(szType, "all types");
+        else
+            sprintf(szType, "%d %s", g_nTrigDrawPathType, TrigDrawPathTypeName(g_nTrigDrawPathType));
+        if (ImGui::BeginCombo("path node type", szType))
+        {
+            if (ImGui::Selectable("all types", g_nTrigDrawPathType < 0))
+                g_nTrigDrawPathType = -1;
+            for (t = 0; t < 20; t++)
+            {
+                sprintf(szType, "%d %s", t, TrigDrawPathTypeName(t));
+                if (ImGui::Selectable(szType, g_nTrigDrawPathType == t))
+                    g_nTrigDrawPathType = t;
+            }
+            ImGui::EndCombo();
+        }
+    }
+    if (g_bTrigDrawPathNodes)
+    {
+        if (unk_4C00E8.unk_64 && unk_4C00E8.unk_08 > 1)
+            ImGui::TextDisabled("(%d nodes in the level's graph, grid %d x %d of %d; drawn: %d nodes, %d links; red "
+                                "links are ones the A* skips)", unk_4C00E8.unk_08 - 1, unk_4C00E8.unk_24,
+                                unk_4C00E8.unk_28, unk_4C00E8.unk_04, g_nTrigDrawPathShown, g_nTrigDrawPathLinksShown);
+        else
+            ImGui::TextDisabled("(no path graph loaded: multiplayer maps have none)");
+    }
     ImGui::Separator();
     Check("noclip for the local player", &g_bTrigDrawNoclip);
     ImGui::SliderFloat("noclip speed", &g_fTrigDrawNoclipSpeed, 1.0f, 500.0f, "%.0f");
