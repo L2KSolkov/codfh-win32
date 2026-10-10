@@ -37,6 +37,7 @@ public:
     {
         return unk_14C;
     }
+    // unk_140 (IsOnlyLiveOnce).
     virtual RwInt32 vf_014()
     {
         return unk_140;
@@ -44,7 +45,6 @@ public:
     // Adds arg_4 to (arg_0 set) or sets (arg_0 0) the number it may spawn,
     // unk_14C (0x7FFFFFFF: no limit).
     virtual void vf_010(RwInt32 arg_0, RwInt32 arg_4);
-    // unk_140.
     // Its CCESS tracker's kind, by its definition's weapon class: 1, 2 or 4.
     virtual RwInt32 vf_018();
     // &unk_D8, folded (/OPT:ICF) into SimpleMechanicTrigger's (sub_B7530).

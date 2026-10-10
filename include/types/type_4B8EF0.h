@@ -1,8 +1,9 @@
 /*
  * type_4B8EF0: the shell manager ("Restart: shellManager.Restart()"), one
  * object at dword_4B8EF0 (built by its dynamic initializer at 0x30B500):
- * the front end's settings (CShellLevelBehaviorClass's HandleAttributes,
- * sub_B7060, sets them), the HUD it owns (unk_2A0, built when its flag 4 is
+ * the front end's settings (CShellBehaviorClass's HandleAttributes,
+ * sub_B0980, sets nearly all, the 54 keys with its commands 119 to 172;
+ * CShellLevelBehaviorClass's, sub_B7060, only a few), the HUD it owns (unk_2A0, built when its flag 4 is
  * set), its camera, the loading screen and its progress bar (sub_E9FB0),
  * and the shell's fonts' path. Its data and the 54 keys the level's
  * objects name are in its base type_E8F90, whose implicit constructor
@@ -27,18 +28,18 @@ struct type_E8F90
     RwReal unk_00;              // CShellLevelBehaviorClass's command 0: the
                                 // level's north in degrees (the HUD's radar,
                                 // type_DC400::sub_E4030, turns by it)
-    RwInt32 unk_04;
+    RwInt32 unk_04;             // read as a float pair (unk_4B8EF4)
     RwInt32 unk_08;
     RwUInt8 unk_0C[0x10];
-    RwInt32 unk_1C;
-    RwInt32 unk_20;
-    RwInt32 unk_24;             // commands 3 and 4
-    RwInt32 unk_28;
+    RwInt32 unk_1C;             // read as a float (flt_4B8F0C)
+    RwInt32 unk_20;             // read as a float (flt_4B8F10)
+    RwInt32 unk_24;             // command 3; read as a float (flt_4B8F14)
+    RwInt32 unk_28;             // command 4; read as a float (flt_4B8F18)
     RwReal unk_2C;              // command 2, times 1000
     RwUInt8 unk_30[0x8];
     RwRGBA unk_38;              // command 5: a colour
     RwUInt8 unk_3C[0x4];
-    RwReal unk_40;              // 5 at set-up
+    RwReal unk_40;              // 5 at set-up (flt_4B8F30)
     RwUInt8 unk_44[0x20];
     RwInt32 unk_64;
     RwInt32 unk_68;
@@ -97,12 +98,12 @@ struct type_E8F90
     type_3DF8D8_04 unk_24C;
     type_3DF8D8_04 unk_254;
     type_3DF8D8_04 unk_25C;
-    RwInt32 unk_264;
+    RwInt32 unk_264;            // read as a float (dword_4B9154)
     RwUInt8 unk_268[0x14];
     RwInt32 unk_27C;
     RwInt32 unk_280;
     RwUInt8 unk_284[0x18];
-    RwInt32 unk_29C;
+    RwInt32 unk_29C;            // dword_4B918C: the credits flag
     type_DC400 *unk_2A0;        // the HUD (flag 4)
     RwUInt32 unk_2A4;           // flags: 4 builds the HUD
     RwCamera *unk_2A8;          // its camera

@@ -33,14 +33,14 @@ public:
 };
 typedef RwChar CShellLevelBehaviorClass_size_check[sizeof(CShellLevelBehaviorClass) == 0x20 ? 1 : -1];
 
-// A level setting (command 8).
+// The credits flag (command 8): Credits.bik plays after the closing movie.
 #ifdef CODFH_PLAIN
 extern RwInt32 &dword_4B918C;
 #else
 extern RwInt32 dword_4B918C;
 #endif
-// Take the names (keys) commands 6 and 7 give (registered with the kind
-// 0x3B); only the widths are known.
+// Set the level's opening (sub_E8DB0) and closing (sub_E8E30) movie from
+// the keys commands 6 and 7 give (registered with the kind 0x3B).
 void sub_E8DB0(Trigger_key *arg_0);
 void sub_E8E30(Trigger_key *arg_0);
 

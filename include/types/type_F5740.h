@@ -26,12 +26,12 @@ struct type_F5740
     RwReal unk_08;              // the delay, in frames
     RwV3d unk_0C;               // the offset from the trigger
     RwInt16 unk_18;             // set once started
-    RwInt16 unk_1A;
+    RwInt16 unk_1A;             // the sound follows the player
     RwInt16 unk_1C;             // placed by the trigger's whole matrix
     RwInt16 unk_1E;             // the offset is in the world, not turned
     type_3DF8D8_04 unk_20;      // its sound's key
     type_F2880 unk_28;          // its particle system
-    RwInt32 unk_34;             // the sound follows the player
+    RwInt32 unk_34;             // set for its blast
     RwReal unk_38;              // its blast's radius
     union
     {

@@ -26,6 +26,7 @@
 
 #include <xtl.h>
 #include <math.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,12 +51,16 @@
 #include "types/type_F8350.h"
 #include "types/AIData.h"
 #include "types/type_3DAFC8.h"
+#include "types/type_3D32F8.h"
+#include <stddef.h>
 #include "types/type_3DC9B0.h"
 #include "types/type_15CCE0.h"
 #include "types/type_154C0_F80.h"
 #include "types/type_154C0_12F4.h"
 
 #include "types/type_D48D0.h"
+#include "types/type_1227C0.h"
+#include "types/ProjectileGeneratorTrigger.h"
 #include "types/type_67620.h"
 #include "types/type_3D2E7C.h"
 #include "types/alfaobject.h"
@@ -683,18 +688,18 @@ struct TrigDrawAiNotes
     RwChar aszText[TRIGDRAW_AI_NOTES][TRIGDRAW_AI_NOTE];
 };
 static TrigDrawAiNotes s_aAiNotes[TRIGDRAW_AI_ENTITIES];
+extern RwBool g_bTrigLiveDebug;          // (a live viewer takes the debug feed: the notes are kept)
 static volatile LONG s_nAiNotesLock;
+
+static void TrigDrawNoteKeep(TrigDrawAiNotes *pAll, RwInt32 nAll, const void *pKey, const RwChar *pszText);
 
 // Keeps a note about the entity pEntity (its newest four), for its label.
 void TrigDrawAiNote(const void *pEntity, const RwChar *pszText)
 {
-    TrigDrawAiNotes *pNotes = NULL;
-    RwInt32 i, nOldest = 0;
-
     RwChar szShort[TRIGDRAW_AI_NOTE];
     const RwChar *p;
 
-    if (!g_bTrigDrawAi || pEntity == NULL || pszText == NULL)
+    if ((!g_bTrigDrawAi && !g_bTrigLiveDebug) || pEntity == NULL || pszText == NULL)
         return;
     // (the A* scheduler's lines, shortened to the search type the game names: "A* eASST_...")
     static const RwChar s_szRegistered[] = "AStar search registered. Type: ";
@@ -711,23 +716,33 @@ void TrigDrawAiNote(const void *pEntity, const RwChar *pszText)
             *strchr(szShort, ',') = 0;
         pszText = szShort;
     }
+    TrigDrawNoteKeep(s_aAiNotes, TRIGDRAW_AI_ENTITIES, pEntity, pszText);
+}
+
+// Keeps the note pszText under pKey in pAll (nAll keys, the oldest
+// replaced): its newest four, a repeat counted on the newest.
+static void TrigDrawNoteKeep(TrigDrawAiNotes *pAll, RwInt32 nAll, const void *pKey, const RwChar *pszText)
+{
+    TrigDrawAiNotes *pNotes = NULL;
+    RwInt32 i, nOldest = 0;
+
     while (InterlockedExchange(&s_nAiNotesLock, 1))
         ;
-    for (i = 0; i < TRIGDRAW_AI_ENTITIES; i++)
+    for (i = 0; i < nAll; i++)
     {
-        if (s_aAiNotes[i].pEntity == pEntity)
+        if (pAll[i].pEntity == pKey)
         {
-            pNotes = &s_aAiNotes[i];
+            pNotes = &pAll[i];
             break;
         }
-        if (s_aAiNotes[i].dwLast < s_aAiNotes[nOldest].dwLast)
+        if (pAll[i].dwLast < pAll[nOldest].dwLast)
             nOldest = i;
     }
     if (pNotes == NULL)
     {
-        pNotes = &s_aAiNotes[nOldest];
+        pNotes = &pAll[nOldest];
         memset(pNotes, 0, sizeof(*pNotes));
-        pNotes->pEntity = pEntity;
+        pNotes->pEntity = pKey;
     }
     pNotes->dwLast = port_frame ? port_frame : 1;
     {
@@ -755,7 +770,7 @@ void TrigDrawAiMessage(const RwChar *pszName, type_67620 *pScript)
 {
     const void *pEntity = NULL;
 
-    if (!g_bTrigDrawAi || pScript == NULL || pszName == NULL)
+    if ((!g_bTrigDrawAi && !g_bTrigLiveDebug) || pScript == NULL || pszName == NULL)
         return;
     __try
     {
@@ -1106,6 +1121,58 @@ static RwBool TrigDrawAiRead(type_3D3548 *pEntity, RwUInt32 dwBits, TrigDrawAiSt
 }
 
 // Draws every AI near the camera at pvCam.
+// Adds the notes kept under pKey in pAll to aszLines from line nLines,
+// newest first, with their age in seconds; the lines then.
+static RwInt32 TrigDrawNoteLines(TrigDrawAiNotes *pAll, RwInt32 nAll, const void *pKey,
+                                 RwChar (*aszLines)[TRIGDRAW_AI_NOTE + 16], RwInt32 nLines)
+{
+    TrigDrawAiNotes *pNotes = NULL;
+    RwInt32 j;
+
+    for (j = 0; j < nAll; j++)
+        if (pAll[j].pEntity == pKey)
+        {
+            pNotes = &pAll[j];
+            break;
+        }
+    for (j = 0; pNotes && j < TRIGDRAW_AI_NOTES; j++)
+    {
+        RwInt32 n = (pNotes->nNext + TRIGDRAW_AI_NOTES - 1 - j) % TRIGDRAW_AI_NOTES;
+
+        if (!pNotes->adwFrame[n])
+            continue;
+        if (pNotes->anRepeats[n] > 1)
+            _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE + 15, "%.0fs %s (x%d)",
+                      (RwReal)(port_frame - pNotes->adwFrame[n]) / 60.0f, pNotes->aszText[n], pNotes->anRepeats[n]);
+        else
+            _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE + 15, "%.0fs %s",
+                      (RwReal)(port_frame - pNotes->adwFrame[n]) / 60.0f, pNotes->aszText[n]);
+    }
+    return nLines;
+}
+
+// The label's lines, stacked up the screen from pvAt (the first on top):
+// white, the last nNotes orange.
+static void TrigDrawLines(RwChar (*aszLines)[TRIGDRAW_AI_NOTE + 16], RwInt32 nLines, RwInt32 nNotes,
+                          const RwV3d *pvAt, RwReal fDist, const RwMatrix *pCamLtm)
+{
+    RwReal fStep = fDist * g_fTrigDrawTextScale * 1.2f;
+    RwInt32 j;
+
+    if (fStep < 0.06f)
+        fStep = 0.06f;
+    for (j = 0; j < nLines; j++)
+    {
+        RwV3d vAt;
+
+        aszLines[j][TRIGDRAW_AI_NOTE + 15] = 0;
+        vAt.x = pvAt->x + pCamLtm->up.x * fStep * (RwReal)(nLines - j);
+        vAt.y = pvAt->y + pCamLtm->up.y * fStep * (RwReal)(nLines - j);
+        vAt.z = pvAt->z + pCamLtm->up.z * fStep * (RwReal)(nLines - j);
+        TrigDrawText(aszLines[j], &vAt, pCamLtm, j < nLines - nNotes ? 0xFFFFFFFF : 0xFFFFD080);
+    }
+}
+
 static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
 {
     static TrigDrawAiState s_state;
@@ -1242,7 +1309,6 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
             RwChar aszLines[12 + TRIGDRAW_AI_NOTES][TRIGDRAW_AI_NOTE + 16];
             RwInt32 nLines = 0, j;
             RwReal fDist = (RwReal)sqrt(vD.x * vD.x + vD.y * vD.y + vD.z * vD.z), fStep;
-            TrigDrawAiNotes *pNotes = NULL;
 
             _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "#%d %s hp %d", i,
                       (dwBits & 0x20) ? "soldier" : "ai", s->nHp);
@@ -1278,14 +1344,14 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
             if (g_bTrigDrawAiCombat)
             {
                 _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "tracked %.1fs%s, hears %X/%X/%d%s%s",
-                          s->fTracked / 60.0f, s->bSeen ? ", seen (x)" : "", s->nHearClasses, s->nHearKinds,
+                          s->fTracked / 60.0f, s->bSeen ? ", chase point (x)" : "", s->nHearClasses, s->nHearKinds,
                           s->nHearSides, s->nLosLoss ? ", may lose sight" : "", s->nControl ? "" : ", no AI control");
             {
                 RwChar szBlocker[32] = "";
 
                 if (s->fBlocker > 0.0f && s->fBlocker < 1e30f)
-                    _snprintf(szBlocker, sizeof(szBlocker) - 1, ", blocker at %.0f", s->fBlocker);
-                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "fighting %.1fs, not %.1fs, burst %d left%s",
+                    _snprintf(szBlocker, sizeof(szBlocker) - 1, ", line of fire blocked at %.0f%%", s->fBlocker * 100.0f);
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "idle/pursuing %.1fs, engaging %.1fs, burst %d left%s",
                           s->fIn / 60.0f, s->fOut / 60.0f, s->nShots, szBlocker);
             }
                 if (s->bWeapon)
@@ -1296,28 +1362,9 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
                 _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "node: at #%d %s, next #%d %s", s->nNodeId,
                           s->nNodeId ? TrigDrawPathTypeName(s->nNodeType) : "-", s->nNextId,
                           s->nNextId ? TrigDrawPathTypeName(s->nNextType) : "-");
-            for (j = 0; j < TRIGDRAW_AI_ENTITIES; j++)
-                if (s_aAiNotes[j].pEntity == pEntity)
-                {
-                    pNotes = &s_aAiNotes[j];
-                    break;
-                }
             // the notes, newest first, with their age in seconds
             RwInt32 nNotes = nLines;
-            for (j = 0; pNotes && j < TRIGDRAW_AI_NOTES; j++)
-            {
-                RwInt32 n = (pNotes->nNext + TRIGDRAW_AI_NOTES - 1 - j) % TRIGDRAW_AI_NOTES;
-
-                if (!pNotes->adwFrame[n])
-                    continue;
-                if (pNotes->anRepeats[n] > 1)
-                    _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE + 15, "%.0fs %s (x%d)",
-                              (RwReal)(port_frame - pNotes->adwFrame[n]) / 60.0f, pNotes->aszText[n],
-                              pNotes->anRepeats[n]);
-                else
-                    _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE + 15, "%.0fs %s",
-                              (RwReal)(port_frame - pNotes->adwFrame[n]) / 60.0f, pNotes->aszText[n]);
-            }
+            nLines = TrigDrawNoteLines(s_aAiNotes, TRIGDRAW_AI_ENTITIES, pEntity, aszLines, nLines);
             nNotes = nLines - nNotes;
             fStep = fDist * g_fTrigDrawTextScale * 1.2f;
             if (fStep < 0.06f)
@@ -1335,6 +1382,295 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
             }
         }
         RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    }
+    TrigDrawPathFlush();
+}
+
+// ---- the projectile generators ----
+
+// Each live projectile generator (type_1227C0, the list dword_4CE8F8): its
+// muzzle (its matrix, unk_70: a cross and its facing; orange fires bullets,
+// red lobs shells), the line to its target by its kind (unk_38: red the
+// nearest entity, orange a set one, yellow a point, blue its path), where
+// it aims (unk_B0, a yellow cross; the last, unk_BC, dimmer) with its spread
+// (unk_60) as a circle there, its turret's facing (unk_12C: cyan, magenta
+// while it turns), and a grey line to its trigger; over it its state, its
+// stage, burst and timers, then its notes (its shots, bursts, stages and
+// starts, seen frame to frame).
+RwBool g_bTrigDrawPg = FALSE;
+RwBool g_bTrigDrawPgText = TRUE;
+RwReal g_fTrigDrawPgRange = 0.0f;
+RwInt32 g_nTrigDrawPgShown;
+
+#define TRIGDRAW_PG_NOTED 64
+static TrigDrawAiNotes s_aPgNotes[TRIGDRAW_PG_NOTED];
+
+// A generator as last seen, for its notes.
+struct TrigDrawPgSeen
+{
+    const void *pGen;
+    RwInt32 nState, nStage, nShots, nStageShots;
+};
+static TrigDrawPgSeen s_aPgSeen[TRIGDRAW_PG_NOTED];
+
+struct TrigDrawPgState
+{
+    RwInt32 nId, nKind, nState, nForced, nTurning, nStagesOn, nStage, nTargetKind, nStageShots, nShots, nBursts,
+        nLos, nReplays;
+    RwReal fNext, fSpread, fHeight, fPathAt, fPathSpeed, fWait, fWaitLeft, fReplay, fSpeed;
+    RwV3d vPos, vAt, vAim, vLastAim, vTarget, vFacing, vTrigger;
+    RwBool bTarget, bTrigger;
+};
+
+static RwBool TrigDrawEntityPos(type_D48D0 *pHandle, RwV3d *pv)
+{
+    type_3D3548 *pEntity = pHandle->sub_D4910();
+
+    if (pEntity == NULL || pEntity->unk_338.unk_08 == NULL)
+        return FALSE;
+    *pv = RwFrameGetMatrix(pEntity->unk_338.unk_08)->pos;
+    return TRUE;
+}
+
+static RwBool TrigDrawPgRead(type_1227C0 *pGen, TrigDrawPgState *p)
+{
+    __try
+    {
+        ProjectileGeneratorTrigger *pTrigger = pGen->unk_18.unk_08_pg;
+
+        p->nId = pGen->unk_104;
+        p->nKind = pGen->vf_01C() != NULL ? 1 : 0;
+        p->nState = pGen->unk_14;
+        p->nForced = pGen->unk_28;
+        p->nTurning = pGen->unk_2C == 0;
+        p->nStagesOn = pGen->unk_30;
+        p->nStage = pGen->unk_34;
+        p->nTargetKind = pGen->unk_38;
+        p->nStageShots = pGen->unk_3C;
+        p->nShots = pGen->unk_40;
+        p->fNext = pGen->unk_44;
+        p->nBursts = pGen->unk_50;
+        p->fSpread = pGen->unk_60_r;
+        p->fHeight = pGen->unk_C8;
+        p->fPathAt = pGen->unk_CC;
+        p->fPathSpeed = pGen->unk_D0;
+        p->nLos = p->nKind == 0 ? ((type_11DB10 *)pGen)->unk_20C : -1;
+        p->fWait = pGen->unk_138;
+        p->fWaitLeft = pGen->unk_13C;
+        p->nReplays = pGen->unk_140;
+        p->fReplay = pGen->unk_144;
+        p->vPos = pGen->unk_70.pos;
+        p->vAt = pGen->unk_70.at;
+        p->vAim = pGen->unk_B0;
+        p->vLastAim = pGen->unk_BC;
+        p->vFacing = pGen->unk_12C;
+        p->bTarget = FALSE;
+        if (p->nTargetKind == 2)
+        {
+            p->vTarget = pGen->unk_54;
+            p->bTarget = TRUE;
+        }
+        else if (p->nTargetKind <= 1)
+            p->bTarget = TrigDrawEntityPos(&pGen->unk_24, &p->vTarget);
+        p->bTrigger = pTrigger != NULL;
+        p->fSpeed = 0.0f;
+        if (pTrigger)
+        {
+            p->vTrigger.x = pTrigger->unk_90;
+            p->vTrigger.y = pTrigger->unk_94;
+            p->vTrigger.z = pTrigger->unk_98;
+            p->fSpeed = pTrigger->unk_158_r;
+        }
+        return TRUE;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+
+// Its notes: what changed since the last frame.
+static void TrigDrawPgNotes(const void *pGen, const TrigDrawPgState *p)
+{
+    TrigDrawPgSeen *pSeen = NULL;
+    RwInt32 i;
+    RwChar sz[TRIGDRAW_AI_NOTE];
+
+    for (i = 0; i < TRIGDRAW_PG_NOTED; i++)
+        if (s_aPgSeen[i].pGen == pGen)
+        {
+            pSeen = &s_aPgSeen[i];
+            break;
+        }
+    if (pSeen == NULL)
+    {
+        for (i = 0; i < TRIGDRAW_PG_NOTED && s_aPgSeen[i].pGen != NULL; i++)
+            ;
+        if (i == TRIGDRAW_PG_NOTED)
+            return;
+        pSeen = &s_aPgSeen[i];
+        pSeen->pGen = pGen;
+        pSeen->nState = p->nState;
+        pSeen->nStage = p->nStage;
+        pSeen->nShots = p->nShots;
+        pSeen->nStageShots = p->nStageShots;
+        return;
+    }
+    if (p->nState != pSeen->nState)
+        TrigDrawNoteKeep(s_aPgNotes, TRIGDRAW_PG_NOTED, pGen,
+                         p->nState == 0 ? "stopped" : pSeen->nState == 0 ? "started" : "firing");
+    if (p->nShots < pSeen->nShots)
+        TrigDrawNoteKeep(s_aPgNotes, TRIGDRAW_PG_NOTED, pGen, "shot");
+    else if (p->nShots > pSeen->nShots)
+    {
+        _snprintf(sz, sizeof(sz) - 1, "burst of %d", p->nShots);
+        sz[sizeof(sz) - 1] = 0;
+        TrigDrawNoteKeep(s_aPgNotes, TRIGDRAW_PG_NOTED, pGen, sz);
+    }
+    if (p->nStage != pSeen->nStage)
+    {
+        _snprintf(sz, sizeof(sz) - 1, p->nStage >= 3 ? "stages over" : "stage %d", p->nStage);
+        sz[sizeof(sz) - 1] = 0;
+        TrigDrawNoteKeep(s_aPgNotes, TRIGDRAW_PG_NOTED, pGen, sz);
+    }
+    pSeen->nState = p->nState;
+    pSeen->nStage = p->nStage;
+    pSeen->nShots = p->nShots;
+    pSeen->nStageShots = p->nStageShots;
+}
+
+static void TrigDrawCross(const RwV3d *pv, RwReal f, RwUInt32 dwColour)
+{
+    RwV3d vA = *pv, vB = *pv;
+
+    vA.x -= f;
+    vB.x += f;
+    TrigDrawPathLine(&vA, &vB, dwColour);
+    vA = *pv;
+    vB = *pv;
+    vA.y -= f;
+    vB.y += f;
+    TrigDrawPathLine(&vA, &vB, dwColour);
+    vA = *pv;
+    vB = *pv;
+    vA.z -= f;
+    vB.z += f;
+    TrigDrawPathLine(&vA, &vB, dwColour);
+}
+
+static void TrigDrawPg(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    static const RwChar *const s_apszTarget[4] = {"the nearest entity", "an entity", "a point", "its path"};
+    static const RwUInt32 s_adwTarget[4] = {0xE0FF4040, 0xE0FF9040, 0xE0FFFF40, 0xE040A0FF};
+    static TrigDrawPgState s_state;
+    type_1227C0 *pGen;
+    RwInt32 n = 0, k;
+
+    g_nTrigDrawPgShown = 0;
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (pGen = dword_4CE8F8; pGen != NULL && n < 512; n++)
+    {
+        TrigDrawPgState *p = &s_state;
+        type_1227C0 *pNext;
+        RwV3d vD, vEnd;
+        RwReal fDist;
+        RwUInt32 dwKind;
+
+        if (!TrigDrawPgRead(pGen, p))
+            break;
+        pNext = pGen->unk_100;
+        TrigDrawPgNotes(pGen, p);
+        vD.x = p->vPos.x - pvCam->x;
+        vD.y = p->vPos.y - pvCam->y;
+        vD.z = p->vPos.z - pvCam->z;
+        fDist = (RwReal)sqrt(vD.x * vD.x + vD.y * vD.y + vD.z * vD.z);
+        if (g_fTrigDrawPgRange > 0.0f && fDist > g_fTrigDrawPgRange)
+        {
+            pGen = pNext;
+            continue;
+        }
+        g_nTrigDrawPgShown++;
+        dwKind = p->nKind ? 0xFFFF3030 : 0xFFFF9020;
+        // the muzzle and its facing
+        TrigDrawCross(&p->vPos, 30.0f, dwKind);
+        vEnd.x = p->vPos.x + p->vAt.x * 120.0f;
+        vEnd.y = p->vPos.y + p->vAt.y * 120.0f;
+        vEnd.z = p->vPos.z + p->vAt.z * 120.0f;
+        TrigDrawPathLine(&p->vPos, &vEnd, dwKind);
+        // the turret's facing
+        if (p->vFacing.x != 0.0f || p->vFacing.y != 0.0f || p->vFacing.z != 0.0f)
+        {
+            vEnd.x = p->vPos.x + p->vFacing.x * 200.0f;
+            vEnd.y = p->vPos.y + p->vFacing.y * 200.0f;
+            vEnd.z = p->vPos.z + p->vFacing.z * 200.0f;
+            TrigDrawPathLine(&p->vPos, &vEnd, p->nTurning ? 0xE0FF40FF : 0xE040FFFF);
+        }
+        // its target
+        if (p->bTarget && p->nTargetKind >= 0 && p->nTargetKind < 4)
+            TrigDrawPathLine(&p->vPos, &p->vTarget, s_adwTarget[p->nTargetKind]);
+        // where it aims, and its spread there
+        if (p->vAim.x != 0.0f || p->vAim.y != 0.0f || p->vAim.z != 0.0f)
+        {
+            TrigDrawPathLine(&p->vPos, &p->vAim, 0x80FFFF60);
+            TrigDrawCross(&p->vAim, 40.0f, 0xFFFFFF40);
+            if (p->fSpread > 0.0f && p->fSpread < 5000.0f)
+                for (k = 0; k < 24; k++)
+                {
+                    RwReal a0 = (RwReal)k * (6.2831853f / 24), a1 = (RwReal)(k + 1) * (6.2831853f / 24);
+                    RwV3d vA = p->vAim, vB = p->vAim;
+
+                    vA.x += (RwReal)cos(a0) * p->fSpread;
+                    vA.z += (RwReal)sin(a0) * p->fSpread;
+                    vB.x += (RwReal)cos(a1) * p->fSpread;
+                    vB.z += (RwReal)sin(a1) * p->fSpread;
+                    TrigDrawPathLine(&vA, &vB, 0xA0FFFF40);
+                }
+        }
+        if (p->vLastAim.x != 0.0f || p->vLastAim.y != 0.0f || p->vLastAim.z != 0.0f)
+            TrigDrawCross(&p->vLastAim, 25.0f, 0x80A0A040);
+        if (p->bTrigger)
+            TrigDrawPathLine(&p->vPos, &p->vTrigger, 0x60C0C0C0);
+
+        if (g_bTrigDrawPgText && TrigDrawCharset() != NULL)
+        {
+            RwChar aszLines[8 + TRIGDRAW_AI_NOTES][TRIGDRAW_AI_NOTE + 16];
+            RwInt32 nLines = 0, nNotes;
+            RwV3d vAt = p->vPos;
+
+            TrigDrawPathFlush();
+            RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+            _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "generator %d (%s): %s%s", p->nId & 0xFFFF,
+                      p->nKind ? "shells" : "bullets",
+                      p->nState == 1 ? "firing" : p->nState == 2 ? "updated" : p->nState == 0 ? "stopped" : "?",
+                      p->nForced ? ", forced" : "");
+            if (p->nTargetKind == 3)
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "target: its path at %.2f (speed %g)", p->fPathAt,
+                          p->fPathSpeed);
+            else
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "target: %s%s, spread %g, height %g",
+                          p->nTargetKind >= 0 && p->nTargetKind < 4 ? s_apszTarget[p->nTargetKind] : "?",
+                          p->bTarget || p->nTargetKind == 2 ? "" : " (none now)", p->fSpread, p->fHeight);
+            _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "burst: %d left, next in %.1fs, %d shots to the long pause",
+                      p->nShots, p->fNext / 60.0f, p->nBursts);
+            if (p->nStagesOn)
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE,
+                          p->nStage >= 3 ? "stages: over" : "stage %d: %d bursts left", p->nStage, p->nStageShots);
+            if (p->nTurning || p->fWaitLeft > 0.0f)
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "%s%sholding its aim %.1f of %.1fs",
+                          p->nTurning ? "turret not on target" : "", p->nTurning ? ", " : "", p->fWaitLeft / 60.0f,
+                          p->fWait / 60.0f);
+            _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "%sprojectile speed %g",
+                      p->nLos < 0 ? "" : p->nLos ? "line of sight check on, " : "line of sight check off, ", p->fSpeed);
+            if (p->nReplays && p->fReplay > 0.0f)
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "hit: paused %.1fs more", p->fReplay / 60.0f);
+            nNotes = nLines;
+            nLines = TrigDrawNoteLines(s_aPgNotes, TRIGDRAW_PG_NOTED, pGen, aszLines, nLines);
+            nNotes = nLines - nNotes;
+            vAt.y += 40.0f;
+            TrigDrawLines(aszLines, nLines, nNotes, &vAt, fDist, pCamLtm);
+            RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+        }
+        pGen = pNext;
     }
     TrigDrawPathFlush();
 }
@@ -1665,6 +2001,57 @@ static RwBool TrigDrawInRange(Trigger *pTrigger, const RwV3d *pvCam)
 // Draws every registered trigger within g_fTrigDrawRange of the camera
 // pCamera, outlines first and then their labels; called once a frame after
 // the world (sub_125F20). Saves and restores the render states it changes.
+// Points the free camera at pv from a little way off (the Generators tab).
+void TrigDrawFreeCamLookAt(const RwV3d *pv)
+{
+    RwV3d vFrom, vD;
+    RwReal fLen;
+
+    vFrom.x = pv->x - 500.0f;
+    vFrom.y = pv->y + 350.0f;
+    vFrom.z = pv->z - 500.0f;
+    vD.x = pv->x - vFrom.x;
+    vD.y = pv->y - vFrom.y;
+    vD.z = pv->z - vFrom.z;
+    fLen = (RwReal)sqrt(vD.x * vD.x + vD.y * vD.y + vD.z * vD.z);
+    s_vFreeCamPos = vFrom;
+    s_fFreeCamYaw = (RwReal)atan2(vD.x, vD.z);
+    s_fFreeCamPitch = (RwReal)asin(vD.y / fLen);
+    memset(&s_FreeCamPad, 0, sizeof(s_FreeCamPad));
+    QueryPerformanceCounter(&s_liFreeCamLast);
+    s_bFreeCamLive = TRUE;
+    g_bTrigDrawFreeCam = TRUE;
+}
+
+// The free camera's place, for the live link (trigweb.cpp): TRUE while it is on.
+RwBool TrigDrawFreeCamGet(RwV3d *pv, RwReal *pfYaw, RwReal *pfPitch)
+{
+    if (!g_bTrigDrawFreeCam || !s_bFreeCamLive)
+        return FALSE;
+    *pv = s_vFreeCamPos;
+    *pfYaw = s_fFreeCamYaw;
+    *pfPitch = s_fFreeCamPitch;
+    return TRUE;
+}
+
+// Puts the free camera at pv, looking along fYaw and fPitch (the viewer's own view).
+void TrigDrawFreeCamSet(const RwV3d *pv, RwReal fYaw, RwReal fPitch)
+{
+    s_vFreeCamPos = *pv;
+    s_fFreeCamYaw = fYaw;
+    s_fFreeCamPitch = fPitch > 1.55f ? 1.55f : fPitch < -1.55f ? -1.55f : fPitch;
+    memset(&s_FreeCamPad, 0, sizeof(s_FreeCamPad));
+    QueryPerformanceCounter(&s_liFreeCamLast);
+    s_bFreeCamLive = TRUE;
+    g_bTrigDrawFreeCam = TRUE;
+}
+
+// A trigger kind's class name (the labels' table), or NULL.
+const RwChar *TrigDrawKindName(RwInt32 nKind)
+{
+    return nKind >= 0 && nKind < 0x28 ? s_apszKindNames[nKind] : NULL;
+}
+
 void TrigDrawAll(RwCamera *pCamera)
 {
     void *pRaster;
@@ -1692,11 +2079,14 @@ void TrigDrawAll(RwCamera *pCamera)
             if (atoi(szValue) >= 2)
                 g_bTrigDrawAiCover = g_bTrigDrawAiCombat = TRUE;
         }
+        // (CODFH_PG=1: the projectile generators)
+        if (GetEnvironmentVariableA("CODFH_PG", NULL, 0))
+            g_bTrigDrawPg = TRUE;
         // (CODFH_PATHNODES=1: the path nodes, with their labels)
         if (GetEnvironmentVariableA("CODFH_PATHNODES", NULL, 0))
             g_bTrigDrawPathNodes = g_bTrigDrawPathLabels = TRUE;
     }
-    if ((!g_bTrigDrawEnabled && !g_bTrigDrawPathNodes && !g_bTrigDrawAi) || pCamera == NULL)
+    if ((!g_bTrigDrawEnabled && !g_bTrigDrawPathNodes && !g_bTrigDrawAi && !g_bTrigDrawPg) || pCamera == NULL)
         return;
     pCamLtm = RwFrameGetLTM(RwCameraGetFrame(pCamera));
     vCam = pCamLtm->pos;
@@ -1727,6 +2117,8 @@ void TrigDrawAll(RwCamera *pCamera)
         TrigDrawPaths(&vCam, pCamLtm);
     if (g_bTrigDrawAi)
         TrigDrawAi(&vCam, pCamLtm);
+    if (g_bTrigDrawPg)
+        TrigDrawPg(&vCam, pCamLtm);
     if (!g_bTrigDrawEnabled)
         i = dword_429D00 + 1;
     else
@@ -1756,6 +2148,448 @@ void TrigDrawAll(RwCamera *pCamera)
     RwRenderStateSet(rwRENDERSTATESRCBLEND, (void *)nSrc);
     RwRenderStateSet(rwRENDERSTATEDESTBLEND, (void *)nDest);
     RwRenderStateSet(rwRENDERSTATECULLMODE, (void *)nCull);
+}
+
+// ---- the live link's debug feed (trigweb.cpp, the web suite's level viewer) ----
+// What the Drawing tab's AI, projectile generator and path node drawing reads, as JSON for the
+// viewer to draw with labels: every AI's whole state (TrigDrawAiRead) with its notes, every
+// projectile generator's (TrigDrawPgRead) with its notes, and the path node graph (all of it
+// once, then the nodes whose flags or blocked links changed). While a viewer takes the feed,
+// the notes are kept as when the overlay draws the AI (g_bTrigLiveDebug).
+RwBool g_bTrigLiveDebug = FALSE;
+
+struct TrigLiveJson
+{
+    RwChar *psz;
+    RwInt32 n, nMax;
+};
+
+static void LiveJ(TrigLiveJson *j, const RwChar *pszFormat, ...)
+{
+    va_list va;
+    RwInt32 n;
+
+    if (j->n >= j->nMax - 1)
+        return;
+    va_start(va, pszFormat);
+    n = _vsnprintf(j->psz + j->n, j->nMax - 1 - j->n, pszFormat, va);
+    va_end(va);
+    if (n < 0)
+        j->n = j->nMax - 1;
+    else
+        j->n += n;
+    j->psz[j->n] = 0;
+}
+
+static void LiveJV(TrigLiveJson *j, const RwChar *pszKey, const RwV3d *pv)
+{
+    LiveJ(j, ",\"%s\":[%.1f,%.1f,%.1f]", pszKey, pv->x, pv->y, pv->z);
+}
+
+static void LiveJText(TrigLiveJson *j, const RwChar *pszIn)
+{
+    LiveJ(j, "\"");
+    for (; *pszIn && j->n < j->nMax - 8; pszIn++)
+    {
+        RwUInt8 c = (RwUInt8)*pszIn;
+
+        if (c == '"' || c == '\\')
+            LiveJ(j, "\\%c", c);
+        else if (c < 0x20 || c > 0x7E)
+            LiveJ(j, " ");
+        else
+            LiveJ(j, "%c", c);
+    }
+    LiveJ(j, "\"");
+}
+
+// The notes kept under pKey, newest first: [age in seconds, repeats, text].
+static void LiveJNotes(TrigLiveJson *j, TrigDrawAiNotes *pAll, RwInt32 nAll, const void *pKey)
+{
+    TrigDrawAiNotes *pNotes = NULL;
+    RwInt32 i, k, nShown = 0;
+
+    for (i = 0; i < nAll; i++)
+        if (pAll[i].pEntity == pKey)
+        {
+            pNotes = &pAll[i];
+            break;
+        }
+    LiveJ(j, ",\"notes\":[");
+    for (k = 0; pNotes && k < TRIGDRAW_AI_NOTES; k++)
+    {
+        RwInt32 n = (pNotes->nNext + TRIGDRAW_AI_NOTES - 1 - k) % TRIGDRAW_AI_NOTES;
+
+        if (!pNotes->adwFrame[n])
+            continue;
+        LiveJ(j, "%s[%.1f,%d,", nShown++ ? "," : "", (RwReal)(port_frame - pNotes->adwFrame[n]) / 60.0f, pNotes->anRepeats[n]);
+        LiveJText(j, pNotes->aszText[n]);
+        LiveJ(j, "]");
+    }
+    LiveJ(j, "]");
+}
+
+// Every AI: {"t":"ai","frame":n,"list":[...]}.
+RwBool TrigDrawLiveAiJson(RwChar *psz, RwInt32 nMax)
+{
+    static TrigDrawAiState s_state;
+    TrigLiveJson j = { psz, 0, nMax };
+    RwInt32 i, k, nShown = 0;
+
+    LiveJ(&j, "{\"t\":\"ai\",\"frame\":%u,\"list\":[", port_frame);
+    TrigDrawAiMachines();
+    for (i = 0; i < 768 && j.n < nMax - 4096; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+        TrigDrawAiState *s = &s_state;
+        RwUInt32 dwBits;
+
+        if (pEntity == NULL)
+            continue;
+        dwBits = pEntity->unk_2C;
+        if ((dwBits & 0x10) || !TrigDrawAiRead(pEntity, dwBits, s))
+            continue;
+        LiveJ(&j, "%s{\"slot\":%d,\"soldier\":%d,\"hp\":%d,\"state\":%d,\"alert\":%d,\"bits\":%u", nShown++ ? "," : "", i,
+              (dwBits & 0x20) ? 1 : 0, s->nHp, s->nState, s->nAlert, dwBits);
+        LiveJV(&j, "pos", &s->vPos);
+        if (s->bTarget)
+        {
+            LiveJ(&j, ",\"target\":%d", s->nTargetSlot);
+            LiveJV(&j, "targetPos", &s->vTarget);
+        }
+        if (s->bPoint)
+            LiveJV(&j, "point", &s->vPoint);
+        if (s->bAim)
+        {
+            LiveJV(&j, "aimFrom", &s->vAimFrom);
+            LiveJV(&j, "aim", &s->vAim);
+        }
+        LiveJ(&j, ",\"node\":%d,\"nodeType\":%d,\"next\":%d,\"nextType\":%d", s->nNodeId, s->nNodeType, s->nNextId, s->nNextType);
+        if (s->bNode)
+            LiveJV(&j, "nodePos", &s->vNode);
+        if (s->bTask)
+        {
+            LiveJ(&j, ",\"task\":{\"script\":%d,\"function\":%d,\"line\":%d,\"waits\":%d,\"file\":", s->nTaskScript,
+                  s->nTaskFunction, s->nTaskLine, s->nTaskWaits);
+            LiveJText(&j, s->szTaskFile);
+            LiveJ(&j, "}");
+        }
+        if (s->bMachine)
+        {
+            LiveJ(&j, ",\"machine\":{\"line\":%d,\"state\":%d,\"file\":", s->nMachineLine, s->nMachineState);
+            LiveJText(&j, s->szMachineFile);
+            LiveJ(&j, "}");
+        }
+        if (s->bPathSearch)
+            LiveJ(&j, ",\"search\":{\"kind\":%d,\"result\":%d,\"length\":%d,\"start\":%d,\"goal\":%d,\"goalType\":%d,\"left\":%d}",
+                  s->nSearchKind, s->nSearchResult, s->nSearchLength, s->nStartNode, s->nGoalNode, s->nGoalType, s->nLeft);
+        if (s->bGoal)
+            LiveJV(&j, "goal", &s->vGoal);
+        if (s->nPath > 0)
+        {
+            LiveJ(&j, ",\"path\":[");
+            for (k = 0; k < s->nPath; k++)
+                LiveJ(&j, "%s[%.1f,%.1f,%.1f]", k ? "," : "", s->avPath[k].x, s->avPath[k].y, s->avPath[k].z);
+            LiveJ(&j, "]");
+        }
+        LiveJ(&j, ",\"cover\":{\"radius\":%.1f,\"found\":%d,\"tried\":%d,\"candidates\":[", s->fCoverRadius, s->nCandidates, s->nTried);
+        for (k = 0; k < s->nCandidates; k++)
+            LiveJ(&j, "%s[%.1f,%.1f,%.1f,%d]", k ? "," : "", s->avCandidate[k].x, s->avCandidate[k].y, s->avCandidate[k].z,
+                  s->abTried[k] ? 1 : 0);
+        LiveJ(&j, "],\"nodes\":[");
+        for (k = 0; k < 3; k++)
+            if (s->abCoverNode[k])
+                LiveJ(&j, "%s[%.1f,%.1f,%.1f,%d]", k ? "," : "", s->avCoverNode[k].x, s->avCoverNode[k].y, s->avCoverNode[k].z, k);
+            else
+                LiveJ(&j, "%snull", k ? "," : "");
+        LiveJ(&j, "],\"points\":[");
+        for (k = 0; k < s->nCoverPoints; k++)
+            LiveJ(&j, "%s[%.1f,%.1f,%.1f]", k ? "," : "", s->avCoverPoint[k].x, s->avCoverPoint[k].y, s->avCoverPoint[k].z);
+        LiveJ(&j, "]},\"combat\":{\"tracked\":%.2f,\"blocker\":%.1f,\"fighting\":%.2f,\"notFighting\":%.2f,\"hearClasses\":%d,"
+                  "\"hearKinds\":%d,\"hearSides\":%d,\"mayLoseSight\":%d,\"control\":%d,\"burstLeft\":%d",
+              s->fTracked / 60.0f, s->fBlocker < 1e30f ? s->fBlocker : -1.0f, s->fIn / 60.0f, s->fOut / 60.0f, s->nHearClasses,
+              s->nHearKinds, s->nHearSides, s->nLosLoss, s->nControl, s->nShots);
+        if (s->bSeen)
+            LiveJV(&j, "seen", &s->vSeen);
+        LiveJ(&j, "}");
+        if (s->bWeapon)
+        {
+            LiveJ(&j, ",\"weapon\":{\"type\":%d,\"ammo\":%d,\"infinite\":%d,\"nextShot\":%.2f,\"noTarget\":%d,\"aims\":%d",
+                  s->nWeaponType, s->nAmmo, s->nInfinite, s->fNextShot, s->nNoTarget, s->nAimsWeapon);
+            if (s->nAimsWeapon)
+                LiveJV(&j, "aim", &s->vWeaponAim);
+            LiveJ(&j, "}");
+        }
+        while (InterlockedExchange(&s_nAiNotesLock, 1))
+            ;
+        LiveJNotes(&j, s_aAiNotes, TRIGDRAW_AI_ENTITIES, pEntity);
+        InterlockedExchange(&s_nAiNotesLock, 0);
+        LiveJ(&j, "}");
+    }
+    LiveJ(&j, "]}");
+    return j.n < nMax - 1;
+}
+
+// Every projectile generator: {"t":"pg","frame":n,"list":[...]}.
+RwBool TrigDrawLivePgJson(RwChar *psz, RwInt32 nMax)
+{
+    static TrigDrawPgState s_state;
+    TrigLiveJson j = { psz, 0, nMax };
+    type_1227C0 *pGen;
+    RwInt32 n = 0;
+
+    LiveJ(&j, "{\"t\":\"pg\",\"frame\":%u,\"list\":[", port_frame);
+    for (pGen = dword_4CE8F8; pGen != NULL && n < 512 && j.n < nMax - 2048; n++)
+    {
+        TrigDrawPgState *p = &s_state;
+        type_1227C0 *pNext;
+
+        if (!TrigDrawPgRead(pGen, p))
+            break;
+        pNext = pGen->unk_100;
+        // (the overlay notes them when it draws them)
+        if (!g_bTrigDrawPg)
+            TrigDrawPgNotes(pGen, p);
+        LiveJ(&j, "%s{\"id\":%d,\"shells\":%d,\"state\":%d,\"forced\":%d,\"turning\":%d,\"stagesOn\":%d,\"stage\":%d,\"targetKind\":%d,"
+                  "\"stageShots\":%d,\"shots\":%d,\"bursts\":%d,\"los\":%d,\"replays\":%d,\"next\":%.2f,\"spread\":%.1f,\"height\":%.1f,"
+                  "\"pathAt\":%.2f,\"pathSpeed\":%.2f,\"wait\":%.2f,\"waitLeft\":%.2f,\"replay\":%.2f,\"speed\":%.1f",
+              n ? "," : "", p->nId, p->nKind, p->nState, p->nForced, p->nTurning, p->nStagesOn, p->nStage, p->nTargetKind,
+              p->nStageShots, p->nShots, p->nBursts, p->nLos, p->nReplays, p->fNext, p->fSpread, p->fHeight, p->fPathAt,
+              p->fPathSpeed, p->fWait, p->fWaitLeft, p->fReplay, p->fSpeed);
+        LiveJV(&j, "pos", &p->vPos);
+        LiveJV(&j, "at", &p->vAt);
+        LiveJV(&j, "aim", &p->vAim);
+        LiveJV(&j, "lastAim", &p->vLastAim);
+        LiveJV(&j, "facing", &p->vFacing);
+        if (p->bTarget)
+            LiveJV(&j, "target", &p->vTarget);
+        if (p->bTrigger)
+            LiveJV(&j, "trigger", &p->vTrigger);
+        LiveJNotes(&j, s_aPgNotes, TRIGDRAW_PG_NOTED, pGen);
+        LiveJ(&j, "}");
+        pGen = pNext;
+    }
+    LiveJ(&j, "]}");
+    return j.n < nMax - 1;
+}
+
+// The path node graph: bFull every node, {"id","type","flags","pos","links":[[to,blocked],...]},
+// else only the nodes whose flags or links' blocked bits changed since the last call.
+static RwUInt32 s_adwLiveNodeHash[4096];
+
+RwBool TrigDrawLiveNodesJson(RwChar *psz, RwInt32 nMax, RwBool bFull)
+{
+    TrigLiveJson j = { psz, 0, nMax };
+    RwInt32 nId, nCount, nShown = 0, i, k;
+
+    LiveJ(&j, "{\"t\":\"nodes\",\"frame\":%u,\"full\":%d,\"list\":[", port_frame, bFull ? 1 : 0);
+    __try
+    {
+        nCount = unk_4C00E8.unk_64 && unk_4C00E8.unk_2C ? unk_4C00E8.unk_08 : 0;
+        if (nCount > 4096)
+            nCount = 4096;
+        for (nId = 1; nId < nCount && j.n < nMax - 2048; nId++)
+        {
+            type_F8350 *pNode = TrigDrawPathNode(nId);
+            const RwUInt32 *p;
+            RwUInt32 dwHash;
+
+            if (pNode == NULL)
+                continue;
+            // (the flags and the links' blocked bits, folded, to tell a change)
+            dwHash = pNode->unk_00 * 2654435761u;
+            p = TrigDrawPathLinks(pNode);
+            for (i = 0; i < 64 && (p[i] & 0xFFF); i++)
+                dwHash = (dwHash ^ (p[i] >> 24)) * 16777619u + (RwUInt32)i;
+            if (!bFull && dwHash == s_adwLiveNodeHash[nId])
+                continue;
+            s_adwLiveNodeHash[nId] = dwHash;
+            LiveJ(&j, "%s{\"id\":%d,\"type\":%d,\"flags\":%u", nShown++ ? "," : "", nId, pNode->unk_04, pNode->unk_00);
+            LiveJV(&j, "pos", &pNode->unk_10);
+            LiveJ(&j, ",\"links\":[");
+            for (i = 0, k = 0; i < 64; i++)
+            {
+                RwInt32 h, nTo;
+
+                for (h = 0; h < 2; h++)
+                {
+                    nTo = (RwInt32)((p[i] >> (h * 12)) & 0xFFF);
+                    if (nTo == 0)
+                        break;
+                    LiveJ(&j, "%s[%d,%d]", k++ ? "," : "", nTo, (RwInt32)((p[i] >> (24 + h)) & 1));
+                }
+                if (h < 2)
+                    break;
+            }
+            LiveJ(&j, "]}");
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    LiveJ(&j, "]}");
+    return j.n < nMax - 1;
+}
+
+// The full AI view (the level viewer's): every field of one AI's AIData and of its entity's
+// classes (type_3D3548, and a soldier's type_3D32F8 and type_3DAFC8), from the tables
+// tools/gen_aifields.py makes from the headers. The tables go once, as {"t":"aifields"}: each
+// class's name, size and rows [path, offset, kind, count, size, comment, bits/values or type,
+// readable name]; the
+// values as the memory itself, {"t":"aifull"}: each class's block as hex, for the page to
+// decode by the table.
+enum { AF_INT, AF_UINT, AF_REAL, AF_INTREAL, AF_I16, AF_U16, AF_I8, AF_U8, AF_V3D, AF_V2D, AF_RGBA, AF_MATRIX, AF_HANDLE,
+       AF_KEY, AF_PTR, AF_GROUP, AF_RAW };
+static const RwChar *const s_apszAiKinds[] = { "int", "uint", "real", "intreal", "i16", "u16", "i8", "u8", "v3d", "v2d",
+                                               "rgba", "matrix", "handle", "key", "ptr", "group", "raw" };
+
+struct AiField
+{
+    const RwChar *pszPath;
+    RwUInt32 dwOffset;
+    RwUInt16 nKind;
+    RwUInt16 nCount;
+    RwUInt32 dwSize;
+    const RwChar *pszDesc;
+    const RwChar *pszExtra;     // the bits or values (AF_UINT, AF_INT), or the type (AF_GROUP, AF_RAW)
+    const RwChar *pszLabel;     // the traced readable name (tools/aifields_desc.json), or ""
+};
+
+struct AiFieldClass
+{
+    const RwChar *pszName;
+    const AiField *pFields;
+    RwInt32 nFields;
+    RwUInt32 dwSize;
+};
+
+#include "aifields.inc"
+
+RwBool TrigDrawLiveAiFieldsJson(RwChar *psz, RwInt32 nMax)
+{
+    TrigLiveJson j = { psz, 0, nMax };
+    RwInt32 c, i;
+
+    LiveJ(&j, "{\"t\":\"aifields\",\"classes\":[");
+    for (c = 0; c < (RwInt32)(sizeof(s_aAiFieldClasses) / sizeof(s_aAiFieldClasses[0])); c++)
+    {
+        const AiFieldClass *pClass = &s_aAiFieldClasses[c];
+
+        LiveJ(&j, "%s{\"name\":\"%s\",\"size\":%u,\"fields\":[", c ? "," : "", pClass->pszName, pClass->dwSize);
+        for (i = 0; i < pClass->nFields; i++)
+        {
+            const AiField *f = &pClass->pFields[i];
+
+            LiveJ(&j, "%s[", i ? "," : "");
+            LiveJText(&j, f->pszPath);
+            LiveJ(&j, ",%u,\"%s\",%u,%u,", f->dwOffset, s_apszAiKinds[f->nKind], f->nCount, f->dwSize);
+            LiveJText(&j, f->pszDesc);
+            LiveJ(&j, ",");
+            LiveJText(&j, f->pszExtra);
+            LiveJ(&j, ",");
+            LiveJText(&j, f->pszLabel);
+            LiveJ(&j, "]");
+        }
+        LiveJ(&j, "]}");
+    }
+    LiveJ(&j, "]}");
+    return j.n < nMax - 1;
+}
+
+// Copies n bytes from p, word by word where a page faults (those words 0xCDCDCDCD); FALSE when
+// none of it could be read.
+static RwBool LiveCopy(RwUInt8 *pOut, const RwUInt8 *p, RwUInt32 n)
+{
+    RwUInt32 i, nRead = 0;
+
+    __try
+    {
+        memcpy(pOut, p, n);
+        return TRUE;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    for (i = 0; i + 4 <= n; i += 4)
+    {
+        __try
+        {
+            *(RwUInt32 *)(pOut + i) = *(const RwUInt32 *)(p + i);
+            nRead++;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            *(RwUInt32 *)(pOut + i) = 0xCDCDCDCD;
+        }
+    }
+    return nRead > 0;
+}
+
+static void LiveJHex(TrigLiveJson *j, const RwUInt8 *p, RwUInt32 n)
+{
+    static const RwChar s_szHex[] = "0123456789abcdef";
+    RwUInt32 i;
+
+    if (j->n + (RwInt32)n * 2 + 8 >= j->nMax)
+        return;
+    j->psz[j->n++] = '"';
+    for (i = 0; i < n; i++)
+    {
+        j->psz[j->n++] = s_szHex[p[i] >> 4];
+        j->psz[j->n++] = s_szHex[p[i] & 15];
+    }
+    j->psz[j->n++] = '"';
+    j->psz[j->n] = 0;
+}
+
+// The AI in entity slot nSlot: its blocks, by class (an AIData, then the entity's classes it is).
+RwBool TrigDrawLiveAiFullJson(RwChar *psz, RwInt32 nMax, RwInt32 nSlot)
+{
+    static RwUInt8 s_ab[0x4000];
+    TrigLiveJson j = { psz, 0, nMax };
+    type_3D3548 *pEntity = nSlot >= 0 && nSlot < 768 ? dword_4B6A00[nSlot].unk_04 : NULL;
+    AIData *pAi = NULL;
+    RwUInt32 dwBits = 0;
+    RwInt32 c;
+
+    LiveJ(&j, "{\"t\":\"aifull\",\"frame\":%u,\"slot\":%d", port_frame, nSlot);
+    if (pEntity)
+        __try
+        {
+            dwBits = pEntity->unk_2C;
+            pAi = pEntity->vf_120();
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            pEntity = NULL;
+        }
+    if (pEntity == NULL)
+    {
+        LiveJ(&j, ",\"gone\":1}");
+        return TRUE;
+    }
+    LiveJ(&j, ",\"soldier\":%d,\"entity\":\"%08X\",\"ai\":\"%08X\",\"classes\":[", (dwBits & 0x20) ? 1 : 0, (RwUInt32)pEntity,
+          (RwUInt32)pAi);
+    for (c = 0; c < (RwInt32)(sizeof(s_aAiFieldClasses) / sizeof(s_aAiFieldClasses[0])); c++)
+    {
+        const AiFieldClass *pClass = &s_aAiFieldClasses[c];
+        const RwUInt8 *pBase;
+
+        // (AIData from the AI object; the entity's classes from the entity, a soldier's only for a soldier)
+        if (c == 0)
+            pBase = (const RwUInt8 *)pAi;
+        else if (c == 1 || (dwBits & 0x20))
+            pBase = (const RwUInt8 *)pEntity;
+        else
+            continue;
+        if (pBase == NULL || pClass->dwSize > sizeof(s_ab) || !LiveCopy(s_ab, pBase, pClass->dwSize))
+            continue;
+        LiveJ(&j, "%s{\"name\":\"%s\",\"addr\":\"%08X\",\"bytes\":", c ? "," : "", pClass->pszName, (RwUInt32)pBase);
+        LiveJHex(&j, s_ab, pClass->dwSize);
+        LiveJ(&j, "}");
+    }
+    LiveJ(&j, "]}");
+    return j.n < nMax - 1;
 }
 
 #endif // CODFH_DRAW_TRIGGERS

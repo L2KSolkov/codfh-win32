@@ -68,7 +68,7 @@ struct type_1227C0
     virtual void vf_00C(ProjectileGeneratorTrigger *arg_0)
     {
     }
-    // +0x010: its update by arg_0 seconds (sub_11FAD0).
+    // +0x010: its update by arg_0 frames (1 a frame at 60 Hz; sub_11FAD0).
     virtual void vf_010(RwReal arg_0);
     // +0x014: turns its line-of-sight check on or off ("PG_EnableLOSCheck");
     // empty here (sub_15FB30).
@@ -107,12 +107,12 @@ struct type_1227C0
     RwInt32 unk_34;             // its firing stage (0 to 2; 3 none)
     RwInt32 unk_38;             // its target: 0 the nearest entity, 1 an
                                 // entity, 2 a point, 3 its path
-    RwInt32 unk_3C;             // the shots left in its stage
+    RwInt32 unk_3C;             // the bursts left in its stage
     RwInt32 unk_40;             // the shots left in its burst
-    RwReal unk_44;              // the time to its next shot
+    RwReal unk_44;              // the frames to its next shot
     RwInt32 unk_48;             // its first shot at the target
     RwReal unk_4C;              // its turret's turn rate
-    RwInt32 unk_50;             // the bursts before a pause
+    RwInt32 unk_50;             // the shots left before its long pause
     RwV3d unk_54;               // the point it targets
     union
     {
@@ -130,7 +130,7 @@ struct type_1227C0
     RwReal unk_C8;              // the target's height offset
     RwReal unk_CC;              // its place along its path (0 to 1)
     RwReal unk_D0;              // its speed along it
-    RwInt32 unk_D4;             // its line-of-sight check is on
+    RwInt32 unk_D4;             // its firing-arc check is on (always 1)
     RwInt32 unk_D8;             // passed to sub_15F2C0
     SplinePath *unk_DC;         // its path
     type_D48D0 unk_E0;          // its parent entity
@@ -150,14 +150,14 @@ struct type_1227C0
     };
     type_F2880 unk_108[3];      // its muzzle particle systems
     RwV3d unk_12C;              // its turret's facing
-    RwReal unk_138;             // the time its turret waits
-    RwReal unk_13C;             // and the time left of it
-    RwInt32 unk_140;            // its sound replays
-    RwReal unk_144;             // the time to the replay
-    RwUInt32 unk_148;           // the replay delay's range (the trigger's
+    RwReal unk_138;             // the frames its turret holds its aim
+    RwReal unk_13C;             // once the target leaves its arc, left
+    RwInt32 unk_140;            // it pauses when its turret or barrel is hit
+    RwReal unk_144;             // the frames left of that pause
+    RwUInt32 unk_148;           // that pause's range in frames (the trigger's
                                 // unk_220)
-    RwUInt32 unk_14C;           // the turret's and barrel's kinds (vf_174),
-                                // high and low words
+    RwUInt32 unk_14C;           // the turret's and barrel's hit points (vf_174),
+                                // high and low words, as last seen
 
     // Its update of the matrix from its parent (sub_11F9E0), whether its
     // parent, barrel and turret still stand (sub_11F8E0), its forced shot
@@ -302,7 +302,7 @@ struct type_11DB10 : type_1227C0
     RwInt32 unk_200;
     RwReal unk_204;
     RwInt32 unk_208;
-    RwInt32 unk_20C;                // its line-of-sight check is on
+    RwInt32 unk_20C;                // its line-of-sight check is on ("PG_EnableLOSCheck")
 };
 typedef RwChar type_11DB10_size_check[sizeof(type_11DB10) == 0x210 ? 1 : -1];
 
@@ -387,7 +387,7 @@ RwInt32 sub_1215E0(RwV3d *arg_0, RwV3d *arg_4, RwReal arg_8, RwReal arg_C, RwInt
 // matrix (sub_121B50).
 RwInt32 sub_121B50(struct type_F2FF0 *arg_0);
 // The pool's set-up, reset and shut-down (sub_122230, sub_1222A0,
-// sub_1222D0); all generators' update by arg_0 seconds (sub_1222F0).
+// sub_1222D0); all generators' update by arg_0 frames (sub_1222F0).
 void sub_122230();
 void sub_1222A0();
 void sub_1222D0();

@@ -62,7 +62,7 @@ public:
     void sub_C1010(type_3D2E7C *arg_0);
 
     type_3DF8D8_04 unk_C0;      // command 2: its model's name (kind 0x27)
-    type_3DF8D8_04 unk_C8;      // commands 3, 13 to 15 and 0: names
+    type_3DF8D8_04 unk_C8;      // command 13: its AI script (14, 15: unk_D0, unk_D8)
     type_3DF8D8_04 unk_D0;
     type_3DF8D8_04 unk_D8;
     type_3DF8D8_04 unk_E0;      // its own name ("VehicleTrigger_GetMyName")
@@ -78,7 +78,7 @@ public:
     RwInt32 unk_114;
     RwUInt8 unk_118[0xC];
     RwReal unk_124;             // the cosines of half two angles (in
-    RwReal unk_128;             // degrees; 60 by default)
+    RwReal unk_128;             // degrees; cos 60 by default: 120 degrees)
     RwReal unk_12C;             // 7000, times 100 from their commands
     RwReal unk_130;
     RwReal unk_134;             // 2500
@@ -127,8 +127,8 @@ public:
     RwInt32 unk_1E4;
     RwInt32 unk_1E8;
     type_3DF8D8_04 unk_1EC;     // when set
-    RwInt32 unk_1F4;            // commands 4 and 5
-    RwInt32 unk_1F8;
+    RwInt32 unk_1F4;            // command 4
+    RwInt32 unk_1F8;            // command 5
     RwUInt8 *unk_1FC;           // its messages' block (sub_BD490)
 };
 typedef RwChar VehicleTrigger_size_check[sizeof(VehicleTrigger) == 0x200 ? 1 : -1];

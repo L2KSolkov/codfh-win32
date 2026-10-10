@@ -51,11 +51,13 @@ public:
     type_6B960 *unk_C4;         // unk_C8 and unk_D8
     RwInt16 unk_C8;             // command 0's message
     RwUInt8 unk_CA[0x2];
-    type_3DF8D8_04 unk_CC;      // command 1, of the kind 0xC when set
+    type_3DF8D8_04 unk_CC;      // command 1: the task (kind 0xC) added to
+                                // the player to get in
     RwInt32 unk_D4;             // set once unk_C8 is done
     RwInt16 unk_D8;             // command 2's message
     RwUInt8 unk_DA[0x2];
-    type_3DF8D8_04 unk_DC;      // command 3 (the vehicle), of the kind 0xC
+    type_3DF8D8_04 unk_DC;      // command 3: the task (kind 0xC) added to
+                                // the player to get out while in a vehicle
     RwInt32 unk_E4;             // set once unk_D8 is done
     RwInt32 unk_E8;             // command 4
     RwUInt8 unk_EC[0x4];

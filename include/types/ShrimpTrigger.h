@@ -52,7 +52,8 @@ public:
     RwInt32 unk_D8;
     RwReal unk_DC;              // command 4 (1)
     RwInt32 unk_E0;             // command 3 (0x7FFFFFFF for none), kept
-    RwInt32 unk_E4;             // and as it is spent
+                                // but never restored or read
+    RwInt32 unk_E4;             // the same, as it is spent
     type_D48D0 unk_E8;
     type_17CC40 unk_EC;
     // vf_024, as the image's vtable has it (a trivial body, folded into

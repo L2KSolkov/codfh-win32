@@ -1,0 +1,1821 @@
+{
+ "unk_00": {
+  "name": "pursueCloseTime",
+  "desc": "Frames the tracked target has stayed within vf_14C range and only potentially visible during PursueTarget (+=deltaTime); pursuit holds while under flt_427400 (90). Zeroed when a pursuit starts",
+  "kind": "real",
+  "evidence": "src/recovered/unit_012000.cpp:1762, src/recovered/unit_012000.cpp:552, src/recovered/unit_012000.cpp:628",
+  "confidence": "verified"
+ },
+ "unk_04": {
+  "name": "grenadeHintPos",
+  "desc": "Points of up to 3 grenade-hint path nodes (kind 0xF/0x10, within 1000) found by the EnableGrenadeHints scheduler (sub_31E20); sp_sub_16540 hands one to a grenade thrower as the aim point",
+  "kind": null,
+  "evidence": "src/recovered/unit_031B90.cpp:164, src/recovered/unit_0154C0.cpp:3371, src/recovered/unit_0441B0.cpp:7064",
+  "confidence": "verified"
+ },
+ "unk_1048": {
+  "name": "coverSearchReq",
+  "desc": "Node search request for cover (defend area/advance/follow, sub_244E0/sub_25180) and near-owner node checks (sub_27CC0); results in coverResults",
+  "kind": null,
+  "evidence": "src/recovered/unit_022C80.cpp:766, src/recovered/unit_022C80.cpp:1084, src/recovered/unit_022C80.cpp:1947",
+  "confidence": "verified"
+ },
+ "unk_10A8": {
+  "name": "attackSearchTargetPos",
+  "desc": "Meant as target position at the last attack-pos search (skip if target moved <300); never written (stays 0) so the reuse test only holds near origin",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:202, src/recovered/unit_0154C0.cpp:268",
+  "confidence": "verified"
+ },
+ "unk_10B4": {
+  "name": "attackSearchOwnerPos",
+  "desc": "Owner position at the last attack-position search; search reused while owner within 300 (flat)",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:198, src/Source/GameCore/ai/aidatapathing.cpp:220",
+  "confidence": "verified"
+ },
+ "unk_10C0": {
+  "name": "attackSearchTarget",
+  "desc": "Handle of the tracked entity the attack-position search was made for; sub_19F30 compares it with unk_1374",
+  "kind": "handle",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:197, src/Source/GameCore/ai/aidatapathing.cpp:221",
+  "confidence": "verified"
+ },
+ "unk_10C4": {
+  "name": "attackPosResults",
+  "desc": "10 attack-position results (type_154C0_F80); first 5 shuffled randomly; tried in order via attackPosIndex",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:215, src/Source/GameCore/ai/aidatapathing.cpp:226",
+  "confidence": "verified"
+ },
+ "unk_1114": {
+  "name": "attackPosSearchReq",
+  "desc": "Node search for an attack position near the tracked entity (filter 9: within vf_114, beyond vf_14C+100, this side, LOS), A* type 9 (sub_28F30)",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:210, src/recovered/unit_0F7BA0.cpp:1071, src/Source/GameCore/ai/astarscheduler.cpp:262",
+  "confidence": "verified"
+ },
+ "unk_1174": {
+  "name": "attackPosIndex",
+  "desc": "Index of the attackPosResults entry last tried (-1 after a new search); next one's point goes to unk_5B0",
+  "kind": "int",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:222, src/Source/GameCore/ai/aidatapathing.cpp:231, src/Source/GameCore/ai/aidatapathing.cpp:246",
+  "confidence": "verified"
+ },
+ "unk_1178": {
+  "name": "coverHoldTime",
+  "desc": "Random 30-120 s (x60 frames) to stay at an ordinary cover node before moving on (compared with state time unk_57C); drawn by sub_17AB0 action 1",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:879, src/recovered/unit_033520.cpp:357, src/recovered/unit_033520.cpp:363",
+  "confidence": "verified"
+ },
+ "unk_117C": {
+  "name": "vehicleCoverPath",
+  "desc": "Path to a vehicle cover point (type_154C0_12F4 on a vehicle): sub_29780 (radius 5000, kind 5, pool 2) from the vehicle-cover search; success commits unk_1354 to unk_1324 (VehicleCoverPointFound). State 36.",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:379-404; src/recovered/unit_022C80.cpp:950-960,225-245; src/recovered/unit_0154C0.cpp:1104",
+  "confidence": "verified"
+ },
+ "unk_12F4": {
+  "name": "vehCoverHeld",
+  "desc": "Vehicle cover point the AI occupies (claimed via sub_23050). \"SetVehicleCoverPoint\" moves the selection unk_133C in here; states 35-37 head for or check it.",
+  "kind": null,
+  "evidence": "src/recovered/unit_022C80.cpp:215, src/recovered/unit_022C80.cpp:381, src/recovered/unit_0441B0.cpp:1216, src/recovered/unit_012000.cpp:614",
+  "confidence": "verified"
+ },
+ "unk_130C": {
+  "name": "vehCoverPrev",
+  "desc": "Previously held vehicle cover point (old unk_12F4 on release/replace); the search (sub_24BA0) will not pick it again.",
+  "kind": null,
+  "evidence": "src/recovered/unit_022C80.cpp:218, src/recovered/unit_022C80.cpp:384, src/recovered/unit_022C80.cpp:949",
+  "confidence": "verified"
+ },
+ "unk_1324": {
+  "name": "vehCoverFound",
+  "desc": "Vehicle cover point the search found and planned a path to (sub_24BA0); copied to the selection unk_133C on \"VehicleCoverPointFound\"; cleared when the search is off or the type changes.",
+  "kind": null,
+  "evidence": "src/recovered/unit_022C80.cpp:959, src/recovered/unit_022C80.cpp:140, src/recovered/unit_022C80.cpp:356, src/recovered/unit_022C80.cpp:240",
+  "confidence": "verified"
+ },
+ "unk_133C": {
+  "name": "vehCoverSelected",
+  "desc": "Selected vehicle cover point (copy of unk_1324); \"OccupyVehicleCoverpointSelected\" claims it and \"SetVehicleCoverPoint\" makes it the held one, then resets it.",
+  "kind": null,
+  "evidence": "src/recovered/unit_022C80.cpp:356, src/recovered/unit_0441B0.cpp:18706, src/recovered/unit_022C80.cpp:219",
+  "confidence": "verified"
+ },
+ "unk_1354": {
+  "name": "vehCoverPending",
+  "desc": "Vehicle cover candidate stored before the path is planned (sub_24BA0); sub_23550(0) promotes it to unk_1324; the search skips it.",
+  "kind": null,
+  "evidence": "src/recovered/unit_022C80.cpp:956, src/recovered/unit_022C80.cpp:302, src/recovered/unit_022C80.cpp:948",
+  "confidence": "verified"
+ },
+ "unk_136C": {
+  "name": "vehCoverSearch",
+  "desc": "Vehicle cover point search enabled (\"Set/GetVehicleCoverPointSearch\"); sub_24BA0 does nothing while it is 0; setting 0 clears unk_1324.",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_022C80.cpp:136, src/recovered/unit_022C80.cpp:884, src/recovered/unit_0441B0.cpp:18539",
+  "confidence": "verified"
+ },
+ "unk_1370": {
+  "name": "vehicleToFollow",
+  "desc": "Vehicle set by \"SetVehicleToFollow\" (kind bits 0x40080 only). With flag 22 the vehicle cover search only looks at this vehicle's cover points.",
+  "kind": "handle",
+  "evidence": "src/recovered/unit_0441B0.cpp:18202, src/recovered/unit_022C80.cpp:896",
+  "confidence": "verified"
+ },
+ "unk_1374": {
+  "name": "target",
+  "desc": "Entity the AI tracks or attacks. sub_18BB0 sets it, saves the old one in unk_137C, resets the tracking timers and fires \"FoundTarget\"/\"LostTarget\".",
+  "kind": "handle",
+  "evidence": "src/recovered/unit_0154C0.cpp:1141, src/recovered/unit_0154C0.cpp:1158",
+  "confidence": "verified"
+ },
+ "unk_1378": {
+  "name": "targetTime",
+  "desc": "Frames (1/60 s) the current target has been tracked; grows each update while a target exists; reset on target change; under 60 = newly acquired (target scoring).",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:671, src/recovered/unit_0154C0.cpp:1151, src/recovered/unit_03FA10.cpp:322",
+  "confidence": "verified"
+ },
+ "unk_137C": {
+  "name": "prevTarget",
+  "desc": "Last target: set on a target change and copied from unk_1374 in combat states 8-13/16-29. Behaviour state 0x11 heads to its last known point, then clears it.",
+  "kind": "handle",
+  "evidence": "src/recovered/unit_0154C0.cpp:860, src/recovered/unit_0154C0.cpp:1156, src/recovered/unit_03F120.cpp:163",
+  "confidence": "verified"
+ },
+ "unk_1380": {
+  "name": "chaseTargetPos",
+  "desc": "Target's position when the vehicle-driving AI last planned its chase path (sub_1C880). Replans after 300 frames or when target moves >1500. Not a general last-seen point.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:2984, src/recovered/unit_0154C0.cpp:3028, src/recovered/unit_0154C0.cpp:3062, src/recovered/unit_0154C0.cpp:3070",
+  "confidence": "verified"
+ },
+ "unk_138C": {
+  "name": "unused138C",
+  "desc": "Only written: the constructor zeroes it. No reader in the recovered source.",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0154C0.cpp:257",
+  "confidence": "unknown"
+ },
+ "unk_1390": {
+  "name": "lastAttacker",
+  "desc": "Entity that last damaged this AI. Set by sub_18DA0 from the damage handlers (hit message unk_0C) when the attacker has an AI object; adds weight in target scoring.",
+  "kind": "handle",
+  "evidence": "src/recovered/unit_0154C0.cpp:1174, src/recovered/unit_0FD730.cpp:8372, src/recovered/unit_134B40.cpp:3340, src/recovered/unit_03FA10.cpp:156",
+  "confidence": "verified"
+ },
+ "unk_1394": {
+  "name": "timeSinceHit",
+  "desc": "Frames since unk_1390 last hit it (1e37 at start; reset to 0 on each hit). Under 120 = attacker preferred; \"ShouldIDoTheAssaultWalk\" needs the player's value over 300.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:705, src/recovered/unit_0154C0.cpp:1179, src/recovered/unit_03FA10.cpp:329, src/recovered/unit_0441B0.cpp:5436",
+  "confidence": "verified"
+ },
+ "unk_1398": {
+  "name": "prevNodeMemory",
+  "desc": "Frames to keep remembering the node just left (unk_F58): 120 for kind 0x11, 0 for 0x0E, 21600 for 0x13, else 480. Counts down; at expiry unk_F58 is cleared. 1e37 = none.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_022C80.cpp:362, src/recovered/unit_0154C0.cpp:678, src/recovered/unit_022C80.cpp:151",
+  "confidence": "verified"
+ },
+ "unk_139C": {
+  "name": "shotBlockFrac",
+  "desc": "Fraction (0..1) along the line of fire to the target's aim point where the nearest blocker is. Set by the line tests in sub_41B20 and vf_134; over 0.9 sets unk_534. Reset on target change.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_040720.cpp:790, src/recovered/unit_134B40.cpp:4358, include/types/type_3D3548.h:1475, src/recovered/unit_0154C0.cpp:1152",
+  "confidence": "likely"
+ },
+ "unk_13A0": {
+  "name": "defendAreaKey",
+  "desc": "Key (two words) of the defend-area object (kinds 0x2C-0x2E) whose point the area follows (\"SetDefendArea\"); zero for a point or entity area.",
+  "kind": "uint",
+  "evidence": "src/recovered/unit_0154C0.cpp:3528, src/recovered/unit_0154C0.cpp:3547, src/recovered/unit_0154C0.cpp:3719",
+  "confidence": "verified"
+ },
+ "unk_13A8": {
+  "name": "defendAreaCentre",
+  "desc": "Defend area centre (flag 13); follows the anchor entity/object each update. \"SetupDefendAreaGotoPoint\" copies it to the target point.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0441B0.cpp:15406, src/recovered/unit_0154C0.cpp:3586, src/recovered/unit_0154C0.cpp:3711, src/recovered/unit_0154C0.cpp:3640",
+  "confidence": "verified"
+ },
+ "unk_13B4": {
+  "name": "defendAreaRadius",
+  "desc": "Defend area radius (\"GetDefendAreaRadius\"); raised by 100 when it is under the anchor entity's size plus 100.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0441B0.cpp:1132, src/recovered/unit_0154C0.cpp:3563, src/recovered/unit_0154C0.cpp:3654",
+  "confidence": "verified"
+ },
+ "unk_13B8": {
+  "name": "defendAreaHeightUp",
+  "desc": "Defend cylinder height above the centre (\"SetDefendAreaCylinder\" arg 3); inside needs y < centre.y + this. 0 with unk_13BC 0 means a sphere.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0441B0.cpp:1129, src/recovered/unit_0154C0.cpp:3564, src/recovered/unit_0154C0.cpp:3664",
+  "confidence": "verified"
+ },
+ "unk_13BC": {
+  "name": "defendAreaHeightDown",
+  "desc": "Defend cylinder depth below the centre (\"SetDefendAreaCylinder\" arg 4); inside needs y > centre.y - this. Minimum flt_4275B8 when nonzero.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0441B0.cpp:1129, src/recovered/unit_0154C0.cpp:3565, src/recovered/unit_0154C0.cpp:3665",
+  "confidence": "verified"
+ },
+ "unk_13C0": {
+  "name": "defendAreaEntity",
+  "desc": "Entity the defend area is centred on (an object with flag 2 holding an entity id); 0 for a point or object area.",
+  "kind": "handle",
+  "evidence": "src/recovered/unit_0154C0.cpp:3511, src/recovered/unit_0154C0.cpp:3708, src/recovered/unit_0154C0.cpp:3739",
+  "confidence": "verified"
+ },
+ "unk_13C4": {
+  "name": "defendAreaDir",
+  "desc": "Defend area anchor's facing: the owner's facing for a point, the anchor's movement direction (updated after each move over dword_4275C8), or the object's direction.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:3505, src/recovered/unit_0154C0.cpp:3585, src/recovered/unit_0154C0.cpp:3717, src/recovered/unit_0154C0.cpp:3674",
+  "confidence": "verified"
+ },
+ "unk_13D0": {
+  "name": "defendAreaAnchorPos",
+  "desc": "Defend area anchor position, updated only after the anchor moves past dword_4275C8. \"SetupDefendAreaAnchorPosGotoPoint\" copies it to the target point.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0441B0.cpp:15430, src/recovered/unit_0154C0.cpp:3586, src/recovered/unit_0154C0.cpp:3716, src/recovered/unit_022C80.cpp:993",
+  "confidence": "verified"
+ },
+ "unk_13DC": {
+  "name": "defendAreaMode",
+  "desc": "Follow-frame mode of the defend area (same values as unk_1404); always set to 3 = use centre unk_13A8 and face away horizontally. 0/1/2/4 would use the anchor position.",
+  "kind": "enum",
+  "values": {
+   "0": "anchor pos",
+   "1": "anchor pos",
+   "2": "anchor pos",
+   "3": "centre, face away (always set)",
+   "4": "anchor pos"
+  },
+  "evidence": "src/recovered/unit_0154C0.cpp:3555, src/recovered/unit_0154C0.cpp:3587, src/recovered/unit_022C80.cpp:988",
+  "confidence": "verified"
+ },
+ "unk_13E0": {
+  "name": "defendPursueDelay",
+  "desc": "Frames before a defend-area AI may chase its target again: 2700 when the target is out of the area, or 1-5 s random (x60). Counts down to 0; reset on target change.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_012000.cpp:1739, src/recovered/unit_012000.cpp:609, src/recovered/unit_0154C0.cpp:673, src/recovered/unit_0154C0.cpp:1154",
+  "confidence": "verified"
+ },
+ "unk_13E4": {
+  "name": "registeredFollowed",
+  "desc": "Entity registered as followed (\"RegisterEntityFollowed\"). Holds a follower count on it (sub_D3FF0/sub_D4170) so it records its own trail direction/point that followers copy.",
+  "kind": "handle",
+  "evidence": "src/recovered/unit_0441B0.cpp:1220, src/recovered/unit_0154C0.cpp:3774, src/recovered/unit_0154C0.cpp:3785, include/types/type_3D3548.h:1460",
+  "confidence": "verified"
+ },
+ "unk_13E8": {
+  "name": "followTarget",
+  "desc": "Entity the AI currently follows (\"SetCurrentEntityFollowed\" / \"...OnSpline\"); takes priority over the defend area as the follow frame.",
+  "kind": "handle",
+  "evidence": "src/recovered/unit_0441B0.cpp:1222, src/recovered/unit_0154C0.cpp:3796, src/recovered/unit_022C80.cpp:974",
+  "confidence": "verified"
+ },
+ "unk_13EC": {
+  "name": "followDir",
+  "desc": "Follow target's horizontal heading: its movement direction (after each move past the threshold), or the spline direction while following on a spline.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:3800, src/recovered/unit_0154C0.cpp:3925, src/recovered/unit_0154C0.cpp:3964",
+  "confidence": "verified"
+ },
+ "unk_13F8": {
+  "name": "followPoint",
+  "desc": "Follow target's last trail point (position stored after each move past the threshold), or the spline point; used as the follow position except in modes 3/4.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:3801, src/recovered/unit_0154C0.cpp:3842, src/recovered/unit_022C80.cpp:983",
+  "confidence": "verified"
+ },
+ "unk_1404": {
+  "name": "followMode",
+  "desc": "Follow mode (\"SetCurrentEntityFollowed\" arg 2, 0-4 or -1; default 3). 3 = target's live position, also face away; 4 = live position unless on a spline; others = trail point.",
+  "kind": "enum",
+  "values": {
+   "-1": "none",
+   "0": "trail point",
+   "1": "trail point",
+   "2": "trail point",
+   "3": "live position, face away (default)",
+   "4": "live position unless spline"
+  },
+  "evidence": "src/recovered/unit_0154C0.cpp:3810, src/recovered/unit_0154C0.cpp:305, src/recovered/unit_022C80.cpp:978, src/recovered/unit_022C80.cpp:1006",
+  "confidence": "verified"
+ },
+ "unk_1408": {
+  "name": "followSplineKey",
+  "desc": "Key (two words with unk_140C) of the spline object followed (\"SetCurrentEntityFollowedOnSpline\" arg 6); zeroed when following without a spline.",
+  "kind": "uint",
+  "evidence": "src/recovered/unit_0154C0.cpp:3840, src/recovered/unit_0154C0.cpp:3812",
+  "confidence": "verified"
+ },
+ "unk_1410": {
+  "name": "followSpline",
+  "desc": "Spline path being followed (object's unk_24); non-null = following on a spline (sub_212A0).",
+  "kind": "ptr",
+  "evidence": "src/recovered/unit_0154C0.cpp:3841, src/recovered/unit_0154C0.cpp:3907",
+  "confidence": "verified"
+ },
+ "unk_1414": {
+  "name": "splineParam",
+  "desc": "Furthest spline parameter (0..1) reached; over 0.9999 fires \"FollowEntityOnSpline_ArrivedAtDestination\".",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:3842, src/recovered/unit_0154C0.cpp:3962",
+  "confidence": "verified"
+ },
+ "unk_1418": {
+  "name": "splinePoint",
+  "desc": "Spline point at unk_1414 (raised 40); range checks measure from it (sub_21610/sub_21790) and the spline leash centres on it.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:3843, src/recovered/unit_0154C0.cpp:3963",
+  "confidence": "verified"
+ },
+ "unk_1424": {
+  "name": "splineMode",
+  "desc": "Spline follow mode (script arg 2, 0 or 1; default -1). 0 = never move back along the spline; 1 = start direction toward the owner's nearest point.",
+  "kind": "enum",
+  "values": {
+   "-1": "none",
+   "0": "forward only",
+   "1": "either way"
+  },
+  "evidence": "src/recovered/unit_0154C0.cpp:3839, src/recovered/unit_0154C0.cpp:3959, src/recovered/unit_0154C0.cpp:313",
+  "confidence": "verified"
+ },
+ "unk_1428": {
+  "name": "splineLeash",
+  "desc": "Spline leash (script arg 4): the spline point stops advancing while the followed entity is over this far from it at a similar height (within 200).",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:3838, src/recovered/unit_0154C0.cpp:3956",
+  "confidence": "verified"
+ },
+ "unk_142C": {
+  "name": "splineDefendRadius",
+  "desc": "Defend radius around the spline point (script arg 5); positive = set a defend area there (sub_20370) that moves with the spline point.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:3862, src/recovered/unit_0154C0.cpp:3965",
+  "confidence": "verified"
+ },
+ "unk_1430": {
+  "name": "goGoGoState",
+  "desc": "GoGoGo order state (sub_1A5A0); -1 none (\"DisableGoGoGo\"). 1 = point path found; \"FoundPointPathForGoGoGo\" sets 2; 3 = done. Only -1/1/2/3 are ever set.",
+  "kind": "enum",
+  "values": {
+   "-1": "none",
+   "0": "find point (handled, never set)",
+   "1": "path found",
+   "2": "acknowledged by script",
+   "3": "done/going"
+  },
+  "evidence": "src/recovered/unit_0154C0.cpp:1688, src/recovered/unit_033520.cpp:472, src/recovered/unit_0441B0.cpp:7127, src/recovered/unit_0441B0.cpp:1089",
+  "confidence": "verified"
+ },
+ "unk_1434": {
+  "name": "goGoGoTime",
+  "desc": "Game time (dword_4B87C8, frames) stamped by \"FinishedGoGoGo\"; \"DidIJustGoGoGo\" = under 60 frames ago; vf_034 waits 60 past it. Cleared for states 3/none.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0441B0.cpp:7173, src/recovered/unit_0441B0.cpp:7152, src/recovered/unit_033520.cpp:486",
+  "confidence": "verified"
+ },
+ "unk_1438": {
+  "name": "goGoGoPoint",
+  "desc": "GoGoGo destination: 2000 (flt_3D9480) ahead of the owner along the player's facing, set on \"PlayerDidGoGoGo\"; the point to head for while unk_1430 is set.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:1635, src/recovered/unit_022C80.cpp:497, src/recovered/unit_0F7BA0.cpp:44",
+  "confidence": "verified"
+ },
+ "unk_1444": {
+  "name": "coverSightCache",
+  "desc": "Three cached line-of-sight results from cover nodes to a target point (sub_22370): reused when node and point match; slot choice keeps current node unk_F60 and unk_F54.",
+  "kind": null,
+  "evidence": "src/recovered/unit_0154C0.cpp:344,4298-4370; src/recovered/unit_022C80.cpp:1705",
+  "confidence": "verified"
+ },
+ "unk_28": {
+  "name": "grenadeHintDir",
+  "desc": "The at (facing) vectors of the unk_04 grenade-hint nodes; sp_sub_16540 accepts a node only when the thrower is on the right side of it",
+  "kind": null,
+  "evidence": "src/recovered/unit_031B90.cpp:166, src/recovered/unit_0154C0.cpp:3381",
+  "confidence": "verified"
+ },
+ "unk_480": {
+  "name": "unused_480",
+  "desc": "Only zeroed by the constructor; no other read or write found",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0154C0.cpp:209",
+  "confidence": "unknown"
+ },
+ "unk_484": {
+  "name": "matchOrientationDir",
+  "desc": "Direction to turn to (script SetupMatchOrientation); states 20 (vehicle, sub_1CFE0) and 30 (sub_1A190) turn to it and log MatchedOrientation; state 10 passes it to an empty stub",
+  "kind": null,
+  "evidence": "src/recovered/unit_0441B0.cpp:12634, src/recovered/unit_0154C0.cpp:763, src/recovered/unit_0154C0.cpp:785",
+  "confidence": "verified"
+ },
+ "unk_490": {
+  "name": "pad_490",
+  "desc": "4 bytes never accessed (padding or dead field)",
+  "kind": null,
+  "evidence": "include/types/AIData.h:95",
+  "confidence": "unknown"
+ },
+ "unk_494": {
+  "name": "fireWeaponIndex",
+  "desc": "Vehicle weapon slot (0/1/2) to fire, script FireWeaponXTimes arg 1; state 29 (sub_1F470) passes it to the vehicle's vf_2A8",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0441B0.cpp:6931, src/recovered/unit_0154C0.cpp:3219, src/recovered/unit_155470.cpp:1258",
+  "confidence": "verified"
+ },
+ "unk_498": {
+  "name": "fireShotsLeft",
+  "desc": "Shots still to fire (FireWeaponXTimes arg 2); sub_1F470 decrements on each successful vf_2A8 and logs FireWeaponCompleted at 0",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0441B0.cpp:6932, src/recovered/unit_0154C0.cpp:3220",
+  "confidence": "verified"
+ },
+ "unk_49C": {
+  "name": "aiFlags",
+  "desc": "AI flag word, set/cleared/tested by script SetAIFlag/ClearAIFlag/GetAIFlag (sub_16D70/sub_16DD0) and by code",
+  "kind": "flags",
+  "bits": {
+   "0": "probe look/avoid: steer the vf_1C8 probe object toward followed entities/directions (sub_2E580); keeps probes alive (mask 0x840001)",
+   "2": "check path blocked by a line cast ahead (sub_2CE90); IsPathBlocked",
+   "3": "takes damage from bullets/explosions (vf_064/vf_068/vf_060)",
+   "4": "autonomous: AI picks its own actions (sub_33820), action timer runs; squad behaviours require it",
+   "5": "vision scans every enemy list, not just the target (sub_40FB0); cleared when disabled",
+   "6": "may be targeted by others/projectile generators (sub_3DE00); cleared when disabled",
+   "7": "vehicle: face the unk_580 entity when matching orientation; skips turret check in sub_1BFB0",
+   "8": "vehicle: face the unk_580 entity when matching orientation (sub_1CFE0)",
+   "9": "hold cover: attack from cover (actions 25/26) while at a cover state; exempt from tank alert",
+   "10": "facing blocked (script BlockFacing): no turning in sub_2D5C0",
+   "11": "vehicle: consider reversing at path start (set by sub_2B740, cleared by sub_1A950)",
+   "12": "has default spline path (SoldierTrigger); HasDefaultSplinePath/SetSplinePathFromName",
+   "13": "has defend area (leash unk_13A8/unk_13B4); IsWithinDefendArea; set sub_1FF10/sub_20370, cleared sub_204E0",
+   "14": "invulnerable: cannot die at 0 hit points (sub_13C490, vf_064)",
+   "15": "strafe: keep facing/aiming at the tracked target while moving (sub_16D70 targets it)",
+   "16": "vehicle drives in reverse (sub_1B710 flips heading/throttle)",
+   "17": "vehicle may fire at the target while moving/attacking (sub_1C4F0)",
+   "18": "probe steering via sub_2F440 (sub_2E580, sub_2C220)",
+   "19": "notified when it hits its target (TargetHit, sub_D2AD0)",
+   "20": "vehicle does not stop to fire (sub_1DB60, sub_1E210)",
+   "21": "vehicles stop for it rather than run it over (vf_060, vf_2D0, vf_2D8)",
+   "22": "vehicle cover only around its assigned vehicle unk_1370 (sub_24BA0, sub_F6FC0)",
+   "23": "probe-based path-block detection (sub_2D3A0, sub_308C0, sub_2F440)",
+   "24": "defend-area centre unk_13A8 follows the steering point unk_D70 (sub_2AE00)",
+   "25": "path-block line check that stops (unk_59C) instead of rerouting (sub_2CE90)",
+   "26": "may be recruited by its squad behaviour (sub_1A1F0 asks unk_574's vf_024)",
+   "27": "vehicle stops at the end of its spline (sub_1B2B0, unk_4B4)",
+   "28": "vehicle always stops to fire, even at soft targets (sub_1E210)",
+   "29": "vehicle ignores blockers: never stops for entities in its path (vf_2D0)",
+   "30": "SetTurnMode turns toward the fixed point unk_500 instead of unk_4F0"
+  },
+  "evidence": "src/recovered/unit_0154C0.cpp:439, src/recovered/unit_0441B0.cpp:6565, src/recovered/unit_040720.cpp:455, src/recovered/unit_033520.cpp:180, src/Source/GameCore/ai/aidatapathing.cpp:1568, src/recovered/unit_14C820.cpp:2899",
+  "confidence": "likely"
+ },
+ "unk_4A0": {
+  "name": "vehicleReversing",
+  "desc": "Vehicle steering (sub_1A950) is reversing to turn toward its point: set when the point is behind or a 3-point turn is chosen, cleared once facing it",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_0154C0.cpp:1805, src/recovered/unit_0154C0.cpp:1834",
+  "confidence": "verified"
+ },
+ "unk_4A4": {
+  "name": "tankAttackRoute",
+  "desc": "Result of sub_1C880 (an attack-position route found, nonzero) for tank states 24/25/33; 0 forces a re-plan; cleared on arrival or when the target moves over 1500",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0154C0.cpp:3021, src/recovered/unit_0154C0.cpp:3067",
+  "confidence": "likely"
+ },
+ "unk_4A8": {
+  "name": "vehicleStateTimer",
+  "desc": "Per-state countdown in frames: attack pause 30 (AttackPauseFinished), lookout 60 (LookOutEntityEmerged), re-plan 300; state 22 uses <=0 as first-tick then sets 1e6",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:2659, src/recovered/unit_0154C0.cpp:2687, src/recovered/unit_0154C0.cpp:2876, src/recovered/unit_0154C0.cpp:3029",
+  "confidence": "verified"
+ },
+ "unk_4AC": {
+  "name": "attackPauseDir",
+  "desc": "Random -1/0/1 redrawn each attack pause in sub_1D2C0 (reset to 0 on entering states 16/34); nothing reads it",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0154C0.cpp:2665, src/recovered/unit_0154C0.cpp:1043",
+  "confidence": "verified"
+ },
+ "unk_4B0": {
+  "name": "vehiclePathBlocked",
+  "desc": "Recomputed each tick by type_3DBC78::vf_2D0 (1 when an entity it must not run over is ahead); logs Vehicle_PathBlocked/UnBlocked on change; vehicle states brake while set",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_14C820.cpp:2826, src/recovered/unit_14C820.cpp:2904, src/recovered/unit_14C820.cpp:2929, src/recovered/unit_0154C0.cpp:1927",
+  "confidence": "verified"
+ },
+ "unk_4B4": {
+  "name": "splineEndBraking",
+  "desc": "State 12: set with flag 27 near the spline's end within stopping distance of unk_4E4; vehicle brakes until speed < 1, then clears; reset on entering state 12/23",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_0154C0.cpp:1980, src/recovered/unit_0154C0.cpp:1966, src/recovered/unit_0154C0.cpp:979",
+  "confidence": "verified"
+ },
+ "unk_4C": {
+  "name": "grenadeHintKind15Mask",
+  "desc": "Bit n set when grenade-hint node n is of kind 0xF (else 0x10); picks which side test sp_sub_16540 applies. Cleared by sub_1FC70 (EnableGrenadeHints off)",
+  "kind": "flags",
+  "evidence": "src/recovered/unit_031B90.cpp:163, src/recovered/unit_0154C0.cpp:3377",
+  "confidence": "verified"
+ },
+ "unk_4E0": {
+  "name": "ridingVehicle",
+  "desc": "1 while the entity rides a vehicle: set by script RideVehicle, cleared by StopRidingVehicle and on attach (sub_16BC0); read by GetRidingVehicle.",
+  "kind": "bool",
+  "evidence": "unit_0441B0.cpp:12829, unit_0441B0.cpp:12852, unit_0441B0.cpp:13834, unit_0154C0.cpp:393",
+  "confidence": "verified"
+ },
+ "unk_4E4": {
+  "name": "destination",
+  "desc": "Point the current movement ends at: the path goal (unk_8AC.unk_20) on entering a path state, the spline end (states 12/23/32), own position (40). Script DistanceToDestination.",
+  "kind": null,
+  "evidence": "unit_0441B0.cpp:18823, unit_0154C0.cpp:935, unit_0154C0.cpp:962, unit_0154C0.cpp:1976",
+  "confidence": "verified"
+ },
+ "unk_4F0": {
+  "name": "turnTarget",
+  "desc": "Pointer to the point the AI turns/aims its body at (sub_17140; tracked entity position, unk_4F4, unk_D70, dive spot). Script SetTurnMode, CanTurnToTurnLocation. 0 = none.",
+  "kind": "ptr",
+  "evidence": "unit_0154C0.cpp:574, unit_0154C0.cpp:1579, unit_0154C0.cpp:4223, unit_0441B0.cpp:4489, unit_0441B0.cpp:17022",
+  "confidence": "verified"
+ },
+ "unk_4F4": {
+  "name": "turnLocation",
+  "desc": "Storage for a turn point: script SetTurnLocationTo(x,y,z) writes it and makes it the turn target; states 35 copy the vehicle cover point here.",
+  "kind": null,
+  "evidence": "unit_0441B0.cpp:17074, unit_0154C0.cpp:1095, unit_0154C0.cpp:3239",
+  "confidence": "verified"
+ },
+ "unk_50": {
+  "name": "grenadeHintCount",
+  "desc": "Number of valid entries (0-3) in unk_04/unk_28, from the node search; cleared by sub_1FC70",
+  "kind": "int",
+  "evidence": "src/recovered/unit_031B90.cpp:158, src/recovered/unit_0154C0.cpp:3369",
+  "confidence": "verified"
+ },
+ "unk_500": {
+  "name": "turnLocationOverride",
+  "desc": "Turn point used instead of unk_4F0 while unk_49C flag 30 is set (SetTurnMode). Script SetTurnLocationOverrideTo(x,y,z).",
+  "kind": null,
+  "evidence": "unit_0441B0.cpp:4479, unit_0441B0.cpp:17102",
+  "confidence": "verified"
+ },
+ "unk_50C": {
+  "name": "turnTargetVelocity",
+  "desc": "World velocity of the entity being turned to (its local velocity unk_D8/DC/E0 on its frame axes); SetTurnMode leads the turn point by it. Zeroed by sub_17140 and state changes.",
+  "kind": null,
+  "evidence": "unit_0154C0.cpp:1571, unit_0154C0.cpp:1425, unit_0154C0.cpp:575, unit_0441B0.cpp:4508",
+  "confidence": "verified"
+ },
+ "unk_518": {
+  "name": "aiSlot",
+  "desc": "This AI's slot in the AIData slot table unk_438CA8 (-1 none); other AIs index their 32 unk_80 records and maneuvers their member arrays by it.",
+  "kind": "int",
+  "evidence": "unit_0154C0.cpp:394, unit_0154C0.cpp:414, unit_0154C0.cpp:499, unit_0390D0.cpp:486",
+  "confidence": "verified"
+ },
+ "unk_51C": {
+  "name": "aiControl",
+  "desc": "AI enabled (1 from ctor). Script GetAIControl/SetAIControl; cleared on death and failed cover spawn; maneuvers and orders skip the AI while 0.",
+  "kind": "bool",
+  "evidence": "unit_0441B0.cpp:8135, unit_0441B0.cpp:8151, unit_0154C0.cpp:1601, unit_033520.cpp:171, unit_070CA0.cpp:204, unit_134B40.cpp:619",
+  "confidence": "verified"
+ },
+ "unk_520": {
+  "name": "alerted",
+  "desc": "Alerted: set on acquiring a target (sub_18BB0) or seeing it (sub_425A0); selects the alerted view range (vf_10C). Script SetAlerted/IsAlerted.",
+  "kind": "bool",
+  "evidence": "unit_0441B0.cpp:17655, unit_0441B0.cpp:17681, unit_0154C0.cpp:1164, unit_040720.cpp:939, unit_134B40.cpp:2980",
+  "confidence": "verified"
+ },
+ "unk_524": {
+  "name": "firing",
+  "desc": "Trigger held: soldier vf_1B0/vf_1B4 store the fire request here and pass it to the weapon; weapon messages re-pull the trigger while it is set.",
+  "kind": "bool",
+  "evidence": "unit_134B40.cpp:4039, unit_134B40.cpp:4058, unit_134B40.cpp:2753",
+  "confidence": "verified"
+ },
+ "unk_528": {
+  "name": "orientToCover",
+  "desc": "Request to face the cover node's orientation: script OrientToCoverPoint (sub_26A30) sets it; ClearCoverPoint and path-state entry clear it; tank state 26 aims along the node.",
+  "kind": "bool",
+  "evidence": "unit_022C80.cpp:1549, unit_022C80.cpp:379, unit_0441B0.cpp:9989, unit_0154C0.cpp:940, unit_0154C0.cpp:3128",
+  "confidence": "verified"
+ },
+ "unk_52C": {
+  "name": "allowTargetLosLoss",
+  "desc": "Script SetAllowTargetLOSLoss: when set, the attack-stand check (sub_14DF0) keeps attacking even when the target is not visible.",
+  "kind": "bool",
+  "evidence": "unit_0441B0.cpp:8968, unit_012000.cpp:1707",
+  "confidence": "verified"
+ },
+ "unk_530": {
+  "name": "holdCover",
+  "desc": "Set for soldiers spawned attacking from cover (trigger kind 5, action 1); while set and unk_58==3 maneuvers leave the member alone. Cleared when a new target is acquired.",
+  "kind": "bool",
+  "evidence": "unit_134B40.cpp:599, unit_134B40.cpp:607, unit_0154C0.cpp:1159, unit_033520.cpp:178, unit_0390D0.cpp:558",
+  "confidence": "likely"
+ },
+ "unk_534": {
+  "name": "targetLineMostlyClear",
+  "desc": "1 when the nearest blocker on the line to a player target is beyond 0.9 of it (with unk_139C); lets a recently seen target count as visible within 300 of its last point.",
+  "kind": "bool",
+  "evidence": "unit_040720.cpp:791, include/types/AIData.h:1121, unit_0154C0.cpp:1214, unit_0154C0.cpp:1229, unit_022C80.cpp:150",
+  "confidence": "likely"
+ },
+ "unk_538": {
+  "name": "hearClasses",
+  "desc": "Sound class mask heard (sub_3C980). Rewritten every update: -1 (all) while action unk_5C is 0, 4 (Idle) or 0x1A, else 0, so AIs only hear while idle. [all: -1 while idle, 0 otherwise]",
+  "kind": "flags",
+  "evidence": "unit_0154C0.cpp:220, unit_0154C0.cpp:666, unit_03C1D0.cpp:324",
+  "confidence": "verified"
+ },
+ "unk_53C": {
+  "name": "hearKinds",
+  "desc": "Sound kind mask heard (sub_3C980); 0x57 from the constructor, nothing else writes it. [0x57: default (bits 0,1,2,4,6)]",
+  "kind": "flags",
+  "evidence": "unit_0154C0.cpp:221, unit_03C1D0.cpp:326",
+  "confidence": "verified"
+ },
+ "unk_54": {
+  "name": "nextSquadMember",
+  "desc": "Handle to the next entity in the owner's squad (type_3DF30) member list: the owner's vf_118/vf_11C get/set it; squad loops walk vf_118()",
+  "kind": "handle",
+  "evidence": "include/types/type_3DAFC8.h:316, include/types/type_3DBC78.h:334, src/recovered/unit_03DF30.cpp:384",
+  "confidence": "verified"
+ },
+ "unk_540": {
+  "name": "hearSides",
+  "desc": "Side mask of sound sources heard (vs source unk_2C&7): the opposite side, 1 for owner side 2, 2 for side 1, 0 (any) otherwise. Sourceless sounds pass only for class 1.",
+  "kind": "enum",
+  "values": {
+   "0": "any side",
+   "1": "side 1 (owner is side 2)",
+   "2": "side 2 (owner is side 1)"
+  },
+  "evidence": "unit_0154C0.cpp:396, unit_03C1D0.cpp:328",
+  "confidence": "verified"
+ },
+ "unk_544": {
+  "name": "canShootStatus",
+  "desc": "Shooting path check result (sub_31C50, scheduled by sub_19010): 0 unknown, 1 blocked (ShootingPathBlocked), 2 clear. Script GetTargetsCanShootStatus.",
+  "kind": "enum",
+  "values": {
+   "0": "not checked (new target)",
+   "1": "path blocked",
+   "2": "can shoot"
+  },
+  "evidence": "unit_031B90.cpp:99, unit_031B90.cpp:103, unit_0441B0.cpp:7215, unit_012000.cpp:547, unit_0154C0.cpp:1160, unit_0154C0.cpp:2644",
+  "confidence": "verified"
+ },
+ "unk_548": {
+  "name": "shootCheckArg",
+  "desc": "Passed as arg_8 to the owner's vf_134 shoot-path test; only ever cleared (sub_19010, ctor), so always 0.",
+  "kind": "int",
+  "evidence": "unit_031B90.cpp:96, unit_0154C0.cpp:1256",
+  "confidence": "unknown"
+ },
+ "unk_54C": {
+  "name": "contactFlags",
+  "desc": "Contact report bits for script GetContactType (sub_22110 returns 1/2 and clears them); forced 0 while unk_558 runs.",
+  "kind": "flags",
+  "bits": {
+   "1": "0x2: 600 frames (10 s) in action 3/4/0x1A; cleared after 300 frames in other actions",
+   "2": "0x4: tracked target unseen for over 600 frames (record unk_10); cleared on new target"
+  },
+  "evidence": "unit_0154C0.cpp:687, unit_0154C0.cpp:697, unit_0154C0.cpp:1153, unit_0154C0.cpp:4237, unit_0441B0.cpp:7486",
+  "confidence": "verified"
+ },
+ "unk_550": {
+  "name": "timeOutOfCombat",
+  "desc": "Frames spent in action unk_5C 3 (PursueTarget), 4 (Idle) or 0x1A (Idle); zeroed in any other action. Crossing 600 sets unk_54C bit 1. Keyed on unk_5C, not unk_578.",
+  "kind": "real",
+  "evidence": "unit_0154C0.cpp:684",
+  "confidence": "verified"
+ },
+ "unk_554": {
+  "name": "timeInCombat",
+  "desc": "Frames spent in any other action (engaging); zeroed in actions 3/4/0x1A and by sub_22110. Over 300 clears unk_54C bit 1.",
+  "kind": "real",
+  "evidence": "unit_0154C0.cpp:689, unit_0154C0.cpp:4249",
+  "confidence": "verified"
+ },
+ "unk_558": {
+  "name": "contactCooldown",
+  "desc": "Countdown (frames) suppressing contact reports: while positive it decrements and keeps unk_54C 0. A maneuver (type_3CE5AC::vf_00C) sets 600.",
+  "kind": "real",
+  "evidence": "unit_0154C0.cpp:701, unit_0154C0.cpp:4237, unit_036730.cpp:195",
+  "confidence": "verified"
+ },
+ "unk_55C": {
+  "name": "astarCheckId",
+  "desc": "Id of the registered A* search (script RegisterAStarCheck, sub_28A60); 0 none. UnRegisterAStarCheck and one-shot search types completing clear it.",
+  "kind": "handle",
+  "evidence": "unit_0441B0.cpp:10539, unit_0441B0.cpp:10584, astarscheduler.cpp:252",
+  "confidence": "verified"
+ },
+ "unk_560": {
+  "name": "astarCheckScriptFile",
+  "desc": "Debug: name of the script file (char*, dword_449288) that registered the A* check.",
+  "kind": "ptr",
+  "evidence": "unit_0441B0.cpp:10556, unit_067B10.cpp:1596",
+  "confidence": "verified"
+ },
+ "unk_564": {
+  "name": "astarCheckScriptLine",
+  "desc": "Debug: script line number (dword_449284) that registered the A* check.",
+  "kind": "int",
+  "evidence": "unit_0441B0.cpp:10557, unit_067B10.cpp:1593",
+  "confidence": "verified"
+ },
+ "unk_568": {
+  "name": "owner",
+  "desc": "The entity this AI object belongs to (sub_16BC0 attaches, sub_16C50 clears).",
+  "kind": "ptr",
+  "evidence": "unit_0154C0.cpp:392",
+  "confidence": "verified"
+ },
+ "unk_56C": {
+  "name": "squad",
+  "desc": "The squad/group (type_3DF30) the entity is in (sub_17030). Script SetSquadLeader, SetManeuverType, SuggestManeuver go through it.",
+  "kind": "ptr",
+  "evidence": "unit_0154C0.cpp:525, unit_0441B0.cpp:6477, unit_0441B0.cpp:10681",
+  "confidence": "verified"
+ },
+ "unk_570": {
+  "name": "squadId",
+  "desc": "The squad's id (its unk_2B4), kept so sub_3EE10 can put the entity back in the same squad; 0 none.",
+  "kind": "int",
+  "evidence": "unit_0154C0.cpp:528, unit_03DF30.cpp:607",
+  "confidence": "verified"
+ },
+ "unk_574": {
+  "name": "maneuver",
+  "desc": "Handle of the squad maneuver (type_3CE4B4 subclass) the AI takes part in; resolved by sub_3D3E0. Script GetManeuverType returns its vf_030.",
+  "kind": "handle",
+  "evidence": "unit_0441B0.cpp:6711, unit_03DF30.cpp:290, unit_033520.cpp:131",
+  "confidence": "verified"
+ },
+ "unk_578": {
+  "name": "aiMode",
+  "desc": "AI mode/state, set only by script SetAIMode (sub_17BF0), read by GetAIMode; sub_172F0 runs its handler each update. 0 = none.",
+  "kind": "enum",
+  "values": {
+   "0": "none (no handler)",
+   "1": "follow A* path unk_5BC to an entity (FindAStarPathToAIObj), tracks it",
+   "2": "follow A* path unk_5BC to a point/node",
+   "3": "no setup or handler (steering range 125 only)",
+   "4": "face/turn to tracked target",
+   "5": "move to cover node (path unk_DDC)",
+   "6": "in cover at node unk_F60",
+   "7": "follow path unk_A24 to tracked target (pursue)",
+   "8": "vehicle: drive path unk_5BC",
+   "9": "vehicle: path to moving entity (pursue)",
+   "10": "vehicle: idle (empty handler)",
+   "11": "vehicle: drive path unk_A24 to target",
+   "12": "vehicle: follow spline unk_D14, keep pace with unk_580",
+   "13": "vehicle: aim at target (handler disabled)",
+   "14": "face the follow entity unk_580",
+   "15": "follow path unk_5BC (as 2)",
+   "16": "tank: attack pause / idle aim (AttackPauseFinished)",
+   "17": "tank: look out (LookOutEntityEmerged)",
+   "18": "tank: drive path unk_5BC",
+   "19": "tank: pursue along path to moving target",
+   "20": "tank: turn to orientation unk_484 / unk_580 (MatchedOrientation)",
+   "21": "tank: drive path unk_5BC (as 18)",
+   "22": "tank: drive to point unk_5B0",
+   "23": "tank: follow spline unk_D14",
+   "24": "tank: chase and attack target",
+   "25": "tank: attack along path unk_5BC",
+   "26": "tank: attack from cover node (path unk_DDC)",
+   "27": "tank: stop and aim at target",
+   "28": "tank: run down target",
+   "29": "fire weapon burst (unk_498 shots, FireWeaponCompleted)",
+   "30": "turn to orientation unk_484 (MatchedOrientation)",
+   "31": "follow second path unk_734",
+   "32": "follow spline unk_D14",
+   "33": "tank attack (24) for a crewed vehicle (vf_2DC)",
+   "34": "attack pause (16) for a crewed vehicle",
+   "35": "go straight to vehicle cover point",
+   "36": "path to vehicle cover point (unk_117C)",
+   "37": "hold vehicle cover point, track target",
+   "38": "in defend-area cover node",
+   "39": "aim mounted gun/turret at target",
+   "40": "go straight to point unk_5B0",
+   "41": "path to defend area (TargetMoved vs unk_13A8)",
+   "42": "in follow-target cover node",
+   "43": "move to defend-area cover node",
+   "44": "move to follow-target cover node",
+   "45": "go straight at tracked target",
+   "46": "follow directional path unk_B9C (go-go-go)",
+   "47": "flee grenade along path unk_B9C"
+  },
+  "evidence": "unit_0154C0.cpp:914, unit_0154C0.cpp:652, unit_0154C0.cpp:584, unit_0441B0.cpp:6509, unit_0441B0.cpp:6536, unit_022C80.cpp:403, unit_022C80.cpp:414, unit_022C80.cpp:428",
+  "confidence": "likely"
+ },
+ "unk_57C": {
+  "name": "modeTime",
+  "desc": "Frames in the current mode unk_578: reset when SetAIMode changes it, advanced by sub_172F0; a maneuver tests mode 0x25 for over 180.",
+  "kind": "real",
+  "evidence": "unit_0154C0.cpp:662, unit_0154C0.cpp:1136, unit_033520.cpp:413",
+  "confidence": "verified"
+ },
+ "unk_58": {
+  "name": "actionState",
+  "desc": "State of the current AI action (script SetManeuverState): 0 idle (reselect), 1 just started (AIAction_* sent), 3 running/held (StopTask handoff or script), 2/4 finished (second handlers reset to 0)",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0441B0.cpp:6736, src/recovered/unit_012000.cpp:288, src/recovered/unit_012000.cpp:327, src/recovered/unit_012000.cpp:1192, src/recovered/unit_033520.cpp:184",
+  "confidence": "likely"
+ },
+ "unk_580": {
+  "name": "followEntity",
+  "desc": "Handle of the entity to follow/plan to: script SetEntityToFollow/GetEntityToFollow, sub_293A0 path targets; mode 14 faces it, sub_1A630 keeps pace with it.",
+  "kind": "handle",
+  "evidence": "unit_0441B0.cpp:6859, unit_0441B0.cpp:6904, aidatapathing.cpp:278, unit_0154C0.cpp:1703",
+  "confidence": "verified"
+ },
+ "unk_584": {
+  "name": "blockingEntity",
+  "desc": "Handle of the non-player entity blocking the path (sub_309E0, from the path line cast); 0 none.",
+  "kind": "handle",
+  "evidence": "aidatapathing.cpp:2580, aidatapathing.cpp:2594",
+  "confidence": "verified"
+ },
+ "unk_588": {
+  "name": "blockedTime",
+  "desc": "Frames the unk_584 entity has blocked the path; past flt_438D30 a same-side blocker is sent \"BlockingEntity\". Reset when the blocker changes.",
+  "kind": "real",
+  "evidence": "aidatapathing.cpp:2581, aidatapathing.cpp:2596",
+  "confidence": "verified"
+ },
+ "unk_58C": {
+  "name": "followDistance",
+  "desc": "Distance to keep from the follow entity (script SetEntityToFollow arg 2); sub_1A630 matches its speed within 1.2x of it.",
+  "kind": "real",
+  "evidence": "unit_0441B0.cpp:6905, unit_0154C0.cpp:1706",
+  "confidence": "verified"
+ },
+ "unk_590": {
+  "name": "maxSpeedSeen",
+  "desc": "Highest owner speed seen (vf_0C8 length, updated each frame, never lowered); sub_1A630 scales speed by followEntitySpeed / this.",
+  "kind": "real",
+  "evidence": "unit_0154C0.cpp:708, unit_0154C0.cpp:1713",
+  "confidence": "verified"
+ },
+ "unk_594": {
+  "name": "pathCheckTimer",
+  "desc": "Frames accumulated by the path handlers, reset on mode entry; drives periodic checks (target moved every 30/60, vehicle cover moved every 15).",
+  "kind": "real",
+  "evidence": "unit_0154C0.cpp:1308, unit_0154C0.cpp:1322, unit_0154C0.cpp:1876, unit_0154C0.cpp:2725, unit_0154C0.cpp:3283",
+  "confidence": "verified"
+ },
+ "unk_598": {
+  "name": "pathBlocked",
+  "desc": "Path blocked (sub_30850; AStar_PathBlocked/UnBlocked, flag 23 or line cast without flag 25); movement stops heading for unk_D70. Script IsPathBlocked.",
+  "kind": "bool",
+  "evidence": "aidatapathing.cpp:2533, aidatapathing.cpp:1576, unit_0441B0.cpp:10619, unit_0154C0.cpp:1364",
+  "confidence": "verified"
+ },
+ "unk_59C": {
+  "name": "pathBlockedByEntity",
+  "desc": "Path blocked by an entity under unk_49C flag 25 (sub_2CE90 line cast); cleared when clear and on mode change. Script IsPathBlocked ORs it with unk_598.",
+  "kind": "bool",
+  "evidence": "aidatapathing.cpp:1570, aidatapathing.cpp:1585, unit_0154C0.cpp:927, unit_0441B0.cpp:10619",
+  "confidence": "verified"
+ },
+ "unk_5A0": {
+  "name": "pathBlockedWhileStrafing",
+  "desc": "Set with unk_598 when unk_49C flag 15 (face target while moving) is on; sub_2D3A0 then only turns (sub_2C220). Script IsPathBlockedWhileStrafing.",
+  "kind": "bool",
+  "evidence": "aidatapathing.cpp:2536, aidatapathing.cpp:1613, unit_0441B0.cpp:10652",
+  "confidence": "verified"
+ },
+ "unk_5A4": {
+  "name": "autoReplan",
+  "desc": "Set by maneuvers/handlers via sub_29380; the A* scheduler only runs search types 0, 1 and 4 (sub_28C60) while it is set.",
+  "kind": "bool",
+  "evidence": "aidatapathing.cpp:266, astarscheduler.cpp:245, unit_033520.cpp:200",
+  "confidence": "likely"
+ },
+ "unk_5A8": {
+  "name": "goalNode",
+  "desc": "Path node to plan to: script FindAStarPathToPathNode plans unk_5BC to its point (sub_29540); maneuvers set it (with unk_F5C) before action 5.",
+  "kind": "ptr",
+  "evidence": "aidatapathing.cpp:328, unit_032210.cpp:320, unit_036730.cpp:518, unit_0441B0.cpp:8017",
+  "confidence": "verified"
+ },
+ "unk_5AC": {
+  "name": "goalNodeIndex",
+  "desc": "Index paired with unk_5A8 (node search result index), passed to sub_29940 as the path's end node index (unk_64.unk_40).",
+  "kind": "int",
+  "evidence": "aidatapathing.cpp:336, aidatapathing.cpp:492, unit_032210.cpp:321, unit_036730.cpp:519",
+  "confidence": "likely"
+ },
+ "unk_5B0": {
+  "name": "gotoPoint",
+  "desc": "Point to go to: SetupGotoPoint, SetCoverPointFromName, defend-area setups, dive spots, node searches; FindAStarPathToPoint plans to it; modes 22 and 40 drive to it.",
+  "kind": null,
+  "evidence": "unit_0441B0.cpp:12407, unit_0441B0.cpp:8067, unit_0441B0.cpp:15419, unit_0441B0.cpp:4784, unit_0154C0.cpp:1107, unit_0154C0.cpp:2874",
+  "confidence": "verified"
+ },
+ "unk_5BC": {
+  "name": "goalPath",
+  "desc": "Main planned path: scheduler searches eASST 2,3,5 (PathToEntity[_UseCover/_Vehicle], via sub_28B50/sub_293A0) and 6,7,8,12 (PathToPoint*, spline point; sub_28D80/sub_29870); script FindAStarPathTo{AIObj,PathNode,Point}. Copied into unk_8AC for most move states.",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:95,140,316,407; src/Source/GameCore/ai/astarscheduler.cpp:23,226-236; src/recovered/unit_0441B0.cpp:8003,8054; src/recovered/unit_0154C0.cpp:934-1084",
+  "confidence": "verified"
+ },
+ "unk_5C": {
+  "name": "aiAction",
+  "desc": "Current AI action code, index into unk_427408 (1 AttackCover, 2 AttackStand, 3 PursueTarget, 4 Idle, 5 GotoPathNode ... 33 GotoDefendAreaPoint); set by sub_17AB0, read by GetAIAction",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0154C0.cpp:875, src/recovered/unit_012000.cpp:272, src/recovered/unit_0441B0.cpp:18457",
+  "confidence": "verified"
+ },
+ "unk_60": {
+  "name": "timedAction",
+  "desc": "The action whose running time unk_64 counts (-1 at start); when unk_5C differs (or flag 4 is clear) sub_17B40/sub_17B90 restart the timer",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0154C0.cpp:871, src/recovered/unit_0154C0.cpp:889, src/recovered/unit_0154C0.cpp:900",
+  "confidence": "verified"
+ },
+ "unk_64": {
+  "name": "actionTime",
+  "desc": "Frames spent in the current action unk_60 (sub_17B90 adds the time step each tick while flag 4 is set); e.g. AttackStand re-evaluates after 30",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:898, src/recovered/unit_033520.cpp:274",
+  "confidence": "verified"
+ },
+ "unk_68": {
+  "name": "retreatRequested",
+  "desc": "One-shot request set by script RequestAIAction_RetreatFromTarget; action 21's first handler (sub_13830) consumes it to start RetreatFromTarget",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_0441B0.cpp:6980, src/recovered/unit_012000.cpp:968",
+  "confidence": "verified"
+ },
+ "unk_6C": {
+  "name": "pursueRequested",
+  "desc": "Set by script RequestAIAction_PursueTarget; read and cleared in the AttackStand branch of type_3CE4B4::sub_33820, letting it switch to PursueTarget (handler 3)",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_0441B0.cpp:7000, src/recovered/unit_033520.cpp:279",
+  "confidence": "verified"
+ },
+ "unk_70": {
+  "name": "coverAttackRequested",
+  "desc": "Set by sub_28F00 (script RequestAIAction_AttackFromCover) unless the action is 1 or 0x18; the next think marks the action finished (unk_58=2) and clears it",
+  "kind": "bool",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:169, src/recovered/unit_033520.cpp:183, src/recovered/unit_0441B0.cpp:7020",
+  "confidence": "verified"
+ },
+ "unk_734": {
+  "name": "retreatPath",
+  "desc": "Retreat path: eASST_Retreat (9) plans here (sub_28D80 case 9) to the point sub_28F30 picked from the unk_1114 retreat-node search; followed in state 31; sub_19F30 = has retreat path from current target (unk_10C0).",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:157,174; src/Source/GameCore/ai/astarscheduler.cpp:238-246; src/recovered/unit_0154C0.cpp:983,1549",
+  "confidence": "verified"
+ },
+ "unk_74": {
+  "name": "attackStandHoldTime",
+  "desc": "Frames to hold the standing attack (script SetAttackStandHoldCount); counted down every tick by sub_172F0; cover/pursue/cover-point handlers refuse while above 0",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0441B0.cpp:17494, src/recovered/unit_0154C0.cpp:706, src/recovered/unit_012000.cpp:358",
+  "confidence": "verified"
+ },
+ "unk_78": {
+  "name": "gotoArriveDist",
+  "desc": "Arrival distance for the goto point unk_5B0 (script SetupGotoPoint arg 4); state 22 (sub_1DF60) logs AStar_ArrivedATDestination once closer than it",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0441B0.cpp:12408, src/recovered/unit_0154C0.cpp:2900",
+  "confidence": "verified"
+ },
+ "unk_7C": {
+  "name": "fireAndMoveCooldown",
+  "desc": "Frames before the soldier may join a fire-and-movement advance again: set to 600 on FireAndMovementFinished, counted down by sub_172F0; type_3CE5E8 skips members above 0",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0390D0.cpp:177, src/recovered/unit_0390D0.cpp:345, src/recovered/unit_0154C0.cpp:669",
+  "confidence": "verified"
+ },
+ "unk_80": {
+  "name": "knowledge",
+  "desc": "Per-entity perception records, indexed by the other entity's AI slot (its unk_518); sub_16ED0 claims/returns one; filled by the vision and range schedulers",
+  "kind": null,
+  "evidence": "src/recovered/unit_0154C0.cpp:492, src/recovered/unit_040720.cpp:945, src/recovered/unit_034FA0.cpp:685",
+  "confidence": "verified"
+ },
+ "unk_8AC": {
+  "name": "followPath",
+  "desc": "The path being followed: sub_29FC0 copies one of the other six paths into it on a state change (sub_17BF0); sub_2B740/sub_192D0 walk it; overlay reads it. Its unk_64 is the source path's request copy.",
+  "kind": null,
+  "evidence": "src/recovered/unit_0154C0.cpp:934,983,998,1015,1104,1130,1272-1314; src/Source/GameCore/ai/aidatapathing.cpp:640-660; port/src/debug/trigdraw.cpp:1091-1109",
+  "confidence": "verified"
+ },
+ "unk_A24": {
+  "name": "targetPath",
+  "desc": "Path to the tracked target unk_1374: eASST_PathToTarget (0), _UseCover (1), _Vehicle (4) via sub_28C60 (radius 1000; cleared when no target). sub_19ED0 = has path to current target; sub_228A0 walks it; states 7, 11.",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:117-137; src/Source/GameCore/ai/astarscheduler.cpp:222-225; src/recovered/unit_0154C0.cpp:1015,1030,1535,4392",
+  "confidence": "verified"
+ },
+ "unk_B9C": {
+  "name": "advancePath",
+  "desc": "Non-A* directional path built by sub_31240 (up to 5 linked nodes furthest along a direction): player GoGoGo order along the player's facing (500, sub_1A2E0) or backing away from the vehicle unk_610 (state 47); kind 3, result preset 1.",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:2742-2860; src/recovered/unit_0154C0.cpp:1120,1130,1661",
+  "confidence": "verified"
+ },
+ "unk_D14": {
+  "name": "splinePath",
+  "desc": "SplinePath the AI follows (states 12/23/32); set by script SetSplinePathFromName (object's +0x24), cleared by DivorceSplinePath; 0 = none",
+  "kind": "ptr",
+  "evidence": "src/recovered/unit_0441B0.cpp:14347, src/recovered/unit_0441B0.cpp:14269, src/recovered/unit_0154C0.cpp:950, src/Source/GameCore/ai/aidatapathing.cpp:1770",
+  "confidence": "verified"
+ },
+ "unk_D18": {
+  "name": "splinePos",
+  "desc": "Current parameter (0..1) along splinePath; script SetSplinePosition/GetSplinePosition; advanced by sub_2DAA0, clamped/wrapped at 0 and splineEnd",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0441B0.cpp:14754, src/recovered/unit_0154C0.cpp:951, src/Source/GameCore/ai/aidatapathing.cpp:1803",
+  "confidence": "verified"
+ },
+ "unk_D1C": {
+  "name": "splineEnd",
+  "desc": "End parameter (0..1, default 1.0) of splinePath travel; script SetSplineEndPosition (set_unk_D1C clamps); arrival/turnaround when splinePos reaches it",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0441B0.cpp:14412, src/recovered/unit_0154C0.cpp:191, src/Source/GameCore/ai/aidatapathing.cpp:1812",
+  "confidence": "verified"
+ },
+ "unk_D20": {
+  "name": "splineIncrement",
+  "desc": "Spline increment stored by script SetSplineIncrement / read by GetSplineIncrement (type_3D3548 vf_124/vf_128); no AI movement code reads it",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0CC8A0.cpp:3226, src/recovered/unit_0441B0.cpp:14800",
+  "confidence": "verified"
+ },
+ "unk_D24": {
+  "name": "splineStep",
+  "desc": "Max splinePos advance per control-point span per update (0.25 state 32, 0.1 states 12/23); negated to reverse in ping-pong mode (spline unk_1C&3==2)",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:950, src/recovered/unit_0154C0.cpp:967, src/Source/GameCore/ai/aidatapathing.cpp:1797, src/Source/GameCore/ai/aidatapathing.cpp:1816",
+  "confidence": "verified"
+ },
+ "unk_D28": {
+  "name": "padD28",
+  "desc": "8 unreferenced bytes before the RwMatrix at +0xD30 (likely alignment padding/unused)",
+  "kind": null,
+  "evidence": "include/types/AIData.h:204",
+  "confidence": "unknown"
+ },
+ "unk_D30": {
+  "name": "splineOffset",
+  "desc": "Matrix applied to every spline point (sub_BA990 -> sub_1414C0); identity by default, set by scripts SetSplineOffsetXYZ / SetSplineOffsetXYZIJK",
+  "kind": null,
+  "evidence": "src/recovered/unit_0441B0.cpp:19174, src/recovered/unit_0441B0.cpp:19223, src/recovered/unit_0B9EA0.cpp:341, src/recovered/unit_0154C0.cpp:316",
+  "confidence": "verified"
+ },
+ "unk_D70": {
+  "name": "pathPoint",
+  "desc": "Steering point the AI moves/turns towards (path point or spline point); script GetWorldYawAngleToTargetFrompPathPoint, GetLocalYawAngleToPathPoint",
+  "kind": null,
+  "evidence": "src/recovered/unit_0441B0.cpp:16637, src/recovered/unit_0154C0.cpp:955, src/Source/GameCore/ai/aidatapathing.cpp:613, src/Source/GameCore/ai/aidatapathing.cpp:1845",
+  "confidence": "verified"
+ },
+ "unk_D7C": {
+  "name": "pathPointFrom",
+  "desc": "Owner position when pathPoint was last placed (sub_29FC0/sub_2AE00); pathDir is pathPoint minus this",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:878, src/Source/GameCore/ai/aidatapathing.cpp:989, src/Source/GameCore/ai/aidatapathing.cpp:1057",
+  "confidence": "verified"
+ },
+ "unk_D88": {
+  "name": "lookAheadDist",
+  "desc": "Steering look-ahead per state (sub_17190: 75/125/400/600; default 200): pathPoint kept this far ahead on paths and splines (sub_2DAA0 reach)",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0154C0.cpp:584, src/recovered/unit_0154C0.cpp:1384, src/Source/GameCore/ai/aidatapathing.cpp:961, src/Source/GameCore/ai/aidatapathing.cpp:1045",
+  "confidence": "verified"
+ },
+ "unk_D8C": {
+  "name": "pathDir",
+  "desc": "Flat unit direction of travel into pathPoint (from previous point/owner); arrived once the offset to pathPoint points against it",
+  "kind": null,
+  "evidence": "src/recovered/unit_0154C0.cpp:956, src/recovered/unit_0154C0.cpp:1375, src/Source/GameCore/ai/aidatapathing.cpp:880, src/Source/GameCore/ai/aidatapathing.cpp:1768",
+  "confidence": "verified"
+ },
+ "unk_D98": {
+  "name": "splineAheadDir",
+  "desc": "Flat unit direction from pathPoint to the spline point one splineStep further on (sub_2E2F0); scaled into splineDrift",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:1925, src/Source/GameCore/ai/aidatapathing.cpp:1866",
+  "confidence": "verified"
+ },
+ "unk_DA4": {
+  "name": "lookPoint",
+  "desc": "Owner position at the last state change (sub_17BF0); overwritten by sub_2DAA0 with a spline point ~30 steps ahead; tank turret aims at it in state 23 (sub_1BFB0)",
+  "kind": null,
+  "evidence": "src/recovered/unit_0154C0.cpp:924, src/Source/GameCore/ai/aidatapathing.cpp:1809, src/recovered/unit_0154C0.cpp:2280",
+  "confidence": "likely"
+ },
+ "unk_DB0": {
+  "name": "splineDrift",
+  "desc": "Offset splineAheadDir * reach set once when the spline point is reached without advancing; zeroed when the spline advances; no reader found",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:1858, src/Source/GameCore/ai/aidatapathing.cpp:1866",
+  "confidence": "likely"
+ },
+ "unk_DBC": {
+  "name": "movingToPoint",
+  "desc": "Set while the AI steers towards pathPoint (sub_29FC0, per-state in sub_17190/sub_17BF0); other AIs use it to test head-on blocking; clearing flag 0x8000 retargets pathPoint",
+  "kind": "bool",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:648, src/Source/GameCore/ai/aidatapathing.cpp:1489, src/recovered/unit_0154C0.cpp:457, src/recovered/unit_0154C0.cpp:584",
+  "confidence": "verified"
+ },
+ "unk_DC0": {
+  "name": "useMoveHeading",
+  "desc": "When set, the AI's travel direction is the unk_8AC path heading (unk_08) instead of owner->pathPoint, for block line casts (sub_2CE90) and others' head-on tests",
+  "kind": "bool",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:649, src/Source/GameCore/ai/aidatapathing.cpp:1493, src/Source/GameCore/ai/aidatapathing.cpp:1545, src/recovered/unit_0154C0.cpp:1005",
+  "confidence": "verified"
+ },
+ "unk_DC4": {
+  "name": "facingToPoint",
+  "desc": "Flat unit direction from owner to pathPoint (sub_29ED0); fallback facing turned by at most 6 deg/unit in sub_2C220",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:613, src/Source/GameCore/ai/aidatapathing.cpp:1314, src/Source/GameCore/ai/aidatapathing.cpp:1373",
+  "confidence": "verified"
+ },
+ "unk_DD0": {
+  "name": "coverSearchType",
+  "desc": "Cover point search type (scripts Set/GetCoverPointSearchType, 0-2); change logs CoverPointSearchTypeChanged and clears coverSearchCentre",
+  "kind": "enum",
+  "values": {
+   "0": "defend area (around owner/defend point, sub_244E0)",
+   "1": "advance (towards group point, sub_23F60 mode 1)",
+   "2": "follow target (sub_25180)"
+  },
+  "evidence": "src/recovered/unit_0441B0.cpp:18584, src/recovered/unit_022C80.cpp:509, src/recovered/unit_0348D0.cpp:255, src/recovered/unit_0390D0.cpp:580",
+  "confidence": "verified"
+ },
+ "unk_DD4": {
+  "name": "coverSearch",
+  "desc": "Cover point search enabled (scripts SetCoverPointSearch/GetCoverPointSearch via sub_22EF0); 0 also clears coverFound",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_0441B0.cpp:18496, src/recovered/unit_022C80.cpp:128, src/recovered/unit_022C80.cpp:750, src/recovered/unit_022C80.cpp:805",
+  "confidence": "verified"
+ },
+ "unk_DD8": {
+  "name": "allowCoverPath",
+  "desc": "Lets a cover search plan a path to a newly found node (sub_29630/sub_24BA0); default 1; groups set 1 on assign, 0 when joining in state 0x17",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_0154C0.cpp:204, src/recovered/unit_022C80.cpp:821, src/recovered/unit_0390D0.cpp:475, src/recovered/unit_033520.cpp:132",
+  "confidence": "verified"
+ },
+ "unk_DDC": {
+  "name": "coverNodePath",
+  "desc": "Path to a candidate cover node: sub_29630 (radius 5000, cover pool 2) from cover searches sub_244E0 (kind 4) and sub_25180 defend-area (kind 6); success sets unk_F54. Followed in states 5/43/44/26 with unk_33=1.",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:342-376; src/recovered/unit_022C80.cpp:823,1125; src/recovered/unit_0154C0.cpp:998-1001,1088",
+  "confidence": "verified"
+ },
+ "unk_F54": {
+  "name": "coverFound",
+  "desc": "Cover node chosen by the last cover search (sub_244E0/sub_27CC0, set by sub_23530); copied to coverNext by sub_23670; cleared when search off",
+  "kind": "ptr",
+  "evidence": "src/recovered/unit_022C80.cpp:828, src/recovered/unit_022C80.cpp:336, src/recovered/unit_022C80.cpp:300, src/recovered/unit_022C80.cpp:130",
+  "confidence": "verified"
+ },
+ "unk_F58": {
+  "name": "coverLeft",
+  "desc": "Cover node most recently left (sub_23790); excluded from the next defend-area search",
+  "kind": "ptr",
+  "evidence": "src/recovered/unit_022C80.cpp:368, src/recovered/unit_022C80.cpp:811",
+  "confidence": "verified"
+ },
+ "unk_F5C": {
+  "name": "coverNext",
+  "desc": "Cover node the AI is heading to (sub_23670/sub_236F0); becomes coverCurrent on arrival (sub_22F70); kind 0x11 = MG node",
+  "kind": "ptr",
+  "evidence": "src/recovered/unit_022C80.cpp:152, src/recovered/unit_022C80.cpp:336, src/recovered/unit_022C80.cpp:349, src/recovered/unit_022C80.cpp:1212",
+  "confidence": "verified"
+ },
+ "unk_F60": {
+  "name": "coverCurrent",
+  "desc": "Cover/path node currently occupied (sub_F7BA0 claims it); script GetDistanceFromCurrentCoverPoint; MG node for PlayPickUpMMGPerformance",
+  "kind": "ptr",
+  "evidence": "src/recovered/unit_0441B0.cpp:18971, src/recovered/unit_022C80.cpp:152, src/recovered/unit_022C80.cpp:366, src/recovered/unit_0441B0.cpp:4096",
+  "confidence": "verified"
+ },
+ "unk_F64": {
+  "name": "coverOnPath",
+  "desc": "Free cover node met along the followed path (sub_2B740 returns -1); script SetArrivedAtCoverPoint (sub_235A0) makes it current and clears it",
+  "kind": "ptr",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:1138, src/recovered/unit_022C80.cpp:320, src/recovered/unit_0441B0.cpp:10252",
+  "confidence": "verified"
+ },
+ "unk_F68": {
+  "name": "coverSearchRange",
+  "desc": "Defend-area cover search radius: 2500 after a hit, +1000 per empty search up to 7500 (sub_244E0)",
+  "kind": "real",
+  "evidence": "src/recovered/unit_022C80.cpp:770, src/recovered/unit_022C80.cpp:779, src/recovered/unit_022C80.cpp:784",
+  "confidence": "verified"
+ },
+ "unk_F6C": {
+  "name": "coverSearchRadius",
+  "desc": "Script SetCoverPointSearchRadius (default 2500): radius of the follow-target cover search (sub_24F30 -> sub_25180)",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0441B0.cpp:18618, src/recovered/unit_022C80.cpp:977, src/recovered/unit_0154C0.cpp:206",
+  "confidence": "verified"
+ },
+ "unk_F70": {
+  "name": "coverSearchCentre",
+  "desc": "Centre of the last cover search; a new search is skipped while within 600 of it (flat); zero = search again",
+  "kind": null,
+  "evidence": "src/recovered/unit_022C80.cpp:751, src/recovered/unit_022C80.cpp:778, src/recovered/unit_022C80.cpp:1068, src/recovered/unit_022C80.cpp:510",
+  "confidence": "verified"
+ },
+ "unk_F7C": {
+  "name": "coverSearchTarget",
+  "desc": "Handle of the tracked entity (unk_1374) at the last cover search; a different target forces a new search",
+  "kind": "handle",
+  "evidence": "src/recovered/unit_022C80.cpp:752, src/recovered/unit_022C80.cpp:794, src/recovered/unit_022C80.cpp:1093",
+  "confidence": "verified"
+ },
+ "unk_F80": {
+  "name": "coverResults",
+  "desc": "25 cover-search results (type_154C0_F80) filled by sub_F8970 via coverSearchReq.unk_20",
+  "kind": null,
+  "evidence": "src/recovered/unit_022C80.cpp:774, src/recovered/unit_022C80.cpp:797, src/recovered/unit_0F7BA0.cpp:831",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_00": {
+  "name": "searcher",
+  "desc": "Entity doing the search (AIData owner); filters use its ranges/AI",
+  "kind": "ptr",
+  "evidence": "src/recovered/unit_022C80.cpp:771, src/recovered/unit_0F7BA0.cpp:1098",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_04": {
+  "name": "centre",
+  "desc": "Point to search around; distances and LOS are measured from it",
+  "kind": null,
+  "evidence": "src/recovered/unit_0F7BA0.cpp:806, src/recovered/unit_022C80.cpp:766",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_10": {
+  "name": "radius",
+  "desc": "Search radius (cover 2500-7500, attack pos owner's vf_114, path ends path unk_2C)",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:689, src/recovered/unit_022C80.cpp:770, src/Source/GameCore/ai/aidatapathing.cpp:211",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_14": {
+  "name": "skipOccupied",
+  "desc": "When set, filters reject nodes with flag bit 2 (occupied); set from a path's unk_30 option",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:1243, src/Source/GameCore/ai/aidatapathing.cpp:476",
+  "confidence": "likely"
+ },
+ "type_154C0_1048.unk_18": {
+  "name": "filter",
+  "desc": "Node filter fn from sub_F7E80(kind); sub_F93D0 when 0",
+  "kind": "ptr",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:694, src/recovered/unit_0F7BA0.cpp:214",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_1C": {
+  "name": "exhaustive",
+  "desc": "1 = scan every grid ring to the radius; 0 = stop two rings after the first hit",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:719, src/recovered/unit_022C80.cpp:773",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_20": {
+  "name": "results",
+  "desc": "Result array (type_154C0_F80) or 0 for best-only",
+  "kind": "ptr",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:831, src/recovered/unit_022C80.cpp:774",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_24": {
+  "name": "maxResults",
+  "desc": "Capacity of results (25 cover, 10 attack pos, 32 sub_28470)",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:834, src/recovered/unit_022C80.cpp:775",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_28": {
+  "name": "aheadDir",
+  "desc": "Direction nodes must lie ahead of (dot>0) for direction filters; path planning sets goal minus start",
+  "kind": null,
+  "evidence": "src/recovered/unit_0F7BA0.cpp:1286, src/Source/GameCore/ai/aidatapathing.cpp:480",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_34": {
+  "name": "bestNode",
+  "desc": "Best (nearest passing) node; AI selection code overwrites it with its pick",
+  "kind": "ptr",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:820, src/recovered/unit_022C80.cpp:654",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_38": {
+  "name": "bestNodeId",
+  "desc": "Index of bestNode",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:822, src/recovered/unit_022C80.cpp:652",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_3C": {
+  "name": "bestScore",
+  "desc": "bestNode's squared distance (1e18 at start) or the AI's selection score",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:821, src/recovered/unit_022C80.cpp:653",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_40": {
+  "name": "bestCellX",
+  "desc": "Grid column of bestNode's cell",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:823",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_44": {
+  "name": "bestCellY",
+  "desc": "Grid row of bestNode's cell",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:824",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_48": {
+  "name": "bestCellList",
+  "desc": "Cell node-list index (unk_4C00E8.unk_3C entry) of bestNode",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:825",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_4C": {
+  "name": "numResults",
+  "desc": "Number of results stored",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:834, src/recovered/unit_022C80.cpp:796",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_50": {
+  "name": "fallbackNode",
+  "desc": "Nearest node with a clear line from centre that failed the ahead test; used when nothing passes (path ends, sub_28F30)",
+  "kind": "ptr",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:1280, src/Source/GameCore/ai/aidatapathing.cpp:487, src/Source/GameCore/ai/aidatapathing.cpp:238",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_54": {
+  "name": "fallbackNodeId",
+  "desc": "Index of fallbackNode (-1 none)",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:1281, src/Source/GameCore/ai/aidatapathing.cpp:217",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_58": {
+  "name": "fallbackDistSq",
+  "desc": "fallbackNode's squared distance (1e18 at start)",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:1279, src/recovered/unit_0F7BA0.cpp:675",
+  "confidence": "verified"
+ },
+ "type_154C0_1048.unk_5C": {
+  "name": "radiusSq",
+  "desc": "radius squared; filters reject nodes beyond it",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:691, src/recovered/unit_0F7BA0.cpp:1099",
+  "confidence": "verified"
+ },
+ "type_154C0_12F4.unk_00": {
+  "name": "coverIndex",
+  "desc": "Index (0-11) of the vehicle cover point in the vehicle's unk_263C[12] table (from the record's own unk_04); -1 when the record is empty.",
+  "kind": "int",
+  "evidence": "src/recovered/unit_14C820.cpp:3063, src/recovered/unit_022C80.cpp:523, src/recovered/unit_022C80.cpp:928",
+  "confidence": "verified"
+ },
+ "type_154C0_12F4.unk_04": {
+  "name": "coverTag",
+  "desc": "Copy of the vehicle cover record's unk_08 (its tag in the vehicle clump); compared with the index to tell records apart; 0 when empty.",
+  "kind": "int",
+  "evidence": "src/recovered/unit_022C80.cpp:929, src/recovered/unit_022C80.cpp:546, include/types/type_14D180.h:44",
+  "confidence": "likely"
+ },
+ "type_154C0_12F4.unk_08": {
+  "name": "vehicle",
+  "desc": "Handle of the vehicle (type_3DBC78) that owns the cover point; sub_155340 only resolves the record when it matches.",
+  "kind": "handle",
+  "evidence": "src/recovered/unit_022C80.cpp:930, src/recovered/unit_022C80.cpp:232, src/recovered/unit_14C820.cpp:3068",
+  "confidence": "verified"
+ },
+ "type_154C0_12F4.unk_0C": {
+  "name": "point",
+  "desc": "World position of the cover point when it was picked (cover record unk_14); records within 500 (250000 squared) count as the same point.",
+  "kind": "real",
+  "evidence": "src/recovered/unit_022C80.cpp:931, src/recovered/unit_022C80.cpp:555",
+  "confidence": "verified"
+ },
+ "type_154C0_1444.unk_00": {
+  "name": "node",
+  "desc": "Cover/path node the cached test was made from (cleared to 0 on reset).",
+  "kind": "ptr",
+  "evidence": "src/recovered/unit_0154C0.cpp:344,4333,4365",
+  "confidence": "verified"
+ },
+ "type_154C0_1444.unk_04": {
+  "name": "targetPoint",
+  "desc": "Target point tested (the entity's vf_110 sphere centre); match within 300 horizontally and height delta < 40000.",
+  "kind": null,
+  "evidence": "src/recovered/unit_0154C0.cpp:4309,4334-4337,4366",
+  "confidence": "verified"
+ },
+ "type_154C0_1444.unk_10": {
+  "name": "lineHit",
+  "desc": "Cached sub_D2FC0 line-test result from the node's offset point to the target; nonzero = hit/blocked; the attack-node check accepts only 0.",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_0154C0.cpp:4312,4318-4319,4367; src/recovered/unit_022C80.cpp:1705",
+  "confidence": "likely"
+ },
+ "type_154C0_5BC.unk_00": {
+  "name": "searchId",
+  "desc": "A* SearchID of the request (sub_29940 arg_2C, new ++dword_438CA0 when 0; the scheduler's SearchID); -1 when reset or for sub_31240's prebuilt path.",
+  "kind": "int",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:459-461,2836; src/recovered/unit_0154C0.cpp:225-240",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_04": {
+  "name": "waypointsLeft",
+  "desc": "Waypoints left: 1-based index of the next node in unk_B0 (walked down to 0); set from node count by sub_29FC0, 0 = arrived/not following.",
+  "kind": "int",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:655,1104,1140,1157; src/recovered/unit_0154C0.cpp:1272,1471",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_08": {
+  "name": "legDir",
+  "desc": "Direction of the current leg (previous waypoint to unk_38, normalized); heading test for sub_2AC00, lateral offset in sub_2AE00; sub_2CE90 casts along unk_8AC's.",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:807,869,1144-1149,1013",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_14": {
+  "name": "startPos",
+  "desc": "Start point: the owner's position when the request was made (sub_31240: first node's point); request unk_04 points at it.",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:303,331,431,517",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_20": {
+  "name": "goalPos",
+  "desc": "Goal point: target entity / node / unk_5B0 point position; copied to unk_4E4 when followed; request unk_08 points at it.",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:304,332,432,518; src/recovered/unit_0154C0.cpp:935",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_2C": {
+  "name": "nodeSearchRadius",
+  "desc": "Radius for finding the start/end nodes near unk_14/unk_20 (sub_F8970 unk_10): 1000, 1500, 5000 or script arg; copied to request unk_0C.",
+  "kind": "real",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:305,474,500,518; src/recovered/unit_0441B0.cpp:8040",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_30": {
+  "name": "skipOccupiedNodes",
+  "desc": "Node-search option passed as type_154C0_1048.unk_14: rejects occupied (bit 2) nodes when choosing start/end nodes. Only ever 0 in the code seen.",
+  "kind": "bool",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:476,502,2838; src/recovered/unit_0F7BA0.cpp:1243",
+  "confidence": "likely"
+ },
+ "type_154C0_5BC.unk_31": {
+  "name": "useCover",
+  "desc": "Set when cost index unk_54 is 2 (UseCover): follower stops (returns -1, unk_F64=node) at a cover node en route that sub_26A80 accepts vs the target.",
+  "kind": "bool",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:468-471,1131-1139; src/recovered/unit_0154C0.cpp:1276",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_32": {
+  "name": "onFinalLeg",
+  "desc": "Set once the last node is passed and the AI heads straight for the goal/entity; sub_1DB60 checks the last leg vs facing while set.",
+  "kind": "bool",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:458,811,872,1123,1156,1162; src/recovered/unit_0154C0.cpp:2755,2808",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_33": {
+  "name": "noEarlyArrive",
+  "desc": "When set the follower does not finish early inside unk_34 of the goal; set for cover-node paths (unk_DDC copy, states 5/43/44).",
+  "kind": "bool",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:1115; src/recovered/unit_0154C0.cpp:1001",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_34": {
+  "name": "arriveRadius",
+  "desc": "Arrival distance to the goal (sub_29940 arg_28, default 64; 100 or script arg; -1 for sub_31240 paths).",
+  "kind": "real",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:462-465,804,1115,2834",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_38": {
+  "name": "waypoint",
+  "desc": "Current steering waypoint (node point, or goal/entity position on the last leg); previous value moved to unk_44.",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:813-820,1070-1071,1119-1130",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_44": {
+  "name": "prevWaypoint",
+  "desc": "Previous waypoint (set_unk_38); sub_2B740 interpolates the owner's height between it and unk_38.",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:878,1070,1210-1219",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_50": {
+  "name": "goalEntity",
+  "desc": "Handle of the entity pathed to (0 for point/node paths); the final leg tracks its live position; unk_A24's is compared with the target.",
+  "kind": "handle",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:457,812,1117; src/recovered/unit_0154C0.cpp:1535",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_54": {
+  "name": "costIndex",
+  "desc": "Cost function index for sub_F6BB0 (script arg 0..2).",
+  "kind": "enum",
+  "values": {
+   "0": "distance with node penalties (sub_F6750)",
+   "1": "vehicle: penalized near target (sub_F6840)",
+   "2": "use cover: exposure cost (sub_F6970)"
+  },
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:306,519; src/recovered/unit_0441B0.cpp:8048",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_58": {
+  "name": "heuristicIndex",
+  "desc": "Heuristic index for sub_F6BF0; only 0 (squared distance, sub_F6B00) exists (script checks < 1).",
+  "kind": "enum",
+  "values": {
+   "0": "squared straight-line distance"
+  },
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:307,520; src/recovered/unit_0441B0.cpp:8049",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_5C": {
+  "name": "filterIndex",
+  "desc": "Node filter index for sub_F6C10 (script 0..2); 1 for vehicle searches.",
+  "kind": "enum",
+  "values": {
+   "0": "none",
+   "1": "only bit-4 nodes (sub_F6B70)",
+   "2": "bit-4 nodes not occupied (sub_F6B80)"
+  },
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:309,521; src/recovered/unit_0441B0.cpp:8051",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_60": {
+  "name": "searchKind",
+  "desc": "Search kind copied to request unk_1C (script 0..6): what to do with the result.",
+  "kind": "enum",
+  "values": {
+   "0": "path (keep nodes if found)",
+   "1": "inverse (nodes only if not found)",
+   "2": "always keep nodes",
+   "3": "prebuilt, never written (sub_31240)",
+   "4": "cover node: found sets unk_F54",
+   "5": "vehicle cover point: found commits it",
+   "6": "defend-area cover: unk_F54 + sub_23320"
+  },
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:308,362,398,522,2831; src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:790-893",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_64": {
+  "name": "request",
+  "desc": "The type_169D0 A* request for this path (handed to sub_F62F0).",
+  "kind": null,
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:513-534",
+  "confidence": "verified"
+ },
+ "type_154C0_5BC.unk_B0": {
+  "name": "nodes",
+  "desc": "Node indices (100), goal first: A* writes from the goal back through parents; followed from unk_04-1 down to 0.",
+  "kind": null,
+  "evidence": "src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:816-826; src/Source/GameCore/ai/aidatapathing.cpp:533,1129,2826",
+  "confidence": "verified"
+ },
+ "type_154C0_80.unk_00": {
+  "name": "entity",
+  "desc": "Handle to the entity this perception record is about; empty means the record is free (sub_16ED0 claims it)",
+  "kind": "handle",
+  "evidence": "src/recovered/unit_0154C0.cpp:500",
+  "confidence": "verified"
+ },
+ "type_154C0_80.unk_04": {
+  "name": "visFlags",
+  "desc": "Visibility bits from the Vision Scheduler (sub_425A0 seen, sub_426E0 not seen)",
+  "kind": "flags",
+  "bits": {
+   "0": "seen: in line of sight now (TargetSeen)",
+   "1": "potentially visible (CanPotentiallySeeTarget / CannotPotentiallySeeTarget)"
+  },
+  "evidence": "src/recovered/unit_040720.cpp:945, src/recovered/unit_040720.cpp:984, src/recovered/unit_0154C0.cpp:1213",
+  "confidence": "verified"
+ },
+ "type_154C0_80.unk_08": {
+  "name": "lookToggle",
+  "desc": "Alternates 1/0 each look: sub_41300 looks at a potentially-visible, untracked entity only every other pass; reset to 1",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_040720.cpp:537",
+  "confidence": "verified"
+ },
+ "type_154C0_80.unk_0C": {
+  "name": "distance",
+  "desc": "Distance to the entity from the range scheduler (sub_35FD0 stores it; 1e37 when out of range/reset); sub_17100 returns it for the target; compared with vf_114, 500, 700",
+  "kind": "real",
+  "evidence": "src/recovered/unit_034FA0.cpp:685, src/recovered/unit_034FA0.cpp:822, src/recovered/unit_0154C0.cpp:565",
+  "confidence": "verified"
+ },
+ "type_154C0_80.unk_10": {
+  "name": "timeUnseen",
+  "desc": "Frames (60ths of a second) since the entity was last seen: 0 when seen, increased by the look interval otherwise; 2700 (45 s) gives up on it",
+  "kind": "real",
+  "evidence": "src/recovered/unit_040720.cpp:986, src/recovered/unit_040720.cpp:375, src/recovered/unit_012000.cpp:1234",
+  "confidence": "verified"
+ },
+ "type_154C0_80.unk_14": {
+  "name": "lastSeenPos",
+  "desc": "The entity's position when last seen (sub_425A0); sub_18F80 treats a player within 300 of it as still known; grenades aim at it",
+  "kind": null,
+  "evidence": "src/recovered/unit_040720.cpp:948, src/recovered/unit_0154C0.cpp:1243",
+  "confidence": "verified"
+ },
+ "type_154C0_F80.unk_00": {
+  "name": "nodeId",
+  "desc": "Node index in the node table unk_4C00E8.unk_2C (sub_FA980)",
+  "kind": "int",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:831, src/recovered/unit_022C80.cpp:640, src/Source/GameCore/ai/aidatapathing.cpp:246",
+  "confidence": "verified"
+ },
+ "type_154C0_F80.unk_02": {
+  "name": "tried",
+  "desc": "Set once the cover search has tried/rejected this result (or it is the best); 0 when stored",
+  "kind": "bool",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:832, src/recovered/unit_022C80.cpp:799, src/recovered/unit_022C80.cpp:864",
+  "confidence": "verified"
+ },
+ "type_154C0_F80.unk_04": {
+  "name": "score",
+  "desc": "Squared distance from the search centre; lower is better; kind-0x11 nodes scaled by 0.0001 in sub_23F60 modes 0/2",
+  "kind": "real",
+  "evidence": "src/recovered/unit_0F7BA0.cpp:833, src/recovered/unit_022C80.cpp:643, src/recovered/unit_022C80.cpp:708",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_00": {
+  "name": "searcher",
+  "desc": "Handle (type_D48D0 id) of the searching entity; cost 1/2 and the debug/event calls resolve it.",
+  "kind": "handle",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:514; src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:478,788",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_04": {
+  "name": "startPos",
+  "desc": "Pointer to the path's start point (path unk_14); cost 2 passes it to sub_27550.",
+  "kind": "ptr",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:516; src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:520",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_08": {
+  "name": "goalPos",
+  "desc": "Pointer to the path's goal point (path unk_20); cost 2 tests cover from it (sub_27550).",
+  "kind": "ptr",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:517; src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:520",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_0C": {
+  "name": "radius",
+  "desc": "Copy of the path's node-search radius (unk_2C); no A* reader found.",
+  "kind": "real",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:518,2844",
+  "confidence": "likely"
+ },
+ "type_169D0.unk_10": {
+  "name": "costFn",
+  "desc": "Step cost (sub_F6BB0): 0 sub_F6750 sq.dist +g, x4 danger-timed node, x30 occupied, x1.5 bit4, x4 cover(0x42), not at goal; 1 sub_F6840 that x10/x3 if target <500/<1000; 2 sub_F6970 exposure.",
+  "kind": "ptr",
+  "evidence": "src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:434-541,578-590,1053",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_14": {
+  "name": "heuristicFn",
+  "desc": "Heuristic (sub_F6BF0): only sub_F6B00, squared distance between node and goal node points.",
+  "kind": "ptr",
+  "evidence": "src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:545-555,594-602,724,1094",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_18": {
+  "name": "filterFn",
+  "desc": "Node filter (sub_F6C10): a linked node is expanded only if it returns nonzero; 0 = none, sub_F6B70 = node bit 4, sub_F6B80 = bit 4 and not occupied (bit 2).",
+  "kind": "ptr",
+  "evidence": "src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:560-574,606-618,1037-1038",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_1C": {
+  "name": "kind",
+  "desc": "Search kind (from path unk_60): decides whether nodes are written and the on-found action in sub_F6FC0.",
+  "kind": "enum",
+  "values": {
+   "0": "path: nodes if found, else length 0",
+   "1": "inverse: nodes only if not found",
+   "2": "always write nodes",
+   "3": "never write (prebuilt)",
+   "4": "cover node: found -> sub_23530(goal node)",
+   "5": "vehicle cover point: found -> sub_23550(0), sub_23230",
+   "6": "defend-area cover: found -> sub_23530 + sub_23320"
+  },
+  "evidence": "src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:790-893; src/recovered/unit_0441B0.cpp:8050",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_20": {
+  "name": "capacity",
+  "desc": "Node buffer capacity (100); writing past it fails the search.",
+  "kind": "int",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:523; src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:823",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_24": {
+  "name": "nodeBuf",
+  "desc": "Node index buffer (the path's unk_B0).",
+  "kind": "ptr",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:524; src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:820",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_28": {
+  "name": "result",
+  "desc": "Search result: -1 pending/not found, 1 found (sub_31240 presets 1).",
+  "kind": "enum",
+  "values": {
+   "-1": "pending or not found",
+   "1": "found"
+  },
+  "evidence": "src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:701,784; src/Source/GameCore/ai/aidatapathing.cpp:525,2851",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_2C": {
+  "name": "length",
+  "desc": "Number of nodes written to unk_24 (0 when none/failed).",
+  "kind": "int",
+  "evidence": "src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:702,826,836",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_30": {
+  "name": "searcherPtr",
+  "desc": "Raw pointer of the searching entity (unk_568) stored as int; no reader found.",
+  "kind": "ptr",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:515,2841",
+  "confidence": "likely"
+ },
+ "type_169D0.unk_34": {
+  "name": "startNode",
+  "desc": "Start node pointer (stored as int): nearest node to unk_14 from sub_F8970 (or its fallback).",
+  "kind": "ptr",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:484-488; src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:705",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_38": {
+  "name": "startNodeIdx",
+  "desc": "Start node index; A* seeds its open list with it.",
+  "kind": "int",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:485; src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:703,715",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_3C": {
+  "name": "goalNode",
+  "desc": "Goal node pointer: the given node (cover/node paths) or nearest to unk_20; kinds 4/6 store it as unk_F54.",
+  "kind": "ptr",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:491,506; src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:850,886",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_40": {
+  "name": "goalNodeIdx",
+  "desc": "Goal node index; reaching it ends the search; unk_B0[0] must equal it.",
+  "kind": "int",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:492,533; src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:704,1079",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_44": {
+  "name": "notifyFound",
+  "desc": "When set, a found non-empty path sends script event AStar_PathFound and logs it.",
+  "kind": "bool",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:466; src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:897-901",
+  "confidence": "verified"
+ },
+ "type_169D0.unk_48": {
+  "name": "notifyNotFound",
+  "desc": "When set, a failed search sends AStar_PathNotFound and logs it.",
+  "kind": "bool",
+  "evidence": "src/Source/GameCore/ai/aidatapathing.cpp:467; src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:903-907",
+  "confidence": "verified"
+ }
+}

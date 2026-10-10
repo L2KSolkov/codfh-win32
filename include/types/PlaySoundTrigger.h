@@ -38,7 +38,8 @@ public:
     RwUInt8 unk_CC[0x40];
     RwInt32 unk_10C;            // command 1: set to play it only once
     RwInt32 unk_110;            // command 3: set to play it from the player
-    RwInt32 unk_114;            // command 4: passed on to sub_8A980
+    RwInt32 unk_114;            // command 4: set to let it take over a
+                                // busy voice when none is free (sub_8A980)
     RwUInt8 unk_118[0x8];
 };
 typedef RwChar PlaySoundTrigger_size_check[sizeof(PlaySoundTrigger) == 0x120 ? 1 : -1];

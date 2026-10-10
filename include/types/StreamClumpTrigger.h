@@ -32,7 +32,9 @@ public:
     // unk_C4 set the first player's (type_10F710::sub_10DA70).
     void sub_C6650();
 
-    RwInt32 unk_C0;             // command 0: the clump bank
+    RwInt32 unk_C0;             // command 0: the clump bank (with unk_C4
+                                // set, sub_10DA70 takes it as a weapon
+                                // index: wbank_%02d.bin)
     RwInt32 unk_C4;             // command 1: set for the player's
     RwUInt8 unk_C8[0x8];
 };

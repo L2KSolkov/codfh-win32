@@ -14,9 +14,11 @@ struct type_4F61F8
 {
     RwUInt32 unk_00[0x40];
     RwUInt16 unk_100;           // the port (2000)
-    RwInt32 unk_104;            // set when this machine hosts (read as
-                                // dword_4F62FC by the multiplayer manager)
-    RwInt32 unk_108;            // 4 after the manager's set-up
+    RwInt32 unk_104;            // 1 when joining as a client, 0 when
+                                // hosting (read as dword_4F62FC by the
+                                // multiplayer manager)
+    RwInt32 unk_108;            // the player limit (1 = 4 players, 2 = 8,
+                                // 4 = 16; 4 after the manager's set-up)
 
     type_4F61F8();
 };

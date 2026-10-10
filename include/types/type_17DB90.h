@@ -16,7 +16,8 @@
 // takes a spawned particle system (0 to stop). Up to 16 entities are in it
 // (unk_10); every unk_CC frames (its trigger's) it pulses: its effect
 // (unk_B4, from dword_42A4B4 by kind: 0 damage, 1 a charge that becomes an
-// explosion, 2 holding the players, 3 none) runs on them, unk_C8 times (0: for ever).
+// explosion, 2 holding the players, 3 none) runs on them, unk_C8 times (negative: for ever;
+// 0: once).
 // Leaving it runs its exit effect (unk_B8, from dword_42A4C4).
 struct type_17DB90
 {

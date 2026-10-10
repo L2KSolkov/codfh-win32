@@ -68,14 +68,15 @@ public:
     RwInt32 unk_C0;             // its index in the list of all points
                                 // (sub_1C1CE0)
     RwUInt32 unk_C4;            // command 0: the game types it serves
-    RwUInt32 unk_C8;            // command 1: its team mask
+    RwUInt32 unk_C8;            // command 1: the player limits it serves
+                                // (tested against unk_4F61F8.unk_108)
     RwUInt32 unk_CC;            // command 2: the teams it spawns (2, 4)
     RwInt32 unk_D0;             // command 3: set when its value is -1
     RwInt32 unk_D4;             // command 4: its group (-1 at first)
     RWS::CEventId unk_D8;       // its visibility message
-    RwUInt32 unk_E0;            // commands 5 to 8 (sub_1C1B60 gives them
-    RwUInt32 unk_E4;            // to the manager); only the widths are
-    RwUInt32 unk_E8;            // known
+    RwUInt32 unk_E0;            // commands 5 to 8: four level sections
+    RwUInt32 unk_E4;            // streamed when a player spawns here
+    RwUInt32 unk_E8;            // (sub_1C1B60 gives them to the manager)
     RwUInt32 unk_EC;
     RwUInt8 unk_F0[0x10];
 };

@@ -2064,7 +2064,13 @@ type_4276E0_fn sub_441B0(const RwChar *arg_0)
     return 0;
 }
 
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigtools.cpp: the VM tab's log: a failed script check, with the running
+// script's place; and the scripts' prints with their values, which the release build drops)
+void TrigWebScriptPrint(type_67620 *pScript, const RwChar *pszWhat, type_44350 *pCall, RwInt32 nFloat);
+#endif
 #ifndef CODFH_SP // single player defines it in include/types/type_44350.h
+
 // match: sub_44220 @ 0x00044220
 // sp-match: sub_44220 @ 0x00032F30
 // The script debugger's hook: with arg_0 clear, looks up what the debugged
@@ -2078,6 +2084,10 @@ void sub_44220(bool arg_0)
     type_712B0 *v8;
     type_3D2E7C *var_4;
 
+#ifdef CODFH_DRAW_TRIGGERS
+    if (arg_0 == 0)
+        TrigWebScriptCheck();
+#endif
     if (arg_0 == 0 && dword_449328 != 0) {
         stk_18 = dword_449328;
         var_4 = stk_18->vf_024();
@@ -2140,6 +2150,9 @@ void sub_443C0(RwUInt32 arg_0, type_44350 *arg_4)
     type_67620 *var_4;
 
     var_4 = sub_67620(arg_0);
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigWebScriptPrint(var_4, "PrintInt", arg_4, 0);
+#endif
     sub_6B060(var_4, "Print Int", 0);
     sub_44350(arg_4, 0);
 }
@@ -2152,6 +2165,9 @@ void sub_44400(RwUInt32 arg_0, type_44350 *arg_4)
     type_67620 *var_4;
 
     var_4 = sub_67620(arg_0);
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigWebScriptPrint(var_4, "PrintFloat", arg_4, 1);
+#endif
     sub_6B060(var_4, "Print Float", 0);
     sub_44350(arg_4, 0);
 }

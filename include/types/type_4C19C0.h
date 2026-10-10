@@ -72,18 +72,18 @@ struct type_4C19C0
     union
     {
         RwInt32 unk_A0;
-        RwReal unk_A0_f;    // as a float (the launcher's sub_11B040)
+        RwReal unk_A0_f;    // as a float (the hand grenades' throw, sub_11B040)
     };
     union
     {
         RwInt32 unk_A4;
-        RwReal unk_A4_f;    // as a float (the launcher's sub_11B040)
+        RwReal unk_A4_f;    // as a float (the hand grenades' throw, sub_11B040)
     };
     RwReal unk_A8;
     union
     {
         RwInt32 unk_AC;
-        RwReal unk_AC_f;    // as a float (the launcher's sub_11B040)
+        RwReal unk_AC_f;    // as a float (the hand grenades' throw, sub_11B040)
     };
     RwInt32 unk_B0;
     RwInt32 unk_B4;
@@ -96,12 +96,12 @@ struct type_4C19C0
     union
     {
         RwInt32 unk_C0;
-        RwReal unk_C0_f;    // as a float (the launcher's sub_11B040)
+        RwReal unk_C0_f;    // as a float (the hand grenades' throw, sub_11B040)
     };
     RwInt32 unk_C4;
     RwUInt32 unk_C8;            // a clip's rounds (the player's start divides
                                 // by it, unsigned)
-    RwUInt32 unk_CC;            // the most rounds in reserve
+    RwUInt32 unk_CC;            // the most rounds in reserve (0: never spent)
     RwReal unk_D0;
     RwInt32 unk_D4;
     RwInt32 unk_D8;
@@ -152,12 +152,12 @@ struct type_4C19C0
     union
     {
         RwInt32 unk_18C;
-        RwReal unk_18C_f;    // as a float (the mounted weapon's fire)
+        RwReal unk_18C_f;    // as a float (the player's and the mounted weapon's fire)
     };
     union
     {
         RwInt32 unk_190;
-        RwReal unk_190_f;    // as a float (the mounted weapon's fire)
+        RwReal unk_190_f;    // as a float (the player's and the mounted weapon's fire)
     };
     union
     {
@@ -177,7 +177,7 @@ struct type_4C19C0
             RwV3d unk_1A8;
             RwV3d unk_1B4;
         };
-        RwV3d unk_19C_a[3]; // by stance: the weapon sway's offset (the
+        RwV3d unk_19C_a[3]; // by stance: the gun model's base offset (the
                             // player's sub_10DBD0)
     };
     union
@@ -228,7 +228,7 @@ struct type_4C19C0
             RwV3d unk_244;
             RwV3d unk_250;
         };
-        RwV3d unk_238_a[3]; // likewise, with the recoil's second settings
+        RwV3d unk_238_a[3]; // likewise, aiming down the sights (unk_1B04)
     };
     union
     {
@@ -442,8 +442,8 @@ struct type_4C19C0
             RwInt32 unk_3C0;
             RwInt32 unk_3C4;
         };
-        RwReal unk_3BC_r[3];    // by stance, with the recoil's second
-                                // settings: the look's scale
+        RwReal unk_3BC_r[3];    // by stance, aiming down the sights
+                                // (unk_1B04): the look's scale
     };
     union
     {
@@ -518,7 +518,7 @@ struct type_4C19C0
             union
             {
                 RwInt32 unk_4AC;
-                RwReal unk_4AC_f;    // as a float (the launcher's sub_11B040)
+                RwReal unk_4AC_f;    // as a float (the hand grenades' throw, sub_11B040)
             };
             RwInt32 unk_4B0;
         };
@@ -528,19 +528,19 @@ struct type_4C19C0
     union
     {
         RwInt32 unk_4B8;
-        RwReal unk_4B8_f;    // as a float (the launcher's sub_11B040)
+        RwReal unk_4B8_f;    // as a float (the hand grenades' throw, sub_11B040)
     };
     RwReal unk_4BC;
     RwReal unk_4C0;
     union
     {
         RwInt32 unk_4C4;
-        RwReal unk_4C4_f;    // as a float (the launcher's sub_11B040)
+        RwReal unk_4C4_f;    // as a float (the hand grenades' throw, sub_11B040)
     };
     union
     {
         RwInt32 unk_4C8;
-        RwReal unk_4C8_f;    // as a float (the launcher's sub_11B040)
+        RwReal unk_4C8_f;    // as a float (the hand grenades' throw, sub_11B040)
     };
     RwReal unk_4CC;
     RwInt32 unk_4D0;

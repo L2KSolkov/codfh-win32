@@ -1,0 +1,4529 @@
+{
+ "SoldierTrigger": {
+  "unk_C0[0]": [
+   "Scene key word 0 (0); script SetSceneValue index 0 overrides it",
+   "I16",
+   null
+  ],
+  "unk_C0[2]": [
+   "Scene key word 1: a kind-1 variable object's word (sub_18F8E0)",
+   "I16",
+   25
+  ],
+  "unk_C0[4]": [
+   "Scene key enable byte (1); 0 makes the scene lookup fail",
+   "BYTE",
+   null
+  ],
+  "unk_C0[5]": [
+   "Second scene key enable byte (1); 0 makes the lookup fail",
+   "BYTE",
+   null
+  ],
+  "unk_C6[0]": [
+   "Scene action 0: first message id of a block (GetSceneActionMsg)",
+   "I16",
+   26
+  ],
+  "unk_C6[1]": [
+   "Scene action 1: first message id of a block",
+   "I16",
+   27
+  ],
+  "unk_C6[2]": [
+   "Scene action 2: first message id of a block",
+   "I16",
+   28
+  ],
+  "unk_C6[3]": [
+   "Always -1: ends the action list; nothing sets it",
+   "I16",
+   null
+  ],
+  "unk_C6[4]": [
+   "Always -1: list end; nothing sets it",
+   "I16",
+   null
+  ],
+  "unk_D0": [
+   "Kind-0x2E AI object name; set-up points it at the spawned soldier",
+   null,
+   0
+  ],
+  "unk_D8": [
+   "Soldier definition (kind 4): body, head, weapon class, side",
+   null,
+   3
+  ],
+  "unk_E0": [
+   "AI script file (kind 0xA) its script object runs as a state machine",
+   null,
+   7
+  ],
+  "unk_E8": [
+   "Task script (kind 0xC) also started with Initialize; optional",
+   null,
+   8
+  ],
+  "unk_F0": [
+   "Its vehicle's name (script SoldierTrigger_GetMyVehiclesName)",
+   null,
+   37
+  ],
+  "unk_F8": [
+   "Default spline path the AI follows (HasDefaultSplinePath)",
+   null,
+   15
+  ],
+  "unk_100": [
+   "Only-live-once flag (script IsOnlyLiveOnce)",
+   null,
+   12
+  ],
+  "unk_104": [
+   "Cosine of half the horizontal vision cone (command: full angle, degrees)",
+   null,
+   16
+  ],
+  "unk_108": [
+   "Cosine of half the vertical vision cone (command: full angle, degrees)",
+   null,
+   17
+  ],
+  "unk_10C": [
+   "View range, units (metres x100; default 60 m)",
+   null,
+   18
+  ],
+  "unk_110": [
+   "Alerted view range, units; base of the preferred attack range",
+   null,
+   19
+  ],
+  "unk_114": [
+   "Preferred attack range as a fraction of the alerted view range (0.95)",
+   null,
+   20
+  ],
+  "unk_118": [
+   "Hearing radius, units (metres x100; default 60 m)",
+   null,
+   21
+  ],
+  "unk_11C": [
+   "Deletion delay sent to its script as SetDeletionDelay (units?)",
+   null,
+   14
+  ],
+  "unk_120": [
+   "Primary weapon name (resolved to the next field)",
+   null,
+   38
+  ],
+  "unk_128": [
+   "Grenade weapon name (used only if it is a grenade kind)",
+   null,
+   39
+  ],
+  "unk_130": [
+   "Primary weapon type index; -1 none",
+   "RO",
+   null
+  ],
+  "unk_134": [
+   "Grenade weapon type index; -1 none",
+   "RO",
+   null
+  ],
+  "unk_138": [
+   "Grenade aim scatter mode 0/1/2 (single player only)",
+   null,
+   40
+  ],
+  "unk_13C": [
+   "Grenade throw chance: 0 low, 1 medium, 2 high",
+   null,
+   41
+  ],
+  "unk_140": [
+   "Hit points, also its full hit points (default 100)",
+   null,
+   22
+  ],
+  "unk_144": [
+   "Half the yaw aim spread, degrees (command: full; default 5)",
+   null,
+   23
+  ],
+  "unk_148": [
+   "Half the pitch aim spread, degrees (command: full; default 7)",
+   null,
+   24
+  ],
+  "unk_14C": [
+   "Pickup kind dropped on death; -1 none",
+   null,
+   42
+  ],
+  "unk_150": [
+   "Pickup amount dropped; 0 no drop",
+   null,
+   43
+  ],
+  "unk_154": [
+   "Default 50 (nothing reads it)",
+   null,
+   44
+  ],
+  "unk_158": [
+   "Spawn limit as set; restores the cap on a restart",
+   null,
+   13
+  ],
+  "unk_15C": [
+   "Spawn cap (against the CCESS spawns so far); negative or 0x7FFFFFFF unlimited",
+   null,
+   13
+  ],
+  "unk_160": [
+   "Priority collision: its soldier pushes others aside",
+   null,
+   6
+  ],
+  "unk_164": [
+   "The CCESS spawn slot it answers",
+   null,
+   11
+  ],
+  "unk_168": [
+   "Start state; 5 starts at cover",
+   null,
+   9
+  ],
+  "unk_16C": [
+   "Nonzero: its definition loads under a lock (?)",
+   null,
+   4
+  ],
+  "unk_170": [
+   "(nothing reads it)",
+   null,
+   5
+  ],
+  "unk_174": [
+   "Soldier display name, up to 31 characters (HUD label)",
+   "RO",
+   1
+  ],
+  "unk_194": [
+   "An entity handle (nothing reads it)",
+   "RO",
+   null
+  ],
+  "unk_198": [
+   "Message block posted to the soldier's script at spawn",
+   "RO",
+   10
+  ],
+  "unk_19C": [
+   "(padding; nothing reads it)",
+   "RO",
+   null
+  ]
+ },
+ "PlayerTrigger": {
+  "unk_C0": [
+   "slot in the player table it registers at; -1 default",
+   null,
+   2
+  ],
+  "unk_C4": [
+   "the pad the player reads",
+   null,
+   3
+  ],
+  "unk_C8": [
+   "player index",
+   null,
+   4
+  ],
+  "unk_CC": [
+   "player body model (a kind-3 clump)",
+   null,
+   1
+  ],
+  "unk_D4": [
+   "player height (overwritten each frame by the stance eye height)",
+   null,
+   30
+  ],
+  "unk_D8": [
+   "radius of the weapon's nearby-world search (?)",
+   null,
+   31
+  ],
+  "unk_DC": [
+   "player collision sphere radius, units",
+   null,
+   32
+  ],
+  "unk_E0": [
+   "gravity: added to the vertical speed (default -5)",
+   null,
+   65
+  ],
+  "unk_E4": [
+   "offset for the collision sweep (?)",
+   null,
+   33
+  ],
+  "unk_F0": [
+   "tan(half the FOV); the command gives the full FOV in degrees",
+   null,
+   18
+  ],
+  "unk_F4": [
+   "cos(0.8 x half the FOV): the horizontal in-view test",
+   null,
+   18
+  ],
+  "unk_F8": [
+   "cos(half the FOV x height/width): the vertical in-view test",
+   null,
+   18
+  ],
+  "unk_FC": [
+   "full hit points (default 100)",
+   null,
+   6
+  ],
+  "unk_100": [
+   "hit timer start, as a float (nothing reads the timer)",
+   null,
+   7
+  ],
+  "unk_104": [
+   "after a hit, forward movement is blocked this long (command 7 sets it too)",
+   null,
+   8
+  ],
+  "unk_108[0]": [
+   "weapon in slot 1 (a weapon index; -1 none)",
+   null,
+   5
+  ],
+  "unk_108[1]": [
+   "weapon in slot 2 (a weapon index; -1 none)",
+   null,
+   5
+  ],
+  "unk_114[0]": [
+   "Bazooka: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[1]": [
+   "Panzerschreck: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[2]": [
+   "BAR: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[3]": [
+   "Bren: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[4]": [
+   "DP: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[5]": [
+   "M1919A6: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[6]": [
+   "MG42: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[7]": [
+   "MP40: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[8]": [
+   "PPSH: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[9]": [
+   "Sten: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[10]": [
+   "Thompson: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[11]": [
+   "Luger: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[12]": [
+   "Enfield: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[13]": [
+   "G43: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[14]": [
+   "Mosin Nagant: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[15]": [
+   "M1 Garand: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[16]": [
+   "Kar98: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[17]": [
+   "Nagant Sniper: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[18]": [
+   "Springfield: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[19]": [
+   "M8 Smoke: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[20]": [
+   "Mark2 Frag: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[21]": [
+   "RGD33: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[22]": [
+   "Stielhandgrenate: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[23]": [
+   "Browning 50cal: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[24]": [
+   "M1919A4: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[25]": [
+   "Maxim: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[26]": [
+   "MG42 Mounted: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[27]": [
+   "Flak38: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[28]": [
+   "Flak88: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[29]": [
+   "T34 Cannon: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[30]": [
+   "T34 Coax: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[31]": [
+   "ST74: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[32]": [
+   "Mosin Ammo Clip: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[33]": [
+   "Teller Mine: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[34]": [
+   "KaiserBear Grenade: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[35]": [
+   "Sherman Cannon: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[36]": [
+   "Sherman Coax: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[37]": [
+   "Grease Gun: carried",
+   "BYTE",
+   5
+  ],
+  "unk_114[38]": [
+   "StickyBear Grenade: carried",
+   "BYTE",
+   5
+  ],
+  "unk_13C": [
+   "weapon in hand at start; -1 none",
+   null,
+   5
+  ],
+  "unk_140": [
+   "free-fly: the pad moves the player directly, no walking states (?)",
+   null,
+   107
+  ],
+  "unk_144": [
+   "standing eye height, units",
+   null,
+   13
+  ],
+  "unk_148": [
+   "crouched eye height (also the seat height on rides)",
+   null,
+   14
+  ],
+  "unk_14C": [
+   "prone eye height, units",
+   null,
+   15
+  ],
+  "unk_150": [
+   "the root node's height in the pose, units",
+   null,
+   16
+  ],
+  "unk_154": [
+   "pitch look speed = the base x the difficulty scale",
+   null,
+   null
+  ],
+  "unk_158": [
+   "base pitch look speed",
+   null,
+   54
+  ],
+  "unk_15C": [
+   "look stick dead zone (a stick fraction)",
+   "INTREAL",
+   53
+  ],
+  "unk_160": [
+   "default 0.1 (nothing reads it)",
+   null,
+   17
+  ],
+  "unk_164": [
+   "forward speed standing (free-fly: forward and up)",
+   null,
+   38
+  ],
+  "unk_168": [
+   "forward speed crouched",
+   null,
+   39
+  ],
+  "unk_16C": [
+   "forward speed prone",
+   null,
+   40
+  ],
+  "unk_170": [
+   "backward speed standing",
+   null,
+   42
+  ],
+  "unk_174": [
+   "backward speed crouched",
+   null,
+   43
+  ],
+  "unk_178": [
+   "backward speed prone",
+   null,
+   44
+  ],
+  "unk_17C": [
+   "forward speed jumping or falling",
+   null,
+   41
+  ],
+  "unk_180": [
+   "backward speed jumping or falling",
+   null,
+   45
+  ],
+  "unk_184": [
+   "on foot: per-axis motion factors (?)",
+   null,
+   46
+  ],
+  "unk_190": [
+   "jumping or falling: per-axis motion factors (?)",
+   null,
+   47
+  ],
+  "unk_19C": [
+   "on foot: y and z decay the idle yaw and pitch spin",
+   null,
+   59
+  ],
+  "unk_1A8": [
+   "jumping or falling: the same look decay",
+   null,
+   60
+  ],
+  "unk_1B4": [
+   "yaw turn speed on foot = the base x the difficulty scale",
+   null,
+   null
+  ],
+  "unk_1B8": [
+   "yaw turn speed jumping or falling",
+   null,
+   49
+  ],
+  "unk_1BC": [
+   "default 1.0 (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_1C0": [
+   "base yaw turn speed",
+   null,
+   48
+  ],
+  "unk_1C4": [
+   "difficulty 0 scale of the turn and look speeds",
+   null,
+   51
+  ],
+  "unk_1C8": [
+   "difficulty 2 scale of the turn and look speeds",
+   null,
+   52
+  ],
+  "unk_1CC": [
+   "fast-turn yaw cap = the base x the difficulty scale",
+   null,
+   null
+  ],
+  "unk_1D0": [
+   "base fast-turn yaw cap",
+   null,
+   50
+  ],
+  "unk_1D4": [
+   "default 7 (nothing reads it)",
+   null,
+   61
+  ],
+  "unk_1D8": [
+   "jump upward speed (standing, ladder)",
+   null,
+   62
+  ],
+  "unk_1DC": [
+   "default 0.5 (nothing reads it)",
+   null,
+   64
+  ],
+  "unk_1E0": [
+   "upward speed jumping off a ladder crouched",
+   null,
+   63
+  ],
+  "unk_1E4": [
+   "sideways speed standing",
+   null,
+   34
+  ],
+  "unk_1E8": [
+   "sideways speed crouched",
+   null,
+   35
+  ],
+  "unk_1EC": [
+   "sideways speed prone",
+   null,
+   36
+  ],
+  "unk_1F0": [
+   "sideways speed jumping or falling",
+   null,
+   37
+  ],
+  "unk_1F4": [
+   "aim assist look scale on a target, on foot (= the base x the scale)",
+   null,
+   null
+  ],
+  "unk_1F8": [
+   "the same while aiming in",
+   null,
+   null
+  ],
+  "unk_1FC": [
+   "base of the on-foot aim assist look scale",
+   null,
+   9
+  ],
+  "unk_200": [
+   "base of the aimed-in aim assist look scale",
+   null,
+   10
+  ],
+  "unk_204": [
+   "view bob, vertical size at low speed",
+   null,
+   22
+  ],
+  "unk_208": [
+   "aim assist look scale on a mounted weapon (= the base x the scale)",
+   null,
+   null
+  ],
+  "unk_20C": [
+   "base of the mounted weapon aim assist look scale",
+   null,
+   11
+  ],
+  "unk_210": [
+   "view bob, vertical size at full speed",
+   null,
+   23
+  ],
+  "unk_214": [
+   "view bob, sideways size at low speed",
+   null,
+   26
+  ],
+  "unk_218": [
+   "view bob, sideways size at full speed",
+   null,
+   27
+  ],
+  "unk_21C": [
+   "view bob, vertical rate at low speed (radians a step)",
+   null,
+   24
+  ],
+  "unk_220": [
+   "view bob, vertical rate at full speed",
+   null,
+   25
+  ],
+  "unk_224": [
+   "view bob, sideways rate at low speed",
+   null,
+   28
+  ],
+  "unk_228": [
+   "view bob, sideways rate at full speed",
+   null,
+   29
+  ],
+  "unk_22C": [
+   "look spring stiffness, yaw and pitch",
+   null,
+   55
+  ],
+  "unk_230": [
+   "look spring damping: the velocity kept a step",
+   null,
+   56
+  ],
+  "unk_234": [
+   "default 0.155 (nothing reads it)",
+   null,
+   57
+  ],
+  "unk_238": [
+   "default 0.43 (nothing reads it)",
+   null,
+   58
+  ],
+  "unk_23C": [
+   "fall height that starts hurting, units",
+   null,
+   66
+  ],
+  "unk_240": [
+   "fall height that kills, units (damage linear between)",
+   null,
+   67
+  ],
+  "unk_244": [
+   "AI point object (kind 46) bound to the player at start",
+   null,
+   0
+  ],
+  "unk_24C": [
+   "the camera entity's model (a kind-3 clump)",
+   null,
+   null
+  ],
+  "unk_254": [
+   "set: the loadout carried over from the last level (single player)",
+   null,
+   null
+  ],
+  "unk_258[0]": [
+   "carried-over weapon, slot 1 (a restart restores it)",
+   null,
+   null
+  ],
+  "unk_258[1]": [
+   "carried-over weapon, slot 2",
+   null,
+   null
+  ],
+  "unk_260": [
+   "carried-over third weapon; -1 none",
+   null,
+   null
+  ],
+  "unk_264[0]": [
+   "Bazooka: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[1]": [
+   "Panzerschreck: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[2]": [
+   "BAR: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[3]": [
+   "Bren: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[4]": [
+   "DP: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[5]": [
+   "M1919A6: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[6]": [
+   "MG42: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[7]": [
+   "MP40: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[8]": [
+   "PPSH: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[9]": [
+   "Sten: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[10]": [
+   "Thompson: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[11]": [
+   "Luger: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[12]": [
+   "Enfield: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[13]": [
+   "G43: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[14]": [
+   "Mosin Nagant: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[15]": [
+   "M1 Garand: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[16]": [
+   "Kar98: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[17]": [
+   "Nagant Sniper: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[18]": [
+   "Springfield: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[19]": [
+   "M8 Smoke: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[20]": [
+   "Mark2 Frag: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[21]": [
+   "RGD33: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[22]": [
+   "Stielhandgrenate: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[23]": [
+   "Browning 50cal: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[24]": [
+   "M1919A4: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[25]": [
+   "Maxim: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[26]": [
+   "MG42 Mounted: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[27]": [
+   "Flak38: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[28]": [
+   "Flak88: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[29]": [
+   "T34 Cannon: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[30]": [
+   "T34 Coax: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[31]": [
+   "ST74: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[32]": [
+   "Mosin Ammo Clip: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[33]": [
+   "Teller Mine: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[34]": [
+   "KaiserBear Grenade: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[35]": [
+   "Sherman Cannon: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[36]": [
+   "Sherman Coax: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[37]": [
+   "Grease Gun: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_264[38]": [
+   "StickyBear Grenade: starting rounds for a restart (-1 none)",
+   null,
+   null
+  ],
+  "unk_300": [
+   "Set when command 5 used the carried-over loadout; dword_4B67B0 restart then restores it once",
+   null,
+   null
+  ],
+  "unk_304": [
+   "Aim assist on; player init and options menu overwrite it with the aim-assist option",
+   null,
+   68
+  ],
+  "unk_308": [
+   "Aim-assist slowdown gain, scaled by (1 - stick deflection)",
+   null,
+   69
+  ],
+  "unk_30C": [
+   "Aim assist turns the player frame to follow the target",
+   null,
+   70
+  ],
+  "unk_310": [
+   "Times unk_360: per-step damping of the strafe auto-turn speed",
+   null,
+   71
+  ],
+  "unk_314": [
+   "Difficulty 2 multiplier: unk_200/1FC/20C into unk_1F8/1F4/208",
+   null,
+   72
+  ],
+  "unk_318": [
+   "Difficulty 0 multiplier: unk_200/1FC/20C into unk_1F8/1F4/208",
+   null,
+   73
+  ],
+  "unk_31C": [
+   "Aimed in: slowdown base lowered by (FOV-tan change) times this",
+   null,
+   74
+  ],
+  "unk_320": [
+   "Distance (units) over which the close-target speed bonus fades out",
+   null,
+   75
+  ],
+  "unk_324": [
+   "Look-speed factor bonus at target distance 0",
+   null,
+   76
+  ],
+  "unk_328": [
+   "Aim-pass sideways reach for non-vf_24C entities (units; ally?)",
+   null,
+   77
+  ],
+  "unk_32C": [
+   "Sideways reach at distance 0 for vf_24C entities (enemy?)",
+   null,
+   78
+  ],
+  "unk_330": [
+   "That reach at 2000 units, linear in distance, unclamped",
+   null,
+   79
+  ],
+  "unk_334": [
+   "Aim-pass ray length (units); distance divisor for the strafe speed",
+   null,
+   80
+  ],
+  "unk_338": [
+   "Allows the turn ramp (player unk_46C) when the stick passes unk_33C",
+   null,
+   81
+  ],
+  "unk_33C": [
+   "Stick deflection threshold (0..1) for the turn ramp",
+   null,
+   82
+  ],
+  "unk_340": [
+   "Grace steps after a fresh full push at a target before ramping",
+   null,
+   83
+  ],
+  "unk_344": [
+   "Turn ramp: look speed added per step, up to unk_1CC",
+   null,
+   84
+  ],
+  "unk_348": [
+   "Strafing turns the view toward the aim point",
+   null,
+   85
+  ],
+  "unk_34C": [
+   "Aim point = view direction times target distance times this",
+   null,
+   86
+  ],
+  "unk_350": [
+   "Strafe auto-turn limit (degrees either side)",
+   null,
+   87
+  ],
+  "unk_354": [
+   "Strafe auto-turn spring setting 1 (sub_112DA0 arg_C)",
+   null,
+   88
+  ],
+  "unk_358": [
+   "Strafe auto-turn spring setting 2 (sub_112DA0 arg_10)",
+   null,
+   89
+  ],
+  "unk_35C": [
+   "Look turn speed (|unk_3EC|) above which the aim point is re-taken",
+   null,
+   90
+  ],
+  "unk_360": [
+   "Times unk_310: per-step damping of the strafe auto-turn speed",
+   null,
+   91
+  ],
+  "unk_37C": [
+   "Look speed while the aim assist has a target",
+   null,
+   98
+  ],
+  "unk_380": [
+   "(nothing reads it)",
+   null,
+   99
+  ],
+  "unk_384[0]": [
+   "Bazooka: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[1]": [
+   "Panzerschreck: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[2]": [
+   "BAR: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[3]": [
+   "Bren: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[4]": [
+   "DP: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[5]": [
+   "M1919A6: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[6]": [
+   "MG42: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[7]": [
+   "MP40: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[8]": [
+   "PPSH: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[9]": [
+   "Sten: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[10]": [
+   "Thompson: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[11]": [
+   "Luger: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[12]": [
+   "Enfield: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[13]": [
+   "G43: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[14]": [
+   "Mosin Nagant: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[15]": [
+   "M1 Garand: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[16]": [
+   "Kar98: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[17]": [
+   "Nagant Sniper: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[18]": [
+   "Springfield: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[19]": [
+   "M8 Smoke: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[20]": [
+   "Mark2 Frag: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[21]": [
+   "RGD33: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[22]": [
+   "Stielhandgrenate: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[23]": [
+   "Browning 50cal: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[24]": [
+   "M1919A4: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[25]": [
+   "Maxim: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[26]": [
+   "MG42 Mounted: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[27]": [
+   "Flak38: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[28]": [
+   "Flak88: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[29]": [
+   "T34 Cannon: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[30]": [
+   "T34 Coax: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[31]": [
+   "ST74: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[32]": [
+   "Mosin Ammo Clip: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[33]": [
+   "Teller Mine: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[34]": [
+   "KaiserBear Grenade: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[35]": [
+   "Sherman Cannon: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[36]": [
+   "Sherman Coax: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[37]": [
+   "Grease Gun: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_384[38]": [
+   "StickyBear Grenade: rounds carried (-1 not carried)",
+   null,
+   null
+  ],
+  "unk_420": [
+   "(nothing reads it)",
+   null,
+   100
+  ],
+  "unk_424": [
+   "(nothing reads it)",
+   null,
+   101
+  ],
+  "unk_428": [
+   "truncated to a whole number (nothing reads it)",
+   null,
+   102
+  ],
+  "unk_42C": [
+   "truncated to a whole number (nothing reads it)",
+   null,
+   103
+  ],
+  "unk_430": [
+   "truncated to a whole number (nothing reads it)",
+   null,
+   104
+  ],
+  "unk_434": [
+   "truncated to a whole number (nothing reads it)",
+   null,
+   105
+  ],
+  "unk_438": [
+   "truncated to a whole number (nothing reads it)",
+   null,
+   106
+  ],
+  "unk_43C": [
+   "Spline path object command 115 sends the player along",
+   null,
+   113
+  ],
+  "unk_444": [
+   "Destination point on that spline (player vf_234)",
+   null,
+   114
+  ],
+  "unk_450": [
+   "Player camera state machine (kind 10)",
+   null,
+   20
+  ],
+  "unk_458": [
+   "Player camera task (kind 12)",
+   null,
+   21
+  ],
+  "unk_460": [
+   "Object (kind 46) given the camera entity handle",
+   null,
+   19
+  ],
+  "unk_468": [
+   "Set when dword_4B8750 arrives (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_46C": [
+   "Player entity handle; deleted on dword_4B67B8 and in the destructor",
+   "RO",
+   null
+  ],
+  "unk_364": [
+   "Aim-assisted strafe speed at distance 0, standing",
+   null,
+   92
+  ],
+  "unk_368": [
+   "Aim-assisted strafe speed at distance 0, crouched",
+   null,
+   94
+  ],
+  "unk_36C": [
+   "Aim-assisted strafe speed at distance 0, prone",
+   null,
+   96
+  ],
+  "unk_370": [
+   "Strafe speed at the ray length, standing (linear between)",
+   null,
+   93
+  ],
+  "unk_374": [
+   "Strafe speed at the ray length, crouched",
+   null,
+   95
+  ],
+  "unk_378": [
+   "Strafe speed at the ray length, prone",
+   null,
+   97
+  ]
+ },
+ "VehicleTrigger": {
+  "unk_C0": [
+   "model to spawn (kind 0x27); none: no vehicle; also its body box and HUD kind",
+   null,
+   2
+  ],
+  "unk_C8": [
+   "AI state machine script (kind 0xA), started for control modes 1 to 3",
+   null,
+   13
+  ],
+  "unk_D0": [
+   "task function started on its AI script (kind 0xC), modes 1 to 3",
+   null,
+   14
+  ],
+  "unk_D8": [
+   "death task (kind 0xC; VehicleGetDeathTask)",
+   null,
+   15
+  ],
+  "unk_E0": [
+   "its own name (kind 0x2E); that object is bound to the vehicle",
+   null,
+   0
+  ],
+  "unk_E8": [
+   "vehicle class: 0 a vehicle, 1 a tank; -1 spawns nothing",
+   null,
+   6
+  ],
+  "unk_EC": [
+   "control mode: 1 AI script; 2 the player starts aboard; 2 and 3 rideable (live)",
+   null,
+   7
+  ],
+  "unk_F0": [
+   "mass: gravity, drag and impulses (default 10000) (live)",
+   null,
+   8
+  ],
+  "unk_F4": [
+   "steering torque (also the turn damping; default 7500) (live)",
+   null,
+   9
+  ],
+  "unk_F8": [
+   "top speed, mph (default 60)",
+   null,
+   10
+  ],
+  "unk_FC": [
+   "starting rider count; two riders let it move",
+   null,
+   11
+  ],
+  "unk_100": [
+   "gimp level (physics mode): 2 snaps to the ground, 3 skips settling",
+   null,
+   12
+  ],
+  "unk_104": [
+   "the player's seat in the vehicle's frame, units (live)",
+   null,
+   43
+  ],
+  "unk_110": [
+   "the player's offset from the seat, swung by the turret's yaw (live)",
+   "INTREAL",
+   44
+  ],
+  "unk_114": [
+   "the player's weapon on the tank gun: 1 weapon 35, else 29 (live)",
+   null,
+   45
+  ],
+  "unk_118": [
+   "runtime copy of the seat made each step; the tank seats the player from it",
+   null,
+   null
+  ],
+  "unk_124": [
+   "cos of half the horizontal field of view (default 120 degrees)",
+   null,
+   18
+  ],
+  "unk_128": [
+   "cos of half the vertical field of view (default 120 degrees)",
+   null,
+   19
+  ],
+  "unk_12C": [
+   "view range when not alerted, units (default 70 m)",
+   null,
+   20
+  ],
+  "unk_130": [
+   "alerted view range, units (x the multiplier: the attack range)",
+   null,
+   21
+  ],
+  "unk_134": [
+   "stand-off range: the tank AI backs away from closer targets (?)",
+   null,
+   23
+  ],
+  "unk_138": [
+   "near range: the AI stops pathing to closer targets (?)",
+   null,
+   24
+  ],
+  "unk_13C": [
+   "destruction id (GetDestructionID)",
+   null,
+   3
+  ],
+  "unk_140": [
+   "health, start and most (default 200)",
+   null,
+   25
+  ],
+  "unk_144": [
+   "armour, used up before health (default 500)",
+   null,
+   26
+  ],
+  "unk_148": [
+   "health regained a step",
+   "INTREAL",
+   36
+  ],
+  "unk_14C": [
+   "AI gun horizontal aim spread, degrees (full width)",
+   null,
+   37
+  ],
+  "unk_150": [
+   "AI gun vertical aim spread, degrees (full width)",
+   null,
+   38
+  ],
+  "unk_154": [
+   "preferred attack range: this x the alerted range (default 1)",
+   null,
+   22
+  ],
+  "unk_158": [
+   "horizontal field of view, degrees as given (GetTankHFOV)",
+   null,
+   18
+  ],
+  "unk_15C": [
+   "gun 0's projectile damage",
+   null,
+   27
+  ],
+  "unk_160": [
+   "gun 1's projectile damage",
+   null,
+   30
+  ],
+  "unk_164": [
+   "gun 2's projectile damage",
+   null,
+   32
+  ],
+  "unk_168": [
+   "gun 3's projectile damage",
+   null,
+   34
+  ],
+  "unk_16C": [
+   "the main gun's shell blast damage",
+   null,
+   28
+  ],
+  "unk_170": [
+   "gun 1's blast value; command 28 zeroes it (nothing reads it)",
+   null,
+   28
+  ],
+  "unk_174": [
+   "gun 2's blast value; command 28 zeroes it (nothing reads it)",
+   null,
+   28
+  ],
+  "unk_178": [
+   "gun 3's blast value; command 28 zeroes it (nothing reads it)",
+   null,
+   28
+  ],
+  "unk_17C": [
+   "the main gun's fire rate, shots a second",
+   null,
+   29
+  ],
+  "unk_180": [
+   "gun 1's fire rate, shots a second",
+   null,
+   31
+  ],
+  "unk_184": [
+   "gun 2's fire rate, shots a second",
+   null,
+   33
+  ],
+  "unk_188": [
+   "gun 3's fire rate, shots a second",
+   null,
+   35
+  ],
+  "unk_18C": [
+   "damage scale for explosive hits on the front (live)",
+   "INTREAL",
+   39
+  ],
+  "unk_190": [
+   "damage scale for explosive hits on a side (live)",
+   "INTREAL",
+   40
+  ],
+  "unk_194": [
+   "damage scale for explosive hits on the rear (live)",
+   "INTREAL",
+   41
+  ],
+  "unk_198": [
+   "damage scale for explosive hits on the top (live)",
+   "INTREAL",
+   42
+  ],
+  "unk_19C": [
+   "turret and gun turning speed scale (live)",
+   "INTREAL",
+   46
+  ],
+  "unk_1A0": [
+   "turret yaw arc, degrees (360: no limit)",
+   null,
+   47
+  ],
+  "unk_1A4": [
+   "(nothing reads it)",
+   null,
+   48
+  ],
+  "unk_1A8": [
+   "copied into the tank's unk_288C (nothing reads that)",
+   "INTREAL",
+   49
+  ],
+  "unk_1AC": [
+   "nonzero: the vehicle spawns a mounted gun",
+   null,
+   52
+  ],
+  "unk_1B0": [
+   "the mounted gun's settings index",
+   null,
+   53
+  ],
+  "unk_1B4": [
+   "the mounted gun's attach tag: 'PGN0' + n (live)",
+   null,
+   54
+  ],
+  "unk_1B8": [
+   "the mounted gun's starting rounds (command 55 sets it too)",
+   null,
+   56
+  ],
+  "unk_1BC": [
+   "gun use: bit 0 the player, bit 1 allies, bit 2 others may mount (live)",
+   "HEX",
+   57
+  ],
+  "unk_1C0": [
+   "the mounted gun's AI script (kind 0xA)",
+   null,
+   58
+  ],
+  "unk_1C8": [
+   "nonzero shows the gun model's weapon part",
+   null,
+   59
+  ],
+  "unk_1CC": [
+   "nonzero shows the gun model's mount part",
+   null,
+   60
+  ],
+  "unk_1D0": [
+   "nonzero shows the gun model's shield part",
+   null,
+   61
+  ],
+  "unk_1D4": [
+   "gun pitch limit, degrees (half the arc given); -1 the gun's own (live)",
+   null,
+   62
+  ],
+  "unk_1D8": [
+   "gun yaw limit, degrees (half the arc given); -1 the gun's own (live)",
+   null,
+   63
+  ],
+  "unk_1DC": [
+   "gun rounds after each reload; -1 the gun's own (live)",
+   null,
+   64
+  ],
+  "unk_1E0": [
+   "(nothing reads it)",
+   null,
+   65
+  ],
+  "unk_1E4": [
+   "(nothing reads it)",
+   null,
+   66
+  ],
+  "unk_1E8": [
+   "the gun's unk_4B8: zero makes mounting set HUD mode 0x17 (?)",
+   null,
+   55
+  ],
+  "unk_1EC": [
+   "default AI spline path",
+   null,
+   17
+  ],
+  "unk_1F4": [
+   "nonzero: its model's registration loads under a lock (?)",
+   null,
+   4
+  ],
+  "unk_1F8": [
+   "(nothing reads it)",
+   null,
+   5
+  ],
+  "unk_1FC": [
+   "message block posted to the vehicle's AI at spawn",
+   "RO",
+   16
+  ]
+ },
+ "ProjectileGeneratorTrigger": {
+  "unk_C0": [
+   "the parent entity it rides on",
+   null,
+   2
+  ],
+  "unk_C8": [
+   "the parent's attach tag: 'PGN0'+n",
+   null,
+   3
+  ],
+  "unk_CC": [
+   "the turret entity (turned to the target; its FIRE tag is the muzzle)",
+   null,
+   4
+  ],
+  "unk_D4": [
+   "the barrel entity (kept on the turret's OPR0 tag)",
+   null,
+   6
+  ],
+  "unk_DC": [
+   "its side: skipped when picking a target (0 is stored as 2)",
+   null,
+   0
+  ],
+  "unk_E0": [
+   "the generator kind: 0 bullets, 1 lobbed shells",
+   null,
+   1
+  ],
+  "unk_E4": [
+   "target choice: 0 the player, 1 the nearest enemy, 2 straight ahead",
+   null,
+   10
+  ],
+  "unk_E8": [
+   "a spline path to fire along (target mode 3)",
+   null,
+   13
+  ],
+  "unk_F0": [
+   "a named target point",
+   null,
+   11
+  ],
+  "unk_F8": [
+   "scatter radius around a point target",
+   "SPREAL",
+   12
+  ],
+  "unk_FC": [
+   "speed along the path, per shot",
+   null,
+   14
+  ],
+  "unk_100": [
+   "shots before the long pause",
+   null,
+   15
+  ],
+  "unk_104": [
+   "chance (%) a projectile collides with the world (default 100)",
+   null,
+   25
+  ],
+  "unk_108": [
+   "shots per burst: from",
+   null,
+   47
+  ],
+  "unk_10C": [
+   "... to",
+   null,
+   48
+  ],
+  "unk_110": [
+   "take its firing matrix from the turret on start (default 1)",
+   null,
+   5
+  ],
+  "unk_114": [
+   "the long pause, frames",
+   null,
+   16
+  ],
+  "unk_118": [
+   "turret turn blend per update (default 0.15)",
+   null,
+   82
+  ],
+  "unk_11C": [
+   "frames the turret holds its aim after losing the target (attr x60, default 5 s)",
+   null,
+   83
+  ],
+  "unk_120": [
+   "pause between bursts, frames: from",
+   null,
+   49
+  ],
+  "unk_124": [
+   "... to",
+   null,
+   50
+  ],
+  "unk_128": [
+   "frames between shots",
+   null,
+   17
+  ],
+  "unk_12C": [
+   "random yaw spread, half angle (scaled by difficulty)",
+   null,
+   54
+  ],
+  "unk_130": [
+   "random pitch spread, half angle (scaled by difficulty)",
+   null,
+   55
+  ],
+  "unk_134": [
+   "horizontal firing arc (the cosine of half its degrees)",
+   null,
+   56
+  ],
+  "unk_138": [
+   "vertical firing arc (the cosine of half its degrees)",
+   null,
+   57
+  ],
+  "unk_13C": [
+   "built-in fire sound 0, 1 or 2 when no sound is set",
+   null,
+   21
+  ],
+  "unk_140": [
+   "the firing (loop) sound",
+   null,
+   19
+  ],
+  "unk_148": [
+   "the sound when firing stops",
+   null,
+   20
+  ],
+  "unk_150": [
+   "the stop sound is on",
+   null,
+   18
+  ],
+  "unk_154": [
+   "projectile damage (also the blast damage)",
+   "INTREAL",
+   23
+  ],
+  "unk_158": [
+   "projectile launch speed",
+   null,
+   24
+  ],
+  "unk_15C": [
+   "artillery: the distance picking the near or far incoming sound (x100)",
+   null,
+   90
+  ],
+  "unk_160": [
+   "stage 0: the first shot's miss distance (x100)",
+   null,
+   72
+  ],
+  "unk_164": [
+   "stage 0 length in bursts: from",
+   null,
+   73
+  ],
+  "unk_168": [
+   "... to",
+   null,
+   74
+  ],
+  "unk_16C": [
+   "stage 1 miss distance (x100)",
+   null,
+   75
+  ],
+  "unk_170": [
+   "stage 1 length in bursts: from",
+   null,
+   76
+  ],
+  "unk_174": [
+   "... to",
+   null,
+   77
+  ],
+  "unk_178": [
+   "stage 2 miss distance (x100)",
+   null,
+   78
+  ],
+  "unk_17C": [
+   "stage 2 length in bursts: from",
+   null,
+   79
+  ],
+  "unk_180": [
+   "... to",
+   null,
+   80
+  ],
+  "unk_184": [
+   "aim walk step per later shot: from (x100)",
+   null,
+   51
+  ],
+  "unk_188": [
+   "... to (x100)",
+   null,
+   52
+  ],
+  "unk_18C": [
+   "aim walk random turn about vertical, half range",
+   null,
+   53
+  ],
+  "unk_190": [
+   "shells explode on impact",
+   null,
+   58
+  ],
+  "unk_194": [
+   "blast radius (x100)",
+   null,
+   59
+  ],
+  "unk_198": [
+   "fuse time, frames: a nearby blast sets it off (x60)",
+   null,
+   60
+  ],
+  "unk_19C": [
+   "(nothing reads it)",
+   null,
+   null
+  ],
+  "unk_1A0": [
+   "blast range, posture class 1 (x100)",
+   null,
+   62
+  ],
+  "unk_1A4": [
+   "blast range, posture class 2 (x100)",
+   null,
+   64
+  ],
+  "unk_1A8": [
+   "maximum blast damage, posture class 1",
+   "INTREAL",
+   63
+  ],
+  "unk_1AC": [
+   "maximum blast damage, posture class 2",
+   "INTREAL",
+   65
+  ],
+  "unk_1B0": [
+   "inner radius of full damage (x100)",
+   null,
+   61
+  ],
+  "unk_1B4": [
+   "the player's camera shake radius (x100)",
+   null,
+   66
+  ],
+  "unk_1B8": [
+   "camera shake strength",
+   "INTREAL",
+   67
+  ],
+  "unk_1BC": [
+   "(never copied: the game copies unk_1C8 where this likely belongs)",
+   null,
+   68
+  ],
+  "unk_1C0": [
+   "camera shake fade per frame",
+   "INTREAL",
+   69
+  ],
+  "unk_1C4": [
+   "the player's shock radius (x100)",
+   null,
+   70
+  ],
+  "unk_1C8": [
+   "shock strength (also copied as the shake duration)",
+   "INTREAL",
+   71
+  ],
+  "unk_1CC": [
+   "projectile type: 0 bullet, 1 model shell, 3 artillery",
+   null,
+   22
+  ],
+  "unk_1D0": [
+   "the projectile's mesh",
+   null,
+   22
+  ],
+  "unk_1D8": [
+   "muzzle particle system 1",
+   null,
+   28
+  ],
+  "unk_1DC": [
+   "muzzle particle system 2",
+   null,
+   31
+  ],
+  "unk_1E0": [
+   "muzzle particle system 3",
+   null,
+   34
+  ],
+  "unk_1E4": [
+   "muzzle particles on (all; and system 1)",
+   null,
+   26
+  ],
+  "unk_1E8": [
+   "muzzle particle 2 on",
+   null,
+   29
+  ],
+  "unk_1EC": [
+   "muzzle particle 3 on",
+   null,
+   32
+  ],
+  "unk_1F0": [
+   "muzzle particle 1 follows the generator (default 1)",
+   null,
+   27
+  ],
+  "unk_1F4": [
+   "muzzle particle 2 follows (default 1)",
+   null,
+   30
+  ],
+  "unk_1F8": [
+   "muzzle particle 3 follows (default 1)",
+   null,
+   33
+  ],
+  "unk_1FC": [
+   "bullets: line-of-sight check on",
+   null,
+   81
+  ],
+  "unk_200": [
+   "shells: the high lob arc (default 1)",
+   null,
+   84
+  ],
+  "unk_204": [
+   "shell gravity (the attribute negated; default 1)",
+   null,
+   85
+  ],
+  "unk_208": [
+   "shells: how fast the fall speeds up",
+   "INTREAL",
+   87
+  ],
+  "unk_20C": [
+   "shells: frames before the fall speeds up",
+   "INTREAL",
+   88
+  ],
+  "unk_210": [
+   "shells: the faster fall is on",
+   null,
+   86
+  ],
+  "unk_214": [
+   "shell lifetime, seconds (default 15)",
+   null,
+   89
+  ],
+  "unk_218": [
+   "(nothing reads it)",
+   null,
+   98
+  ],
+  "unk_21C": [
+   "pause firing when its turret or barrel is hit",
+   null,
+   7
+  ],
+  "unk_220": [
+   "that pause's range in frames (commands 8 and 9: low, high words)",
+   "HEX",
+   8
+  ],
+  "unk_228.unk_00": [
+   "the projectiles' colour (0xAARRGGBB)",
+   "HEX",
+   91
+  ],
+  "unk_228.unk_04": [
+   "the other colour, blended at random (0: the first)",
+   "HEX",
+   92
+  ],
+  "unk_228.unk_08": [
+   "the tracer's width",
+   "INTREAL",
+   93
+  ],
+  "unk_228.unk_0C": [
+   "the tracer's height",
+   "INTREAL",
+   94
+  ],
+  "unk_228.unk_10": [
+   "the shortest life (tracer length)",
+   "INTREAL",
+   95
+  ],
+  "unk_228.unk_14": [
+   "random extra life",
+   "INTREAL",
+   96
+  ],
+  "unk_228.unk_18": [
+   "the tracer's fade distance",
+   "INTREAL",
+   97
+  ],
+  "unk_244": [
+   "trail particle effect 1 on",
+   null,
+   35
+  ],
+  "unk_248": [
+   "trail effect 1: its particle system",
+   null,
+   36
+  ],
+  "unk_24C": [
+   "trail effect 1: count",
+   null,
+   37
+  ],
+  "unk_250": [
+   "trail effect 1: duration (x60)",
+   null,
+   38
+  ],
+  "unk_254": [
+   "trail effect 1: a value (its +0x2C)",
+   null,
+   39
+  ],
+  "unk_258": [
+   "trail effect 1: the node it follows",
+   null,
+   40
+  ],
+  "unk_25C": [
+   "trail particle effect 2 on",
+   null,
+   41
+  ],
+  "unk_260": [
+   "trail effect 2: its particle system",
+   null,
+   42
+  ],
+  "unk_264": [
+   "trail effect 2: count",
+   null,
+   43
+  ],
+  "unk_268": [
+   "trail effect 2: duration (x60)",
+   null,
+   44
+  ],
+  "unk_26C": [
+   "trail effect 2: a value (its +0x2C)",
+   null,
+   45
+  ],
+  "unk_270": [
+   "trail effect 2: the node it follows",
+   null,
+   46
+  ]
+ },
+ "Trigger": {
+  "unk_20": [
+   "Unused 4 bytes (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_24": [
+   "Flags: bit 0 placed, 3 proximity off, 7/12 facing tests, 13 message target (live)",
+   null,
+   null
+  ],
+  "unk_28": [
+   "Its name key (cmd 0): trigger-handle variable; script debugger's name filter",
+   null,
+   null
+  ],
+  "unk_30": [
+   "Enter/leave/death message blocks by entity kind (cmds 18-24) (live)",
+   null,
+   null
+  ],
+  "unk_34": [
+   "Facing limit: cos of half the cmd-7 angle in degrees (live)",
+   null,
+   null
+  ],
+  "unk_38": [
+   "Upright facing limit: cos of half the cmd-8 angle in degrees (live)",
+   null,
+   null
+  ],
+  "unk_3C": [
+   "Its handle: index in the trigger table (GetMyTriggerPointer)",
+   "RO",
+   null
+  ],
+  "unk_3E": [
+   "Script id from the cmd-13 script name; started on level start (-1 none)",
+   null,
+   13
+  ],
+  "unk_40": [
+   "Task function id from the cmd-14 name; started with its script (-1 none)",
+   null,
+   14
+  ],
+  "unk_42": [
+   "Action icon: low 4 bits shown on HUD inside it, high 4 default (live)",
+   null,
+   null
+  ],
+  "unk_43": [
+   "Render priority 0-2 copied into its entity at model set-up",
+   null,
+   null
+  ],
+  "unk_44": [
+   "Entity update callback index into dword_429238, -1 default; read at set-up",
+   null,
+   null
+  ],
+  "unk_45": [
+   "Count of filter-list values resolved; sorts list when complete",
+   "RO",
+   null
+  ],
+  "unk_46": [
+   "Shape: 0 sphere, 1 cylinder, 2 box (live)",
+   null,
+   null
+  ],
+  "unk_47": [
+   "(padding) (nothing reads it)",
+   "RO",
+   null
+  ],
+  "unk_48": [
+   "Sphere/cylinder radius or box width, units (100); GetMyTriggerMetric 0 (live)",
+   null,
+   null
+  ],
+  "unk_4C": [
+   "Cylinder or box height, units (100); ladder half-length (live)",
+   null,
+   null
+  ],
+  "unk_50": [
+   "Box depth, units (100); GetMyTriggerMetric 2 (live)",
+   null,
+   null
+  ],
+  "unk_54": [
+   "Soldier assassination range: cmd 32 metres x100; further hits send message (live)",
+   null,
+   null
+  ],
+  "unk_58": [
+   "(padding) (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_60_m.right": [
+   "Placement matrix right axis; volume and facing tests (live)",
+   null,
+   null
+  ],
+  "unk_60_m.up": [
+   "Placement matrix up axis; ladder climb direction (live)",
+   null,
+   null
+  ],
+  "unk_60_m.at": [
+   "Placement matrix at axis; facing test reference (live)",
+   null,
+   null
+  ],
+  "unk_60_m.pos": [
+   "Volume centre, units; moved by SetMyTriggerPosition (live)",
+   null,
+   null
+  ],
+  "unk_A0": [
+   "Named object receiving its block messages when flag bit 13 set (live)",
+   null,
+   null
+  ],
+  "unk_A8": [
+   "Its script object handle (made on level start, freed on restart)",
+   "RO",
+   null
+  ],
+  "unk_AC": [
+   "Message filter list: channel/rank pairs from cmd 15, sorted",
+   null,
+   null
+  ],
+  "unk_B0": [
+   "Buffer of entity sizes/settings (cmds 36-39), read at entity set-up",
+   null,
+   35
+  ],
+  "unk_B4": [
+   "List of handles referring to it; cleared on destruction",
+   null,
+   null
+  ],
+  "unk_B8": [
+   "(padding) (nothing reads it)",
+   null,
+   null
+  ]
+ },
+ "SectionTrigger": {
+  "unk_C0": [
+   "Section id to keep loaded when a player enters (live)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Second section id to keep loaded (live)",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "Third section id to keep loaded (live)",
+   null,
+   null
+  ],
+  "unk_CC": [
+   "Section id queued to load when a player enters (live)",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "Bank slot 1-4 to load into when sections are set up; 0 any (live)",
+   null,
+   null
+  ],
+  "unk_D4": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "ConfinedAreaTrigger": {
+  "unk_C0": [
+   "Player stance limit on entry: 1/3 change orders, 2 locks stance (live)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "LevelScriptTrigger": {
+  "unk_C0": [
+   "Message block from cmd 0; freed on destruction (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "LadderTrigger": {
+  "unk_C0": [
+   "Name key the script debugger shows (vf_01C); nothing sets it",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "Zeroed at construction (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_CC": [
+   "Zeroed at construction (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "Enabled (1): entering puts the player on the ladder (live)",
+   null,
+   null
+  ],
+  "unk_D4": [
+   "Set when the player faces away from it (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_D8": [
+   "Climb limit from SetLadderMovement: 1 no down, 2 no up, 3 none (live)",
+   null,
+   null
+  ],
+  "unk_DC": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "EndLevelTrigger": {
+  "unk_C0": [
+   "Level number; single player maps it to the next level; MP ignores",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Armed by EnableEndLevelTrigger; player inside gets the end prompt (live)",
+   null,
+   null
+  ],
+  "unk_C6": [
+   "Set while a player is inside; arming then ends the level (live)",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "FogTrigger": {
+  "unk_C0": [
+   "Set once a player has entered it (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_C2": [
+   "(padding)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Fog distance, units (20000), applied when a player enters (live)",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "Fog fade time in seconds (x30 for the fade) (live)",
+   null,
+   null
+  ],
+  "unk_CC": [
+   "Far clip distance, units (20000), applied when a player enters (live)",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "Clip fade time in seconds (x30 for the fade) (live)",
+   null,
+   null
+  ],
+  "unk_D4": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "PASTrigger": {
+  "unk_C0": [
+   "Set while a player is inside (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_C2": [
+   "(padding)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Mode 0-2 from cmd 0 (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "AnimatedBGTrigger": {
+  "unk_C0": [
+   "Entity's model key (kind 3); missing model leaves entity inert (once)",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "Model key swapped in when destroyed (if unk_138 set) (live)",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "Entity's AI script key (kind 0xA) (once)",
+   null,
+   null
+  ],
+  "unk_D8": [
+   "Entity's AI tasks key (kind 0xC), optional (once)",
+   null,
+   null
+  ],
+  "unk_E0": [
+   "Its name object (kind 0x2E), bound to its entity (once)",
+   null,
+   null
+  ],
+  "unk_E8": [
+   "A kind-0x2E key; no reader for this kind (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_F0": [
+   "Entity's spline path key; script default spline path (once)",
+   null,
+   null
+  ],
+  "unk_F8": [
+   "Entity's speed along its spline (float bits) unless unk_FC set (once)",
+   "INTREAL",
+   null
+  ],
+  "unk_FC": [
+   "Nonzero: spline speed comes from unk_100 instead of unk_F8 (once)",
+   null,
+   null
+  ],
+  "unk_100": [
+   "Alternative spline speed (float bits), used while unk_FC set (once)",
+   "INTREAL",
+   null
+  ],
+  "unk_104": [
+   "Scene values (6 bytes; scene word at +2) copied to entity (once)",
+   null,
+   null
+  ],
+  "unk_10A[0]": [
+   "Scene action 1's message id (block's first id); -1 none (live)",
+   null,
+   null
+  ],
+  "unk_10A[1]": [
+   "Scene action 2's message id; -1 ends the list (live)",
+   null,
+   null
+  ],
+  "unk_10A[2]": [
+   "Scene action 3's message id; -1 ends the list (live)",
+   null,
+   null
+  ],
+  "unk_10A[3]": [
+   "Scene action 4's message id; no command, always -1 (live)",
+   null,
+   null
+  ],
+  "unk_10A[4]": [
+   "Scene action 5's message id; no command, always -1 (live)",
+   null,
+   null
+  ],
+  "unk_114": [
+   "Nonzero: model keys registered as kind 0x30, not 3 (once)",
+   null,
+   null
+  ],
+  "unk_118": [
+   "Read in the first attribute pass only (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_11C": [
+   "Side (1 or 2): entity side bits, CCESS tracker kind (once)",
+   null,
+   null
+  ],
+  "unk_120": [
+   "Entity's health (float bits, truncated to its hit points) (once)",
+   "INTREAL",
+   null
+  ],
+  "unk_124": [
+   "Command 24 value (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_128": [
+   "Whether allies' bullets may damage its entity (live)",
+   null,
+   null
+  ],
+  "unk_12C": [
+   "Whether enemies' bullets may damage its entity (live)",
+   null,
+   null
+  ],
+  "unk_130": [
+   "Whether bullets may damage its entity (live)",
+   null,
+   null
+  ],
+  "unk_134": [
+   "Whether explosions may damage its entity (live)",
+   null,
+   null
+  ],
+  "unk_138": [
+   "Nonzero: entity switches to model unk_C8 when destroyed (live)",
+   null,
+   null
+  ],
+  "unk_13C": [
+   "Nonzero: spawns a mounted weapon on the entity (once)",
+   null,
+   null
+  ],
+  "unk_140": [
+   "Mounted weapon's settings index (sub_166990) (live)",
+   null,
+   null
+  ],
+  "unk_144": [
+   "Mounted weapon's attach tag digit, PGN0 + value mod 10 (live)",
+   null,
+   null
+  ],
+  "unk_148": [
+   "Mounted weapon's starting ammo count (command 28 also sets it) (once)",
+   null,
+   null
+  ],
+  "unk_14C": [
+   "Mount flags: bit0 player, bit1 allies, bit2 others may use (live)",
+   null,
+   null
+  ],
+  "unk_150": [
+   "Mounted weapon's AI script key (kind 0xA) (once)",
+   null,
+   null
+  ],
+  "unk_158": [
+   "Mounted weapon shows its \"weapon\" part (once)",
+   null,
+   null
+  ],
+  "unk_15C": [
+   "Mounted weapon shows its \"mount\" part (once)",
+   null,
+   null
+  ],
+  "unk_160": [
+   "Mounted weapon shows its \"shield\" part (once)",
+   null,
+   null
+  ],
+  "unk_164": [
+   "Mounted weapon's pitch limit, degrees (halved); -1 = settings' (live)",
+   null,
+   null
+  ],
+  "unk_168": [
+   "Mounted weapon's yaw limit, degrees (halved); -1 = settings' (live)",
+   null,
+   null
+  ],
+  "unk_16C": [
+   "Mounted weapon's ammo after running out; -1 = settings' (live)",
+   null,
+   null
+  ],
+  "unk_170": [
+   "Command 38 value (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_174": [
+   "Command 39 value (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_178": [
+   "Message block: enables physics; started on entity collisions (live)",
+   null,
+   null
+  ],
+  "unk_17C": [
+   "Zero: mounting sets HUD value 0x17 (sub_E0800) (live)",
+   null,
+   null
+  ],
+  "unk_180": [
+   "Entity handle, cleared at construction; no other use found (?)",
+   "RO",
+   null
+  ],
+  "unk_184": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "AnimPackTrigger": {
+  "unk_C0": [
+   "Music key started when it fires, unless the null key (live)",
+   null,
+   1
+  ],
+  "unk_C8": [
+   "Six animation packs (key + name) loaded at it when fired (live)",
+   null,
+   null
+  ],
+  "unk_1B8": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "AnimTestTrigger": {
+  "unk_1A0": [
+   "Hit-death values (bytes 0-5; 6-11 = 1); scripts read by id (live)",
+   null,
+   null
+  ],
+  "unk_1AC": [
+   "Performance map (kind 0xD); command 8 sends its id to script (once)",
+   null,
+   null
+  ],
+  "unk_1B0": [
+   "Second performance map (kind 0xD); command 10 sends its id (once)",
+   null,
+   null
+  ],
+  "unk_1B4": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "SceneTestTrigger": {
+  "unk_1A0": [
+   "Scene values (words 0, 1; bytes 4, 5 = 1); SetSceneMap reads by id (live)",
+   null,
+   null
+  ],
+  "unk_1A6": [
+   "(padding)",
+   null,
+   null
+  ],
+  "unk_1A8": [
+   "Performance map (kind 0xD); command 4 sends its id to script (once)",
+   null,
+   null
+  ],
+  "unk_1AC": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "HitDeathTestTrigger": {
+  "unk_1A0": [
+   "Hit-death values (bytes 0-5; 6-11 = 1); PlayHitDeathAnim reads by id (live)",
+   null,
+   null
+  ],
+  "unk_1AC": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "SceneTrigger": {
+  "unk_C0": [
+   "Scene value word 0 (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_C2": [
+   "Scene value word 1 (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Scene value bytes 4 and 5, both 1 (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_C6": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "GimpTrigger": {
+  "unk_C0": [
+   "Gimp definition (kind 4): body, head, weapon class, side; read at spawn",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "AI state machine script (kind 0xA) its script object runs",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "Task function (kind 0xC) started on its script; optional",
+   null,
+   null
+  ],
+  "unk_D8": [
+   "Its own name (kind 0x2E); that object is bound to the gimp",
+   null,
+   null
+  ],
+  "unk_E0": [
+   "Default spline path the gimp follows (SetSplinePathFromName)",
+   null,
+   null
+  ],
+  "unk_E8": [
+   "Weapon settings name, resolved to unk_F8 at start",
+   null,
+   null
+  ],
+  "unk_F0": [
+   "Its vehicle's name (script GetMyVehiclesName) (live)",
+   null,
+   null
+  ],
+  "unk_F8": [
+   "Weapon settings index; -1 none; the gimp re-arms when it changes (live)",
+   "RO",
+   null
+  ],
+  "unk_FC": [
+   "Deletion delay sent to its script as SetDeletionDelay (units?)",
+   null,
+   null
+  ],
+  "unk_100": [
+   "Scene map entry: words 0-1 (1 from command 13), two enable bytes",
+   null,
+   null
+  ],
+  "unk_106[0]": [
+   "Scene action 0; always -1, nothing sets it (scripts read it) (live)",
+   null,
+   null
+  ],
+  "unk_106[1]": [
+   "Scene action 1; always -1, nothing sets it",
+   null,
+   null
+  ],
+  "unk_106[2]": [
+   "Scene action 2; always -1, nothing sets it",
+   null,
+   null
+  ],
+  "unk_106[3]": [
+   "Scene action 3; always -1, nothing sets it",
+   null,
+   null
+  ],
+  "unk_106[4]": [
+   "Scene action 4; always -1, ends the list",
+   null,
+   null
+  ],
+  "unk_110": [
+   "Nonzero: its definition loads under a lock (?)",
+   null,
+   null
+  ],
+  "unk_114": [
+   "(nothing reads it)",
+   null,
+   null
+  ],
+  "unk_118": [
+   "Priority collision: its gimp pushes others aside (SetPriorityCollision)",
+   null,
+   null
+  ],
+  "unk_11C": [
+   "Starting attitude (GetAttitude / SetEngineAttitude)",
+   null,
+   null
+  ],
+  "unk_120": [
+   "Hit points, also its full hit points (float, truncated)",
+   null,
+   null
+  ],
+  "unk_124": [
+   "Nonzero: side-1 shooters' bullets may hurt it (SetCanAlliesDamage) (live)",
+   null,
+   null
+  ],
+  "unk_128": [
+   "Nonzero: side-2 shooters' bullets may hurt it (SetCanEnemiesDamage) (live)",
+   null,
+   null
+  ],
+  "unk_12C": [
+   "Nonzero: bullets may hurt it (SetCanBulletsDamage) (live)",
+   null,
+   null
+  ],
+  "unk_130": [
+   "Nonzero: explosions may hurt it (SetCanExplosionsDamage) (live)",
+   null,
+   null
+  ],
+  "unk_134": [
+   "(padding)",
+   null,
+   null
+  ],
+  "unk_138": [
+   "Nonzero: glides along its spline; 0: moves by its animation",
+   null,
+   null
+  ],
+  "unk_13C": [
+   "(nothing reads it)",
+   null,
+   null
+  ],
+  "unk_140": [
+   "Only-live-once flag (script IsOnlyLiveOnce) (live)",
+   null,
+   null
+  ],
+  "unk_144": [
+   "Ground following on paths: 1 always, 0 when bone-height flag set",
+   null,
+   null
+  ],
+  "unk_148": [
+   "Spawn limit as set; restores the cap on a restart",
+   null,
+   null
+  ],
+  "unk_14C": [
+   "Spawns left; 0x7FFFFFFF unlimited (SetNumSpawnableEntities) (live)",
+   null,
+   null
+  ],
+  "unk_150": [
+   "An entity handle, cleared at construction (nothing reads it)",
+   "RO",
+   null
+  ],
+  "unk_154": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "ShrimpTrigger": {
+  "unk_C0": [
+   "Shrimp model (kind 3 clump); its first atomic is cloned; read once",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "Spline path the shrimps swim along; read once",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "Shrimp speed, fraction of the path per second (float bits)",
+   null,
+   null
+  ],
+  "unk_D4": [
+   "Always 0; nonzero would register unk_C0 as kind 0x30",
+   null,
+   null
+  ],
+  "unk_D8": [
+   "Always 0 (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_DC": [
+   "Chance per spawn attempt, percent (default 1) (live)",
+   null,
+   null
+  ],
+  "unk_E0": [
+   "Spawn limit as set (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_E4": [
+   "Spawns left; 0x7FFFFFFF unlimited (SetNumSpawnableEntities) (live)",
+   null,
+   null
+  ],
+  "unk_E8": [
+   "An entity handle, cleared at construction (nothing reads it)",
+   "RO",
+   null
+  ],
+  "unk_EC": [
+   "Shrimp holder: its model, path and live shrimp list",
+   null,
+   null
+  ]
+ },
+ "GimpVehicleTrigger": {
+  "unk_C0": [
+   "Vehicle data (kind 0x27): model, side, guns; none spawns nothing",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "AI state machine script (kind 0xA) its script object runs",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "Task function (kind 0xC) started on its script; optional",
+   null,
+   null
+  ],
+  "unk_D8": [
+   "Its own name (kind 0x2E); that object is bound to the vehicle",
+   null,
+   null
+  ],
+  "unk_E0": [
+   "Vehicle class: 0 plain, 1 with rifle tags RIFA-RIFC; else none",
+   null,
+   null
+  ],
+  "unk_E4": [
+   "Health, start and most (default 200)",
+   null,
+   null
+  ],
+  "unk_E8": [
+   "Armour, used up before health (default 500)",
+   null,
+   null
+  ],
+  "unk_EC": [
+   "Move speed, units a second (float bits; SetGimpVehicleMoveSpeed)",
+   "INTREAL",
+   null
+  ],
+  "unk_F0": [
+   "Turn speed limit, degrees a second (float bits; ...RotSpeed) (?)",
+   "INTREAL",
+   null
+  ],
+  "unk_F4": [
+   "Nonzero: its data loads under a lock (?)",
+   null,
+   null
+  ],
+  "unk_F8": [
+   "(nothing reads it)",
+   null,
+   null
+  ],
+  "unk_FC": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "ParticleTrigger": {
+  "unk_C0": [
+   "Five emitter settings (0x8C each); commands step by 22 per emitter",
+   null,
+   null
+  ],
+  "unk_C0.unk_00": [
+   "Emitter enabled; started with the trigger when it has a system",
+   "I16",
+   0
+  ],
+  "unk_C0.unk_02": [
+   "Placed by the trigger's whole matrix, not just its centre",
+   "I16",
+   29
+  ],
+  "unk_C0.unk_04": [
+   "Particle system id (resolved name) the emitter spawns",
+   "INT",
+   14
+  ],
+  "unk_C0.unk_08": [
+   "Start delay, seconds (x60 to frames at spawn)",
+   "INTREAL",
+   15
+  ],
+  "unk_C0.unk_0C": [
+   "Offset from the trigger, units (turned by its matrix)",
+   "V3D",
+   16
+  ],
+  "unk_C0.unk_18": [
+   "Sound key played when it emits",
+   "KEY",
+   17
+  ],
+  "unk_C0.unk_20": [
+   "The sound plays at, and follows, the player",
+   "INT",
+   19
+  ],
+  "unk_C0.unk_24": [
+   "Offset is a world position, not turned by the trigger",
+   "INT",
+   20
+  ],
+  "unk_C0.unk_28": [
+   "The running emitter (type_F5740), cleared when it ends (live)",
+   "RO",
+   null
+  ],
+  "unk_C0.unk_2C": [
+   "Emitting also sets off a blast",
+   "INT",
+   21
+  ],
+  "unk_C0.unk_30": [
+   "Blast radius, units (metres x100)",
+   "REAL",
+   22
+  ],
+  "unk_C0.unk_34": [
+   "Blast damage",
+   "INTREAL",
+   23
+  ],
+  "unk_C0.unk_38": [
+   "Set by command 25, metres x100 (nothing reads it)",
+   "REAL",
+   25
+  ],
+  "unk_C0.unk_3C": [
+   "Set by command 27, metres x100 (nothing reads it)",
+   "REAL",
+   27
+  ],
+  "unk_C0.unk_40": [
+   "Set by command 26 (nothing reads it)",
+   "INT",
+   26
+  ],
+  "unk_C0.unk_44": [
+   "Set by command 28 (nothing reads it)",
+   "INT",
+   28
+  ],
+  "unk_C0.unk_48": [
+   "Set by command 24, metres x100 (nothing reads it)",
+   "REAL",
+   24
+  ],
+  "unk_C0.unk_4C": [
+   "Child blast's camera shake radius, units (metres x100)",
+   "REAL",
+   30
+  ],
+  "unk_C0.unk_50": [
+   "Camera shake strength at the centre, falling with distance",
+   "INTREAL",
+   31
+  ],
+  "unk_C0.unk_54": [
+   "Camera shake fall per frame (times the strength)",
+   "INTREAL",
+   33
+  ],
+  "unk_C0.unk_58": [
+   "Camera shake length, frames",
+   "INTREAL",
+   32
+  ],
+  "unk_C0.unk_5C": [
+   "Child blast's player shock radius, units (metres x100)",
+   "REAL",
+   34
+  ],
+  "unk_C0.unk_60": [
+   "Player shock strength at the centre, falling with distance",
+   "INTREAL",
+   35
+  ],
+  "unk_C0.unk_64": [
+   "Emitter 0 only: emitters 1-4 fire as its children",
+   "INT",
+   5
+  ],
+  "unk_C0.unk_68": [
+   "Emitter 0: how many emissions (-1 without end)",
+   "INT",
+   8
+  ],
+  "unk_C0.unk_6C": [
+   "Emitter 0: interval between emissions, frames: from",
+   "INTREAL",
+   6
+  ],
+  "unk_C0.unk_70": [
+   "... to",
+   "INTREAL",
+   7
+  ],
+  "unk_C0.unk_74": [
+   "Emitter 0: first emission's child count (0: random)",
+   "INT",
+   9
+  ],
+  "unk_C0.unk_78": [
+   "Emitter 0: children per emission: from",
+   "INT",
+   10
+  ],
+  "unk_C0.unk_7C": [
+   "... to",
+   "INT",
+   11
+  ],
+  "unk_C0.unk_80": [
+   "Emitter 0: each child's random delay, frames: from",
+   "REAL",
+   12
+  ],
+  "unk_C0.unk_84": [
+   "... to",
+   "REAL",
+   13
+  ],
+  "unk_C0.unk_88": [
+   "Set by command 18 (nothing reads it)",
+   "INT",
+   18
+  ],
+  "unk_37C": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "PulseZoneTrigger": {
+  "unk_C0": [
+   "Who may enter: 0 anyone, 3 players, else that side (live)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Zone kind: 0 damage, 1 charge then explosion, 2 hold players, 3 none",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "Pulses before the zone ends (negative: for ever; 0: one)",
+   null,
+   null
+  ],
+  "unk_CC": [
+   "Time between pulses, frames (seconds x60; default 1 s) (live)",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "Effect value: kind 0 damage per pulse, kind 1 shake strength",
+   null,
+   null
+  ],
+  "unk_D4": [
+   "Effect value: kind 1 explosion shake radius, units",
+   null,
+   null
+  ],
+  "unk_D8": [
+   "Its pulse zone (type_17DB90), made on start (live)",
+   null,
+   null
+  ],
+  "unk_DC": [
+   "Particle system id (resolved name) spawned at the trigger on start",
+   null,
+   null
+  ],
+  "unk_E0": [
+   "Spawn the particle system when the zone starts",
+   null,
+   null
+  ],
+  "unk_E4": [
+   "(nothing reads it)",
+   null,
+   null
+  ]
+ },
+ "CustomTrigger": {
+  "unk_C0": [
+   "Its keys: AI script, AI task, objects for the Custom_ commands",
+   null,
+   null
+  ],
+  "unk_C0.unk_00[0]": [
+   "Object 1 (kind 3) for script Custom_SetObject (live)",
+   "KEY",
+   4
+  ],
+  "unk_C0.unk_00[1]": [
+   "Object 2 (kind 3) for script Custom_SetObject (live)",
+   "KEY",
+   5
+  ],
+  "unk_C0.unk_10[0]": [
+   "Animated object 1 for script Custom_SetAnimatedObject (live)",
+   "KEY",
+   6
+  ],
+  "unk_C0.unk_10[1]": [
+   "Animated object 2 for script Custom_SetAnimatedObject (live)",
+   "KEY",
+   7
+  ],
+  "unk_C0.unk_20[0]": [
+   "(nothing reads it)",
+   "KEY",
+   null
+  ],
+  "unk_C0.unk_20[1]": [
+   "(nothing reads it)",
+   "KEY",
+   null
+  ],
+  "unk_C0.unk_30": [
+   "AI state-machine script (kind 0xA) the spawned entity starts",
+   "KEY",
+   0
+  ],
+  "unk_C0.unk_38": [
+   "AI task function (kind 0xC) the spawned entity starts",
+   "KEY",
+   1
+  ],
+  "unk_100": [
+   "(nothing reads it)",
+   null,
+   null
+  ],
+  "unk_104": [
+   "Start message list (5 data, 5 ids); Custom_GetStartMessage reads first (live)",
+   null,
+   null
+  ],
+  "unk_108": [
+   "Message list (5 data, 5 ids) Custom_SendMessages sends (live)",
+   null,
+   null
+  ],
+  "unk_10C": [
+   "Scene 1 (3 words): the entity's scene; Custom_GetSceneID 1 (live)",
+   null,
+   null
+  ],
+  "unk_112": [
+   "Scene 2 (3 words); its id read by Custom_GetSceneID 2 (live)",
+   null,
+   null
+  ],
+  "unk_118": [
+   "(nothing reads it)",
+   null,
+   null
+  ]
+ },
+ "AddTaskTrigger": {
+  "unk_C0": [
+   "Its callback registration on the AddTaskGroup message; cleared when done (live)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Task function (kind 0xC) sent via AddTaskToObject to chosen entities (live)",
+   null,
+   null
+  ],
+  "unk_CC": [
+   "Task given to entities leaving the trigger; none: the first task (live)",
+   null,
+   null
+  ],
+  "unk_D4": [
+   "AddTaskGroup message id it listens on; -1 none (live)",
+   null,
+   null
+  ],
+  "unk_D6": [
+   "(padding)",
+   null,
+   null
+  ],
+  "unk_D8": [
+   "Total tasks to hand out; restores the count on reset (live)",
+   null,
+   null
+  ],
+  "unk_DC": [
+   "Tasks still to hand out; counts down, stops at 0 (live)",
+   null,
+   null
+  ],
+  "unk_E0": [
+   "Most nearest entities given the task per message (live)",
+   null,
+   null
+  ],
+  "unk_E4": [
+   "Entity-list mask searched for nearest: bits 0-5 pick six lists (live)",
+   null,
+   null
+  ],
+  "unk_E8": [
+   "Object (kind 0x2E/0x2D) whose point measures distance; none: trigger's own (live)",
+   null,
+   null
+  ],
+  "unk_F0": [
+   "Integer value sent with the task in AddTaskToObject (live)",
+   null,
+   null
+  ],
+  "unk_F4": [
+   "Outer distance limit squared, units (metres x100, squared) (live)",
+   null,
+   null
+  ],
+  "unk_F8": [
+   "Inner distance limit squared, units (metres x100, squared) (live)",
+   null,
+   null
+  ],
+  "unk_FC": [
+   "Flags: 0 sender/same group, 1-6 enter/leave by side, 7 nearest (live)",
+   null,
+   null
+  ]
+ },
+ "CCESSPoolTrigger": {
+  "unk_C0": [
+   "Two sides' CCESS pool settings: max, delay frames, random, picks per round (live)",
+   null,
+   null
+  ]
+ },
+ "DogTrigger": {
+  "unk_C0": [
+   "Scene map key, 6 bytes copied to the dog at spawn (once)",
+   null,
+   null
+  ],
+  "unk_C6[0]": [
+   "Scene action message 1 (GetSceneActionMsg); -1 ends the list (live)",
+   null,
+   null
+  ],
+  "unk_C6[1]": [
+   "Scene action message 2 (GetSceneActionMsg); -1 ends the list (live)",
+   null,
+   null
+  ],
+  "unk_C6[2]": [
+   "Scene action message 3 (GetSceneActionMsg); -1 ends the list (live)",
+   null,
+   null
+  ],
+  "unk_C6[3]": [
+   "Scene action message 4; no command, always -1 (live)",
+   null,
+   null
+  ],
+  "unk_C6[4]": [
+   "Scene action message 5; no command, always -1 (live)",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "Name object (kind 0x2C) bound to the dog entity while it lives",
+   null,
+   null
+  ],
+  "unk_D8": [
+   "Dog model (kind 3); none or not kind 3: no dog spawns (once)",
+   null,
+   null
+  ],
+  "unk_E0": [
+   "AI state machine script (kind 0xA) run on the dog's AI (once)",
+   null,
+   null
+  ],
+  "unk_E8": [
+   "Task function (kind 0xC) started on the dog's AI script (once)",
+   null,
+   null
+  ],
+  "unk_F0": [
+   "Cosine of half horizontal vision cone; default 1.047 blocks sight (once)",
+   null,
+   null
+  ],
+  "unk_F4": [
+   "Cosine of half vertical vision cone (command: full angle, degrees) (once)",
+   null,
+   null
+  ],
+  "unk_F8": [
+   "View range without a target, units (metres x100; default 50 m) (once)",
+   null,
+   null
+  ],
+  "unk_FC": [
+   "View range with a target, units (metres x100; default 50 m) (once)",
+   null,
+   null
+  ],
+  "unk_100": [
+   "Preferred attack range as fraction of target view range (0.5) (once)",
+   null,
+   null
+  ],
+  "unk_104": [
+   "Hearing radius, units (metres x100; default 20 m) (once)",
+   null,
+   null
+  ],
+  "unk_108": [
+   "Dog's starting health (default 100) (once)",
+   null,
+   null
+  ],
+  "unk_10C": [
+   "AI parameter 0 copied to the dog, default 2.5 (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_110": [
+   "AI parameter 1 copied to the dog, default 3.5 (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_114": [
+   "Side: 1 ally, 2 or 4 enemy (0 becomes 2); picks pool (once)",
+   null,
+   null
+  ],
+  "unk_118": [
+   "Set: model name resolved as kind 0x30, which then fails spawn (once)",
+   null,
+   null
+  ],
+  "unk_11C": [
+   "Integer from command 3 (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_120": [
+   "Entity handle; never set or read here (nothing reads it)",
+   "RO",
+   null
+  ],
+  "unk_124": [
+   "Message block posted to the dog's AI object at spawn (once)",
+   null,
+   null
+  ],
+  "unk_128": [
+   "(padding) (nothing reads it)",
+   null,
+   null
+  ]
+ },
+ "DestructableObjectTrigger": {
+  "unk_C0": [
+   "AI state-machine script its mesh-swap entity runs, set at spawn",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "AI task script its mesh-swap entity adds, set at spawn",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "Script name object linked to its entity (flags 0x402) at spawn and teardown",
+   null,
+   null
+  ],
+  "unk_D8": [
+   "Message/task id: first id word of a trigger block (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_DA": [
+   "(padding)",
+   null,
+   null
+  ],
+  "unk_DC": [
+   "Particle system spawned where it stands on SwapToDestroyedVersion (live)",
+   null,
+   null
+  ],
+  "unk_E0": [
+   "Health: float bits truncated into entity's hit points at spawn",
+   "INTREAL",
+   null
+  ],
+  "unk_E4": [
+   "0: explosions stop hitting it after swapping to destroyed mesh (live)",
+   null,
+   null
+  ],
+  "unk_E8": [
+   "Whether bullets from allies damage it (live)",
+   null,
+   null
+  ],
+  "unk_EC": [
+   "Whether bullets from enemies damage it (live)",
+   null,
+   null
+  ],
+  "unk_F0": [
+   "Whether bullets damage it at all (live)",
+   null,
+   null
+  ],
+  "unk_F4": [
+   "Whether explosions and vehicle impacts (100 damage) damage it (live)",
+   null,
+   null
+  ],
+  "unk_F8": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "MeshSwapDestructableObjectTrigger": {
+  "unk_100": [
+   "Intact mesh (kind-3 object); entity hides itself without it, at spawn",
+   null,
+   null
+  ],
+  "unk_108": [
+   "Destroyed mesh swapped in by SwapToDestroyedVersion script command (live)",
+   null,
+   null
+  ],
+  "unk_110": [
+   "Nonzero: mesh names looked up as kind 0x30, else kind 3 (set-up)",
+   null,
+   null
+  ],
+  "unk_114": [
+   "Integer setting (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_118": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "MountedWeaponTrigger": {
+  "unk_C0": [
+   "Mounted weapon settings index (type_4E1B70 table), at spawn and key checks (live)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Rounds loaded when the weapon spawns",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "Rounds loaded whenever a soldier mounts or dismounts it (live)",
+   null,
+   null
+  ],
+  "unk_CC": [
+   "Use flags: 1 player, 2 allies, 4 enemies may use it (live)",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "Per-shot projectile value overriding settings' unk_1C (damage?); -1 default (live)",
+   null,
+   null
+  ],
+  "unk_D4": [
+   "Pitch limit either side, degrees (halved); -1 uses weapon settings (live)",
+   null,
+   null
+  ],
+  "unk_D8": [
+   "Yaw limit either side, degrees (halved); -1 uses weapon settings (live)",
+   null,
+   null
+  ],
+  "unk_DC": [
+   "Rounds after a reload; -1 uses weapon settings' unk_40 (live)",
+   null,
+   null
+  ],
+  "unk_E0": [
+   "0: mounting switches the HUD to mounted-weapon mode 0x17 (live)",
+   null,
+   null
+  ],
+  "unk_E4": [
+   "Script name object linked to the weapon entity (flags 6), spawn/teardown",
+   null,
+   null
+  ],
+  "unk_EC": [
+   "Show the model's \"weapon\" part, at spawn",
+   null,
+   null
+  ],
+  "unk_F0": [
+   "Show the model's \"mount\" part, at spawn",
+   null,
+   null
+  ],
+  "unk_F4": [
+   "Show the model's \"shield\" part, at spawn",
+   null,
+   null
+  ],
+  "unk_F8": [
+   "AI state-machine script the weapon entity runs, at spawn",
+   null,
+   null
+  ]
+ },
+ "FlakTrigger": {
+  "unk_200": [
+   "Flak gun's half traverse arc (halved; cosine taken directly, radians?) at spawn",
+   null,
+   null
+  ],
+  "unk_204": [
+   "Gun needs a gunner to fire; disabled when gunner lost (live)",
+   null,
+   null
+  ],
+  "unk_208": [
+   "Gun needs a loader to fire; disabled when loader lost (live)",
+   null,
+   null
+  ],
+  "unk_20C": [
+   "Gun needs a third crewman to fire; disabled when lost (live)",
+   null,
+   null
+  ]
+ },
+ "SimpleMechanicTrigger": {
+  "unk_C0": [
+   "Mechanism's model (kind-3 object), at spawn; also its key match (live)",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "AI state-machine script the mechanism runs, at spawn",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "AI task script the mechanism adds, at spawn",
+   null,
+   null
+  ],
+  "unk_D8": [
+   "Script name object linked to the mechanism (flags 0x202), spawn/teardown",
+   null,
+   null
+  ],
+  "unk_E0": [
+   "Nonzero: model name looked up as kind 0x30, else kind 3 (set-up)",
+   null,
+   null
+  ],
+  "unk_E4": [
+   "Integer setting (nothing reads it)",
+   null,
+   null
+  ],
+  "unk_E8": [
+   "Default spline path it follows; also SetSplinePathFromName(-1,-1) (live)",
+   null,
+   null
+  ],
+  "unk_F0": [
+   "Speed along spline, path fraction per frame (float bits), at spawn",
+   "INTREAL",
+   null
+  ],
+  "unk_F4": [
+   "Health (hit points), copied at spawn",
+   null,
+   null
+  ],
+  "unk_F8": [
+   "Particle system spawned where it stands when destroyed (live)",
+   null,
+   null
+  ],
+  "unk_FC": [
+   "Whether bullets from allies damage it (live)",
+   null,
+   null
+  ],
+  "unk_100": [
+   "Whether bullets from enemies damage it (live)",
+   null,
+   null
+  ],
+  "unk_104": [
+   "Whether bullets damage it at all (live)",
+   null,
+   null
+  ],
+  "unk_108": [
+   "Whether explosions damage it (live)",
+   null,
+   null
+  ],
+  "unk_10C": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "PickupTrigger": {
+  "unk_C0": [
+   "Pickup type: index into pickup settings table (0-109; -1 none)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Amount given when picked up (e.g. ammo rounds added)",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "Set: pickup drops with physics and turns by its settings' angles",
+   null,
+   null
+  ],
+  "unk_CC": [
+   "Respawn delay in frames (seconds x60); <= 0 never respawns (live)",
+   null,
+   null
+  ],
+  "unk_D0": [
+   "Respawn clock, frames since pickup taken (live)",
+   "RO",
+   null
+  ],
+  "unk_D4": [
+   "Set while respawn clock counts (live)",
+   "RO",
+   null
+  ],
+  "unk_D8": [
+   "Spawns left; each spawn decrements, 0 stops; -1 unlimited (live)",
+   null,
+   null
+  ],
+  "unk_DC": [
+   "Spawn count (command 4), restored into spawns left on reset message (live)",
+   null,
+   null
+  ]
+ },
+ "PlaySoundTrigger": {
+  "unk_C0": [
+   "Set: any entity entering plays it; else only players (live)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Sound alias key played on trigger (live)",
+   null,
+   2
+  ],
+  "unk_CC": [
+   "(padding)",
+   null,
+   null
+  ],
+  "unk_10C": [
+   "Set: plays only once until reset message (live)",
+   null,
+   null
+  ],
+  "unk_110": [
+   "Set: plays from first player's position, else at trigger (live)",
+   null,
+   null
+  ],
+  "unk_114": [
+   "Set: steals a busy voice when none is free (live)",
+   null,
+   null
+  ],
+  "unk_118": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "StreamTrigger": {
+  "unk_C0": [
+   "Music stream alias key to start (live)",
+   null,
+   1
+  ],
+  "unk_C8[0]": [
+   "Channel 1 volume, percent of stream's volume, clamped 0-100 (live)",
+   null,
+   null
+  ],
+  "unk_C8[1]": [
+   "Channel 2 volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C8[2]": [
+   "Channel 3 volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C8[3]": [
+   "Channel 4 volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C8[4]": [
+   "Channel 5 volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C8[5]": [
+   "Channel 6 volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C8[6]": [
+   "Channel 7 volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C8[7]": [
+   "Channel 8 volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_E8[0]": [
+   "Channel 1 fade length, in music-player updates (rate 1/n) (live)",
+   null,
+   null
+  ],
+  "unk_E8[1]": [
+   "Channel 2 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_E8[2]": [
+   "Channel 3 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_E8[3]": [
+   "Channel 4 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_E8[4]": [
+   "Channel 5 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_E8[5]": [
+   "Channel 6 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_E8[6]": [
+   "Channel 7 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_E8[7]": [
+   "Channel 8 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_108": [
+   "Set: starts stream only once until reset message (live)",
+   null,
+   null
+  ],
+  "unk_10C": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "StreamVolume": {
+  "unk_C0": [
+   "Music player index (0-2) whose channels it fades (live)",
+   null,
+   null
+  ],
+  "unk_C4[0]": [
+   "Channel 1 target volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C4[1]": [
+   "Channel 2 target volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C4[2]": [
+   "Channel 3 target volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C4[3]": [
+   "Channel 4 target volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C4[4]": [
+   "Channel 5 target volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C4[5]": [
+   "Channel 6 target volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C4[6]": [
+   "Channel 7 target volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_C4[7]": [
+   "Channel 8 target volume, percent of stream's volume (live)",
+   null,
+   null
+  ],
+  "unk_E4[0]": [
+   "Channel 1 fade length, in music-player updates (rate 1/n) (live)",
+   null,
+   null
+  ],
+  "unk_E4[1]": [
+   "Channel 2 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_E4[2]": [
+   "Channel 3 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_E4[3]": [
+   "Channel 4 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_E4[4]": [
+   "Channel 5 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_E4[5]": [
+   "Channel 6 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_E4[6]": [
+   "Channel 7 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_E4[7]": [
+   "Channel 8 fade length, in music-player updates (live)",
+   null,
+   null
+  ],
+  "unk_104": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "StopSoundStreamTrigger": {
+  "unk_C0": [
+   "Music player index (0-2) faded to silence and stopped (live)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Fade-out length, in music-player updates (at least 1) (live)",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "SoundBankTrigger": {
+  "unk_C0": [
+   "Up to 6 sound banks loaded when a player enters (live)",
+   null,
+   null
+  ],
+  "unk_120": [
+   "Up to 10 slot-0x63 banks replacing the async bank queue (live)",
+   null,
+   null
+  ]
+ },
+ "StreamClumpTrigger": {
+  "unk_C0": [
+   "Clump bank number to queue; with unk_C4, a weapon index (live)",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Set: streams weapon unk_C0 into first player's weapon slot (live)",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "LevelClumpBankParamTrigger": {
+  "(no fields of its own)": [
+   "No fields of its own; sets global clump bank memory/banks",
+   null,
+   null
+  ]
+ },
+ "VehicleEnterExitTrigger": {
+  "unk_C0": [
+   "Registration waiting for the enter message (unk_C8); cleared when it fires",
+   null,
+   null
+  ],
+  "unk_C4": [
+   "Registration waiting for the exit message (unk_D8); cleared when it fires",
+   null,
+   null
+  ],
+  "unk_C8": [
+   "Script message (command 0's block) that unlocks getting in; -1 none",
+   null,
+   null
+  ],
+  "unk_CA": [
+   "(padding)",
+   null,
+   null
+  ],
+  "unk_CC": [
+   "Task (kind 0xC) added to the player to get in, on foot (live)",
+   null,
+   null
+  ],
+  "unk_D4": [
+   "1 once the enter message fired (or none): getting in allowed (live)",
+   null,
+   null
+  ],
+  "unk_D8": [
+   "Script message (command 2's block) that unlocks getting out; -1 none",
+   null,
+   null
+  ],
+  "unk_DA": [
+   "(padding)",
+   null,
+   null
+  ],
+  "unk_DC": [
+   "Task (kind 0xC) added to the player to get out, in a vehicle (live)",
+   null,
+   null
+  ],
+  "unk_E4": [
+   "1 once the exit message fired (or none): getting out allowed (live)",
+   null,
+   null
+  ],
+  "unk_E8": [
+   "Nonzero: touching it runs the task without the use button (live)",
+   null,
+   null
+  ],
+  "unk_EC": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "cNetPickupTrigger": {
+  "unk_E0": [
+   "Game types mask (1 DM, 2 TDM, 4 CTF, 8 S&D, 16 supremacy); read at start",
+   "HEX",
+   0
+  ],
+  "unk_E4": [
+   "Player-limit mask (1: 4 players, 2: 8, 4: 16); read at start",
+   "HEX",
+   1
+  ],
+  "unk_E8": [
+   "Visibility message id; its handler passes data to an empty function",
+   null,
+   null
+  ],
+  "unk_F0": [
+   "(padding)",
+   null,
+   null
+  ]
+ },
+ "cNetPlayerTrigger": {
+  "unk_470[0]": [
+   "Primary weapon id for the chosen class; 10000 rounds at each respawn",
+   null,
+   null
+  ],
+  "unk_470[1]": [
+   "Second weapon id (the manager sets -1, none); read at each respawn",
+   null,
+   null
+  ],
+  "unk_478": [
+   "Grenade weapon id (class slot 4); given unk_47C rounds at respawn",
+   null,
+   null
+  ],
+  "unk_47C": [
+   "Grenade count for unk_478 (sub_1AF2C0); read at each respawn",
+   null,
+   null
+  ]
+ },
+ "cNetSoldierTrigger": {
+  "(no fields of its own)": [
+   "(no fields of its own; its soldier is a remote player)",
+   null,
+   null
+  ]
+ },
+ "cNetStaticCamTrigger": {
+  "unk_C0[0]": [
+   "Level section streamed when the view returns to this camera (live)",
+   null,
+   null
+  ],
+  "unk_C0[1]": [
+   "Second level section for the static camera view (live)",
+   null,
+   null
+  ],
+  "unk_C0[2]": [
+   "Third level section for the static camera view (live)",
+   null,
+   null
+  ],
+  "unk_C0[3]": [
+   "Fourth level section for the static camera view (live)",
+   null,
+   null
+  ]
+ },
+ "cNetSpawnPoint": {
+  "unk_C0": [
+   "Index in the all-points list, set at start; pick returns it (live)",
+   "RO",
+   null
+  ],
+  "unk_C4": [
+   "Game types mask (1 DM, 2 TDM, 4 CTF, 8 S&D, 16); read at start",
+   "HEX",
+   0
+  ],
+  "unk_C8": [
+   "Player-limit mask (1: 4 players, 2: 8, 4: 16); read at start",
+   "HEX",
+   1
+  ],
+  "unk_CC": [
+   "Teams it spawns, bits 2 and 4; sorts it into team lists at start",
+   "HEX",
+   2
+  ],
+  "unk_D0": [
+   "1 when command 3 is -1: S&D then groups it by unk_D4",
+   null,
+   3
+  ],
+  "unk_D4": [
+   "S&D spawn group id (-1 none), used when unk_D0 set; read at start",
+   null,
+   4
+  ],
+  "unk_D8": [
+   "Visibility message id; its handler passes data to an empty function",
+   null,
+   null
+  ],
+  "unk_E0": [
+   "First level section streamed when a player spawns here (live)",
+   null,
+   null
+  ],
+  "unk_E4": [
+   "Second level section streamed on spawning here (live)",
+   null,
+   null
+  ],
+  "unk_E8": [
+   "Third level section streamed on spawning here (live)",
+   null,
+   null
+  ],
+  "unk_EC": [
+   "Fourth level section streamed on spawning here (live)",
+   null,
+   null
+  ],
+  "unk_F0": [
+   "(padding)",
+   null,
+   null
+  ]
+ }
+}

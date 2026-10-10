@@ -399,6 +399,10 @@ void sub_68250()
 // (port/src/debug/trigtools.cpp: the VM tab's snapshot of the script that halted last; the
 // overlay draws between runs, when the VM's state is the idle one again)
 void TrigWebVmSnapshot();
+// (port/src/debug/scriptdbg.cpp: the script debugger's look before each instruction, while
+// something needs it: a trace, the calls, breakpoints, a step)
+extern RwBool g_bTrigScriptStep;
+void TrigScriptStep();
 #endif
 void sub_68310(type_67620 *arg_0)
 {
@@ -423,6 +427,10 @@ void sub_68310(type_67620 *arg_0)
     dword_4492E0 = arg_0->vf_00C();
     dword_449328 = arg_0;
     while (byte_449324 == 0) {
+#ifdef CODFH_DRAW_TRIGGERS
+        if (g_bTrigScriptStep)
+            TrigScriptStep();
+#endif
         RwInt8 var_19 = (RwInt8)(*dword_449320 & 0xFF);
         void (*local_20)() = dword_4491C0[var_19];
         local_20();

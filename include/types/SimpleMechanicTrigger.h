@@ -51,7 +51,9 @@ public:
     RwInt32 unk_E0;             // commands 3 and 4
     RwInt32 unk_E4;
     type_3DF8D8_04 unk_E8;      // command 8, when set
-    RwInt32 unk_F0;             // commands 9 and 7
+    RwInt32 unk_F0;             // commands 9 and 7 (command 9's int is read
+                                // as float bits: its spline speed, unk_3BC
+                                // in unit_1331E0)
     RwInt32 unk_F4;
     RwInt32 unk_F8;             // command 10's name's value
     RwInt32 unk_FC;             // commands 11 to 14 (1 by default)

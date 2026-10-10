@@ -51,8 +51,8 @@ struct type_429E54
     union
     {
         RwInt32 unk_10;         // written as integers (the trigger's
-        RwReal unk_10_r;        // HandleAttributes); read as its life's
-    };                          // range: from unk_10_r
+        RwReal unk_10_r;        // HandleAttributes); read as its length's
+    };                          // (and life's) range: from unk_10_r
     union
     {
         RwInt32 unk_14;

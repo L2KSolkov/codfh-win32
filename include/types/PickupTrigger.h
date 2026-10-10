@@ -45,7 +45,8 @@ public:
     RwReal unk_D0;              // the respawn clock
     RwInt32 unk_D4;             // set while it counts
     RwInt32 unk_D8;             // the respawns left (command 4; unk_DC
-                                // again on dword_4B67B8)
+                                // again on dword_4B67B8; -1 by default,
+                                // unlimited)
     RwInt32 unk_DC;             // command 4
 };
 typedef RwChar PickupTrigger_size_check[sizeof(PickupTrigger) == 0xE0 ? 1 : -1];

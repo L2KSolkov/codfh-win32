@@ -4,7 +4,7 @@
  * trigger, derived from Trigger, anchored at its vtables off_3D5F98 and
  * off_3D5F90 (+0x18), which its constructor (sub_A9A00) and destructor
  * (sub_AA2F0) install. It holds the player's settings, which it copies into
- * the player entity (sub_ACF10), its weapons (39 flags and slots), and the
+ * the player entity (sub_ACF10), its weapons (39 flags and rounds), and the
  * player entity itself (unk_46C), which its destructor deletes. It listens
  * to Id, dword_4B8750, RWS::iMsgStartSystem, dword_4B67B8, dword_4B67C0 and
  * dword_4B67B0. The pause menu's options (sub_18E380) and the front end's
@@ -93,17 +93,17 @@ public:
     RwReal unk_DC;              // unk_4C
     RwReal unk_E0;              // unk_108
     PlayerTrigger_v3d unk_E4;   // unk_3C
-    RwReal unk_F0;              // unk_534: tan of the field of view
+    RwReal unk_F0;              // unk_534: tan of half the field of view
     RwReal unk_F4;              // unk_53C
     RwReal unk_F8;              // unk_540
     RwInt32 unk_FC;             // unk_19E0: its full hit points
-    RwInt32 unk_100;            // unk_19E4 (as a real)
+    RwInt32 unk_100;            // unk_19E4 (as a real; command 7 also sets unk_104)
     RwInt32 unk_104;            // unk_19E8 (as a real)
     RwInt32 unk_108[2];         // its two weapons (-1 for none)
     RwUInt8 unk_110[0x4];
     RwInt8 unk_114[0x27];       // set: it has the weapon
     RwUInt8 unk_13B;
-    RwInt32 unk_13C;            // its first weapon
+    RwInt32 unk_13C;            // the weapon in hand at the start
     RwInt32 unk_140;
     RwReal unk_144;
     RwReal unk_148;
@@ -111,7 +111,7 @@ public:
     RwReal unk_150;
     RwReal unk_154;             // unk_158 by the difficulty
     RwReal unk_158;
-    RwInt32 unk_15C;
+    RwInt32 unk_15C;            // read as a real: the look stick's dead zone
     RwReal unk_160;
     RwReal unk_164;
     RwReal unk_168;
@@ -162,19 +162,19 @@ public:
     RwReal unk_23C;
     RwReal unk_240;
     type_3DF8D8_04 unk_244;
-    type_3DF8D8_04 unk_24C;     // "DeathAnims" (a name's key)
+    type_3DF8D8_04 unk_24C;     // a clump (kind 3): the camera entity's model
     RwInt32 unk_254;
-    RwInt32 unk_258[2];         // its first two weapons, as it started
+    RwInt32 unk_258[2];         // its two weapons carried over (set only then)
     RwInt32 unk_260;
-    RwInt32 unk_264[0x27];      // its weapons' slots as it started (-1 for
+    RwInt32 unk_264[0x27];      // its weapons' rounds as it started (-1 for
                                 // none)
-    RwInt32 unk_300;            // set: its weapons were changed (dword_4B67B0
-                                // puts back the ones it started with)
+    RwInt32 unk_300;            // set: it took the loadout carried over
+                                // (dword_4B67B0 puts it back once)
     RwInt32 unk_304;            // set from option dword_4F2368
     RwReal unk_308;
     RwInt32 unk_30C;
     RwReal unk_310;
-    RwReal unk_314;             // the hard scale of unk_1F8, unk_1F4, unk_208
+    RwReal unk_314;             // the hard scale of unk_200, unk_1FC, unk_20C (into unk_1F8, unk_1F4, unk_208)
     RwReal unk_318;             // the easy scale of them
     RwReal unk_31C;
     RwReal unk_320;
@@ -202,7 +202,7 @@ public:
     RwReal unk_378;
     RwReal unk_37C;
     RwInt32 unk_380;
-    RwInt32 unk_384[0x27];      // its weapons' slots (-1 for none)
+    RwInt32 unk_384[0x27];      // its weapons' rounds (-1 for none)
     RwReal unk_420;
     RwReal unk_424;
     RwReal unk_428;

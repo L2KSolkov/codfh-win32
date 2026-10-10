@@ -54,12 +54,12 @@ public:
         RwReal unk_FC_r;
     };
     RwInt32 unk_100;
-    RwUInt32 unk_104;          // the chance, in percent, its projectiles
-                                // are not flagged 2 (the kinds' vf_024)
-    RwUInt32 unk_108;          // the bursts before a pause, a random
-    RwUInt32 unk_10C;          // count between these (either order)
+    RwUInt32 unk_104;          // the chance, in percent, a projectile hits
+                                // the world (flag 2 skips it; the kinds' vf_024)
+    RwUInt32 unk_108;          // the shots in a burst, a random count
+    RwUInt32 unk_10C;          // between these (either order)
     RwInt32 unk_110;
-    union                       // the pause after a burst (sub_120170)
+    union                       // the long pause after unk_100 shots (sub_120170)
     {
         RwInt32 unk_114;         // (the attribute's raw bits)
         RwReal unk_114_r;
@@ -143,10 +143,10 @@ public:
     RwReal unk_214;
     RwInt32 unk_218;
     RwInt32 unk_21C;
-    RwUInt32 unk_220;          // the sound's replay delay: a random time
-                                // between its low and high words
+    RwUInt32 unk_220;          // the pause when its turret or barrel is hit:
+                                // frames between its low and high words
     struct type_1227C0 *unk_224;    // its generator
-    type_429E54 unk_228;       // commands 43 to 49 (stru_429E54 by default)
+    type_429E54 unk_228;       // commands 91 to 97 (stru_429E54 by default)
     RwInt32 unk_244;
     RwInt32 unk_248;
     RwInt32 unk_24C;

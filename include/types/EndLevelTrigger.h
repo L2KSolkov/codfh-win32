@@ -38,10 +38,12 @@ public:
     // Ends the level: records the checkpoint named by dword_4B9144's object
     // (sub_EACA0).
     void sub_CC2F0();
-    // 0, whatever unk_C0 is (an empty switch on it).
+    // The next level for unk_C0 in single player; 0 in multiplayer
+    // (an empty switch on it).
     RwInt32 sub_CC330();
 
-    RwInt32 unk_C0;             // command 0
+    RwInt32 unk_C0;             // command 0: a level number (only single
+                                // player maps it to the next level)
     RwInt16 unk_C4;             // armed
     RwInt16 unk_C6;             // reached
     RwUInt8 unk_C8[0x8];

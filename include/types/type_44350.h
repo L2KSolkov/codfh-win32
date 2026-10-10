@@ -282,7 +282,10 @@ public:
         struct
         {
             RwUInt32 unk_24_0 : 1;  // VehicleEnterExitTrigger: both its
-                                    // vehicle and exit tasks are done
+                                    // vehicle and exit tasks are done; also
+                                    // set when the matrix loads (sub_BD0B0),
+                                    // and sub_144F20 takes a trigger without
+                                    // it as off
             RwUInt32 unk_24_1 : 1;
             RwUInt32 unk_24_2 : 1;  // command 29
             RwUInt32 unk_24_3 : 1;  // set while proximity checks are off
@@ -451,7 +454,8 @@ struct type_712B0 : Trigger
     type_3DF8D8_04 unk_F0;
     type_3DF8D8_04 unk_F8;  // a type_3D32F8 reads it as its speed along its
                             // spline (a float) and a flag (unk_100_f
-                            // instead while set)
+                            // instead while set); AnimatedBGTrigger
+                            // keeps two ints here (unk_F8, unk_FC)
     union
     {
         struct
@@ -476,7 +480,8 @@ struct type_712B0 : Trigger
     RwUInt8 unk_118[0x4];
     RwInt32 unk_11C;        // a kind-8 trigger's CCESS side (vf_018: 1 gives
                             // tracker kind 2, 2 gives 1, else 4)
-    RwReal unk_120;         // a type_3D32F8's unk_430 and unk_434 (truncated)
+    RwReal unk_120;         // a type_3D32F8's unk_430 and unk_434 (truncated);
+                            // AnimatedBGTrigger stores an int here
     RwUInt8 unk_124[0x4];
     RwInt32 unk_128;        // whether allies, enemies, bullets and explosions
     RwInt32 unk_12C;        // may damage a type_3D32F8 (vf_064, vf_068)
@@ -497,9 +502,12 @@ struct type_712B0 : Trigger
     RwInt32 unk_15C;
     RwInt32 unk_160;
     RwUInt8 unk_164[0x4];
-    RwInt32 unk_168;        // its start state ("GetStartState")
+    RwInt32 unk_168;        // its start state ("GetStartState"); in
+                            // AnimatedBGTrigger its mounted weapon's yaw
+                            // limit (a float, sub_16A890)
     RwUInt8 unk_16C[0xC];
-    RwInt32 unk_178;        // a type_3D32F8 runs its physics while set
+    RwInt32 unk_178;        // a type_3D32F8 runs its physics while set;
+                            // in AnimatedBGTrigger a block pointer
     RwInt32 unk_17C;
     RwUInt8 unk_180[0x40];
     type_3DF8D8_04 unk_1C0;     // a vehicle's mounted weapon's script
@@ -673,6 +681,12 @@ void sub_44350(type_44350 *arg_0, void *arg_4);
 #ifdef CODFH_SP // an inline in single player: expanded in the script commands (SP 0x58CD0),
                 // kept out of line where VC declines (SP 0x32F30)
 type_3DF8D8 *sub_198800(type_3DF8D8_04 *arg_0);   // (game/functions.h)
+#endif
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigtools.cpp: the VM tab's log of a failed script check)
+void TrigWebScriptCheck();
+#endif
+#ifdef CODFH_SP
 inline void sub_44220(bool arg_0)
 {
     type_67620 *stk_18;
@@ -682,6 +696,10 @@ inline void sub_44220(bool arg_0)
     type_712B0 *v8;
     type_3D2E7C *var_4;
 
+#ifdef CODFH_DRAW_TRIGGERS
+    if (arg_0 == 0)
+        TrigWebScriptCheck();
+#endif
     if (arg_0 == 0 && dword_449328 != 0) {
         stk_18 = dword_449328;
         var_4 = stk_18->vf_024();

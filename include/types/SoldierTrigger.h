@@ -94,7 +94,7 @@ public:
 
     virtual void HandleAttributes(const RWS::CAttributePacket &attr);
     virtual void HandleEvents(RWS::CMsg &pMsg);
-    // Its kind (5), how many CCESS slots it serves (unk_15C), its key
+    // Its kind (5), the most soldiers it may spawn (unk_15C), its key
     // (&unk_D0) and its CCESS slot (unk_164).
     // Inline: the constructor's vtable emits them after it, before ??_G (the image's order).
     virtual RwInt32 vf_008()
@@ -157,14 +157,14 @@ public:
     RwInt32 unk_150;            // command 43
     RwReal unk_154;             // command 44
     RwInt32 unk_158;            // command 13: the number it may spawn, and
-    RwInt32 unk_15C;            // how many are left (0x7FFFFFFF: no limit)
+    RwInt32 unk_15C;            // its cap now (spawning leaves it; 0x7FFFFFFF: no limit)
     RwInt32 unk_160;            // command 6
     RwInt32 unk_164;            // command 11
     RwInt32 unk_168;            // command 9
     RwInt32 unk_16C;            // commands 4 and 5
     RwInt32 unk_170;
     RwChar unk_174[0x20];       // command 1: a name (at most 31 characters)
-    type_D48D0 unk_194;         // an entity (a handle)
+    type_D48D0 unk_194;         // an entity (a handle; nothing reads it)
     RwUInt8 *unk_198;           // command 10: its messages' block
                                 // (sub_BD490)
     RwUInt8 unk_19C[0x4];

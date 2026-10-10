@@ -5,13 +5,25 @@
 //   Drawing     trigdraw.cpp's switches (triggers, collision, the AI's path
 //               nodes, the AI's state, noclip, the free camera) and
 //               the game's own debug menu
+//   Cheats      the developers' switches (the AI ignores me, god mode, next level, no
+//               AI spawns, tank reset), freeze all AI, unlimited ammo, game speed, cheat flags,
+//               the level and render switches (frame step, FOV zoom...), audio mutes
+//   Tunables    the tuning values no code changes (AI, pathing, vehicles, player...), editable
 //   Player      the local player (sub_1745A0(0), a type_10F710)
 //   Inventory   health, the inventory and the 39 weapons, with gives
 //   Weapons     the weapon settings (dword_4C19C0), edited in place
 //   Entities    the entity table (dword_4B6A00): teleport, kill, hp
 //   Triggers    the handle table, nearest first: teleport, spawn soldiers
+//   Trigger     every field of any trigger (triggerfields.inc), editable
+//   Shell       the shell manager's settings (the level's and the front end's), editable
+//   Generators  the projectile generators, nearest first: their state and
+//               target, the scripts' PG_ actions, teleport, a free camera look
+//   Generator   every field of a projectile generator and its trigger, editable
 //   Objectives  the checkpoint and global script registers, the objectives
-//   Scripts     the script pools and live state machines
+//   Scripts     the live state machines, performances and tasks by name; a
+//               picked one's code and (a state machine's) variables, editable
+//   Script log  the scripts' prints and failed checks, the script debugger's
+//               reports (CDebugScript's settings) and the debug switches
 //   VM          the level-script VM's registers, code and stacks, as the last
 //               script to run halted (the overlay draws between runs)
 //   Sections    the section slots, and a section load into one
@@ -53,6 +65,9 @@
 #include "game/objectives.h"
 #include "types/alfaobjman.h"
 #include "types/PlayerTrigger.h"
+#include "types/SoldierTrigger.h"
+#include "types/type_4B8EF0.h"
+#include "types/VehicleTrigger.h"
 #include "types/type_495F0.h"
 #include "game/weaponbank.h"
 #include "game/debugmenu.h"
@@ -63,6 +78,17 @@
 #include "game/data.h"
 #include "types/type_4C00E8.h"
 #include "rws/debugswitches.h"
+#include "rws/camerahelper.h"
+#include "game/cheats.h"
+#include "game/gameloop.h"
+#include "game/savestate.h"
+#include "types/AIData.h"
+#include "types/type_3DBC78_450.h"
+#include "types/type_1227C0.h"
+#include "types/ProjectileGeneratorTrigger.h"
+#include "types/type_3D2E7C.h"
+#include "game/godassetmanager.h"
+#include "types/type_3DF8D8.h"
 
 #include "../../third_party/imgui/imgui.h"
 
@@ -84,12 +110,23 @@ extern RwReal g_fTrigDrawTextScale;
 extern RwReal g_fTrigDrawCollisionRange;
 extern RwReal g_fTrigDrawCollisionLift;
 extern RwBool g_bTrigDrawFreeCam;
+// (trigweb.cpp: the level viewer's live link)
+extern RwBool g_bTrigLive;
+extern RwInt32 g_nTrigLivePort;
+extern RwInt32 g_nTrigLiveClients;
+void TrigLiveTick();
+void TrigLiveLog(const RwChar *pszLine);
 extern RwBool g_bTrigDrawAi;
 extern RwBool g_bTrigDrawAiText;
 extern RwBool g_bTrigDrawAiLines;
 extern RwBool g_bTrigDrawAiPath;
 extern RwBool g_bTrigDrawAiCover;
 extern RwBool g_bTrigDrawAiCombat;
+extern RwBool g_bTrigDrawPg;
+extern RwBool g_bTrigDrawPgText;
+extern RwReal g_fTrigDrawPgRange;
+extern RwInt32 g_nTrigDrawPgShown;
+void TrigDrawFreeCamLookAt(const RwV3d *pv);
 extern RwReal g_fTrigDrawAiRange;
 extern RwInt32 g_nTrigDrawAiShown;
 extern RwBool g_bTrigDrawPathNodes;
@@ -140,8 +177,23 @@ enum
     REQ_SETHP,          // a: the entity table slot, b: the hit points
     REQ_GIVEWEAPON,     // a: the weapon, b: 1 into the other slot (else the
                         // hand's) | 2 keep it across checkpoint restarts
-    REQ_SPAWNSOLDIER    // a: the soldier trigger's handle (-1 the nearest
+    REQ_SPAWNSOLDIER,   // a: the soldier trigger's handle (-1 the nearest
                         // that can spawn), f: where
+    REQ_PG              // a: the projectile generator's id, b: what (PG_*)
+};
+
+// What a REQ_PG does to its generator, as the scripts' "PG_" commands do.
+enum
+{
+    PG_START,           // "PG_ManipulateProjectileGenerator" 2
+    PG_STOP,            // and 1
+    PG_FIRE,            // "PG_ForcedFire"
+    PG_TARGETME,        // "PG_TargetPoint" at the player, its spread kept
+    PG_TARGETDEFAULT,   // "PG_TargetDefault"
+    PG_LOSON,           // "PG_EnableLOSCheck"
+    PG_LOSOFF,
+    PG_STAGESON,        // "PG_EnableFiringStages"
+    PG_STAGESOFF
 };
 
 // A weapon give in progress (TickGive, each frame): the weapon, its slot
@@ -805,6 +857,88 @@ static void TickGive()
     s_nGiveWeapon = -1;
 }
 
+// ---- Cheats ----
+
+// The developers' switches left in the game with nothing that sets them
+// (each only zeroed at a reset), and the debug menu's: kept on each frame
+// here, as the resets would clear them.
+//   byte_4C1940  the AI's target filter (sub_3DE00) refuses players: the AI
+//                ignores you (zeroed at the player's reset)
+//   byte_4F28F8  the player's bullet and explosion damage (vf_064, vf_068)
+//                takes no health ("Invulnerability"; zeroed at set-up)
+//   dword_4C19AC the player's weapons spend no rounds (the debug menu's
+//                "Unlimited Ammo"; zeroed at the player's reset)
+static RwBool s_bCheatIgnoreMe, s_bCheatGod, s_bCheatAmmo, s_bCheatFreezeAi;
+
+// The AI control (AIData::unk_51C, "SetAIControl") of the AIs frozen, to
+// put back: the AI data and its value.
+struct CheatFrozen
+{
+    AIData *pAi;
+    RwInt32 nControl;
+};
+static CheatFrozen s_aCheatFrozen[768];
+static RwInt32 s_nCheatFrozen;
+
+static void CheatFreezeTick()
+{
+    RwInt32 i, j;
+
+    if (!s_bCheatFreezeAi)
+    {
+        // thaw: each frozen AI gets its control back, if it still has the 0 we gave it
+        for (j = 0; j < s_nCheatFrozen; j++)
+            __try
+            {
+                if (s_aCheatFrozen[j].pAi->unk_51C == 0)
+                    s_aCheatFrozen[j].pAi->unk_51C = s_aCheatFrozen[j].nControl;
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+            }
+        s_nCheatFrozen = 0;
+        return;
+    }
+    for (i = 0; i < 768; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+        AIData *pAi;
+
+        if (pEntity == NULL || (pEntity->unk_2C & 0x10))
+            continue;               // (players)
+        __try
+        {
+            pAi = pEntity->vf_120();
+            if (pAi == NULL || pAi->unk_51C == 0)
+                continue;
+            for (j = 0; j < s_nCheatFrozen && s_aCheatFrozen[j].pAi != pAi; j++)
+                ;
+            if (j == s_nCheatFrozen && s_nCheatFrozen < 768)
+            {
+                s_aCheatFrozen[s_nCheatFrozen].pAi = pAi;
+                s_aCheatFrozen[s_nCheatFrozen].nControl = pAi->unk_51C;
+                s_nCheatFrozen++;
+            }
+            pAi->unk_51C = 0;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+}
+
+static void CheatTick()
+{
+    if (s_bCheatIgnoreMe)
+        byte_4C1940 = 1;
+    if (s_bCheatGod)
+        byte_4F28F8 = 1;
+    if (s_bCheatAmmo)
+        dword_4C19AC = 1;
+    if (s_bCheatFreezeAi || s_nCheatFrozen)
+        CheatFreezeTick();
+}
+
 // Called each frame on the main thread (sub_D7880): carries out the pending
 // action from a tab, and a weapon give in progress.
 void TrigWebTick()
@@ -812,7 +946,9 @@ void TrigWebTick()
     type_10F710 *pPlayer;
     RwV3d v;
 
+    CheatTick();
     TickGive();
+    TrigLiveTick();
     if (!s_bReqPending)
         return;
     pPlayer = (type_10F710 *)sub_1745A0(0);
@@ -911,6 +1047,58 @@ void TrigWebTick()
         sprintf(s_szReqResult, "entity %d: hit points set to %d", s_nReqA, s_nReqB);
         break;
     }
+    case REQ_PG:
+    {
+        type_1227C0 *pGen = sub_1227C0(s_nReqA);
+        static const RwChar *const s_apszDone[9] = {"started", "stopped", "fired", "targets you",
+                                                    "back on its default target", "line of sight check on",
+                                                    "line of sight check off", "firing stages on",
+                                                    "firing stages off"};
+
+        if (pGen == NULL)
+        {
+            sprintf(s_szReqResult, "no projectile generator %d now", s_nReqA & 0xFFFF);
+            break;
+        }
+        switch (s_nReqB)
+        {
+        case PG_START:
+            pGen->sub_121D20(1);
+            break;
+        case PG_STOP:
+            pGen->sub_121D20(0);
+            break;
+        case PG_FIRE:
+            pGen->sub_120150();
+            break;
+        case PG_TARGETME:
+            if (pPlayer == NULL || !PlayerPosition(pPlayer, &v))
+            {
+                strcpy(s_szReqResult, "no local player");
+                s_bReqPending = FALSE;
+                return;
+            }
+            pGen->sub_1218A0(&v, pGen->unk_60);
+            break;
+        case PG_TARGETDEFAULT:
+            pGen->sub_121870();
+            break;
+        case PG_LOSON:
+        case PG_LOSOFF:
+            pGen->vf_014(s_nReqB == PG_LOSON);
+            break;
+        case PG_STAGESON:
+        case PG_STAGESOFF:
+            pGen->sub_121A30(s_nReqB == PG_STAGESON);
+            break;
+        default:
+            strcpy(s_szReqResult, "unknown generator action");
+            s_bReqPending = FALSE;
+            return;
+        }
+        sprintf(s_szReqResult, "generator %d %s", s_nReqA & 0xFFFF, s_apszDone[s_nReqB]);
+        break;
+    }
     default:
         strcpy(s_szReqResult, "unknown action");
     }
@@ -929,6 +1117,121 @@ static void Check(const RwChar *pszLabel, RwBool *pb)
 
     if (ImGui::Checkbox(pszLabel, &b))
         *pb = b;
+}
+
+// The cheat flags (dword_4B8888's word, game/cheats.h), by bit.
+static const RwChar *const s_apszCheatBits[7] =
+{
+    "soldiers' second animation at double speed",
+    "projectiles bounce (bit 1)",
+    "bullets kill with a head shot, and do nothing otherwise",
+    "projectiles bounce (bit 3)",
+    "soldiers shrink with their hit points",
+    "bullets kill",
+    "soldiers drawn smaller, at random",
+};
+
+static void CheckSet(const RwChar *pszLabel, RwBool *pb, RwBool bOff, void (*pfnOff)())
+{
+    bool b = *pb != 0;
+
+    if (ImGui::Checkbox(pszLabel, &b))
+    {
+        *pb = b;
+        if (!b && pfnOff)
+            pfnOff();
+    }
+}
+
+static void CheatIgnoreOff()
+{
+    byte_4C1940 = 0;
+}
+
+static void CheatGodOff()
+{
+    byte_4F28F8 = 0;
+}
+
+static void CheatAmmoOff()
+{
+    dword_4C19AC = 0;
+}
+
+static void CheatsLevelRender();
+static void CheatsAudio();
+
+static void TabCheats()
+{
+    RwInt32 i;
+
+    ResultLine();
+    ImGui::SeparatorText("The developers' switches (nothing in the game sets them)");
+    CheckSet("the AI ignores me (byte_4C1940: their target filter refuses players)", &s_bCheatIgnoreMe, FALSE,
+             CheatIgnoreOff);
+    CheckSet("god mode (byte_4F28F8: bullets and explosions take no health)", &s_bCheatGod, FALSE, CheatGodOff);
+    {
+        bool b = RWS::DebugSwitches::GetSwitch(0x15);
+
+        if (ImGui::Checkbox("no AI spawns (debug switch 0x15: the scripts' CreateSoldier and CreateTank)", &b))
+            RWS::DebugSwitches::SetSwitch(0x15, b);
+    }
+    if (ImGui::Button("skip to the next level (byte_4C1941)"))
+    {
+        byte_4C1941 = 1;
+        strcpy(s_szReqResult, "the main loop goes to the next level");
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("reset the tanks (dword_4D50F8)"))
+    {
+        dword_4D50F8 = 2;
+        strcpy(s_szReqResult, "tanks put back over their triggers, their motion cleared");
+    }
+    ImGui::SameLine();
+    ImGui::TextDisabled("(each tank 100 above its trigger, stopped)");
+
+    ImGui::SeparatorText("The AI");
+    CheckSet("freeze all AI (clears each AI's AI control, SetAIControl; put back when off)", &s_bCheatFreezeAi,
+             FALSE, NULL);
+    ImGui::SameLine();
+    ImGui::TextDisabled("%d frozen", s_nCheatFrozen);
+    ImGui::TextDisabled("(AI control off makes their checks pass over them; scripted moves may still play)");
+
+    ImGui::SeparatorText("The debug menu's");
+    CheckSet("unlimited ammunition (dword_4C19AC)", &s_bCheatAmmo, FALSE, CheatAmmoOff);
+    ImGui::SetNextItemWidth(240.0f);
+    ImGui::SliderFloat("game speed (flt_429298)", &flt_429298, 0.05f, 4.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+    ImGui::SameLine();
+    if (ImGui::SmallButton("1"))
+        flt_429298 = 1.0f;
+
+    ImGui::SeparatorText("Cheat flags (dword_4B8888)");
+    if (dword_4B8888 == NULL)
+        ImGui::TextDisabled("Not set up yet (a level sets the pointer).");
+    else
+    {
+        RwUInt32 *pdw = (RwUInt32 *)dword_4B8888;
+        RwUInt32 dw;
+
+        if (!ReadU32(pdw, &dw))
+            ImGui::Text("0x%08X can't be read.", (RwUInt32)pdw);
+        else
+        {
+            for (i = 0; i < 7; i++)
+            {
+                bool b = ((dw >> i) & 1) != 0;
+
+                if (ImGui::Checkbox(s_apszCheatBits[i], &b))
+                {
+                    dw = b ? dw | (1u << i) : dw & ~(1u << i);
+                    *pdw = dw;
+                }
+            }
+            ImGui::TextDisabled("at 0x%08X (single player: the save's cheats; they stay as set)", (RwUInt32)pdw);
+        }
+    }
+    CheatsLevelRender();
+    CheatsAudio();
 }
 
 static void TabDrawing()
@@ -1000,6 +1303,17 @@ static void TabDrawing()
                             "with their age; lines: red the tracked entity, orange the target point, yellow where it "
                             "aims, green its current node, cyan its path)", g_nTrigDrawAiShown);
     ImGui::Separator();
+    Check("draw the projectile generators", &g_bTrigDrawPg);
+    ImGui::SameLine();
+    Check("their state##pg", &g_bTrigDrawPgText);
+    ImGui::SliderFloat("generator draw distance (0 unlimited)", &g_fTrigDrawPgRange, 0.0f, 20000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    if (g_bTrigDrawPg)
+        ImGui::TextDisabled("(%d drawn: the muzzle, orange bullets, red shells; to the target, red the nearest "
+                            "entity, orange a set one, yellow a point, blue its path; the yellow cross where it aims "
+                            "with its spread; cyan its turret's facing, magenta while it turns; grey to its "
+                            "trigger)", g_nTrigDrawPgShown);
+    ImGui::Separator();
     Check("noclip for the local player", &g_bTrigDrawNoclip);
     ImGui::SliderFloat("noclip speed", &g_fTrigDrawNoclipSpeed, 1.0f, 500.0f, "%.0f");
     ImGui::TextDisabled("(noclip: the left stick moves along the view, Black up, White down)");
@@ -1011,6 +1325,17 @@ static void TabDrawing()
     ImGui::TextDisabled("(free camera: the pad is the camera's, not the player's; the left stick (WASD) moves, the "
                         "right (the mouse) looks, Black/White (Q/E) up and down, the right trigger faster, the left "
                         "slower; start and back stay the game's)");
+    ImGui::Separator();
+    Check("live link for the level viewer", &g_bTrigLive);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(90.0f);
+    if (!g_bTrigLive)
+        ImGui::InputInt("port##live", &g_nTrigLivePort, 0, 0);
+    else
+        ImGui::Text("ws://127.0.0.1:%d, %d viewer%s", g_nTrigLivePort, g_nTrigLiveClients,
+                    g_nTrigLiveClients == 1 ? "" : "s");
+    ImGui::TextDisabled("(the viewer's Live game panel connects to it; CODFH_LIVE=1 starts with it on; only this "
+                        "machine can connect, and only a page served from it may command the game)");
     ImGui::Separator();
     ImGui::Text("The game's debug menu: %s", unk_4E73A8.unk_14 ? "open" : "closed");
     ImGui::SameLine();
@@ -1208,7 +1533,7 @@ static void TabInventory()
 
 // The weapon settings fields the behaviours set (weaponfields.inc, written by
 // the plain build's research/gen_weaponfields.py from their HandleAttributes).
-enum { WF_INT, WF_REAL, WF_BOOL, WF_V3D };
+enum { WF_INT, WF_REAL, WF_BOOL, WF_V3D, WF_BYTE };
 
 struct WeaponField
 {
@@ -1437,6 +1762,7 @@ static void WeaponFieldRow(RwUInt8 *pSettings, const WeaponField *pField)
     {
     case WF_INT:
     case WF_BOOL:
+    case WF_BYTE:
         if (!ReadU32(p, &dw))
             return;
         break;
@@ -1475,6 +1801,10 @@ static void WeaponFieldRow(RwUInt8 *pSettings, const WeaponField *pField)
         break;
     case WF_V3D:
         if (ImGui::InputFloat3("##v", (float *)p, "%g", ImGuiInputTextFlags_EnterReturnsTrue))
+            sprintf(s_szReqResult, "%s (command %d) set", pField->pszField, pField->nCommand);
+        break;
+    case WF_BYTE:
+        if (ImGui::InputScalar("##v", ImGuiDataType_U8, p, NULL, NULL, "%u", ImGuiInputTextFlags_EnterReturnsTrue))
             sprintf(s_szReqResult, "%s (command %d) set", pField->pszField, pField->nCommand);
         break;
     }
@@ -1580,12 +1910,15 @@ static int __cdecl TrigByDistance(const void *pA, const void *pB)
 }
 
 // The trigger's row: its type, shape, place, flags, distance and its actions.
+// The trigger the Trigger tab edits (a handle; -1 none), set from here.
+static RwInt32 s_nTrigEdit = -1;
+
 static void TrigRow(RwInt32 nHandle, Trigger *pTrigger, RwReal fDist)
 {
     RwChar szShape[64], szFlags[48];
     const RwChar *pszKind;
     RwV3d vAt;
-    RwBool bSoldier;
+    RwBool bSoldier, bEditable;
 
     __try
     {
@@ -1611,6 +1944,7 @@ static void TrigRow(RwInt32 nHandle, Trigger *pTrigger, RwReal fDist)
         vAt.y = pTrigger->unk_94;
         vAt.z = pTrigger->unk_98;
         bSoldier = pTrigger->vf_008() == 5;
+        bEditable = TRUE;
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
@@ -1633,6 +1967,12 @@ static void TrigRow(RwInt32 nHandle, Trigger *pTrigger, RwReal fDist)
     ImGui::TableNextColumn();
     if (ImGui::SmallButton("teleport"))
         Request(REQ_TELEPORT, 0, 0, vAt.x, vAt.y, vAt.z);
+    if (bEditable)
+    {
+        ImGui::SameLine();
+        if (ImGui::SmallButton(s_nTrigEdit == nHandle ? "editing" : "edit"))
+            s_nTrigEdit = nHandle;
+    }
     if (bSoldier)
     {
         ImGui::SameLine();
@@ -1640,6 +1980,1167 @@ static void TrigRow(RwInt32 nHandle, Trigger *pTrigger, RwReal fDist)
             Request(REQ_SPAWNSOLDIER, nHandle, 0, 0.0f, 0.0f, 0.0f);
     }
     ImGui::PopID();
+}
+
+// ---- Generators ----
+
+// The live projectile generators (type_1227C0, the list dword_4CE8F8),
+// nearest first: their state and target, with the scripts' "PG_" actions
+// (REQ_PG), a teleport and a look with the free camera; the picked one's
+// trigger settings (ProjectileGeneratorTrigger) below.
+struct TrigWebPg
+{
+    type_1227C0 *pGen;
+    RwInt32 nId, nKind, nState, nTarget, nShots, nStage, nStagesOn, nLos, nForced;
+    RwReal fNext, fDist;
+    RwV3d vPos, vTrigger;
+    ProjectileGeneratorTrigger *pTrigger;
+};
+static TrigWebPg s_aPg[256];
+static RwInt32 s_nPgSel = -1;
+
+static int PgByDistance(const void *pA, const void *pB)
+{
+    RwReal f = ((const TrigWebPg *)pA)->fDist - ((const TrigWebPg *)pB)->fDist;
+
+    return f < 0.0f ? -1 : f > 0.0f ? 1 : 0;
+}
+
+static RwInt32 PgList(const RwV3d *pvFrom)
+{
+    RwInt32 n = 0;
+
+    __try
+    {
+        type_1227C0 *pGen;
+
+        for (pGen = dword_4CE8F8; pGen != NULL && n < 256; pGen = pGen->unk_100)
+        {
+            TrigWebPg *p = &s_aPg[n];
+            RwV3d vD;
+
+            p->pGen = pGen;
+            p->nId = pGen->unk_104;
+            p->nKind = pGen->vf_01C() != NULL;
+            p->nState = pGen->unk_14;
+            p->nTarget = pGen->unk_38;
+            p->nShots = pGen->unk_40;
+            p->nStage = pGen->unk_34;
+            p->nStagesOn = pGen->unk_30;
+            p->nLos = p->nKind == 0 ? ((type_11DB10 *)pGen)->unk_20C : -1;
+            p->nForced = pGen->unk_28;
+            p->fNext = pGen->unk_44;
+            p->vPos = pGen->unk_70.pos;
+            p->pTrigger = pGen->unk_18.unk_08_pg;
+            p->vTrigger = p->vPos;
+            if (p->pTrigger)
+            {
+                p->vTrigger.x = p->pTrigger->unk_90;
+                p->vTrigger.y = p->pTrigger->unk_94;
+                p->vTrigger.z = p->pTrigger->unk_98;
+            }
+            vD.x = p->vPos.x - pvFrom->x;
+            vD.y = p->vPos.y - pvFrom->y;
+            vD.z = p->vPos.z - pvFrom->z;
+            p->fDist = (RwReal)sqrt(vD.x * vD.x + vD.y * vD.y + vD.z * vD.z);
+            n++;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    qsort(s_aPg, n, sizeof(TrigWebPg), PgByDistance);
+    return n;
+}
+
+static void PgSettings(ProjectileGeneratorTrigger *pT)
+{
+    if (pT == NULL || !BeginRows("pgset"))
+        return;
+    __try
+    {
+        Row("trigger", "0x%08X at %.1f, %.1f, %.1f", (RwUInt32)pT, pT->unk_90, pT->unk_94, pT->unk_98);
+        Row("projectile speed (unk_158)", "%g", pT->unk_158_r);
+        Row("time between shots (unk_128)", "%g", pT->unk_128_r);
+        Row("bursts before a pause (unk_108, unk_10C)", "%u to %u", pT->unk_108, pT->unk_10C);
+        Row("pause after a burst (unk_114)", "%g", pT->unk_114_r);
+        Row("pause between bursts (unk_120, unk_124)", "%g to %g", pT->unk_120_r, pT->unk_124_r);
+        Row("stage shot counts (unk_164, unk_168)", "%u, %u", pT->unk_164, pT->unk_168);
+        Row("chance not flagged 2 (unk_104)", "%u%%", pT->unk_104);
+        Row("path speed (unk_FC)", "%g", pT->unk_FC_r);
+        Row("sound replay delay (unk_220)", "%u to %u", pT->unk_220 & 0xFFFF, pT->unk_220 >> 16);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        Row("trigger", "?");
+    }
+    ImGui::EndTable();
+}
+
+static void TabGenerators()
+{
+    static const RwChar *const s_apszTarget[4] = {"nearest", "entity", "point", "path"};
+    type_10F710 *pPlayer = (type_10F710 *)sub_1745A0(0);
+    RwV3d vFrom = {0.0f, 0.0f, 0.0f};
+    RwInt32 n, i;
+
+    ResultLine();
+    if (pPlayer == NULL || !PlayerPosition(pPlayer, &vFrom))
+        vFrom.x = vFrom.y = vFrom.z = 0.0f;
+    n = PgList(&vFrom);
+    Check("draw them##pgtab", &g_bTrigDrawPg);
+    ImGui::SameLine();
+    ImGui::TextDisabled("%d live, nearest first; the actions are the scripts' PG_ commands", n);
+    if (!ImGui::BeginTable("pgs", 8, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+                           ImVec2(0.0f, 320.0f)))
+        return;
+    ImGui::TableSetupScrollFreeze(0, 1);
+    ImGui::TableSetupColumn("id");
+    ImGui::TableSetupColumn("kind");
+    ImGui::TableSetupColumn("state");
+    ImGui::TableSetupColumn("target");
+    ImGui::TableSetupColumn("burst");
+    ImGui::TableSetupColumn("distance");
+    ImGui::TableSetupColumn("go");
+    ImGui::TableSetupColumn("actions");
+    ImGui::TableHeadersRow();
+    for (i = 0; i < n; i++)
+    {
+        TrigWebPg *p = &s_aPg[i];
+        RwChar szId[16];
+
+        ImGui::PushID(p->nId);
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        sprintf(szId, "%d", p->nId & 0xFFFF);
+        if (ImGui::Selectable(szId, s_nPgSel == p->nId))
+            s_nPgSel = s_nPgSel == p->nId ? -1 : p->nId;
+        ImGui::TableNextColumn();
+        ImGui::TextUnformatted(p->nKind ? "shells" : "bullets");
+        ImGui::TableNextColumn();
+        ImGui::Text("%s%s", p->nState == 1 ? "firing" : p->nState == 2 ? "updated" : p->nState == 0 ? "stopped" : "?",
+                    p->nForced ? ", forced" : "");
+        ImGui::TableNextColumn();
+        ImGui::TextUnformatted(p->nTarget >= 0 && p->nTarget < 4 ? s_apszTarget[p->nTarget] : "?");
+        ImGui::TableNextColumn();
+        ImGui::Text("%d, next %.1fs", p->nShots, p->fNext / 60.0f);
+        ImGui::TableNextColumn();
+        ImGui::Text("%.0f", p->fDist);
+        ImGui::TableNextColumn();
+        if (ImGui::SmallButton("teleport"))
+            Request(REQ_TELEPORT, 0, 0, p->vTrigger.x, p->vTrigger.y, p->vTrigger.z);
+        ImGui::SameLine();
+        if (ImGui::SmallButton("look"))
+            TrigDrawFreeCamLookAt(&p->vPos);
+        ImGui::TableNextColumn();
+        if (ImGui::SmallButton(p->nState ? "stop" : "start"))
+            Request(REQ_PG, p->nId, p->nState ? PG_STOP : PG_START, 0.0f, 0.0f, 0.0f);
+        ImGui::SameLine();
+        if (ImGui::SmallButton("fire"))
+            Request(REQ_PG, p->nId, PG_FIRE, 0.0f, 0.0f, 0.0f);
+        ImGui::SameLine();
+        if (ImGui::SmallButton("target me"))
+            Request(REQ_PG, p->nId, PG_TARGETME, 0.0f, 0.0f, 0.0f);
+        ImGui::SameLine();
+        if (ImGui::SmallButton("default"))
+            Request(REQ_PG, p->nId, PG_TARGETDEFAULT, 0.0f, 0.0f, 0.0f);
+        if (p->nLos >= 0)
+        {
+            ImGui::SameLine();
+            if (ImGui::SmallButton(p->nLos ? "LOS off" : "LOS on"))
+                Request(REQ_PG, p->nId, p->nLos ? PG_LOSOFF : PG_LOSON, 0.0f, 0.0f, 0.0f);
+        }
+        ImGui::SameLine();
+        if (ImGui::SmallButton(p->nStagesOn ? "stages off" : "stages on"))
+            Request(REQ_PG, p->nId, p->nStagesOn ? PG_STAGESOFF : PG_STAGESON, 0.0f, 0.0f, 0.0f);
+        ImGui::PopID();
+    }
+    ImGui::EndTable();
+    for (i = 0; i < n; i++)
+        if (s_aPg[i].nId == s_nPgSel)
+        {
+            ImGui::SeparatorText("Its trigger's settings");
+            PgSettings(s_aPg[i].pTrigger);
+            break;
+        }
+    if (s_nPgSel != -1 && i == n)
+        ImGui::TextDisabled("(the picked generator is gone)");
+}
+
+// ---- Generator ----
+
+// Every field of a projectile generator (type_1227C0, and its kind's own) and
+// of the trigger it was set up from (ProjectileGeneratorTrigger), editable:
+// Enter sets a value. What each does is from tracing the generator's code
+// (unit_11EE20, unit_11DB10, unit_11E440) and the projectiles' (unit_15F1B0,
+// unit_161C50); times are frames. The trigger's rows give the attribute command that sets each
+// (HandleAttributes, unit_0AD1B0) and how it stores it.
+enum
+{
+    PF_INT,         // an integer (its bits as a real beside it)
+    PF_REAL,        // a real (its bits as an integer beside it)
+    PF_INTREAL,     // either: an integer the game may read as a real
+    PF_HEX,         // a word in hex
+    PF_HEX16,       // a half word in hex
+    PF_I16,         // a signed half word
+    PF_BYTE,        // a byte
+    PF_TEXT,        // a string (nSize characters, 32 when 0)
+    PF_V2D,         // a 2D vector
+    PF_RGBA,        // an RwRGBA
+    PF_V3D,         // a vector
+    PF_KEY,         // two words: an object's key
+    PF_RO           // a pointer or id, shown only
+};
+
+struct PgField
+{
+    const RwChar *pszName;
+    RwUInt32 dwOffset;
+    RwInt32 nKind;
+    RwInt32 nCommand;
+    const RwChar *pszDesc;
+    RwInt32 nSize;              // PF_TEXT's buffer (0: 32)
+};
+
+static const PgField s_aPgGenFields[] =
+{
+    { "unk_10", offsetof(type_1227C0, unk_10), PF_RO, -1, "the looping fire sound (its emitter handle)" },
+    { "unk_14", offsetof(type_1227C0, unk_14), PF_INT, -1, "run state: 0 stopped, 1 just started, 2 running" },
+    { "unk_24", offsetof(type_1227C0, unk_24), PF_INT, -1, "the target entity (an entity id)" },
+    { "unk_28", offsetof(type_1227C0, unk_28), PF_INT, -1, "a forced shot is due (\"PG_ForcedFire\"); cleared after" },
+    { "unk_2C", offsetof(type_1227C0, unk_2C), PF_INT, -1, "the turret is on target; bullets fire only then" },
+    { "unk_30", offsetof(type_1227C0, unk_30), PF_INT, -1, "firing stages on (\"PG_EnableFiringStages\")" },
+    { "unk_34", offsetof(type_1227C0, unk_34), PF_INT, -1, "firing stage 0 to 2; 3: aim straight at it with an angle spread" },
+    { "unk_38", offsetof(type_1227C0, unk_38), PF_INT, -1, "target mode: 0 picked, 1 an entity, 2 a point, 3 its path" },
+    { "unk_3C", offsetof(type_1227C0, unk_3C), PF_INT, -1, "bursts left in the stage" },
+    { "unk_40", offsetof(type_1227C0, unk_40), PF_INT, -1, "shots left in the burst" },
+    { "unk_44", offsetof(type_1227C0, unk_44), PF_REAL, -1, "frames to the next shot (or pause)" },
+    { "unk_48", offsetof(type_1227C0, unk_48), PF_INT, -1, "start a new aim walk on the next stage shot" },
+    { "unk_4C", offsetof(type_1227C0, unk_4C), PF_REAL, -1, "the turret's turn blend per update (default 0.15)" },
+    { "unk_50", offsetof(type_1227C0, unk_50), PF_INT, -1, "shots left before the long pause" },
+    { "unk_54", offsetof(type_1227C0, unk_54), PF_V3D, -1, "the target point (the entity's centre, or the script's point)" },
+    { "unk_60", offsetof(type_1227C0, unk_60_r), PF_REAL, -1, "scatter radius around a point target (world units)" },
+    { "unk_70.right", offsetof(type_1227C0, unk_70) + offsetof(RwMatrixTag, right), PF_V3D, -1, "its matrix: right" },
+    { "unk_70.up", offsetof(type_1227C0, unk_70) + offsetof(RwMatrixTag, up), PF_V3D, -1, "its matrix: up" },
+    { "unk_70.at", offsetof(type_1227C0, unk_70) + offsetof(RwMatrixTag, at), PF_V3D, -1, "its matrix: at (where it fires; the arc tests)" },
+    { "unk_70.pos", offsetof(type_1227C0, unk_70) + offsetof(RwMatrixTag, pos), PF_V3D, -1, "its matrix: position (the muzzle)" },
+    { "unk_B0", offsetof(type_1227C0, unk_B0), PF_V3D, -1, "the current aim point" },
+    { "unk_BC", offsetof(type_1227C0, unk_BC), PF_V3D, -1, "the previous aim point (sets the aim walk's direction)" },
+    { "unk_C8", offsetof(type_1227C0, unk_C8), PF_REAL, -1, "vertical aim offset (minus the target's height)" },
+    { "unk_CC", offsetof(type_1227C0, unk_CC), PF_REAL, -1, "its place along its path, 0 to 1" },
+    { "unk_D0", offsetof(type_1227C0, unk_D0), PF_REAL, -1, "path step per shot (its sign flips at the ends)" },
+    { "unk_D4", offsetof(type_1227C0, unk_D4), PF_INT, -1, "firing-arc check on (always 1)" },
+    { "unk_D8", offsetof(type_1227C0, unk_D8), PF_INT, -1, "passed on as the projectile's unk_48 (always 0)" },
+    { "unk_DC", offsetof(type_1227C0, unk_DC), PF_RO, -1, "its path (a SplinePath)" },
+    { "unk_E0", offsetof(type_1227C0, unk_E0), PF_INT, -1, "its parent entity (an entity id)" },
+    { "unk_E4", offsetof(type_1227C0, unk_E4), PF_INT, -1, "its attach point: the parent's 'PGN0'+n tag" },
+    { "unk_E8", offsetof(type_1227C0, unk_E8), PF_INT, -1, "its turret (an entity id)" },
+    { "unk_EC", offsetof(type_1227C0, unk_EC), PF_INT, -1, "its barrel (an entity id)" },
+    { "unk_F0", offsetof(type_1227C0, unk_F0), PF_INT, -1, "follows its parent: 0 no, 1 its frame, 2 the tag" },
+    { "unk_F4", offsetof(type_1227C0, unk_F4), PF_INT, -1, "fires from the turret's 'FIRE' tag (2) or frame" },
+    { "unk_F8", offsetof(type_1227C0, unk_F8), PF_INT, -1, "the barrel sits on the turret's 'OPR0' tag (2) or frame" },
+    { "unk_FC", offsetof(type_1227C0, unk_FC), PF_INT, -1, "the turret's 'ATMT' tag offset (2)" },
+    { "unk_104", offsetof(type_1227C0, unk_104), PF_RO, -1, "its id (index and serial)" },
+    { "unk_12C", offsetof(type_1227C0, unk_12C), PF_V3D, -1, "the turret's current facing (bullets)" },
+    { "unk_138", offsetof(type_1227C0, unk_138), PF_REAL, -1, "frames the turret holds its aim once the target leaves its arc (default 300)" },
+    { "unk_13C", offsetof(type_1227C0, unk_13C), PF_REAL, -1, "frames left of that hold" },
+    { "unk_140", offsetof(type_1227C0, unk_140), PF_INT, -1, "pause when its turret or barrel is hit: on" },
+    { "unk_144", offsetof(type_1227C0, unk_144), PF_REAL, -1, "frames left of that pause (bullets hold fire)" },
+    { "unk_148", offsetof(type_1227C0, unk_148), PF_HEX, -1, "that pause's range in frames (low word min, high max)" },
+    { "unk_14C", offsetof(type_1227C0, unk_14C), PF_HEX, -1, "the turret's hit points (high word) and the barrel's (low), last seen" },
+};
+
+static const PgField s_aPgTrigFields[] =
+{
+    { "unk_C0", offsetof(ProjectileGeneratorTrigger, unk_C0), PF_KEY, 2, "the parent entity it rides on" },
+    { "unk_C8", offsetof(ProjectileGeneratorTrigger, unk_C8), PF_INT, 3, "the parent's attach tag: 'PGN0'+n" },
+    { "unk_CC", offsetof(ProjectileGeneratorTrigger, unk_CC), PF_KEY, 4, "the turret entity (turned to the target; its FIRE tag is the muzzle)" },
+    { "unk_D4", offsetof(ProjectileGeneratorTrigger, unk_D4), PF_KEY, 6, "the barrel entity (kept on the turret's OPR0 tag)" },
+    { "unk_DC", offsetof(ProjectileGeneratorTrigger, unk_DC), PF_INT, 0, "its side: skipped when picking a target (0 is stored as 2)" },
+    { "unk_E0", offsetof(ProjectileGeneratorTrigger, unk_E0), PF_INT, 1, "the generator kind: 0 bullets, 1 lobbed shells" },
+    { "unk_E4", offsetof(ProjectileGeneratorTrigger, unk_E4), PF_INT, 10, "target choice: 0 the player, 1 the nearest enemy, 2 straight ahead" },
+    { "unk_E8", offsetof(ProjectileGeneratorTrigger, unk_E8), PF_KEY, 13, "a spline path to fire along (target mode 3)" },
+    { "unk_F0", offsetof(ProjectileGeneratorTrigger, unk_F0), PF_KEY, 11, "a named target point" },
+#ifdef CODFH_SP
+    { "unk_F8", offsetof(ProjectileGeneratorTrigger, unk_F8), PF_REAL, 12, "scatter radius around a point target" },
+#else
+    { "unk_F8", offsetof(ProjectileGeneratorTrigger, unk_F8), PF_INTREAL, 12, "scatter radius around a point target" },
+#endif
+    { "unk_FC", offsetof(ProjectileGeneratorTrigger, unk_FC_r), PF_REAL, 14, "speed along the path, per shot" },
+    { "unk_100", offsetof(ProjectileGeneratorTrigger, unk_100), PF_INT, 15, "shots before the long pause" },
+    { "unk_104", offsetof(ProjectileGeneratorTrigger, unk_104), PF_INT, 25, "chance (%) a projectile collides with the world (default 100)" },
+    { "unk_108", offsetof(ProjectileGeneratorTrigger, unk_108), PF_INT, 47, "shots per burst: from" },
+    { "unk_10C", offsetof(ProjectileGeneratorTrigger, unk_10C), PF_INT, 48, "... to" },
+    { "unk_110", offsetof(ProjectileGeneratorTrigger, unk_110), PF_INT, 5, "take its firing matrix from the turret on start (default 1)" },
+    { "unk_114", offsetof(ProjectileGeneratorTrigger, unk_114_r), PF_REAL, 16, "the long pause, frames" },
+    { "unk_118", offsetof(ProjectileGeneratorTrigger, unk_118), PF_REAL, 82, "turret turn blend per update (default 0.15)" },
+    { "unk_11C", offsetof(ProjectileGeneratorTrigger, unk_11C), PF_REAL, 83, "frames the turret holds its aim after losing the target (attr x60, default 5 s)" },
+    { "unk_120", offsetof(ProjectileGeneratorTrigger, unk_120_r), PF_REAL, 49, "pause between bursts, frames: from" },
+    { "unk_124", offsetof(ProjectileGeneratorTrigger, unk_124_r), PF_REAL, 50, "... to" },
+    { "unk_128", offsetof(ProjectileGeneratorTrigger, unk_128_r), PF_REAL, 17, "frames between shots" },
+    { "unk_12C", offsetof(ProjectileGeneratorTrigger, unk_12C), PF_REAL, 54, "random yaw spread, half angle (scaled by difficulty)" },
+    { "unk_130", offsetof(ProjectileGeneratorTrigger, unk_130), PF_REAL, 55, "random pitch spread, half angle (scaled by difficulty)" },
+    { "unk_134", offsetof(ProjectileGeneratorTrigger, unk_134), PF_REAL, 56, "horizontal firing arc (the cosine of half its degrees)" },
+    { "unk_138", offsetof(ProjectileGeneratorTrigger, unk_138), PF_REAL, 57, "vertical firing arc (the cosine of half its degrees)" },
+    { "unk_13C", offsetof(ProjectileGeneratorTrigger, unk_13C), PF_INT, 21, "built-in fire sound 0, 1 or 2 when no sound is set" },
+    { "unk_140", offsetof(ProjectileGeneratorTrigger, unk_140), PF_KEY, 19, "the firing (loop) sound" },
+    { "unk_148", offsetof(ProjectileGeneratorTrigger, unk_148), PF_KEY, 20, "the sound when firing stops" },
+    { "unk_150", offsetof(ProjectileGeneratorTrigger, unk_150), PF_INT, 18, "the stop sound is on" },
+    { "unk_154", offsetof(ProjectileGeneratorTrigger, unk_154), PF_INTREAL, 23, "projectile damage (also the blast damage)" },
+    { "unk_158", offsetof(ProjectileGeneratorTrigger, unk_158_r), PF_REAL, 24, "projectile launch speed" },
+    { "unk_15C", offsetof(ProjectileGeneratorTrigger, unk_15C), PF_REAL, 90, "artillery: the distance picking the near or far incoming sound (x100)" },
+    { "unk_160", offsetof(ProjectileGeneratorTrigger, unk_160), PF_REAL, 72, "stage 0: the first shot's miss distance (x100)" },
+    { "unk_164", offsetof(ProjectileGeneratorTrigger, unk_164), PF_INT, 73, "stage 0 length in bursts: from" },
+    { "unk_168", offsetof(ProjectileGeneratorTrigger, unk_168), PF_INT, 74, "... to" },
+    { "unk_16C", offsetof(ProjectileGeneratorTrigger, unk_16C), PF_REAL, 75, "stage 1 miss distance (x100)" },
+    { "unk_170", offsetof(ProjectileGeneratorTrigger, unk_170), PF_INT, 76, "stage 1 length in bursts: from" },
+    { "unk_174", offsetof(ProjectileGeneratorTrigger, unk_174), PF_INT, 77, "... to" },
+    { "unk_178", offsetof(ProjectileGeneratorTrigger, unk_178), PF_REAL, 78, "stage 2 miss distance (x100)" },
+    { "unk_17C", offsetof(ProjectileGeneratorTrigger, unk_17C), PF_INT, 79, "stage 2 length in bursts: from" },
+    { "unk_180", offsetof(ProjectileGeneratorTrigger, unk_180), PF_INT, 80, "... to" },
+    { "unk_184", offsetof(ProjectileGeneratorTrigger, unk_184), PF_REAL, 51, "aim walk step per later shot: from (x100)" },
+    { "unk_188", offsetof(ProjectileGeneratorTrigger, unk_188), PF_REAL, 52, "... to (x100)" },
+    { "unk_18C", offsetof(ProjectileGeneratorTrigger, unk_18C), PF_REAL, 53, "aim walk random turn about vertical, half range" },
+    { "unk_190", offsetof(ProjectileGeneratorTrigger, unk_190), PF_INT, 58, "shells explode on impact" },
+    { "unk_194", offsetof(ProjectileGeneratorTrigger, unk_194), PF_REAL, 59, "blast radius (x100)" },
+    { "unk_198", offsetof(ProjectileGeneratorTrigger, unk_198), PF_REAL, 60, "fuse time, frames: a nearby blast sets it off (x60)" },
+    { "unk_19C", offsetof(ProjectileGeneratorTrigger, unk_19C), PF_INT, -1, "(nothing reads it)" },
+    { "unk_1A0", offsetof(ProjectileGeneratorTrigger, unk_1A0), PF_REAL, 62, "blast range, posture class 1 (x100)" },
+    { "unk_1A4", offsetof(ProjectileGeneratorTrigger, unk_1A4), PF_REAL, 64, "blast range, posture class 2 (x100)" },
+    { "unk_1A8", offsetof(ProjectileGeneratorTrigger, unk_1A8), PF_INTREAL, 63, "maximum blast damage, posture class 1" },
+    { "unk_1AC", offsetof(ProjectileGeneratorTrigger, unk_1AC), PF_INTREAL, 65, "maximum blast damage, posture class 2" },
+    { "unk_1B0", offsetof(ProjectileGeneratorTrigger, unk_1B0), PF_REAL, 61, "inner radius of full damage (x100)" },
+    { "unk_1B4", offsetof(ProjectileGeneratorTrigger, unk_1B4), PF_REAL, 66, "the player's camera shake radius (x100)" },
+    { "unk_1B8", offsetof(ProjectileGeneratorTrigger, unk_1B8), PF_INTREAL, 67, "camera shake strength" },
+    { "unk_1BC", offsetof(ProjectileGeneratorTrigger, unk_1BC), PF_INT, 68, "(never copied: the game copies unk_1C8 where this likely belongs)" },
+    { "unk_1C0", offsetof(ProjectileGeneratorTrigger, unk_1C0), PF_INTREAL, 69, "camera shake fade per frame" },
+    { "unk_1C4", offsetof(ProjectileGeneratorTrigger, unk_1C4), PF_REAL, 70, "the player's shock radius (x100)" },
+    { "unk_1C8", offsetof(ProjectileGeneratorTrigger, unk_1C8), PF_INTREAL, 71, "shock strength (also copied as the shake duration)" },
+    { "unk_1CC", offsetof(ProjectileGeneratorTrigger, unk_1CC), PF_INT, 22, "projectile type: 0 bullet, 1 model shell, 3 artillery" },
+    { "unk_1D0", offsetof(ProjectileGeneratorTrigger, unk_1D0), PF_KEY, 22, "the projectile's mesh" },
+    { "unk_1D8", offsetof(ProjectileGeneratorTrigger, unk_1D8), PF_INT, 28, "muzzle particle system 1" },
+    { "unk_1DC", offsetof(ProjectileGeneratorTrigger, unk_1DC), PF_INT, 31, "muzzle particle system 2" },
+    { "unk_1E0", offsetof(ProjectileGeneratorTrigger, unk_1E0), PF_INT, 34, "muzzle particle system 3" },
+    { "unk_1E4", offsetof(ProjectileGeneratorTrigger, unk_1E4), PF_INT, 26, "muzzle particles on (all; and system 1)" },
+    { "unk_1E8", offsetof(ProjectileGeneratorTrigger, unk_1E8), PF_INT, 29, "muzzle particle 2 on" },
+    { "unk_1EC", offsetof(ProjectileGeneratorTrigger, unk_1EC), PF_INT, 32, "muzzle particle 3 on" },
+    { "unk_1F0", offsetof(ProjectileGeneratorTrigger, unk_1F0), PF_INT, 27, "muzzle particle 1 follows the generator (default 1)" },
+    { "unk_1F4", offsetof(ProjectileGeneratorTrigger, unk_1F4), PF_INT, 30, "muzzle particle 2 follows (default 1)" },
+    { "unk_1F8", offsetof(ProjectileGeneratorTrigger, unk_1F8), PF_INT, 33, "muzzle particle 3 follows (default 1)" },
+    { "unk_1FC", offsetof(ProjectileGeneratorTrigger, unk_1FC), PF_INT, 81, "bullets: line-of-sight check on" },
+    { "unk_200", offsetof(ProjectileGeneratorTrigger, unk_200), PF_INT, 84, "shells: the high lob arc (default 1)" },
+    { "unk_204", offsetof(ProjectileGeneratorTrigger, unk_204), PF_REAL, 85, "shell gravity (the attribute negated; default 1)" },
+    { "unk_208", offsetof(ProjectileGeneratorTrigger, unk_208), PF_INTREAL, 87, "shells: how fast the fall speeds up" },
+    { "unk_20C", offsetof(ProjectileGeneratorTrigger, unk_20C), PF_INTREAL, 88, "shells: frames before the fall speeds up" },
+    { "unk_210", offsetof(ProjectileGeneratorTrigger, unk_210), PF_INT, 86, "shells: the faster fall is on" },
+    { "unk_214", offsetof(ProjectileGeneratorTrigger, unk_214), PF_REAL, 89, "shell lifetime, seconds (default 15)" },
+    { "unk_218", offsetof(ProjectileGeneratorTrigger, unk_218), PF_INT, 98, "(nothing reads it)" },
+    { "unk_21C", offsetof(ProjectileGeneratorTrigger, unk_21C), PF_INT, 7, "pause firing when its turret or barrel is hit" },
+    { "unk_220", offsetof(ProjectileGeneratorTrigger, unk_220), PF_HEX, 8, "that pause's range in frames (commands 8 and 9: low, high words)" },
+    { "unk_228.unk_00", offsetof(ProjectileGeneratorTrigger, unk_228) + offsetof(type_429E54, unk_00), PF_HEX, 91, "the projectiles' colour (0xAARRGGBB)" },
+    { "unk_228.unk_04", offsetof(ProjectileGeneratorTrigger, unk_228) + offsetof(type_429E54, unk_04), PF_HEX, 92, "the other colour, blended at random (0: the first)" },
+    { "unk_228.unk_08", offsetof(ProjectileGeneratorTrigger, unk_228) + offsetof(type_429E54, unk_08), PF_INTREAL, 93, "the tracer's width" },
+    { "unk_228.unk_0C", offsetof(ProjectileGeneratorTrigger, unk_228) + offsetof(type_429E54, unk_0C), PF_INTREAL, 94, "the tracer's height" },
+    { "unk_228.unk_10", offsetof(ProjectileGeneratorTrigger, unk_228) + offsetof(type_429E54, unk_10), PF_INTREAL, 95, "the shortest life (tracer length)" },
+    { "unk_228.unk_14", offsetof(ProjectileGeneratorTrigger, unk_228) + offsetof(type_429E54, unk_14), PF_INTREAL, 96, "random extra life" },
+    { "unk_228.unk_18", offsetof(ProjectileGeneratorTrigger, unk_228) + offsetof(type_429E54, unk_18), PF_INTREAL, 97, "the tracer's fade distance" },
+    { "unk_244", offsetof(ProjectileGeneratorTrigger, unk_244), PF_INT, 35, "trail particle effect 1 on" },
+    { "unk_248", offsetof(ProjectileGeneratorTrigger, unk_248), PF_INT, 36, "trail effect 1: its particle system" },
+    { "unk_24C", offsetof(ProjectileGeneratorTrigger, unk_24C), PF_INT, 37, "trail effect 1: count" },
+    { "unk_250", offsetof(ProjectileGeneratorTrigger, unk_250), PF_REAL, 38, "trail effect 1: duration (x60)" },
+    { "unk_254", offsetof(ProjectileGeneratorTrigger, unk_254), PF_INT, 39, "trail effect 1: a value (its +0x2C)" },
+    { "unk_258", offsetof(ProjectileGeneratorTrigger, unk_258), PF_INT, 40, "trail effect 1: the node it follows" },
+    { "unk_25C", offsetof(ProjectileGeneratorTrigger, unk_25C), PF_INT, 41, "trail particle effect 2 on" },
+    { "unk_260", offsetof(ProjectileGeneratorTrigger, unk_260), PF_INT, 42, "trail effect 2: its particle system" },
+    { "unk_264", offsetof(ProjectileGeneratorTrigger, unk_264), PF_INT, 43, "trail effect 2: count" },
+    { "unk_268", offsetof(ProjectileGeneratorTrigger, unk_268), PF_REAL, 44, "trail effect 2: duration (x60)" },
+    { "unk_26C", offsetof(ProjectileGeneratorTrigger, unk_26C), PF_INT, 45, "trail effect 2: a value (its +0x2C)" },
+    { "unk_270", offsetof(ProjectileGeneratorTrigger, unk_270), PF_INT, 46, "trail effect 2: the node it follows" },
+};
+
+// The kinds' own: the bullets' (type_11DB10) and the shells' (type_11E440),
+// mostly their projectile settings, copied from the trigger on set-up.
+static const PgField s_aPgBulletFields[] =
+{
+    { "unk_150.unk_04", offsetof(type_11DB10, unk_150) + offsetof(type_10F710_1A48_29C, unk_04), PF_INTREAL, -1, "a plain bullet's damage (trigger unk_154)" },
+    { "unk_188.unk_04", offsetof(type_11DB10, unk_188) + offsetof(type_67260, unk_04), PF_INTREAL, -1, "a model projectile's damage" },
+    { "unk_188.unk_38", offsetof(type_11DB10, unk_188) + offsetof(type_67260, unk_38), PF_HEX, -1, "the projectile's model (the trigger's mesh)" },
+    { "unk_188.unk_40", offsetof(type_11DB10, unk_188) + offsetof(type_67260, unk_40), PF_INTREAL, -1, "gravity (0 here)" },
+    { "unk_188.unk_4C", offsetof(type_11DB10, unk_188) + offsetof(type_67260, unk_4C), PF_INTREAL, -1, "blast radius (world units)" },
+    { "unk_1D8", offsetof(type_11DB10, unk_1D8), PF_REAL, -1, "fuse time, frames (set off by a nearby blast)" },
+    { "unk_1DC", offsetof(type_11DB10, unk_1DC), PF_INTREAL, -1, "blast damage" },
+    { "unk_1E0", offsetof(type_11DB10, unk_1E0), PF_REAL, -1, "blast range, posture class 1" },
+    { "unk_1E4", offsetof(type_11DB10, unk_1E4), PF_REAL, -1, "blast range, posture class 2" },
+    { "unk_1E8", offsetof(type_11DB10, unk_1E8), PF_INTREAL, -1, "maximum blast damage, posture class 1" },
+    { "unk_1EC", offsetof(type_11DB10, unk_1EC), PF_INTREAL, -1, "maximum blast damage, posture class 2" },
+    { "unk_1F0", offsetof(type_11DB10, unk_1F0), PF_REAL, -1, "inner radius of full damage" },
+    { "unk_1F4", offsetof(type_11DB10, unk_1F4), PF_REAL, -1, "the player's camera shake radius" },
+    { "unk_1F8", offsetof(type_11DB10, unk_1F8), PF_INTREAL, -1, "camera shake strength" },
+    { "unk_1FC", offsetof(type_11DB10, unk_1FC), PF_INTREAL, -1, "camera shake duration (the game copies the shock strength here)" },
+    { "unk_200", offsetof(type_11DB10, unk_200), PF_INTREAL, -1, "camera shake fade per frame" },
+    { "unk_204", offsetof(type_11DB10, unk_204), PF_REAL, -1, "the player's shock radius" },
+    { "unk_208", offsetof(type_11DB10, unk_208), PF_INTREAL, -1, "shock strength" },
+    { "unk_20C", offsetof(type_11DB10, unk_20C), PF_INT, -1, "line-of-sight check on (\"PG_EnableLOSCheck\")" },
+};
+
+static const PgField s_aPgShellFields[] =
+{
+    { "unk_150.unk_00", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_00), PF_HEX16, -1, "projectile table: 7 no model, 8 with a model" },
+    { "unk_150.unk_04", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_04), PF_INTREAL, -1, "damage" },
+    { "unk_150.unk_38", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_38), PF_HEX, -1, "its model (table 8)" },
+    { "unk_150.unk_40", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_40), PF_INTREAL, -1, "gravity (the lob solve uses it too)" },
+    { "unk_150.unk_4C", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_4C), PF_INTREAL, -1, "blast radius (world units)" },
+    { "unk_150.unk_50", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_50), PF_REAL, -1, "fuse time, frames" },
+    { "unk_150.unk_54", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_54), PF_INTREAL, -1, "blast damage" },
+    { "unk_150.unk_58", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_58), PF_REAL, -1, "blast range, posture class 1" },
+    { "unk_150.unk_5C", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_5C), PF_REAL, -1, "blast range, posture class 2" },
+    { "unk_150.unk_60", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_60), PF_INTREAL, -1, "maximum blast damage, posture class 1" },
+    { "unk_150.unk_64", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_64), PF_INTREAL, -1, "maximum blast damage, posture class 2" },
+    { "unk_150.unk_68", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_68), PF_REAL, -1, "inner radius of full damage" },
+    { "unk_150.unk_6C", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_6C), PF_REAL, -1, "the player's camera shake radius" },
+    { "unk_150.unk_70", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_70), PF_INTREAL, -1, "camera shake strength" },
+    { "unk_150.unk_74", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_74), PF_INTREAL, -1, "camera shake duration (the game copies the shock strength here)" },
+    { "unk_150.unk_78", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_78), PF_INTREAL, -1, "camera shake fade per frame" },
+    { "unk_150.unk_7C", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_7C), PF_REAL, -1, "the player's shock radius" },
+    { "unk_150.unk_80", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_80), PF_INTREAL, -1, "shock strength" },
+    { "unk_150.unk_84", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_84), PF_INT, -1, "explodes on impact" },
+    { "unk_150.unk_88", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_88), PF_INTREAL, -1, "how fast the fall speeds up" },
+    { "unk_150.unk_8C", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_8C), PF_INTREAL, -1, "frames before the fall speeds up" },
+    { "unk_150.unk_90", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_90), PF_INT, -1, "the faster fall is on" },
+    { "unk_150.unk_94", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_94), PF_REAL, -1, "lifetime in seconds (default 15)" },
+    { "unk_150.unk_98", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_98), PF_REAL, -1, "predicted flight time, frames" },
+    { "unk_150.unk_9C", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_9C), PF_REAL, -1, "distance picking the near or far incoming sound" },
+    { "unk_150.unk_A0", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_A0), PF_REAL, -1, "frames until the incoming sound (flight time - 180)" },
+    { "unk_150.unk_A4", offsetof(type_11E440, unk_150) + offsetof(type_11E4A0, unk_A4), PF_V3D, -1, "the impact point (the incoming sound is placed there)" },
+};
+
+static RwChar s_szPgFieldFilter[32];
+static RwBool ReportHas(const RwChar *psz, const RwChar *pszPart);
+
+static void PgFieldRow(RwUInt8 *pBase, const PgField *pField, RwBool bCommands)
+{
+    RwUInt8 *p = pBase + pField->dwOffset;
+    RwUInt32 dw, dw2;
+
+    if (s_szPgFieldFilter[0] && !ReportHas(pField->pszName, s_szPgFieldFilter)
+        && !ReportHas(pField->pszDesc, s_szPgFieldFilter))
+        return;
+    if (!ReadU32(p, &dw) || ((pField->nKind == PF_V3D || pField->nKind == PF_KEY || pField->nKind == PF_V2D)
+                             && !ReadU32(p + 4, &dw2)))
+        return;
+    ImGui::PushID(pField->pszName);
+    ImGui::TableNextRow();
+    ImGui::TableNextColumn();
+    ImGui::TextUnformatted(pField->pszName);
+    if (bCommands)
+    {
+        ImGui::TableNextColumn();
+        if (pField->nCommand >= 0)
+            ImGui::Text("%d", pField->nCommand);
+    }
+    ImGui::TableNextColumn();
+    ImGui::SetNextItemWidth(230.0f);
+    switch (pField->nKind)
+    {
+    case PF_INT:
+    case PF_INTREAL:
+        ImGui::InputInt("##v", (int *)p, 0, 0, ImGuiInputTextFlags_EnterReturnsTrue);
+        break;
+    case PF_REAL:
+        ImGui::InputFloat("##v", (float *)p, 0.0f, 0.0f, "%g", ImGuiInputTextFlags_EnterReturnsTrue);
+        break;
+    case PF_HEX:
+        ImGui::InputScalar("##v", ImGuiDataType_U32, p, NULL, NULL, "%08X",
+                           ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsHexadecimal);
+        break;
+    case PF_HEX16:
+        ImGui::InputScalar("##v", ImGuiDataType_U16, p, NULL, NULL, "%04X",
+                           ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsHexadecimal);
+        break;
+    case PF_I16:
+        ImGui::InputScalar("##v", ImGuiDataType_S16, p, NULL, NULL, "%d", ImGuiInputTextFlags_EnterReturnsTrue);
+        break;
+    case PF_BYTE:
+        ImGui::InputScalar("##v", ImGuiDataType_U8, p, NULL, NULL, "%u", ImGuiInputTextFlags_EnterReturnsTrue);
+        break;
+    case PF_TEXT:
+        ImGui::InputText("##v", (char *)p, pField->nSize > 0 ? pField->nSize : 32,
+                         ImGuiInputTextFlags_EnterReturnsTrue);
+        break;
+    case PF_V2D:
+        ImGui::InputFloat2("##v", (float *)p, "%g", ImGuiInputTextFlags_EnterReturnsTrue);
+        break;
+    case PF_RGBA:
+    {
+        RwRGBA *pc = (RwRGBA *)p;
+        float af[4] = {pc->red / 255.0f, pc->green / 255.0f, pc->blue / 255.0f, pc->alpha / 255.0f};
+
+        if (ImGui::ColorEdit4("##v", af, ImGuiColorEditFlags_AlphaBar))
+        {
+            pc->red = (RwUInt8)(af[0] * 255.0f + 0.5f);
+            pc->green = (RwUInt8)(af[1] * 255.0f + 0.5f);
+            pc->blue = (RwUInt8)(af[2] * 255.0f + 0.5f);
+            pc->alpha = (RwUInt8)(af[3] * 255.0f + 0.5f);
+        }
+        break;
+    }
+    case PF_V3D:
+        ImGui::InputFloat3("##v", (float *)p, "%g", ImGuiInputTextFlags_EnterReturnsTrue);
+        break;
+    case PF_KEY:
+        ImGui::InputScalarN("##v", ImGuiDataType_U32, p, 2, NULL, NULL, "%08X",
+                            ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CharsHexadecimal);
+        break;
+    default:
+        ImGui::Text("0x%08X", dw);
+    }
+    ImGui::TableNextColumn();
+    // the same bits read the other way
+    if (pField->nKind == PF_INT || pField->nKind == PF_HEX)
+        ImGui::TextDisabled("%g", *(RwReal *)&dw);
+    else if (pField->nKind == PF_I16 || pField->nKind == PF_BYTE || pField->nKind == PF_HEX16)
+        ImGui::TextDisabled("0x%X", pField->nKind == PF_BYTE ? dw & 0xFF : dw & 0xFFFF);
+    else if (pField->nKind == PF_REAL)
+        ImGui::TextDisabled("%d", (RwInt32)dw);
+    else if (pField->nKind == PF_INTREAL)
+    {
+        ImGui::SetNextItemWidth(120.0f);
+        ImGui::InputFloat("##r", (float *)p, 0.0f, 0.0f, "%g", ImGuiInputTextFlags_EnterReturnsTrue);
+    }
+    ImGui::TableNextColumn();
+    ImGui::TextDisabled("%s", pField->pszDesc);
+    ImGui::PopID();
+}
+
+static void PgFieldTable(const RwChar *pszId, RwUInt8 *pBase, const PgField *pFields, RwInt32 nFields,
+                         RwBool bCommands)
+{
+    RwInt32 i;
+
+    if (!ImGui::BeginTable(pszId, bCommands ? 5 : 4, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg))
+        return;
+    ImGui::TableSetupColumn("field");
+    if (bCommands)
+        ImGui::TableSetupColumn("command");
+    ImGui::TableSetupColumn("value (Enter sets it)");
+    ImGui::TableSetupColumn("the other way");
+    ImGui::TableSetupColumn("what it is");
+    ImGui::TableHeadersRow();
+    __try
+    {
+        for (i = 0; i < nFields; i++)
+            PgFieldRow(pBase, &pFields[i], bCommands);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    ImGui::EndTable();
+}
+
+static void TabGenerator()
+{
+    type_10F710 *pPlayer = (type_10F710 *)sub_1745A0(0);
+    RwV3d vFrom = {0.0f, 0.0f, 0.0f};
+    RwInt32 n, i, nSel = -1;
+    RwChar szPreview[64];
+
+    if (pPlayer == NULL || !PlayerPosition(pPlayer, &vFrom))
+        vFrom.x = vFrom.y = vFrom.z = 0.0f;
+    n = PgList(&vFrom);
+    for (i = 0; i < n; i++)
+        if (s_aPg[i].nId == s_nPgSel)
+            nSel = i;
+    if (nSel < 0 && n > 0)
+    {
+        nSel = 0;
+        s_nPgSel = s_aPg[0].nId;
+    }
+    if (nSel < 0)
+    {
+        ImGui::Text("No projectile generators are live.");
+        return;
+    }
+    sprintf(szPreview, "%d (%s, %.0f away)", s_aPg[nSel].nId & 0xFFFF, s_aPg[nSel].nKind ? "shells" : "bullets",
+            s_aPg[nSel].fDist);
+    ImGui::SetNextItemWidth(240.0f);
+    if (ImGui::BeginCombo("generator (nearest first)", szPreview))
+    {
+        for (i = 0; i < n; i++)
+        {
+            RwChar sz[64];
+
+            sprintf(sz, "%d (%s, %.0f away)##%d", s_aPg[i].nId & 0xFFFF, s_aPg[i].nKind ? "shells" : "bullets",
+                    s_aPg[i].fDist, i);
+            if (ImGui::Selectable(sz, i == nSel))
+                s_nPgSel = s_aPg[i].nId;
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::SameLine();
+    if (ImGui::SmallButton("look"))
+        TrigDrawFreeCamLookAt(&s_aPg[nSel].vPos);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(160.0f);
+    ImGui::InputText("filter##pgf", s_szPgFieldFilter, sizeof(s_szPgFieldFilter));
+    if (ImGui::CollapsingHeader("The generator (type_1227C0), live", ImGuiTreeNodeFlags_DefaultOpen))
+        PgFieldTable("pggen", (RwUInt8 *)s_aPg[nSel].pGen, s_aPgGenFields,
+                     sizeof(s_aPgGenFields) / sizeof(s_aPgGenFields[0]), FALSE);
+    if (s_aPg[nSel].nKind == 0 &&
+        ImGui::CollapsingHeader("The bullets' own (type_11DB10)", ImGuiTreeNodeFlags_DefaultOpen))
+        PgFieldTable("pgbul", (RwUInt8 *)s_aPg[nSel].pGen, s_aPgBulletFields,
+                     sizeof(s_aPgBulletFields) / sizeof(s_aPgBulletFields[0]), FALSE);
+    if (s_aPg[nSel].nKind == 1 &&
+        ImGui::CollapsingHeader("The shells' own (type_11E440)", ImGuiTreeNodeFlags_DefaultOpen))
+        PgFieldTable("pgshl", (RwUInt8 *)s_aPg[nSel].pGen, s_aPgShellFields,
+                     sizeof(s_aPgShellFields) / sizeof(s_aPgShellFields[0]), FALSE);
+    if (ImGui::CollapsingHeader("Its trigger (ProjectileGeneratorTrigger)", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (s_aPg[nSel].pTrigger == NULL)
+            ImGui::Text("It has no trigger.");
+        else
+        {
+            ImGui::TextDisabled("The generator copies some of these when it is set up (into the rows above) and "
+                                "reads others as it fires. Times are in frames (60 a second).");
+            PgFieldTable("pgtrig", (RwUInt8 *)s_aPg[nSel].pTrigger, s_aPgTrigFields,
+                         sizeof(s_aPgTrigFields) / sizeof(s_aPgTrigFields[0]), TRUE);
+        }
+    }
+}
+
+// ---- Trigger ----
+
+// Every field of any trigger, editable: Enter sets a value. The tables
+// (triggerfields.inc, generated by tools/gen_triggerfields.py) hold each
+// class's own fields with the attribute command that sets them and what
+// they do where traced (tools/triggerfields_desc.json). A trigger's class
+// is found by its kind (vf_008); the classes that share one are picked by
+// hand. Most fields are read when the trigger acts (its spawn, its set-up);
+// the ones marked (live) are read as the game runs.
+struct TrigFieldClass
+{
+    const RwChar *pszClass;
+    RwInt32 nKind;
+    const RwChar *pszBase;
+    const PgField *pFields;
+    RwInt32 nFields;
+};
+
+#include "triggerfields.inc"
+
+#define TRIGFIELD_CLASSES (RwInt32)(sizeof(s_aTrigFieldClasses) / sizeof(s_aTrigFieldClasses[0]))
+
+static const TrigFieldClass *TrigFieldClassNamed(const RwChar *pszName)
+{
+    RwInt32 i;
+
+    for (i = 0; i < TRIGFIELD_CLASSES; i++)
+        if (strcmp(s_aTrigFieldClasses[i].pszClass, pszName) == 0)
+            return &s_aTrigFieldClasses[i];
+    return NULL;
+}
+
+static RwInt32 TrigKind(Trigger *pTrigger)
+{
+    __try
+    {
+        return pTrigger->vf_008();
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return -1;
+    }
+}
+
+// The class picked for a kind shared by several ("view as"), by kind.
+static RwInt32 s_anTrigViewAs[0x40];
+
+static void TabTrigger()
+{
+    type_10F710 *pPlayer = (type_10F710 *)sub_1745A0(0);
+    RwV3d vFrom = {0.0f, 0.0f, 0.0f};
+    RwInt32 i, nLast = dword_429D00, nKind, nBest = -1, nHandle, nCands = 0;
+    RwReal fBest = 1e30f;
+    Trigger *pTrigger = NULL;
+    const TrigFieldClass *apCands[8];
+    const TrigFieldClass *pClass;
+    RwChar szPreview[96];
+
+    if (pPlayer == NULL || !PlayerPosition(pPlayer, &vFrom))
+        vFrom.x = vFrom.y = vFrom.z = 0.0f;
+    if (nLast >= 2000)
+        nLast = 1999;
+    // (none picked: the nearest)
+    if (s_nTrigEdit < 0 || s_nTrigEdit > nLast || dword_4CFE30[s_nTrigEdit] == 0)
+    {
+        for (i = 0; i <= nLast; i++)
+        {
+            Trigger *p = (Trigger *)dword_4CFE30[i];
+            RwReal fX, fY, fZ, fD;
+
+            if (p == NULL || !ReadF32(&p->unk_90, &fX) || !ReadF32(&p->unk_94, &fY) || !ReadF32(&p->unk_98, &fZ))
+                continue;
+            fD = (fX - vFrom.x) * (fX - vFrom.x) + (fY - vFrom.y) * (fY - vFrom.y) + (fZ - vFrom.z) * (fZ - vFrom.z);
+            if (fD < fBest)
+            {
+                fBest = fD;
+                nBest = i;
+            }
+        }
+        nHandle = nBest;
+    }
+    else
+        nHandle = s_nTrigEdit;
+    if (nHandle >= 0)
+        pTrigger = (Trigger *)dword_4CFE30[nHandle];
+    nKind = pTrigger ? TrigKind(pTrigger) : -1;
+
+    if (pTrigger)
+        sprintf(szPreview, "%d: %s%s", nHandle, TrigDrawKindName(pTrigger), s_nTrigEdit < 0 ? " (the nearest)" : "");
+    else
+        strcpy(szPreview, "none");
+    ImGui::SetNextItemWidth(360.0f);
+    if (ImGui::BeginCombo("trigger", szPreview, ImGuiComboFlags_HeightLarge))
+    {
+        if (ImGui::Selectable("the nearest", s_nTrigEdit < 0))
+            s_nTrigEdit = -1;
+        for (i = 0; i <= nLast; i++)
+        {
+            Trigger *p = (Trigger *)dword_4CFE30[i];
+            RwChar sz[80];
+
+            if (p == NULL || TrigKind(p) < 0)
+                continue;
+            sprintf(sz, "%d: %s##t%d", i, TrigDrawKindName(p), i);
+            if (ImGui::Selectable(sz, i == s_nTrigEdit))
+                s_nTrigEdit = i;
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::SameLine();
+    ImGui::TextDisabled("at 0x%08X; or edit in the Triggers tab", (RwUInt32)pTrigger);
+    if (pTrigger == NULL)
+    {
+        ImGui::Text("No trigger to edit.");
+        return;
+    }
+    // its class: by its kind, picked by hand when several share it
+    for (i = 0; i < TRIGFIELD_CLASSES && nCands < 8; i++)
+        if (s_aTrigFieldClasses[i].nKind == nKind && nKind > 0)
+            apCands[nCands++] = &s_aTrigFieldClasses[i];
+    pClass = NULL;
+    if (nCands > 0)
+    {
+        RwInt32 nPick = nKind < 0x40 ? s_anTrigViewAs[nKind] : 0;
+
+        if (nPick >= nCands)
+            nPick = 0;
+        pClass = apCands[nPick];
+        if (nCands > 1)
+        {
+            ImGui::SetNextItemWidth(260.0f);
+            if (ImGui::BeginCombo("view as (classes of this kind)", pClass->pszClass))
+            {
+                for (i = 0; i < nCands; i++)
+                    if (ImGui::Selectable(apCands[i]->pszClass, i == nPick) && nKind < 0x40)
+                        s_anTrigViewAs[nKind] = i;
+                ImGui::EndCombo();
+            }
+        }
+    }
+    ImGui::SetNextItemWidth(160.0f);
+    ImGui::InputText("filter##tf", s_szPgFieldFilter, sizeof(s_szPgFieldFilter));
+    ImGui::SameLine();
+    ImGui::TextDisabled("[how] rows: only the storage is known yet");
+    if (pClass == NULL)
+        ImGui::Text("Kind %d has no table; only the base Trigger's fields.", nKind);
+    else
+    {
+        // the class's own, then its bases' (other than Trigger)
+        const TrigFieldClass *pC = pClass;
+        RwInt32 nDepth = 0;
+
+        while (pC != NULL && nDepth++ < 4)
+        {
+            RwChar szHead[96];
+
+            sprintf(szHead, "%s%s", pC->pszClass, pC == pClass ? "" : " (its base)");
+            if (ImGui::CollapsingHeader(szHead, ImGuiTreeNodeFlags_DefaultOpen))
+                PgFieldTable(pC->pszClass, (RwUInt8 *)pTrigger, pC->pFields, pC->nFields, TRUE);
+            if (pC->pszBase[0] == 0 || strcmp(pC->pszBase, "Trigger") == 0)
+                break;
+            pC = TrigFieldClassNamed(pC->pszBase);
+        }
+    }
+    pClass = TrigFieldClassNamed("Trigger");
+    if (pClass && ImGui::CollapsingHeader("Trigger (the base: shape, flags, matrix, script)"))
+        PgFieldTable("Trigger", (RwUInt8 *)pTrigger, pClass->pFields, pClass->nFields, TRUE);
+}
+
+// ---- Shell ----
+
+// The shell manager's settings (dword_4B8EF0, type_E8F90), live and
+// editable: the level's (CShellLevelBehaviorClass: the command column) and
+// the front end's (CShellBehaviorClass: its commands in the text). The level
+// behaviour's commands 6 and 7 name the opening and closing movies, kept
+// elsewhere (unk_4B8EA8, unk_4B8EB0).
+static const PgField s_aShellFields[] =
+{
+    { "unk_00", offsetof(type_E8F90, unk_00), PF_REAL, 0, "north offset, degrees: the compass and radar turn by it (live)", 0 },
+    { "unk_04", offsetof(type_E8F90, unk_04), PF_INTREAL, -1, "text manager lines: x, pixels (CShellBehavior 84) (live)", 0 },
+    { "unk_08", offsetof(type_E8F90, unk_08), PF_INTREAL, -1, "text manager lines: y, pixels (CShellBehavior 84) (live)", 0 },
+    { "unk_0C", offsetof(type_E8F90, unk_0C) + 0, PF_RGBA, -1, "text colour, kind 0 (CShellBehavior 85) (live)", 0 },
+    { "unk_0C+4", offsetof(type_E8F90, unk_0C) + 4, PF_RGBA, -1, "text colour, kind 2 (CShellBehavior 86) (live)", 0 },
+    { "unk_0C+8", offsetof(type_E8F90, unk_0C) + 8, PF_RGBA, -1, "text colour, kind 1 (CShellBehavior 87) (live)", 0 },
+    { "unk_0C+12", offsetof(type_E8F90, unk_0C) + 12, PF_REAL, -1, "text typing interval, seconds (CShellBehavior 88) (live)", 0 },
+    { "unk_1C", offsetof(type_E8F90, unk_1C), PF_INTREAL, -1, "CShellBehavior 104, ms (nothing reads it)", 0 },
+    { "unk_20", offsetof(type_E8F90, unk_20), PF_INTREAL, -1, "CShellBehavior 105, ms (nothing reads it)", 0 },
+    { "unk_24", offsetof(type_E8F90, unk_24), PF_INTREAL, 3, "HUD items: alpha at rest, 0 to 1 (live)", 0 },
+    { "unk_28", offsetof(type_E8F90, unk_28), PF_INTREAL, 4, "HUD items: alpha when flashed, 0 to 1 (live)", 0 },
+    { "unk_2C", offsetof(type_E8F90, unk_2C), PF_REAL, 2, "how long a flashed HUD item stays lit, ms (live)", 0 },
+    { "unk_30", offsetof(type_E8F90, unk_30), PF_RO, -1, "two colours (CShellBehavior 26, 27; nothing reads them)", 0 },
+    { "unk_38", offsetof(type_E8F90, unk_38), PF_RGBA, 5, "crosshair colour (the command pushes it to the HUD at once; this copy is unread)", 0 },
+    { "unk_3C", offsetof(type_E8F90, unk_3C) + 0, PF_REAL, -1, "the player's aim ray length, units (CShellBehavior 28); 0 skips the aim pass (live)", 0 },
+    { "unk_40", offsetof(type_E8F90, unk_40), PF_REAL, -1, "radar range: a blip sits at distance/100/this (5 at set-up) (live)", 0 },
+    { "unk_44", offsetof(type_E8F90, unk_44) + 0, PF_RGBA, -1, "vehicle armour bar colour, one end (CShellBehavior 68)", 0 },
+    { "unk_44+4", offsetof(type_E8F90, unk_44) + 4, PF_RGBA, -1, "vehicle armour bar colour, the other end (CShellBehavior 69)", 0 },
+    { "unk_64", offsetof(type_E8F90, unk_64), PF_INTREAL, -1, "pause screen objectives list: x (CShellBehavior 89; single player)", 0 },
+    { "unk_68", offsetof(type_E8F90, unk_68), PF_INTREAL, -1, "pause screen objectives list: y (CShellBehavior 89; single player)", 0 },
+    { "unk_6C", offsetof(type_E8F90, unk_6C), PF_RO, -1, "pause fade, help text colour, place, size, fade and hold, box, scroll speed (CShellBehavior 94-118)", 0 },
+    { "unk_B4", offsetof(type_E8F90, unk_B4), PF_KEY, -1, "pickup text, kinds 75-77", 0 },
+    { "unk_BC", offsetof(type_E8F90, unk_BC), PF_KEY, -1, "Luger ammo pickup text", 0 },
+    { "unk_C4", offsetof(type_E8F90, unk_C4), PF_KEY, -1, "PPSH ammo pickup text", 0 },
+    { "unk_CC", offsetof(type_E8F90, unk_CC), PF_KEY, -1, "Thompson ammo pickup text", 0 },
+    { "unk_D4", offsetof(type_E8F90, unk_D4), PF_KEY, -1, "MP40 ammo pickup text", 0 },
+    { "unk_DC", offsetof(type_E8F90, unk_DC), PF_KEY, -1, "Sten ammo pickup text", 0 },
+    { "unk_E4", offsetof(type_E8F90, unk_E4), PF_KEY, -1, "BAR ammo pickup text", 0 },
+    { "unk_EC", offsetof(type_E8F90, unk_EC), PF_KEY, -1, "DP ammo pickup text", 0 },
+    { "unk_F4", offsetof(type_E8F90, unk_F4), PF_KEY, -1, "MG42 ammo pickup text", 0 },
+    { "unk_FC", offsetof(type_E8F90, unk_FC), PF_KEY, -1, "Bren ammo pickup text", 0 },
+    { "unk_104", offsetof(type_E8F90, unk_104), PF_KEY, -1, "M1919A6 ammo pickup text", 0 },
+    { "unk_10C", offsetof(type_E8F90, unk_10C), PF_KEY, -1, "Enfield ammo pickup text", 0 },
+    { "unk_114", offsetof(type_E8F90, unk_114), PF_KEY, -1, "G43 ammo pickup text", 0 },
+    { "unk_11C", offsetof(type_E8F90, unk_11C), PF_KEY, -1, "Kar98 ammo pickup text", 0 },
+    { "unk_124", offsetof(type_E8F90, unk_124), PF_KEY, -1, "Nagant Sniper ammo pickup text", 0 },
+    { "unk_12C", offsetof(type_E8F90, unk_12C), PF_KEY, -1, "(nothing reads it)", 0 },
+    { "unk_134", offsetof(type_E8F90, unk_134), PF_KEY, -1, "Springfield ammo pickup text", 0 },
+    { "unk_13C", offsetof(type_E8F90, unk_13C), PF_KEY, -1, "Bazooka ammo pickup text", 0 },
+    { "unk_144", offsetof(type_E8F90, unk_144), PF_KEY, -1, "Mosin Nagant ammo pickup text", 0 },
+    { "unk_14C", offsetof(type_E8F90, unk_14C), PF_KEY, -1, "Panzerschreck ammo pickup text", 0 },
+    { "unk_154", offsetof(type_E8F90, unk_154), PF_KEY, -1, "Grease Gun ammo pickup text", 0 },
+    { "unk_15C", offsetof(type_E8F90, unk_15C), PF_KEY, -1, "M1 Garand ammo pickup text", 0 },
+    { "unk_164", offsetof(type_E8F90, unk_164), PF_KEY, -1, "pickup text, kinds 78-79 (?)", 0 },
+    { "unk_16C", offsetof(type_E8F90, unk_16C), PF_KEY, -1, "pickup text, kinds 80-81 (?)", 0 },
+    { "unk_174", offsetof(type_E8F90, unk_174), PF_KEY, -1, "pickup text, kinds 82-83 (?)", 0 },
+    { "unk_17C", offsetof(type_E8F90, unk_17C), PF_KEY, -1, "pickup text, kinds 84-85 (?)", 0 },
+    { "unk_184", offsetof(type_E8F90, unk_184), PF_KEY, -1, "pickup text, kinds 86-87 (?)", 0 },
+    { "unk_18C", offsetof(type_E8F90, unk_18C), PF_KEY, -1, "pickup text, kinds 88-89 (?)", 0 },
+    { "unk_194", offsetof(type_E8F90, unk_194), PF_KEY, -1, "teddy bear pickup text", 0 },
+    { "unk_19C", offsetof(type_E8F90, unk_19C), PF_KEY, -1, "Kaiser bear pickup text", 0 },
+    { "unk_1A4", offsetof(type_E8F90, unk_1A4), PF_KEY, -1, "Sticky bear pickup text", 0 },
+    { "unk_1AC", offsetof(type_E8F90, unk_1AC), PF_KEY, -1, "PPSH weapon pickup text", 0 },
+    { "unk_1B4", offsetof(type_E8F90, unk_1B4), PF_KEY, -1, "Luger weapon pickup text", 0 },
+    { "unk_1BC", offsetof(type_E8F90, unk_1BC), PF_KEY, -1, "Thompson weapon pickup text", 0 },
+    { "unk_1C4", offsetof(type_E8F90, unk_1C4), PF_KEY, -1, "MP40 weapon pickup text", 0 },
+    { "unk_1CC", offsetof(type_E8F90, unk_1CC), PF_KEY, -1, "Sten weapon pickup text", 0 },
+    { "unk_1D4", offsetof(type_E8F90, unk_1D4), PF_KEY, -1, "BAR weapon pickup text", 0 },
+    { "unk_1DC", offsetof(type_E8F90, unk_1DC), PF_KEY, -1, "DP weapon pickup text", 0 },
+    { "unk_1E4", offsetof(type_E8F90, unk_1E4), PF_KEY, -1, "MG42 weapon pickup text", 0 },
+    { "unk_1EC", offsetof(type_E8F90, unk_1EC), PF_KEY, -1, "Bren weapon pickup text", 0 },
+    { "unk_1F4", offsetof(type_E8F90, unk_1F4), PF_KEY, -1, "M1919A6 weapon pickup text", 0 },
+    { "unk_1FC", offsetof(type_E8F90, unk_1FC), PF_KEY, -1, "Mosin Nagant weapon pickup text", 0 },
+    { "unk_204", offsetof(type_E8F90, unk_204), PF_KEY, -1, "Kar98 weapon pickup text", 0 },
+    { "unk_20C", offsetof(type_E8F90, unk_20C), PF_KEY, -1, "M1 Garand weapon pickup text", 0 },
+    { "unk_214", offsetof(type_E8F90, unk_214), PF_KEY, -1, "Springfield weapon pickup text", 0 },
+    { "unk_21C", offsetof(type_E8F90, unk_21C), PF_KEY, -1, "Bazooka weapon pickup text", 0 },
+    { "unk_224", offsetof(type_E8F90, unk_224), PF_KEY, -1, "Panzerschreck weapon pickup text", 0 },
+    { "unk_22C", offsetof(type_E8F90, unk_22C), PF_KEY, -1, "Enfield weapon pickup text", 0 },
+    { "unk_234", offsetof(type_E8F90, unk_234), PF_KEY, -1, "G43 weapon pickup text", 0 },
+    { "unk_23C", offsetof(type_E8F90, unk_23C), PF_KEY, -1, "Grease Gun weapon pickup text", 0 },
+    { "unk_244", offsetof(type_E8F90, unk_244), PF_KEY, -1, "Nagant Sniper weapon pickup text", 0 },
+    { "unk_24C", offsetof(type_E8F90, unk_24C), PF_KEY, -1, "objective updated message text", 0 },
+    { "unk_254", offsetof(type_E8F90, unk_254), PF_KEY, -1, "level end checkpoint message text", 0 },
+    { "unk_25C", offsetof(type_E8F90, unk_25C), PF_KEY, -1, "checkpoint message text", 0 },
+    { "unk_264", offsetof(type_E8F90, unk_264), PF_INTREAL, -1, "hit direction marker lifetime, ms (CShellBehavior 100) (live)", 0 },
+    { "unk_268", offsetof(type_E8F90, unk_268) + 0, PF_REAL, -1, "name label: lift above the head bone (CShellBehavior 12) (live)", 0 },
+    { "unk_268+4", offsetof(type_E8F90, unk_268) + 4, PF_REAL, -1, "name label: show time, frames (13) (live)", 0 },
+    { "unk_268+8", offsetof(type_E8F90, unk_268) + 8, PF_REAL, -1, "name label: fade start, frames (14) (live)", 0 },
+    { "unk_268+12", offsetof(type_E8F90, unk_268) + 12, PF_REAL, -1, "name label: fade distance squared, near (15) (live)", 0 },
+    { "unk_268+16", offsetof(type_E8F90, unk_268) + 16, PF_REAL, -1, "name label: fade distance squared, far (16) (live)", 0 },
+    { "unk_27C", offsetof(type_E8F90, unk_27C), PF_INT, -1, "CShellBehavior 173 (nothing reads it)", 0 },
+    { "unk_280", offsetof(type_E8F90, unk_280), PF_INT, -1, "CShellBehavior 174 (nothing reads it)", 0 },
+    { "unk_284", offsetof(type_E8F90, unk_284), PF_RO, -1, "a 2D point and a colour (CShellBehavior 175, 176; nothing reads them)", 0 },
+    { "unk_29C", offsetof(type_E8F90, unk_29C), PF_INT, 8, "the credits flag (dword_4B918C): Credits.bik plays after the closing movie", 0 },
+    { "unk_2A0", offsetof(type_E8F90, unk_2A0), PF_RO, -1, "the HUD (dword_4B9190), built with flag 4", 0 },
+    { "unk_2A4", offsetof(type_E8F90, unk_2A4), PF_HEX, -1, "module flags: 4 the HUD (live)", 0 },
+    { "unk_2A8", offsetof(type_E8F90, unk_2A8), PF_RO, -1, "the shell camera", 0 },
+    { "unk_2AC", offsetof(type_E8F90, unk_2AC), PF_TEXT, -1, "the shell's fonts path", 128 },
+    { "unk_32C", offsetof(type_E8F90, unk_32C), PF_REAL, -1, "loading bar progress, 0 to 1", 0 },
+};
+
+static void TabShell()
+{
+    ImGui::TextDisabled("dword_4B8EF0 at 0x%08X. The rows marked (live) are read as the game runs.",
+                        (RwUInt32)&dword_4B8EF0);
+    ImGui::SetNextItemWidth(160.0f);
+    ImGui::InputText("filter##shell", s_szPgFieldFilter, sizeof(s_szPgFieldFilter));
+    PgFieldTable("shell", (RwUInt8 *)(type_E8F90 *)&dword_4B8EF0, s_aShellFields,
+                 sizeof(s_aShellFields) / sizeof(s_aShellFields[0]), TRUE);
+}
+
+// ---- Switches and tunables ----
+
+// The game's leftover switches and tuning values (a whole-tree scan for
+// globals tested but never set, then traced): declared here with their
+// definitions' types; those of one build only guarded.
+extern RwInt32 dword_4CF444;
+extern RwInt32 dword_4E5F00;
+extern RwUInt8 byte_4CF400;
+extern RwUInt8 byte_4CF7D0;
+extern RwInt32 dword_4B6764;
+extern RwInt32 dword_4B8210;
+#ifndef CODFH_SP
+extern RwInt32 dword_4FBC3C;
+#endif
+extern RwInt32 dword_44E840;
+extern RwInt32 dword_44E844;
+extern RwInt32 dword_44E848;
+extern RwInt32 dword_44E84C;
+extern RwInt32 dword_44E850;
+extern RwInt32 dword_44E854;
+extern RwInt32 dword_44E858;
+extern RwInt32 dword_44E85C;
+extern RwInt32 dword_44E838;
+extern RwInt32 dword_44E83C;
+extern RwInt32 dword_44E868;
+extern RwInt32 dword_44E884;
+extern bool byte_4B92AE;
+extern bool byte_4B8975;
+extern RwReal flt_429C38;
+extern RwReal flt_4CF7CC;
+extern RwInt32 dword_4B87DC;
+extern bool byte_42929C;
+extern RwReal dword_42928C;
+extern RwReal dword_4275C8;
+extern RwReal dword_4290C0;
+extern RwReal dword_4290C4;
+extern RwReal dword_4290C8;
+extern RwReal flt_427400;
+extern RwReal flt_4275B8;
+extern RwReal flt_4275BC;
+extern RwReal flt_4275C0;
+extern RwReal flt_4275C4;
+extern RwReal flt_4275DC;
+extern RwReal flt_4275E0;
+extern RwReal flt_4275E4;
+extern RwReal flt_4275E8;
+extern RwReal flt_427680;
+extern RwReal flt_4290CC;
+extern RwReal flt_4290D0;
+extern RwReal flt_4290DC;
+extern RwReal flt_4290E0;
+extern RwReal flt_429AA4;
+extern RwReal flt_429CC0;
+extern RwReal flt_429CC4;
+extern RwReal flt_429E94;
+extern RwReal flt_429E98;
+extern RwReal flt_429E9C;
+extern RwReal flt_4C0198;
+extern RwInt32 dword_4296D8;
+extern RwUInt32 dword_4296F0;
+extern RwReal flt_4296DC;
+extern RwReal flt_4296E0;
+extern RwReal flt_4296E4;
+extern RwReal flt_4296E8;
+extern RwInt32 dword_429D74;
+extern RwInt32 dword_429D8C;
+extern RwReal flt_429D68;
+extern RwReal flt_429D88;
+extern RwReal flt_429D9C;
+extern RwReal flt_429DD8;
+extern RwReal flt_429DDC;
+extern RwReal flt_429DE0;
+extern RwInt32 dword_429B3C;
+extern RwReal flt_429748;
+extern RwReal flt_42974C;
+extern RwReal flt_429B38;
+extern RwReal flt_42C778;
+extern RwReal flt_42C77C;
+extern RwReal dword_429E40;
+extern RwReal dword_429E78;
+extern RwInt32 dword_429E7C;
+extern RwReal dword_429E80;
+extern RwReal dword_429E88;
+extern RwReal dword_429E8C;
+extern RwReal flt_429E20;
+extern RwReal flt_429E24;
+extern RwReal flt_4293E4;
+extern RwReal flt_4293E8;
+extern RwReal flt_429BD0;
+extern RwReal flt_429E2C;
+extern RwReal flt_4290E8;
+extern RwReal flt_4290EC;
+extern RwReal flt_42925C;
+extern RwReal flt_429CA4;
+extern RwReal flt_429CA8;
+
+static void CheckInt(const RwChar *pszLabel, RwInt32 *pn);
+
+static void CheckByte(const RwChar *pszLabel, RwUInt8 *pb)
+{
+    bool b = *pb != 0;
+
+    if (ImGui::Checkbox(pszLabel, &b))
+        *pb = b ? 1 : 0;
+}
+
+static void CheatsLevelRender()
+{
+    ImGui::SeparatorText("Level and render (nothing in the game sets these)");
+    {
+        // the time scale's frame step (mode 5: a frame each "step"; nothing sets it) and its
+        // speed lock (mode 3: real time, the slow motion blocked)
+        bool bStep = dword_4B87DC == 5, bLock = dword_4B87DC == 3;
+
+        if (ImGui::Checkbox("frame step (time scale mode 5)", &bStep))
+            dword_4B87DC = bStep ? 5 : 0;
+        ImGui::SameLine();
+        if (ImGui::Button("step") && dword_4B87DC == 5)
+            byte_42929C = true;
+        ImGui::SameLine();
+        if (ImGui::Checkbox("speed lock (mode 3: no slow motion)", &bLock))
+        {
+            dword_4B87DC = bLock ? 3 : 0;
+            if (bLock)
+                dword_42928C = 0.0f;
+        }
+        ImGui::SameLine();
+        ImGui::TextDisabled("mode %d", dword_4B87DC);
+    }
+    if (ImGui::Button("widescreen toggle (byte_4B8975)"))
+        byte_4B8975 = true;
+    ImGui::SameLine();
+    ImGui::TextDisabled("now %s", dword_4CF9A8 ? "wide" : "4:3");
+    {
+        bool b = byte_4CF9AC;
+
+        if (ImGui::Checkbox("FOV zoom (byte_4CF9AC)", &b))
+            byte_4CF9AC = b;
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(160.0f);
+        ImGui::SliderFloat("zoom (flt_429C38)", &flt_429C38, 0.1f, 4.0f, "%.2f");
+    }
+    {
+        static float s_fFar = 5000.0f;
+
+        ImGui::SetNextItemWidth(160.0f);
+        ImGui::InputFloat("##far", &s_fFar, 0.0f, 0.0f, "%.0f");
+        ImGui::SameLine();
+        if (ImGui::Button("fade the far clip to it over 30 s (flt_4CF7CC)") && s_fFar > 0.0f)
+            flt_4CF7CC = s_fFar;
+    }
+    if (ImGui::Button("queue the 'Console initialized' lines (byte_4B92AE)"))
+        byte_4B92AE = true;
+    CheckInt("hide the moving objects in the level sections (dword_4CF444)", (RwInt32 *)&dword_4CF444);
+    CheckInt("camera shake off (dword_4E5F00)", (RwInt32 *)&dword_4E5F00);
+    CheckByte("keep the fade quad drawn (byte_4CF400)", (RwUInt8 *)&byte_4CF400);
+    CheckByte("draw the memory card message (byte_4CF7D0)", (RwUInt8 *)&byte_4CF7D0);
+    CheckInt("find zones by the sections' collision (dword_4B6764)", (RwInt32 *)&dword_4B6764);
+    CheckInt("entity zones off (dword_4B8210; set it before a level loads)", (RwInt32 *)&dword_4B8210);
+#ifndef CODFH_SP
+    CheckInt("remote soldiers in one test animation (dword_4FBC3C; multiplayer)", (RwInt32 *)&dword_4FBC3C);
+#endif
+}
+
+static void CheatsAudio()
+{
+    ImGui::SeparatorText("Audio (the level's CGlobalSounds sets these; read live)");
+    CheckInt("mute: dialog", (RwInt32 *)&dword_44E840);
+    CheckInt("mute: foley", (RwInt32 *)&dword_44E844);
+    CheckInt("mute: weapons fire", (RwInt32 *)&dword_44E848);
+    CheckInt("mute: vehicles", (RwInt32 *)&dword_44E84C);
+    CheckInt("mute: weapon foley", (RwInt32 *)&dword_44E850);
+    CheckInt("mute: debris", (RwInt32 *)&dword_44E854);
+    CheckInt("mute: ambience 1", (RwInt32 *)&dword_44E858);
+    CheckInt("mute: ambience 2", (RwInt32 *)&dword_44E85C);
+    CheckInt("warning sound for an untagged index sound (dword_44E838)", &dword_44E838);
+    CheckInt("warning sound for an index alias without the index (dword_44E83C)", &dword_44E83C);
+    CheckInt("log the music streams (dword_44E868, to the port's log)", &dword_44E868);
+    CheckInt("keep the music playing through the pause (dword_44E884; single player)", &dword_44E884);
+}
+
+// The tuning values no code changes (each read where its row says).
+static const PgField s_aTunables[] =
+{
+    { "dword_4275C8", (RwUInt32)&dword_4275C8, PF_REAL, -1, "AI: Default distance an AI anchor must move before re-targeting (units, horizontal) (unit_0154C0.cpp:3683)", 0 },
+    { "dword_4290C0", (RwUInt32)&dword_4290C0, PF_REAL, -1, "AI: Facing cosine sorting a soldier contact as ahead/behind (~49 degrees) (unit_0929A0.cpp:2926)", 0 },
+    { "dword_4290C4", (RwUInt32)&dword_4290C4, PF_REAL, -1, "AI: Cosine margin past perpendicular for side contacts (~6 degrees) (unit_0929A0.cpp:2992)", 0 },
+    { "dword_4290C8", (RwUInt32)&dword_4290C8, PF_REAL, -1, "AI: Right-axis cosine splitting side contacts into left/right (60 degrees) (unit_0929A0.cpp:2998)", 0 },
+    { "flt_427400", (RwUInt32)&flt_427400, PF_REAL, -1, "AI: AI wait before AttackStand on out-of-range target (frames, deltaTime units) (unit_012000.cpp:1763)", 0 },
+    { "flt_4275B8", (RwUInt32)&flt_4275B8, PF_REAL, -1, "AI: Minimum nonzero AI leash distance; small values raised to it (units) (unit_0154C0.cpp:3482)", 0 },
+    { "flt_4275BC", (RwUInt32)&flt_4275BC, PF_REAL, -1, "AI: Threshold below which the leash's second distance is raised (units) (unit_0154C0.cpp:3484)", 0 },
+    { "flt_4275C0", (RwUInt32)&flt_4275C0, PF_REAL, -1, "AI: Arrival check: distance squared under speed squared x400 (20 frames) (unit_0154C0.cpp:1979)", 0 },
+    { "flt_4275C4", (RwUInt32)&flt_4275C4, PF_REAL, -1, "AI: AI speed above which aiming runs a line-of-fire test (units/frame) (unit_0154C0.cpp:2424)", 0 },
+    { "flt_4275DC", (RwUInt32)&flt_4275DC, PF_REAL, -1, "AI: Visibility-cache record match radius, squared (300 units) (unit_0154C0.cpp:4336)", 0 },
+    { "flt_4275E0", (RwUInt32)&flt_4275E0, PF_REAL, -1, "AI: Visibility-cache height limit; compared unsquared, so effectively 40000 units (unit_0154C0.cpp:4336)", 0 },
+    { "flt_4275E4", (RwUInt32)&flt_4275E4, PF_REAL, -1, "AI: Height above cover node where the player spoils it (units) (unit_022C80.cpp:1394)", 0 },
+    { "flt_4275E8", (RwUInt32)&flt_4275E8, PF_REAL, -1, "AI: Cover-node spoil radius squared (150 units); also reused as lower height bound (unit_022C80.cpp:1399)", 0 },
+    { "flt_427680", (RwUInt32)&flt_427680, PF_REAL, -1, "AI: Squared range (2000 units) beyond which a look at target may wait (unit_040720.cpp:342)", 0 },
+    { "flt_4290CC", (RwUInt32)&flt_4290CC, PF_REAL, -1, "AI: Wall must face soldier: normal-direction dot below -0.5 to be contact (unit_0929A0.cpp:2963)", 0 },
+    { "flt_4290D0", (RwUInt32)&flt_4290D0, PF_REAL, -1, "AI: Height a triangle must reach above soldier frame to be contact (units) (unit_0929A0.cpp:216)", 0 },
+    { "flt_4290DC", (RwUInt32)&flt_4290DC, PF_REAL, -1, "AI: Downward normal limit for steep contact triangles (normal y, ~65 degrees) (unit_0929A0.cpp:2342)", 0 },
+    { "flt_4290E0", (RwUInt32)&flt_4290E0, PF_REAL, -1, "AI: Min wall triangle width for contacts unless 400 units high (units) (unit_0929A0.cpp:2907)", 0 },
+    { "flt_429AA4", (RwUInt32)&flt_429AA4, PF_REAL, -1, "AI: Squared radius (300 units) of AIs alerted around player's target (unit_0FD730.cpp:3504)", 0 },
+    { "flt_429CC0", (RwUInt32)&flt_429CC0, PF_REAL, -1, "AI: Target height above shooter that counts as steep shot (units) (unit_134B40.cpp:4328)", 0 },
+    { "flt_429CC4", (RwUInt32)&flt_429CC4, PF_REAL, -1, "AI: Steep shot: horizontal squared / height squared below this lowers aim offset (unit_134B40.cpp:4332)", 0 },
+    { "flt_429E94", (RwUInt32)&flt_429E94, PF_REAL, -1, "AI: Mounted-gun NPC gunner max aim turn per step (degrees) (unit_166990.cpp:1716)", 0 },
+    { "flt_429E98", (RwUInt32)&flt_429E98, PF_REAL, -1, "AI: NPC gunner aim arc: min cosine to mount facing (~84 degrees) (unit_166990.cpp:1724)", 0 },
+    { "flt_429E9C", (RwUInt32)&flt_429E9C, PF_REAL, -1, "AI: NPC gunner fires when aim within this angle of target (degrees) (unit_166990.cpp:1714)", 0 },
+    { "flt_4C0198", (RwUInt32)&flt_4C0198, PF_REAL, -1, "AI: AI search rescoring minimum radius (500 units, copied from flt_3D9488) (unit_022C80.cpp:607)", 0 },
+    { "dword_4296D8", (RwUInt32)&dword_4296D8, PF_INT, -1, "pathing: A* node expansions allowed per search step (count) (src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:1105)", 0 },
+    { "dword_4296F0", (RwUInt32)&dword_4296F0, PF_INT, -1, "pathing: A* search steps before PathNotFound 'max time reached' (steps) (src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:764)", 0 },
+    { "flt_4296DC", (RwUInt32)&flt_4296DC, PF_REAL, -1, "pathing: Squared range (500 units) near AI's target where A* cost x10 (src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:484)", 0 },
+    { "flt_4296E0", (RwUInt32)&flt_4296E0, PF_REAL, -1, "pathing: Squared range (1000 units) near AI's target where A* cost x3 (src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:488)", 0 },
+    { "flt_4296E4", (RwUInt32)&flt_4296E4, PF_REAL, -1, "pathing: A* path length (squared units) beyond which node discounts/scaling apply (src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:526)", 0 },
+    { "flt_4296E8", (RwUInt32)&flt_4296E8, PF_REAL, -1, "pathing: Squared step (500 units) under which a flagged node may cost zero (src/Source/GameCore/pathnodemanager/astarpathfinder.cpp:517)", 0 },
+    { "dword_429D74", (RwUInt32)&dword_429D74, PF_INT, -1, "vehicles: Flag: cap vehicle velocity at its top speed (unit_147080.cpp:680)", 0 },
+    { "dword_429D8C", (RwUInt32)&dword_429D8C, PF_INT, -1, "vehicles: Flag: scale vehicle contact push's vertical part by flt_4D50FC (unit_147080.cpp:1089)", 0 },
+    { "flt_429D68", (RwUInt32)&flt_429D68, PF_REAL, -1, "vehicles: Max ground penetration corrected per physics step (units, scaled by step) (unit_147080.cpp:1283)", 0 },
+    { "flt_429D88", (RwUInt32)&flt_429D88, PF_REAL, -1, "vehicles: Tilt cosine (40 degrees) beyond which vehicle steering fades out (unit_147080.cpp:526)", 0 },
+    { "flt_429D9C", (RwUInt32)&flt_429D9C, PF_REAL, -1, "vehicles: Cosine (30 degrees) choosing which side a body is pushed out (unit_147080.cpp:1500)", 0 },
+    { "flt_429DD8", (RwUInt32)&flt_429DD8, PF_REAL, -1, "vehicles: Tank field-of-fire cosine (about 21 degrees) (unit_14C820.cpp:2618)", 0 },
+    { "flt_429DDC", (RwUInt32)&flt_429DDC, PF_REAL, -1, "vehicles: Tank engagement aim cone cosine (about 23 degrees) (unit_14C820.cpp:2754)", 0 },
+    { "flt_429DE0", (RwUInt32)&flt_429DE0, PF_REAL, -1, "vehicles: Tank engagement facing-toward cosine (about 31 degrees) (unit_14C820.cpp:2711)", 0 },
+    { "dword_429B3C", (RwUInt32)&dword_429B3C, PF_INT, -1, "player: Flag: track soldier's peak height while falling (fall damage) (unit_0FD730.cpp:9634)", 0 },
+    { "flt_429748", (RwUInt32)&flt_429748, PF_REAL, -1, "player: Aim assist: stick deflection below which strongest slowdown applies (0-1) (unit_0FD730.cpp:2225)", 0 },
+    { "flt_42974C", (RwUInt32)&flt_42974C, PF_REAL, -1, "player: Aim assist: stick deflection below which medium slowdown applies (0-1) (unit_0FD730.cpp:2230)", 0 },
+    { "flt_429B38", (RwUInt32)&flt_429B38, PF_REAL, -1, "player: Longest fall: fall counter limit (+0.5 per frame, ~240 frames) (unit_0FD730.cpp:9644)", 0 },
+    { "flt_42C778", (RwUInt32)&flt_42C778, PF_REAL, -1, "player: Analog button minimum value treated as pressed (0-1 pressure) (unit_19D920.cpp:211)", 0 },
+    { "flt_42C77C", (RwUInt32)&flt_42C77C, PF_REAL, -1, "player: Analog stick dead zone (fraction of full deflection) (unit_19D920.cpp:155)", 0 },
+    { "dword_429E40", (RwUInt32)&dword_429E40, PF_REAL, -1, "projectiles: Tracer age before it is drawn (game time units) (unit_15F1B0.cpp:850)", 0 },
+    { "dword_429E78", (RwUInt32)&dword_429E78, PF_REAL, -1, "projectiles: Maximum grenade spin per frame (degrees) (unit_161C50.cpp:606)", 0 },
+    { "dword_429E7C", (RwUInt32)&dword_429E7C, PF_INT, -1, "projectiles: Max recursion depth of a grenade's step within one frame (unit_161C50.cpp:738)", 0 },
+    { "dword_429E80", (RwUInt32)&dword_429E80, PF_REAL, -1, "projectiles: Grenade standoff distance from surfaces it hits (units) (unit_161C50.cpp:477)", 0 },
+    { "dword_429E88", (RwUInt32)&dword_429E88, PF_REAL, -1, "projectiles: Grenade inner collision sphere radius (units) (unit_161C50.cpp:280)", 0 },
+    { "dword_429E8C", (RwUInt32)&dword_429E8C, PF_REAL, -1, "projectiles: Grenade outer collision sphere radius (units) (unit_161C50.cpp:281)", 0 },
+    { "flt_429E20", (RwUInt32)&flt_429E20, PF_REAL, -1, "camera: Tank camera clearance from obstacles and minimum distance (units) (unit_155470.cpp:1107)", 0 },
+    { "flt_429E24", (RwUInt32)&flt_429E24, PF_REAL, -1, "camera: Tank camera distance below which the camera drops lower (units) (unit_155470.cpp:1085)", 0 },
+    { "flt_4293E4", (RwUInt32)&flt_4293E4, PF_REAL, -1, "HUD: Radar path search maximum iterations (count) (unit_0DC400.cpp:4004)", 0 },
+    { "flt_4293E8", (RwUInt32)&flt_4293E8, PF_REAL, -1, "HUD: Radar path search tolerance on squared distance (units squared) (unit_0DC400.cpp:3938)", 0 },
+    { "flt_429BD0", (RwUInt32)&flt_429BD0, PF_REAL, -1, "rendering: Blob shadow draw distance from camera; fade from half (units) (unit_1279C0.cpp:95)", 0 },
+    { "flt_429E2C", (RwUInt32)&flt_429E2C, PF_REAL, -1, "audio: Turret/gun turn speed that starts or stops turning sound (unit_155470.cpp:1496)", 0 },
+    { "flt_4290E8", (RwUInt32)&flt_4290E8, PF_REAL, -1, "other: Min floor normal y a soldier can stand on (cos 45 degrees) (unit_0929A0.cpp:2253)", 0 },
+    { "flt_4290EC", (RwUInt32)&flt_4290EC, PF_REAL, -1, "other: Normal y below which a triangle counts as vertical for point drops (unit_0929A0.cpp:1492)", 0 },
+    { "flt_42925C", (RwUInt32)&flt_42925C, PF_REAL, -1, "other: Object jiggle: bounce turn rate = this / bounce time (max 3) (unit_0D48D0.cpp:253)", 0 },
+    { "flt_429CA4", (RwUInt32)&flt_429CA4, PF_REAL, -1, "other: SendFlying knockback: minimum launch strength (units of speed) (unit_134B40.cpp:3916)", 0 },
+    { "flt_429CA8", (RwUInt32)&flt_429CA8, PF_REAL, -1, "other: SendFlying knockback: maximum launch strength (units of speed) (unit_134B40.cpp:3918)", 0 },
+};
+
+static void TabTunables()
+{
+    ImGui::TextDisabled("Fixed tuning values no code changes, read live where they are used (Enter sets one).");
+    ImGui::SetNextItemWidth(160.0f);
+    ImGui::InputText("filter##tun", s_szPgFieldFilter, sizeof(s_szPgFieldFilter));
+    PgFieldTable("tunables", (RwUInt8 *)0, s_aTunables, sizeof(s_aTunables) / sizeof(s_aTunables[0]), FALSE);
 }
 
 static void TabTriggers()
@@ -1774,86 +3275,405 @@ static void CodeWord(RwUInt32 dwCode, RwInt32 nCall, RwChar *psz)
     sprintf(psz, "op %u %s", dw & 0xFF, szName);
 }
 
-static void TabScripts()
+static RwBool ReportHas(const RwChar *psz, const RwChar *pszPart);
+
+// A script object's name as the debugger gives it (its trigger's object's
+// name, sub_6B060) and its object's ID.
+static void ScriptName(type_67620 *pScript, RwChar *psz, RwInt32 nMax)
 {
-    RwUInt32 dwBase, dwRunning;
-    RwInt32 nStride, nCount, i, nCall = CallOpcode(), nShown = 0;
-    RwChar szFile[48], szCode[96];
+    RwChar szName[48];
+    RwInt32 nId = -1;
 
-    if (!ReadU32(&dword_449328, &dwRunning))
-        dwRunning = 0;
-    if (ImGui::CollapsingHeader("Pools (sub_713E0)", ImGuiTreeNodeFlags_DefaultOpen))
-        Pools();
+    szName[0] = 0;
+    __try
+    {
+        type_3D2E7C *pObject = pScript ? pScript->vf_024() : NULL;
 
-    // the live state machines (type_3D2DB8): the elements of their pool not
-    // on its free list
-    if (!ImGui::CollapsingHeader("State machines (m_stateMachineObjectPool, type_3D2DB8)",
-                                 ImGuiTreeNodeFlags_DefaultOpen))
-        return;
-    if (!PoolFree(&dword_449A30, &dwBase, &nStride, &nCount))
+        if (pObject)
+        {
+            type_712B0 *pTrigger = pObject->sub_712B0();
+
+            nId = pObject->get_unk_24_d();
+            if (pTrigger)
+            {
+                type_3DF8D8_04 *pKey = pTrigger->vf_01C();
+
+                if (pKey && pKey->unk_00 && pKey->unk_04)
+                {
+                    type_3DF8D8 *pAsset = sub_198800(pKey);
+
+                    if (pAsset)
+                        ReadText((const RwChar *)pAsset->unk_14, szName, 40);
+                }
+            }
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    if (szName[0])
+        _snprintf(psz, nMax, "%s (ID %d)", szName, nId);
+    else if (nId >= 0)
+        _snprintf(psz, nMax, "ID %d", nId);
+    else
+        _snprintf(psz, nMax, "-");
+    psz[nMax - 1] = 0;
+}
+
+// The picked script object and whether it is a state machine (which alone
+// keeps variables: unk_74, unk_78 bytes, the words the load and store
+// global opcodes, 34 and 32, address by their operand).
+static RwUInt32 s_dwSelScript;
+static RwBool s_bSelMachine;
+static RwChar s_szScriptFilter[48];
+
+// The script table's row for the object dwObj, its name and code pointer;
+// FALSE when the filter hides it.
+static RwBool ScriptRow(RwUInt32 dwObj, RwBool bMachine, RwUInt32 dwRunning, RwUInt32 dwCodePtr, RwInt32 nCall,
+                        RwChar *pszName, RwInt32 nName)
+{
+    RwChar szObj[32], szCode[96];
+
+    ScriptName((type_67620 *)dwObj, pszName, nName);
+    if (s_szScriptFilter[0] && !ReportHas(pszName, s_szScriptFilter))
+        return FALSE;
+    CodeWord(dwCodePtr, nCall, szCode);
+    ImGui::TableNextRow();
+    ImGui::TableNextColumn();
+    sprintf(szObj, "0x%08X%s", dwObj, dwObj == dwRunning ? " <" : "");
+    if (ImGui::Selectable(szObj, dwObj == s_dwSelScript, ImGuiSelectableFlags_SpanAllColumns))
+    {
+        s_dwSelScript = dwObj == s_dwSelScript ? 0 : dwObj;
+        s_bSelMachine = bMachine;
+    }
+    ImGui::TableNextColumn();
+    ImGui::TextUnformatted(pszName);
+    ImGui::TableNextColumn();
+    ImGui::TextUnformatted(szCode);
+    return TRUE;
+}
+
+// The live objects of the pool pPool: state machines (type_3D2DB8) with
+// their state and family, or performances (type_3D2CD0) and tasks
+// (type_3D2E20), both type_3D2C30.
+static void ScriptTable(const RwChar *pszId, type_16C2A0 *pPool, RwBool bMachine, RwUInt32 dwRunning, RwInt32 nCall)
+{
+    RwUInt32 dwBase;
+    RwInt32 nStride, nCount, i, nShown = 0, nLive = 0;
+    RwChar szName[96];
+
+    if (!PoolFree(pPool, &dwBase, &nStride, &nCount))
     {
         ImGui::Text("The pool is not set up.");
         return;
     }
-    if (!ImGui::BeginTable("machines", 9, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg))
+    if (!ImGui::BeginTable(pszId, bMachine ? 6 : 3, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg |
+                                                       ImGuiTableFlags_ScrollY, ImVec2(0.0f, 260.0f)))
         return;
+    ImGui::TableSetupScrollFreeze(0, 1);
+    ImGui::TableSetupColumn("object (< running)");
+    ImGui::TableSetupColumn("name");
+    ImGui::TableSetupColumn("at the code");
+    if (bMachine)
     {
-        static const RwChar *const s_apszCols[9] = {"object", "handle", "line", "file", "code", "at the code",
-                                                    "state", "owner", "parent"};
-        for (i = 0; i < 9; i++)
-            ImGui::TableSetupColumn(s_apszCols[i]);
-        ImGui::TableHeadersRow();
+        ImGui::TableSetupColumn("state");
+        ImGui::TableSetupColumn("owner");
+        ImGui::TableSetupColumn("parent");
     }
+    ImGui::TableHeadersRow();
     for (i = 0; i < nCount && nShown < 300; i++)
     {
-        RwUInt32 dwObj = dwBase + i * nStride, dwHandle, dwLine, dwFile, dwCodePtr, dwState, dwOwner, dwParent;
-        RwUInt32 dwStateIndex = (RwUInt32)-1;
-        type_3D2DB8 *pMachine = (type_3D2DB8 *)dwObj;
+        RwUInt32 dwObj = dwBase + i * nStride, dwCodePtr;
 
         if (s_abFree[i])
             continue;
-        if (!ReadU32(&pMachine->unk_04, &dwHandle) || !ReadU32(&pMachine->unk_08, &dwLine)
-            || !ReadU32(&pMachine->unk_0C, &dwFile) || !ReadU32(&pMachine->unk_68, &dwCodePtr)
-            || !ReadU32(&pMachine->unk_6C, &dwState) || !ReadU32(&pMachine->unk_7C, &dwOwner)
-            || !ReadU32(&pMachine->unk_88, &dwParent))
+        nLive++;
+        if (!ReadU32(&((type_3D2C30 *)dwObj)->unk_68, &dwCodePtr))
             continue;
-        // the state record's index (type_3D2DB8_6C::unk_10)
-        if (dwState)
+        if (bMachine)
         {
-            RwUInt32 dw;
+            type_3D2DB8 *pMachine = (type_3D2DB8 *)dwObj;
+            RwUInt32 dwState, dwOwner, dwParent, dw;
+            RwInt32 nState = -1;
 
-            if (ReadU32(&((type_3D2DB8_6C *)dwState)->unk_10, &dw))
-                dwStateIndex = (RwInt16)(dw & 0xFFFF);
+            if (!ReadU32(&pMachine->unk_68, &dwCodePtr) || !ReadU32(&pMachine->unk_6C, &dwState)
+                || !ReadU32(&pMachine->unk_7C, &dwOwner) || !ReadU32(&pMachine->unk_88, &dwParent))
+                continue;
+            // the state record's index (type_3D2DB8_6C::unk_10)
+            if (dwState && ReadU32(&((type_3D2DB8_6C *)dwState)->unk_10, &dw))
+                nState = (RwInt16)(dw & 0xFFFF);
+            if (!ScriptRow(dwObj, TRUE, dwRunning, dwCodePtr, nCall, szName, sizeof(szName)))
+                continue;
+            ImGui::TableNextColumn();
+            ImGui::Text("%d", nState);
+            ImGui::TableNextColumn();
+            ImGui::Text("0x%08X", dwOwner);
+            ImGui::TableNextColumn();
+            ImGui::Text("0x%08X", dwParent);
         }
-        // the file: a name when it reads as text, else the number
-        if (dwFile > 0x10000)
-            ReadText((const RwChar *)dwFile, szFile, 40);
-        else
-            sprintf(szFile, "%d", (RwInt32)dwFile);
-        CodeWord(dwCodePtr, nCall, szCode);
-        ImGui::TableNextRow();
-        ImGui::TableNextColumn();
-        ImGui::Text("0x%08X%s", dwObj, dwObj == dwRunning ? " < running" : "");
-        ImGui::TableNextColumn();
-        ImGui::Text("0x%08X", dwHandle);
-        ImGui::TableNextColumn();
-        ImGui::Text("%d", (RwInt32)dwLine);
-        ImGui::TableNextColumn();
-        ImGui::TextUnformatted(szFile);
-        ImGui::TableNextColumn();
-        ImGui::Text("0x%08X", dwCodePtr);
-        ImGui::TableNextColumn();
-        ImGui::TextUnformatted(szCode);
-        ImGui::TableNextColumn();
-        ImGui::Text("%d", (RwInt32)dwStateIndex);
-        ImGui::TableNextColumn();
-        ImGui::Text("0x%08X", dwOwner);
-        ImGui::TableNextColumn();
-        ImGui::Text("0x%08X", dwParent);
+        else if (!ScriptRow(dwObj, FALSE, dwRunning, dwCodePtr, nCall, szName, sizeof(szName)))
+            continue;
         nShown++;
     }
     ImGui::EndTable();
-    ImGui::Text("%d shown (up to 300).", nShown);
+    ImGui::TextDisabled("%d live, %d shown (up to 300)", nLive, nShown);
+}
+
+// The picked script: its name, code and, for a state machine, its
+// variables as ints and floats, editable.
+static void ScriptSelected(RwInt32 nCall)
+{
+    type_3D2DB8 *pMachine = (type_3D2DB8 *)s_dwSelScript;
+    RwUInt32 dwVtbl, dwCodePtr, dwVars = 0, dwSize = 0;
+    RwChar szName[96], szCode[96];
+    RwInt32 i, nWords;
+
+    if (s_dwSelScript == 0)
+    {
+        ImGui::TextDisabled("Click a row for its details and variables.");
+        return;
+    }
+    if (!ReadU32((void *)s_dwSelScript, &dwVtbl) || !ReadU32(&((type_3D2C30 *)s_dwSelScript)->unk_68, &dwCodePtr)
+        || (s_bSelMachine && (!ReadU32(&pMachine->unk_74, &dwVars) || !ReadU32(&pMachine->unk_78, &dwSize))))
+    {
+        ImGui::Text("0x%08X can't be read.", s_dwSelScript);
+        s_dwSelScript = 0;
+        return;
+    }
+    ScriptName((type_67620 *)s_dwSelScript, szName, sizeof(szName));
+    CodeWord(dwCodePtr, nCall, szCode);
+    ImGui::SeparatorText(szName);
+    ImGui::Text("0x%08X, code 0x%08X: %s", s_dwSelScript, dwCodePtr, szCode);
+    ImGui::SameLine();
+    if (ImGui::SmallButton("close"))
+        s_dwSelScript = 0;
+    if (!s_bSelMachine)
+        return;
+    nWords = (RwInt32)(dwSize / 4);
+    if (dwVars == 0 || nWords <= 0)
+    {
+        ImGui::TextDisabled("No variables.");
+        return;
+    }
+    if (nWords > 256)
+        nWords = 256;
+    ImGui::TextDisabled("%d variables (Enter to set one):", nWords);
+    if (!ImGui::BeginTable("selvars", 4, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg |
+                                             ImGuiTableFlags_ScrollY, ImVec2(0.0f, 200.0f)))
+        return;
+    ImGui::TableSetupScrollFreeze(0, 1);
+    ImGui::TableSetupColumn("#");
+    ImGui::TableSetupColumn("int");
+    ImGui::TableSetupColumn("float");
+    ImGui::TableSetupColumn("hex");
+    ImGui::TableHeadersRow();
+    for (i = 0; i < nWords; i++)
+    {
+        RwInt32 *pn = (RwInt32 *)dwVars + i;
+        RwUInt32 dw;
+
+        if (!ReadU32(pn, &dw))
+            break;
+        ImGui::PushID(i);
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::Text("%d", i);
+        ImGui::TableNextColumn();
+        {
+            RwInt32 n = (RwInt32)dw;
+
+            ImGui::SetNextItemWidth(100.0f);
+            if (ImGui::InputInt("##i", &n, 0, 0, ImGuiInputTextFlags_EnterReturnsTrue))
+                *pn = n;
+        }
+        ImGui::TableNextColumn();
+        {
+            RwReal f = *(RwReal *)&dw;
+
+            ImGui::SetNextItemWidth(100.0f);
+            if (ImGui::InputFloat("##f", &f, 0.0f, 0.0f, "%g", ImGuiInputTextFlags_EnterReturnsTrue))
+                *(RwReal *)pn = f;
+        }
+        ImGui::TableNextColumn();
+        ImGui::TextDisabled("%08X", dw);
+        ImGui::PopID();
+    }
+    ImGui::EndTable();
+}
+
+// The live link's script snapshot (trigweb.cpp, the web suite's Blueprint page), what the
+// Scripts tab shows, as one JSON event: {"t":"scripts","frame":n,"running":"obj","machines":[..],
+// "performances":[..],"tasks":[..]}. Each entry has "obj", "name" (ScriptName's) and "code" (its
+// code pointer). A state machine (type_3D2DB8) adds "image" (its script's header, its object's
+// type_3D2E7C::unk_08, a type_72990), "state" (the current state's index), "base" (that state's
+// code, type_3D2DB8_6C::unk_04), "pc" (the code pointer's word offset from it, -1 when it is
+// elsewhere: another state's code, or a called function), "owner" and "parent" (unk_7C, unk_88)
+// and "vars" (the first 16 variables, all of the watched script's). A performance or task
+// (type_3D2C30) adds "script" (its script's record, unk_74, a type_67620_74), "start" (its first
+// instruction) and "pc" (the offset from it). Each image goes to pfnImage too (the link describes a new one's states, which
+// the page matches with its decompiled units). FALSE when there is no room; psz is NUL-ended
+// either way.
+extern "C" volatile unsigned port_frame;
+
+// A name as JSON text (quotes and backslashes made safe).
+static void JsonName(const RwChar *pszIn, RwChar *psz, RwInt32 nMax)
+{
+    RwChar *pq = psz;
+
+    for (; *pszIn && pq < psz + nMax - 3; pszIn++)
+    {
+        if (*pszIn == '"' || *pszIn == '\\')
+            *pq++ = '\\';
+        *pq++ = (RwUInt8)*pszIn < 0x20 ? ' ' : *pszIn;
+    }
+    *pq = 0;
+}
+
+RwUInt32 TrigScriptWatched();
+
+static RwInt32 ScriptsJsonPool(RwChar *psz, RwInt32 n, RwInt32 nMax, const RwChar *pszKey, type_16C2A0 *pPool,
+                               RwBool bMachine, void (*pfnImage)(RwUInt32 dwImage))
+{
+    RwUInt32 dwBase;
+    RwInt32 nStride, nCount, i, nShown = 0;
+
+    n += _snprintf(psz + n, nMax - n, ",\"%s\":[", pszKey);
+    if (!PoolFree(pPool, &dwBase, &nStride, &nCount))
+        nCount = 0;
+    for (i = 0; i < nCount; i++)
+    {
+        RwUInt32 dwObj = dwBase + i * nStride, dwCode, dw;
+        RwChar szName[96], szQuoted[200];
+        RwInt32 nLen;
+
+        if (s_abFree[i] || !ReadU32(&((type_3D2C30 *)dwObj)->unk_68, &dwCode))
+            continue;
+        ScriptName((type_67620 *)dwObj, szName, sizeof(szName));
+        JsonName(szName, szQuoted, sizeof(szQuoted));
+        if (bMachine)
+        {
+            type_3D2DB8 *pMachine = (type_3D2DB8 *)dwObj;
+            RwUInt32 dwState = 0, dwStateCode = 0, dwVars = 0, dwSize = 0, dwImage = 0, dwOwner = 0, dwParent = 0;
+            RwInt32 nState = -1, nPc = -1, k, nWords;
+
+            ReadU32(&pMachine->unk_6C, &dwState);
+            if (dwState && ReadU32(&((type_3D2DB8_6C *)dwState)->unk_10, &dw))
+                nState = (RwInt16)(dw & 0xFFFF);
+            if (dwState)
+                ReadU32(&((type_3D2DB8_6C *)dwState)->unk_04, &dwStateCode);
+            if (dwStateCode && dwCode >= dwStateCode && dwCode - dwStateCode < 0x40000)
+                nPc = (RwInt32)((dwCode - dwStateCode) / 4);
+            __try
+            {
+                type_3D2E7C *pObject = pMachine->vf_024();
+
+                if (pObject)
+                    dwImage = (RwUInt32)pObject->unk_08;
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+            }
+            if (dwImage && pfnImage)
+                pfnImage(dwImage);
+            ReadU32(&pMachine->unk_74, &dwVars);
+            ReadU32(&pMachine->unk_78, &dwSize);
+            ReadU32(&pMachine->unk_7C, &dwOwner);
+            ReadU32(&pMachine->unk_88, &dwParent);
+            nLen = _snprintf(psz + n, nMax - n,
+                             "%s{\"obj\":\"%08X\",\"name\":\"%s\",\"image\":\"%08X\",\"state\":%d,\"base\":\"%08X\",\"code\":\"%08X\","
+                             "\"pc\":%d,\"owner\":\"%08X\",\"parent\":\"%08X\",\"vars\":[",
+                             nShown ? "," : "", dwObj, szQuoted, dwImage, nState, dwStateCode, dwCode, nPc, dwOwner, dwParent);
+            if (nLen < 0 || n + nLen > nMax - 1200)
+                break;
+            n += nLen;
+            // (16 in the list; the watched script's all, up to 256: the page edits them)
+            nWords = dwVars ? (RwInt32)(dwSize / 4) : 0;
+            if (nWords > (dwObj == TrigScriptWatched() ? 256 : 16))
+                nWords = dwObj == TrigScriptWatched() ? 256 : 16;
+            for (k = 0; k < nWords && ReadU32((RwInt32 *)dwVars + k, &dw); k++)
+                n += sprintf(psz + n, "%s%d", k ? "," : "", (RwInt32)dw);
+            n += sprintf(psz + n, "]}");
+        }
+        else
+        {
+            RwUInt32 dwScript = 0, dwStart = 0, dwId = 0, dwNamePtr = 0;
+            RwChar szScript[64], szScriptQuoted[140];
+            RwInt32 nPc = -1;
+
+            szScript[0] = 0;
+            ReadU32(&((type_3D2C30 *)dwObj)->unk_74, &dwScript);
+            if (dwScript)
+            {
+                ReadU32(&((type_67620_74 *)dwScript)->unk_08, &dwStart);
+                if (ReadU32(&((type_67620_74 *)dwScript)->unk_04, &dw))
+                    dwId = dw & 0xFFFF;
+                if (ReadU32(&((type_67620_74 *)dwScript)->unk_00, &dwNamePtr) && dwNamePtr)
+                    ReadText((const RwChar *)dwNamePtr, szScript, 60);
+            }
+            JsonName(szScript, szScriptQuoted, sizeof(szScriptQuoted));
+            if (dwStart && dwCode >= dwStart && dwCode - dwStart < 0x40000)
+                nPc = (RwInt32)((dwCode - dwStart) / 4);
+            nLen = _snprintf(psz + n, nMax - n,
+                             "%s{\"obj\":\"%08X\",\"name\":\"%s\",\"code\":\"%08X\",\"script\":\"%08X\",\"scriptName\":\"%s\","
+                             "\"scriptId\":%u,\"start\":\"%08X\",\"pc\":%d}",
+                             nShown ? "," : "", dwObj, szQuoted, dwCode, dwScript, szScriptQuoted, dwId, dwStart, nPc);
+            if (nLen < 0 || n + nLen > nMax - 1200)
+                break;
+            n += nLen;
+        }
+        nShown++;
+    }
+    n += _snprintf(psz + n, nMax - n, "]");
+    return n;
+}
+
+RwBool TrigWebScriptsJson(RwChar *psz, RwInt32 nMax, void (*pfnImage)(RwUInt32 dwImage))
+{
+    RwUInt32 dwRunning;
+    RwInt32 n;
+
+    if (!ReadU32(&dword_449328, &dwRunning))
+        dwRunning = 0;
+    n = _snprintf(psz, nMax, "{\"t\":\"scripts\",\"frame\":%u,\"running\":\"%08X\"", port_frame, dwRunning);
+    n = ScriptsJsonPool(psz, n, nMax / 2, "machines", &dword_449A30, TRUE, pfnImage);
+    n = ScriptsJsonPool(psz, n, nMax * 3 / 4, "performances", &dword_449A50, FALSE, NULL);
+    n = ScriptsJsonPool(psz, n, nMax - 16, "tasks", &dword_4499F0, FALSE, NULL);
+    _snprintf(psz + n, nMax - n, "}");
+    psz[nMax - 1] = 0;
+    return TRUE;
+}
+
+static void TabScripts()
+{
+    RwUInt32 dwRunning;
+    RwInt32 nCall = CallOpcode();
+
+    if (!ReadU32(&dword_449328, &dwRunning))
+        dwRunning = 0;
+    if (ImGui::CollapsingHeader("Pools (sub_713E0)"))
+        Pools();
+    ImGui::SetNextItemWidth(200.0f);
+    ImGui::InputText("name filter##scripts", s_szScriptFilter, sizeof(s_szScriptFilter));
+    if (ImGui::BeginTabBar("scriptkinds"))
+    {
+        if (ImGui::BeginTabItem("State machines"))
+        {
+            ScriptTable("machines", &dword_449A30, TRUE, dwRunning, nCall);
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Performances"))
+        {
+            ScriptTable("performances", &dword_449A50, FALSE, dwRunning, nCall);
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Tasks"))
+        {
+            ScriptTable("tasks", &dword_4499F0, FALSE, dwRunning, nCall);
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+    }
+    ScriptSelected(nCall);
 }
 
 // ---- VM ----
@@ -1878,10 +3698,13 @@ static TrigWebVm s_vm;
 static RwBool s_bVmFreeze;
 extern "C" volatile unsigned port_frame;
 
+void TrigScriptRunEnd();
+
 void TrigWebVmSnapshot()
 {
     RwInt32 i;
 
+    TrigScriptRunEnd();
     if (s_bVmFreeze)
         return;
     s_vm.dwRuns++;
@@ -1921,7 +3744,7 @@ void TrigWebVmSnapshot()
 static RwChar s_aszReport[TRIGWEB_REPORTS][TRIGWEB_REPORT];
 static RwUInt32 s_adwReportFrame[TRIGWEB_REPORTS];
 static RwUInt32 s_dwReports;
-static RwBool s_bReportPause, s_bReportLines = TRUE, s_bReportFollow = TRUE;
+static RwBool s_bReportPause, s_bReportFollow = TRUE;
 static RwChar s_szReportFilter[64];
 static CRITICAL_SECTION s_csReport;
 static LONG s_nReportInit;
@@ -1945,7 +3768,10 @@ void TrigWebScriptReport(const RwChar *pszWhat, const RwChar *pszLine)
 
     if (s_bReportPause || pszLine == NULL)
         return;
-    if (!s_bReportLines && strstr(pszLine, "Line Changed") != NULL)
+    // (the prints and asserts come with their values from TrigWebScriptPrint and
+    // TrigWebScriptCheck, whatever the settings)
+    if (pszWhat == NULL && (strstr(pszLine, " Print Int at") || strstr(pszLine, " Print Float at")
+                            || strstr(pszLine, " Script Assert at")))
         return;
     ReportLock();
     psz = s_aszReport[s_dwReports % TRIGWEB_REPORTS];
@@ -1959,7 +3785,62 @@ void TrigWebScriptReport(const RwChar *pszWhat, const RwChar *pszLine)
     while (n && (psz[n - 1] == '\n' || psz[n - 1] == '\r'))
         psz[--n] = 0;
     s_dwReports++;
+    TrigLiveLog(psz);
     LeaveCriticalSection(&s_csReport);
+}
+
+// The script pScript as the debugger names it, with its place when the
+// running script has one (release scripts leave "(Release Scripts)" and 0).
+static void ScriptWho(type_67620 *pScript, RwChar *psz, RwInt32 nMax)
+{
+    RwChar szFile[48], szName[96];
+
+    ScriptName(pScript, szName, sizeof(szName));
+    if (dword_449284 > 0 && dword_449288 > 0x10000)
+    {
+        ReadText((const RwChar *)dword_449288, szFile, 40);
+        _snprintf(psz, nMax, "%s, %s(%d)", szName, szFile, dword_449284);
+    }
+    else
+        _snprintf(psz, nMax, "%s", szName);
+    psz[nMax - 1] = 0;
+}
+
+// "PrintInt" and "PrintFloat" (unit_0441B0): their argument, which the
+// release build never prints.
+void TrigWebScriptPrint(type_67620 *pScript, const RwChar *pszWhat, type_44350 *pCall, RwInt32 nFloat)
+{
+    RwChar szWho[128], szLine[TRIGWEB_REPORT];
+
+    if (s_bReportPause)
+        return;
+    ScriptWho(pScript, szWho, sizeof(szWho));
+    if (pCall->unk_0C < 1)
+        _snprintf(szLine, sizeof(szLine), "%s (no argument), %s", pszWhat, szWho);
+    else if (nFloat)
+        _snprintf(szLine, sizeof(szLine), "%s %g, %s", pszWhat, SCRIPT_ARGF(pCall, 1), szWho);
+    else
+        _snprintf(szLine, sizeof(szLine), "%s %d, %s", pszWhat, SCRIPT_ARG(pCall, 1), szWho);
+    szLine[sizeof(szLine) - 1] = 0;
+    TrigWebScriptReport("print", szLine);
+}
+
+// A failed script check (sub_44220's condition clear): the running script,
+// its place and the command at its code pointer.
+void TrigWebScriptCheck()
+{
+    RwChar szWho[128], szCommand[64], szLine[TRIGWEB_REPORT];
+    RwUInt32 dw;
+
+    if (s_bReportPause)
+        return;
+    ScriptWho(dword_449328, szWho, sizeof(szWho));
+    szCommand[0] = 0;
+    if (dword_449320 && ReadU32(dword_449320, &dw) && (RwInt32)(dw & 0xFF) == CallOpcode())
+        CommandName((RwInt16)(dw >> 16), szCommand);
+    _snprintf(szLine, sizeof(szLine), "%s%s%s", szCommand[0] ? szCommand : "", szCommand[0] ? ", " : "", szWho);
+    szLine[sizeof(szLine) - 1] = 0;
+    TrigWebScriptReport("check failed", szLine);
 }
 
 static RwBool ReportHas(const RwChar *psz, const RwChar *pszPart)
@@ -1993,28 +3874,30 @@ static const RwChar *SwitchName(RwInt32 n)
     return NULL;
 }
 
-static void VmDebugger()
+static void TabScriptLog()
 {
     RwInt32 i, nFirst, nCount;
     RwChar szName[0x20];
 
-    if (!ImGui::CollapsingHeader("Script debugger (CDebugScript's settings)"))
-        return;
-    ImGui::TextDisabled("Which reports the game makes; it prints none, they go to the log below.");
-    CheckInt("report every script object's lines (dword_44928C)", &dword_44928C);
-    CheckInt("report task objects' lines (dword_4492A8)", &dword_4492A8);
-    CheckInt("report every message delivered (dword_449294)", &dword_449294);
-    CheckInt("report one-argument messages (dword_4492B0)", &dword_4492B0);
-    CheckInt("only objects with a name (dword_449310)", &dword_449310);
-    memcpy(szName, String, sizeof(szName));
-    szName[sizeof(szName) - 1] = 0;
-    if (ImGui::InputText("only this name or ID (String; empty: any)", szName, sizeof(szName)))
+    ImGui::TextDisabled("The scripts' prints and failed checks are always logged; the reports below as asked.");
+    if (ImGui::TreeNode("Reports to make (CDebugScript's settings)"))
     {
-        memcpy(String, szName, sizeof(szName));
-        byte_44930C = String[0] >= '0' && String[0] <= '9' ? 1 : 0;
+        CheckInt("report every script object's lines (dword_44928C)", &dword_44928C);
+        CheckInt("report task objects' lines (dword_4492A8)", &dword_4492A8);
+        CheckInt("report every message delivered (dword_449294)", &dword_449294);
+        CheckInt("report one-argument messages (dword_4492B0)", &dword_4492B0);
+        CheckInt("only objects with a name (dword_449310)", &dword_449310);
+        memcpy(szName, String, sizeof(szName));
+        szName[sizeof(szName) - 1] = 0;
+        if (ImGui::InputText("only this name or ID (String; empty: any)", szName, sizeof(szName)))
+        {
+            memcpy(String, szName, sizeof(szName));
+            byte_44930C = String[0] >= '0' && String[0] <= '9' ? 1 : 0;
+        }
+        ImGui::SameLine();
+        ImGui::TextDisabled(byte_44930C ? "(an ID)" : "(a name)");
+        ImGui::TreePop();
     }
-    ImGui::SameLine();
-    ImGui::TextDisabled(byte_44930C ? "(an ID)" : "(a name)");
 
     if (ImGui::TreeNode("Debug switches (RWS::DebugSwitches)"))
     {
@@ -2052,10 +3935,8 @@ static void VmDebugger()
         ImGui::TreePop();
     }
 
-    ImGui::SeparatorText("Reports");
+    ImGui::Separator();
     Check("pause", &s_bReportPause);
-    ImGui::SameLine();
-    Check("line changes", &s_bReportLines);
     ImGui::SameLine();
     Check("follow", &s_bReportFollow);
     ImGui::SameLine();
@@ -2070,7 +3951,7 @@ static void VmDebugger()
     ImGui::InputText("filter##reports", s_szReportFilter, sizeof(s_szReportFilter));
     ImGui::SameLine();
     ImGui::TextDisabled("%u made", s_dwReports);
-    if (ImGui::BeginChild("reports", ImVec2(0.0f, 260.0f), ImGuiChildFlags_Borders,
+    if (ImGui::BeginChild("reports", ImVec2(0.0f, 0.0f), ImGuiChildFlags_Borders,
                           ImGuiWindowFlags_HorizontalScrollbar))
     {
         ReportLock();
@@ -2099,7 +3980,6 @@ static void TabVm()
     RwInt32 i, nCall = CallOpcode();
     RwChar szName[64];
 
-    VmDebugger();
     if (s_vm.dwRuns == 0)
     {
         ImGui::Text("No script has run yet.");
@@ -2728,6 +4608,16 @@ extern "C" void port_debug_tools_window()
             TabDrawing();
             ImGui::EndTabItem();
         }
+        if (ImGui::BeginTabItem("Cheats"))
+        {
+            TabCheats();
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Tunables"))
+        {
+            TabTunables();
+            ImGui::EndTabItem();
+        }
         if (ImGui::BeginTabItem("Player"))
         {
             TabPlayer();
@@ -2753,6 +4643,26 @@ extern "C" void port_debug_tools_window()
             TabTriggers();
             ImGui::EndTabItem();
         }
+        if (ImGui::BeginTabItem("Trigger"))
+        {
+            TabTrigger();
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Shell"))
+        {
+            TabShell();
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Generators"))
+        {
+            TabGenerators();
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Generator"))
+        {
+            TabGenerator();
+            ImGui::EndTabItem();
+        }
         if (ImGui::BeginTabItem("Objectives"))
         {
             TabObjectives();
@@ -2761,6 +4671,11 @@ extern "C" void port_debug_tools_window()
         if (ImGui::BeginTabItem("Scripts"))
         {
             TabScripts();
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Script log"))
+        {
+            TabScriptLog();
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("VM"))
@@ -2791,6 +4706,115 @@ extern "C" void port_debug_tools_window()
         ImGui::EndTabBar();
     }
     ImGui::End();
+}
+
+// The live link's ways in (trigweb.cpp, on the game thread): a teleport through the action
+// queue, the trigger the Trigger tab edits, and the last action's result.
+void TrigWebRequestTeleport(const RwV3d *pv)
+{
+    Request(REQ_TELEPORT, 0, 0, pv->x, pv->y, pv->z);
+}
+
+void TrigWebEditTrigger(RwInt32 nHandle)
+{
+    if (nHandle >= 0 && nHandle < 2000)
+        s_nTrigEdit = nHandle;
+}
+
+const RwChar *TrigWebResult()
+{
+    return s_szReqResult;
+}
+
+// The live link's script debugger's lookups (scriptdbg.cpp): a command's name, a script's name.
+void TrigWebCommandName(RwInt32 nIndex, RwChar *pszOut)
+{
+    RwInt32 i;
+
+    CommandName(nIndex, pszOut);
+    for (i = 0; pszOut[i]; i++)
+        if (pszOut[i] == '"' || pszOut[i] == '\\')
+            pszOut[i] = '_';
+}
+
+void TrigWebScriptName(void *pScript, RwChar *pszOut, RwInt32 nMax)
+{
+    ScriptName((type_67620 *)pScript, pszOut, nMax);
+}
+
+// The Script log tab's settings for the live link: CDebugScript's report switches (the
+// debugger's globals), the log's pause, and RWS::DebugSwitches, as {"t":"settings",...}.
+RwBool TrigWebSettingsJson(RwChar *psz, RwInt32 nMax)
+{
+    RwChar szFilter[0x20], szQuoted[80];
+    RwInt32 n, i;
+
+    memcpy(szFilter, String, sizeof(szFilter));
+    szFilter[sizeof(szFilter) - 1] = 0;
+    JsonName(szFilter, szQuoted, sizeof(szQuoted));
+    n = _snprintf(psz, nMax,
+                  "{\"t\":\"settings\",\"reportAll\":%d,\"reportTasks\":%d,\"reportMessages\":%d,\"reportOneArg\":%d,"
+                  "\"namedOnly\":%d,\"filter\":\"%s\",\"filterIsId\":%d,\"logPaused\":%d,\"vmFrozen\":%d,\"switches\":[",
+                  dword_44928C, dword_4492A8, dword_449294, dword_4492B0, dword_449310, szQuoted, (RwInt32)byte_44930C,
+                  (RwInt32)s_bReportPause, (RwInt32)s_bVmFreeze);
+    for (i = 0; i < RWS::DebugSwitches::m_last && n < nMax - 16; i++)
+        n += sprintf(psz + n, "%s%d", i ? "," : "", RWS::DebugSwitches::GetSwitch(i) ? 1 : 0);
+    _snprintf(psz + n, nMax - n, "]}");
+    psz[nMax - 1] = 0;
+    return TRUE;
+}
+
+// A setting from the live link (the game thread): its name, an index (a switch's) and a value,
+// or the text (the report filter's).
+void TrigWebSetSetting(const RwChar *pszName, RwInt32 nIndex, RwInt32 nValue, const RwChar *pszText)
+{
+    if (!strcmp(pszName, "reportAll"))
+        dword_44928C = nValue;
+    else if (!strcmp(pszName, "reportTasks"))
+        dword_4492A8 = nValue;
+    else if (!strcmp(pszName, "reportMessages"))
+        dword_449294 = nValue;
+    else if (!strcmp(pszName, "reportOneArg"))
+        dword_4492B0 = nValue;
+    else if (!strcmp(pszName, "namedOnly"))
+        dword_449310 = nValue;
+    else if (!strcmp(pszName, "logPaused"))
+        s_bReportPause = nValue != 0;
+    else if (!strcmp(pszName, "vmFrozen"))
+        s_bVmFreeze = nValue != 0;
+    else if (!strcmp(pszName, "switch") && nIndex >= 0 && nIndex < RWS::DebugSwitches::m_last)
+        RWS::DebugSwitches::SetSwitch(nIndex, nValue != 0);
+    else if (!strcmp(pszName, "filter") && pszText)
+    {
+        memset(String, 0, 0x20);
+        strncpy(String, pszText, 0x1F);
+        byte_44930C = String[0] >= '0' && String[0] <= '9' ? 1 : 0;
+    }
+}
+
+// The VM tab's snapshot for the live link, as {"t":"vm",...}: the registers when the last
+// script halted, the code around the code pointer (from 4 words before it) and the stack's top.
+RwBool TrigWebVmJson(RwChar *psz, RwInt32 nMax)
+{
+    RwInt32 n, i;
+    RwChar szName[96], szQuoted[200];
+
+    ScriptName((type_67620 *)s_vm.dwObj, szName, sizeof(szName));
+    JsonName(szName, szQuoted, sizeof(szQuoted));
+    n = _snprintf(psz, nMax,
+                  "{\"t\":\"vm\",\"frame\":%u,\"runs\":%u,\"frozen\":%d,\"ip\":\"%08X\",\"sp\":\"%08X\",\"fp\":\"%08X\",\"fourth\":%d,"
+                  "\"obj\":\"%08X\",\"name\":\"%s\",\"halted\":%d,\"ended\":%d,\"objCode\":\"%08X\",\"objStack\":\"%08X\","
+                  "\"objFrame\":\"%08X\",\"code\":[",
+                  s_vm.dwFrame, s_vm.dwRuns, (RwInt32)s_bVmFreeze, s_vm.dwIp, s_vm.dwSp, s_vm.dwFp, (RwInt32)s_vm.dwFourth,
+                  s_vm.dwObj, szQuoted, s_vm.bHalt, s_vm.bYielded, s_vm.dwObjCode, s_vm.dwObjStack, s_vm.dwObjFrame);
+    for (i = 0; i < 16; i++)
+        n += sprintf(psz + n, "%s%s%u", i ? "," : "", s_vm.abCode[i] ? "" : "-", s_vm.abCode[i] ? s_vm.adwCode[i] : 1);
+    n += sprintf(psz + n, "],\"stack\":[");
+    for (i = 0; i < s_vm.nStack; i++)
+        n += sprintf(psz + n, "%s%d", i ? "," : "", (RwInt32)s_vm.adwStack[i]);
+    _snprintf(psz + n, nMax - n, "]}");
+    psz[nMax - 1] = 0;
+    return TRUE;
 }
 
 #endif // CODFH_DRAW_TRIGGERS

@@ -68,31 +68,31 @@ public:
     void sub_9EFD0(type_3D3548 *arg_0);
 
     type_6B960 *unk_C0;         // its registration on the task group
-    type_3DF8D8_04 unk_C4;      // the task (command 15, of the kind 0xC)
-    type_3DF8D8_04 unk_CC;      // a second task (command 16)
+    type_3DF8D8_04 unk_C4;      // the task (command 1, of the kind 0xC)
+    type_3DF8D8_04 unk_CC;      // a second task (command 12)
     RwInt16 unk_D4;             // its task group's message (-1 for none)
     RwUInt8 unk_D6[0x2];
-    RwInt32 unk_D8;             // how many to hand out (command 14)
+    RwInt32 unk_D8;             // how many to hand out (command 0)
     RwInt32 unk_DC;             // how many are left
-    RwInt32 unk_E0;             // how many at a time (command 4)
-    RwInt32 unk_E4;             // the entity lists to search (command 6)
-    type_3DF8D8_04 unk_E8;      // its point's object (command 0)
-    RwInt32 unk_F0;             // the task's value (command 5)
-    RwReal unk_F4;              // the band, squared (commands 2 and 3)
+    RwInt32 unk_E0;             // how many at a time (command 8)
+    RwInt32 unk_E4;             // the entity lists to search (command 10)
+    type_3DF8D8_04 unk_E8;      // its point's object (command 11)
+    RwInt32 unk_F0;             // the task's value (command 2)
+    RwReal unk_F4;              // the band, squared (commands 7 and 6)
     RwReal unk_F8;
     union
     {
         RwUInt32 unk_FC;
         struct
         {
-            RwUInt32 unk_FC_0 : 1;  // to the message's sender (command 7)
-            RwUInt32 unk_FC_1 : 1;  // by side (commands 8 to 13)
+            RwUInt32 unk_FC_0 : 1;  // to the message's sender (command 3)
+            RwUInt32 unk_FC_1 : 1;  // by side (commands 13 to 18)
             RwUInt32 unk_FC_2 : 1;
             RwUInt32 unk_FC_3 : 1;
             RwUInt32 unk_FC_4 : 1;
             RwUInt32 unk_FC_5 : 1;
             RwUInt32 unk_FC_6 : 1;
-            RwUInt32 unk_FC_7 : 1;  // to the nearest (command 1)
+            RwUInt32 unk_FC_7 : 1;  // to the nearest (command 5)
         };
     };
 };

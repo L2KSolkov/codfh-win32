@@ -37,7 +37,9 @@ public:
     RwInt16 unk_D8;             // command 5: the word at +0x14 of its block
     RwUInt8 unk_DA[0x2];
     RwInt32 unk_DC;             // command 4's name's value
-    RwInt32 unk_E0;             // command 3
+    RwInt32 unk_E0;             // command 3: its health (an int, but its
+                                // entity reads the bits as a float and
+                                // truncates it, unit_09B700)
     RwInt32 unk_E4;             // commands 6 to 10
     RwInt32 unk_E8;
     RwInt32 unk_EC;

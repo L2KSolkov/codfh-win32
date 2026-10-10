@@ -310,7 +310,7 @@ RwInt16 sub_144E80(type_144E80 **arg_0, RwInt32 *arg_4, RwInt16 arg_8)
 // match: ?sub_144F20@@YAHPAURwV3d@@PAVTrigger@@@Z @ 0x00144F20
 // sp-match: ?sub_144F20@@YAHPAURwV3d@@PAVTrigger@@@Z @ 0x000F0110
 // Whether the point arg_0 lies in the trigger arg_4's volume, by its shape:
-// a sphere (0), a box (1) or a cylinder (2); 0 for a trigger switched off.
+// a sphere (0), a cylinder (1) or a box (2); 0 for a trigger switched off.
 RwInt32 sub_144F20(RwV3d *arg_0, Trigger *arg_4)
 {
     if (arg_4 && arg_4->unk_24_0)
