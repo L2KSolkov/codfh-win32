@@ -36,8 +36,11 @@
 #include "types/type_3DAFC8.h"
 
 #ifdef CODFH_DRAW_TRIGGERS
-// port/src/debug/trigdraw.cpp: the trigger volumes, drawn after the world
+// port/src/debug/trigdraw.cpp: the trigger volumes, drawn after the world; the free camera
 void TrigDrawAll(RwCamera *pCamera);
+void TrigDrawFreeCamBegin(RwCamera *pCamera);
+void TrigDrawFreeCamEnd(RwCamera *pCamera);
+RwBool TrigDrawFreeCamActive();
 #endif
 #include "types/type_3D3548.h"
 #include "types/type_3D96F0.h"
@@ -638,6 +641,11 @@ void sub_125F20(RwInt32 arg_0)
     RwCameraGetFrame(bp_8)->modelling.flags = 3;
     RwMatrixOrthoNormalize(&RwCameraGetFrame(bp_8)->modelling,
                            &RwCameraGetFrame(bp_8)->modelling);
+#ifdef CODFH_DRAW_TRIGGERS
+    // (the debug tools' free camera: the frame drawn from its place; the game's camera back at
+    // the end)
+    TrigDrawFreeCamBegin(bp_8);
+#endif
     if (flt_4CF7CC != 0.0f)
     {
         sub_128CD0(flt_4CF7CC, 30.0f);
@@ -685,7 +693,12 @@ void sub_125F20(RwInt32 arg_0)
     sub_16D7F0(0x1C);
     sub_16D850(0x1C);
     ebp_14 = (type_10F710 *)sub_1745A0(dword_429EB0);
+#ifdef CODFH_DRAW_TRIGGERS
+    // (the player's weapon is not drawn in front of the free camera)
+    if (ebp_14 && ebp_14->unk_1A3C.get_unk_08() && !TrigDrawFreeCamActive())
+#else
     if (ebp_14 && ebp_14->unk_1A3C.get_unk_08())
+#endif
     {
         var_C = ebp_14->sub_111000();
         sub_16D7F0(0x10);
@@ -783,6 +796,9 @@ void sub_125F20(RwInt32 arg_0)
     ResumeThread((HANDLE)dword_44BAD4);
     sub_126750(bp_8);
     sub_16D850(2);
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawFreeCamEnd(bp_8);
+#endif
 }
 
 // match: ?sub_126750@@YAXPAURwCamera@@@Z @ 0x00126750

@@ -528,6 +528,172 @@ void TrigDrawNoclipMove(RwV3d *pvPos, RwReal fStep)
     pvPos->z += (pLtm->at.z * fFwd - pLtm->right.z * fSide) * fDist;
 }
 
+// ---- the free camera ----
+
+// The free camera (the Drawing tab's switch): the world is drawn from its own
+// place and look instead of the game's camera, which is put back after the
+// frame (TrigDrawFreeCamBegin, TrigDrawFreeCamEnd, from sub_125F20), so the
+// game's logic, aiming and sound go on from the player; while it is on, pad
+// 0 (the keyboard and mouse with it) is the camera's, not the game's
+// (port_freecam_input, from the port's XInputGetState; start and back stay
+// the game's), outside the menus. The left stick (WASD) moves along the look,
+// the right stick (the mouse) looks, Black and White (Q, E) go up and down,
+// the right trigger is four times the speed, the left a quarter.
+RwBool g_bTrigDrawFreeCam = FALSE;
+RwReal g_fTrigDrawFreeCamSpeed = 1000.0f;   // units a second (noclip's default is about 3000)
+RwReal g_fTrigDrawFreeCamLook = 2.5f;       // radians a second at full deflection
+
+static RwBool s_bFreeCamLive;               // its place set from the game's camera
+static RwV3d s_vFreeCamPos;
+static RwReal s_fFreeCamYaw, s_fFreeCamPitch;
+static XINPUT_GAMEPAD s_FreeCamPad;         // the pad as the camera last took it
+static RwMatrix s_mFreeCamSaved;            // the game's camera, put back after the frame
+static RwBool s_bFreeCamSaved;
+static LARGE_INTEGER s_liFreeCamLast;
+
+extern "C" int port_in_menus(void);
+
+// Takes pad 0's state for the free camera while it is on in a level: TRUE
+// when it did (the game then gets a neutral pad).
+extern "C" int port_freecam_input(XINPUT_GAMEPAD *pPad)
+{
+    static RwInt32 s_nStart = -1;
+
+    // (CODFH_FREECAM=1 starts with it on)
+    if (s_nStart < 0)
+    {
+        s_nStart = GetEnvironmentVariableA("CODFH_FREECAM", NULL, 0) ? 1 : 0;
+        if (s_nStart)
+            g_bTrigDrawFreeCam = TRUE;
+    }
+    if (!g_bTrigDrawFreeCam || dword_4E5C74 == NULL || port_in_menus())
+        return FALSE;
+    s_FreeCamPad = *pPad;
+    return TRUE;
+}
+
+RwBool TrigDrawFreeCamActive()
+{
+    return g_bTrigDrawFreeCam && dword_4E5C74 != NULL;
+}
+
+// A stick axis as -1..1 with a dead zone of 0.2.
+static RwReal TrigDrawFreeCamAxis(SHORT sValue)
+{
+    RwReal f = (RwReal)sValue / 32767.0f;
+
+    if (f > -0.2f && f < 0.2f)
+        return 0.0f;
+    return f > 1.0f ? 1.0f : f < -1.0f ? -1.0f : f;
+}
+
+// Before the world is drawn: moves the free camera by the pad over the time
+// since the last frame and puts the camera pCamera's frame there (the game's
+// own matrix kept for TrigDrawFreeCamEnd).
+void TrigDrawFreeCamBegin(RwCamera *pCamera)
+{
+    RwFrame *pFrame;
+    RwMatrix *pLtm, mWorld, mInv;
+    RwV3d vAt, vRight, vUp;
+    RwReal fDt, fFwd, fSide, fRise, fSpeed, fCos;
+    LARGE_INTEGER liNow, liFreq;
+
+    s_bFreeCamSaved = FALSE;
+    if (!g_bTrigDrawFreeCam || pCamera == NULL)
+    {
+        s_bFreeCamLive = FALSE;
+        return;
+    }
+    pFrame = RwCameraGetFrame(pCamera);
+    pLtm = RwFrameGetLTM(pFrame);
+    QueryPerformanceCounter(&liNow);
+    QueryPerformanceFrequency(&liFreq);
+    if (!s_bFreeCamLive)
+    {
+        // (from where the game's camera is, looking its way)
+        s_vFreeCamPos = pLtm->pos;
+        s_fFreeCamYaw = (RwReal)atan2(pLtm->at.x, pLtm->at.z);
+        s_fFreeCamPitch = (RwReal)asin(pLtm->at.y > 1.0f ? 1.0f : pLtm->at.y < -1.0f ? -1.0f : pLtm->at.y);
+        memset(&s_FreeCamPad, 0, sizeof(s_FreeCamPad));
+        s_liFreeCamLast = liNow;
+        s_bFreeCamLive = TRUE;
+    }
+    fDt = (RwReal)((RwReal)(liNow.QuadPart - s_liFreeCamLast.QuadPart) / (RwReal)liFreq.QuadPart);
+    s_liFreeCamLast = liNow;
+    if (fDt > 0.1f)
+        fDt = 0.1f;
+
+    // the look: the right stick turns right (the yaw falls) and up
+    s_fFreeCamYaw -= TrigDrawFreeCamAxis(s_FreeCamPad.sThumbRX) * g_fTrigDrawFreeCamLook * fDt;
+    s_fFreeCamPitch += TrigDrawFreeCamAxis(s_FreeCamPad.sThumbRY) * g_fTrigDrawFreeCamLook * fDt;
+    if (s_fFreeCamPitch > 1.55f)
+        s_fFreeCamPitch = 1.55f;
+    if (s_fFreeCamPitch < -1.55f)
+        s_fFreeCamPitch = -1.55f;
+    fCos = (RwReal)cos(s_fFreeCamPitch);
+    vAt.x = fCos * (RwReal)sin(s_fFreeCamYaw);
+    vAt.y = (RwReal)sin(s_fFreeCamPitch);
+    vAt.z = fCos * (RwReal)cos(s_fFreeCamYaw);
+    // (y is up; a RenderWare camera's right vector points to the screen's left: up x at)
+    vRight.x = vAt.z;
+    vRight.y = 0.0f;
+    vRight.z = -vAt.x;
+    fCos = (RwReal)sqrt(vRight.x * vRight.x + vRight.z * vRight.z);
+    if (fCos < 1e-5f)
+        fCos = 1e-5f;
+    vRight.x /= fCos;
+    vRight.z /= fCos;
+    // (at x right)
+    vUp.x = vAt.y * vRight.z - vAt.z * vRight.y;
+    vUp.y = vAt.z * vRight.x - vAt.x * vRight.z;
+    vUp.z = vAt.x * vRight.y - vAt.y * vRight.x;
+
+    // the move: along the look, sideways (to the screen's right is -right), up and down
+    fFwd = TrigDrawFreeCamAxis(s_FreeCamPad.sThumbLY);
+    fSide = TrigDrawFreeCamAxis(s_FreeCamPad.sThumbLX);
+    fRise = (s_FreeCamPad.bAnalogButtons[XINPUT_GAMEPAD_BLACK] > 30 ? 1.0f : 0.0f)
+          - (s_FreeCamPad.bAnalogButtons[XINPUT_GAMEPAD_WHITE] > 30 ? 1.0f : 0.0f);
+    fSpeed = g_fTrigDrawFreeCamSpeed * fDt;
+    if (s_FreeCamPad.bAnalogButtons[7] > 30)
+        fSpeed *= 4.0f;
+    if (s_FreeCamPad.bAnalogButtons[6] > 30)
+        fSpeed *= 0.25f;
+    s_vFreeCamPos.x += (vAt.x * fFwd - vRight.x * fSide) * fSpeed;
+    s_vFreeCamPos.y += (vAt.y * fFwd + fRise) * fSpeed;
+    s_vFreeCamPos.z += (vAt.z * fFwd - vRight.z * fSide) * fSpeed;
+
+    // the camera's frame there: its modelling matrix, relative to its parent's when it has one
+    memset(&mWorld, 0, sizeof(mWorld));
+    mWorld.right = vRight;
+    mWorld.up = vUp;
+    mWorld.at = vAt;
+    mWorld.pos = s_vFreeCamPos;
+    mWorld.flags = 3;
+    s_mFreeCamSaved = pFrame->modelling;
+    s_bFreeCamSaved = TRUE;
+    if (RwFrameGetParent(pFrame))
+    {
+        RwMatrixInvert(&mInv, RwFrameGetLTM(RwFrameGetParent(pFrame)));
+        RwMatrixMultiply(&pFrame->modelling, &mWorld, &mInv);
+    }
+    else
+        pFrame->modelling = mWorld;
+    RwFrameUpdateObjects(pFrame);
+}
+
+// After the frame: the game's camera back as the game left it.
+void TrigDrawFreeCamEnd(RwCamera *pCamera)
+{
+    RwFrame *pFrame;
+
+    if (!s_bFreeCamSaved || pCamera == NULL)
+        return;
+    pFrame = RwCameraGetFrame(pCamera);
+    pFrame->modelling = s_mFreeCamSaved;
+    RwFrameUpdateObjects(pFrame);
+    s_bFreeCamSaved = FALSE;
+}
+
 // Whether the trigger is within g_fTrigDrawRange of the camera at pvCam
 // (always when the range is 0).
 static RwBool TrigDrawInRange(Trigger *pTrigger, const RwV3d *pvCam)

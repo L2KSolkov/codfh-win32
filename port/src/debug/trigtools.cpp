@@ -2,7 +2,8 @@
 // overlay): the plain build's research web pages (research/trigweb.cpp in
 // C:\codfh-patches\plain-build\draw-triggers.patch) as tabs of an overlay
 // window, live state read straight from memory and the pages' actions:
-//   Drawing     trigdraw.cpp's switches (triggers, collision, noclip) and
+//   Drawing     trigdraw.cpp's switches (triggers, collision, noclip, the free
+//               camera) and
 //               the game's own debug menu
 //   Player      the local player (sub_1745A0(0), a type_10F710)
 //   Inventory   health, the inventory and the 39 weapons, with gives
@@ -80,6 +81,9 @@ extern RwReal g_fTrigDrawRange;
 extern RwReal g_fTrigDrawTextScale;
 extern RwReal g_fTrigDrawCollisionRange;
 extern RwReal g_fTrigDrawCollisionLift;
+extern RwBool g_bTrigDrawFreeCam;
+extern RwReal g_fTrigDrawFreeCamSpeed;
+extern RwReal g_fTrigDrawFreeCamLook;
 const RwChar *TrigDrawKindName(Trigger *pTrigger);
 // The section slots, the global section, and the starting sections
 // (unit_171DC0, unit_0B0410).
@@ -926,6 +930,14 @@ static void TabDrawing()
     Check("noclip for the local player", &g_bTrigDrawNoclip);
     ImGui::SliderFloat("noclip speed", &g_fTrigDrawNoclipSpeed, 1.0f, 500.0f, "%.0f");
     ImGui::TextDisabled("(noclip: the left stick moves along the view, Black up, White down)");
+    ImGui::Separator();
+    Check("free camera", &g_bTrigDrawFreeCam);
+    ImGui::SliderFloat("free camera speed (units a second)", &g_fTrigDrawFreeCamSpeed, 50.0f, 10000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    ImGui::SliderFloat("free camera look (radians a second)", &g_fTrigDrawFreeCamLook, 0.5f, 6.0f, "%.1f");
+    ImGui::TextDisabled("(free camera: the pad is the camera's, not the player's; the left stick (WASD) moves, the "
+                        "right (the mouse) looks, Black/White (Q/E) up and down, the right trigger faster, the left "
+                        "slower; start and back stay the game's)");
     ImGui::Separator();
     ImGui::Text("The game's debug menu: %s", unk_4E73A8.unk_14 ? "open" : "closed");
     ImGui::SameLine();

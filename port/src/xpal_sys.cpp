@@ -325,6 +325,10 @@ extern "C" volatile LONG port_menu_mouse_clicks, port_menu_mouse_backs, port_men
 extern "C" volatile LONG port_menu_mouse_lefts, port_menu_mouse_rights;
 extern "C" int port_in_menus(void);
 
+#ifdef CODFH_DRAW_TRIGGERS
+extern "C" int port_freecam_input(XINPUT_GAMEPAD *pPad);
+#endif
+
 static void menu_mouse_state(XINPUT_GAMEPAD *g)
 {
     static DWORD a_until, b_until, wheel_until, left_until, right_until;
@@ -465,6 +469,16 @@ extern "C" DWORD WINAPI XInputGetState(HANDLE hDevice, PXINPUT_STATE pState)
         menu_mouse_state(&s.Gamepad);
 #endif
         scripted_state(&s.Gamepad);
+#ifdef CODFH_DRAW_TRIGGERS
+        /* the debug tools' free camera (port/src/debug/trigdraw.cpp) takes the pad while it is on:
+           the game gets a neutral one, but for start and back */
+        if (port_freecam_input(&s.Gamepad))
+        {
+            WORD keep = s.Gamepad.wButtons & (XB_START | XB_BACK);
+            memset(&s.Gamepad, 0, sizeof(s.Gamepad));
+            s.Gamepad.wButtons = keep;
+        }
+#endif
     }
     if (memcmp(&s.Gamepad, &pState->Gamepad, sizeof(s.Gamepad)))
         packets[port]++;
