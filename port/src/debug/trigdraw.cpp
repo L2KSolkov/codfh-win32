@@ -50,9 +50,13 @@
 #include "types/type_F8350.h"
 #include "types/AIData.h"
 #include "types/type_3DAFC8.h"
+#include "types/type_3DC9B0.h"
+#include "types/type_15CCE0.h"
 #include "types/type_D48D0.h"
 #include "types/type_67620.h"
 #include "types/type_3D2E7C.h"
+#include "types/alfaobject.h"
+#include "types/alfasched.h"
 
 extern type_4C00E8 unk_4C00E8;
 
@@ -626,14 +630,20 @@ static void TrigDrawPaths(const RwV3d *pvCam, const RwMatrix *pCamLtm)
 // What each AI is doing, over its head and as lines: its AI object's
 // (AIData, the entity's vf_120) state code (unk_578) and alert (unk_520),
 // its hit points, the entity it tracks (unk_1374: a red line), its target
-// point (unk_4F0: orange), where it aims (a soldier's vf_244, the point its
-// five-way aim blend turns to: yellow), the path it follows (unk_8AC's nodes
+// point (unk_4F0: orange), where it aims (a soldier's aim object's world
+// point, from its aim blend's origin, as type_3DAFC8::vf_244 takes them: yellow), the path it follows (unk_8AC's nodes
 // in the path-node graph: cyan) and its current node (unk_F60: green); and
 // the game's own words for what it is thinking: the last lines its AI code
 // logged about it (the entity-tagged sub_19A750, as the A* scheduler's "AStar
 // search registered. Type: eASST_...") and the script messages it raised
 // (sub_6B5F0: "FoundTarget", "AStar_ArrivedATDestination", "AIAction_..."),
-// with their age. Within the AI range of the camera; players left out.
+// with their age. Also: the task its object runs (its script, function and
+// line, when the scripts keep lines), its behaviour script's state, the
+// path's A* request (its kind, the path's own request parameter; whether
+// found, its length, the start and goal nodes by ID and type; the goal a
+// magenta cross) and its current and next nodes. The search's eASST type is
+// in the notes, from the scheduler's own log. A note repeated is one line
+// with its count. Within the AI range of the camera; players left out.
 RwBool g_bTrigDrawAi = FALSE;
 RwBool g_bTrigDrawAiText = TRUE;
 RwBool g_bTrigDrawAiLines = TRUE;
@@ -651,6 +661,7 @@ struct TrigDrawAiNotes
     RwUInt32 dwLast;                    // the frame of its newest note
     RwInt32 nNext;
     RwUInt32 adwFrame[TRIGDRAW_AI_NOTES];
+    RwInt32 anRepeats[TRIGDRAW_AI_NOTES];   // the same note again (1 once)
     RwChar aszText[TRIGDRAW_AI_NOTES][TRIGDRAW_AI_NOTE];
 };
 static TrigDrawAiNotes s_aAiNotes[TRIGDRAW_AI_ENTITIES];
@@ -668,8 +679,10 @@ void TrigDrawAiNote(const void *pEntity, const RwChar *pszText)
     if (!g_bTrigDrawAi || pEntity == NULL || pszText == NULL)
         return;
     // (the A* scheduler's lines, shortened to the search type the game names: "A* eASST_...")
-    if (strncmp(pszText, "AStar search registered. Type: ", 32) == 0 ||
-        strncmp(pszText, "Unregistering A* search for object. Type: ", 42) == 0)
+    static const RwChar s_szRegistered[] = "AStar search registered. Type: ";
+    static const RwChar s_szUnregistering[] = "Unregistering A* search for object. Type: ";
+    if (strncmp(pszText, s_szRegistered, sizeof(s_szRegistered) - 1) == 0 ||
+        strncmp(pszText, s_szUnregistering, sizeof(s_szUnregistering) - 1) == 0)
     {
         RwBool bDone = pszText[0] == 'U';
 
@@ -699,6 +712,18 @@ void TrigDrawAiNote(const void *pEntity, const RwChar *pszText)
         pNotes->pEntity = pEntity;
     }
     pNotes->dwLast = port_frame ? port_frame : 1;
+    {
+        RwInt32 nNewest = (pNotes->nNext + TRIGDRAW_AI_NOTES - 1) % TRIGDRAW_AI_NOTES;
+
+        if (pNotes->adwFrame[nNewest] && strncmp(pNotes->aszText[nNewest], pszText, TRIGDRAW_AI_NOTE - 1) == 0)
+        {
+            pNotes->adwFrame[nNewest] = pNotes->dwLast;
+            pNotes->anRepeats[nNewest]++;
+            InterlockedExchange(&s_nAiNotesLock, 0);
+            return;
+        }
+    }
+    pNotes->anRepeats[pNotes->nNext] = 1;
     pNotes->adwFrame[pNotes->nNext] = pNotes->dwLast;
     strncpy(pNotes->aszText[pNotes->nNext], pszText, TRIGDRAW_AI_NOTE - 1);
     pNotes->aszText[pNotes->nNext][TRIGDRAW_AI_NOTE - 1] = 0;
@@ -738,12 +763,111 @@ void TrigDrawAiMessage(const RwChar *pszName, type_67620 *pScript)
 // One AI's state, read guarded (an entity can go while it is read).
 struct TrigDrawAiState
 {
-    RwV3d vPos, vTarget, vPoint, vAim, vNode;
+    RwV3d vPos, vTarget, vPoint, vAim, vAimFrom, vNode;
     RwBool bTarget, bPoint, bAim, bNode;
     RwInt32 nState, nAlert, nHp, nTargetSlot;
     RwInt32 nPath;
     RwV3d avPath[32];
+    // its object's task (type_3D2E7C::sub_71090, a type_3D2E20): its script, function, place and
+    // whether it waits
+    RwBool bTask;
+    RwInt32 nTaskScript, nTaskFunction, nTaskLine, nTaskWaits;
+    RwChar szTaskFile[40];
+    // its behaviour script (the state machine whose owner is its object): place and state
+    RwBool bMachine;
+    RwInt32 nMachineLine, nMachineState;
+    RwChar szMachineFile[40];
+    // the path it follows (unk_8AC): its A* request's kind, result, length, start and goal
+    // nodes, the waypoints left, the goal point
+    RwBool bPathSearch;
+    RwInt32 nSearchKind, nSearchResult, nSearchLength, nStartNode, nGoalNode, nGoalType, nLeft;
+    RwV3d vGoal;
+    RwBool bGoal;
+    // its nodes: the current (unk_F60) and the one found next (unk_F5C)
+    RwInt32 nNodeId, nNodeType, nNextId, nNextType;
 };
+
+// The live state machines' owners and machines (the m_stateMachineObjectPool's
+// elements not on its free list, walked as trigtools.cpp's Scripts tab does),
+// gathered once a frame for the AI's behaviour scripts.
+extern type_16C2A0 dword_449A30;
+static RwUInt32 s_adwMachineOwner[1100];
+static type_3D2DB8 *s_apMachine[1100];
+static RwInt32 s_nMachines;
+
+static void TrigDrawAiMachines()
+{
+    static RwUInt8 s_abFree[1100];
+
+    s_nMachines = 0;
+    __try
+    {
+        type_16C2A0 *pPool = &dword_449A30;
+        RwUInt8 *p = pPool->unk_08, *pBase = (RwUInt8 *)pPool->unk_04;
+        RwInt32 nStride = pPool->unk_10, nCount = pPool->unk_0C;
+        RwInt32 nNext = nStride - ((pPool->unk_00 & 2) ? 4 : 0);
+        RwInt32 i, nIndex;
+
+        if (pBase == NULL || nStride <= 0 || nCount <= 0 || nCount > 1100)
+            return;
+        memset(s_abFree, 0, nCount);
+        for (i = 0; p != NULL && i < nCount; i++)
+        {
+            nIndex = (RwInt32)(p - pBase) / nStride;
+            if (nIndex < 0 || nIndex >= nCount)
+                break;
+            s_abFree[nIndex] = 1;
+            p = *(RwUInt8 **)(p + nNext);
+        }
+        for (i = 0; i < nCount; i++)
+        {
+            if (s_abFree[i])
+                continue;
+            s_apMachine[s_nMachines] = (type_3D2DB8 *)(pBase + i * nStride);
+            s_adwMachineOwner[s_nMachines] = s_apMachine[s_nMachines]->unk_7C;
+            s_nMachines++;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        s_nMachines = 0;
+    }
+}
+
+// A script's file: its name when the word points at text, else its number.
+static void TrigDrawAiFile(RwUInt32 dwFile, RwChar *psz, RwInt32 nMax)
+{
+    RwInt32 i;
+
+    if (dwFile <= 0x10000)
+    {
+        _snprintf(psz, nMax - 1, "%d", (RwInt32)dwFile);
+        psz[nMax - 1] = 0;
+        return;
+    }
+    for (i = 0; i < nMax - 1; i++)
+    {
+        RwChar c = ((const RwChar *)dwFile)[i];
+
+        if (c == 0)
+            break;
+        psz[i] = (RwUInt8)c < 0x20 || (RwUInt8)c > 0x7E ? '.' : c;
+    }
+    psz[i] = 0;
+}
+
+// The ID of the node pNode in the graph, 0 for none.
+static RwInt32 TrigDrawPathNodeId(type_F8350 *pNode)
+{
+    RwInt32 i;
+
+    if (pNode == NULL || unk_4C00E8.unk_2C == NULL)
+        return 0;
+    for (i = 1; i < unk_4C00E8.unk_08 && i < 4096; i++)
+        if (unk_4C00E8.unk_2C[i] == pNode)
+            return i;
+    return 0;
+}
 
 static RwBool TrigDrawAiRead(type_3D3548 *pEntity, RwUInt32 dwBits, TrigDrawAiState *pState)
 {
@@ -778,14 +902,85 @@ static RwBool TrigDrawAiRead(type_3D3548 *pEntity, RwUInt32 dwBits, TrigDrawAiSt
         pState->bPoint = pAi->unk_4F0 != NULL;
         if (pState->bPoint)
             pState->vPoint = *pAi->unk_4F0;
-        // (a soldier's aim point: the five-way blend's, type_3DAFC8::vf_244)
-        pState->bAim = (dwBits & 0x20) != 0;
-        if (pState->bAim)
-            ((type_3DAFC8 *)pEntity)->vf_244(&pState->vAim);
+        // (a soldier's aim, as type_3DAFC8::vf_244 finds it before turning it into its five-way
+        // blend's local point: the world point its aim object (unk_3E0) or, mounted, its
+        // vehicle gives, from the blend's origin, unk_1D64 in its frame)
+        pState->bAim = FALSE;
+        if (dwBits & 0x20)
+        {
+            type_3DAFC8 *pSoldier = (type_3DAFC8 *)pEntity;
+
+            if (pSoldier->get_unk_61C())
+            {
+                type_3DC9B0 *pVehicle = (type_3DC9B0 *)pSoldier->unk_618.sub_D4910();
+
+                if (pVehicle)
+                {
+                    pVehicle->sub_16A580(&pState->vAim);
+                    pState->bAim = TRUE;
+                }
+            }
+            else
+            {
+                pSoldier->unk_3E0.sub_15E9E0(&pState->vAim);
+                pState->bAim = TRUE;
+            }
+            if (pState->bAim)
+                RwV3dTransformPoints(&pState->vAimFrom, &pSoldier->unk_1D64, 1, RwFrameGetLTM(pFrame));
+        }
         pNode = pAi->get_unk_F60();
         pState->bNode = pNode != NULL;
         if (pNode)
             pState->vNode = pNode->unk_10;
+        pState->nNodeId = TrigDrawPathNodeId(pNode);
+        pState->nNodeType = pNode ? pNode->unk_04 : -1;
+        pState->nNextId = TrigDrawPathNodeId(pAi->unk_F5C);
+        pState->nNextType = pAi->unk_F5C ? pAi->unk_F5C->unk_04 : -1;
+        // the task its object runs, and its behaviour script (by its object's handle)
+        pState->bTask = FALSE;
+        pState->bMachine = FALSE;
+        {
+            type_3D2E7C *pObject = pEntity->vf_098();
+
+            if (pObject)
+            {
+                type_3D2E20 *pTask = (type_3D2E20 *)pObject->sub_71090();
+                RwUInt32 dwHandle = pObject->get_unk_04();
+
+                if (pTask)
+                {
+                    pState->bTask = TRUE;
+                    pState->nTaskScript = pTask->unk_64;
+                    pState->nTaskFunction = pTask->unk_108;
+                    pState->nTaskLine = pTask->unk_08;
+                    pState->nTaskWaits = pTask->unk_10C;
+                    TrigDrawAiFile((RwUInt32)pTask->unk_0C, pState->szTaskFile, sizeof(pState->szTaskFile));
+                }
+                for (i = 0; i < s_nMachines; i++)
+                    if (s_adwMachineOwner[i] == dwHandle)
+                    {
+                        pState->bMachine = TRUE;
+                        pState->nMachineLine = s_apMachine[i]->unk_08;
+                        pState->nMachineState = s_apMachine[i]->unk_90;
+                        TrigDrawAiFile((RwUInt32)s_apMachine[i]->unk_0C, pState->szMachineFile,
+                                       sizeof(pState->szMachineFile));
+                        break;
+                    }
+            }
+        }
+        // the path it follows: its A* request and goal
+        // (shown once found, or with a goal node asked for)
+        pState->bPathSearch = pAi->unk_8AC.unk_64.unk_28 == 1 || pAi->unk_8AC.unk_64.unk_40 != 0;
+        pState->nSearchKind = pAi->unk_8AC.unk_64.unk_1C;
+        pState->nSearchResult = pAi->unk_8AC.unk_64.unk_28;
+        pState->nSearchLength = pAi->unk_8AC.unk_64.unk_2C;
+        pState->nStartNode = pAi->unk_8AC.unk_64.unk_38;
+        pState->nGoalNode = pAi->unk_8AC.unk_64.unk_40;
+        pState->nGoalType = TrigDrawPathNode(pState->nGoalNode) ? TrigDrawPathNode(pState->nGoalNode)->unk_04 : -1;
+        pState->nLeft = pAi->unk_8AC.unk_04;
+        pState->bGoal = pState->nLeft > 0;
+        if (pState->bGoal)
+            pState->vGoal = pAi->unk_8AC.unk_20;
         // the path it follows: its nodes' places, in the order the path keeps them
         pState->nPath = 0;
         n = pAi->unk_8AC.unk_64.unk_2C;
@@ -815,6 +1010,7 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
 
     g_nTrigDrawAiShown = 0;
     s_nPathVerts = 0;
+    TrigDrawAiMachines();
     RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
     for (i = 0; i < 768; i++)
     {
@@ -845,9 +1041,23 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
             if (s->bPoint)
                 TrigDrawPathLine(&vEye, &s->vPoint, 0xE0FF9020);
             if (s->bAim)
-                TrigDrawPathLine(&vEye, &s->vAim, 0xE0FFFF40);
+                TrigDrawPathLine(&s->vAimFrom, &s->vAim, 0xE0FFFF40);
             if (s->bNode)
                 TrigDrawPathLine(&s->vPos, &s->vNode, 0xE040FF40);
+        }
+        if (g_bTrigDrawAiPath && s->bGoal)
+        {
+            RwV3d vA = s->vGoal, vB = s->vGoal;
+
+            TrigDrawPathLine(&s->vPos, &s->vGoal, 0x90FF40FF);
+            vA.x -= 40.0f;
+            vB.x += 40.0f;
+            TrigDrawPathLine(&vA, &vB, 0xE0FF40FF);
+            vA = s->vGoal;
+            vB = s->vGoal;
+            vA.z -= 40.0f;
+            vB.z += 40.0f;
+            TrigDrawPathLine(&vA, &vB, 0xE0FF40FF);
         }
         if (g_bTrigDrawAiPath && s->nPath > 0)
         {
@@ -860,7 +1070,7 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
         TrigDrawPathFlush();
         RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
         {
-            RwChar aszLines[3 + TRIGDRAW_AI_NOTES][TRIGDRAW_AI_NOTE + 16];
+            RwChar aszLines[7 + TRIGDRAW_AI_NOTES][TRIGDRAW_AI_NOTE + 16];
             RwInt32 nLines = 0, j;
             RwReal fDist = (RwReal)sqrt(vD.x * vD.x + vD.y * vD.y + vD.z * vD.z), fStep;
             TrigDrawAiNotes *pNotes = NULL;
@@ -870,6 +1080,33 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
             _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "state %d%s", s->nState, s->nAlert ? ", alerted" : "");
             if (s->bTarget)
                 _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "target #%d", s->nTargetSlot);
+            if (s->bTask)
+            {
+                RwChar szAt[56] = "";
+
+                if (s->nTaskLine >= 0)
+                    _snprintf(szAt, sizeof(szAt) - 1, ", %s:%d", s->szTaskFile, s->nTaskLine);
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "task: script %d fn %d%s%s", s->nTaskScript,
+                          s->nTaskFunction, szAt, s->nTaskWaits ? ", waiting" : "");
+            }
+            else
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "no task");
+            if (s->bMachine)
+            {
+                if (s->nMachineLine >= 0)
+                    _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "script: %s:%d, state %d", s->szMachineFile,
+                              s->nMachineLine, s->nMachineState);
+                else
+                    _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "script: state %d", s->nMachineState);
+            }
+            if (s->bPathSearch)
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "path: kind %d %s, %d nodes, #%d to #%d %s%s",
+                          s->nSearchKind, s->nSearchResult > 0 ? "found" : "not found", s->nSearchLength, s->nStartNode,
+                          s->nGoalNode, TrigDrawPathTypeName(s->nGoalType), s->bGoal ? "" : " (done)");
+            if (s->nNodeId || s->nNextId)
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "node: at #%d %s, next #%d %s", s->nNodeId,
+                          s->nNodeId ? TrigDrawPathTypeName(s->nNodeType) : "-", s->nNextId,
+                          s->nNextId ? TrigDrawPathTypeName(s->nNextType) : "-");
             for (j = 0; j < TRIGDRAW_AI_ENTITIES; j++)
                 if (s_aAiNotes[j].pEntity == pEntity)
                 {
@@ -877,15 +1114,22 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
                     break;
                 }
             // the notes, newest first, with their age in seconds
+            RwInt32 nNotes = nLines;
             for (j = 0; pNotes && j < TRIGDRAW_AI_NOTES; j++)
             {
                 RwInt32 n = (pNotes->nNext + TRIGDRAW_AI_NOTES - 1 - j) % TRIGDRAW_AI_NOTES;
 
                 if (!pNotes->adwFrame[n])
                     continue;
-                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE + 15, "%.0fs %s",
-                          (RwReal)(port_frame - pNotes->adwFrame[n]) / 60.0f, pNotes->aszText[n]);
+                if (pNotes->anRepeats[n] > 1)
+                    _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE + 15, "%.0fs %s (x%d)",
+                              (RwReal)(port_frame - pNotes->adwFrame[n]) / 60.0f, pNotes->aszText[n],
+                              pNotes->anRepeats[n]);
+                else
+                    _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE + 15, "%.0fs %s",
+                              (RwReal)(port_frame - pNotes->adwFrame[n]) / 60.0f, pNotes->aszText[n]);
             }
+            nNotes = nLines - nNotes;
             fStep = fDist * g_fTrigDrawTextScale * 1.2f;
             if (fStep < 0.06f)
                 fStep = 0.06f;
@@ -898,7 +1142,7 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
                 vAt.x = vEye.x + pCamLtm->up.x * fStep * (RwReal)(nLines - j);
                 vAt.y = vEye.y + 40.0f + pCamLtm->up.y * fStep * (RwReal)(nLines - j);
                 vAt.z = vEye.z + pCamLtm->up.z * fStep * (RwReal)(nLines - j);
-                TrigDrawText(aszLines[j], &vAt, pCamLtm, j < 3 ? 0xFFFFFFFF : 0xFFFFD080);
+                TrigDrawText(aszLines[j], &vAt, pCamLtm, j < nLines - nNotes ? 0xFFFFFFFF : 0xFFFFD080);
             }
         }
         RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
