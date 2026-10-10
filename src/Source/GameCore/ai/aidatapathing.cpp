@@ -558,6 +558,9 @@ RwInt32 AIData::sub_29940(type_154C0_5BC *arg_0, RwInt32 arg_4, RwInt32 arg_8, R
 #ifdef CODFH_WIN32
 extern "C" void port_debug_print(const RwChar *arg_0, ...);
 #endif
+#ifdef CODFH_DRAW_TRIGGERS
+void TrigDrawAiNote(const void *pEntity, const RwChar *pszText);
+#endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
@@ -568,6 +571,10 @@ void sub_19A750(struct type_3D3548 * arg_0, RwInt32 arg_4, RwChar const * arg_8,
 #ifdef CODFH_WIN32
     // The A* debug log (the entity, a value, the message, where): the port prints it.
     port_debug_print("%s (entity %p, %d; %s:%d)", arg_8, arg_0, arg_4, arg_C, arg_10);
+#endif
+#ifdef CODFH_DRAW_TRIGGERS
+    // (and for the debug tools' AI view, port/src/debug/trigdraw.cpp)
+    TrigDrawAiNote(arg_0, arg_8);
 #endif
 }
 

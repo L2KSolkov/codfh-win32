@@ -48,6 +48,11 @@
 #include "game/worldmgr.h"
 #include "types/type_4C00E8.h"
 #include "types/type_F8350.h"
+#include "types/AIData.h"
+#include "types/type_3DAFC8.h"
+#include "types/type_D48D0.h"
+#include "types/type_67620.h"
+#include "types/type_3D2E7C.h"
 
 extern type_4C00E8 unk_4C00E8;
 
@@ -73,6 +78,8 @@ typedef RwChar TrigDrawSector_check[sizeof(TrigDrawSector) == 0x88 ? 1 : -1];
 
 extern type_4E5D30 dword_4E5D30[4];
 extern type_4E5D30 unk_4E5CD8;
+
+extern "C" volatile unsigned port_frame;
 
 #define TRIGDRAW_COLLVERTS  3000
 
@@ -614,6 +621,291 @@ static void TrigDrawPaths(const RwV3d *pvCam, const RwMatrix *pCamLtm)
     }
 }
 
+// ---- the AI ----
+
+// What each AI is doing, over its head and as lines: its AI object's
+// (AIData, the entity's vf_120) state code (unk_578) and alert (unk_520),
+// its hit points, the entity it tracks (unk_1374: a red line), its target
+// point (unk_4F0: orange), where it aims (a soldier's vf_244, the point its
+// five-way aim blend turns to: yellow), the path it follows (unk_8AC's nodes
+// in the path-node graph: cyan) and its current node (unk_F60: green); and
+// the game's own words for what it is thinking: the last lines its AI code
+// logged about it (the entity-tagged sub_19A750, as the A* scheduler's "AStar
+// search registered. Type: eASST_...") and the script messages it raised
+// (sub_6B5F0: "FoundTarget", "AStar_ArrivedATDestination", "AIAction_..."),
+// with their age. Within the AI range of the camera; players left out.
+RwBool g_bTrigDrawAi = FALSE;
+RwBool g_bTrigDrawAiText = TRUE;
+RwBool g_bTrigDrawAiLines = TRUE;
+RwBool g_bTrigDrawAiPath = TRUE;
+RwReal g_fTrigDrawAiRange = 3000.0f;
+RwInt32 g_nTrigDrawAiShown;
+
+#define TRIGDRAW_AI_ENTITIES    96
+#define TRIGDRAW_AI_NOTES       4
+#define TRIGDRAW_AI_NOTE        72
+
+struct TrigDrawAiNotes
+{
+    const void *pEntity;
+    RwUInt32 dwLast;                    // the frame of its newest note
+    RwInt32 nNext;
+    RwUInt32 adwFrame[TRIGDRAW_AI_NOTES];
+    RwChar aszText[TRIGDRAW_AI_NOTES][TRIGDRAW_AI_NOTE];
+};
+static TrigDrawAiNotes s_aAiNotes[TRIGDRAW_AI_ENTITIES];
+static volatile LONG s_nAiNotesLock;
+
+// Keeps a note about the entity pEntity (its newest four), for its label.
+void TrigDrawAiNote(const void *pEntity, const RwChar *pszText)
+{
+    TrigDrawAiNotes *pNotes = NULL;
+    RwInt32 i, nOldest = 0;
+
+    RwChar szShort[TRIGDRAW_AI_NOTE];
+    const RwChar *p;
+
+    if (!g_bTrigDrawAi || pEntity == NULL || pszText == NULL)
+        return;
+    // (the A* scheduler's lines, shortened to the search type the game names: "A* eASST_...")
+    if (strncmp(pszText, "AStar search registered. Type: ", 32) == 0 ||
+        strncmp(pszText, "Unregistering A* search for object. Type: ", 42) == 0)
+    {
+        RwBool bDone = pszText[0] == 'U';
+
+        p = strstr(pszText, "Type: ") + 6;
+        _snprintf(szShort, sizeof(szShort) - 1, "A* %s%s", bDone ? "done " : "", p);
+        szShort[sizeof(szShort) - 1] = 0;
+        if (strchr(szShort, ','))
+            *strchr(szShort, ',') = 0;
+        pszText = szShort;
+    }
+    while (InterlockedExchange(&s_nAiNotesLock, 1))
+        ;
+    for (i = 0; i < TRIGDRAW_AI_ENTITIES; i++)
+    {
+        if (s_aAiNotes[i].pEntity == pEntity)
+        {
+            pNotes = &s_aAiNotes[i];
+            break;
+        }
+        if (s_aAiNotes[i].dwLast < s_aAiNotes[nOldest].dwLast)
+            nOldest = i;
+    }
+    if (pNotes == NULL)
+    {
+        pNotes = &s_aAiNotes[nOldest];
+        memset(pNotes, 0, sizeof(*pNotes));
+        pNotes->pEntity = pEntity;
+    }
+    pNotes->dwLast = port_frame ? port_frame : 1;
+    pNotes->adwFrame[pNotes->nNext] = pNotes->dwLast;
+    strncpy(pNotes->aszText[pNotes->nNext], pszText, TRIGDRAW_AI_NOTE - 1);
+    pNotes->aszText[pNotes->nNext][TRIGDRAW_AI_NOTE - 1] = 0;
+    pNotes->nNext = (pNotes->nNext + 1) % TRIGDRAW_AI_NOTES;
+    InterlockedExchange(&s_nAiNotesLock, 0);
+}
+
+// A script message (sub_6B5F0) sent to the script object pScript: noted for
+// the entity the object belongs to.
+void TrigDrawAiMessage(const RwChar *pszName, type_67620 *pScript)
+{
+    const void *pEntity = NULL;
+
+    if (!g_bTrigDrawAi || pScript == NULL || pszName == NULL)
+        return;
+    __try
+    {
+        type_3D2E7C *pObject = pScript->vf_024();
+
+        if (pObject)
+            pEntity = pObject->sub_71300();
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        pEntity = NULL;
+    }
+    if (pEntity)
+    {
+        RwChar sz[TRIGDRAW_AI_NOTE];
+
+        _snprintf(sz, sizeof(sz) - 1, "> %s", pszName);
+        sz[sizeof(sz) - 1] = 0;
+        TrigDrawAiNote(pEntity, sz);
+    }
+}
+
+// One AI's state, read guarded (an entity can go while it is read).
+struct TrigDrawAiState
+{
+    RwV3d vPos, vTarget, vPoint, vAim, vNode;
+    RwBool bTarget, bPoint, bAim, bNode;
+    RwInt32 nState, nAlert, nHp, nTargetSlot;
+    RwInt32 nPath;
+    RwV3d avPath[32];
+};
+
+static RwBool TrigDrawAiRead(type_3D3548 *pEntity, RwUInt32 dwBits, TrigDrawAiState *pState)
+{
+    __try
+    {
+        AIData *pAi = pEntity->vf_120();
+        RwFrame *pFrame = pEntity->unk_338.unk_08;
+        type_3D3548 *pTarget;
+        type_F8350 *pNode;
+        RwInt32 i, n;
+
+        if (pAi == NULL || pFrame == NULL)
+            return FALSE;
+        pState->vPos = RwFrameGetMatrix(pFrame)->pos;
+        pState->nState = pAi->get_unk_578();
+        pState->nAlert = pAi->get_unk_520();
+        pState->nHp = pEntity->vf_174();
+        pTarget = pAi->unk_1374.sub_D4910();
+        pState->bTarget = FALSE;
+        pState->nTargetSlot = -1;
+        if (pTarget && pTarget->unk_338.unk_08)
+        {
+            pState->vTarget = RwFrameGetMatrix(pTarget->unk_338.unk_08)->pos;
+            pState->bTarget = TRUE;
+            for (i = 0; i < 768; i++)
+                if (dword_4B6A00[i].unk_04 == pTarget)
+                {
+                    pState->nTargetSlot = i;
+                    break;
+                }
+        }
+        pState->bPoint = pAi->unk_4F0 != NULL;
+        if (pState->bPoint)
+            pState->vPoint = *pAi->unk_4F0;
+        // (a soldier's aim point: the five-way blend's, type_3DAFC8::vf_244)
+        pState->bAim = (dwBits & 0x20) != 0;
+        if (pState->bAim)
+            ((type_3DAFC8 *)pEntity)->vf_244(&pState->vAim);
+        pNode = pAi->get_unk_F60();
+        pState->bNode = pNode != NULL;
+        if (pNode)
+            pState->vNode = pNode->unk_10;
+        // the path it follows: its nodes' places, in the order the path keeps them
+        pState->nPath = 0;
+        n = pAi->unk_8AC.unk_64.unk_2C;
+        if (n > 0 && unk_4C00E8.unk_64 && unk_4C00E8.unk_2C)
+        {
+            for (i = 0; i < n && i < 100 && pState->nPath < 32; i++)
+            {
+                type_F8350 *pPathNode = TrigDrawPathNode(pAi->unk_8AC.unk_B0[i]);
+
+                if (pPathNode)
+                    pState->avPath[pState->nPath++] = pPathNode->unk_10;
+            }
+        }
+        return TRUE;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+
+// Draws every AI near the camera at pvCam.
+static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    static TrigDrawAiState s_state;
+    RwInt32 i, k;
+
+    g_nTrigDrawAiShown = 0;
+    s_nPathVerts = 0;
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (i = 0; i < 768; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+        RwUInt32 dwBits;
+        RwV3d vHead, vD, vEye;
+        TrigDrawAiState *s = &s_state;
+
+        if (pEntity == NULL)
+            continue;
+        dwBits = pEntity->unk_2C;
+        if (dwBits & 0x10)
+            continue;               // (players)
+        if (!TrigDrawAiRead(pEntity, dwBits, s))
+            continue;
+        vD.x = s->vPos.x - pvCam->x;
+        vD.y = s->vPos.y - pvCam->y;
+        vD.z = s->vPos.z - pvCam->z;
+        if (g_fTrigDrawAiRange > 0.0f && vD.x * vD.x + vD.y * vD.y + vD.z * vD.z > g_fTrigDrawAiRange * g_fTrigDrawAiRange)
+            continue;
+        g_nTrigDrawAiShown++;
+        vEye = s->vPos;
+        vEye.y += 160.0f;
+        if (g_bTrigDrawAiLines)
+        {
+            if (s->bTarget)
+                TrigDrawPathLine(&vEye, &s->vTarget, 0xE0FF3030);
+            if (s->bPoint)
+                TrigDrawPathLine(&vEye, &s->vPoint, 0xE0FF9020);
+            if (s->bAim)
+                TrigDrawPathLine(&vEye, &s->vAim, 0xE0FFFF40);
+            if (s->bNode)
+                TrigDrawPathLine(&s->vPos, &s->vNode, 0xE040FF40);
+        }
+        if (g_bTrigDrawAiPath && s->nPath > 0)
+        {
+            TrigDrawPathLine(&s->vPos, &s->avPath[0], 0xC040E0FF);
+            for (k = 1; k < s->nPath; k++)
+                TrigDrawPathLine(&s->avPath[k - 1], &s->avPath[k], 0xC040E0FF);
+        }
+        if (!g_bTrigDrawAiText || TrigDrawCharset() == NULL)
+            continue;
+        TrigDrawPathFlush();
+        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+        {
+            RwChar aszLines[3 + TRIGDRAW_AI_NOTES][TRIGDRAW_AI_NOTE + 16];
+            RwInt32 nLines = 0, j;
+            RwReal fDist = (RwReal)sqrt(vD.x * vD.x + vD.y * vD.y + vD.z * vD.z), fStep;
+            TrigDrawAiNotes *pNotes = NULL;
+
+            _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "#%d %s hp %d", i,
+                      (dwBits & 0x20) ? "soldier" : "ai", s->nHp);
+            _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "state %d%s", s->nState, s->nAlert ? ", alerted" : "");
+            if (s->bTarget)
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "target #%d", s->nTargetSlot);
+            for (j = 0; j < TRIGDRAW_AI_ENTITIES; j++)
+                if (s_aAiNotes[j].pEntity == pEntity)
+                {
+                    pNotes = &s_aAiNotes[j];
+                    break;
+                }
+            // the notes, newest first, with their age in seconds
+            for (j = 0; pNotes && j < TRIGDRAW_AI_NOTES; j++)
+            {
+                RwInt32 n = (pNotes->nNext + TRIGDRAW_AI_NOTES - 1 - j) % TRIGDRAW_AI_NOTES;
+
+                if (!pNotes->adwFrame[n])
+                    continue;
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE + 15, "%.0fs %s",
+                          (RwReal)(port_frame - pNotes->adwFrame[n]) / 60.0f, pNotes->aszText[n]);
+            }
+            fStep = fDist * g_fTrigDrawTextScale * 1.2f;
+            if (fStep < 0.06f)
+                fStep = 0.06f;
+            for (j = 0; j < nLines; j++)
+            {
+                RwV3d vAt;
+
+                aszLines[j][TRIGDRAW_AI_NOTE + 15] = 0;
+                // (stacked up the screen from over its head, the first line on top)
+                vAt.x = vEye.x + pCamLtm->up.x * fStep * (RwReal)(nLines - j);
+                vAt.y = vEye.y + 40.0f + pCamLtm->up.y * fStep * (RwReal)(nLines - j);
+                vAt.z = vEye.z + pCamLtm->up.z * fStep * (RwReal)(nLines - j);
+                TrigDrawText(aszLines[j], &vAt, pCamLtm, j < 3 ? 0xFFFFFFFF : 0xFFFFD080);
+            }
+        }
+        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    }
+    TrigDrawPathFlush();
+}
+
 // Draws and empties the collision triangle buffer.
 static void TrigDrawCollisionFlush()
 {
@@ -960,11 +1252,14 @@ void TrigDrawAll(RwCamera *pCamera)
             g_bTrigDrawEnabled = TRUE;
         if (s_nStart >= 2)
             g_bTrigDrawCollision = TRUE;
+        // (CODFH_AI=1: the AI's state and notes)
+        if (GetEnvironmentVariableA("CODFH_AI", NULL, 0))
+            g_bTrigDrawAi = TRUE;
         // (CODFH_PATHNODES=1: the path nodes, with their labels)
         if (GetEnvironmentVariableA("CODFH_PATHNODES", NULL, 0))
             g_bTrigDrawPathNodes = g_bTrigDrawPathLabels = TRUE;
     }
-    if ((!g_bTrigDrawEnabled && !g_bTrigDrawPathNodes) || pCamera == NULL)
+    if ((!g_bTrigDrawEnabled && !g_bTrigDrawPathNodes && !g_bTrigDrawAi) || pCamera == NULL)
         return;
     pCamLtm = RwFrameGetLTM(RwCameraGetFrame(pCamera));
     vCam = pCamLtm->pos;
@@ -993,6 +1288,8 @@ void TrigDrawAll(RwCamera *pCamera)
     RwRenderStateSet(rwRENDERSTATEZTESTENABLE, (void *)(g_bTrigDrawSeeThrough ? FALSE : TRUE));
     if (g_bTrigDrawPathNodes)
         TrigDrawPaths(&vCam, pCamLtm);
+    if (g_bTrigDrawAi)
+        TrigDrawAi(&vCam, pCamLtm);
     if (!g_bTrigDrawEnabled)
         i = dword_429D00 + 1;
     else

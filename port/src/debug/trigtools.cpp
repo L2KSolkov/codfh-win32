@@ -3,7 +3,7 @@
 // C:\codfh-patches\plain-build\draw-triggers.patch) as tabs of an overlay
 // window, live state read straight from memory and the pages' actions:
 //   Drawing     trigdraw.cpp's switches (triggers, collision, the AI's path
-//               nodes, noclip, the free camera) and
+//               nodes, the AI's state, noclip, the free camera) and
 //               the game's own debug menu
 //   Player      the local player (sub_1745A0(0), a type_10F710)
 //   Inventory   health, the inventory and the 39 weapons, with gives
@@ -83,6 +83,12 @@ extern RwReal g_fTrigDrawTextScale;
 extern RwReal g_fTrigDrawCollisionRange;
 extern RwReal g_fTrigDrawCollisionLift;
 extern RwBool g_bTrigDrawFreeCam;
+extern RwBool g_bTrigDrawAi;
+extern RwBool g_bTrigDrawAiText;
+extern RwBool g_bTrigDrawAiLines;
+extern RwBool g_bTrigDrawAiPath;
+extern RwReal g_fTrigDrawAiRange;
+extern RwInt32 g_nTrigDrawAiShown;
 extern RwBool g_bTrigDrawPathNodes;
 extern RwBool g_bTrigDrawPathLinks;
 extern RwBool g_bTrigDrawPathLabels;
@@ -972,6 +978,21 @@ static void TabDrawing()
         else
             ImGui::TextDisabled("(no path graph loaded: multiplayer maps have none)");
     }
+    ImGui::Separator();
+    Check("draw the AI's state", &g_bTrigDrawAi);
+    ImGui::SameLine();
+    Check("text", &g_bTrigDrawAiText);
+    ImGui::SameLine();
+    Check("target, point, aim, node", &g_bTrigDrawAiLines);
+    ImGui::SameLine();
+    Check("path", &g_bTrigDrawAiPath);
+    ImGui::SliderFloat("AI draw distance (0 unlimited)", &g_fTrigDrawAiRange, 0.0f, 20000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    if (g_bTrigDrawAi)
+        ImGui::TextDisabled("(%d drawn: over each, its slot, hit points, AI state code (unk_578), alert and target, "
+                            "then the last lines the game logged about it and the script messages it raised (> ...), "
+                            "with their age; lines: red the tracked entity, orange the target point, yellow where it "
+                            "aims, green its current node, cyan its path)", g_nTrigDrawAiShown);
     ImGui::Separator();
     Check("noclip for the local player", &g_bTrigDrawNoclip);
     ImGui::SliderFloat("noclip speed", &g_fTrigDrawNoclipSpeed, 1.0f, 500.0f, "%.0f");
