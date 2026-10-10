@@ -87,6 +87,8 @@ extern RwBool g_bTrigDrawAi;
 extern RwBool g_bTrigDrawAiText;
 extern RwBool g_bTrigDrawAiLines;
 extern RwBool g_bTrigDrawAiPath;
+extern RwBool g_bTrigDrawAiCover;
+extern RwBool g_bTrigDrawAiCombat;
 extern RwReal g_fTrigDrawAiRange;
 extern RwInt32 g_nTrigDrawAiShown;
 extern RwBool g_bTrigDrawPathNodes;
@@ -986,6 +988,9 @@ static void TabDrawing()
     Check("target, point, aim, node", &g_bTrigDrawAiLines);
     ImGui::SameLine();
     Check("path", &g_bTrigDrawAiPath);
+    Check("cover (radius, nodes found, cover points)", &g_bTrigDrawAiCover);
+    ImGui::SameLine();
+    Check("perception and combat", &g_bTrigDrawAiCombat);
     ImGui::SliderFloat("AI draw distance (0 unlimited)", &g_fTrigDrawAiRange, 0.0f, 20000.0f, "%.0f",
                        ImGuiSliderFlags_Logarithmic);
     if (g_bTrigDrawAi)

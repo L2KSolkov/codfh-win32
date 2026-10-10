@@ -52,6 +52,9 @@
 #include "types/type_3DAFC8.h"
 #include "types/type_3DC9B0.h"
 #include "types/type_15CCE0.h"
+#include "types/type_154C0_F80.h"
+#include "types/type_154C0_12F4.h"
+
 #include "types/type_D48D0.h"
 #include "types/type_67620.h"
 #include "types/type_3D2E7C.h"
@@ -648,6 +651,21 @@ RwBool g_bTrigDrawAi = FALSE;
 RwBool g_bTrigDrawAiText = TRUE;
 RwBool g_bTrigDrawAiLines = TRUE;
 RwBool g_bTrigDrawAiPath = TRUE;
+// Its cover: the cover search radius (unk_F6C, a circle), the cover nodes its
+// two node searches found (unk_F80, unk_10C4: small posts, grey once tried),
+// the node found (unk_F54), next (unk_F5C) and left (unk_F58), its vehicle
+// cover point (unk_4F4) and its five cover records' points (unk_12F4 on).
+RwBool g_bTrigDrawAiCover = FALSE;
+// Its perception and fighting: where it last saw the entity it tracks
+// (unk_1380, a white cross), how long it has tracked it (unk_1378), what it
+// hears (the classes, kinds and sides, unk_538 to unk_540), whether it may
+// lose sight of its target (unk_52C), its AI control (unk_51C), the nearest
+// blocker to a player target (unk_139C), the shots left in its burst
+// (unk_498), its timers in and out of its fighting states (unk_550,
+// unk_554), and its weapon (a soldier's unk_3E0: type, the soldiers' own
+// numbering, not the player's weapons'; ammunition, time to its next shot,
+// the point it aims its weapon at).
+RwBool g_bTrigDrawAiCombat = FALSE;
 RwReal g_fTrigDrawAiRange = 3000.0f;
 RwInt32 g_nTrigDrawAiShown;
 
@@ -785,6 +803,24 @@ struct TrigDrawAiState
     RwBool bGoal;
     // its nodes: the current (unk_F60) and the one found next (unk_F5C)
     RwInt32 nNodeId, nNodeType, nNextId, nNextType;
+    // its cover
+    RwReal fCoverRadius;
+    RwInt32 nCandidates, nTried;
+    RwV3d avCandidate[35];
+    RwBool abTried[35];
+    RwV3d avCoverNode[3];               // found, next, left
+    RwBool abCoverNode[3];
+    RwV3d avCoverPoint[6];              // the vehicle cover point, the five records
+    RwInt32 nCoverPoints;
+    // its perception and fighting
+    RwBool bSeen;
+    RwV3d vSeen;
+    RwReal fTracked, fBlocker, fIn, fOut;
+    RwInt32 nHearClasses, nHearKinds, nHearSides, nLosLoss, nControl, nShots;
+    RwBool bWeapon;
+    RwInt32 nWeaponType, nAmmo, nInfinite, nNoTarget, nAimsWeapon;
+    RwReal fNextShot;
+    RwV3d vWeaponAim;
 };
 
 // The live state machines' owners and machines (the m_stateMachineObjectPool's
@@ -968,6 +1004,73 @@ static RwBool TrigDrawAiRead(type_3D3548 *pEntity, RwUInt32 dwBits, TrigDrawAiSt
                     }
             }
         }
+        // its cover
+        {
+            type_154C0_12F4 *apRecord[5];
+            type_F8350 *apNode[3];
+
+            pState->fCoverRadius = pAi->unk_F6C;
+            pState->nCandidates = pState->nTried = 0;
+            for (i = 0; i < 35; i++)
+            {
+                const type_154C0_F80 *r = i < 25 ? &pAi->unk_F80[i] : &pAi->unk_10C4[i - 25];
+                type_F8350 *pCand = TrigDrawPathNode(r->unk_00);
+
+                if (pCand == NULL)
+                    continue;
+                pState->avCandidate[pState->nCandidates] = pCand->unk_10;
+                pState->abTried[pState->nCandidates] = r->unk_02 != 0;
+                pState->nTried += r->unk_02 != 0;
+                pState->nCandidates++;
+            }
+            apNode[0] = pAi->unk_F54;
+            apNode[1] = pAi->unk_F5C;
+            apNode[2] = pAi->unk_F58;
+            for (i = 0; i < 3; i++)
+            {
+                pState->abCoverNode[i] = apNode[i] != NULL;
+                if (apNode[i])
+                    pState->avCoverNode[i] = apNode[i]->unk_10;
+            }
+            pState->nCoverPoints = 0;
+            if (pAi->unk_4F4.x != 0.0f || pAi->unk_4F4.y != 0.0f || pAi->unk_4F4.z != 0.0f)
+                pState->avCoverPoint[pState->nCoverPoints++] = pAi->unk_4F4;
+            apRecord[0] = &pAi->unk_12F4;
+            apRecord[1] = &pAi->unk_130C;
+            apRecord[2] = &pAi->unk_1324;
+            apRecord[3] = &pAi->unk_133C;
+            apRecord[4] = &pAi->unk_1354;
+            for (i = 0; i < 5; i++)
+                if (apRecord[i]->unk_0C.x != 0.0f || apRecord[i]->unk_0C.y != 0.0f || apRecord[i]->unk_0C.z != 0.0f)
+                    pState->avCoverPoint[pState->nCoverPoints++] = apRecord[i]->unk_0C;
+        }
+        // its perception and fighting
+        pState->bSeen = pState->bTarget &&
+                        (pAi->unk_1380.x != 0.0f || pAi->unk_1380.y != 0.0f || pAi->unk_1380.z != 0.0f);
+        pState->vSeen = pAi->unk_1380;
+        pState->fTracked = pAi->unk_1378;
+        pState->fBlocker = pAi->unk_139C;
+        pState->fIn = pAi->unk_550;
+        pState->fOut = pAi->unk_554;
+        pState->nHearClasses = pAi->unk_538;
+        pState->nHearKinds = pAi->unk_53C;
+        pState->nHearSides = pAi->unk_540;
+        pState->nLosLoss = pAi->unk_52C;
+        pState->nControl = pAi->unk_51C;
+        pState->nShots = pAi->unk_498;
+        pState->bWeapon = (dwBits & 0x20) != 0;
+        if (pState->bWeapon)
+        {
+            type_15CCE0 *pWeapon = &((type_3DAFC8 *)pEntity)->unk_3E0;
+
+            pState->nWeaponType = pWeapon->unk_04;
+            pState->nAmmo = pWeapon->unk_1C;
+            pState->nInfinite = pWeapon->unk_20;
+            pState->fNextShot = pWeapon->unk_88;
+            pState->nNoTarget = pWeapon->unk_A0;
+            pState->nAimsWeapon = pWeapon->unk_CC;
+            pState->vWeaponAim = pWeapon->unk_D0;
+        }
         // the path it follows: its A* request and goal
         // (shown once found, or with a goal node asked for)
         pState->bPathSearch = pAi->unk_8AC.unk_64.unk_28 == 1 || pAi->unk_8AC.unk_64.unk_40 != 0;
@@ -1045,6 +1148,72 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
             if (s->bNode)
                 TrigDrawPathLine(&s->vPos, &s->vNode, 0xE040FF40);
         }
+        if (g_bTrigDrawAiCover)
+        {
+            // the search radius (a circle at its feet), the candidates, its nodes, its cover points
+            if (s->fCoverRadius > 0.0f)
+                for (k = 0; k < 32; k++)
+                {
+                    RwReal a0 = (RwReal)k * (6.2831853f / 32), a1 = (RwReal)(k + 1) * (6.2831853f / 32);
+                    RwV3d vA = s->vPos, vB = s->vPos;
+
+                    vA.x += (RwReal)cos(a0) * s->fCoverRadius;
+                    vA.z += (RwReal)sin(a0) * s->fCoverRadius;
+                    vB.x += (RwReal)cos(a1) * s->fCoverRadius;
+                    vB.z += (RwReal)sin(a1) * s->fCoverRadius;
+                    vA.y += 5.0f;
+                    vB.y += 5.0f;
+                    TrigDrawPathLine(&vA, &vB, 0x6040C0C0);
+                }
+            for (k = 0; k < s->nCandidates; k++)
+            {
+                RwV3d vTop = s->avCandidate[k];
+
+                vTop.y += 100.0f;
+                TrigDrawPathLine(&s->avCandidate[k], &vTop, s->abTried[k] ? 0x80808080 : 0xC040FFC0);
+            }
+            {
+                static const RwUInt32 s_adwNode[3] = { 0xE0FFFFFF, 0xE040FF40, 0xC0FF8080 };
+
+                for (k = 0; k < 3; k++)
+                    if (s->abCoverNode[k])
+                    {
+                        RwV3d vTop = s->avCoverNode[k];
+
+                        vTop.y += 150.0f;
+                        TrigDrawPathLine(&s->avCoverNode[k], &vTop, s_adwNode[k]);
+                        TrigDrawPathLine(&s->vPos, &s->avCoverNode[k], s_adwNode[k] & 0x60FFFFFF);
+                    }
+            }
+            for (k = 0; k < s->nCoverPoints; k++)
+            {
+                RwV3d vA = s->avCoverPoint[k], vB = s->avCoverPoint[k];
+
+                vA.x -= 30.0f;
+                vB.x += 30.0f;
+                vA.y += 30.0f;
+                vB.y += 30.0f;
+                TrigDrawPathLine(&vA, &vB, 0xE0FFC040);
+            }
+        }
+        if (g_bTrigDrawAiCombat)
+        {
+            if (s->bSeen)
+            {
+                RwV3d vA = s->vSeen, vB = s->vSeen;
+
+                vA.x -= 40.0f;
+                vB.x += 40.0f;
+                TrigDrawPathLine(&vA, &vB, 0xFFFFFFFF);
+                vA = s->vSeen;
+                vB = s->vSeen;
+                vA.z -= 40.0f;
+                vB.z += 40.0f;
+                TrigDrawPathLine(&vA, &vB, 0xFFFFFFFF);
+            }
+            if (s->bWeapon && s->nAimsWeapon)
+                TrigDrawPathLine(&vEye, &s->vWeaponAim, 0xC0FF80FF);
+        }
         if (g_bTrigDrawAiPath && s->bGoal)
         {
             RwV3d vA = s->vGoal, vB = s->vGoal;
@@ -1070,7 +1239,7 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
         TrigDrawPathFlush();
         RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
         {
-            RwChar aszLines[7 + TRIGDRAW_AI_NOTES][TRIGDRAW_AI_NOTE + 16];
+            RwChar aszLines[12 + TRIGDRAW_AI_NOTES][TRIGDRAW_AI_NOTE + 16];
             RwInt32 nLines = 0, j;
             RwReal fDist = (RwReal)sqrt(vD.x * vD.x + vD.y * vD.y + vD.z * vD.z), fStep;
             TrigDrawAiNotes *pNotes = NULL;
@@ -1103,6 +1272,26 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
                 _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "path: kind %d %s, %d nodes, #%d to #%d %s%s",
                           s->nSearchKind, s->nSearchResult > 0 ? "found" : "not found", s->nSearchLength, s->nStartNode,
                           s->nGoalNode, TrigDrawPathTypeName(s->nGoalType), s->bGoal ? "" : " (done)");
+            if (g_bTrigDrawAiCover)
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "cover: radius %.0f, %d nodes found (%d tried)%s",
+                          s->fCoverRadius, s->nCandidates, s->nTried, s->nCoverPoints ? ", cover points" : "");
+            if (g_bTrigDrawAiCombat)
+            {
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "tracked %.1fs%s, hears %X/%X/%d%s%s",
+                          s->fTracked / 60.0f, s->bSeen ? ", seen (x)" : "", s->nHearClasses, s->nHearKinds,
+                          s->nHearSides, s->nLosLoss ? ", may lose sight" : "", s->nControl ? "" : ", no AI control");
+            {
+                RwChar szBlocker[32] = "";
+
+                if (s->fBlocker > 0.0f && s->fBlocker < 1e30f)
+                    _snprintf(szBlocker, sizeof(szBlocker) - 1, ", blocker at %.0f", s->fBlocker);
+                _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "fighting %.1fs, not %.1fs, burst %d left%s",
+                          s->fIn / 60.0f, s->fOut / 60.0f, s->nShots, szBlocker);
+            }
+                if (s->bWeapon)
+                    _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "weapon type %d: ammo %d%s, next shot %.2f",
+                              s->nWeaponType, s->nAmmo, s->nInfinite ? " (infinite)" : "", s->fNextShot);
+            }
             if (s->nNodeId || s->nNextId)
                 _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "node: at #%d %s, next #%d %s", s->nNodeId,
                           s->nNodeId ? TrigDrawPathTypeName(s->nNodeType) : "-", s->nNextId,
@@ -1496,9 +1685,13 @@ void TrigDrawAll(RwCamera *pCamera)
             g_bTrigDrawEnabled = TRUE;
         if (s_nStart >= 2)
             g_bTrigDrawCollision = TRUE;
-        // (CODFH_AI=1: the AI's state and notes)
-        if (GetEnvironmentVariableA("CODFH_AI", NULL, 0))
+        // (CODFH_AI=1: the AI's state and notes; 2 with its cover and fighting)
+        if (GetEnvironmentVariableA("CODFH_AI", szValue, sizeof(szValue)))
+        {
             g_bTrigDrawAi = TRUE;
+            if (atoi(szValue) >= 2)
+                g_bTrigDrawAiCover = g_bTrigDrawAiCombat = TRUE;
+        }
         // (CODFH_PATHNODES=1: the path nodes, with their labels)
         if (GetEnvironmentVariableA("CODFH_PATHNODES", NULL, 0))
             g_bTrigDrawPathNodes = g_bTrigDrawPathLabels = TRUE;
