@@ -1842,6 +1842,22 @@ bool type_3DA5A0::vf_018()
                                         1.0f, 1.0f);
             unk_10 = 0;
         }
+#ifdef CODFH_DRAW_TRIGGERS
+        else
+        {
+            // (the debug tools: a map that never set this grenade's throw animation
+            // up, as the multiplayer maps: the animation's events at once,
+            // the release (1900, the projectile) and the end (back to the
+            // weapon before), when the projectile's object is loaded)
+            type_495F0 *pDef = (type_495F0 *)sub_198800(&unk_448->unk_00);
+
+            if (pDef && sub_198800(&pDef->unk_38.unk_04))
+            {
+                vf_030(1900, 0, 0);
+                vf_030(1, 0, 0);
+            }
+        }
+#endif
         return 1;
     }
     return 0;

@@ -18,6 +18,12 @@
 #include "rw/rpcollis.h"
 #include "game/clumputil.h"
 #include "rw/rphanim.h"
+#ifdef CODFH_DRAW_TRIGGERS
+#include "types/type_4C09B0.h"
+#include "types/type_4C19C0.h"
+#include "types/type_495F0.h"
+#include "types/type_10F710.h"
+#endif
 #include "game/data.h"
 #include "game/gameloop.h"
 #include "game/flags.h"
@@ -87,6 +93,33 @@ type_1AE520 *sub_1BD450(RwInt32 arg_0, RwInt32 arg_4, RwMatrix *arg_8, RwReal ar
 {
     type_1AE520 *var_10 = 0;
 
+#ifdef CODFH_DRAW_TRIGGERS
+    // (the debug tools: a dropped weapon given from the overlay can name a pickup
+    // whose model this map never loaded; spawning it reads a null model, so
+    // it borrows the weapon's handheld model from its loaded bank instead)
+    if (arg_0 < 0 || arg_0 >= 0x6E)
+        return 0;
+    if (!arg_14 && !sub_198800(&dword_4C09B0[arg_0].unk_04))
+    {
+        type_10F710 *pPlayer = (type_10F710 *)sub_1745A0(0);
+        RwInt32 w;
+
+        for (w = 0; pPlayer && w < 39; w++)
+        {
+            if (pPlayer->sub_1064C0(w) == arg_0)
+            {
+                type_495F0 *pDef = (type_495F0 *)sub_198800(&dword_4C19C0[w].unk_00);
+                type_3DF8D8 *pModel = pDef && pDef->vf_008() == 5 ? sub_198800(&pDef->unk_20.unk_04) : 0;
+
+                if (pModel)
+                    arg_14 = (RwInt32)((type_3DF9C4 *)pModel)->sub_190A10();
+                break;
+            }
+        }
+        if (!arg_14)
+            return 0;
+    }
+#endif
     var_10 = (type_1AE520 *)sub_D56D0(0x3E0, 0, 0x18);
     if (var_10 != 0)
     {

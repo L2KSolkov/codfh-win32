@@ -39,6 +39,10 @@ RwInt32 unk_4E73A0;
 // functions at the end of .text).
 type_4E73A8 unk_4E73A8;
 // Its data (PLAN M5): literals, constants and tables where the image has them.
+#ifdef CODFH_DRAW_TRIGGERS
+// port/src/debug/trigtools.cpp: set to open or close the menu from the overlay
+extern RwInt32 g_nTrigWebDebugMenuToggle;
+#endif
 // match: ??_C@_0BA@DDAEONIJ@MAIN?5DEBUG?5MENU?$AA@ @ 0x003DE5B4
 // match: ?flt_3DE5C4@@3MB @ 0x003DE5C4
 // match: ??_C@_0BA@EDCKMLNE@int?5g_debugInt1?$AA@ @ 0x003DE5C8
@@ -340,6 +344,20 @@ void type_4E73A8::sub_183840()
     r10 = (RwInt32)unk_4B9308.sub_EE8F0(0, 0x27);
 #else
     r10 = (RwInt32)unk_4B9308.sub_EE8F0(0, 0x2B);
+#endif
+#ifdef CODFH_DRAW_TRIGGERS
+    // (the debug tools: the open/close the release build compiled out (its input 0xF, the Black
+    // button, still read above), asked for from the overlay. Opening selects the shown group's
+    // first item, as the draw needs one.)
+    if (g_nTrigWebDebugMenuToggle)
+    {
+        g_nTrigWebDebugMenuToggle = 0;
+        unk_14 = !unk_14;
+        if (unk_14 && unk_0C && !unk_10)
+            unk_10 = unk_0C->unk_08;
+        if (unk_14 && !unk_10)
+            unk_14 = 0;
+    }
 #endif
     if (unk_14)
     {

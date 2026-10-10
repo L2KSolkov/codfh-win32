@@ -20,6 +20,14 @@
 #include "../../third_party/imgui/backends/imgui_impl_win32.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#ifdef CODFH_DRAW_TRIGGERS
+/* the game's debug tools (port/src/debug/trigtools.cpp) */
+extern "C" void port_debug_tools_window(void);
+#endif
+#ifdef CODFH_DRAW_TRIGGERS
+/* the game's debug tools (port/src/debug/trigtools.cpp) */
+extern "C" void port_debug_tools_window(void);
+#endif
 
 static int ready, visible, show_demo;
 /* the real time between presents (not ImGui's smoothed rate): the last 240 frames */
@@ -203,6 +211,12 @@ extern "C" void pdev_imgui_frame(int back_w, int back_h)
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
     port_window(back_w, back_h);
+#ifdef CODFH_DRAW_TRIGGERS
+    port_debug_tools_window();
+#endif
+#ifdef CODFH_DRAW_TRIGGERS
+    port_debug_tools_window();
+#endif
     if (show_demo)
         {
             bool open = true;

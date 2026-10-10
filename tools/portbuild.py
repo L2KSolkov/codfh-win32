@@ -13,7 +13,9 @@ and the headers and identifiers the errors name most. Linking comes with W0's en
 
 CODFH_IMGUI (the port's Dear ImGui overlay, port/third_party/imgui) is on in the game's build and
 off in the dedicated server's; --no-imgui leaves it out. ImGui itself is compiled with the current
-compiler's own rules, not the sources' VC7.1 ones.
+compiler's own rules, not the sources' VC7.1 ones. CODFH_DRAW_TRIGGERS, the game's debug tools
+(port/src/debug: trigger volumes and collision drawn, noclip, the overlay's Game debug tools
+window), comes with it; --no-debug-tools leaves them out.
 
 --dedicated builds the dedicated server instead (build/port/dedicated/codfh_server.exe, its own
 objects): every unit compiled with CODFH_DEDICATED too, which the port layer reads (no window,
@@ -187,6 +189,9 @@ def main():
     imgui = '--dedicated' not in args and '--no-imgui' not in args
     if imgui:
         PORT_FLAGS.append('/DCODFH_IMGUI')
+        # (the game's debug tools, port/src/debug; --no-debug-tools leaves them out)
+        if '--no-debug-tools' not in args:
+            PORT_FLAGS.append('/DCODFH_DRAW_TRIGGERS')
     os.makedirs(OUT, exist_ok=True)
     only = [args[i + 1] for i, a in enumerate(args) if a == '--only']
     jobs_n = int(args[args.index('--jobs') + 1]) if '--jobs' in args else (os.cpu_count() or 4)

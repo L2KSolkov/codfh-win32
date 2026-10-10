@@ -83,6 +83,11 @@
 #include "rw/rpcollis.h"
 #include "types/type_4E5D30.h"
 
+#ifdef CODFH_DRAW_TRIGGERS
+// port/src/debug/trigdraw.cpp: noclip for the local player
+extern RwBool g_bTrigDrawNoclip;
+void TrigDrawNoclipMove(RwV3d *pvPos, RwReal fStep);
+#endif
 // match: __ehhandler$??0type_10F710@@QAE@PAUtype_712B0@@@Z>1>8 @ 0x0041D200
 // match: __ehhandler$??0type_10F710@@QAE@PAUtype_712B0@@@Z>1 @ 0x0041D268
 // match: __ehhandler$??1type_10F710@@UAE@XZ>1>8 @ 0x0041D284
@@ -9523,6 +9528,20 @@ void type_10F710::vf_044(RwReal arg_0)
     if ((slot_C = RwFrameGetMatrix(bp_4)) == 0)
         return;
     q48 = &slot_C->pos;
+#ifdef CODFH_DRAW_TRIGGERS
+    // (the debug tools: noclip for the local player, port/src/debug/trigdraw.cpp; no collision,
+    // no fall, the last and target places kept with the frame)
+    if (g_bTrigDrawNoclip && (void *)this == (void *)sub_1745A0(0))
+    {
+        TrigDrawNoclipMove(q48, arg_0);
+        unk_434 = *q48;
+        unk_440 = *q48;
+        unk_510 = -1000000.0f;
+        unk_518 = 0.0f;
+        RwFrameUpdateObjects(bp_4);
+        return;
+    }
+#endif
     l1C = *q48;
     RwV3dSubMacro(&stk_40, &unk_434, &unk_440);
     if (arg_0 > 2.0f)

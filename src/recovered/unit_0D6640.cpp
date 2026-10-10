@@ -168,6 +168,10 @@ RWS::CEventId iMsgSparkStartSystem;
 RWS::CEventId dword_4B8750;
 type_3DF8D8_04 unk_4B8798[6];
 // Its data (PLAN M5): literals, constants and tables where the image has them.
+#ifdef CODFH_DRAW_TRIGGERS
+// port/src/debug/trigtools.cpp: the debug tools' main-thread work
+void TrigWebTick();
+#endif
 // match: ?iMsgSparkStartSystem_name@@3QBDB @ 0x003D7334
 // match: ?iMsgSparkStartGame_name@@3QBDB @ 0x003D734C
 // match: ?flt_3D7360@@3MB @ 0x003D7360
@@ -1044,6 +1048,10 @@ RwInt32 sub_D7570()
 void sub_D7880()
 {
     RwInt32 var_4;
+#ifdef CODFH_DRAW_TRIGGERS
+    // (the debug tools, port/src/debug/trigtools.cpp: a section load, a give, a teleport asked for)
+    TrigWebTick();
+#endif
 
     sub_D9620();
     unk_4E73A8.sub_183840();

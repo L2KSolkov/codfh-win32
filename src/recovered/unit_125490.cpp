@@ -34,6 +34,11 @@
 #include "types/type_4E1B70.h"
 #include "types/type_4B8EF0.h"
 #include "types/type_3DAFC8.h"
+
+#ifdef CODFH_DRAW_TRIGGERS
+// port/src/debug/trigdraw.cpp: the trigger volumes, drawn after the world
+void TrigDrawAll(RwCamera *pCamera);
+#endif
 #include "types/type_3D3548.h"
 #include "types/type_3D96F0.h"
 #include "types/type_4E5D30.h"
@@ -660,6 +665,9 @@ void sub_125F20(RwInt32 arg_0)
     sub_16D7F0(0x1E);
     sub_1287F0();
     sub_16D850(0x1E);
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawAll(bp_8);
+#endif
     sub_16D7F0(0xF);
     sub_F34C0(1, 0);
     sub_16D850(0xF);

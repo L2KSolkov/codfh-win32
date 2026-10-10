@@ -105,7 +105,14 @@ type_1FF250::type_1FF250()
     for (RwInt32 var_10 = 0; var_10 < 11; var_10++)
         unk_10[var_10] = 0;
     unk_08 = new type_3E75B8(0);
+#ifdef CODFH_DRAW_TRIGGERS
+    // (the debug tools: the pause menu with its "Debug" button, whose page
+    // DebugMenu.layout, type_216440, the menu already makes; the disc carries
+    // both layouts, the release build loads the one without)
+    unk_00 = new type_21A5E0("DebugPauseMenu.layout");
+#else
     unk_00 = new type_21A5E0("PauseMenu.layout");
+#endif
     dword_5043C0 = new type_218DD0("IngameControls.layout", unk_00);
     ((type_20E850 *)dword_5043C0)->sub_20EA40();
 }
