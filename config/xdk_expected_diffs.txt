@@ -1,0 +1,153 @@
+# XDK members placed from the installed libraries that do not match the image: the image
+# was linked with XDK 5849.9, and the libraries at hand are 5849, 5849.15 and 5849.17
+# The mismatched members are binarized: M7 builds their stand-ins from the image's bytes
+# (config/m7binarize.txt marks the members xdkrepack does so for).
+# xdk_members.py --check counts these as expected and fails on any other difference.
+# ADDRESS NAME LIB MEMBER [binarized]
+0x00239DD0 _itrp_MIN@12 xgraphics.lib obj\i386\interp.obj binarized
+0x0023A1C0 _itrp_NROUND@12 xgraphics.lib obj\i386\interp.obj binarized
+0x0023B048 _itrp_IDEF@12 xgraphics.lib obj\i386\interp.obj binarized
+0x0025FE66 ??_GCNotificationScreen@UIXNamespace@@UAEPAXI@Z uix.lib obj\i386\engine.obj
+0x00261BAF ?HideNotification@CNotificationScreen@UIXNamespace@@QAEXXZ uix.lib obj\i386\friends.obj
+0x002637A0 ??_GCLogonScreen@UIXNamespace@@UAEPAXI@Z uix.lib obj\i386\uixlogon.obj
+0x00266DCD ?RegisterPlayer@CPlayersFeature@UIXNamespace@@UAGJPBUITitlePlayersListItem@@@Z uix.lib obj\i386\players.obj
+0x00267AA4 ??_GCPlayersScreen@UIXNamespace@@UAEPAXI@Z uix.lib obj\i386\players.obj
+0x0026B46F ?InactiveOutputPacket@CMicrophoneProxy@XHVNamespace@@QAEHXZ xvoice.lib obj\i386\xhvutils.obj
+0x0026B508 ?SetVoiceMask@CMicrophoneProxy@XHVNamespace@@QAEJPBU_XHV_VOICE_MASK@@@Z xvoice.lib obj\i386\xhvutils.obj
+0x0026C270 ?ReleaseCustomStack@XHVNamespace@@YGXXZ xvoice.lib obj\i386\voicecodecsutils.obj
+0x0026CE06 ?Shutdown@BackupBuffer@XHVNamespace@@QAEXXZ xvoice.lib obj\i386\networkqueue.obj
+0x0026DCFF ?UpdateWAVFileSize@CWMAVoiceEncoder@XHVNamespace@@QAEXPAEK@Z xvoice.lib obj\i386\wmavoiceenc.obj
+0x002897B8 _cFFT_1 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x002897D8 _cFFT_norm_1 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x00289808 _cFFT_2 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x00289858 _cFFT_norm_2 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x002898C8 _cFFTfwd_4 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x00289988 _cFFTinv_4 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x00289A48 _cFFTfwd_norm_4 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x00289B38 _cFFTinv_norm_4 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x00289C28 _cFFTfwd_8 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x00289F08 _cFFTinv_8 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028A1E8 _cFFTfwd_norm_8 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028A518 _cFFTinv_norm_8 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028A848 _crFFT_1 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028A868 _crFFT_norm_1 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028A8A8 _crFFT_2 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028A908 _crFFT_norm_2 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028A978 _crFFTfwd_4 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028AA48 _crFFTinv_4 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028AB18 _crFFTfwd_norm_4 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028AC08 _crFFTinv_norm_4 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028ACF8 _crFFTfwd_8 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028AFA8 _crFFTinv_8 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028B258 _crFFTfwd_norm_8 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x0028B548 _crFFTinv_norm_8 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\a6\psffts.obj
+0x00293910 _ownsSet_64sc_A6 xvoice.lib h:\nightly\IPPnightly-2001-08-07\windows\slibsobjs\win32\asm\a6\pscopym6a6as.obj
+0x002C613D ___onexitinit libcmt.lib obj\i386\onexit.obj
+0x002C61BA __CIatan2 libcmt.lib obj\i386\87ctriga.obj
+0x002C6AC0 _asin libcmt.lib obj\i386\asin.obj
+0x002C773C _atan libcmt.lib obj\i386\atan.obj
+0x002C7D94 __CIpow libcmt.lib obj\i386\pow.obj
+0x002C842E __seh_longjmp_unwind@4 libcmt.lib obj\i386\exsup3.obj
+0x002C8B30 __CIexp libcmt.lib obj\i386\87ctran.obj
+0x002C8B3C __CIexp_default libcmt.lib obj\i386\87ctran.obj
+0x002C8DF5 ___initstdio libcmt.lib obj\i386\_file.obj
+0x002C8E9E ___endstdio libcmt.lib obj\i386\_file.obj
+0x002CB05B __ctrandisp2 libcmt.lib obj\i386\87cdisp.obj
+0x002CBDF4 ?__CxxSetUnhandledExceptionFilter@@YAHXZ libcmt.lib obj\i386\unhandld.obj
+0x002CBE06 ?__CxxRestoreUnhandledExceptionFilter@@YAXXZ libcmt.lib obj\i386\unhandld.obj
+0x002CC70E __ffexpm1 libcmt.lib obj\i386\87tran.obj
+0x002CD3A0 __ioinit libcmt.lib obj\i386\ioinit.obj
+0x002CF3A7 ___initmbctable libcmt.lib obj\i386\mbctype.obj
+0x00319360 ?ReportHardwareError@D3D@@YGXKKKK@Z d3d8.lib obj\i386\mpintr.obj
+0x003193B0 ?SoftwareMethod@CMiniport@D3D@@AAEXK@Z d3d8.lib obj\i386\mpintr.obj
+0x003196D0 ?ServiceFifoInterrupt@CMiniport@D3D@@AAEKXZ d3d8.lib obj\i386\mpintr.obj
+0x00328F63 ??_GCMcpxStream@DirectSound@@UAEPAXI@Z dsound.lib obj\i386\mcpstrm.obj binarized
+0x0032BB8D ??_GCMcpxBuffer@DirectSound@@UAEPAXI@Z dsound.lib obj\i386\mcpbuf.obj binarized
+0x0032DDBC ??1CAc97Device@DirectSound@@QAE@XZ dsound.lib obj\i386\ac97.obj binarized
+0x003575E2 ?XOnlineLogonTaskGetResults@CXo@@QAEJPAUXONLINETASK_HANDLE__@@@Z xonlines.lib obj\i386\logon.obj
+0x0035BDE6 ?XOnlineMatchSessionGetInfo@CXo@@QAEJPAUXONLINETASK_HANDLE__@@PAUXNKID@@PAUXNKEY@@@Z xonlines.lib obj\i386\match.obj
+0x0035CC1D ?Continue@CTitleCache@@QAEJPAUXONTC_TASK_ENTENDED_HANDLE@@@Z xonlines.lib obj\i386\titlecache.obj
+0x0035D3DA ?XOnlineTitleIdIsSameTitle@CXo@@QAEHK@Z xonlines.lib obj\i386\presence.obj
+0x0035D3E9 ?XOnlineGetNotificationEx@CXo@@QAEHKPAUXONLINE_NOTIFICATION_EX_INFO@@PAK@Z xonlines.lib obj\i386\presence.obj
+0x0035D6D9 ?XOnlineFriendsEnumerateFinish@CXo@@QAEJPAUXONLINETASK_HANDLE__@@@Z xonlines.lib obj\i386\presence.obj
+0x0035D6FC ?XOnlineFriendsGetTitleName@CXo@@QAEJKKKPAG@Z xonlines.lib obj\i386\presence.obj
+0x0035E817 ?XOnlineFriendsJoinGame@CXo@@QAEJKPBU_XONLINE_FRIEND@@@Z xonlines.lib obj\i386\presence.obj
+0x0035F27F ?XOnlineFriendsGetLatest@CXo@@QAEKKKPAU_XONLINE_FRIEND@@@Z xonlines.lib obj\i386\presence.obj
+0x003613C9 ?XOnlineFriendsStartup@CXo@@QAEJPAXPAPAUXONLINETASK_HANDLE__@@@Z xonlines.lib obj\i386\presence.obj
+0x0036365B ?GetNotificationEx@CAdvNotif@@QAEHKPAUXONLINE_NOTIFICATION_EX_INFO@@PAK@Z xonlines.lib obj\i386\advnotif.obj
+0x00369FB5 ?KerbPrincipalNameToMultiString@@YGJPAUKERB_PRINCIPAL_NAME@@KPAD@Z xonlines.lib obj\i386\kerberos.obj binarized
+0x0036A482 ?KerbAddClientVersionPreAuth@@YGJPAVCScratchMemoryAllocator@@PBUKERB_ENCRYPTION_KEY@@KPAPAUKERB_KDC_REQUEST_preauth_data_s@@@Z xonlines.lib obj\i386\kerberos.obj binarized
+0x0036CC25 ?XOnlineMessageDownloadAttachmentToMemoryGetResults@CXo@@QAEJPAUXONLINETASK_HANDLE__@@PAPAEPAK2@Z xonlines.lib obj\i386\messaging.obj
+0x0036EE2C ?XOnlineMessageDetails@CXo@@QAEJKKKKPAXPAPAUXONLINETASK_HANDLE__@@@Z xonlines.lib obj\i386\messaging.obj
+0x0036FB95 ?ConfigureUPnPNatVerifyDiscoveryReply@CXo@@IAEJPAUXONLINETASK_CONFIGURE_UPNP_NAT@@@Z xonlines.lib obj\i386\upnpnat.obj
+0x00372C66 ?StorageUploadInitializeContext@CXo@@IAEJPAUXONLINETASK_STORAGE_UPLOAD@@KKPAXPBDK1@Z xonlines.lib obj\i386\storul.obj binarized
+0x00376E60 ?XNetCreateKey@CXn@@QAEHPAUXNKID@@PAUXNKEY@@@Z xonlines.lib obj\i386\xnet.obj
+0x00376E71 ?XNetRegisterKey@CXn@@QAEHPBUXNKID@@PBUXNKEY@@@Z xonlines.lib obj\i386\xnet.obj
+0x00376E82 ?XNetUnregisterKey@CXn@@QAEHPBUXNKID@@@Z xonlines.lib obj\i386\xnet.obj
+0x00376EE6 ?XNetQosRelease@CXn@@QAEHPAUXNQOS@@@Z xonlines.lib obj\i386\xnet.obj
+0x00376EF7 ?XNetConfig@CXn@@QAEHPBUXNetConfigParams@@K@Z xonlines.lib obj\i386\xnet.obj
+0x00376F08 ?XNetGetConfigStatus@CXn@@QAEHPAUXNetConfigStatus@@@Z xonlines.lib obj\i386\xnet.obj
+0x003770A8 ?XNetUnregisterInAddr@CXn@@QAEHUin_addr@@@Z xonlines.lib obj\i386\xnet.obj
+0x003770F2 _XnInit@24 xonlines.lib obj\i386\xnet.obj
+0x003775C6 ?shutdown@CXnSock@@QAEHIH@Z xonlines.lib obj\i386\sock.obj
+0x0037870D ?WSACancelOverlappedIO@CXnSock@@QAEHI@Z xonlines.lib obj\i386\sock.obj
+0x0037912A ?closesocket@CXnSock@@QAEHI@Z xonlines.lib obj\i386\sock.obj
+0x0037989E ?IpTerm2@CXnIp@@IAEXXZ xonlines.lib obj\i386\ip.obj
+0x00379BAC ?IpRaiseToDpc@CXnIp@@QAEXH@Z xonlines.lib obj\i386\ip.obj
+0x0037A73A ?IpLogonGetQFlags@CXnIp@@QAEKI@Z xonlines.lib obj\i386\ip.obj
+0x00385339 ?IpConfigProbe@CXnIp@@QAEXXZ xonlines.lib obj\i386\ipcfg.obj
+0x00386019 ?EnetTerm@CXnEnet@@IAEXXZ xonlines.lib obj\i386\enet.obj
+0x003900A2 ?RecordInputMasks@DeadCodeStripper@XGRAPHICS@@QAEJABU_D3DVsInstruction@@ABUInRegMaskSet@12@@Z xgraphics.lib obj\i386\api.obj binarized
+0x0039040E ?ParseOut@InstructionDisassembler@XGRAPHICS@@AAEJPBU_D3DVsInstruction@@_N1@Z xgraphics.lib obj\i386\api.obj binarized
+0x0039055A ?ParseMux@InstructionDisassembler@XGRAPHICS@@AAEJDHHHHHHHPBU_D3DVsInstruction@@_N@Z xgraphics.lib obj\i386\api.obj binarized
+0x0039144C ?Log@MyErrorLog@XGRAPHICS@@UAEJ_NKPBDK1@Z xgraphics.lib obj\i386\api.obj binarized
+0x00391A38 ?Disassemble@InstructionDisassembler@XGRAPHICS@@AAEJPBU_D3DVsInstruction@@_N1@Z xgraphics.lib obj\i386\api.obj binarized
+0x0039CFF5 _$E3 xgraphics.lib obj\i386\instructiongraph.obj binarized
+0x0039D001 _$E6 xgraphics.lib obj\i386\instructiongraph.obj binarized
+0x0039D00D _$E9 xgraphics.lib obj\i386\instructiongraph.obj binarized
+0x0039D019 _$E4 xgraphics.lib obj\i386\instructiongraph.obj binarized
+0x0039D03D _$E7 xgraphics.lib obj\i386\instructiongraph.obj binarized
+0x0039D061 _$E10 xgraphics.lib obj\i386\instructiongraph.obj binarized
+0x0039D20C ?InstructionDP3@XGRAPHICS@@YGXKKPAK00000@Z xgraphics.lib obj\i386\pixelshader.obj binarized
+0x0039DE1B ?PrintPixelShaderDef@XGRAPHICS@@YGXPAU_D3DPixelShaderDef@@PAVBuffer@1@@Z xgraphics.lib obj\i386\pixelshader.obj binarized
+0x003A1B0F ?DecodeRegister@CD3DXAssembler@XGRAPHICS@@QAEKPADKH@Z xgraphics.lib obj\i386\cd3dxassembler.obj binarized
+0x003A4AE6 ?ProcessMacroBody@PreProcessor@XGRAPHICS@@AAEJAAVBuffer@2@AAPBDAAVMap@12@@Z xgraphics.lib obj\i386\preprocessor.obj binarized
+0x003A52A8 ?DoEnumLine@PreProcessor@XGRAPHICS@@AAEJAAVBuffer@2@@Z xgraphics.lib obj\i386\preprocessor.obj binarized
+0x003A5D59 ?CheckForMacroDeclaration@PreProcessor@XGRAPHICS@@AAEJAAVBuffer@2@PA_N@Z xgraphics.lib obj\i386\preprocessor.obj binarized
+0x003A6599 ?DoDirective@PreProcessor@XGRAPHICS@@AAEJPBD@Z xgraphics.lib obj\i386\preprocessor.obj binarized
+0x003AAF40 ?SampleRateToHz@@YGKW4tagWMAFileSampleRate@@@Z dsound.lib obj\i386\wmaxmo.obj binarized
+0x003AAF9A ?Flush@CWMAXMediaObject@@UAGJXZ dsound.lib obj\i386\wmaxmo.obj binarized
+0x003AB2B0 ?GetFileHeader@CWMAXMediaObject@@UAGJPAU_WMAXMOFileHeader@@@Z dsound.lib obj\i386\wmaxmo.obj binarized
+0x003AB54C ?AddRef@CWMAXMediaObject@@UAGKXZ dsound.lib obj\i386\wmaxmo.obj binarized
+0x003AB721 ?Process@CWMAXMediaObject@@UAGJPBU_XMEDIAPACKET@@0@Z dsound.lib obj\i386\wmaxmo.obj binarized
+0x003AEC7A _prvWMAGetMoreData_XDS@16 dsound.lib obj\i386\msaudiodec.obj binarized
+0x003B3412 _prvDecodeRunLevel_XDS@20 dsound.lib obj\i386\entropydec.obj binarized
+0x003C489D _USBHUB_Init@4 xapilib.lib obj\i386\hub.obj
+0x003C4B82 _XID_Init@4 xapilib.lib obj\i386\xid.obj
+0x003C5415 _HawkInit@4 xvoice.lib obj\i386\hawk2.obj
+0x003C58C6 ?USBD_DeviceEnumStagePre4@@YGXPAT_URB@@PAVIUsbDevice@@@Z xapilib.lib obj\i386\tree.obj
+0x003C6EF8 ?USBHUB_DisableComplete@@YGXPAT_URB@@PAVIUsbDevice@@@Z xapilib.lib obj\i386\hub.obj
+0x003C74B6 _USBHUB_RemoveDevice@4 xapilib.lib obj\i386\hub.obj
+0x003C792B ?USBHUB_EnumHubStage2@@YGXPAT_URB@@PAVIUsbDevice@@@Z xapilib.lib obj\i386\hub.obj
+0x003C7ACD _USBHUB_AddDevice@4 xapilib.lib obj\i386\hub.obj
+0x003C912F _XID_AddDevice@4 xapilib.lib obj\i386\xid.obj
+0x003CAB3B _HawkAddDevice@4 xvoice.lib obj\i386\hawk2.obj
+0x003CB9A2 _$E1 xvoice.lib obj\i386\hawk2.obj
+0x003CB9D2 _$E3 xvoice.lib obj\i386\hawk2.obj
+0x00432AD0 ?c_szResponseHeaders@@3PAPBDA xonlines.lib obj\i386\upnpnat.obj
+0x00539900 ??_C@_09JEJNBHMD@UPnPError?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x0053990C ??_C@_06EENFNEPD@detail?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x00539914 ??_C@_05GFBBDHMI@Fault?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x00539934 ??_C@_04MJIIEFNN@Body?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x0053993C ??_C@_08OMOPOOMD@Envelope?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x0053995C ??_C@_0L@CLAIMKPJ@deviceList?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x00539970 ??_C@_04NBFCGMPH@root?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x00539B9C ??_C@_0L@NAKJMHAN@controlURL?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x00539BA8 ??_C@_09PFHJFCNH@serviceId?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x00539BC0 ??_C@_06PNFLLAEF@xmlns?3?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x00539BE8 ??_C@_08JAFHAICJ@HTTP?11?40?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x00539C00 ??_C@_03ILLHFMNI@?5?7?6?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x00539E9C ??_C@_09LMNIMBH@errorCode?$AA@ xonlines.lib obj\i386\upnpnat.obj
+0x0053A230 ??_C@_05COPGPDIO@?9?$CF04d?$AA@ xonlines.lib obj\i386\msasn1.obj
+0x0053A240 ??_C@_05PIKPBAJD@?$CL?$CF04d?$AA@ xonlines.lib obj\i386\msasn1.obj
+0x0053A250 ??_C@_05KMOPPNJC@?4?$CF02d?$AA@ xonlines.lib obj\i386\msasn1.obj

@@ -71,18 +71,36 @@ def check(failed=None):
         sym = cache[obj].find_function(name)
         if sym is None or sym['class'] not in (3, 6):
             placed.setdefault(name, int(addr, 16))
+    expected = expected_diffs()
+    known = 0
     for addr, obj, name in rows:
         names = dict(placed)
         names.update(own[obj])
         ok, message = match.compare(cache[obj], name, int(addr, 16), image, names)
+        if ok and int(addr, 16) in expected:
+            print('NOW MATCHES (drop it from config/xdk_expected_diffs.txt) ' + name)
         if not ok:
+            if int(addr, 16) in expected:
+                known += 1
+                continue
             print('DIFF ' + message)
             failures += 1
             if failed is not None:
                 failed.append(int(addr, 16))
-    print('xdk members: %d placed functions, %d differ' % (sum(1 for l in open(os.path.join(ROOT, 'config', 'compiled.txt'))
-                                                               if l.split()[1:2] and l.split()[1] in objs), failures))
+    print('xdk members: %d placed functions, %d differ, %d expected (another XDK version)' % (
+        sum(1 for l in open(os.path.join(ROOT, 'config', 'compiled.txt')) if l.split()[1:2] and l.split()[1] in objs),
+        failures, known))
     return failures
+
+
+def expected_diffs():
+    """The addresses config/xdk_expected_diffs.txt lists: members the image holds in an XDK
+    version no library at hand has (binarized for M7)."""
+    path = os.path.join(ROOT, 'config', 'xdk_expected_diffs.txt')
+    if not os.path.exists(path):
+        return set()
+    return set(int(line.split()[0], 16) for line in open(path, encoding='utf-8')
+               if line.startswith('0x'))
 
 
 if __name__ == '__main__':

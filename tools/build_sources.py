@@ -60,6 +60,11 @@ def main(argv):
         glob.glob(os.path.join(ROOT, 'src', '**', '*.cpp'), recursive=True)
         + glob.glob(os.path.join(ROOT, 'src', '**', '*.c'), recursive=True)
         + glob.glob(os.path.join(ROOT, 'src', '**', '*.asm'), recursive=True))
+    # (src/sp is the single player's: never part of the multiplayer image; portbuild.py --sp
+    # builds it, as ibuild.py's sources step leaves it out)
+    if not argv[1:]:
+        sp = os.path.join(ROOT, 'src', 'sp') + os.sep
+        sources = [s for s in sources if not s.startswith(sp)]
     jobs = int(os.environ.get('BUILD_JOBS') or os.cpu_count() or 1)
     failures = 0
     if jobs <= 1 or len(sources) <= 1:
