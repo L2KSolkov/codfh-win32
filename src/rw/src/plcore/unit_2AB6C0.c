@@ -9,6 +9,9 @@
 
 #include "batypes.h"
 #include "balibtyp.h"
+#if defined(CODFH_WIN32)
+extern FILE *xpal_fopen(const char *name, const char *mode);
+#endif
 
 /* RenderWare 3.6's RCS id string, which the image keeps (the 3.7.2 tree has none) */
 static const char rcsid[] = "@@(#)$Id: //RenderWare/RW36Active/rwsdk/src/plcore/bafsys.c#1 $";
@@ -48,7 +51,12 @@ RwBool
 sub_2AB700(void)
 {
     RWSRCGLOBAL(fileFuncs).rwfexist = sub_2AB6D0;
+#if defined(CODFH_WIN32)
+    /* (the Win32 port: the Xbox drive paths mapped to its folders, xpal_core.cpp) */
+    RWSRCGLOBAL(fileFuncs).rwfopen = (rwFnFopen)xpal_fopen;
+#else
     RWSRCGLOBAL(fileFuncs).rwfopen = (rwFnFopen)fopen;
+#endif
     RWSRCGLOBAL(fileFuncs).rwfclose = (rwFnFclose)fclose;
     RWSRCGLOBAL(fileFuncs).rwfread = (rwFnFread)fread;
     RWSRCGLOBAL(fileFuncs).rwfwrite = (rwFnFwrite)fwrite;

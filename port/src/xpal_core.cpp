@@ -302,6 +302,14 @@ extern "C" HANDLE WINAPI xpal_CreateFileA(LPCSTR name, DWORD access, DWORD share
     return h;
 }
 
+/* RenderWare's fopen (its file interface, sub_2AB700): the Xbox paths ("d:" the disc, "t:",
+   "u:", "z:") mapped as CreateFile's are; the C runtime's fopen would open the PC's own D: drive. */
+extern "C" FILE *xpal_fopen(const char *name, const char *mode)
+{
+    char buf[520];
+    return fopen(port_map_path(name, buf), mode);
+}
+
 extern "C" DWORD WINAPI xpal_GetFileAttributesA(LPCSTR name)
 {
     char buf[520];

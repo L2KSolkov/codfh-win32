@@ -9,6 +9,9 @@
 #include <string.h>
 #include <stdio.h>
 #include "rw/badevice.h"
+#if defined(CODFH_WIN32)
+extern "C" void plog(const RwChar *fmt, ...);
+#endif
 
 #ifdef CODFH_SP
 // Single player uses the disc-error callback in these byte-count call slots;
@@ -95,6 +98,11 @@ bool sub_16C940()
     dword_4E22A8.unk_CC = *RwOsGetFileInterface();
     sub_19CDE0("d:\\COD.PAK");
     bp_4->unk_BC = dword_4E22A8.unk_CC.rwfopen("d:\\COD.PAK", "rb");
+#if defined(CODFH_WIN32)
+    // (the Win32 port: without the pack nothing in it opens; say so)
+    if (!bp_4->unk_BC)
+        plog("pack: d:\\COD.PAK could not be opened: every file in it will be missing");
+#endif
     if (!bp_4->unk_BC)
         return false;
     dword_4E22A8.unk_CC.rwfseek(bp_4->unk_BC, 0, 0);
@@ -112,6 +120,22 @@ bool sub_16C940()
     sub_19A750((const RwChar *)bp_8);
 #endif
     bp_4->unk_C8 = bp_4->unk_7C * sizeof(type_16CC10) + 0x80;
+#if defined(CODFH_WIN32)
+    {
+        // (its directory, and the furthest end of a file in it against the pack's size: a
+        // truncated or foreign pack shows here)
+        RwInt32 i, nSize, nEnd = 0;
+
+        for (i = 0; bp_4->unk_C4 && i < bp_4->unk_7C; i++)
+            if (bp_4->unk_C4[i].unk_04 + bp_4->unk_C4[i].unk_00 > nEnd)
+                nEnd = bp_4->unk_C4[i].unk_04 + bp_4->unk_C4[i].unk_00;
+        dword_4E22A8.unk_CC.rwfseek(bp_4->unk_BC, 0, SEEK_END);
+        nSize = dword_4E22A8.unk_CC.rwftell(bp_4->unk_BC);
+        dword_4E22A8.unk_CC.rwfseek(bp_4->unk_BC, bp_4->unk_C8, SEEK_SET);
+        plog("pack: d:\\COD.PAK opened: %d files, %d bytes, its files end at %d%s", bp_4->unk_7C, nSize, nEnd,
+             nSize >= 0 && nEnd > nSize ? " (PAST ITS END: the pack is truncated or not this game's)" : "");
+    }
+#endif
     var_C = RwOsGetFileInterface();
     var_C->rwfopen = sub_16CB00;
     var_C->rwfclose = sub_16CCC0;
@@ -138,6 +162,9 @@ void *sub_16CB00(const RwChar *arg_0, const RwChar *arg_4)
     if (strchr(arg_4, 'w') || strchr(arg_4, 'W') || arg_0[0] == 'd' && arg_0[1] == ':')
     {
         bp_8 = dword_4E22A8.unk_CC.rwfopen(arg_0, arg_4);
+#if defined(CODFH_WIN32)
+        plog("pack: open %s (\"%s\", from disk): %s", arg_0, arg_4, bp_8 ? "opened" : "NOT FOUND");
+#endif
         return bp_8;
     }
     bp_4 = sub_16CC10(arg_0);
@@ -151,6 +178,9 @@ void *sub_16CB00(const RwChar *arg_0, const RwChar *arg_4)
                 dword_4E22A8.unk_80[var_C].unk_01 = 0;
                 dword_4E22A8.unk_80[var_C].unk_04 = bp_4;
                 dword_4E22A8.unk_80[var_C].unk_08 = 0;
+#if defined(CODFH_WIN32)
+                plog("pack: open %s (in COD.PAK, %d bytes)", arg_0, bp_4->unk_00);
+#endif
                 return (void *)var_C;
             }
         }
@@ -162,8 +192,17 @@ void *sub_16CB00(const RwChar *arg_0, const RwChar *arg_4)
         sub_19A750("Unable to locate %s in pack file - attempting to load off disk\n", arg_0);
 #endif
         var_10 = dword_4E22A8.unk_CC.rwfopen(arg_0, arg_4);
+#if defined(CODFH_WIN32)
+        // (the Win32 port: a file the pack lacks, and whether the disk fallback, relative to
+        // the working directory, found it; the image's print above is compiled out of SP)
+        plog("pack: %s is not in COD.PAK (%d files); from disk: %s", arg_0, dword_4E22A8.unk_7C,
+             var_10 ? "opened" : "NOT FOUND");
+#endif
         return var_10;
     }
+#if defined(CODFH_WIN32)
+    plog("pack: %s found but all five pack handles are in use", arg_0);
+#endif
     return 0;
 }
 
