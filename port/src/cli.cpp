@@ -18,6 +18,17 @@
  *
  * -movie <file> plays a movie from SHELL\MOVIES (Credits.bik, Act_1.bik...) through the game's
  * player (sub_E8AC0, as the credits are played) when the menus first run.
+ *
+ * SP: -checkpoint <n> (or -cp <n>) starts the -map level at its checkpoint n (from 1, in the
+ * order of cli_checkpoints.inc; 0 lists them in codfh.log). Nothing of a checkpoint goes into the
+ * save: the scripts, on reaching one, set the restart's state live (SetCheckPointRegister,
+ * SetDefaultClumpBank, SetStartingSections, SetRestartAnimGroup) and a death then only restarts
+ * the level (bit 3 of dword_4B86F8; sub_D7410 runs sub_D6A50). So, once the level has run two
+ * seconds (its master script has taken its level-start snapshot, which clears the register),
+ * the checkpoint's calls are made as its script makes them and the level restarted as a death
+ * restarts it. The scripts then see its register and GetNumberOfRestarts() == 1, and the restart
+ * loads its sections, clump bank and animation groups. -cpvalue <v> gives the register where the
+ * script computes it (the player's health on L_1_2); else the one the level set already, or 100.
  */
 #include <xtl.h>
 #include <ctype.h>
@@ -33,6 +44,8 @@
 #include "game/parsedfile.h"
 #ifdef CODFH_SP
 #include "sp/sp_fend.h"
+#include "game/functions.h"
+#include "types/CAnimPackSelector.h"
 extern type_sp_AE5D0 *sp_dword_3B4724;
 #endif
 
@@ -42,6 +55,25 @@ static char cli_map[64], cli_type[16], cli_name[64], cli_movie[64];
 static int cli_pending;
 #ifdef CODFH_SP
 static int cli_auto_main_menu_phase;
+static int cli_checkpoint = -1, cli_checkpoint_level, cli_checkpoint_value = -1;
+
+/* The levels' checkpoints (generated from their scripts). */
+#define CLI_CP_UNKNOWN 0x7FFFFFFF
+struct cli_checkpoint_anim
+{
+    RwInt32 slot;
+    RwUInt32 a, b;
+};
+struct cli_checkpoint_entry
+{
+    const char *level;
+    RwInt32 reg, clump, sections[4], anims;
+    cli_checkpoint_anim anim[6];
+    const char *script;
+};
+static const cli_checkpoint_entry cli_checkpoints[] = {
+#include "cli_checkpoints.inc"
+};
 #endif
 
 /* Reads the options from the command line (WinMain). */
@@ -88,6 +120,10 @@ extern "C" void port_cli_parse(const char *cmd)
             cli_auto_main_menu_phase = 1;
         else if (!_stricmp(argv[i], "-no-main-menu"))
             cli_auto_main_menu_phase = 0;
+        else if ((!_stricmp(argv[i], "-checkpoint") || !_stricmp(argv[i], "-cp")) && i + 1 < argc)
+            cli_checkpoint = atoi(argv[++i]);
+        else if (!_stricmp(argv[i], "-cpvalue") && i + 1 < argc)
+            cli_checkpoint_value = atoi(argv[++i]);
 #endif
     }
 #ifdef CODFH_DEDICATED
@@ -107,6 +143,15 @@ extern "C" void port_cli_parse(const char *cmd)
     if (cli_pending)
         plog("command line: map %s, game type %s, session %s", cli_map, cli_type[0] ? cli_type : "DM",
              cli_name[0] ? cli_name : "(default)");
+#ifdef CODFH_SP
+    if (cli_checkpoint >= 0 && !cli_pending)
+    {
+        plog("command line: -checkpoint needs -map; ignored");
+        cli_checkpoint = -1;
+    }
+    else if (cli_checkpoint >= 0)
+        plog("command line: checkpoint %d", cli_checkpoint);
+#endif
 }
 
 #ifdef CODFH_SP
@@ -196,10 +241,83 @@ static void dedicated_frame(void)
 }
 #endif
 
+#ifdef CODFH_SP
+/* -checkpoint: the command-line level restarted at its checkpoint n, two seconds after it is up. */
+static void checkpoint_frame(void)
+{
+    static unsigned running;
+    if (cli_checkpoint < 0 || !cli_checkpoint_level)
+        return;
+    if (!dword_4B8710 || !dword_4E5C74 || sub_19B050() != cli_checkpoint_level || (dword_4B86F8 & 0x3A))
+    {
+        running = 0;
+        return;
+    }
+    if (++running < 120)
+        return;
+
+    const char *name = sub_19B060(cli_checkpoint_level);
+    const cli_checkpoint_entry *cp = NULL;
+    int n = 0;
+    plog("command line: %s's checkpoints:", name);
+    for (int i = 0; i < (int)(sizeof(cli_checkpoints) / sizeof(cli_checkpoints[0])); i++)
+    {
+        const cli_checkpoint_entry *e = &cli_checkpoints[i];
+        if (_stricmp(e->level, name))
+            continue;
+        n++;
+        if (e->reg == CLI_CP_UNKNOWN)
+            plog("  %d: register (computed), clump bank %d, sections %d %d %d %d, %d animation groups (%s)", n,
+                 e->clump, e->sections[0], e->sections[1], e->sections[2], e->sections[3], e->anims, e->script);
+        else
+            plog("  %d: register %d, clump bank %d, sections %d %d %d %d, %d animation groups (%s)", n, e->reg,
+                 e->clump, e->sections[0], e->sections[1], e->sections[2], e->sections[3], e->anims, e->script);
+        if (n == cli_checkpoint)
+            cp = e;
+    }
+    int wanted = cli_checkpoint;
+    cli_checkpoint = -1;
+    if (!cp)
+    {
+        if (wanted)
+            plog("command line: %s has no checkpoint %d (%d found); not restarting", name, wanted, n);
+        return;
+    }
+
+    /* the checkpoint's calls, as its script makes them */
+    RwInt32 reg = cp->reg;
+    if (reg == CLI_CP_UNKNOWN)
+        reg = cli_checkpoint_value >= 0 ? cli_checkpoint_value : dword_4B8780 ? dword_4B8780 : 100;
+    else if (cli_checkpoint_value >= 0)
+        reg = cli_checkpoint_value;
+    dword_4B8780 = reg;                         /* SetCheckPointRegister */
+    if (cp->clump >= 0)
+        dword_429EA8 = cp->clump;               /* SetDefaultClumpBank */
+    if (cp->sections[0] >= 0)
+    {
+        RwInt32 sections[4] = {cp->sections[0], cp->sections[1], cp->sections[2], cp->sections[3]};
+        sub_1727E0(sections);                   /* SetStartingSections */
+    }
+    for (int i = 0; i < cp->anims && dword_4B67CC; i++)
+    {
+        type_3DF8D8_04 key(cp->anim[i].a, cp->anim[i].b);
+        dword_4B67CC->sub_A1130(cp->anim[i].slot - 1, &key);   /* SetRestartAnimGroup */
+    }
+    plog("command line: restarting %s at checkpoint %d: register %d, clump bank %d, sections %d %d %d %d, "
+         "%d animation groups (%d restarts so far)", name, wanted, reg, dword_429EA8, cp->sections[0],
+         cp->sections[1], cp->sections[2], cp->sections[3], cp->anims, dword_4B8720);
+    /* the restart, as a death's fade ends it (sub_150B00) */
+    dword_4B86F8 |= 8;
+}
+#endif
+
 extern "C" void port_cli_present(void)
 {
 #ifdef CODFH_DEDICATED
     dedicated_frame();
+#endif
+#ifdef CODFH_SP
+    checkpoint_frame();
 #endif
     static int playing;
     if (cli_movie[0] && dword_4E5C74 && port_frame > 30 && !playing)
@@ -281,6 +399,7 @@ extern "C" void port_cli_frame(void)
     }
     plog("command line: starting SP level %s (index %d, game level %d)",
          sub_19B060(level), level - 1, level);
+    cli_checkpoint_level = level;
     sub_D8CC0(level);
     /* The SP front end owns a blocking frame loop. Leave it so the shared
        game-loop fade callback can finish and consume the level change. */
