@@ -65,6 +65,12 @@
 #include "types/type_3D2E7C.h"
 #include "types/alfaobject.h"
 #include "types/alfasched.h"
+#include "types/GimpTrigger.h"
+#include "types/ShrimpTrigger.h"
+#include "types/type_3DDB98.h"
+#include "types/type_3DDE70.h"
+#include "types/type_17CC40.h"
+#include "types/SplinePath.h"
 
 extern type_4C00E8 unk_4C00E8;
 
@@ -160,6 +166,16 @@ RwReal g_fTrigDrawRange = 150.0f;
 RwBool g_bTrigDrawSeeThrough = TRUE;
 // The labels: on or off, and their height as a fraction of the distance.
 RwBool g_bTrigDrawLabels = TRUE;
+RwBool g_bTrigDrawNames = TRUE;        // the level's name for each trigger, above its type
+// the gimps and shrimps (their section below)
+RwBool g_bTrigDrawGimps = FALSE;
+RwBool g_bTrigDrawShrimps = FALSE;
+RwReal g_fTrigDrawGimpRange = 6000.0f;
+RwInt32 g_nTrigDrawGimpsShown;
+RwInt32 g_nTrigDrawShrimpsShown;
+static void TrigDrawSpawnerLines(Trigger *pTrigger, const RwV3d *pvCentre, const RwMatrix *pCamLtm, RwUInt32 dwColour);
+const RwChar *TrigDrawTriggerName(Trigger *pTrigger);   // (trignames.cpp)
+const RwChar *TrigDrawKeyName(RwUInt32 a, RwUInt32 b);
 RwReal g_fTrigDrawTextScale = 0.02f;
 // The collision: on or off, how far from the camera a sector's box may be,
 // and how far each triangle is pushed along its normal (against flicker).
@@ -316,8 +332,9 @@ const RwChar *TrigDrawKindName(Trigger *pTrigger)
 // Writes pszText centred at *pvAt, facing the camera whose matrix is
 // pCamLtm: a quad per character with the charset's glyph cell as its
 // texture, tinted dwColour. The characters are g_fTrigDrawTextScale of the
-// distance high.
-static void TrigDrawText(const RwChar *pszText, const RwV3d *pvAt, const RwMatrix *pCamLtm, RwUInt32 dwColour)
+// distance high; fLines moves the line up by that many lines.
+static void TrigDrawText(const RwChar *pszText, const RwV3d *pvAt, const RwMatrix *pCamLtm, RwUInt32 dwColour,
+                         RwReal fLines = 0.0f)
 {
     RtCharsetDesc desc;
     RwInt32 nChars = (RwInt32)strlen(pszText);
@@ -345,6 +362,9 @@ static void TrigDrawText(const RwChar *pszText, const RwV3d *pvAt, const RwMatri
     vRight.y = -pCamLtm->right.y;
     vRight.z = -pCamLtm->right.z;
     vUp = pCamLtm->up;
+    vCentre.x += vUp.x * fH * 1.2f * fLines;
+    vCentre.y += vUp.y * fH * 1.2f * fLines;
+    vCentre.z += vUp.z * fH * 1.2f * fLines;
     // the top left corner of the first character, centring the line
     vCorner.x = vCentre.x - vRight.x * fW * nChars * 0.5f + vUp.x * fH * 0.5f;
     vCorner.y = vCentre.y - vRight.y * fW * nChars * 0.5f + vUp.y * fH * 0.5f;
@@ -406,15 +426,20 @@ static void TrigDrawText(const RwChar *pszText, const RwV3d *pvAt, const RwMatri
     }
 }
 
-// Writes the trigger's type at its centre (the matrix's position).
+// Writes the trigger's type at its centre (the matrix's position), and the name the level
+// gives it (trignames.cpp), when it has one, on the line above.
 static void TrigDrawLabel(Trigger *pTrigger, const RwMatrix *pCamLtm, RwUInt32 dwColour)
 {
     RwV3d vCentre;
+    const RwChar *pszName = g_bTrigDrawNames ? TrigDrawTriggerName(pTrigger) : NULL;
 
     vCentre.x = pTrigger->unk_90;
     vCentre.y = pTrigger->unk_94;
     vCentre.z = pTrigger->unk_98;
     TrigDrawText(TrigDrawKindName(pTrigger), &vCentre, pCamLtm, dwColour);
+    if (pszName != NULL)
+        TrigDrawText(pszName, &vCentre, pCamLtm, dwColour, 1.0f);
+    TrigDrawSpawnerLines(pTrigger, &vCentre, pCamLtm, dwColour);
 }
 
 // ---- the path nodes ----
@@ -699,7 +724,7 @@ void TrigDrawAiNote(const void *pEntity, const RwChar *pszText)
     RwChar szShort[TRIGDRAW_AI_NOTE];
     const RwChar *p;
 
-    if ((!g_bTrigDrawAi && !g_bTrigLiveDebug) || pEntity == NULL || pszText == NULL)
+    if ((!g_bTrigDrawAi && !g_bTrigDrawGimps && !g_bTrigLiveDebug) || pEntity == NULL || pszText == NULL)
         return;
     // (the A* scheduler's lines, shortened to the search type the game names: "A* eASST_...")
     static const RwChar s_szRegistered[] = "AStar search registered. Type: ";
@@ -770,7 +795,7 @@ void TrigDrawAiMessage(const RwChar *pszName, type_67620 *pScript)
 {
     const void *pEntity = NULL;
 
-    if ((!g_bTrigDrawAi && !g_bTrigLiveDebug) || pScript == NULL || pszName == NULL)
+    if ((!g_bTrigDrawAi && !g_bTrigDrawGimps && !g_bTrigLiveDebug) || pScript == NULL || pszName == NULL)
         return;
     __try
     {
@@ -1384,6 +1409,459 @@ static void TrigDrawAi(const RwV3d *pvCam, const RwMatrix *pCamLtm)
         RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
     }
     TrigDrawPathFlush();
+}
+
+// ---- the gimps and shrimps ----
+
+// Gimps: GimpTrigger's scripted extras (type_3DDB98, entity kind 0x200000), with no AI of
+// their own: each gets a label over its head (its health, attitude, the ride it is on, its
+// head shot, its place along its spline and the state of each of its scripts, by name for
+// the shared GimpEntityObjClass and GimpAnim) and a line to its point on the spline.
+// Shrimps: each ShrimpTrigger's swimmers (type_17CC40's list of type_17CA70_node), drawn as
+// its spline path and a marker per shrimp. The two spawners' labels (TrigDrawLabel) add
+// their spawn counts.
+
+// The shared gimp scripts' states, by index (their names in the debug-built levels).
+static const RwChar *s_apszGimpEntityStates[] = {
+    "Main", "FlyingExplosionReaction", "Start", "ScriptedScene", "TankCrewCommanderLookAround",
+    "HitDeathReaction", "WaitForFadeOut", "WaitForFadeToBegin", "WaitForDeathAnim", "DestroyedExit", "Exit",
+};
+static const RwChar *s_apszGimpAnimStates[] = {
+    "Main", "DoNothingEverAgain", "Start", "ScriptedScene", "DoNothing", "AlertStand", "Idle", "StartIdle",
+    "ExplosionReaction", "WaitForWallOrGroundHit", "HitTheWall", "LandedOnGround", "Run", "ExplosionDive",
+    "TankCrewCommanderLookAround", "RunLoop",
+};
+
+struct TrigDrawGimpState
+{
+    RwV3d vPos, vPoint;
+    RwInt32 nHp, nHpMax, nAttitude, nHeadShot;
+    RwReal fAlong, fEnd, fSpeed, fPathLength;
+    RwBool bRiding, bSpline;
+    RwInt32 nMachines;
+    RwChar aszMachine[3][48];
+    // its names (its trigger's binding, definition and scripts, its spline path's), "" for none
+    RwChar szName[48], szDef[48], szPath[48], szScripts[2][48];
+    RwChar szHat[8];
+    RwInt32 nTrigger;           // its GimpTrigger's index in dword_4CFE30, -1 for none found
+    RwUInt32 dwFlags;           // unk_760: 1 at its own speed (else its animation's), 2 along
+                                // its spline, 4 to its point
+    RwInt32 nGround;            // unk_764: 1 kept on the ground, 0 when its entity says, else
+                                // at its path's height
+    RwInt32 nEndMode;           // its path's end: 2 turns back, 1 wraps, 0 stops
+};
+
+// Each gimp's GimpTrigger, once a frame: the trigger whose binding (unk_D8, the name the
+// scripts find the gimp by; flag 2, the entity's id at unk_24_id) holds it.
+struct TrigDrawGimpOwner
+{
+    type_3D3548 *pGimp;
+    RwInt32 nTrigger;
+};
+static TrigDrawGimpOwner s_aGimpOwner[256];
+static RwInt32 s_nGimpOwners;
+static unsigned s_uGimpOwnersFrame = 0xFFFFFFFF;
+
+static GimpTrigger *TrigDrawGimpTrigger(type_3D3548 *pGimp, RwInt32 *pnIndex)
+{
+    RwInt32 i;
+
+    if (s_uGimpOwnersFrame != port_frame)
+    {
+        s_uGimpOwnersFrame = port_frame;
+        s_nGimpOwners = 0;
+        for (i = 0; i <= dword_429D00 && i < 2000 && s_nGimpOwners < 256; i++)
+        {
+            Trigger *pTrigger = (Trigger *)dword_4CFE30[i];
+
+            if (pTrigger == NULL || pTrigger->vf_008() != 0x1F)
+                continue;
+            __try
+            {
+                GimpTrigger *pGimps = (GimpTrigger *)pTrigger;
+                type_3DF8D8 *pObj;
+                type_3D3548 *pEntity;
+
+                if (!pGimps->unk_D8.unk_00)
+                    continue;
+                pObj = sub_198800(&pGimps->unk_D8);
+                if (pObj == NULL || pObj->vf_008() != 0x2E || !(pObj->unk_10 & 2))
+                    continue;
+                pEntity = ((type_D48D0 *)&((type_3DFEEC *)pObj)->unk_24_id)->sub_D4910();
+                if (pEntity == NULL)
+                    continue;
+                s_aGimpOwner[s_nGimpOwners].pGimp = pEntity;
+                s_aGimpOwner[s_nGimpOwners].nTrigger = i;
+                s_nGimpOwners++;
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+            }
+        }
+    }
+    for (i = 0; i < s_nGimpOwners; i++)
+        if (s_aGimpOwner[i].pGimp == pGimp)
+        {
+            if (pnIndex)
+                *pnIndex = s_aGimpOwner[i].nTrigger;
+            return (GimpTrigger *)dword_4CFE30[s_aGimpOwner[i].nTrigger];
+        }
+    if (pnIndex)
+        *pnIndex = -1;
+    return NULL;
+}
+
+// A key's name into psz ("" for none).
+static void TrigDrawKeyText(const type_3DF8D8_04 *pKey, RwChar *psz, RwInt32 nMax)
+{
+    const RwChar *pszName = pKey ? TrigDrawKeyName(pKey->unk_00, pKey->unk_04) : NULL;
+
+    psz[0] = 0;
+    if (pszName)
+    {
+        strncpy(psz, pszName, nMax - 1);
+        psz[nMax - 1] = 0;
+    }
+}
+
+// A tag's characters, high byte first, while printable ("HAT" is a gimp with no hat).
+static void TrigDrawTagText(RwUInt32 dwTag, RwChar *psz)
+{
+    RwInt32 i, n = 0;
+
+    for (i = 3; i >= 0; i--)
+    {
+        RwUInt8 c = (RwUInt8)(dwTag >> (i * 8));
+
+        if (c < 0x21 || c > 0x7E)
+            break;
+        psz[n++] = (RwChar)c;
+    }
+    psz[n] = 0;
+}
+
+// Its path's end mode, as text.
+static const RwChar *TrigDrawEndMode(RwInt32 nMode)
+{
+    return nMode == 2 ? "turns back" : nMode == 1 ? "wraps" : "stops";
+}
+
+// One machine's state as text: the gimp scripts' state names by their state counts.
+static void TrigDrawMachineState(type_3D2DB8 *pMachine, RwChar *psz, RwInt32 nMax)
+{
+    RwInt32 nState = -1, nStates = 0;
+    type_3D2DB8_6C *pState = pMachine->unk_6C;
+    type_3D2E7C *pObject = pMachine->vf_024();
+
+    if (pState)
+        nState = pState->unk_10;
+    if (pObject && pObject->unk_08)
+        nStates = pObject->unk_08->unk_0C;
+    if (nStates == 11 && nState >= 0 && nState < 11)
+        _snprintf(psz, nMax - 1, "GimpEntity: %s", s_apszGimpEntityStates[nState]);
+    else if (nStates == 16 && nState >= 0 && nState < 16)
+        _snprintf(psz, nMax - 1, "GimpAnim: %s", s_apszGimpAnimStates[nState]);
+    else
+        _snprintf(psz, nMax - 1, "script (%d states): state %d", nStates, nState);
+    psz[nMax - 1] = 0;
+}
+
+static RwBool TrigDrawGimpRead(type_3DDB98 *pGimp, TrigDrawGimpState *s)
+{
+    __try
+    {
+        RwFrame *pFrame = pGimp->unk_338.unk_08;
+        type_3D2E7C *pObject;
+        RwInt32 i;
+
+        if (pFrame == NULL)
+            return FALSE;
+        s->vPos = RwFrameGetMatrix(pFrame)->pos;
+        s->nHp = pGimp->unk_740;
+        s->nHpMax = pGimp->unk_744;
+        s->nAttitude = pGimp->unk_75C;
+        s->nHeadShot = pGimp->unk_695;
+        s->fAlong = pGimp->unk_6E4;
+        s->fEnd = pGimp->unk_738;
+        s->fSpeed = pGimp->unk_768;
+        s->vPoint = pGimp->unk_76C;
+        s->bSpline = s->fEnd > 0.0f && pGimp->unk_734 != NULL;
+        s->bRiding = pGimp->unk_3D8.sub_D4910() != NULL;
+        s->dwFlags = pGimp->unk_760;
+        s->nGround = pGimp->unk_764;
+        TrigDrawTagText(pGimp->unk_69C, s->szHat);
+        s->szPath[0] = 0;
+        s->fPathLength = 0.0f;
+        s->nEndMode = 0;
+        if (pGimp->unk_734)
+        {
+            TrigDrawKeyText(&pGimp->unk_734->unk_2C, s->szPath, sizeof(s->szPath));
+            s->fPathLength = pGimp->unk_734->unk_24;
+            s->nEndMode = pGimp->unk_734->unk_1C_0;
+        }
+        {
+            GimpTrigger *pGimps = TrigDrawGimpTrigger(pGimp, &s->nTrigger);
+
+            s->szName[0] = s->szDef[0] = s->szScripts[0][0] = s->szScripts[1][0] = 0;
+            if (pGimps)
+            {
+                TrigDrawKeyText(&pGimps->unk_D8, s->szName, sizeof(s->szName));
+                TrigDrawKeyText(&pGimps->unk_C0, s->szDef, sizeof(s->szDef));
+                TrigDrawKeyText(&pGimps->unk_C8, s->szScripts[0], sizeof(s->szScripts[0]));
+                if (pGimps->unk_D0.unk_00)
+                    TrigDrawKeyText(&pGimps->unk_D0, s->szScripts[1], sizeof(s->szScripts[1]));
+            }
+        }
+        s->nMachines = 0;
+        pObject = pGimp->vf_098();
+        if (pObject)
+        {
+            RwUInt32 dwHandle = pObject->get_unk_04();
+
+            for (i = 0; i < s_nMachines && s->nMachines < 3; i++)
+                if (s_adwMachineOwner[i] == dwHandle)
+                    TrigDrawMachineState(s_apMachine[i], s->aszMachine[s->nMachines++], 48);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+// A cross at *pv, the size of fSize, with a post up from it.
+static void TrigDrawMarker(const RwV3d *pv, RwReal fSize, RwUInt32 dwColour)
+{
+    RwV3d vA = *pv, vB = *pv;
+
+    vA.x -= fSize;
+    vB.x += fSize;
+    TrigDrawPathLine(&vA, &vB, dwColour);
+    vA = *pv;
+    vB = *pv;
+    vA.z -= fSize;
+    vB.z += fSize;
+    TrigDrawPathLine(&vA, &vB, dwColour);
+    vA = *pv;
+    vB = *pv;
+    vB.y += fSize * 2.0f;
+    TrigDrawPathLine(&vA, &vB, dwColour);
+}
+
+static void TrigDrawGimps(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    RwInt32 i, j;
+
+    g_nTrigDrawGimpsShown = 0;
+    TrigDrawAiMachines();
+    for (i = 0; i < 768; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+        TrigDrawGimpState s;
+        RwV3d vD, vHead;
+        RwReal fDist, fStep;
+        RwChar aszLines[12 + TRIGDRAW_AI_NOTES][TRIGDRAW_AI_NOTE + 16];
+        RwInt32 nLines = 0, nNotes;
+
+        if (pEntity == NULL || (pEntity->unk_2C & 0x3FFFFF0) != 0x200000)
+            continue;
+        if (!TrigDrawGimpRead((type_3DDB98 *)pEntity, &s))
+            continue;
+        vD.x = s.vPos.x - pvCam->x;
+        vD.y = s.vPos.y - pvCam->y;
+        vD.z = s.vPos.z - pvCam->z;
+        fDist = (RwReal)sqrt(vD.x * vD.x + vD.y * vD.y + vD.z * vD.z);
+        if (g_fTrigDrawGimpRange > 0.0f && fDist > g_fTrigDrawGimpRange)
+            continue;
+        g_nTrigDrawGimpsShown++;
+        vHead = s.vPos;
+        vHead.y += 160.0f;
+        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+        if (s.bSpline)
+        {
+            TrigDrawPathLine(&s.vPos, &s.vPoint, 0xC0FFA040);
+            TrigDrawMarker(&s.vPoint, 25.0f, 0xE0FFA040);
+        }
+        TrigDrawPathFlush();
+        if (TrigDrawCharset() == NULL)
+            continue;
+        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+        _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "#%d gimp %s hp %d/%d, attitude %d%s%s", i,
+                  s.szName[0] ? s.szName : "", s.nHp, s.nHpMax, s.nAttitude, s.bRiding ? ", riding" : "",
+                  s.nHeadShot == 2 ? ", head shot" : "");
+        if (s.szDef[0] || s.szHat[0])
+            _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "%s%s%s%s", s.szDef[0] ? "def " : "", s.szDef,
+                      s.szHat[0] && strcmp(s.szHat, "HAT") ? (s.szDef[0] ? ", hat " : "hat ") : "",
+                      s.szHat[0] && strcmp(s.szHat, "HAT") ? s.szHat : "");
+        if (s.bSpline)
+        {
+            _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "spline %s: %.0f of %.0f (length %.0f, %s), speed %.2f",
+                      s.szPath[0] ? s.szPath : "?", s.fAlong, s.fEnd, s.fPathLength, TrigDrawEndMode(s.nEndMode),
+                      s.fSpeed);
+            _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "%s, %s, %s",
+                      (s.dwFlags & 2) ? "going along its spline" : (s.dwFlags & 4) ? "going to its point" : "held",
+                      (s.dwFlags & 1) ? "at its own speed" : "at its animation's speed",
+                      s.nGround == 1 ? "on the ground" : s.nGround == 0 ? "on the ground if flagged" : "at the path's height");
+        }
+        if (s.szScripts[0][0] || s.szScripts[1][0])
+            _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "scripts %s%s%s", s.szScripts[0],
+                      s.szScripts[1][0] ? ", " : "", s.szScripts[1]);
+        for (j = 0; j < s.nMachines; j++)
+            _snprintf(aszLines[nLines++], TRIGDRAW_AI_NOTE, "%s", s.aszMachine[j]);
+        nNotes = nLines;
+        nLines = TrigDrawNoteLines(s_aAiNotes, TRIGDRAW_AI_ENTITIES, pEntity, aszLines, nLines);
+        nNotes = nLines - nNotes;
+        fStep = fDist * g_fTrigDrawTextScale * 1.2f;
+        if (fStep < 0.06f)
+            fStep = 0.06f;
+        for (j = 0; j < nLines; j++)
+        {
+            RwV3d vAt;
+
+            aszLines[j][TRIGDRAW_AI_NOTE + 15] = 0;
+            vAt.x = vHead.x + pCamLtm->up.x * fStep * (RwReal)(nLines - j);
+            vAt.y = vHead.y + 40.0f + pCamLtm->up.y * fStep * (RwReal)(nLines - j);
+            vAt.z = vHead.z + pCamLtm->up.z * fStep * (RwReal)(nLines - j);
+            TrigDrawText(aszLines[j], &vAt, pCamLtm, j < nLines - nNotes ? 0xFFFFE0A0 : 0xFFFFD080);
+        }
+    }
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+}
+
+// The shrimp triggers' paths and their shrimps (kind 0x21 triggers).
+static void TrigDrawShrimps(const RwV3d *pvCam)
+{
+    RwInt32 i, k;
+
+    g_nTrigDrawShrimpsShown = 0;
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (i = 0; i <= dword_429D00 && i < 2000; i++)
+    {
+        Trigger *pTrigger = (Trigger *)dword_4CFE30[i];
+
+        if (pTrigger == NULL || pTrigger->vf_008() != 0x21)
+            continue;
+        __try
+        {
+            ShrimpTrigger *pShrimps = (ShrimpTrigger *)pTrigger;
+            SplinePath *pPath = pShrimps->unk_EC.unk_0C;
+            type_17CA70_node *pNode;
+            RwV3d vA, vB;
+
+            if (pPath == NULL)
+                continue;
+            if (g_fTrigDrawGimpRange > 0.0f)
+            {
+                RwReal dx = pTrigger->unk_90 - pvCam->x, dz = pTrigger->unk_98 - pvCam->z;
+
+                if (dx * dx + dz * dz > g_fTrigDrawGimpRange * g_fTrigDrawGimpRange * 4.0f)
+                    continue;
+            }
+            // its path, with a tick at its start
+            pPath->sub_BA990(0.0f, &vA, NULL);
+            vB = vA;
+            vB.y += 80.0f;
+            TrigDrawPathLine(&vA, &vB, 0xE040FFFF);
+            for (k = 1; k <= 48; k++)
+            {
+                pPath->sub_BA990((RwReal)k / 48.0f, &vB, NULL);
+                TrigDrawPathLine(&vA, &vB, 0x9040C0FF);
+                vA = vB;
+            }
+            // each shrimp
+            for (pNode = pShrimps->unk_EC.unk_14, k = 0; pNode != NULL && k < 256; pNode = pNode->unk_0C, k++)
+            {
+                pPath->sub_BA990(pNode->unk_00, &vA, NULL);
+                TrigDrawMarker(&vA, 20.0f, pNode->unk_04 >= 0.0f ? 0xFF60FFFF : 0xFFFF60FF);
+                g_nTrigDrawShrimpsShown++;
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+    TrigDrawPathFlush();
+}
+
+// The spawn counts under a GimpTrigger's or ShrimpTrigger's label, for TrigDrawLabel: lines
+// written below the type at *pvCentre.
+static void TrigDrawSpawnerLines(Trigger *pTrigger, const RwV3d *pvCentre, const RwMatrix *pCamLtm, RwUInt32 dwColour)
+{
+    RwChar sz[96], szLimit[24];
+    RwInt32 nKind = pTrigger->vf_008();
+
+    if (nKind == 0x1F && g_bTrigDrawGimps)
+    {
+        GimpTrigger *pGimps = (GimpTrigger *)pTrigger;
+
+        if (pGimps->unk_148 == 0x7FFFFFFF)
+            strcpy(szLimit, "no limit");
+        else
+            _snprintf(szLimit, sizeof(szLimit) - 1, "%d left of %d", pGimps->unk_14C, pGimps->unk_148);
+        szLimit[sizeof(szLimit) - 1] = 0;
+        _snprintf(sz, sizeof(sz) - 1, "spawns %s%s, health %.0f", szLimit, pGimps->unk_140 ? ", live once" : "",
+                  pGimps->unk_120_r);
+        sz[sizeof(sz) - 1] = 0;
+        TrigDrawText(sz, pvCentre, pCamLtm, dwColour, -1.0f);
+        {
+            RwChar szName[48], szDef[48], szWeapon[48], szScript[48];
+
+            TrigDrawKeyText(&pGimps->unk_D8, szName, sizeof(szName));
+            TrigDrawKeyText(&pGimps->unk_C0, szDef, sizeof(szDef));
+            TrigDrawKeyText(&pGimps->unk_E8, szWeapon, sizeof(szWeapon));
+            TrigDrawKeyText(&pGimps->unk_C8, szScript, sizeof(szScript));
+            _snprintf(sz, sizeof(sz) - 1, "gimp %s, def %s%s%s", szName[0] ? szName : "-", szDef[0] ? szDef : "-",
+                      szWeapon[0] ? ", weapon " : "", szWeapon);
+            sz[sizeof(sz) - 1] = 0;
+            TrigDrawText(sz, pvCentre, pCamLtm, dwColour, -2.0f);
+            if (szScript[0])
+            {
+                _snprintf(sz, sizeof(sz) - 1, "script %s", szScript);
+                sz[sizeof(sz) - 1] = 0;
+                TrigDrawText(sz, pvCentre, pCamLtm, dwColour, -3.0f);
+            }
+        }
+    }
+    else if (nKind == 0x21 && g_bTrigDrawShrimps)
+    {
+        ShrimpTrigger *pShrimps = (ShrimpTrigger *)pTrigger;
+        type_17CA70_node *pNode;
+        RwInt32 nAlive = 0;
+
+        RwInt32 nForward = 0;
+
+        for (pNode = pShrimps->unk_EC.unk_14; pNode != NULL && nAlive < 256; pNode = pNode->unk_0C)
+        {
+            nAlive++;
+            nForward += pNode->unk_04 >= 0.0f;
+        }
+        if (pShrimps->unk_E0 == 0x7FFFFFFF)
+            strcpy(szLimit, "no limit");
+        else
+            _snprintf(szLimit, sizeof(szLimit) - 1, "%d left of %d", pShrimps->unk_E4, pShrimps->unk_E0);
+        szLimit[sizeof(szLimit) - 1] = 0;
+        _snprintf(sz, sizeof(sz) - 1, "%d shrimps (%d forward, %d back), spawns %s, chance %.0f%%, speed %.3f",
+                  nAlive, nForward, nAlive - nForward, szLimit, pShrimps->unk_DC, pShrimps->unk_D0_r);
+        sz[sizeof(sz) - 1] = 0;
+        TrigDrawText(sz, pvCentre, pCamLtm, dwColour, -1.0f);
+        {
+            RwChar szModel[48], szPath[48];
+            SplinePath *pPath = pShrimps->unk_EC.unk_0C;
+
+            TrigDrawKeyText(&pShrimps->unk_C0, szModel, sizeof(szModel));
+            szPath[0] = 0;
+            if (pPath)
+                TrigDrawKeyText(&pPath->unk_2C, szPath, sizeof(szPath));
+            if (pPath)
+                _snprintf(sz, sizeof(sz) - 1, "model %s, path %s (length %.0f, %s)", szModel[0] ? szModel : "-",
+                          szPath[0] ? szPath : "-", pPath->unk_24, TrigDrawEndMode(pPath->unk_1C_0));
+            else
+                _snprintf(sz, sizeof(sz) - 1, "model %s, no path yet", szModel[0] ? szModel : "-");
+            sz[sizeof(sz) - 1] = 0;
+            TrigDrawText(sz, pvCentre, pCamLtm, dwColour, -2.0f);
+        }
+    }
 }
 
 // ---- the projectile generators ----
@@ -2085,8 +2563,14 @@ void TrigDrawAll(RwCamera *pCamera)
         // (CODFH_PATHNODES=1: the path nodes, with their labels)
         if (GetEnvironmentVariableA("CODFH_PATHNODES", NULL, 0))
             g_bTrigDrawPathNodes = g_bTrigDrawPathLabels = TRUE;
+        // (CODFH_GIMPS=1, CODFH_SHRIMPS=1: the gimps, the shrimps)
+        if (GetEnvironmentVariableA("CODFH_GIMPS", NULL, 0))
+            g_bTrigDrawGimps = TRUE;
+        if (GetEnvironmentVariableA("CODFH_SHRIMPS", NULL, 0))
+            g_bTrigDrawShrimps = TRUE;
     }
-    if ((!g_bTrigDrawEnabled && !g_bTrigDrawPathNodes && !g_bTrigDrawAi && !g_bTrigDrawPg) || pCamera == NULL)
+    if ((!g_bTrigDrawEnabled && !g_bTrigDrawPathNodes && !g_bTrigDrawAi && !g_bTrigDrawPg && !g_bTrigDrawGimps &&
+         !g_bTrigDrawShrimps) || pCamera == NULL)
         return;
     pCamLtm = RwFrameGetLTM(RwCameraGetFrame(pCamera));
     vCam = pCamLtm->pos;
@@ -2119,6 +2603,10 @@ void TrigDrawAll(RwCamera *pCamera)
         TrigDrawAi(&vCam, pCamLtm);
     if (g_bTrigDrawPg)
         TrigDrawPg(&vCam, pCamLtm);
+    if (g_bTrigDrawGimps)
+        TrigDrawGimps(&vCam, pCamLtm);
+    if (g_bTrigDrawShrimps)
+        TrigDrawShrimps(&vCam);
     if (!g_bTrigDrawEnabled)
         i = dword_429D00 + 1;
     else
@@ -2368,6 +2856,193 @@ RwBool TrigDrawLivePgJson(RwChar *psz, RwInt32 nMax)
         LiveJNotes(&j, s_aPgNotes, TRIGDRAW_PG_NOTED, pGen);
         LiveJ(&j, "}");
         pGen = pNext;
+    }
+    LiveJ(&j, "]}");
+    return j.n < nMax - 1;
+}
+
+// The gimps and their spawners: {"t":"gimps","frame":n,"list":[...],"spawners":[...]}, each
+// gimp as its label draws it (TrigDrawGimpRead) with its notes, each GimpTrigger with its
+// spawn counts.
+RwBool TrigDrawLiveGimpsJson(RwChar *psz, RwInt32 nMax)
+{
+    static TrigDrawGimpState s_state;
+    TrigLiveJson j = { psz, 0, nMax };
+    RwInt32 i, k, nShown = 0, nMark;
+
+    LiveJ(&j, "{\"t\":\"gimps\",\"frame\":%u,\"list\":[", port_frame);
+    TrigDrawAiMachines();
+    for (i = 0; i < 768 && j.n < nMax - 2048; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+        TrigDrawGimpState *s = &s_state;
+
+        if (pEntity == NULL || (pEntity->unk_2C & 0x3FFFFF0) != 0x200000)
+            continue;
+        if (!TrigDrawGimpRead((type_3DDB98 *)pEntity, s))
+            continue;
+        LiveJ(&j, "%s{\"slot\":%d,\"hp\":%d,\"hpMax\":%d,\"attitude\":%d,\"riding\":%d,\"headShot\":%d,\"trigger\":%d,"
+                  "\"flags\":%u,\"ground\":%d", nShown++ ? "," : "", i, s->nHp, s->nHpMax, s->nAttitude, s->bRiding ? 1 : 0,
+              s->nHeadShot, s->nTrigger, s->dwFlags, s->nGround);
+        LiveJV(&j, "pos", &s->vPos);
+        LiveJ(&j, ",\"name\":");
+        LiveJText(&j, s->szName);
+        LiveJ(&j, ",\"def\":");
+        LiveJText(&j, s->szDef);
+        LiveJ(&j, ",\"hat\":");
+        LiveJText(&j, s->szHat);
+        LiveJ(&j, ",\"scriptNames\":[");
+        LiveJText(&j, s->szScripts[0]);
+        LiveJ(&j, ",");
+        LiveJText(&j, s->szScripts[1]);
+        LiveJ(&j, "]");
+        if (s->bSpline)
+        {
+            LiveJ(&j, ",\"spline\":{\"along\":%.1f,\"end\":%.1f,\"speed\":%.2f,\"length\":%.1f,\"endMode\":%d,\"name\":",
+                  s->fAlong, s->fEnd, s->fSpeed, s->fPathLength, s->nEndMode);
+            LiveJText(&j, s->szPath);
+            LiveJV(&j, "point", &s->vPoint);
+            LiveJ(&j, "}");
+        }
+        LiveJ(&j, ",\"scripts\":[");
+        for (k = 0; k < s->nMachines; k++)
+        {
+            if (k)
+                LiveJ(&j, ",");
+            LiveJText(&j, s->aszMachine[k]);
+        }
+        LiveJ(&j, "]");
+        LiveJNotes(&j, s_aAiNotes, TRIGDRAW_AI_ENTITIES, pEntity);
+        LiveJ(&j, "}");
+    }
+    LiveJ(&j, "],\"spawners\":[");
+    nShown = 0;
+    for (i = 0; i <= dword_429D00 && i < 2000 && j.n < nMax - 1024; i++)
+    {
+        Trigger *pTrigger = (Trigger *)dword_4CFE30[i];
+        const RwChar *pszName;
+
+        if (pTrigger == NULL || pTrigger->vf_008() != 0x1F)
+            continue;
+        nMark = j.n;
+        __try
+        {
+            GimpTrigger *pGimps = (GimpTrigger *)pTrigger;
+
+            LiveJ(&j, "%s{\"trigger\":%d,\"left\":%d,\"limit\":%d,\"liveOnce\":%d,\"health\":%.0f,\"pos\":[%.1f,%.1f,%.1f]",
+                  nShown++ ? "," : "", i, pGimps->unk_14C, pGimps->unk_148 == 0x7FFFFFFF ? -1 : pGimps->unk_148,
+                  pGimps->unk_140 ? 1 : 0, pGimps->unk_120_r, pTrigger->unk_90, pTrigger->unk_94, pTrigger->unk_98);
+            pszName = TrigDrawTriggerName(pTrigger);
+            if (pszName)
+            {
+                LiveJ(&j, ",\"name\":");
+                LiveJText(&j, pszName);
+            }
+            {
+                RwChar sz[48];
+
+                TrigDrawKeyText(&pGimps->unk_D8, sz, sizeof(sz));
+                LiveJ(&j, ",\"gimp\":");
+                LiveJText(&j, sz);
+                TrigDrawKeyText(&pGimps->unk_C0, sz, sizeof(sz));
+                LiveJ(&j, ",\"def\":");
+                LiveJText(&j, sz);
+                TrigDrawKeyText(&pGimps->unk_E8, sz, sizeof(sz));
+                LiveJ(&j, ",\"weapon\":");
+                LiveJText(&j, sz);
+                TrigDrawKeyText(&pGimps->unk_C8, sz, sizeof(sz));
+                LiveJ(&j, ",\"script\":");
+                LiveJText(&j, sz);
+            }
+            LiveJ(&j, "}");
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            j.n = nMark;
+            psz[j.n] = 0;
+            if (j.n && psz[j.n - 1] == '[')
+                nShown = 0;
+        }
+    }
+    LiveJ(&j, "]}");
+    return j.n < nMax - 1;
+}
+
+// The shrimp triggers: {"t":"shrimps","frame":n,"list":[...]}, each with its counts, its path
+// (49 points along its spline) and its shrimps ([x,y,z,forward]).
+RwBool TrigDrawLiveShrimpsJson(RwChar *psz, RwInt32 nMax)
+{
+    TrigLiveJson j = { psz, 0, nMax };
+    RwInt32 i, k, nShown = 0, nMark;
+
+    LiveJ(&j, "{\"t\":\"shrimps\",\"frame\":%u,\"list\":[", port_frame);
+    for (i = 0; i <= dword_429D00 && i < 2000 && j.n < nMax - 8192; i++)
+    {
+        Trigger *pTrigger = (Trigger *)dword_4CFE30[i];
+        const RwChar *pszName;
+
+        if (pTrigger == NULL || pTrigger->vf_008() != 0x21)
+            continue;
+        nMark = j.n;
+        __try
+        {
+            ShrimpTrigger *pShrimps = (ShrimpTrigger *)pTrigger;
+            SplinePath *pPath = pShrimps->unk_EC.unk_0C;
+            type_17CA70_node *pNode;
+            RwInt32 nAlive = 0;
+            RwV3d v;
+
+            for (pNode = pShrimps->unk_EC.unk_14; pNode != NULL && nAlive < 256; pNode = pNode->unk_0C)
+                nAlive++;
+            LiveJ(&j, "%s{\"trigger\":%d,\"alive\":%d,\"left\":%d,\"limit\":%d,\"chance\":%.0f,\"speed\":%.3f,\"pos\":[%.1f,%.1f,%.1f]",
+                  nShown++ ? "," : "", i, nAlive, pShrimps->unk_E4, pShrimps->unk_E0 == 0x7FFFFFFF ? -1 : pShrimps->unk_E0,
+                  pShrimps->unk_DC, pShrimps->unk_D0_r, pTrigger->unk_90, pTrigger->unk_94, pTrigger->unk_98);
+            pszName = TrigDrawTriggerName(pTrigger);
+            if (pszName)
+            {
+                LiveJ(&j, ",\"name\":");
+                LiveJText(&j, pszName);
+            }
+            {
+                RwChar sz[48];
+
+                TrigDrawKeyText(&pShrimps->unk_C0, sz, sizeof(sz));
+                LiveJ(&j, ",\"model\":");
+                LiveJText(&j, sz);
+                if (pPath)
+                {
+                    TrigDrawKeyText(&pPath->unk_2C, sz, sizeof(sz));
+                    LiveJ(&j, ",\"pathName\":");
+                    LiveJText(&j, sz);
+                    LiveJ(&j, ",\"length\":%.1f,\"endMode\":%d", pPath->unk_24, (RwInt32)pPath->unk_1C_0);
+                }
+            }
+            if (pPath)
+            {
+                LiveJ(&j, ",\"path\":[");
+                for (k = 0; k <= 48; k++)
+                {
+                    pPath->sub_BA990((RwReal)k / 48.0f, &v, NULL);
+                    LiveJ(&j, "%s[%.1f,%.1f,%.1f]", k ? "," : "", v.x, v.y, v.z);
+                }
+                LiveJ(&j, "],\"shrimps\":[");
+                for (pNode = pShrimps->unk_EC.unk_14, k = 0; pNode != NULL && k < 256; pNode = pNode->unk_0C, k++)
+                {
+                    pPath->sub_BA990(pNode->unk_00, &v, NULL);
+                    LiveJ(&j, "%s[%.1f,%.1f,%.1f,%d]", k ? "," : "", v.x, v.y, v.z, pNode->unk_04 >= 0.0f ? 1 : 0);
+                }
+                LiveJ(&j, "]");
+            }
+            LiveJ(&j, "}");
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            // (a half-written entry: dropped)
+            j.n = nMark;
+            psz[j.n] = 0;
+            if (j.n && psz[j.n - 1] == '[')
+                nShown = 0;
+        }
     }
     LiveJ(&j, "]}");
     return j.n < nMax - 1;

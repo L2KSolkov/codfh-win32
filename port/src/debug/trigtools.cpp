@@ -105,6 +105,7 @@ extern RwBool g_bTrigDrawNoclip;
 extern RwReal g_fTrigDrawNoclipSpeed;
 extern RwBool g_bTrigDrawSeeThrough;
 extern RwBool g_bTrigDrawLabels;
+extern RwBool g_bTrigDrawNames;
 extern RwReal g_fTrigDrawRange;
 extern RwReal g_fTrigDrawTextScale;
 extern RwReal g_fTrigDrawCollisionRange;
@@ -123,6 +124,9 @@ extern RwBool g_bTrigDrawAiPath;
 extern RwBool g_bTrigDrawAiCover;
 extern RwBool g_bTrigDrawAiCombat;
 extern RwBool g_bTrigDrawPg;
+extern RwBool g_bTrigDrawGimps, g_bTrigDrawShrimps;
+extern RwReal g_fTrigDrawGimpRange;
+extern RwInt32 g_nTrigDrawGimpsShown, g_nTrigDrawShrimpsShown;
 extern RwBool g_bTrigDrawPgText;
 extern RwReal g_fTrigDrawPgRange;
 extern RwInt32 g_nTrigDrawPgShown;
@@ -1240,6 +1244,7 @@ static void TabDrawing()
     Check("through walls", &g_bTrigDrawSeeThrough);
     ImGui::SameLine();
     Check("labels (each trigger's type)", &g_bTrigDrawLabels);
+    Check("names (the level's name for a trigger, above its type)", &g_bTrigDrawNames);
     ImGui::SliderFloat("trigger draw distance (0 unlimited)", &g_fTrigDrawRange, 0.0f, 1000.0f, "%.0f");
     ImGui::SliderFloat("label height (of the distance)", &g_fTrigDrawTextScale, 0.005f, 0.1f, "%.3f");
     ImGui::Separator();
@@ -1313,6 +1318,21 @@ static void TabDrawing()
                             "entity, orange a set one, yellow a point, blue its path; the yellow cross where it aims "
                             "with its spread; cyan its turret's facing, magenta while it turns; grey to its "
                             "trigger)", g_nTrigDrawPgShown);
+    ImGui::Separator();
+    Check("draw the gimps", &g_bTrigDrawGimps);
+    ImGui::SameLine();
+    Check("the shrimps", &g_bTrigDrawShrimps);
+    ImGui::SliderFloat("gimp draw distance (0 unlimited)", &g_fTrigDrawGimpRange, 0.0f, 20000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    if (g_bTrigDrawGimps)
+        ImGui::TextDisabled("(%d gimps drawn: over each, its slot, health, attitude, its ride and head shot, its place "
+                            "along its spline and each of its scripts' states, then the messages it got; orange to its "
+                            "point on the spline; a GimpTrigger's label adds its spawns left and the gimp's health)",
+                            g_nTrigDrawGimpsShown);
+    if (g_bTrigDrawShrimps)
+        ImGui::TextDisabled("(%d shrimps drawn: each shrimp trigger's path in blue from its tick, a cross per shrimp, "
+                            "cyan going forward, magenta back; its label adds the count, spawns left, chance and speed)",
+                            g_nTrigDrawShrimpsShown);
     ImGui::Separator();
     Check("noclip for the local player", &g_bTrigDrawNoclip);
     ImGui::SliderFloat("noclip speed", &g_fTrigDrawNoclipSpeed, 1.0f, 500.0f, "%.0f");

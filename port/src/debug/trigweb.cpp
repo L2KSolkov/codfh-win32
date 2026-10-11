@@ -19,7 +19,8 @@
 //           "settings" (the VM and Script log tabs'), and the debugger's (scriptdbg.cpp); for a
 //           page that sent {"cmd":"debug","on":1} (the level viewer's debug labels), "ai" and "pg"
 //           ten times a second (every AI's and projectile generator's state, with their notes,
-//           trigdraw.cpp's) and "nodes" (the path node graph once a level, then its changes); for
+//           trigdraw.cpp's), "gimps" and "shrimps" as often (the gimps, the shrimps and their
+//           spawners) and "nodes" (the path node graph once a level, then its changes); for
 //           a page that sent {"cmd":"aifull","slot":n} (the full AI view), "aifields" once (the
 //           field tables) and "aifull" five times a second (that AI's memory, by class).
 // Commands come back as text JSON ({"cmd":"teleport","x":..,"y":..,"z":..}, "freecam" with
@@ -79,6 +80,8 @@ void TrigWebSetSetting(const RwChar *pszName, RwInt32 nIndex, RwInt32 nValue, co
 RwBool TrigWebVmJson(RwChar *psz, RwInt32 nMax);
 RwBool TrigDrawLiveAiJson(RwChar *psz, RwInt32 nMax);
 RwBool TrigDrawLivePgJson(RwChar *psz, RwInt32 nMax);
+RwBool TrigDrawLiveGimpsJson(RwChar *psz, RwInt32 nMax);
+RwBool TrigDrawLiveShrimpsJson(RwChar *psz, RwInt32 nMax);
 RwBool TrigDrawLiveNodesJson(RwChar *psz, RwInt32 nMax, RwBool bFull);
 RwBool TrigDrawLiveAiFieldsJson(RwChar *psz, RwInt32 nMax);
 RwBool TrigDrawLiveAiFullJson(RwChar *psz, RwInt32 nMax, RwInt32 nSlot);
@@ -1212,6 +1215,14 @@ void TrigLiveTick()
                 TrigDrawLiveAiJson(s_pszDebug, LIVE_DEBUG);
                 LiveEventDebug(s_pszDebug);
                 TrigDrawLivePgJson(s_pszDebug, LIVE_DEBUG);
+                LiveEventDebug(s_pszDebug);
+            }
+            // the gimps and shrimps, between the AI's frames
+            if (s_pszDebug && port_frame % 6 == 0)
+            {
+                TrigDrawLiveGimpsJson(s_pszDebug, LIVE_DEBUG);
+                LiveEventDebug(s_pszDebug);
+                TrigDrawLiveShrimpsJson(s_pszDebug, LIVE_DEBUG);
                 LiveEventDebug(s_pszDebug);
             }
         }
