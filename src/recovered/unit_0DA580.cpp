@@ -166,6 +166,13 @@ type_DA580 *type_DA580::sub_DA680(const RwChar *arg_0)
             dword_4B8958 = sub_DC000("SHELL\\HUD\\INSTANCE\\XBOX\\F_HUD.TXD");
             Rt2dFontTexDictionarySet(dword_4B8958);
         }
+#ifdef CODFH_WIN32
+        // (the port: the fonts' dictionary handed to Rt2d again: each level's MainLoop::Open
+        // reopens Rt2d, whose current font dictionary is then a new, empty one; with a font left
+        // from before, F_HUD.TXD stays loaded and was not set again, and every font read failed)
+        else
+            Rt2dFontTexDictionarySet(dword_4B8958);
+#endif
         lv_10 = Rt2dFontRead(arg_0);
         if (!lv_10)
         {
