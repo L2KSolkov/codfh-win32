@@ -2055,19 +2055,50 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
             if (dbgps)
                 d.ps = dbgps;
         }
-        /* CODFH_WIREFRAME=1: everything as wireframe with no depth, blending or alpha test (these
-           switches are port_render_debug's: the overlay changes them) */
+        /* (these switches are port_render_debug's: the overlay changes them; CODFH_NODEPTH,
+           CODFH_NOCULL and CODFH_WIREFRAME set them at start) */
         if (port_render_debug.nodepth)
             d.depthEnable = 0;
         if (port_render_debug.nocull)
             d.cull = PDEV_CULL_NONE;
-        if (port_render_debug.wireframe)
+        /* The wireframe, of the 3D draws only (the HUD, the menus and the text stay as they are),
+           in one flat colour: 1 hidden lines (the draw's depth alone first, its colour not
+           written, then its edges on it), 2 over the shaded scene (the draw, then its edges), 3
+           through walls (the edges alone with no depth test) */
+        if (port_render_debug.wireframe && !draw_is_2d)
         {
+            static void *wireps;
+            int mode = port_render_debug.wireframe;
+            if (!wireps)
+                wireps = pdev_pixel_shader("float4 main(float4 p : SV_Position, float4 d0 : COLOR0, float4 d1 : COLOR1,\n"
+                                           "            float4 uv : TEXCOORD0) : SV_Target {\n"
+                                           "    return float4(0.55, 1.0, 0.65, 1); }\n");
+            if (mode == 1)
+            {
+                PDevDraw z = d;
+                z.writeMask = 0;
+                z.blendEnable = 0;
+                pdev_draw(&z);
+            }
+            else if (mode == 2)
+                pdev_draw(&d);
             d.wireframe = 1;
-            d.depthEnable = 0;
+            if (wireps)
+                d.ps = wireps;
             d.blendEnable = 0;
-            d.cull = PDEV_CULL_NONE;
             d.writeMask = 0xF;
+            d.cull = PDEV_CULL_NONE;
+            d.depthWrite = 0;
+            if (mode >= 3)
+                d.depthEnable = 0;
+            else
+            {
+                /* (the edges pulled a little towards the camera, onto the depth their own faces
+                   left) */
+                d.depthFunc = 4; /* D3D11_COMPARISON_LESS_EQUAL */
+                d.depthBias = -64.0f;
+                d.slopeBias = -1.0f;
+            }
         }
     }
     pdev_draw(&d);

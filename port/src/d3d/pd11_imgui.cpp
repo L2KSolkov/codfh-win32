@@ -162,8 +162,14 @@ static void port_window(int back_w, int back_h)
         ImGui::Text("untextured %u, dropped %u", s.untextured, s.dropped);
         ImGui::Text("shaders %.2f  convert %.2f  state %.2f  device %.2f ms", s.shaderMs, s.convertMs, s.stateMs,
                     s.deviceMs);
-        check("wireframe", &port_render_debug.wireframe);
-        ImGui::SameLine();
+        {
+            /* (xdraw.cpp's modes: the 3D draws only, in one colour) */
+            static const char *const modes[] = {"off", "hidden lines", "over the shaded scene", "through walls"};
+            if (port_render_debug.wireframe < 0 || port_render_debug.wireframe > 3)
+                port_render_debug.wireframe = 1;
+            ImGui::SetNextItemWidth(200.0f);
+            ImGui::Combo("wireframe", &port_render_debug.wireframe, modes, 4);
+        }
         check("no depth", &port_render_debug.nodepth);
         check("no culling", &port_render_debug.nocull);
         ImGui::SameLine();
