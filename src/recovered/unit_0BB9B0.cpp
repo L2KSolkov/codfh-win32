@@ -1431,7 +1431,7 @@ void Trigger::sub_BE710(RwReal arg_0, RwReal arg_4, RwReal arg_8)
 
     sub_BE810();
     var_4 = sub_145830();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     // single player compiles the debug prints out (SP 0x911E0)
     sub_19A750("*Trigger (%d) being moved to:(%6.3f,%6.3f,%6.3f) from:(%6.3f,%6.3f,%6.3f)", unk_3C,
                (RwDouble)arg_0, (RwDouble)arg_4, (RwDouble)arg_8, (RwDouble)unk_90, (RwDouble)unk_94,
@@ -1464,7 +1464,7 @@ void Trigger::sub_BE810()
             var_4 = (type_145830 *)dword_4D1D98.sub_16C6A0(local_8);
             if (var_4 && var_4->unk_00 == unk_3C)
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 // single player compiles the debug prints out (SP 0x90BA0)
                 sub_19A750("-Trigger (%d) being moved to:(%6.3f,%6.3f,%6.3f) from:(%6.3f,%6.3f,%6.3f)", unk_3C,
                            (RwDouble)var_4->unk_04.x, (RwDouble)var_4->unk_04.y, (RwDouble)var_4->unk_04.z,
@@ -1475,7 +1475,7 @@ void Trigger::sub_BE810()
                 unk_98 = var_4->unk_04.z;
                 RwMatrixOrthoNormalize((RwMatrix *)&unk_60_m, (RwMatrix *)&unk_60_m);
                 RwMatrixOptimize((RwMatrix *)&unk_60_m, 0);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 sub_19A750("\tOrthoNormalizing trigger(%d)", unk_3C);
                 sub_19A750("\t\tLoc now:(%6.3f,%6.3f,%6.3f)", (RwDouble)unk_90, (RwDouble)unk_94, (RwDouble)unk_98);
                 sub_19A750("\t\tAt now:(%6.3f,%6.3f,%6.3f)", (RwDouble)unk_60_m.at.x, (RwDouble)unk_60_m.at.y,

@@ -17,6 +17,10 @@ compiler's own rules, not the sources' VC7.1 ones. CODFH_DRAW_TRIGGERS, the game
 (port/src/debug: trigger volumes and collision drawn, noclip, the overlay's Game debug tools
 window), comes with it; --no-debug-tools leaves them out.
 
+CODFH_SP_LOGS (single player's builds) prints what single player compiled out of the shared
+sources and multiplayer kept: their debug prints, as the multiplayer port's log has them;
+--no-sp-logs leaves them out.
+
 --dedicated builds the dedicated server instead (build/port/dedicated/codfh_server.exe, its own
 objects): every unit compiled with CODFH_DEDICATED too, which the port layer reads (no window,
 device, audio output or local input; it hosts from the command line and never plays).
@@ -239,6 +243,9 @@ def main():
         # (the game's debug tools, port/src/debug; --no-debug-tools leaves them out)
         if '--no-debug-tools' not in args:
             PORT_FLAGS.append('/DCODFH_DRAW_TRIGGERS')
+    # (single player: the debug prints multiplayer kept; --no-sp-logs leaves them out)
+    if SINGLE_PLAYER and '--no-sp-logs' not in args:
+        PORT_FLAGS.append('/DCODFH_SP_LOGS')
     os.makedirs(OUT, exist_ok=True)
     only = [args[i + 1] for i, a in enumerate(args) if a == '--only']
     jobs_n = int(args[args.index('--jobs') + 1]) if '--jobs' in args else (os.cpu_count() or 4)

@@ -5420,7 +5420,7 @@ RwTexDictionary *sub_E8320(const RwChar *arg_0)
     l4 = 0;
     var8 = 0;
     sub_D7F20(var_210, arg_0);
-#ifndef CODFH_SP // MP only: single player compiles out the debug print (SP 0xA9810)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // MP only: single player compiles out the debug print (SP 0xA9810)
     sub_19A750("Loading HUD Texture Dictionary file from: %s...", var_210);
 #endif
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_210);

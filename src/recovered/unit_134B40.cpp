@@ -202,7 +202,7 @@ type_3D3548 *sub_134B40(type_3D3548 *arg_0)
             var_10 = 0;
         }
     }
-#ifndef CODFH_SP // MP only: single player has no warning (SP 0xEC200)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // MP only: single player has no warning (SP 0xEC200)
     else
     {
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
@@ -538,7 +538,7 @@ RwInt32 type_3DAFC8::sub_135430(SoldierTrigger *arg_0)
             unk_650[var_108].unk_00.x = 0.0f;
             unk_650[var_108].unk_00.y = 0.0f;
             unk_650[var_108].unk_00.z = 0.0f;
-#ifndef CODFH_SP // MP only: single player has no debug print (SP 0xE9B00)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // MP only: single player has no debug print (SP 0xE9B00)
             sub_19A750("%2d %4d { %9.6f, %9.6f, %9.6f }, \n", var_108,
                        unk_28C->get_unk_18()->pNodeInfo[var_108].nodeID, var_DC[var_108].pos.x,
                        var_DC[var_108].pos.y, var_DC[var_108].pos.z);
@@ -557,7 +557,7 @@ RwInt32 type_3DAFC8::sub_135430(SoldierTrigger *arg_0)
     else
     {
         unk_298 = 0;
-#ifndef CODFH_SP // MP only: single player has no debug print (SP 0xE9B00)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // MP only: single player has no debug print (SP 0xE9B00)
         sub_19A750("WARNING: No idle face anim loaded for level!\n");
 #endif
     }
@@ -613,7 +613,7 @@ RwInt32 type_3DAFC8::sub_135430(SoldierTrigger *arg_0)
                     "***ERROR: Cannot create soldier entity from trigger loc: %f,%f,%f because it could not "
                     "find a starting coverpoint",
                     var_18C->x, var_18C->y, var_18C->z);
-#ifndef CODFH_SP // MP only: single player has no debug print (SP 0xE9B00)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // MP only: single player has no debug print (SP 0xE9B00)
             sub_19A750(var_390);
 #endif
             unk_8A0.unk_51C = 0;

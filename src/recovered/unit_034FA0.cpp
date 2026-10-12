@@ -138,7 +138,7 @@ void sub_35080()
 // match: sub_350D0 @ 0x000350D0
 void sub_350D0()
 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Somebody forgot to unregister in the Distance Scheduler!");
 #endif
 }

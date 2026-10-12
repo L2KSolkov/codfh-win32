@@ -70,7 +70,7 @@ void sub_16FF90()
 // sp-match: ?sub_16FFB0@@YAXPAVTrigger@@@Z @ 0x0010DE10
 void sub_16FFB0(Trigger *arg_0)
 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     if (dword_4E5650)
         sub_19A750("WARNING: ObjectiveManager initialized twice! There might be 2 level scripts in the level");
 #endif

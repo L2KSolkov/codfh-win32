@@ -830,7 +830,7 @@ void type_3D3548::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
                             "GameEntity Animation Event: WARNING! Entity on non-tagged surface calling index "
                             "alias 0x%x, 0x%x! Using 0 for Index Alias purposes",
                             var_C.unk_00, var_C.unk_04);
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x9FB10 keeps the sprintf)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x9FB10 keeps the sprintf)
                     sub_19A750(var_120);
 #endif
                 }
@@ -3583,7 +3583,7 @@ RpAtomic *sub_D3EB0(RpAtomic *arg_0, void *arg_4)
 // sp-match: ?sub_D3FB0@type_3D3548@@QAEXPBDPAXPAUtype_3DF8D8_04@@@Z @ 0x000FEB20
 void type_3D3548::sub_D3FB0(const RwChar *arg_0, void *arg_4, type_3DF8D8_04 *arg_8)
 {
-#ifndef CODFH_SP // MP only: single player compiles the debug print out (the text is not in default.xbe)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // MP only: single player compiles the debug print out (the text is not in default.xbe)
     if (arg_4)
     {
         return;

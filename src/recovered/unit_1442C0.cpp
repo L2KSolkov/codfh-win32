@@ -151,7 +151,7 @@ void sub_1446C0()
 // Destroys the texture arg_0, warning when something else still holds it.
 RwTexture *fpCallBack(RwTexture *texture, void *pData)
 {
-#ifndef CODFH_SP // single player compiles the warning out: the body folds into destroyTexture
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the warning out: the body folds into destroyTexture
     if (texture->refCount > 2)
         sub_19A750("TextureManager: WARNING: Texture might not be destroyed! Ref count is: %d",
                    texture->refCount - 1);

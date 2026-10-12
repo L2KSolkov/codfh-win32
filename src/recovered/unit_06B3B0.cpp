@@ -153,7 +153,7 @@ void sub_6B4A0()
 // Warns of messages, registrations and arguments still out.
 void sub_6B510()
 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     // Single player compiles the debug prints out (SP 0x5AC80 only resets the count).
     RwInt32 var_4;
 

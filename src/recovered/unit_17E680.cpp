@@ -89,7 +89,7 @@ type_3D3548 *sub_17E680(GimpVehicleTrigger *arg_0)
             var_10 = 0;
         }
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     // Single player compiles the debug print out (SP 0x119A70).
     else
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
@@ -953,7 +953,7 @@ type_3D3548 *sub_180CF0(GimpVehicleTrigger *arg_0)
             var_10 = 0;
         }
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     // Single player compiles the debug print out (SP 0x119B10).
     else
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "

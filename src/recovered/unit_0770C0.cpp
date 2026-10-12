@@ -94,7 +94,7 @@ void sub_770F0(RwUInt32 arg_0, RwUInt32 arg_4, RwUInt32 *arg_8)
     RwUInt32 var_10;
 
     var_4 = 0;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     // single player compiles the debug prints out (SP 0x621A0)
     sub_19A750("*********************************************");
     sub_19A750("******ANIMATION HEAP SIZE ALLOCATION*********");
@@ -102,7 +102,7 @@ void sub_770F0(RwUInt32 arg_0, RwUInt32 arg_4, RwUInt32 *arg_8)
     dword_449C90 = arg_0;
     var_4 = arg_0 * 0x44;
     dword_449C94 = (type_449C94 *)RwMalloc(var_4, 0x34251); // not an address: an allocation tag
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Size Allocated for DataSet Entries: %d", var_4);
     sub_19A750("Number of anim banks: %d", arg_0);
 #endif
@@ -110,7 +110,7 @@ void sub_770F0(RwUInt32 arg_0, RwUInt32 arg_4, RwUInt32 *arg_8)
     for (v8 = 0; v8 < arg_0; v8++) {
         if (arg_8 != 0) {
             var_4 += arg_8[v8] < 0x800 ? 0x800 : arg_8[v8];
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             sub_19A750("Anim bank %d size: %d", v8 + 1, arg_8[v8]);
 #endif
         }
@@ -126,13 +126,13 @@ void sub_770F0(RwUInt32 arg_0, RwUInt32 arg_4, RwUInt32 *arg_8)
     }
     if (var_4 == 0) {
         var_4 = arg_0 * arg_4;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("Size per bank %d", arg_4);
 #endif
     }
     dword_449C98 = (RwUInt8 *)RwMalloc(var_4, 0x34251); // not an address: an allocation tag
     stk_C = dword_449C98;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("***Total size allocated for all anim banks: %d", var_4);
 #endif
     for (v8 = 0; v8 < arg_0; v8++) {
@@ -149,7 +149,7 @@ void sub_770F0(RwUInt32 arg_0, RwUInt32 arg_4, RwUInt32 *arg_8)
             stk_C += arg_4;
         }
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("*********************************************");
 #endif
 }
@@ -266,7 +266,7 @@ RwInt32 sub_777F0(const RwChar *arg_0, type_449C94_08 arg_4, RwInt32 arg_C, RwV3
     bool l9;
 
     if (dword_449C94[arg_C].unk_08 == arg_4.unk_00 && dword_449C94[arg_C].unk_0C == arg_4.unk_04) {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // single player compiles the debug prints out (SP 0x623C0)
         sub_19A750("Requested Animation bank %x:%x is already loaded in slot %d. Ignoring load.\n",
                    arg_4.unk_00, arg_4.unk_04, arg_C);
@@ -280,7 +280,7 @@ RwInt32 sub_777F0(const RwChar *arg_0, type_449C94_08 arg_4, RwInt32 arg_C, RwV3
             sprintf(var_110,
                     "ERROR! Cannot load anim bank %x:%x into slot %d.  It is already loaded in %d!!\n",
                     arg_4.unk_00, arg_4.unk_04, arg_C + 1, var_4 + 1);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             sub_19A750(var_110);
 #endif
         }
@@ -295,7 +295,7 @@ RwInt32 sub_777F0(const RwChar *arg_0, type_449C94_08 arg_4, RwInt32 arg_C, RwV3
         while (var_118 != 0) {
             var_114 = var_118->unk_24;
             if (sub_788C0(var_118->unk_00, 1)) {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 sub_19A750("\n*\nERROR: Attempting to unload animation %s (in bank %d) while still "
                            "active.\n*\n",
                            var_118->unk_04, arg_C + 1);
@@ -317,7 +317,7 @@ RwInt32 sub_777F0(const RwChar *arg_0, type_449C94_08 arg_4, RwInt32 arg_C, RwV3
             sprintf(var_218, "ERROR: Can't unload a bank with active animations from SCRIPT");
     }
     if (dword_449C94[arg_C].unk_04 & 0x80000000) {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("Unloading anim bank slot %d \n", arg_C);
 #endif
         dword_449C94[arg_C].unk_04 &= 0x7FFFFFFF;
@@ -326,7 +326,7 @@ RwInt32 sub_777F0(const RwChar *arg_0, type_449C94_08 arg_4, RwInt32 arg_C, RwV3
     dword_449C94[arg_C].unk_08 = arg_4.unk_00;
     dword_449C94[arg_C].unk_0C = arg_4.unk_04;
     dword_449C94[arg_C].unk_1C = 0;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Adding load of Anim bank %s slot %d to AsyncQueue...\n", arg_0, arg_C);
 #endif
     sub_81EB0(2, arg_0, (RwInt32)&dword_449C94[arg_C]);
@@ -601,7 +601,7 @@ void *type_77D30::sub_78370(RwUInt32 arg_0)
         unk_20 += var_4;
         unk_14 = unk_20 - &unk_00;
     } else {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // single player compiles the debug print out (SP 0x62A20)
         sub_19A750("Out of animation bank memory!");
 #endif

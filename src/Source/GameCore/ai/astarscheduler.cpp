@@ -104,7 +104,7 @@ void sub_32F00()
 // match: sub_32F50 @ 0x00032F50
 void sub_32F50()
 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Somebody forgot to unregister in the AStar Scheduler!");
 #endif
 }

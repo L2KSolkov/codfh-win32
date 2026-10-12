@@ -193,6 +193,8 @@ static void find_data_root(const char *ini)
     ExitProcess(1);
 }
 
+extern "C" int port_log_astar;   /* (below, with the game's debug prints) */
+
 void port_config_load(void)
 {
     char ini[MAX_PATH];
@@ -242,6 +244,8 @@ void port_config_load(void)
         port_config.maxFps = ini_int(ini, "video", "max_fps", 60);
         char con[8];
         port_config.console = ini_int(ini, "debug", "console", 1);
+        if (GetEnvironmentVariableA("CODFH_ASTARLOG", con, sizeof(con)))
+            port_log_astar = atoi(con);
         if (GetEnvironmentVariableA("CODFH_CONSOLE", con, sizeof(con)))
             port_config.console = atoi(con);
         port_config.renderScale = (float)atof(rs);
@@ -363,6 +367,10 @@ extern "C" DWORD WINAPI xpal_GetTickCount(void)
     }
     return t0 + (DWORD)((now.QuadPart - q0) * 1000 / freq);
 }
+
+/* The A* search logs (the scheduler's and the path finder's, src/Source/GameCore): many a
+   second in a fight, so off unless the overlay's Logs switch or CODFH_ASTARLOG=1 turns them on. */
+extern "C" int port_log_astar = 0;
 
 /* The game's debug prints (its compiled-out logs): formatted with the faults a bad argument
    raises caught (the format alone then), to the log. */

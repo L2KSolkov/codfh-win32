@@ -15890,7 +15890,7 @@ void sub_5EFC0(RwUInt32 arg_0, type_44350 *arg_4)
                             "self for index has no tag... calling index alias 0x%x, 0x%x! Using "
                             "0 for Index Alias purposes",
                             var_4->unk_00, var_4->unk_04);
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
                     sub_19A750(var_240);
 #endif
                 }
@@ -15915,7 +15915,7 @@ void sub_5EFC0(RwUInt32 arg_0, type_44350 *arg_4)
                             "EfuncPlayIndexSound: WARNING! Entity on non-tagged surface calling "
                             "index alias 0x%x, 0x%x! Using 0 for Index Alias purposes",
                             var_4->unk_00, var_4->unk_04);
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
                     sub_19A750(var_350);
 #endif
                 }
@@ -16030,7 +16030,7 @@ void sub_5F4B0(RwUInt32 arg_0, type_44350 *arg_4)
                             "sound using self for index has no tag... calling index alias 0x%x, "
                             "0x%x! Using 0 for Index Alias purposes",
                             var_4->unk_00, var_4->unk_04);
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
                     sub_19A750(var_248);
 #endif
                 }
@@ -16056,7 +16056,7 @@ void sub_5F4B0(RwUInt32 arg_0, type_44350 *arg_4)
                             "surface calling index alias 0x%x, 0x%x! Using 0 for Index Alias "
                             "purposes",
                             var_4->unk_00, var_4->unk_04);
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
                     sub_19A750(var_358);
 #endif
                 }
@@ -17794,7 +17794,7 @@ void sub_62B20(RwUInt32 arg_0, type_44350 *arg_4)
             // A local the image reserves and never uses.
             RwInt32 unused_0;
         }
-#ifdef CODFH_SP // single player compiles the debug print out
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS) // single player compiles the debug print out
     }
 #else
     } else
@@ -17833,7 +17833,7 @@ void sub_62DD0(RwUInt32 arg_0, type_44350 *arg_4)
             RwInt32 unused_0;
         }
         v8->unk_42C = var_10->get_unk_24();
-#ifdef CODFH_SP // single player compiles the debug print out
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS) // single player compiles the debug print out
     }
 #else
     } else
@@ -18972,7 +18972,7 @@ void sub_64B60(RwUInt32 arg_0, type_44350 *arg_4)
         if (l10 != 0) {
             RwV3dSubMacro(&var_1C, &l10->unk_10, var_4->sub_CD550());
             lv_8 = RwV3dLength((RwV3d *)&var_1C);
-#ifdef CODFH_SP // single player compiles the debug print out
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS) // single player compiles the debug print out
         }
 #else
         } else

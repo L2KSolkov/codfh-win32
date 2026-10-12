@@ -277,7 +277,7 @@ void sub_D5480()
     dword_4B8208 = 0;
     dword_4B69F8 = 0;
     dword_429268 = 1;
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
     for (var_8 = 0; var_8 < 0x300; var_8++)
     {
         if (dword_4B6A00[var_8].unk_00 || dword_4B6A00[var_8].unk_04)
@@ -310,7 +310,7 @@ void sub_D5570()
     }
     dword_4B8200 = 0;
     sub_D6350();
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
     for (var_8 = 0; var_8 < 0x300; var_8++)
     {
         if (dword_4B6A00[var_8].unk_00 || dword_4B6A00[var_8].unk_04)
@@ -491,7 +491,7 @@ void *sub_D56D0(RwInt32 arg_0, bool arg_4, RwInt32 arg_8)
             bp_8 = dword_4B83A0[var_C].sub_D65C0();
             dword_429264 = var_C;
         }
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
         else
         {
             sub_19A750("WARNING: A priority spawn could not be created due to lack of sacficial lambs. "
@@ -800,7 +800,7 @@ void sub_D61F0(type_3DF8D8_04 *arg_0)
     type_4B6A00 *bp_8;
     type_3D3548 *bp_4;
 
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
     if (!dword_4B8200)
     {
         for (var_C = 0; var_C < 0x300; var_C++)

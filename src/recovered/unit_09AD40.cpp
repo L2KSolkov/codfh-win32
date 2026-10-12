@@ -114,7 +114,7 @@ type_3D51C0 *sub_9AD40(type_712B0 *arg_0)
             var_10 = 0;
         }
     }
-#ifndef CODFH_SP // the warning is compiled out in single player (SP 0x7A670)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // the warning is compiled out in single player (SP 0x7A670)
     else
     {
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "

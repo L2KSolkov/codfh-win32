@@ -75,7 +75,7 @@ RwInt32 alfasched::sub_71FF0()
 
     var_4 = 0;
     if (unk_00 != 0) {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // single player compiles the debug print out (SP 0x5F590)
         sub_19A750("Some things are still registered in the scheduler at restart/shutdown!  "
                    "But this might not be anybody's fault.  I'll clean it up for you\n");

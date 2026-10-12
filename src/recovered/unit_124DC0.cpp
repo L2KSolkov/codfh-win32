@@ -80,7 +80,7 @@ void sub_124DC0(RwReal arg_0)
 
     if (byte_4CF428)
     {
-#ifndef CODFH_SP // single player compiles the debug prints out (SP 0xDABC0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug prints out (SP 0xDABC0)
         sub_19A750(1);
 #endif
         return;
@@ -93,7 +93,7 @@ void sub_124DC0(RwReal arg_0)
     }
     dword_4CF3C0[9] = arg_0 - flt_4CF430;
     var_4 = (var_4 += dword_4CF3C0[9]) * 0.0001f;
-#ifndef CODFH_SP // single player compiles the debug prints out (SP 0xDABC0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug prints out (SP 0xDABC0)
     if (var_4 < 0.025f)
     {
         sub_19A750(1);
@@ -132,7 +132,7 @@ void sub_124EE0(RwReal arg_0, RwInt32 arg_4)
     dword_4CF3F8 = 0.0f;
     dword_4CF3FC = arg_0 * 1000.0f / flt_3DA7DC;
     byte_4CF408 = 1;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     // single player has no call here (SP 0xDA950)
     sub_19A750(1);
 #endif

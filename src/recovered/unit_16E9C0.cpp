@@ -108,7 +108,7 @@ void sub_16E9E0(RwInt32 arg_0)
     sub_16EFD0();
     sprintf(var_28, "cbank_%02d.bin", arg_0);
     sprintf(var_128, "Request to load %s", var_28);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750(var_128);
 #endif
     sub_16EDB0(var_128, 0x100, arg_0);
@@ -174,13 +174,13 @@ void sub_16EAE0(RwStream *arg_0, RwInt32 arg_4)
         {
             if (frm_24)
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 sub_19A750("\tStream Skip: %d bytes", frm_24);
 #endif
                 RwStreamSkip(arg_0, frm_24);
                 frm_24 = 0;
             }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             sub_19A750("\tLoading clump : (0x%x,0x%x)", m_18->unk_00.unk_00, m_18->unk_00.unk_04);
 #endif
             RwStreamRead(arg_0, &var_40, sizeof(var_40));
@@ -199,19 +199,19 @@ void sub_16EAE0(RwStream *arg_0, RwInt32 arg_4)
         }
         else
         {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             sub_19A750("\tIgnoring clump: (0x%x,0x%x). Already Loaded!", m_18->unk_00.unk_00,
                        m_18->unk_00.unk_04);
 #endif
             frm_24 += m_18->unk_08;
         }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("\t MemoryHeap At: (%08d/%08d)", dword_4E51B8.unk_04, dword_4E51B8.unk_08);
 #endif
         m_18++;
         lv_10--;
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("File contained %d clumps. %d loaded with a total mem footprint of %d bytes. %d slots are still "
                "available.  %d bytes are still free.",
                var_48.unk_00, l1C, dword_4E51B8.unk_04, sub_16EF70(), dword_4E51B8.unk_08 - dword_4E51B8.unk_04);
@@ -272,7 +272,7 @@ void sub_16EEC0(RwInt32 arg_0)
 
     if (sub_16EE80(arg_0))
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("A request to load cbank_%02d.bin is ignored because it is already loaded!", arg_0);
 #endif
         return;
@@ -283,7 +283,7 @@ void sub_16EEC0(RwInt32 arg_0)
     if (sub_82020(3, arg_0))
         return;
     sub_82130();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Request to load %s", var_24);
 #endif
     sub_81EB0(3, var_24, arg_0);
@@ -329,7 +329,7 @@ void sub_16EFD0()
     ebp_14 = lv_10;
     if (dword_4E51C4 != -1)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("Request to unload cbank_%02d.bin\n", dword_4E51C4);
 #endif
         while (*ebp_14)
@@ -349,7 +349,7 @@ void sub_16EFD0()
                     }
                     sub_198F00(&var_20->unk_00);
                     m_18++;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("\tUnloading GodID (0x%08x,0x%08x)", var_20->unk_00.unk_00, var_20->unk_00.unk_04);
 #endif
                     var_20->unk_00.unk_00 = 0;
@@ -359,7 +359,7 @@ void sub_16EFD0()
             }
             ebp_14++;
         }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("Unloaded %d GodIDs. %d slots are available.", m_18, sub_16EF70());
 #endif
         dword_4E51B8.unk_04 = 0;

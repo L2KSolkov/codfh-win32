@@ -22,6 +22,11 @@
 #include "types/soundbank.h"
 #include "types/type_10F710.h"
 #include "types/PlayerTrigger.h"
+#ifdef CODFH_WIN32
+// (the port: the game's printf prints, which the Xbox showed on its debug output, to the log)
+extern "C" void port_debug_print(const RwChar *fmt, ...);
+#define printf port_debug_print
+#endif
 
 // The messages' openers (defined below; the last, sub_1A2580, in
 // unit_1A16D0), for their table.

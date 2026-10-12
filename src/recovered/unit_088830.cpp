@@ -550,7 +550,7 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E840)
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 // single player compiles the debug print out (SP 0x6E2C0)
                 if (dword_44E860 && dword_44E86C)
                 {
@@ -587,7 +587,7 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E844)
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("Foley sound disabled in GlobalSounds!");
@@ -620,7 +620,7 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E848)
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("WeaponsFire sound disabled in GlobalSounds!");
@@ -653,7 +653,7 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E84C)
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("Vehicles sound disabled in GlobalSounds!");
@@ -689,7 +689,7 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E850)
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("WeaponsFoley sound disabled in GlobalSounds!");
@@ -722,7 +722,7 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E854)
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("Debris sound disabled in GlobalSounds!");
@@ -755,7 +755,7 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E858)
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("Ambience1 sound disabled in GlobalSounds!");
@@ -788,7 +788,7 @@ RwInt32 type_8A980::sub_89B00(RwInt32 arg_0, RwInt32 arg_4)
         {
             if (dword_44E85C)
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 if (dword_44E860 && dword_44E86C)
                 {
                     sub_19A750("Ambience2 sound disabled in GlobalSounds!");

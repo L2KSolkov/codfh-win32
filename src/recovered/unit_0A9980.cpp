@@ -534,7 +534,7 @@ void PlayerTrigger::HandleAttributes(const RWS::CAttributePacket &attr)
                     RwInt32 frm_70;
                     RwInt32 q6C;
 
-#ifndef CODFH_SP // the debug print is compiled out of single player
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // the debug print is compiled out of single player
                     sub_19A750("NOTE: !!! PlayerTrigger: using player attribs from previous level or from memCard !!!\n");
 #endif
                     memset(unk_258, -1, 8);
@@ -1070,7 +1070,7 @@ void PlayerTrigger::sub_AC900()
         else
             unk_384[bp_4] = -1;
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     // Single player compiles the debug print out (SP 0x844C0).
     sub_19A750("Restoring Original Weapons, Unloading current banks -=]MF[=-\n");
 #endif
@@ -1242,7 +1242,7 @@ void PlayerTrigger::sub_ACE00()
         bp_8 = (type_1917A0 *)sub_198800((type_3DF8D8_04 *)slot_C);
         lv_10 = bp_8->unk_44;
         slot_C->unk_24 = lv_10;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // Single player compiles the debug prints out (SP 0x84720).
         sub_19A750("Assigning weapon %d's def to wbank_%02d.bin", bp_4, slot_C->unk_24);
         if (unk_114[bp_4])

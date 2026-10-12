@@ -9,6 +9,11 @@
 #include "rw/batypes.h"
 #include "rw/osintf.h"
 #include <stdio.h>
+#ifdef CODFH_WIN32
+// (the port: the game's printf prints, which the Xbox showed on its debug output, to the log)
+extern "C" void port_debug_print(const RwChar *fmt, ...);
+#define printf port_debug_print
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D7E4C

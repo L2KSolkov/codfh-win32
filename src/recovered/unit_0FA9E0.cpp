@@ -68,7 +68,7 @@ type_3D3548 *sub_FA9E0(PickupTrigger *arg_0)
             var_10 = 0;
         }
     }
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xBEDD0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xBEDD0)
     else
     {
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "

@@ -18,6 +18,11 @@
 #include "types/type_3D3548.h"
 #include "types/type_8A980.h"
 #include "types/CGlobalSounds.h"
+#ifdef CODFH_WIN32
+// (the port: the game's printf prints, which the Xbox showed on its debug output, to the log)
+extern "C" void port_debug_print(const RwChar *fmt, ...);
+#define printf port_debug_print
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D8E8C

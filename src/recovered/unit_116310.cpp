@@ -1567,7 +1567,7 @@ void type_10F710_1A48::vf_030(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
                     var_1AC = sub_1745A0(0);
                     dword_4B1E98.sub_8A980(&var_1A8, 0, 0, var_1AC->sub_CD550(), 1, 0);
                 }
-#ifndef CODFH_SP // single player compiles the debug print and its test out (SP 0xD4E30)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print and its test out (SP 0xD4E30)
                 if (dword_44E860 && dword_44E874)
                 {
                     sub_19A750("Audio: WARNING! Player on non-tagged surface! Using 0 for Index Alias purposes");

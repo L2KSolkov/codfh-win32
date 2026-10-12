@@ -865,7 +865,7 @@ RwInt32 type_3DBC78::vf_064(type_75600 *arg_0)
             zero_v3d(&var_80.pos);
             sub_1414C0(&var_8C, arg_0->unk_20, &var_80);
             var_90 = RwV3dDotProduct(&var_8C, &var_80.up);
-#ifdef CODFH_SP // SP 0xF6030 has no debug prints (their strings are absent); the scaling stays
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS) // SP 0xF6030 has no debug prints (their strings are absent); the scaling stays
             if (var_90 > 0.985f)
             {
                 var_1C *= var_24->unk_198;

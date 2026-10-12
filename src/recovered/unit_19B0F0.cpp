@@ -17,6 +17,11 @@
 #include "game/gameloop.h"
 #include "game/savestate.h"
 #include "game/padlib.h"
+#ifdef CODFH_WIN32
+// (the port: the game's printf prints, which the Xbox showed on its debug output, to the log)
+extern "C" void port_debug_print(const RwChar *fmt, ...);
+#define printf port_debug_print
+#endif
 #ifdef CODFH_SP
 // single player's own full-screen and text helpers below
 #include "game/profiles.h"

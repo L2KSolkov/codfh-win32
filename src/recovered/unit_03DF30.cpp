@@ -546,7 +546,7 @@ void sub_3ECC0()
     while (local_8 != 0) {
         var_4 = local_8->unk_2AC;
         varC = local_8->unk_00;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // Single player compiles the debug print out (SP 0x2F7F0 only walks the list).
         if (varC != 0)
             sub_19A750("An entity was not removed from a squad during restart/shutdown!");

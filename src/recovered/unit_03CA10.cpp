@@ -258,14 +258,14 @@ void sub_3CCE0()
 void sub_3CD10()
 {
     if (dword_4395B0.in_use()) {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // single player compiles the warnings out (their texts are not in default.xbe; its
         // callers call an empty function, SP 0x2E541, 0x2E580)
         sub_19A750("AIManeuverManager: Some large maneuvers were not deleted during restart/shutdown!");
 #endif
     }
     if (dword_4395D0.in_use()) {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("AIManeuverManager: Some normal maneuvers were not deleted during restart/shutdown!");
 #endif
     }

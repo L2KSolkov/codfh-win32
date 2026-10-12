@@ -465,7 +465,7 @@ RwInt32 type_3DF8FC::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
                     strcat(var_128, var1A8);
                     sprintf(var1A8, "\n***********************************************");
                     strcat(var_128, var1A8);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     // single player compiles the debug prints out (SP 0x1225C0)
                     sub_19A750(var_128);
 #endif
@@ -909,7 +909,7 @@ RwInt32 type_3DF9C4::sub_190B20(RwStream *arg_0, type_3DF8D8_ev *arg_4)
         call_unk_1C(&var_17C.unk_0C.unk_04, 7);
         sprintf(v160, "\t\tCreating GodAsset: texture dictionary (%x,%x)", var_17C.unk_0C.unk_04.unk_00,
                 var_17C.unk_0C.unk_04.unk_04);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // single player compiles the debug prints out (SP 0x125B40)
         sub_19A750(v160);
 #endif
@@ -934,7 +934,7 @@ RwInt32 type_3DF9C4::sub_190B20(RwStream *arg_0, type_3DF8D8_ev *arg_4)
         RtlEnterCriticalSection(&dword_44BFB8);
         sprintf(v160, "\t\tCreating GodAsset: DFF geometry (%x,%x)", var_17C.unk_0C.unk_04.unk_00,
                 var_17C.unk_0C.unk_04.unk_04);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750(v160);
 #endif
         call_unk_1C(&var_17C.unk_0C.unk_04, 6);
@@ -960,7 +960,7 @@ RwInt32 type_3DF9C4::sub_190B20(RwStream *arg_0, type_3DF8D8_ev *arg_4)
         RtlEnterCriticalSection(&dword_44BFB8);
         sprintf(v160, "\t\tCreating GodAsset: DFF collide (%x,%x)", var_17C.unk_0C.unk_04.unk_00,
                 var_17C.unk_0C.unk_04.unk_04);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750(v160);
 #endif
         call_unk_1C(&var_17C.unk_0C.unk_04, 6);
@@ -1110,7 +1110,7 @@ type_1908A0 *type_1917A0::sub_1917A0()
 
     l4 = sub_198800(&unk_20);
     var_8 = (type_1908A0 *)sub_198800((type_3DF8D8_04 *)&l4->unk_14);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     // single player compiles the debug print out (SP 0x122F90)
     if (!var_8)
         sub_19A750("Clump could not be dereferenced. Did you forget to trigger a clump stream?");
@@ -1128,7 +1128,7 @@ type_1908A0 *type_1917A0::sub_1917F0()
 
     l4 = sub_198800((type_3DF8D8_04 *)&unk_14);
     var_8 = (type_1908A0 *)sub_198800((type_3DF8D8_04 *)&l4->unk_14);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     // single player compiles the debug print out (SP 0x122FB0)
     if (!var_8)
         sub_19A750("Clump could not be dereferenced. Did you forget to trigger a clump stream?");

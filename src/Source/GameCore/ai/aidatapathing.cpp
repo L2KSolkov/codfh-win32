@@ -76,7 +76,7 @@ RwInt32 AIData::sub_28A60(RwInt32 arg_0, type_3D3548 *arg_4, RwReal arg_8, RwInt
         if (arg_4 != 0) {
             unk_580.sub_D48D0(arg_4);
         } else {
-#ifndef CODFH_SP // SP 0x210F0: the debug print is compiled out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // SP 0x210F0: the debug print is compiled out
             sub_19A750("WARNING: An attempt to register an A* search with a NULL pointer has occured!\n");
 #endif
             return 0;
@@ -557,6 +557,7 @@ RwInt32 AIData::sub_29940(type_154C0_5BC *arg_0, RwInt32 arg_4, RwInt32 arg_8, R
 
 #ifdef CODFH_WIN32
 extern "C" void port_debug_print(const RwChar *arg_0, ...);
+extern "C" RwInt32 port_log_astar;   // (port/src/xpal_core.cpp: the overlay's A* log switch)
 #endif
 #ifdef CODFH_DRAW_TRIGGERS
 void TrigDrawAiNote(const void *pEntity, const RwChar *pszText);
@@ -569,8 +570,10 @@ void TrigDrawAiNote(const void *pEntity, const RwChar *pszText);
 void sub_19A750(struct type_3D3548 * arg_0, RwInt32 arg_4, RwChar const * arg_8, RwChar const * arg_C, RwInt32 arg_10)
 {
 #ifdef CODFH_WIN32
-    // The A* debug log (the entity, a value, the message, where): the port prints it.
-    port_debug_print("%s (entity %p, %d; %s:%d)", arg_8, arg_0, arg_4, arg_C, arg_10);
+    // The A* debug log (the entity, a value, the message, where): the port prints it, when the
+    // overlay's A* switch is on (CODFH_ASTARLOG=1 starts with it on).
+    if (port_log_astar)
+        port_debug_print("%s (entity %p, %d; %s:%d)", arg_8, arg_0, arg_4, arg_C, arg_10);
 #endif
 #ifdef CODFH_DRAW_TRIGGERS
     // (and for the debug tools' AI view, port/src/debug/trigdraw.cpp)

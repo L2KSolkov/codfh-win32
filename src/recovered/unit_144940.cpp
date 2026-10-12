@@ -399,7 +399,7 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
                         var_28 = var_20->unk_08;
                         if (var_28 == m_18->unk_C0 || var_28 == m_18->unk_C4 || var_28 == m_18->unk_C8)
                         {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                             sub_19A750("Cannot unload section ID %d in bank slot %d because it is specified as one of "
                                        "the sections to keep",
                                        var_28, var_20->get_unk_0A());
@@ -434,7 +434,7 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
                     if (var_2C->get_unk_08() != m_18->unk_C0 && var_2C->get_unk_08() != m_18->unk_C4
                         && var_2C->get_unk_08() != m_18->unk_C8 && var_2C->get_unk_08() != m_18->unk_CC)
                     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                         if (bp_4)
                             sub_19A750("Unloading more than one section!\n");
 #endif
@@ -444,7 +444,7 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
                     }
                     if (var_2C->get_unk_08() == m_18->unk_CC)
                     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                         if (ebp_14)
                             sub_19A750("Section to load was loaded twice \n");
 #endif
@@ -456,7 +456,7 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
             {
                 if (lv_10 != 0xFFFF && !sub_82020(0, lv_10))
                 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     if (bp_4->get_unk_04())
                         sub_19A750("Section being removed while loading\n");
 #endif
@@ -469,7 +469,7 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
             }
             if (!ebp_14 && !sub_81FB0(0, "", m_18->unk_CC))
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 sub_19A750("Adding load of section %d to AsynchQueue...\n", m_18->unk_CC);
 #endif
                 sub_81EB0(0, "", m_18->unk_CC);

@@ -1665,7 +1665,7 @@ bool sub_7FFD0(RwStream *arg_0, type_7FFD0 *arg_4)
     }
     if (var_4 != 0x101)
     {
-#ifdef CODFH_SP // SP 0x67D20 prints no warning
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS) // SP 0x67D20 prints no warning
 #else
         sub_19A750("WARNING! Animation is an old version!! Current ver # %x, File ver # %x\n", 0x101, var_4);
 #endif
@@ -1718,7 +1718,7 @@ void *sub_800F0(type_7CBD0_hdr *arg_0, RwInt32 arg_4, RwInt32 arg_8)
     {
         if (v8 == arg_4)
         {
-#ifdef CODFH_SP // SP 0x67DE0 has no size check
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS) // SP 0x67DE0 has no size check
 #else
             stk_C = lv_14;
             var_4 = *stk_C & 0x7FFF;

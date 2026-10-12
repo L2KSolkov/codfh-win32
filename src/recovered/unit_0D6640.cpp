@@ -259,24 +259,24 @@ RwInt32 sub_D6640()
     RwInt32 var_8;
     RwInt32 l4;
 
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750(" ");
     sub_19A750(" ");
     sub_19A750("******************************************");
 #endif
-#ifdef CODFH_SP
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS)
     sp_debug_print("", RWS::Time::GetTime());
 #else
     sub_19A750("GameLoop Init BEGIN....at %d", RWS::Time::GetTime());
 #endif
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("******************************************");
 #endif
 #ifndef CODFH_SP // single player has no call here (SP 0xA2B85 goes on to the purge)
     sub_1A2D80();
 #endif
     l4 = RwFreeListPurgeAllFreeLists();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("GameLoopInit: Memory freed on RwFreeList purge - %d", l4);
 #endif
     dword_4B8718 = 0;
@@ -284,7 +284,7 @@ RwInt32 sub_D6640()
     var_8 = 1;
     if (sub_31DB0())
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("GameLoop Init RWStudio begin....");
 #endif
         RWS::MainLoop::Open(Width, Height, ZDepth);
@@ -294,7 +294,7 @@ RwInt32 sub_D6640()
         RWS::CEventHandler::RegisterMsg(dword_4B67C0, iMsgSparkRestartSystemEnd_name, 0);
         RWS::CEventHandler::RegisterMsg(dword_4B67B0, iMsgSparkRestartStartGame_name, 0);
         l4 = RwFreeListPurgeAllFreeLists();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("GameLoopInit RWStudio: Memory freed on RwFreeList purge - %d", l4);
         sub_19A750("GameLoop Init RWStudio end....");
 #endif
@@ -311,7 +311,7 @@ RwInt32 sub_D6640()
     {
         var_8 = 0;
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("******************************************");
     sub_19A750("GameLoop Init END....");
     sub_19A750("******************************************");
@@ -330,7 +330,7 @@ RwInt32 sub_D6820(RwInt32 arg_0)
     RwInt32 var_8;
     RwInt32 l4;
 
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("GameLoopInitModules begin....");
 #endif
     RwFreeListPurgeAllFreeLists();
@@ -415,7 +415,7 @@ RwInt32 sub_D6820(RwInt32 arg_0)
     dword_4B8734 = 0;
     RwFreeListPurgeAllFreeLists();
     unk_4E73A8.sub_183130();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("GameLoop Init Modules end....");
 #endif
     return l4;
@@ -425,7 +425,7 @@ RwInt32 sub_D6820(RwInt32 arg_0)
 // sp-match: ?sub_D6A50@@YAXXZ @ 0x000A2540
 void sub_D6A50()
 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750(" ");
     sub_19A750(" ");
     sub_19A750("**************************************");
@@ -456,7 +456,7 @@ void sub_D6A50()
     sub_31B10();
     sub_3EC80();
     sub_3CC80();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: AI class restarts");
 #endif
     sub_3C220();
@@ -464,7 +464,7 @@ void sub_D6A50()
     sub_35020();
     sub_19A750();
     sub_32EB0();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: Alfa class restarts");
 #endif
     sub_733A0();
@@ -474,110 +474,110 @@ void sub_D6A50()
     sub_19A750();
     sub_19A750();
     sub_67340();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: CAnimObjectMgr::RestartClass()");
 #endif
     sub_78790();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: ProjectileGeneratorManager::RestartClass()");
 #endif
     sub_1222A0();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: CProjectileMgr::RestartClass()");
 #endif
     sub_15F240();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: StreamClumpManager::Restart()");
 #endif
     sub_16F1C0();
     sub_16FD10();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: LevelInfo::RestartClass()");
 #endif
     sub_19A750();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: StartingSections::RestartClass()");
 #endif
     sub_19A750();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: PlayerTrigger::RestartClass()");
 #endif
     sub_19A750();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: SectionInfo::RestartClass()");
 #endif
     sub_19A750();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: CPlayerWeapon::RestartPlayerWeaponDefs()");
 #endif
     sub_19A750();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: CNPCWeapon::RestartClass()");
 #endif
     sub_19A750();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: TriggeredParticleManager::RestartClass()");
 #endif
     sub_F4850();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: DecalManager::Restart()");
 #endif
     sub_EFF70();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: CloneManager::Restart()");
 #endif
     sub_19A750();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: ParticleManager::Restart()");
 #endif
     sub_F29F0();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: TriggerManager::Restart()");
 #endif
     sub_19A750();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: PathNodeManager::Restart()");
 #endif
     sub_F8010();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: SplineManager::Restart()");
 #endif
     sub_19A750();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: shellManager.Restart()");
 #endif
     dword_4B8EF0.sub_E99A0();
     sub_186950();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: Audio::RestartClass()");
 #endif
     sub_83510();
     sub_D9450();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: GodAssetManager::RestartClass()");
 #endif
     sub_198570();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: CAnimDatabase::Restart()");
 #endif
     sub_19A750();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: TextureManager::RestartClass()");
 #endif
     sub_19A750();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: LevelManager::Restart()");
 #endif
     sub_172210();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: SerializeManager::Restart()");
 #endif
     unk_4F2B68.pDtor();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: CProfiler::RestartProfiler()");
 #endif
     sub_16D630();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Restart: Tick::Restart()");
 #endif
     sub_D9610();
@@ -590,7 +590,7 @@ void sub_D6A50()
     if (sub_12F080(2))
     {
         sub_12F060(2);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("***ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!***");
         sub_19A750("MEMORY LEAK detected during shutdown! Show this to a");
         sub_19A750("programmer immediately (especially the last one that");
@@ -601,7 +601,7 @@ void sub_D6A50()
     sub_83C90();
     sub_19A750("Game Restart END"); // single player keeps this print (SP 0xA2715)
     dword_4B8714 = 1;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("**************************************");
     sub_19A750("Game Restart END...");
     sub_19A750("**************************************");
@@ -618,7 +618,7 @@ void sub_D6A50()
 // sp-match: ?sub_D6EB0@@YAXXZ @ 0x000A2C60
 void sub_D6EB0()
 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750(" ");
     sub_19A750(" ");
     sub_19A750("******************************************");
@@ -631,7 +631,7 @@ void sub_D6EB0()
     sub_19D060();
     unk_4B9308.sub_EEF90(0, 1);
     sub_D7040(0);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("GameLoop Shutdown RWStudio begin....");
 #endif
     RWS::CEventHandler::UnRegisterMsg(iMsgSparkStartSystem);
@@ -640,7 +640,7 @@ void sub_D6EB0()
     RWS::CEventHandler::UnRegisterMsg(dword_4B67C0);
     RWS::CEventHandler::UnRegisterMsg(dword_4B67B0);
     RWS::MainLoop::Close();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("GameLoop Shutdown RWStudio end....");
 #endif
     sub_19A750();
@@ -688,7 +688,7 @@ void sub_D6EB0()
         XLaunchNewImage("d:\\default.xbe", (PLAUNCH_DATA)&var_C00);
     }
 #endif
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("******************************************");
     sub_19A750("GameLoop Shutdown END....");
     sub_19A750("******************************************");
@@ -698,7 +698,7 @@ void sub_D6EB0()
     if (sub_12F080(1))
     {
         sub_12F060(1);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("***ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!***");
         sub_19A750("MEMORY LEAK detected during shutdown! Show this to a");
         sub_19A750("programmer immediately (especially the last one that");
@@ -712,7 +712,7 @@ void sub_D6EB0()
 // sp-match: ?sub_D7040@@YAXH@Z @ 0x000A2740
 void sub_D7040(RwInt32 arg_0)
 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("GameLoopShutdownModules begin....");
 #endif
     // Three shutdowns that expand to nothing (see unused_slot).
@@ -852,7 +852,7 @@ void sub_D7040(RwInt32 arg_0)
 #ifndef CODFH_SP
     unk_4F7EB8.sub_1AF750(sub_1CCA10(), 1, 0);
 #endif
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("GameLoop Shutdown modules end....");
 #endif
 }

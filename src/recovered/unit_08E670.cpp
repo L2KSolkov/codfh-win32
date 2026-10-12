@@ -403,7 +403,7 @@ RpWorldSector *sub_8F5C0(RpWorldSector *arg_0, void *arg_4)
     }
     if (((type_8F8C0 *)arg_0)->unk_10 && (((type_8F8C0 *)arg_0)->unk_10 & 0xFFFFFF00) != 0xFFFFFF00)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // Single player compiles the debug prints out (SP 0x71390).
         sub_19A750("***COULD NOT STORE LIGHT VOLUME INFO!\n");
 #endif
@@ -424,7 +424,7 @@ RpWorldSector *sub_8F5C0(RpWorldSector *arg_0, void *arg_4)
         var_7C = &((type_8F8C0 *)arg_0)->unk_10;
         *var_7C = ++var_74 | 0xFFFFFF00;
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     else
     {
         sub_19A750("***SECTOR HAS TOO MANY VOLUMES! Volume number %i is a potential issue \n", var_4);

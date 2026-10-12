@@ -83,7 +83,7 @@ type_3DAC58 *sub_133230(type_712B0 *arg_0)
             var_10 = 0;
         }
     }
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
     else
     {
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "

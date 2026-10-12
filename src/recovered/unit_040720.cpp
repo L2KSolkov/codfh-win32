@@ -180,7 +180,7 @@ void sub_40840()
 // match: sub_408D0 @ 0x000408D0
 void sub_408D0()
 {
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x31530 drops the calls)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x31530 drops the calls)
     sub_19A750("Somebody forgot to unregister in the Vision Scheduler!");
 #endif
 }

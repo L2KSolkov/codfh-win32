@@ -196,7 +196,7 @@ type_3D3548 *sub_176E50(GimpTrigger *arg_0)
             var_10 = 0;
         }
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     else
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "
                    "location(%6.2f,%6.2f,%6.2f)",
@@ -651,7 +651,7 @@ RwInt32 type_3DDB98::sub_1774C0(GimpTrigger *arg_0)
             unk_4E0[var_118].unk_00.x = 0.0f;
             unk_4E0[var_118].unk_00.y = 0.0f;
             unk_4E0[var_118].unk_00.z = 0.0f;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             sub_19A750("%2d %4d { %9.6f, %9.6f, %9.6f }, \n", var_118,
                        unk_28C->get_unk_18()->pNodeInfo[var_118].nodeID, var_EC[var_118].pos.x,
                        var_EC[var_118].pos.y, var_EC[var_118].pos.z);
@@ -670,7 +670,7 @@ RwInt32 type_3DDB98::sub_1774C0(GimpTrigger *arg_0)
     else
     {
         unk_298 = 0;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("WARNING: No idle face anim loaded for level!\n");
 #endif
     }
@@ -1919,7 +1919,7 @@ void sub_17AD60(type_7C8D0 *arg_0)
         arg_0->sub_794C0(0.1f);
         arg_0->sub_796A0((RtAnimAnimation *)var_10, bp_4, 0, (type_783F0 *)bp_8, 0, 1.0f, 1.0f);
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     else
     {
         sub_19A750("WARNING: No Death face anim loaded for level!\n");
@@ -1947,7 +1947,7 @@ void sub_17ADF0(type_7C8D0 *arg_0)
         arg_0->sub_794C0(0.1f);
         arg_0->sub_796A0((RtAnimAnimation *)var_10, bp_4, 0, (type_783F0 *)bp_8, 0, 1.0f, 1.0f);
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     else
     {
         sub_19A750("WARNING: No Death face anim loaded for level!\n");

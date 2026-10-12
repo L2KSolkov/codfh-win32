@@ -658,7 +658,7 @@ void sub_125F20(RwInt32 arg_0)
         return;
     }
     sub_16D7F0(9);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750((RwInt32)bp_8);
 #endif
     sub_16D850(9);

@@ -461,7 +461,7 @@ void sub_82500()
 
     sub_85840(var_120, 0);
     var_4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_120);
-#ifdef CODFH_SP // single player compiles the debug print out (no string in SP; SP 0x6A3D0)
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS) // single player compiles the debug print out (no string in SP; SP 0x6A3D0)
     if (var_4)
     {
 #else
@@ -511,7 +511,7 @@ void sub_825E0(type_825E0 *arg_0, RwInt32 arg_4)
     bp_4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, local_240.unk_110);
     if (!bp_4)
     {
-#ifndef CODFH_SP // single player compiles the debug print out (no string in SP; SP 0x6A460)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (no string in SP; SP 0x6A460)
         sub_19A750("ERROR: Could not open file %s!\n", local_240.unk_110);
 #endif
         return;
@@ -695,7 +695,7 @@ void sub_82C70(type_825E0 *arg_0, bool arg_4)
     sub_23BFE0(dword_44C0A8);
     if (l4->unk_00)
     {
-#ifndef CODFH_SP // single player compiles the debug prints out (no strings in SP; SP 0x6A8D0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug prints out (no strings in SP; SP 0x6A8D0)
         sub_19A750("LoadSoundBankSynchronously: Attempting to load a sound bank into slot %d that has not been "
                    "unloaded! (Or is still loading!)",
                    arg_0->unk_08);
@@ -709,7 +709,7 @@ void sub_82C70(type_825E0 *arg_0, bool arg_4)
     {
         sub_19BB40(var_210, 1);
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     if (dword_44E870)
     {
         sub_19A750("Loading sound bank god ID: %x,%x to slot %d from file %s\n", l4->unk_18.unk_00.unk_00,
@@ -753,7 +753,7 @@ void sub_82C70(type_825E0 *arg_0, bool arg_4)
             sub_19BB40(var_210, 0);
         }
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     if (dword_44E870)
     {
         sub_19A750("Loading sound bank AGD\n");
@@ -777,7 +777,7 @@ void sub_82C70(type_825E0 *arg_0, bool arg_4)
     var_218 = dword_44D48C - var_214;
     dword_44D48C = var_214;
     dword_44E768 += var_218;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     if (dword_44E870)
     {
         sub_19A750("Sound Bank Loaded!\n");
@@ -1302,12 +1302,12 @@ RwInt32 sub_83DE0(RwInt32 arg_0)
     if (bp_4->unk_18.unk_00.unk_00 == -1 && bp_4->unk_18.unk_00.unk_04 == -1 && !bp_4->unk_14
         && !bp_4->unk_10)
     {
-#ifndef CODFH_SP // single player compiles the debug prints out (no strings in SP; SP 0x6ADE0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug prints out (no strings in SP; SP 0x6ADE0)
         sub_19A750("UnloadBank:Sound bank slot %d is already empty...", arg_0);
 #endif
         return 1;
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     if (dword_44E870)
     {
         sub_19A750("Unloading sound bank god ID: %x,%x from slot %d", bp_4->unk_18.unk_00.unk_00,
@@ -1316,7 +1316,7 @@ RwInt32 sub_83DE0(RwInt32 arg_0)
 #endif
     if (bp_4->unk_00)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         if (dword_44E870)
         {
             sub_19A750("Error Unloading sound bank. The sound bank you tried to unload is still loading! Ignoring "
@@ -1509,7 +1509,7 @@ void sub_84300(type_825E0 *arg_0)
         if (dword_4AF038[var_4].unk_00.unk_00.unk_00 == -1 && dword_4AF038[var_4].unk_00.unk_00.unk_04 == -1)
         {
             dword_4AF038[var_4].unk_00 = *arg_0;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             // Single player compiles the debug prints out (SP 0x6AF70).
             if (dword_44E870)
             {
@@ -1520,7 +1520,7 @@ void sub_84300(type_825E0 *arg_0)
             return;
         }
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Too many things in the sound bank loading queue!!!");
 #endif
 }
@@ -1562,7 +1562,7 @@ void sub_843F0()
             if (v8->unk_18.unk_00.unk_00 == dword_4AF038[0].unk_00.unk_00.unk_00
                 && v8->unk_18.unk_00.unk_04 == dword_4AF038[0].unk_00.unk_00.unk_04)
             {
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x6AFF0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x6AFF0)
                 sub_19A750("LoadSoundBankAsynchronously: Bank %d is already loaded in slot %d!! Ignoring load request...",
                            dword_4AF038[0].unk_00.unk_0C, dword_4AF038[0].unk_00.unk_08);
 #endif
@@ -1790,7 +1790,7 @@ void sub_84B20()
 // match: ?sub_84C40@@YAXPBD@Z @ 0x00084C40
 void sub_84C40(const RwChar *arg_0)
 {
-#ifndef CODFH_SP // MP only: single player compiles the debug print out (an empty function folded into sp_nullsub_1, SP 0xC2A96 calls it)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // MP only: single player compiles the debug print out (an empty function folded into sp_nullsub_1, SP 0xC2A96 calls it)
     if (dword_44E888)
     {
         sub_19A750("<<[%d]---==$$##: %s\n", dword_4B87D8, arg_0);

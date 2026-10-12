@@ -79,7 +79,7 @@ type_3D5400 *sub_9B700(type_712B0 *arg_0)
             var_10 = 0;
         }
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     else
     {
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "

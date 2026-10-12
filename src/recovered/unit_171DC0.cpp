@@ -420,7 +420,7 @@ void sub_1724C0()
         {
             sprintf(var_110, "Opaque world is not empty for section ID %d bank %d at restart//shutdown\n",
                     var_114->get_unk_08(), var_8);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             // single player compiles the debug prints out (SP 0x10E530)
             sub_19A750(var_110);
 #endif
@@ -430,7 +430,7 @@ void sub_1724C0()
         {
             sprintf(var_110, "Alpha world is not empty for section ID %d bank %d at restart//shutdown\n",
                     var_114->get_unk_08(), var_8);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             sub_19A750(var_110);
 #endif
         }
@@ -439,7 +439,7 @@ void sub_1724C0()
         {
             sprintf(var_110, "Collision world is not empty for section ID %d bank %d at restart//shutdown\n",
                     var_114->get_unk_08(), var_8);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             sub_19A750(var_110);
 #endif
         }
@@ -448,7 +448,7 @@ void sub_1724C0()
         {
             sprintf(var_110, "Extra world is not empty for section ID %d bank %d at restart//shutdown\n",
                     var_114->get_unk_08(), var_8);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             sub_19A750(var_110);
 #endif
         }
@@ -456,28 +456,28 @@ void sub_1724C0()
     if (world && !sub_16E5C0(world, 0, 0))
     {
         sprintf(var_110, "SkyBox world is not empty at restart//shutdown!\n");
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750(var_110);
 #endif
     }
     if (dword_4E5C84 && !sub_16E5C0(dword_4E5C84, 0, 0))
     {
         sprintf(var_110, "SkyBox alpha world is not empty at restart//shutdown!\n");
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750(var_110);
 #endif
     }
     if (dword_4E5C88 && !sub_16E5C0(dword_4E5C88, 0, 0))
     {
         sprintf(var_110, "SkyBox extra world is not empty at restart//shutdown!\n");
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750(var_110);
 #endif
     }
     if (dword_4E5C78 && !sub_16E5C0(dword_4E5C78, 0, 0))
     {
         sprintf(var_110, "Default world is not empty at restart//shutdown!\n");
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750(var_110);
 #endif
     }
@@ -1497,7 +1497,7 @@ void sub_174060(type_4E5D30 *arg_0, RwInt32 arg_4)
     RpWorld *lv_10[4];
 
     RtlEnterCriticalSection(&dword_44BFB8);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     // single player compiles the debug prints out (SP 0x10FDD0)
     sub_19A750("Removing world %d in bank %d", arg_0->get_unk_08(), arg_0->get_unk_0A());
     if (arg_0->get_unk_08() == 0xFFFF)
@@ -1532,7 +1532,7 @@ void sub_174060(type_4E5D30 *arg_0, RwInt32 arg_4)
     }
     if (var_14)
     {
-#ifdef CODFH_SP
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS)
         sub_16E6F0(var_14);
 #else
         if (!sub_16E6F0(var_14))
@@ -1694,7 +1694,7 @@ void sub_174530()
 {
     if (dword_4E5C90)
     {
-#ifdef CODFH_SP
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS)
         // single player compiles the debug print out, keeping the check's call (SP 0x10F500)
         sub_16E6F0(dword_4E5C90);
 #else
@@ -1823,7 +1823,7 @@ void type_4E5D30::sub_1747D0()
     if (unk_20)
     {
         sprintf(var_108, "Opaque world was not deleted for section ID %d bank %d on shutdown\n", unk_08, unk_0A);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // single player compiles the debug prints out (SP 0x1100F0)
         sub_19A750(var_108);
 #endif
@@ -1831,7 +1831,7 @@ void type_4E5D30::sub_1747D0()
     if (unk_24)
     {
         sprintf(var_108, "Alpha world was not deleted for section ID %d bank %d on shutdown\n", unk_08, unk_0A);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750(var_108);
 #endif
     }
@@ -1839,7 +1839,7 @@ void type_4E5D30::sub_1747D0()
     {
         sprintf(var_108, "Collision world was not deleted for section ID %d bank %d on shutdown\n", unk_08,
                 unk_0A);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750(var_108);
 #endif
     }
@@ -1847,14 +1847,14 @@ void type_4E5D30::sub_1747D0()
     {
         sprintf(var_108, "Texture dictionary was not deleted for section ID %d bank %d on shutdown\n", unk_08,
                 unk_0A);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750(var_108);
 #endif
     }
     if (unk_2C)
     {
         sprintf(var_108, "Extra world was not deleted for section ID %d bank %d on shutdown\n", unk_08, unk_0A);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750(var_108);
 #endif
     }

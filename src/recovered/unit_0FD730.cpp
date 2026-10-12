@@ -1083,7 +1083,7 @@ RwInt32 type_10F710::sub_FDC10(type_712B0 *arg_0)
     unk_21B4.sub_1154A0();
     if (lv_10->unk_254)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("NOTE: !!! Player::Init(): using player attribs from previous level or from memCard !!!\n");
 #endif
         m_4C = &dword_4F28F0->unk_5C;
@@ -1612,7 +1612,7 @@ void type_10F710::sub_FF210()
     unk_1A48[unk_1AE4]->sub_1170B0(1, 1);
     if (bp_4->unk_254)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("NOTE: !!! Player::SystemStartInit(): using player attribs from previous level or from memCard !!!\n");
 #endif
         bp_4->unk_254 = 0;
@@ -1892,7 +1892,7 @@ void type_10F710::sub_100200(RwInt32 arg_0)
     if (!sub_77B70(lv_10->unk_34, (void **)(&bp_8), (void **)(&bp_4)) && unk_1A48[unk_1AE4]->get_unk_45C() != 2)
     {
         slot_C = 1;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("WeaponDef %d is missing deselect animation: 0x%x", unk_1B30[unk_1AE8], lv_10->unk_34);
 #endif
     }
@@ -1900,7 +1900,7 @@ void type_10F710::sub_100200(RwInt32 arg_0)
     if (!sub_77B70(lv_10->unk_38, (void **)(&bp_8), (void **)(&bp_4)) && unk_1A48[arg_0]->get_unk_45C() != 2)
     {
         slot_C = 1;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("WeaponDef %d is missing select animation: 0x%x", arg_0, lv_10->unk_38);
 #endif
     }
@@ -2964,7 +2964,7 @@ void type_10F710::vf_03C(RwReal arg_0)
                                                    unk_1A48[unk_1AE4]->get_unk_448()->unk_68, 0,
                                                    (struct type_783F0 *)v_1B4, 0.0f, 1.0f, 1.0f);
                             }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                             else if (unk_1A48[unk_1AE4]->get_unk_448()->unk_68)
                                 sub_19A750("WARNING: Missing a bipod deploy anim 0x%x.",
                                            unk_1A48[unk_1AE4]->get_unk_448()->unk_68);
@@ -2984,7 +2984,7 @@ void type_10F710::vf_03C(RwReal arg_0)
                                                    unk_1A48[unk_1AE4]->get_unk_448()->unk_6C, 0,
                                                    (struct type_783F0 *)v_1B4, 0.0f, 1.0f, 1.0f);
                             }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                             else if (unk_1A48[unk_1AE4]->get_unk_448()->unk_6C)
                                 sub_19A750("WARNING: Missing a bipod undeploy anim 0x%x.",
                                            unk_1A48[unk_1AE4]->get_unk_448()->unk_6C);
@@ -3279,7 +3279,7 @@ RwReal sp_sub_BF950()
 // sp-match: ?sub_104420@@YAMXZ @ 0x000BF970
 RwReal sub_104420()
 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("GameDiff:GetPlayerHealthPupMultiplier  m_eDifficulty=%d, pupMod=%f\n", dword_42B714,
                flt_4F28CC[dword_42B714]);
 #endif
@@ -5423,7 +5423,7 @@ void type_10F710::sub_109110(RwReal arg_0, RwReal arg_4, RwReal arg_8)
                 unk_284->sub_794C0(0.0f);
                 unk_284->sub_796A0((RtAnimAnimation *)lv_10, m_18, 0, (type_783F0 *)slot_C, 0.0f, 1.0f, 1.0f);
             }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             else if (m_18)
             {
                 sub_19A750("WARNING: Missing start anim: 0x%x", m_18);
@@ -5439,7 +5439,7 @@ void type_10F710::sub_109110(RwReal arg_0, RwReal arg_4, RwReal arg_8)
             unk_284->sub_796A0((RtAnimAnimation *)lv_10, bp_4->unk_28, 0, (type_783F0 *)slot_C, 0.0f, 1.0f,
                                1.0f);
         }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         else if (bp_4->unk_28)
         {
             sub_19A750("WARNING: Missing idle anim: 0x%x", bp_4->unk_28);
@@ -6752,7 +6752,7 @@ void type_10F710::sub_10C370(RwReal arg_0)
                 var_20 = sub_1745A0(0);
                 dword_4B1E98.sub_8A980(&var_28, 0, 0, var_20->sub_CD550(), 1, 0);
             }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             if (dword_44E860)
             {
                 sub_19A750("Audio: WARNING! Player on non-tagged surface! Using 0 for Index Alias purposes");
@@ -7033,7 +7033,7 @@ void type_10F710::sub_10D8A0()
             unk_1A48[bp_8] = 0;
         }
         slot_C = bp_4->unk_114[bp_8];
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         if (slot_C)
         {
             sub_19A750("Initializing geometery for weapon %d", bp_8);
@@ -7046,7 +7046,7 @@ void type_10F710::sub_10D8A0()
     unk_1A48[29]->set_unk_460(unk_1A48[30]);
     unk_1A48[36]->set_unk_464(1);
     unk_1A48[35]->set_unk_460(unk_1A48[36]);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Allocated %d bytes for %d CPlayerWeapon classes.", lv_10, 0x27);
 #endif
 }
@@ -7070,7 +7070,7 @@ void type_10F710::sub_10DA70(RwInt32 arg_0)
     bp_4 = sub_16F860(slot_C->unk_24);
     if (bp_4 != -1)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("Requesting to stream weapon %d into slot %d IGNORED! Already detected in slot %d.", arg_0,
                    unk_2134, bp_4);
 #endif
@@ -7080,7 +7080,7 @@ void type_10F710::sub_10DA70(RwInt32 arg_0)
     {
         return;
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("Requesting to stream weapon %d into slot %d.  Clumps contained in wbank_%02d.bin.", arg_0,
                unk_2134, slot_C->unk_24);
 #endif
@@ -7092,7 +7092,7 @@ void type_10F710::sub_10DA70(RwInt32 arg_0)
             lv_10 = sub_119B70(ebp_14);
             if (lv_10->unk_24 == bp_8)
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 sub_19A750("\tUnInitializing geometry for weapon %d because it was in slot %d.  wbank_%02d.bin has "
                            "been unloaded",
                            ebp_14, unk_2134, lv_10->unk_24);
@@ -10129,7 +10129,7 @@ void type_10F710::sub_114E70(RwReal arg_0)
     var_C.z = var_10->z;
     if (!sub_144F20((RwV3d *)((RwReal *)&var_C), (Trigger *)((RwInt32)unk_2178)))
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("getting off the ladder because foot pos is not inside.\n");
 #endif
         sub_1090F0(0);
@@ -10137,7 +10137,7 @@ void type_10F710::sub_114E70(RwReal arg_0)
     }
     else if ((unk_28 >> 1) & 1)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("getting off the ladder because player is on ground.\n");
 #endif
         set_v3d(&unk_D8_v, 0.0f, 0.0f, 0.0f);

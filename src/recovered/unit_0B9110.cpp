@@ -211,7 +211,7 @@ void CSoundBankSelector::sub_B9800()
 {
     RwInt32 var_4;
 
-#ifndef CODFH_SP // single player compiles the debug prints out (SP 0x8DB00)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug prints out (SP 0x8DB00)
     sub_19A750("SoundBank Loading begin...\n");
 #endif
     var_4 = 0;
@@ -227,7 +227,7 @@ void CSoundBankSelector::sub_B9800()
             if (dword_4B1A20[unk_20[var_4].unk_08].unk_18.unk_00.unk_00 == unk_20[var_4].unk_00.unk_00 &&
                 dword_4B1A20[unk_20[var_4].unk_08].unk_18.unk_00.unk_04 == unk_20[var_4].unk_00.unk_04)
             {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 sub_19A750("Sound bank god ID: %x,%x is already loaded to slot %d",
                            unk_20[var_4].unk_00.unk_00, unk_20[var_4].unk_00.unk_00, unk_20[var_4].unk_08);
 #endif

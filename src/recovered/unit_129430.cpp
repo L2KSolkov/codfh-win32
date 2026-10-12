@@ -109,7 +109,7 @@ RwBool type_1294D0::sub_1294D0()
             }
             bp_4 = RpAtomicDestroy(bp_8);
         }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // Single player compiles the debug print out (SP 0xDDB00).
         else
         {
@@ -321,7 +321,7 @@ RwBool type_129940::sub_129940(RwInt32 arg_0)
         bp_8 = unk_08;
         var_C = sub_FBA10(bp_8);
         var_C->sub_FC3B0((type_3D96F0_node *)this);
-#ifdef CODFH_SP
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS)
         // shape: the print's branch kept as an empty if (SP 0xDDE51 lays that return out last).
         if (var_C->get_unk_18() && !arg_0)
         {
@@ -352,7 +352,7 @@ RwBool type_129940::sub_129940(RwInt32 arg_0)
             }
             bp_4 = RpClumpDestroy(bp_8);
         }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // Single player compiles the debug print out (SP 0xDDD80).
         else
         {
@@ -429,7 +429,7 @@ RwInt32 type_129B10::sub_129B10()
             }
             bp_4 = RWS::FrameHelper::FrameDestroy(bp_8);
         }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // Single player compiles the debug print out (SP 0xDDF70).
         else
         {
@@ -517,7 +517,7 @@ RwBool type_129BD0::sub_129C40()
             }
             bp_4 = RpLightDestroy(bp_8);
         }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // Single player compiles the debug print out (SP 0xDE060).
         else
         {

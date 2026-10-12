@@ -163,7 +163,7 @@ type_3DC048 *sub_155470(type_712B0 *arg_0)
             var_10 = 0;
         }
     }
-#ifdef CODFH_SP // single player compiles the debug print out (no warning; SP 0xFF8C0)
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS) // single player compiles the debug print out (no warning; SP 0xFF8C0)
 #else
     else
     {
@@ -255,7 +255,7 @@ type_3DBC78 *sub_14C820(type_712B0 *arg_0)
             var_10 = 0;
         }
     }
-#ifdef CODFH_SP // single player compiles the debug print out (no warning; SP 0xFF7C0)
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS) // single player compiles the debug print out (no warning; SP 0xFF7C0)
 #else
     else
     {
@@ -1931,7 +1931,7 @@ type_3DC378 *sub_15A7B0(type_712B0 *arg_0)
             var_10 = 0;
         }
     }
-#ifdef CODFH_SP // single player compiles the debug print out (no warning; SP 0xFF960)
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS) // single player compiles the debug print out (no warning; SP 0xFF960)
 #else
     else
     {

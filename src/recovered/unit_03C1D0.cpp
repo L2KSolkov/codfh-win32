@@ -96,7 +96,7 @@ void sub_3C270()
 // match: sub_3C290 @ 0x0003C290
 void sub_3C290()
 {
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x2DD60 drops the call)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x2DD60 drops the call)
     sub_19A750("Somebody forgot to unregister in the AIHearing Class!");
 #endif
 }

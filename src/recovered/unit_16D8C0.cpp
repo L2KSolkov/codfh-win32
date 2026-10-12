@@ -706,7 +706,7 @@ RwTexture *sub_16E6B0(RwTexture *arg_0, void *arg_4)
     {
         var_4 = (RwInt32 *)arg_4;
         (*var_4)++;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // single player compiles the debug prints out (SP 0x10B690)
         sub_19A750("Warning: Texture cannot be deleted! Texture has %d ref count!", arg_0->refCount);
 #endif
@@ -726,7 +726,7 @@ bool sub_16E6F0(RwTexDictionary *arg_0)
     RwTexDictionaryForAllTextures(arg_0, sub_16E6B0, &var_4);
     if (var_4 > 0)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // single player compiles the debug print out (SP 0x10B6B0)
         sub_19A750("Warning: Texture dictionary has %d textures that cannot be deleted! Refcount > 0!", var_4);
 #endif

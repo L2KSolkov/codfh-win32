@@ -291,7 +291,7 @@ void sub_E8BA0(const RwChar *arg_0, RwCamera *arg_4)
     }
     if (!var_120.sub_19D640(arg_0, 1))
     {
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
         sub_19A750("Failed to load movie for movie player. Bailing out!");
 #endif
         var_120.sub_19D5E0();

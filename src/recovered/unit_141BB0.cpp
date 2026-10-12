@@ -250,7 +250,7 @@ RwInt32 sub_142030(RwStream *arg_0, type_141C10 *arg_4)
         if (arg_4->unk_04 == (RwUInt16)word_429EAC || (RwUInt16)word_429EAC == 0xFFFF)
         {
             stk_C = (type_173F50 *)sub_173F50((RwUInt16)arg_4->unk_04);
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEEF60)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEEF60)
             if (!stk_C)
                 sub_19A750("***ERROR: no section bank available to load Opaque BSP for section %d\n",
                            arg_4->unk_04);
@@ -275,14 +275,14 @@ RwInt32 sub_142030(RwStream *arg_0, type_141C10 *arg_4)
         }
         else
         {
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEEF60)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEEF60)
             sub_19A750("Warning: Loading opaque BSP for section %d but section to load is %d\n", arg_4->unk_04,
                        (RwUInt16)word_429EAC);
 #endif
             RwStreamSkip(arg_0, arg_4->unk_08);
         }
     }
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEEF60)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEEF60)
     else
     {
         sub_19A750("Warning: not able to find world chunk for Opaque BSP while loading section %d\n",
@@ -312,7 +312,7 @@ RwInt32 sub_1421B0(RwStream *arg_0, type_141C10 *arg_4)
         if (arg_4->unk_04 == (RwUInt16)word_429EAC || (RwUInt16)word_429EAC == 0xFFFF)
         {
             stk_C = (type_173F50 *)sub_173F50((RwUInt16)arg_4->unk_04);
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF030)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEF030)
             if (!stk_C)
                 sub_19A750("***ERROR: no section bank available to load Alpha BSP for section %d\n",
                            arg_4->unk_04);
@@ -337,14 +337,14 @@ RwInt32 sub_1421B0(RwStream *arg_0, type_141C10 *arg_4)
         }
         else
         {
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF030)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEF030)
             sub_19A750("Warning: Loading Alpha BSP for section %d but section to load is %d\n", arg_4->unk_04,
                        (RwUInt16)word_429EAC);
 #endif
             RwStreamSkip(arg_0, arg_4->unk_08);
         }
     }
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF030)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEF030)
     else
     {
         sub_19A750("Warning: not able to find world chunk for Alpha BSP while loading section %d\n",
@@ -372,7 +372,7 @@ RwInt32 sub_142330(RwStream *arg_0, type_141C10 *arg_4)
         if (arg_4->unk_04 == (RwUInt16)word_429EAC || (RwUInt16)word_429EAC == 0xFFFF)
         {
             var_10 = (type_173F50 *)sub_173F50((RwUInt16)arg_4->unk_04);
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEE8B0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEE8B0)
             if (!var_10)
                 sub_19A750("***ERROR: no section bank available to load Alpha BSP for section %d\n",
                            arg_4->unk_04);
@@ -395,14 +395,14 @@ RwInt32 sub_142330(RwStream *arg_0, type_141C10 *arg_4)
         }
         else
         {
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEE8B0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEE8B0)
             sub_19A750("Warning: Loading TXD for section %d but section to load is %d\n", arg_4->unk_04,
                        (RwUInt16)word_429EAC);
 #endif
             RwStreamSkip(arg_0, arg_4->unk_08);
         }
     }
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEE8B0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEE8B0)
     else
     {
         sub_19A750("Warning: not able to find TXD chunk for section TXD while loading section %d\n",
@@ -431,7 +431,7 @@ RwInt32 sub_142490(RwStream *arg_0, type_141C10 *arg_4)
         if (arg_4->unk_04 == (RwUInt16)word_429EAC || (RwUInt16)word_429EAC == 0xFFFF)
         {
             stk_C = (type_173F50 *)sub_173F50((RwUInt16)arg_4->unk_04);
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF100)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEF100)
             if (!stk_C)
                 sub_19A750("***ERROR: no section bank available to load XBSP for section %d\n",
                            arg_4->unk_04);
@@ -457,14 +457,14 @@ RwInt32 sub_142490(RwStream *arg_0, type_141C10 *arg_4)
         }
         else
         {
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF100)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEF100)
             sub_19A750("Warning: Loading XBSP for section %d but section to load is %d\n", arg_4->unk_04,
                        (RwUInt16)word_429EAC);
 #endif
             RwStreamSkip(arg_0, arg_4->unk_08);
         }
     }
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF100)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEF100)
     sub_19A750("Warning: not able to find world chunk for XBSP while loading section %d\n", arg_4->unk_04);
 #endif
     return v8;
@@ -596,7 +596,7 @@ RwInt32 sub_142890(RwStream *arg_0, type_141C10 *arg_4)
         if (arg_4->unk_04 == (RwUInt16)word_429EAC || (RwUInt16)word_429EAC == 0xFFFF)
         {
             stk_C = (type_173F50 *)sub_173F50((RwUInt16)arg_4->unk_04);
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF1E0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEF1E0)
             if (!stk_C)
                 sub_19A750("***ERROR: no section bank available to load Collision BSP for section %d\n",
                            arg_4->unk_04);
@@ -621,14 +621,14 @@ RwInt32 sub_142890(RwStream *arg_0, type_141C10 *arg_4)
         }
         else
         {
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF1E0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEF1E0)
             sub_19A750("Warning: Loading Collsion BSP for section %d but section to load is %d\n", arg_4->unk_04,
                        (RwUInt16)word_429EAC);
 #endif
             RwStreamSkip(arg_0, arg_4->unk_08);
         }
     }
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF1E0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEF1E0)
     else
     {
         sub_19A750("Warning: not able to find world chunk for collision BSP while loading section %d\n",
@@ -984,7 +984,7 @@ RwInt32 sub_142F70(RwStream *arg_0, type_141C10 *arg_4)
             break;
         }
     }
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEF2B0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEF2B0)
     if (stk_C)
         sub_19A750("Received abort of section load...\n");
 #endif
@@ -1312,7 +1312,7 @@ void sub_143900(RwStream *arg_0, type_141C10 *arg_4)
             sub_1989D0("COD_MapData+SceneData+Filename", 0x18, 0, 0, 0);
         }
     }
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xEE640)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xEE640)
     else
     {
         sub_19A750("NO level directory name received! This is bad!");

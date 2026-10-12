@@ -180,37 +180,37 @@ void sub_715E0()
 
     if (dword_449A50.in_use()) {
         sub_19A750("CheckAllocations");
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x5D480)
         sub_19A750("Alfa Object Pool is not empty at restart/shutdown!");
 #endif
     }
     if (dword_449A10.in_use()) {
         sub_19A750("CheckAllocations");
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x5D480)
         sub_19A750("Alfa AI Object Pool is not empty at restart/shutdown!");
 #endif
     }
     if (dword_4499B0.in_use()) {
         sub_19A750("CheckAllocations");
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x5D480)
         sub_19A750("Alfa Input List Pool is not empty at restart/shutdown!");
 #endif
     }
     if (dword_449A30.in_use()) {
         sub_19A750("CheckAllocations");
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x5D480)
         sub_19A750("Alfa StateMachine Object Pool is not empty at restart/shutdown!");
 #endif
     }
     if (dword_4499F0.in_use()) {
         sub_19A750("CheckAllocations");
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x5D480)
         sub_19A750("Alfa Task Object Pool is not empty at restart/shutdown!");
 #endif
     }
     if (dword_4499D0.in_use()) {
         sub_19A750("CheckAllocations");
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x5D480)
         sub_19A750("Alfa Task Tree Pool is not empty at restart/shutdown!");
 #endif
     }
@@ -218,7 +218,7 @@ void sub_715E0()
         local_8 = &dword_449950[var_4];
         if (local_8->in_use()) {
             sub_19A750("CheckAllocations");
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D480)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x5D480)
             sub_19A750("Alfa Mem Pool %d is not empty at restart!");
 #endif
         }

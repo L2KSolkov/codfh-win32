@@ -320,7 +320,7 @@ RwInt32 type_3DFCA0::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8
                     return var_800[v804]->vf_00C(arg_0, arg_4, arg_8, arg_C, arg_10, arg_14);
             }
         }
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x123CA0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x123CA0)
         sub_19A750("Didn't play anything from a random even though at least one of it's sounds was actually loaded. What the hell?? That's not right! -RB\n");
 #endif
     }
@@ -452,7 +452,7 @@ RwInt32 type_3DFD40::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8
         if (var_C == -1)
         {
             var_C = 0;
-#ifndef CODFH_SP // single player compiles the debug prints out (SP 0x123E60)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug prints out (SP 0x123E60)
             sub_19A750("******^&^&^^ WARNING: Did not find a sequence alias slot that has no subtitle to remove!\n");
             sub_19A750("******^&^&^^ WARNING: Subtitles might not display\n");
 #endif

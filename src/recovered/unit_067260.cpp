@@ -90,7 +90,7 @@ void sub_672F0()
 // Empties the handle table on a restart.
 void sub_67340()
 {
-#ifndef CODFH_SP // MP only: single player compiles the debug print out (the text is not in default.xbe)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // MP only: single player compiles the debug print out (the text is not in default.xbe)
     sub_19A750("Restart");
 #endif
     dword_428A30 = 1;
@@ -103,7 +103,7 @@ void sub_67340()
 // match: sub_673A0 @ 0x000673A0
 void sub_673A0()
 {
-#ifndef CODFH_SP // MP only: single player compiles the debug print out (the text is not in default.xbe)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // MP only: single player compiles the debug print out (the text is not in default.xbe)
     sub_19A750("Shutdown");
 #endif
 }
@@ -147,7 +147,7 @@ RwUInt32 sub_673C0(type_67620 *arg_0, RwInt32 arg_4)
             }
         }
     }
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x57AC0)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x57AC0)
     if (v8 == 0)
         sub_19A750("Out of Handles!");
 #endif

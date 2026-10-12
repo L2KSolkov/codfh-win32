@@ -110,7 +110,7 @@ void type_16C2A0::sub_16C4D0(bool arg_0)
     RwInt32 var_8;
     RwUInt8 *l4;
 
-#ifndef CODFH_SP // single player compiles the debug prints out (and the check that only guards them)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug prints out (and the check that only guards them)
     if (arg_0 && unk_18 != unk_0C)
     {
         if (!(unk_00 & 2))

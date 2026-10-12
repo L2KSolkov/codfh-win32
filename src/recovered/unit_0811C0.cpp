@@ -201,20 +201,20 @@ void sub_81300()
 // sp-match: ?sub_81310@@YAXXZ @ 0x000693D0
 void sub_81310()
 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("AsynchLoadingQueue::ShutdownClass(): Begin...");
 #endif
     sub_821C0();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("AsynchLoadingQueue::ShutdownClass(): Unhooking VBlankInterrupt...");
 #endif
     sub_19A750();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("AsynchLoadingQueue::ShutdownClass(): Destroying loading thread...");
 #endif
     sub_823F0(dword_44BAD4);
     dword_44C004 = 0;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("AsynchLoadingQueue::ShutdownClass(): End...");
 #endif
     sub_2A7870(0);
@@ -370,7 +370,7 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                 strcpy(l12C, "None");
                 break;
             }
-#ifdef CODFH_SP
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS)
             sp_debug_print("", l12C, p10C->unk_00, RWS::Time::GetTime());
 #else
             sub_19A750("****\n**** BEGIN %s %s load at %d\n****\n", l12C, p10C->unk_00, RWS::Time::GetTime());
@@ -379,10 +379,10 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
             {
             case 0:
                 dword_428E20 = 0;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 sub_19A750("Section %d started loading\n", p10C->unk_44);
 #endif
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 sub_19A750("Now loading: ");
 #endif
                 lcl_130 = dword_44BFF8;
@@ -390,7 +390,7 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                 {
                     if (lcl_130->unk_40 == 0 && lcl_130->unk_48)
                     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                         sub_19A750("%d ", lcl_130->unk_44);
 #endif
                     }
@@ -400,7 +400,7 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                         lcl_130 = dword_44BAD8;
                     }
                 }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 sub_19A750("\n");
 #endif
                 setLoadingSection_((RwInt16)p10C->unk_44);
@@ -413,10 +413,10 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                     lv_138 = sub_1745F0(p10C->unk_44);
                     sub_174030((RwUInt16)lv_138, 1);
                     dword_44C000 = 0;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("Aborted load of Section %d...\n", p10C->unk_44);
 #endif
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("Now loading: ");
 #endif
                     y134 = dword_44BFF8;
@@ -429,7 +429,7 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                     {
                         if (y134->unk_40 == 0 && y134->unk_48)
                         {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                             sub_19A750("%d ", y134->unk_44);
 #endif
                         }
@@ -439,16 +439,16 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                             y134 = dword_44BAD8;
                         }
                     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("\n");
 #endif
                 }
                 else
                 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("Section %d finished loading\n", p10C->unk_44);
 #endif
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("Now loading: ");
 #endif
                     local_13C = dword_44BFF8;
@@ -461,7 +461,7 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                     {
                         if (local_13C->unk_40 == 0 && local_13C->unk_48)
                         {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                             sub_19A750("%d ", local_13C->unk_44);
 #endif
                         }
@@ -471,7 +471,7 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                             local_13C = dword_44BAD8;
                         }
                     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("\n");
 #endif
                 }
@@ -486,7 +486,7 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                     l144 = p10C->unk_44 & 0xFF;
                     sub_16F770(var_108, 0x100, l144);
                     sub_19BB40(var_108, 1);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("Loading weapon clump bank file %s!\n", var_108);
 #endif
                     sub_82350();
@@ -496,13 +496,13 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                     {
                         sub_16F460(var_140, var_148, l144);
                         RwStreamClose(var_140, 0);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                         sub_19A750("Finished Loading weapon clump bank file....\n");
 #endif
                     }
                     else
                     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                         sub_19A750("***ERROR: unable to open clump file %s!\n", var_108);
 #endif
                     }
@@ -517,7 +517,7 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                     dword_4E51C8 = 0;
                     sub_16EDB0(var_108, 0x100, p10C->unk_44);
                     sub_19BB40(var_108, 1);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("Loading clump bank file %s!\n", var_108);
 #endif
                     slot_14C = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_108);
@@ -526,13 +526,13 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                         sub_16EAE0(slot_14C, p10C->unk_44);
                         RwStreamClose(slot_14C, 0);
                         sub_6B5F0("ClumpBankLoaded", 0, 0, 0, 0, 0, 1, 0);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                         sub_19A750("Finished Loading clump bank....\n");
 #endif
                     }
                     else
                     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                         sub_19A750("***ERROR: unable to open clump file %s!\n", var_108);
 #endif
                     }
@@ -550,21 +550,21 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
                 break;
             case 2:
                 var_150 = (type_449C94 *)p10C->unk_44;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 sub_19A750("Loading anim bank: %s!\n", p10C->unk_00);
 #endif
                 sub_19BB40(p10C->unk_00, 1);
                 sub_82350();
                 sub_77540(p10C->unk_00, var_150->unk_08_s, var_150->unk_00, 1, 0);
                 sub_82360();
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 sub_19A750("Finished Loading AnimBank....\n");
 #endif
                 sub_6B5F0("AnimBankLoaded", 0, 0, 0, 0, 0, 1, 0);
                 sub_19BB40(p10C->unk_00, 0);
                 break;
             }
-#ifdef CODFH_SP
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS)
             sp_debug_print("", l12C, p10C->unk_00, RWS::Time::GetTime());
 #else
             sub_19A750("****\n**** DONE %s %s load at %d\n****\n", l12C, p10C->unk_00, RWS::Time::GetTime());
@@ -588,7 +588,7 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
             if (dword_44BFF8->unk_48 && dword_44BFF8->unk_40 == 0)
             {
                 var154 = (type_173F50 *)sub_173F50((RwUInt16)dword_44BFF8->unk_44);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                 if (!var154)
                 {
                     sub_19A750("bad section asynch loading queue stuff thingy dohicky mabob\n");
@@ -645,7 +645,7 @@ void sub_81EB0(RwInt32 arg_0, const RwChar *arg_4, RwInt32 arg_8)
 {
     RwInt32 var_4;
 
-#ifdef CODFH_SP
+#if defined(CODFH_SP) && !defined(CODFH_SP_LOGS)
     // Single player compiles the print out but still reads the time (SP 0x69230).
     RWS::Time::GetTime();
 #else
@@ -672,7 +672,7 @@ void sub_81EF0(RwInt32 arg_0, const RwChar *arg_4, RwInt32 arg_8)
     }
     RtlLeaveCriticalSection(&dword_44BAB4);
     dword_44BF98 = 0;
-#ifndef CODFH_SP // MP only: single player compiles the debug print out (the text is not in default.xbe)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // MP only: single player compiles the debug print out (the text is not in default.xbe)
     if (dword_44BFFC == dword_44BFF8)
     {
         sub_19A750("The asynch loading queue is FULL!");
@@ -730,14 +730,14 @@ void sub_82070(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 arg_C)
             {
                 if (sub_82020(0, local_8))
                 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("(AbortUnneededSections...)Aborting load of section %d\n", local_8);
 #endif
                     dword_44C000 = 1;
                 }
                 else
                 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("Canceling queued load of section %d\n", local_8);
 #endif
                     var_4->unk_48 = 0;
@@ -759,7 +759,7 @@ void sub_82130()
         if (var_4->unk_40 == 3 && var_4->unk_48 && ((var_4->unk_44 & 0x80000000) != 0) == 0
             && !sub_82020(var_4->unk_40, var_4->unk_44))
         {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             sub_19A750("(AbortPendingClumpBanks...)Canceling queued load of bank %d\n", var_4->unk_44);
 #endif
             var_4->unk_48 = 0;
@@ -776,7 +776,7 @@ void sub_821C0()
 
     dword_44BF98 = 1;
     RtlEnterCriticalSection(&dword_44BAB4);
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("(WaitForCurrentLoadToFinish...)Aborting all sections\n");
 #endif
     for (var_4 = dword_44BAD8; var_4 < &dword_44BAD8[16]; var_4++)
@@ -790,7 +790,7 @@ void sub_821C0()
     dword_44BF98 = 0;
     if (dword_44BFF8 && dword_44BFF8->unk_48)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("Waiting for loading thread to finish...");
 #endif
         while (dword_44BFF8->unk_48)
@@ -798,7 +798,7 @@ void sub_821C0()
             sub_813E0(0);
             sub_16E9C0();
         }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("Loading thread finished loading...");
 #endif
     }
@@ -916,7 +916,7 @@ RwUInt32 sub_82410(PTHREAD_START_ROUTINE arg_0)
 // sp-match: ?sub_82450@@YAII@Z @ 0x00069480
 RwUInt32 sub_82450(RwUInt32 arg_0)
 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     // Single player compiles the debug prints out (SP 0x69480).
     sub_19A750("XBOXDestroyThread:: Waiting for loading thread to exit...");
 #endif
@@ -931,7 +931,7 @@ RwUInt32 sub_82450(RwUInt32 arg_0)
         sub_813E0(1);
     }
     dword_44C004 = 0;
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     sub_19A750("XBOXDestroyThread:: Done waiting for loading thread to exit.  Loading thread destroyed...");
 #endif
     return arg_0;

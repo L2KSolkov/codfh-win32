@@ -23,6 +23,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #ifdef CODFH_DRAW_TRIGGERS
 /* the game's debug tools (port/src/debug/trigtools.cpp) */
 extern "C" void port_debug_tools_window(void);
+extern "C" int port_log_astar;   /* (xpal_core.cpp: the A* search logs) */
 #endif
 
 static int ready, visible, show_demo;
@@ -182,6 +183,8 @@ static void port_window(int back_w, int back_h)
     }
     if (ImGui::CollapsingHeader("Input"))
         ImGui::SliderFloat("mouse sensitivity", &port_config.mouseSensitivity, 0.1f, 5.0f, "%.2f");
+    if (ImGui::CollapsingHeader("Logs"))
+        check("A* search logs (scheduler, path finder)", &port_log_astar);
     check("ImGui demo", &show_demo);
     ImGui::End();
 }

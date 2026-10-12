@@ -1331,7 +1331,7 @@ void type_1227C0::sub_121A50()
         var_4 = unk_18.unk_08_pg;
         if (var_4 == 0)
         {
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xD7A70)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xD7A70)
             sub_19A750("WARNING: ProjectileGenerator::ClearSound(): Trigger not valid! -RJB");
 #endif
             return;

@@ -627,7 +627,7 @@ type_F5740 *sub_F5BC0(type_F5740 *arg_0, ParticleTrigger *arg_4, RwInt32 arg_8, 
         }
         else
         {
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0xBAD90)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0xBAD90)
             sub_19A750("Warning..adding child triggered particle to null parent.\n");
 #endif
             var_4->unk_B0 = 0;

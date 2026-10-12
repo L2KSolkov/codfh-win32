@@ -119,7 +119,7 @@ void sub_D7F70(RwInt32 arg_0)
         m_10C = sub_142F70(l4, (type_141C10 *)&var_128);
         RwStreamClose(l4, var_1A8);
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     else
     {
         sub_19A750("Unabled to open file: %s", var108);
@@ -218,13 +218,13 @@ RwInt32 sub_D8310()
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_208);
     if (l4)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("Loading GODDATA.DFF file...\n");
 #endif
         RWS::CStreamHandler::ProcessStream(l4);
         RwStreamClose(l4, var_208);
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     else
     {
         sub_19A750("***Unable to load GODDATA.DFF file!\n");
@@ -257,13 +257,13 @@ RwInt32 sub_D83C0()
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_138);
     if (l4)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("Loading GLOBAL.DFF file...\n");
 #endif
         RWS::CStreamHandler::ProcessStream(l4);
         RwStreamClose(l4, var_138);
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     else
     {
         sub_19A750("***Unable to load GLOBAL.DFF\n");
@@ -275,13 +275,13 @@ RwInt32 sub_D83C0()
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_138);
     if (l4)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("Loading LEVEL.DFF file...\n");
 #endif
         RWS::CStreamHandler::ProcessStream(l4);
         RwStreamClose(l4, var_138);
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     else
     {
         sub_19A750("***Unable to load LEVEL.DFF\n");
@@ -296,7 +296,7 @@ RwInt32 sub_D83C0()
     l4 = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, var_138);
     if (l4)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("Loading LEVEL.RWS file...\n");
 #endif
         stk_B8.unk_00 = 0x13;
@@ -305,7 +305,7 @@ RwInt32 sub_D83C0()
         sub_142F70(l4, (type_141C10 *)&stk_B8);
         RwStreamClose(l4, var_138);
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     else
     {
         sub_19A750("***Unable to load LEVEL.RWS\n");

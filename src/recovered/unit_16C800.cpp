@@ -9,6 +9,11 @@
 #include <string.h>
 #include <stdio.h>
 #include "rw/badevice.h"
+#ifdef CODFH_WIN32
+// (the port: the game's printf prints, which the Xbox showed on its debug output, to the log)
+extern "C" void port_debug_print(const RwChar *fmt, ...);
+#define printf port_debug_print
+#endif
 #if defined(CODFH_WIN32)
 extern "C" void plog(const RwChar *fmt, ...);
 #endif
@@ -187,7 +192,7 @@ void *sub_16CB00(const RwChar *arg_0, const RwChar *arg_4)
     }
     else
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // Single player compiles the debug print out (SP 0x10A780).
         sub_19A750("Unable to locate %s in pack file - attempting to load off disk\n", arg_0);
 #endif
@@ -298,7 +303,7 @@ size_t sub_16CD00(void *arg_0, size_t arg_4, size_t arg_8, void *arg_C)
 #else
         sub_19A750((const RwChar *)var_18);
 #endif
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // Single player compiles the debug print out (SP 0x10A8DE goes straight on).
         if (var_18 != bp_4)
             sub_19A750("Read Error\n");

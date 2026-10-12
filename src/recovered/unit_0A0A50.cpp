@@ -154,7 +154,7 @@ void CAnimPackSelector::HandleEvents(RWS::CMsg &pMsg)
 
     if (pMsg.Id.p_msgrec == iMsgSparkStartSystem.p_msgrec || pMsg.Id.p_msgrec == dword_4B67C0.p_msgrec)
     {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // single player compiles the debug prints out (SP 0x7DD40)
         sub_19A750("AnimPack Loading begin...");
 #endif
@@ -187,7 +187,7 @@ void CAnimPackSelector::HandleEvents(RWS::CMsg &pMsg)
             {
                 if (!sub_774F0(*(type_449C94_08 *)&var_C->unk_00, bp_4))
                 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("Loading animation group god ID: %x,%x to slot %d from file %s",
                                var_C->unk_00.unk_00, var_C->unk_00.unk_04, bp_4, var_C->unk_08);
 #endif
@@ -195,7 +195,7 @@ void CAnimPackSelector::HandleEvents(RWS::CMsg &pMsg)
                 }
                 else
                 {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
                     sub_19A750("Animation group god ID: %x,%x Name: %s is already loaded to slot %d",
                                var_C->unk_00.unk_00, var_C->unk_00.unk_04, var_C->unk_08, bp_4);
 #endif
@@ -208,7 +208,7 @@ void CAnimPackSelector::HandleEvents(RWS::CMsg &pMsg)
         {
             UnLinkMsg(iMsgSparkStartSystem);
         }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         sub_19A750("AnimPack Loading end...");
 #endif
     }

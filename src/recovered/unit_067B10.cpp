@@ -976,7 +976,7 @@ void sub_693A0()
         ebp_9 = ((type_3D2CD0 *)dword_449328)->sub_6DE40(var_4 + 1, dword_449320 + 1, local_8, 1, 1.0f);
 #endif
         if (!ebp_9) {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
             sub_19A750("ERROR Playing animation in script file: %s, line no.: %d\n", dword_449288,
                        dword_449284);
             sub_19A750("Could not play animation.  Look above this messaage for possibly more "

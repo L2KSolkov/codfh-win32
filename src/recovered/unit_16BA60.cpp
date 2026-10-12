@@ -13,6 +13,10 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
+#ifdef CODFH_WIN32
+// (port/src/xpal_core.cpp: the port's log and its console)
+extern "C" void port_debug_vprint(const RwChar *arg_0, va_list arg_4);
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 #ifdef CODFH_SP
@@ -273,8 +277,17 @@ void sub_16C220(const RwChar *arg_0, ...)
     RwChar var_408[0x400];
     va_list var_4;
 
+#ifdef CODFH_WIN32
+    // (the port: to the log, which the Xbox's debug output was; formatted there, where a bad
+    // argument prints a note)
+    va_start(var_4, arg_0);
+    port_debug_vprint(arg_0, var_4);
+    va_end(var_4);
+    (void)var_408;
+#else
     va_start(var_4, arg_0);
     vsprintf(var_408, arg_0, var_4);
     va_end(var_4);
     printf("%s%s", var_408, "\n");
+#endif
 }

@@ -536,7 +536,7 @@ void type_3D2CD0::sub_6D5A0(RwReal arg_0)
         if (!sub_6DE40(1, &((type_EDA50_item *)unk_118)->unk_04[unk_11C],
                        ((type_EDA50_item *)unk_118)->unk_01 >> unk_11C, true, 1.0f)) {
 #endif
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5D900)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x5D900)
             sub_19A750("WARNING:  transition animation could not play.  ID: %x. Complain to the animation department!\n",
                        ((type_EDA50_item *)unk_118)->unk_04[unk_11C]);
 #endif
@@ -723,7 +723,7 @@ void type_3D2CD0::sub_6DF90(RwInt32 arg_0, bool arg_4)
             if (!sub_6DE40(1, &((type_EDA50_item *)unk_118)->unk_04[unk_11C],
                            ((type_EDA50_item *)unk_118)->unk_01 >> unk_11C, true, 1.0f)) {
 #endif
-#ifndef CODFH_SP // single player compiles the debug print out (SP 0x5C420)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (SP 0x5C420)
                 sub_19A750("WARNING:  transition animation could not play.  ID: %x. Complain to the animation department!\n",
                            ((type_EDA50_item *)unk_118)->unk_04[unk_11C]);
 #endif

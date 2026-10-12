@@ -125,7 +125,7 @@ type_3D3548 *sub_1669B0(type_712B0 *arg_0)
             var_10 = 0;
         }
     }
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
     // Single player compiles the debug print out (SP 0x109F30).
     else
         sub_19A750("WARNING: A spawn could not be created due to lack of entity memory. Trigger "

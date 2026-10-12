@@ -68,7 +68,7 @@ void sub_16F2C0(RwInt32 arg_0, RwInt32 arg_4)
     dword_4E5518[arg_0] = make_bank_state(0, 1);
     sprintf(var_28, "wbank_%02d.bin", arg_4);
     sprintf(var_128, "Request to load %s", var_28);
-#ifndef CODFH_SP // single player compiles the debug print out (the message is still formatted: SP 0x10C9C2)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out (the message is still formatted: SP 0x10C9C2)
     sub_19A750(var_128);
 #endif
     sub_16F770(var_128, 0x100, arg_4);
@@ -140,13 +140,13 @@ void sub_16F460(RwStream *arg_0, RwInt32 arg_4, RwInt32 arg_8)
         {
             if (frm_24)
             {
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
                 sub_19A750("\tStream Skip: %d bytes", frm_24);
 #endif
                 RwStreamSkip(arg_0, frm_24);
                 frm_24 = 0;
             }
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
             sub_19A750("\tLoading weapon clump: (0x%x,0x%x)", m_18->unk_00.unk_00, m_18->unk_00.unk_04);
 #endif
             RwStreamRead(arg_0, &var_40, sizeof(var_40));
@@ -165,7 +165,7 @@ void sub_16F460(RwStream *arg_0, RwInt32 arg_4, RwInt32 arg_8)
         }
         else
         {
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
             sub_19A750("\tIgnoring clump: (0x%x,0x%x). Already Loaded!", m_18->unk_00.unk_00,
                        m_18->unk_00.unk_04);
 #endif
@@ -179,7 +179,7 @@ void sub_16F460(RwStream *arg_0, RwInt32 arg_4, RwInt32 arg_8)
         RwStreamSkip(arg_0, frm_24);
         frm_24 = 0;
     }
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
     sub_19A750("Weapon file contained %d weapon clumps. %d loaded with a total mem footprint of %d bytes. \n%d "
                "slots are still available.  %d bytes are still free in weapon bank (%d).",
                var_48.unk_00, l1C, dword_4E54F4[arg_4].unk_04, sub_16FAC0(arg_4),
@@ -264,7 +264,7 @@ RwInt32 sub_16F900(RwInt32 arg_0, RwInt32 arg_4)
 
     if (sub_16F860(arg_4) == arg_0)
     {
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
         sub_19A750("A request to load wbank_%02d.bin is ignored because it is already loaded in slot %d!", arg_4,
                    arg_0);
 #endif
@@ -272,14 +272,14 @@ RwInt32 sub_16F900(RwInt32 arg_0, RwInt32 arg_4)
     }
     if (sub_16F8E0(arg_0, arg_4))
     {
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
         sub_19A750("\tRequest to load wbank_%02d.bin is ignored because it is already loading!", arg_4);
 #endif
         return 0;
     }
     if (get_bank_state(arg_0))
     {
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
         sub_19A750("A request to load wbank_%02d.bin is ignored because the bank(%d) is locked!", arg_4, arg_0);
 #endif
         return 0;
@@ -293,7 +293,7 @@ RwInt32 sub_16F900(RwInt32 arg_0, RwInt32 arg_4)
         return 1;
     if (sub_82020(3, l4))
         return 1;
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
     sub_19A750("Request to load %s\n", var_28);
 #endif
     sub_81EB0(3, var_28, l4);
@@ -345,7 +345,7 @@ void sub_16FAE0(RwInt32 arg_0)
     ebp_14 = lv_10;
     if (dword_4E54D0[arg_0] != -1)
     {
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
         sub_19A750("Request to unload wbank_%02d.bin\n", dword_4E54D0[arg_0]);
 #endif
         while (*ebp_14)
@@ -364,7 +364,7 @@ void sub_16FAE0(RwInt32 arg_0)
                     }
                     sub_198F00(&var_20->unk_00);
                     m_18++;
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
                     sub_19A750("\tUnloading GodID (0x%08x,0x%08x)", var_20->unk_00.unk_00, var_20->unk_00.unk_04);
 #endif
                     var_20->unk_00.unk_00 = 0;
@@ -374,7 +374,7 @@ void sub_16FAE0(RwInt32 arg_0)
             }
             ebp_14++;
         }
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
         sub_19A750("Unloaded %d GodIDs. %d slots are available.", m_18, sub_16FAC0(arg_0));
 #endif
         dword_4E54F4[arg_0].unk_04 = 0;

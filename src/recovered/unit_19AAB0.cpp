@@ -112,7 +112,7 @@ void sub_19AAB0()
     RwInt32 var_4;
 
     dword_42B714 = sub_19B080();
-#ifndef CODFH_SP // single player compiles the debug print out
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out
     sub_19A750("difficulty = %d from shell\n", dword_42B714);
 #endif
     for (var_4 = 0; var_4 < 3; var_4++)

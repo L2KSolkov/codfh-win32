@@ -79,7 +79,7 @@ RwInt32 CAnimObjectPool::sub_78BB0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 void CAnimObjectPool::sub_78C00()
 {
     if (m_pool.in_use()) {
-#ifndef CODFH_SP
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS)
         // Single player compiles the warning out (its text is not in default.xbe; sub_78790's
         // call goes to an empty function, SP 0x63215).
         sub_19A750("CAnimObjectPool:: Somebody forgot to deallocate an anim object!");

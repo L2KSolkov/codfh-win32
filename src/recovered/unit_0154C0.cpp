@@ -466,7 +466,7 @@ void sub_16E30()
     for (var_4 = 0; var_4 < 32; var_4++) {
         if (unk_438CA8[var_4].sub_D4910() != 0)
         {
-#ifndef CODFH_SP // MP only: single player compiles the debug print out but keeps the check's call (SP 0x13888; the text is not in default.xbe)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // MP only: single player compiles the debug print out but keeps the check's call (SP 0x13888; the text is not in default.xbe)
             sub_19A750("An AIData entity slot was not cleared on restart/shutdown!");
 #endif
         }
