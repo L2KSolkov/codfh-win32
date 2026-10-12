@@ -298,8 +298,53 @@ extern volatile LONG port_mouse_dx, port_mouse_dy;
 
 /* The mouse's movement as the right stick: counts per read scaled by the sensitivity, full
    deflection at about 25 counts a frame at 1.0 (codfh.ini [input] mouse_sensitivity). */
+/*
+ * Direct mouse look: the player's view code (unit_0FD730's sub_109AE0 and sub_10A330) takes the
+ * mouse's movement in degrees, 0.1 a count at a sensitivity of 1 ([input] mouse_sensitivity).
+ * While it does, the mouse no longer drives the right stick (mouse_state).
+ */
+static unsigned direct_look_frame;
+static int script_count_fwd(void);
+
+static int direct_look_ready(void)
+{
+    if (script_count_fwd() > 0)
+        return 1;   /* (scripted input: in front or not) */
+    if (!port_hwnd || GetForegroundWindow() != (HWND)port_hwnd)
+        return 0;
+#ifdef CODFH_IMGUI
+    if (port_imgui_wants_mouse())
+        return 0;
+#endif
+    return 1;
+}
+
+static float look_scale(void)
+{
+    return 0.1f * (port_config.mouseSensitivity > 0 ? port_config.mouseSensitivity : 1.0f);
+}
+
+/* (right turns the view right: the view's yaw grows to the left) */
+extern "C" float port_mouse_yaw(void)
+{
+    direct_look_frame = port_frame;
+    LONG dx = InterlockedExchange(&port_mouse_dx, 0);
+    return direct_look_ready() ? -dx * look_scale() : 0.0f;
+}
+
+/* (the mouse forward looks up, as most PC games: the pitch grows downward) */
+extern "C" float port_mouse_pitch(void)
+{
+    direct_look_frame = port_frame;
+    LONG dy = InterlockedExchange(&port_mouse_dy, 0);
+    return direct_look_ready() ? dy * look_scale() : 0.0f;
+}
+
 static void mouse_state(XINPUT_GAMEPAD *g)
 {
+    /* (the view takes the mouse directly while it asks for it) */
+    if (direct_look_frame && port_frame - direct_look_frame <= 2)
+        return;
     LONG dx = InterlockedExchange(&port_mouse_dx, 0), dy = InterlockedExchange(&port_mouse_dy, 0);
 #ifdef CODFH_IMGUI
     if (port_imgui_wants_mouse())
@@ -382,6 +427,10 @@ struct ScriptedPress
 };
 static ScriptedPress script[256];
 static int script_count = -1;
+static int script_count_fwd(void)
+{
+    return script_count;
+}
 
 static void load_script(void)
 {
@@ -426,6 +475,11 @@ static void scripted_state(XINPUT_GAMEPAD *g)
         if (!strcmp(b, "LDOWN")) g->sThumbLY = -32768;
         if (!strcmp(b, "LLEFT")) g->sThumbLX = -32768;
         if (!strcmp(b, "LRIGHT")) g->sThumbLX = 32767;
+        /* (mouse movement, 20 counts a read: the direct look's test) */
+        if (!strcmp(b, "MUP")) InterlockedExchangeAdd(&port_mouse_dy, -20);
+        if (!strcmp(b, "MDOWN")) InterlockedExchangeAdd(&port_mouse_dy, 20);
+        if (!strcmp(b, "MLEFT")) InterlockedExchangeAdd(&port_mouse_dx, -20);
+        if (!strcmp(b, "MRIGHT")) InterlockedExchangeAdd(&port_mouse_dx, 20);
     }
 }
 

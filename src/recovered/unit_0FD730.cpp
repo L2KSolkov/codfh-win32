@@ -11,6 +11,13 @@
 #include <stdio.h>
 
 #include "rw/ostypes.h"
+#ifdef CODFH_WIN32
+// The port's mouse look (port/src/xpal_sys.cpp): the mouse's movement since the last call, in
+// degrees, turned straight into the local player's view rather than through the pad's stick (its
+// dead zone, rate cap and acceleration made the mouse lag and overshoot).
+extern "C" RwReal port_mouse_yaw(void);
+extern "C" RwReal port_mouse_pitch(void);
+#endif
 #include "types/type_3D3548.h"
 #include "types/type_10F710.h"
 #include "types/animobjpool.h"
@@ -5797,6 +5804,11 @@ void type_10F710::sub_109AE0(RwReal arg_0, RwReal arg_4)
             unk_548 += l54;
         }
         unk_E8 = unk_3EC + unk_3FC;
+#ifdef CODFH_WIN32
+        // (the local player's: the mouse's turn, added to the stick's)
+        if (unk_3D8 == 0)
+            unk_E8 += port_mouse_yaw();
+#endif
         sub_19B650(&unk_E4);
     }
 }
@@ -5993,6 +6005,10 @@ void type_10F710::sub_10A330(RwReal arg_0, RwReal arg_4)
             unk_544 += fp_40;
         }
         unk_530 += unk_3F0;
+#ifdef CODFH_WIN32
+        if (unk_3D8 == 0)
+            unk_530 += port_mouse_pitch();
+#endif
 #ifdef CODFH_SP // shape: the bounds in a block of their own (SP 0xCA3A0's frame)
         {
             RwReal hi;
