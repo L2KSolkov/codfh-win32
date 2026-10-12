@@ -36,6 +36,13 @@
 #ifdef CODFH_SP
 #include "game/savestate.h"     // type_4F45F8
 #include "game/levels.h"        // sub_19BE30
+#if defined(CODFH_WIN32)
+#include "game/godassetmanager.h"
+#include "types/type_3DF8D8.h"
+extern "C" void plog(const RwChar *fmt, ...);
+// (frames the level start has waited: sub_D7570)
+static RwInt32 s_nStartWait;
+#endif
 #include "game/movie.h"         // sub_19BAC0
 #include "game/profiles.h"      // sub_1A2650
 #include "game/platform.h"      // Width, Height, ZDepth
@@ -1029,6 +1036,20 @@ RwInt32 sub_D7570()
 
         }
     }
+#if defined(CODFH_WIN32) && defined(CODFH_SP)
+    // (the port: a level start still waiting after ten seconds logs what it waits on, once: the
+    // god-asset requests nothing answered (their keys and kinds) and the loading stages left)
+    else if (++s_nStartWait == 600)
+    {
+        type_4F26D0 *pReq;
+        RwInt32 n = 0;
+
+        plog("level start: still waiting after 10 s; %d loading stages left", dword_4B86FC);
+        for (pReq = (type_4F26D0 *)dword_4F26D0; pReq && n < 40; pReq = pReq->unk_08, n++)
+            plog("level start: waiting for god asset %08X,%08X (kind %d)", pReq->unk_00->unk_04.unk_00,
+                 pReq->unk_00->unk_04.unk_04, pReq->unk_00->vf_008());
+    }
+#endif
     else if (sub_198650() > 30.0f)
     {
         dword_4B8760++;

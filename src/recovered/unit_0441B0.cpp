@@ -36,6 +36,9 @@
 #include "types/type_3DBC78.h"
 #include "types/type_4AE70.h"
 #include "game/surfaceparticles.h"
+#if defined(CODFH_WIN32)
+extern "C" void plog(const RwChar *fmt, ...);
+#endif
 #include "types/type_3DC048.h"
 #include "types/type_3DC378.h"
 #include "types/type_3DA6C0.h"
@@ -12899,6 +12902,18 @@ void sub_58360(RwUInt32 arg_0, type_44350 *arg_4)
         var_18 = (type_3DFEEC *)var_14;
         var_20 = var_4->vf_024()->get_unk_10();
         SCRIPT_CHECK(var_20 != 0);
+#if defined(CODFH_WIN32)
+        // (the Win32 port: a name whose entity is not there, as when the debug tools' "no
+        // soldiers or tanks created" leaves a tank out: 0, as for an object of no such kind,
+        // rather than a call through nothing)
+        if (!((type_D48D0 *)&var_18->unk_24_id)->sub_D4910())
+        {
+            plog("script: AttachToEntity: %08X,%08X names no entity now; not attached", var_C->unk_00, var_C->unk_04);
+            var_8 = 0;
+            sub_44350(arg_4, &var_8);
+            return;
+        }
+#endif
         if (((type_D48D0 *)&var_18->unk_24_id)->sub_D4910()->vf_01C()
             || ((type_D48D0 *)&var_18->unk_24_id)->sub_D4910()->vf_020()
             || ((type_D48D0 *)&var_18->unk_24_id)->sub_D4910()->vf_010())

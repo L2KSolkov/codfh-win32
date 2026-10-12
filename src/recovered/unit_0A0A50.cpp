@@ -14,6 +14,10 @@
 #include "game/data.h"
 #include "game/functions.h"
 #include "types/type_3DF8D8.h"
+#ifdef CODFH_WIN32
+// (port/src/cli.cpp: a -leveldir test level's extra animation packs)
+extern "C" RwInt32 port_anim_packs(const RwChar *const **pppNames);
+#endif
 
 // match: __ehhandler$?MakeNew@CAnimPackSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z>1>8 @ 0x0041B9DC
 // match: __ehhandler$?MakeNew@CAnimPackSelector@@SAPAVCAttributeHandler@RWS@@ABVCAttributePacket@3@@Z>1 @ 0x0041B9E4
@@ -204,6 +208,25 @@ void CAnimPackSelector::HandleEvents(RWS::CMsg &pMsg)
             dword_4B8EF0.sub_E9FB0(4);
             sub_D9450();
         }
+#ifdef CODFH_WIN32
+        {
+            // (the port: a test level's extra animation packs into the banks after the six,
+            // CAnimBankInfo's; each under an id of its own, so a restart finds it loaded)
+            const RwChar *const *ppszExtra;
+            RwInt32 nExtra = port_anim_packs(&ppszExtra), i;
+
+            for (i = 0; i < nExtra; i++)
+            {
+                type_449C94_08 id;
+
+                id.unk_00 = (RwInt32)0xC0DEA9A0 + i; // not an address: an id of the port's
+                id.unk_04 = 0x0000C0DE;     // not an address: an id of the port's
+                if (!sub_774F0(id, 6 + i))
+                    sub_77540(ppszExtra[i], id, 6 + i, 1, 0);
+                sub_D9450();
+            }
+        }
+#endif
         if (pMsg.Id.p_msgrec == iMsgSparkStartSystem.p_msgrec)
         {
             UnLinkMsg(iMsgSparkStartSystem);

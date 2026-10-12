@@ -257,6 +257,13 @@ size_t sub_16CD00(void *arg_0, size_t arg_4, size_t arg_8, void *arg_C)
     {
         size_t var_14 = dword_4E22A8.unk_CC.rwfread(arg_0, arg_4, arg_8, arg_C);
 
+#if defined(CODFH_WIN32)
+        // (the port: a file the pack lacks, read off the disk, reads nothing at its end, as
+        // RenderWare's streams read to it; the Xbox's files were all in the pack, which has its
+        // own end flag (unk_01, below), so the image takes any empty read for a disc error)
+        if (!var_14 && feof((FILE *)arg_C))
+            return 0;
+#endif
 #ifdef CODFH_SP
         sp_sub_12C410((void *)var_14);
 #else
@@ -410,6 +417,21 @@ RwInt32 sub_16D1B0(void *arg_0)
 {
     RwInt32 var_4 = (RwInt32)arg_0;
 
+#if defined(CODFH_WIN32)
+    // (the port: a file read off the disk is at its end once its last byte is read, as the
+    // pack's are (unk_01, set by the read that reaches it); the C runtime's feof only turns
+    // once a read has failed, so RWS's ProcessStream, testing it before each chunk, took the
+    // last chunk again: its header left in place, its body a stale buffer, its entity made twice)
+    if (var_4 > 5)
+    {
+        RwInt32 c = fgetc((FILE *)arg_0);
+
+        if (c == EOF)
+            return 1;
+        ungetc(c, (FILE *)arg_0);
+        return 0;
+    }
+#endif
     if (var_4 > 5)
         return dword_4E22A8.unk_CC.rwfeof(arg_0);
     return dword_4E22A8.unk_80[var_4].unk_01;

@@ -14,6 +14,10 @@
 #include "game/data.h"
 #include "game/functions.h"
 #include "types/type_3DF8D8.h"
+#ifdef CODFH_WIN32
+// (port/src/cli.cpp: a -leveldir test level's extra animation packs)
+extern "C" RwInt32 port_anim_packs(const RwChar *const **pppNames);
+#endif
 
 
 // Globals with constructors defined here (their initializers and exit
@@ -168,7 +172,21 @@ void CAnimBankInfo::HandleEvents(RWS::CMsg &pMsg)
 {
     if (pMsg.Id.p_msgrec == RWS::iMsgStartSystem.p_msgrec)
     {
+#ifdef CODFH_WIN32
+        // (the port: a test level's extra animation packs, port_anim_packs, each a 1 MB bank
+        // after the six, which CAnimPackSelector's HandleEvents loads them into)
+        const RwChar *const *ppszExtra;
+        RwInt32 nExtra = port_anim_packs(&ppszExtra), i;
+        RwUInt32 auSize[6 + 8];
+
+        for (i = 0; i < 6; i++)
+            auSize[i] = sub_A0A20()[i];
+        for (i = 0; i < nExtra; i++)
+            auSize[6 + i] = sub_A0530(0x100000); // not an address: 1 MB
+        sub_770F0(6 + nExtra, 0x100000, auSize); // not an address: 1 MB
+#else
         sub_770F0(6, 0x100000, sub_A0A20()); // not an address: 1 MB
+#endif
         UnLinkMsg(RWS::iMsgStartSystem);
     }
 }

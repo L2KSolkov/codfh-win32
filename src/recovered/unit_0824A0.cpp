@@ -245,7 +245,7 @@ RwReal flt_4AEFF4 = flt_428E28;
 type_4B1CA0 dword_4B1CA0[0x14];
 type_44E8D8 dword_44E8D8[3];
 type_8A980 dword_4B1E98;
-type_4B1A20 dword_4B1A20[6];
+type_4B1A20 dword_4B1A20[SOUND_BANK_SLOTS];
 type_4B1C20 dword_4B1C20[3];
 type_825E0 dword_4B1B60[10];
 // Constructed last (its .CRT$XCU entry follows the banks').
@@ -800,7 +800,13 @@ RwInt32 sub_82F50()
 
     var_40 = 0;
     RwaObjDefGetDefaultCreationParams(sub_23DCA0(0, unk_3EDF5C, 0), &l3C);
+#ifdef CODFH_WIN32
+    // (the port: room for a test level's extra sound banks, port_sound_banks: 16 MB of wave
+    // memory, within the wave allocator's bitmap, unk_516CC0's 33 MB of 144-byte units)
+    l3C.unk_14 = SOUND_WAVE_MEMORY;
+#else
     l3C.unk_14 = 0x2EE000; // not an address: a buffer size (3 MB)
+#endif
     loc44 = (void *)sub_19CDE0("d:\\data\\dsstdfx.bin");
     if (!loc44)
     {
@@ -930,13 +936,17 @@ RwInt32 sub_83280()
     dword_44D4C8 = 0;
     dword_44D4DC = 0;
     dword_44D49C = 0;
+#ifdef CODFH_WIN32
+    dword_44D48C = SOUND_WAVE_MEMORY; // (the port's, as sub_82F50's)
+#else
     dword_44D48C = 0x2EE000; // not an address: a size (3 MB)
+#endif
     dword_44E768 = 0;
     for (var_4 = 0; var_4 < 0x14; var_4++)
     {
         sub_84230(&dword_4AF038[var_4]);
     }
-    for (var_4 = 0; var_4 < 6; var_4++)
+    for (var_4 = 0; var_4 < SOUND_BANK_SLOTS; var_4++)
     {
         dword_4B1A20[var_4].unk_18.unk_00.unk_00 = -1;
         dword_4B1A20[var_4].unk_18.unk_00.unk_04 = -1;
@@ -1021,7 +1031,7 @@ void sub_835E0()
         dword_4B1CA0[lv_10].sub_83760();
     }
     sub_83B40();
-    for (var_14 = 0; var_14 < 6; var_14++)
+    for (var_14 = 0; var_14 < SOUND_BANK_SLOTS; var_14++)
     {
         sub_83DE0(var_14);
     }
@@ -1414,7 +1424,7 @@ RwInt32 sub_840D0(type_199010 *arg_0)
 
     for (var_4 = 0; var_4 < 2; var_4++)
     {
-        for (local_8 = 0; local_8 < 6; local_8++)
+        for (local_8 = 0; local_8 < SOUND_BANK_SLOTS; local_8++)
         {
             if (dword_4B1A20[local_8].unk_10 && sub_84090(&arg_0->unk_2C[var_4].unk_00, &dword_4B1A20[local_8].unk_18.unk_00))
             {

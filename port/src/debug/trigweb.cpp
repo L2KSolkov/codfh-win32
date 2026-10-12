@@ -1017,6 +1017,10 @@ static void LiveAnnounceEntity(LiveClient *pOnly, RwInt32 nSlot, const LiveEntit
     LiveEventWorld(pOnly, szEvent);
 }
 
+// (port_level_dir: -leveldir's folder, a test level played as the -map level: "dir", so a viewer
+// can show that folder's scripts instead of the -map level's)
+extern "C" const char *port_level_dir;
+
 static void LiveHello(LiveClient *pOnly, RwInt32 nLevel, const RwChar *pszType)
 {
     RwChar szEvent[200];
@@ -1027,8 +1031,9 @@ static void LiveHello(LiveClient *pOnly, RwInt32 nLevel, const RwChar *pszType)
 #else
     const RwChar *pszBuild = "mp";
 #endif
-    _snprintf(szEvent, sizeof(szEvent), "{\"t\":\"%s\",\"version\":1,\"build\":\"%s\",\"level\":%d,\"name\":\"%s\"}",
-              pszType, pszBuild, nLevel, pszName ? pszName : "");
+    _snprintf(szEvent, sizeof(szEvent),
+              "{\"t\":\"%s\",\"version\":1,\"build\":\"%s\",\"level\":%d,\"name\":\"%s\",\"dir\":\"%s\"}",
+              pszType, pszBuild, nLevel, pszName ? pszName : "", port_level_dir ? port_level_dir : "");
     szEvent[sizeof(szEvent) - 1] = 0;
     LiveEvent(pOnly, szEvent);
 }

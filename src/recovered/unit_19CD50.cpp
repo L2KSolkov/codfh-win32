@@ -12,6 +12,10 @@
 #include "game/savestate.h"
 #include "game/functions.h"
 #include "game/clones.h"
+#ifdef CODFH_WIN32
+#include <intrin.h>
+extern "C" void plog(const RwChar *fmt, ...);
+#endif
 #include "rw/rwxbox.h"
 #ifdef CODFH_SP
 #include <xfont.h>
@@ -97,6 +101,12 @@ void sp_sub_12C410(void *arg_0)
     lang = sub_19B0A0();
     if (arg_0)
         return;
+#ifdef CODFH_WIN32
+    // (the port logs which check failed: the caller's address, for the map file)
+    plog("disc error: a disc check failed (called from %p, the map's %08X)%s", _ReturnAddress(),
+         (RwUInt32)((RwChar *)_ReturnAddress() - (RwChar *)GetModuleHandleA(NULL)) + 0x400000, // not an address: the image base
+         dword_428E14 ? "; showing the disc-error screen" : "; noted");
+#endif
     if (dword_428E14)
     {
         sp_dword_3EB790++;

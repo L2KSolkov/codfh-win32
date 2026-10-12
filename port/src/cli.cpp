@@ -29,9 +29,21 @@
  * restarts it. The scripts then see its register and GetNumberOfRestarts() == 1, and the restart
  * loads its sections, clump bank and animation groups. -cpvalue <v> gives the register where the
  * script computes it (the player's health on L_1_2); else the one the level set already, or 100.
+ *
+ * -leveldir <folder> loads the -map level's files from LEVELS\<folder> instead of its own
+ * (sub_D7F40, the level-file path): a test level (tools/testmap/make_flat.py) under the data
+ * root's LEVELS, played as the -map level is (its number, loading picture and save).
+ *
+ * -patrol walks a soldier (the level's first soldier trigger's) back and forth between two points
+ * in front of the player (port/src/debug/trigtools.cpp). -pickups makes every pickup, soldier, vehicle
+ * and gimp trigger spawn its child and starts the projectile generators (for a level with no scripts
+ * of its own to; make_flat.py's levels start themselves). -give <weapon> gives the weapon
+ * (its number, 0-38: 11 the Luger) in hand. -shoot has the soldier fire its weapon (a rocket
+ * launcher in the test level) every three seconds at a point 15 m ahead of the player's start.
  */
 #include <xtl.h>
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -52,6 +64,123 @@ extern type_sp_AE5D0 *sp_dword_3B4724;
 #include "port.h"
 
 static char cli_map[64], cli_type[16], cli_name[64], cli_movie[64];
+
+/* -leveldir's folder, or NULL (src/recovered/unit_0D7F20.cpp, sub_D7F40). */
+static char cli_level_dir[64];
+extern "C" const char *port_level_dir;
+extern "C" const char *port_level_dir = NULL;
+
+/* A -leveldir test level's extra animation packs, past the six its CAnimPackSelector loads: the
+ * folder's ANIMPACKS.TXT, a pack's file name a line ("MPA_00Ger.ads"; '#' a comment), read
+ * once; each loaded into a bank of its own after the six (src/recovered/unit_0A02D0.cpp's
+ * CAnimBankInfo and unit_0A0A50.cpp's CAnimPackSelector). Its count; *pppNames their names. */
+#define PORT_ANIM_PACKS 8
+extern "C" int port_anim_packs(const char *const **pppNames)
+{
+    static char s_aszName[PORT_ANIM_PACKS][32];
+    static const char *s_apszName[PORT_ANIM_PACKS];
+    static int s_n = -1;
+
+    if (s_n < 0)
+    {
+        char szPath[260], szLine[128];
+        FILE *pFile;
+
+        s_n = 0;
+        if (port_level_dir)
+        {
+            _snprintf(szPath, sizeof(szPath), "LEVELS\\%s\\ANIMPACKS.TXT", port_level_dir);
+            szPath[sizeof(szPath) - 1] = 0;
+            pFile = fopen(szPath, "r");
+            if (pFile)
+            {
+                while (s_n < PORT_ANIM_PACKS && fgets(szLine, sizeof(szLine), pFile))
+                {
+                    char *p = szLine, *e;
+
+                    while (*p == ' ' || *p == '\t')
+                        p++;
+                    for (e = p + strlen(p); e > p && (unsigned char)e[-1] <= ' '; e--)
+                        ;
+                    *e = 0;
+                    if (!*p || *p == '#')
+                        continue;
+                    strncpy(s_aszName[s_n], p, sizeof(s_aszName[s_n]) - 1);
+                    s_apszName[s_n] = s_aszName[s_n];
+                    plog("animation packs: extra pack %d (bank %d): %s", s_n, 6 + s_n, s_aszName[s_n]);
+                    s_n++;
+                }
+                fclose(pFile);
+            }
+        }
+    }
+    *pppNames = s_apszName;
+    return s_n;
+}
+
+/* A -leveldir test level's extra sound banks, past the five (and the random one) its
+ * CSoundBankSelector loads: the folder's SOUNDBANKS.TXT, a bank a line, its id's two words in hex
+ * and its number ("A6FA4330 750E091F 221": SB_AWD/SB_AGD's XBX_0221; '#' a comment), read once;
+ * each loaded into a slot of its own after the six (include/types/soundbank.h's SOUND_BANK_SLOTS,
+ * src/recovered/unit_0B9110.cpp's sub_B9800). Its count, at most nMax copied out. */
+#define PORT_SOUND_BANKS 8
+extern "C" int port_sound_banks(unsigned *pKeys, int *pBanks, int nMax)
+{
+    static unsigned s_auKey[PORT_SOUND_BANKS][2];
+    static int s_anBank[PORT_SOUND_BANKS];
+    static int s_n = -1;
+    int i;
+
+    if (s_n < 0)
+    {
+        char szPath[260], szLine[128];
+        FILE *pFile;
+
+        s_n = 0;
+        if (port_level_dir)
+        {
+            _snprintf(szPath, sizeof(szPath), "LEVELS\\%s\\SOUNDBANKS.TXT", port_level_dir);
+            szPath[sizeof(szPath) - 1] = 0;
+            pFile = fopen(szPath, "r");
+            if (pFile)
+            {
+                while (s_n < PORT_SOUND_BANKS && fgets(szLine, sizeof(szLine), pFile))
+                {
+                    if (szLine[0] == '#'
+                        || sscanf(szLine, "%x %x %d", &s_auKey[s_n][0], &s_auKey[s_n][1], &s_anBank[s_n]) != 3)
+                        continue;
+                    plog("sound banks: extra bank %d (slot %d): %08X,%08X, XBX_%04d", s_n, 6 + s_n,
+                         s_auKey[s_n][0], s_auKey[s_n][1], s_anBank[s_n]);
+                    s_n++;
+                }
+                fclose(pFile);
+            }
+        }
+    }
+    for (i = 0; i < s_n && i < nMax; i++)
+    {
+        pKeys[i * 2] = s_auKey[i][0];
+        pKeys[i * 2 + 1] = s_auKey[i][1];
+        pBanks[i] = s_anBank[i];
+    }
+    return s_n < nMax ? s_n : nMax;
+}
+
+/* -patrol: a soldier walked between two points in front of the player (port/src/debug/trigtools.cpp). */
+extern "C" int port_patrol;
+extern "C" int port_patrol = 0;
+
+/* -pickups: every pickup trigger made to spawn its pickup (port/src/debug/trigtools.cpp). */
+extern "C" int port_pickups;
+extern "C" int port_pickups = 0;
+
+/* -give <weapon>: the weapon (0-38) given to the player in hand (port/src/debug/trigtools.cpp). */
+extern "C" int port_give;
+extern "C" int port_give = -1;
+
+/* -shoot: that soldier firing at a point in front of the player (port/src/debug/trigtools.cpp). */
+extern "C" int port_shoot;
+extern "C" int port_shoot = 0;
 static int cli_pending;
 #ifdef CODFH_SP
 static int cli_auto_main_menu_phase;
@@ -115,6 +244,19 @@ extern "C" void port_cli_parse(const char *cmd)
             strncpy(cli_name, argv[++i], sizeof(cli_name) - 1);
         else if (!_stricmp(argv[i], "-movie") && i + 1 < argc)
             strncpy(cli_movie, argv[++i], sizeof(cli_movie) - 1);
+        else if (!_stricmp(argv[i], "-leveldir") && i + 1 < argc)
+        {
+            strncpy(cli_level_dir, argv[++i], sizeof(cli_level_dir) - 1);
+            port_level_dir = cli_level_dir;
+        }
+        else if (!_stricmp(argv[i], "-patrol"))
+            port_patrol = 1;
+        else if (!_stricmp(argv[i], "-pickups"))
+            port_pickups = 1;
+        else if (!_stricmp(argv[i], "-shoot"))
+            port_shoot = 1;
+        else if (!_stricmp(argv[i], "-give") && i + 1 < argc)
+            port_give = atoi(argv[++i]);
 #ifdef CODFH_SP
         else if (!_stricmp(argv[i], "-main-menu"))
             cli_auto_main_menu_phase = 1;

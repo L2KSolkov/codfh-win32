@@ -22,6 +22,11 @@
 #include "types/vec4.h"
 #include "types/CAnimPackSelector.h"
 #include "types/type_4B85F8.h"
+#if defined(CODFH_WIN32)
+#include "game/godassetmanager.h"
+#include "types/type_141C10.h"
+extern "C" void plog(const RwChar *fmt, ...);
+#endif
 #include "types/musicplayer.h"
 #include "types/type_3D3548.h"
 #include "types/CShellLevelBehaviorClass.h"
@@ -88,10 +93,24 @@ void sub_D7F20(RwChar *arg_0, const RwChar *arg_4)
 {
     sprintf(arg_0, "%s", arg_4);
 }
+#ifdef CODFH_WIN32
+// (the port's -leveldir: the level's files from another folder, port/src/cli.cpp)
+extern "C" const RwChar *port_level_dir;
+#endif
 // match: ?sub_D7F40@@YAXPADPBD@Z @ 0x000D7F40
 // sp-match: ?sub_D7F40@@YAXPADPBD@Z @ 0x000A3440
 void sub_D7F40(RwChar *arg_0, const RwChar *arg_4)
 {
+#ifdef CODFH_WIN32
+    // (its clump banks still the -map level's own, from the pack: a level folder built from
+    // that level, tools/testmap/make_flat.py, keeps its god data and so its banks; a bank read
+    // off the disk instead failed in type_3DF9C4::sub_190B20)
+    if (port_level_dir && _strnicmp(arg_4, "Clumps\\", 7) != 0)
+    {
+        sprintf(arg_0, "LEVELS\\%s\\%s", port_level_dir, arg_4);
+        return;
+    }
+#endif
     sprintf(arg_0, "LEVELS\\%s\\%s", sub_19B060(sub_19B050()), arg_4);
 }
 // match: ?sub_D7F70@@YAXH@Z @ 0x000D7F70
@@ -204,6 +223,58 @@ void sub_D8230(RwInt32 arg_0)
         get_4E5D30(l10C)->unk_04 = 0;
     }
 }
+#if defined(CODFH_WIN32)
+// (the port: GODDATA.DFF's god assets read again while requests for them are open. It is read
+// once, and an asset's record is read only when it has been asked for by then (sub_198D30);
+// one asked for later, by an asset read after it (a script's imports, sub_72FC0), is never
+// read, and the level start waits on it for ever (sub_D7570). A level's own objects ask for
+// those early; a level with few objects (tools/testmap/make_flat.py's) does not. Only the
+// asset records (kinds 8 and 9: sub_142BC0) are read again, while a pass answers any.)
+static RwInt32 PortOpenRequests()
+{
+    RwInt32 n = 0;
+    type_4F26D0 *p;
+
+    for (p = (type_4F26D0 *)dword_4F26D0; p; p = p->unk_08)
+        n++;
+    return n;
+}
+
+static void PortGodDataPasses(const RwChar *pszPath)
+{
+    RwInt32 nPass, nBefore;
+
+    for (nPass = 0; nPass < 8 && (nBefore = PortOpenRequests()) != 0; nPass++)
+    {
+        RwChunkHeaderInfo hdr;
+        type_141C10 rec;
+        RwStream *pStream = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, (void *)pszPath);
+
+        if (!pStream)
+            return;
+        while (RwStreamReadChunkHeaderInfo(pStream, &hdr))
+        {
+            if (hdr.type == 0x719 && hdr.length >= sizeof(rec))
+            {
+                RwStreamRead(pStream, &rec, sizeof(rec));
+                if (rec.unk_00 == 8 || rec.unk_00 == 9)
+                {
+                    sub_12F0A0();
+                    sub_142BC0(pStream, &rec);
+                }
+                else
+                    RwStreamSkip(pStream, hdr.length - sizeof(rec));
+            }
+            else
+                RwStreamSkip(pStream, hdr.length);
+        }
+        RwStreamClose(pStream, (void *)pszPath);
+        plog("god data: pass %d: %d requests open before, %d after", nPass + 2, nBefore, PortOpenRequests());
+        if (PortOpenRequests() >= nBefore)
+            return;
+    }
+}
+#endif
 // match: ?sub_D8310@@YAHXZ @ 0x000D8310
 // sp-match: ?sub_D8310@@YAHXZ @ 0x000A3470
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -223,6 +294,9 @@ RwInt32 sub_D8310()
 #endif
         RWS::CStreamHandler::ProcessStream(l4);
         RwStreamClose(l4, var_208);
+#if defined(CODFH_WIN32)
+        PortGodDataPasses(var_208);
+#endif
     }
 #ifndef CODFH_SP
     else

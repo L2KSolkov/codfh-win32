@@ -53,6 +53,7 @@
 #include "rw/baframe.h"
 #include "types/type_44350.h"
 #include "types/scriptvm.h"
+#include "types/PickupTrigger.h"
 #include "types/alfaobject.h"
 #include "types/type_10F710.h"
 #include "game/functions.h"
@@ -86,9 +87,17 @@
 #include "types/type_3DBC78_450.h"
 #include "types/type_1227C0.h"
 #include "types/ProjectileGeneratorTrigger.h"
+#include "types/projectile.h"
 #include "types/type_3D2E7C.h"
+#include "types/type_3DDB98.h"
 #include "game/godassetmanager.h"
 #include "types/type_3DF8D8.h"
+#include "types/type_3DC9B0.h"
+#include "types/type_DC400.h"
+#include "types/VehicleEnterExitTrigger.h"
+#include "types/type_3DBC78.h"
+
+extern "C" volatile unsigned port_frame;
 
 #include "../../third_party/imgui/imgui.h"
 
@@ -105,6 +114,7 @@ extern RwBool g_bTrigDrawNoclip;
 extern RwReal g_fTrigDrawNoclipSpeed;
 extern RwBool g_bTrigDrawSeeThrough;
 extern RwBool g_bTrigDrawLabels;
+extern RwBool g_bTrigDrawLabelSpread;
 extern RwBool g_bTrigDrawNames;
 extern RwReal g_fTrigDrawRange;
 extern RwReal g_fTrigDrawTextScale;
@@ -183,7 +193,10 @@ enum
                         // hand's) | 2 keep it across checkpoint restarts
     REQ_SPAWNSOLDIER,   // a: the soldier trigger's handle (-1 the nearest
                         // that can spawn), f: where
-    REQ_PG              // a: the projectile generator's id, b: what (PG_*)
+    REQ_PG,             // a: the projectile generator's id, b: what (PG_*)
+    REQ_MOUNT,          // a: a MountedWeaponTrigger's handle (-1 off the one the player is on)
+    REQ_VEHICLE,        // a: a VehicleEnterExitTrigger's handle
+    REQ_VEHSEAT         // a: a VehicleTrigger's handle, b: 0 drive, 1 its gun, 2 out, 3 ride
 };
 
 // What a REQ_PG does to its generator, as the scripts' "PG_" commands do.
@@ -945,6 +958,743 @@ static void CheatTick()
 
 // Called each frame on the main thread (sub_D7880): carries out the pending
 // action from a tab, and a weapon give in progress.
+// The mounted weapon (type_3DC9B0, entity bit 19) a MountedWeaponTrigger spawned: the entity
+// whose trigger (unk_34C) it is.
+static type_3DC9B0 *MountedWeaponOf(Trigger *pTrigger)
+{
+    RwInt32 i;
+
+    for (i = 0; i < 768; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+
+        if (pEntity && ((pEntity->unk_2C >> 19) & 1) && (Trigger *)pEntity->get_unk_34C() == pTrigger)
+            return (type_3DC9B0 *)pEntity;
+    }
+    return NULL;
+}
+
+// Whoever is on the mounted weapon pGun (not the player) taken off it: a soldier as
+// "DetachFromMountedWeapon" takes one off (its sub_13F590(0): the gun's own dismount,
+// sub_169000, and its hold on the gun cleared), anything else by clearing the gun's user.
+// What was on it, or NULL.
+static type_3D3548 *BootGunUser(type_3DC9B0 *pGun, type_10F710 *pPlayer)
+{
+    type_3D3548 *pUser = pGun->vf_1F8(0);
+
+    if (pUser == NULL || pUser == (type_3D3548 *)pPlayer)
+        return NULL;
+    if (pUser->vf_008())
+        pUser->vf_008()->sub_13F590(0);
+    if (pGun->vf_1F8(0) != NULL)
+        pGun->vf_1FC(NULL, 0);
+    return pUser;
+}
+
+// On the main thread: the player put on, or taken off, a mounted weapon as the use button
+// does (type_10F710's update: the weapon's sub_168820, posture 7 and the HUD's weapon
+// display; and sub_168A90, posture 0 back), wherever the player stands.
+static void Mount(type_10F710 *pPlayer, RwInt32 n)
+{
+    type_3DC9B0 *pOn = (type_3DC9B0 *)pPlayer->unk_210C.sub_D4910();
+    type_3DC9B0 *pWeapon;
+    Trigger *pTrigger;
+
+    // (off the one it is on first)
+    if (pOn && (pPlayer->unk_19D0 == 7 || pPlayer->unk_1B28))
+    {
+        pOn->sub_168A90(pPlayer);
+        pPlayer->sub_1090F0(0);
+        if (dword_4B9190)
+            dword_4B9190->sub_DEB80(0);
+        pPlayer->unk_210C.sub_D48D0(0);
+        if (n < 0)
+        {
+            strcpy(s_szReqResult, "off the mounted weapon");
+            return;
+        }
+    }
+    else if (n < 0)
+    {
+        strcpy(s_szReqResult, "the player is not on a mounted weapon");
+        return;
+    }
+    pTrigger = n < 2000 ? (Trigger *)dword_4CFE30[n] : NULL;
+    if (pTrigger == NULL || pTrigger->vf_008() != 0x1B)
+    {
+        sprintf(s_szReqResult, "trigger %d is not a mounted weapon trigger", n);
+        return;
+    }
+    pWeapon = MountedWeaponOf(pTrigger);
+    if (pWeapon == NULL)
+    {
+        sprintf(s_szReqResult, "trigger %d has no mounted weapon (not spawned yet)", n);
+        return;
+    }
+    if (!pWeapon->unk_4A8)
+    {
+        sprintf(s_szReqResult, "trigger %d's weapon is not usable now", n);
+        return;
+    }
+    // (whoever is on it taken off)
+    RwBool bBooted = BootGunUser(pWeapon, pPlayer) != NULL;
+
+    pPlayer->unk_210C.sub_D48D0(pWeapon);
+    pWeapon->sub_168820(pPlayer);
+    pPlayer->sub_1090F0(7);
+    if (dword_4B9190)
+        dword_4B9190->sub_DEB80(2);
+    sprintf(s_szReqResult, "on trigger %d's mounted weapon%s", n, bBooted ? " (its gunner taken off)" : "");
+}
+
+// On the main thread: the player given a VehicleEnterExitTrigger's get-in task, as walking
+// into it and pressing use does (sub_BF310: its task, or its get-out task when in a
+// vehicle), the level's own script then playing the transition and seating the player.
+static void EnterVehicle(type_10F710 *pPlayer, RwInt32 n)
+{
+    Trigger *pTrigger = n >= 0 && n < 2000 ? (Trigger *)dword_4CFE30[n] : NULL;
+
+    if (pTrigger == NULL || pTrigger->vf_008() != 0x1A)
+    {
+        sprintf(s_szReqResult, "trigger %d is not a vehicle enter/exit trigger", n);
+        return;
+    }
+    ((VehicleEnterExitTrigger *)pTrigger)->sub_BF310(pPlayer);
+    sprintf(s_szReqResult, "trigger %d's vehicle task given to the player", n);
+}
+
+// The vehicle (type_3DBC78, an entity whose vf_010 is itself) a VehicleTrigger or
+// GimpVehicleTrigger spawned: the entity whose trigger (unk_34C) it is (*ppEntity).
+static type_3DBC78 *VehicleOf(Trigger *pTrigger, type_3D3548 **ppEntity = NULL)
+{
+    RwInt32 i;
+
+    for (i = 0; i < 768; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+
+        if (pEntity && (Trigger *)pEntity->get_unk_34C() == pTrigger && pEntity->vf_010())
+        {
+            if (ppEntity)
+                *ppEntity = pEntity;
+            return pEntity->vf_010();
+        }
+    }
+    return NULL;
+}
+
+// Whether the player sits in its vehicle as the driver (vf_268) or a passenger (vf_2C8):
+// the two get out differently (vf_270, vf_2CC).
+static RwBool s_bDriving;
+
+// A drive waiting for the tank's own weapon to stream in (TrigWebTick): the trigger, the
+// weapon, and when it was asked for.
+static RwInt32 s_nDriveTrigger = -1, s_nDriveWeapon;
+static unsigned s_uDriveSince;
+
+// The player off a vehicle's gun and out of its seat, as the scripts' detaches do
+// ("VehicleAttachEntityToMountedWeapon" and "VehicleAttachPlayerPassenger" with no entity:
+// vf_274, vf_2CC); whether it was on or in it.
+static RwBool LeaveVehicle(type_10F710 *pPlayer, type_3DBC78 *pVehicle)
+{
+    type_3DC9B0 *pGun = pVehicle->vf_2C4();
+    RwBool bWas = FALSE;
+
+    // (vf_274 takes its gun's user without a check: only when it is the player)
+    if (pGun && pGun->vf_1F8(0) == pPlayer)
+    {
+        pVehicle->vf_274();
+        bWas = TRUE;
+    }
+    if (pVehicle->unk_118C.sub_D4910() == pPlayer)
+    {
+        if (s_bDriving)
+            pVehicle->vf_270();
+        else
+            pVehicle->vf_2CC();
+        s_bDriving = FALSE;
+        bWas = TRUE;
+    }
+    return bWas;
+}
+
+// On the main thread: the player made a vehicle's driver as the tank script's
+// "ConnectEntityToSelf" does ("VehicleAttachEntity": vf_268, at its trigger's seat), with its
+// AI off as that script's state does first ("SetManeuverState" 2, "SetAIMode" 0,
+// "SetAIControl" 0); a passenger as "ConnectPlayerAsJeepPassenger" does
+// ("VehicleAttachPlayerPassenger" with its "DRIV" tag, 125 up: vf_2C8); put on its gun
+// ("VehicleAttachEntityToMountedWeapon": vf_26C); or taken out of it.
+static void VehicleSeat(type_10F710 *pPlayer, RwInt32 n, RwInt32 nWhat)
+{
+    Trigger *pTrigger = n >= 0 && n < 2000 ? (Trigger *)dword_4CFE30[n] : NULL;
+    type_3DBC78 *pVehicle, *pIn;
+    type_3D3548 *pInEntity;
+
+    if (pTrigger == NULL || (pTrigger->vf_008() != 7 && pTrigger->vf_008() != 0x23))
+    {
+        sprintf(s_szReqResult, "trigger %d is not a vehicle trigger", n);
+        return;
+    }
+    type_3D3548 *pVehicleEntity = NULL;
+
+    pVehicle = VehicleOf(pTrigger, &pVehicleEntity);
+    if (pVehicle == NULL)
+    {
+        sprintf(s_szReqResult, "trigger %d has no vehicle (not spawned yet)", n);
+        return;
+    }
+    if (nWhat == 2)
+    {
+        strcpy(s_szReqResult, LeaveVehicle(pPlayer, pVehicle) ? "out of the vehicle" : "the player is not in that vehicle");
+        return;
+    }
+    // (out of another one it is in first; in this one it stays seated for its gun)
+    pInEntity = pPlayer->unk_2180.sub_D4910();
+    pIn = pInEntity ? pInEntity->vf_010() : NULL;
+    if (pIn && (pIn != pVehicle || nWhat != 1))
+    {
+        LeaveVehicle(pPlayer, pIn);
+        pIn = NULL;
+    }
+    if (nWhat == 0)
+    {
+        AIData *pAi = pVehicleEntity->vf_120();
+
+        // (its driver's seat is its VehicleTrigger's; a GimpVehicleTrigger keeps none)
+        if (pTrigger->vf_008() != 7)
+        {
+            sprintf(s_szReqResult, "trigger %d's vehicle has no driver's seat (a gimp vehicle): ride it", n);
+            return;
+        }
+        // (a tank's driver takes its cannon, the player's weapon 0x23 for a trigger whose gun
+        // kind is 1, else 0x1D: type_10F710::sub_10F900; its model must be there, or taking it
+        // up clones nothing, so it is streamed first, as "RequestToStreamPlayerWeapon" does,
+        // and the drive waits for it)
+        if (pVehicle->get_unk_1188() == 1)
+        {
+            RwInt32 nWeapon = ((VehicleTrigger *)pTrigger)->unk_114 == 1 ? 0x23 : 0x1D;
+            type_10F710_1A48 *pGun = pPlayer->unk_1A48[nWeapon];
+
+            if (pGun == NULL)
+            {
+                sprintf(s_szReqResult, "the player has no weapon %d (the tank's cannon) in this level", nWeapon);
+                return;
+            }
+            if (!pPlayer->sub_10E8C0(nWeapon))
+            {
+                pPlayer->sub_10DA70(nWeapon);
+                pPlayer->unk_2138 = 0;
+                s_nDriveTrigger = n;
+                s_nDriveWeapon = nWeapon;
+                s_uDriveSince = port_frame;
+                sprintf(s_szReqResult, "streaming the tank's cannon (weapon %d); driving when it is in", nWeapon);
+                return;
+            }
+            if (pGun->unk_420.get_unk_08() == NULL)
+                pGun->vf_008(pPlayer, NULL, nWeapon);
+            if (pGun->unk_420.get_unk_08() == NULL)
+            {
+                sprintf(s_szReqResult, "the tank's cannon (weapon %d) has no model yet; not driving", nWeapon);
+                return;
+            }
+        }
+        if (pAi)
+        {
+            pAi->unk_58 = 2;
+            pAi->sub_17BF0(0);
+            pAi->unk_51C = 0;
+        }
+        pVehicle->vf_268(pPlayer);
+        s_bDriving = TRUE;
+        sprintf(s_szReqResult, "driving trigger %d's vehicle%s", n, pAi ? " (its AI off)" : "");
+        return;
+    }
+    if (nWhat == 3)
+    {
+        pVehicle->vf_2C8(pPlayer, 0x44524956, 0, 125, 0);   // ("DRIV")
+        s_bDriving = FALSE;
+        sprintf(s_szReqResult, "riding in trigger %d's vehicle", n);
+        return;
+    }
+    if (pVehicle->vf_2C4() == NULL)
+    {
+        sprintf(s_szReqResult, "trigger %d's vehicle has no gun", n);
+        return;
+    }
+    // (whoever is on it taken off)
+    RwBool bBooted = BootGunUser(pVehicle->vf_2C4(), pPlayer) != NULL;
+    if (pPlayer->unk_210C.sub_D4910() && (pPlayer->unk_19D0 == 7 || pPlayer->unk_1B28))
+        Mount(pPlayer, -1);
+    // (the gun moves with the vehicle: the player rides in it, as a passenger, unless
+    // already in it, then takes the gun)
+    if (pIn != pVehicle)
+    {
+        pVehicle->vf_2C8(pPlayer, 0x44524956, 0, 125, 0);   // ("DRIV")
+        s_bDriving = FALSE;
+    }
+    pVehicle->vf_26C(pPlayer);
+    sprintf(s_szReqResult, "on trigger %d's vehicle's gun%s", n, bBooted ? " (its gunner taken off)" : "");
+}
+
+// -patrol (port/src/cli.cpp): a soldier walked back and forth between two points in front of
+// the player, for test levels (tools/testmap/make_flat.py keeps one soldier trigger). Two
+// seconds into the level the first soldier trigger's soldier is spawned at the left point (5 m
+// ahead, 4 m to the side); then it is sent to the other point as a task command:
+// "SetTaskCommand_GoToPoint" (x, y, z, 0) to its script object, as the command
+// "SetTaskCommand_GoToAttachPoint" (sub_58F10) sends it. Its own class (SoldierClass, state 1)
+// takes it: SetupGotoPoint and its walking state (state 2's case 4, then 90). When within
+// 1.5 m of the point it is sent to the other; the command is sent again every five seconds
+// until it starts walking (its class takes it only once it is up).
+extern "C" int port_patrol;
+extern "C" void plog(const RwChar *fmt, ...);
+static RwInt32 s_nPatrolState;      // 0 waiting, 1 walking, 2 given up
+static unsigned s_uPatrolSince;
+static type_3D3548 *s_pPatrol;
+static RwV3d s_avPatrol[2];
+static RwInt32 s_nPatrolTarget;
+static unsigned s_uPatrolSent;
+
+// -shoot (port/src/cli.cpp): the same soldier (spawned as -patrol spawns it, standing there
+// without -patrol) fires its weapon every three seconds at a point on the floor 15 m ahead of
+// the player's start, through the weapon's own fire-at-a-point (type_15CCE0::sub_15DE60: its
+// shot, a rocket for a rocket launcher, from its muzzle), its clip made endless (unk_20, as
+// "InfiniteAmmoClip"); without -patrol it is turned to face the point first
+// ("SetTaskCommand_TurnToPoint", which its class takes as it takes the goto).
+extern "C" int port_shoot;
+static RwV3d s_vShoot;
+static unsigned s_uShotAt;
+static RwInt32 s_nShots;
+
+static void ShootTurn()
+{
+    RwReal af[4];
+    type_3D2E7C *pScript = s_pPatrol->vf_098();
+
+    af[0] = s_vShoot.x;
+    af[1] = s_vShoot.y;
+    af[2] = s_vShoot.z;
+    af[3] = 0.0f;
+    if (pScript)
+        sub_6B5F0("SetTaskCommand_TurnToPoint", (type_67620 *)pScript, 0, 0, (RwInt32 *)af, 4, true, false);
+}
+
+static void ShootTick()
+{
+    type_3DAFC8 *pSoldier = s_pPatrol->vf_008();
+
+    if (pSoldier == NULL || port_frame - s_uShotAt < 180)
+        return;
+    s_uShotAt = port_frame;
+    if (!port_patrol)
+        ShootTurn();
+    pSoldier->unk_3E0.unk_20 = 1;
+    pSoldier->unk_3E0.sub_15DE60(&s_vShoot);
+    if (s_nShots++ < 3)
+        plog("shoot: shot %d at (%.0f, %.0f, %.0f), weapon slot %d", s_nShots, s_vShoot.x, s_vShoot.y, s_vShoot.z,
+             pSoldier->unk_3E0.unk_04);
+}
+
+static void PatrolGo()
+{
+    RwReal af[4];
+    type_3D2E7C *pScript = s_pPatrol->vf_098();
+
+    af[0] = s_avPatrol[s_nPatrolTarget].x;
+    af[1] = s_avPatrol[s_nPatrolTarget].y;
+    af[2] = s_avPatrol[s_nPatrolTarget].z;
+    af[3] = 0.0f;
+    if (pScript)
+        sub_6B5F0("SetTaskCommand_GoToPoint", (type_67620 *)pScript, 0, 0, (RwInt32 *)af, 4, true, false);
+    s_uPatrolSent = port_frame;
+}
+
+static void PatrolTick(type_10F710 *pPlayer)
+{
+    RwInt32 i;
+
+    if ((!port_patrol && !port_shoot) || s_nPatrolState == 2)
+        return;
+    if (pPlayer == NULL)
+    {
+        s_uPatrolSince = port_frame;
+        return;
+    }
+    if (s_nPatrolState == 0)
+    {
+        RwV3d v, vFwd = { 0.0f, 0.0f, 1.0f }, vRight;
+        Trigger *pTrigger = NULL;
+
+        if (port_frame - s_uPatrolSince < 120 || !PlayerPosition(pPlayer, &v))
+            return;
+        if (dword_4E5C74)
+        {
+            RwMatrix *pLtm = RwFrameGetLTM(RwCameraGetFrame((RwCamera *)dword_4E5C74));
+            RwReal fLen = (RwReal)sqrt(pLtm->at.x * pLtm->at.x + pLtm->at.z * pLtm->at.z);
+
+            if (fLen > 0.01f)
+            {
+                vFwd.x = pLtm->at.x / fLen;
+                vFwd.z = pLtm->at.z / fLen;
+            }
+        }
+        vRight.x = vFwd.z;
+        vRight.y = 0.0f;
+        vRight.z = -vFwd.x;
+        for (i = 0; i < 2; i++)
+        {
+            RwReal fSide = i ? 400.0f : -400.0f;
+
+            s_avPatrol[i].x = v.x + vFwd.x * 500.0f + vRight.x * fSide;
+            s_avPatrol[i].y = v.y;
+            s_avPatrol[i].z = v.z + vFwd.z * 500.0f + vRight.z * fSide;
+            if (!GroundBelow(&s_avPatrol[i]))
+            {
+                plog("patrol: no floor under point %d (%.0f, %.0f, %.0f); no patrol", i, s_avPatrol[i].x,
+                     s_avPatrol[i].y, s_avPatrol[i].z);
+                s_nPatrolState = 2;
+                return;
+            }
+        }
+        s_vShoot.x = v.x + vFwd.x * 1500.0f;
+        s_vShoot.y = v.y;
+        s_vShoot.z = v.z + vFwd.z * 1500.0f;
+        if (!GroundBelow(&s_vShoot))
+            s_vShoot.y = s_avPatrol[0].y;
+        for (i = 0; i < 2000 && pTrigger == NULL; i++)
+            if (dword_4CFE30[i] && ((Trigger *)dword_4CFE30[i])->vf_008() == 5)
+                pTrigger = (Trigger *)dword_4CFE30[i];
+        if (pTrigger == NULL)
+        {
+            plog("patrol: the level has no soldier trigger; no patrol");
+            s_nPatrolState = 2;
+            return;
+        }
+        s_pPatrol = SpawnSoldierAt(pTrigger, &s_avPatrol[0]);
+        if (s_pPatrol == NULL || s_pPatrol->vf_120() == NULL)
+        {
+            plog("patrol: soldier trigger %d spawned no soldier with an AI (%s)", pTrigger->unk_3C, s_szReqResult);
+            s_nPatrolState = 2;
+            return;
+        }
+        s_nPatrolTarget = 1;
+        if (port_patrol)
+            PatrolGo();
+        else
+            ShootTurn();
+        s_uShotAt = port_frame;
+        plog("patrol: soldier from trigger %d walking between (%.0f, %.0f, %.0f) and (%.0f, %.0f, %.0f)",
+             pTrigger->unk_3C, s_avPatrol[0].x, s_avPatrol[0].y, s_avPatrol[0].z, s_avPatrol[1].x,
+             s_avPatrol[1].y, s_avPatrol[1].z);
+        s_nPatrolState = 1;
+        return;
+    }
+    // (still the same entity in the entity table, else it died or was removed)
+    for (i = 0; i < 768; i++)
+        if (dword_4B6A00[i].unk_04 == s_pPatrol)
+            break;
+    if (i == 768)
+    {
+        plog("patrol: the soldier is gone; patrol over");
+        s_nPatrolState = 2;
+        return;
+    }
+    {
+        AIData *pAi = s_pPatrol->vf_120();
+        RwV3d *pv = s_pPatrol->sub_CD550();
+        RwReal dx, dz;
+
+        if (pAi == NULL || pv == NULL)
+            return;
+        dx = s_avPatrol[s_nPatrolTarget].x - pv->x;
+        dz = s_avPatrol[s_nPatrolTarget].z - pv->z;
+        if (port_shoot)
+            ShootTick();
+        if (!port_patrol)
+            return;
+        if (port_frame % 120 == 0)
+            plog("patrol: soldier at (%.0f, %.0f, %.0f), state %d, heading to point %d, %.0f away", pv->x, pv->y,
+                 pv->z, pAi->unk_578, s_nPatrolTarget, (RwReal)sqrt(dx * dx + dz * dz));
+        if (dx * dx + dz * dz < 150.0f * 150.0f)
+        {
+            s_nPatrolTarget ^= 1;
+            PatrolGo();
+        }
+        else if (port_frame - s_uPatrolSent > 300)
+            PatrolGo();
+    }
+}
+
+// -pickups (port/src/cli.cpp): every pickup trigger told to make its pickup, two seconds into
+// the level: "CreateChild" to its script (BasicCreationTrigger, which waits for it in its state
+// 1 and spawns the pickup), as the levels' own scripts send it; for test levels
+// (tools/testmap/make_flat.py's line of every pickup), which have no level script to.
+extern "C" int port_pickups;
+static RwInt32 s_nPickupsState;
+static unsigned s_uPickupsSince;
+
+static void PickupsTick(type_10F710 *pPlayer)
+{
+    RwInt32 i, n = 0, nLast = dword_429D00 < 2000 ? dword_429D00 : 1999;
+    RwInt32 nZero = 0;
+
+    if (!port_pickups || s_nPickupsState)
+        return;
+    if (pPlayer == NULL)
+    {
+        s_uPickupsSince = port_frame;
+        return;
+    }
+    if (port_frame - s_uPickupsSince < 120)
+        return;
+    for (i = 0; i <= nLast; i++)
+    {
+        Trigger *pTrigger = (Trigger *)dword_4CFE30[i];
+
+        // (pickup triggers, kind 0x18, soldier triggers, 5: a test level's soldier with its
+        // creation script kept, make_flat.py's scripted patrol, vehicle triggers, 7: its vehicles,
+        // VehicleTrigger and FlakTrigger, its background vehicles, GimpVehicleTrigger, 0x23, and its
+        // gimps, GimpTrigger, 0x1F)
+        if (pTrigger && (pTrigger->vf_008() == 0x18 || pTrigger->vf_008() == 5 || pTrigger->vf_008() == 7
+                         || pTrigger->vf_008() == 0x23 || pTrigger->vf_008() == 0x1F)
+            && pTrigger->sub_BDF50())
+        {
+            sub_6B5F0("CreateChild", (type_67620 *)pTrigger->sub_BDF50(), 0, 0, &nZero, 1, true, false);
+            n++;
+        }
+        // (projectile generators, kind 0x13: their class script, ProjectileGeneratorCreation,
+        // makes and starts the generator on "StartProjectileGenerator", as a level's tasks send it)
+        if (pTrigger && pTrigger->vf_008() == 0x13 && pTrigger->sub_BDF50())
+        {
+            sub_6B5F0("StartProjectileGenerator", (type_67620 *)pTrigger->sub_BDF50(), 0, 0, &nZero, 1, true, false);
+            n++;
+        }
+    }
+    plog("pickups: CreateChild sent to %d pickup, soldier and vehicle triggers (and generators started)", n);
+    for (i = 0; i <= nLast; i++)
+    {
+        Trigger *pTrigger = (Trigger *)dword_4CFE30[i];
+
+        if (pTrigger && pTrigger->vf_008() == 5)
+            plog("pickups: soldier trigger %d places at (%.0f, %.0f, %.0f)", i, pTrigger->unk_90, pTrigger->unk_94,
+                 pTrigger->unk_98);
+    }
+    s_nPickupsState = 1;
+}
+
+// -give <weapon> (port/src/cli.cpp): the weapon (its number, 0-38) given to the player, in
+// hand, two seconds into the level, as the debug tools' give does (StartGive).
+extern "C" int port_give;
+static unsigned s_uGiveSince;
+
+static void CliGiveTick(type_10F710 *pPlayer)
+{
+    if (port_give < 0)
+        return;
+    if (pPlayer == NULL)
+    {
+        s_uGiveSince = port_frame;
+        return;
+    }
+    if (port_frame - s_uGiveSince < 120)
+        return;
+    StartGive(pPlayer, port_give, 0, TRUE);
+    plog("give: weapon %d: %s", port_give, s_szReqResult);
+    port_give = -1;
+}
+
+// (a test level's watches run from the local player's arrival: the frame it was first there)
+extern "C" const char *port_level_dir;
+static unsigned s_uPlayerSince;
+
+// (which pickup triggers made a pickup: 300 frames after -pickups' spawn, each pickup trigger
+// (kind 0x18) whose id (PickupTrigger command 0, unk_C0) no entity's trigger (unk_34C) is, logged)
+static void PickupsCheck()
+{
+    static RwBool s_bChecked;
+    RwUInt8 abMade[2000];
+    RwChar szMissing[1024];
+    RwInt32 i, n = 0, nMade = 0, nLast = dword_429D00 < 2000 ? dword_429D00 : 1999;
+
+    if (s_bChecked || !port_level_dir || !s_uPlayerSince || port_frame - s_uPlayerSince < 600)
+        return;
+    s_bChecked = TRUE;
+    memset(abMade, 0, sizeof(abMade));
+    for (i = 0; i < 768; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+        Trigger *pTrigger = pEntity ? (Trigger *)pEntity->get_unk_34C() : NULL;
+        RwInt32 j;
+
+        if (pTrigger == NULL || pTrigger->vf_008() != 0x18)
+            continue;
+        for (j = 0; j <= nLast; j++)
+            if ((Trigger *)dword_4CFE30[j] == pTrigger)
+                abMade[j] = 1;
+    }
+    szMissing[0] = 0;
+    for (i = 0; i <= nLast; i++)
+    {
+        Trigger *pTrigger = (Trigger *)dword_4CFE30[i];
+
+        if (pTrigger == NULL || pTrigger->vf_008() != 0x18)
+            continue;
+        if (abMade[i])
+            nMade++;
+        else if (n++ < 120)
+        {
+            size_t k = strlen(szMissing);
+
+            _snprintf(szMissing + k, sizeof(szMissing) - k - 1, " %d", ((PickupTrigger *)pTrigger)->unk_C0);
+        }
+    }
+    szMissing[sizeof(szMissing) - 1] = 0;
+    plog("pickups: %d made a pickup, %d did not; ids without one:%s", nMade, n, szMissing);
+}
+
+// A test level's projectile generators (tools/testmap/make_flat.py: its artillery and machine
+// gun): three seconds after -pickups' start, each generator (kind 0x13, its generator made by
+// then) that a line of the level folder's TESTMAP.TXT, "aim gx gy gz  x y z spread", places
+// (within 1 m of gx, gy, gz: its trigger's point) aimed at x, y, z with the spread, as
+// "PG_TargetPoint" does (type_1227C0::sub_1218A0).
+extern "C" const char *port_level_dir;
+static void ArtilleryTick()
+{
+    static RwBool s_bAimed;
+    RwChar szPath[260], szLine[200];
+    RwInt32 n = 0, nLines = 0, nLast = dword_429D00 < 2000 ? dword_429D00 : 1999;
+    FILE *pFile;
+
+    if (s_bAimed || !port_level_dir || s_nPickupsState != 1 || port_frame - s_uPickupsSince < 300)
+        return;
+    s_bAimed = TRUE;
+    _snprintf(szPath, sizeof(szPath), "LEVELS\\%s\\TESTMAP.TXT", port_level_dir);
+    szPath[sizeof(szPath) - 1] = 0;
+    pFile = fopen(szPath, "r");
+    if (pFile == NULL)
+        return;
+    while (fgets(szLine, sizeof(szLine), pFile))
+    {
+        RwV3d vAt, vTo;
+        RwReal fSpread;
+        RwInt32 i;
+
+        if (sscanf(szLine, "aim %f %f %f %f %f %f %f", &vAt.x, &vAt.y, &vAt.z, &vTo.x, &vTo.y, &vTo.z, &fSpread) != 7)
+            continue;
+        nLines++;
+        for (i = 0; i <= nLast; i++)
+        {
+            Trigger *pTrigger = (Trigger *)dword_4CFE30[i];
+            ProjectileGeneratorTrigger *pPg;
+            RwReal dx, dy, dz;
+
+            if (pTrigger == NULL || pTrigger->vf_008() != 0x13)
+                continue;
+            dx = pTrigger->unk_90 - vAt.x;
+            dy = pTrigger->unk_94 - vAt.y;
+            dz = pTrigger->unk_98 - vAt.z;
+            if (dx * dx + dy * dy + dz * dz > 100.0f * 100.0f)
+                continue;
+            pPg = (ProjectileGeneratorTrigger *)pTrigger;
+            if (pPg->unk_224)
+            {
+                pPg->unk_224->sub_1218A0(&vTo, fSpread);
+                n++;
+                plog("projectile generator at (%.0f, %.0f, %.0f): run state %d", pTrigger->unk_90, pTrigger->unk_94,
+                     pTrigger->unk_98, pPg->unk_224->unk_14);
+            }
+            else
+                plog("projectile generator at (%.0f, %.0f, %.0f): no generator", pTrigger->unk_90, pTrigger->unk_94,
+                     pTrigger->unk_98);
+        }
+    }
+    fclose(pFile);
+    plog("projectile generators: %d of %d aimed (TESTMAP.TXT)", n, nLines);
+}
+
+void TrigDrawStatesOf(RwUInt32 dwHandle, RwChar *psz, RwInt32 nMax);
+// (the soldiers the soldier triggers made, the gimps and the background vehicles: logged every 1200 frames for 60000
+// frames after -pickups' spawn)
+static void SoldierWatch()
+{
+    static unsigned s_uWatched;
+    RwInt32 i;
+
+    if (!port_level_dir || !s_uPlayerSince || port_frame - s_uPlayerSince > 60000 || port_frame - s_uWatched < 1200)
+        return;
+    s_uWatched = port_frame;
+    {
+        RwV3d vPlayer;
+        type_10F710 *pPlayer = (type_10F710 *)sub_1745A0(0);
+
+        if (pPlayer && PlayerPosition(pPlayer, &vPlayer))
+            plog("player: at (%.0f, %.0f, %.0f)", vPlayer.x, vPlayer.y, vPlayer.z);
+    }
+    for (i = 0; i < 768; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+        Trigger *pTrigger = pEntity ? (Trigger *)pEntity->get_unk_34C() : NULL;
+
+        if (pTrigger && pTrigger->vf_008() == 0x1F && pEntity->sub_CD550())
+            plog("gimp: entity %d at (%.0f, %.0f, %.0f), hit points %d", i, pEntity->sub_CD550()->x,
+                 pEntity->sub_CD550()->y, pEntity->sub_CD550()->z, ((type_3DDB98 *)pEntity)->unk_740);
+        if (pTrigger && pTrigger->vf_008() == 0x23 && pEntity->sub_CD550())
+            plog("background vehicle: entity %d at (%.0f, %.0f, %.0f)", i, pEntity->sub_CD550()->x,
+                 pEntity->sub_CD550()->y, pEntity->sub_CD550()->z);
+        if (pTrigger && pTrigger->vf_008() == 5 && pEntity->sub_CD550())
+        {
+            // the states of the state machines it owns (its class script, its animation script)
+            type_3D2E7C *pObject = pEntity->vf_098();
+            RwChar szStates[64];
+
+            strcpy(szStates, "-");
+            if (pObject)
+                TrigDrawStatesOf(pObject->get_unk_04(), szStates, sizeof(szStates));
+            plog("soldier: entity %d at (%.0f, %.0f, %.0f), AI state %d, script states %s", i,
+                 pEntity->sub_CD550()->x, pEntity->sub_CD550()->y, pEntity->sub_CD550()->z,
+                 pEntity->vf_120() ? pEntity->vf_120()->unk_578 : -1, szStates);
+        }
+    }
+    // the projectile pools (dword_4E19F8, sub_15F2C0 spawns from its settings' kind's: 2 the
+    // grenades', 0x40): each one's taken, size and most taken at once
+    {
+        RwChar szPools[256];
+        RwInt32 k, n = 0;
+
+        for (k = 0; k < 9; k++)
+        {
+            type_16C2A0 *pPool = &dword_4E19F8[k].unk_04;
+
+            n += _snprintf(szPools + n, sizeof(szPools) - n, " %d:%d/%d(%d)", k, pPool->unk_0C - pPool->unk_18,
+                           pPool->unk_0C, pPool->unk_14);
+        }
+        plog("projectile pools (kind:taken/size(most)):%s", szPools);
+    }
+    // the projectile generators (kind 0x13): their generator (made by their class script on
+    // "StartProjectileGenerator"), firing (unk_14), target mode (unk_38: 0 the nearest entity, 1
+    // an entity, 2 a point, 3 a path), the point and whether the entity targeted is the player
+    for (i = 0; i < 2000 && i <= dword_429D00; i++)
+    {
+        Trigger *pTrigger = (Trigger *)dword_4CFE30[i];
+        type_1227C0 *pGen;
+        type_3D3548 *pTarget;
+
+        if (pTrigger == NULL || pTrigger->vf_008() != 0x13)
+            continue;
+        pGen = ((ProjectileGeneratorTrigger *)pTrigger)->unk_224;
+        if (pGen == NULL)
+        {
+            plog("generator: trigger %d at (%.0f, %.0f, %.0f): none made", i, pTrigger->unk_90, pTrigger->unk_94,
+                 pTrigger->unk_98);
+            continue;
+        }
+        pTarget = pGen->unk_24.sub_D4910();
+        plog("generator: trigger %d at (%.0f, %.0f, %.0f): firing %d, mode %d, point (%.0f, %.0f, %.0f), target %s",
+             i, pTrigger->unk_90, pTrigger->unk_94, pTrigger->unk_98, pGen->unk_14, pGen->unk_38, pGen->unk_54.x,
+             pGen->unk_54.y, pGen->unk_54.z,
+             pTarget == NULL ? "none" : pTarget == (type_3D3548 *)sub_1745A0(0) ? "the player" : "an entity");
+    }
+}
+
 void TrigWebTick()
 {
     type_10F710 *pPlayer;
@@ -953,9 +1703,35 @@ void TrigWebTick()
     CheatTick();
     TickGive();
     TrigLiveTick();
+    pPlayer = (type_10F710 *)sub_1745A0(0);
+    if (pPlayer == NULL)
+        s_uPlayerSince = 0;
+    else if (!s_uPlayerSince)
+        s_uPlayerSince = port_frame ? port_frame : 1;
+    PatrolTick(pPlayer);
+    PickupsTick(pPlayer);
+    SoldierWatch();
+    PickupsCheck();
+    ArtilleryTick();
+    CliGiveTick(pPlayer);
+    // (a drive waiting for its tank's cannon to stream in)
+    if (s_nDriveTrigger >= 0 && !s_bReqPending)
+    {
+        if (pPlayer == NULL || port_frame - s_uDriveSince > 600)
+        {
+            sprintf(s_szReqResult, "the tank's cannon (weapon %d) did not stream in; not driving", s_nDriveWeapon);
+            s_nDriveTrigger = -1;
+        }
+        else if (pPlayer->sub_10E8C0(s_nDriveWeapon))
+        {
+            RwInt32 n = s_nDriveTrigger;
+
+            s_nDriveTrigger = -1;
+            VehicleSeat(pPlayer, n, 0);
+        }
+    }
     if (!s_bReqPending)
         return;
-    pPlayer = (type_10F710 *)sub_1745A0(0);
     switch (s_nReqKind)
     {
     case REQ_SECTION:
@@ -1011,6 +1787,30 @@ void TrigWebTick()
             break;
         }
         StartGive(pPlayer, s_nReqA, s_nReqB & 1, (s_nReqB & 2) != 0);
+        break;
+    case REQ_MOUNT:
+        if (pPlayer == NULL)
+        {
+            strcpy(s_szReqResult, "no local player");
+            break;
+        }
+        Mount(pPlayer, s_nReqA);
+        break;
+    case REQ_VEHICLE:
+        if (pPlayer == NULL)
+        {
+            strcpy(s_szReqResult, "no local player");
+            break;
+        }
+        EnterVehicle(pPlayer, s_nReqA);
+        break;
+    case REQ_VEHSEAT:
+        if (pPlayer == NULL)
+        {
+            strcpy(s_szReqResult, "no local player");
+            break;
+        }
+        VehicleSeat(pPlayer, s_nReqA, s_nReqB);
         break;
     case REQ_SPAWNSOLDIER:
         if (pPlayer == NULL || !PlayerPosition(pPlayer, &v))
@@ -1245,6 +2045,8 @@ static void TabDrawing()
     ImGui::SameLine();
     Check("labels (each trigger's type)", &g_bTrigDrawLabels);
     Check("names (the level's name for a trigger, above its type)", &g_bTrigDrawNames);
+    ImGui::SameLine();
+    Check("spread overlapping labels", &g_bTrigDrawLabelSpread);
     ImGui::SliderFloat("trigger draw distance (0 unlimited)", &g_fTrigDrawRange, 0.0f, 1000.0f, "%.0f");
     ImGui::SliderFloat("label height (of the distance)", &g_fTrigDrawTextScale, 0.005f, 0.1f, "%.3f");
     ImGui::Separator();
@@ -1430,6 +2232,10 @@ static void TabInventory()
     ImGui::SameLine();
     if (ImGui::Button("set 10%"))
         Request(REQ_HEAL, 0, 0, 10.0f, 0.0f, 0.0f);
+    if (ImGui::Button("take me off the mounted weapon"))
+        Request(REQ_MOUNT, -1, 0, 0.0f, 0.0f, 0.0f);
+    ImGui::SameLine();
+    ImGui::TextDisabled("(the Triggers tab puts you on one, or into a vehicle)");
 
     // the inventory: a count per kind 1 to 12 (1 the health packs)
     if (ImGui::CollapsingHeader("Inventory (unk_21B4)", ImGuiTreeNodeFlags_DefaultOpen))
@@ -1998,6 +2804,33 @@ static void TrigRow(RwInt32 nHandle, Trigger *pTrigger, RwReal fDist)
         ImGui::SameLine();
         if (ImGui::SmallButton("spawn its soldier ahead of me"))
             Request(REQ_SPAWNSOLDIER, nHandle, 0, 0.0f, 0.0f, 0.0f);
+    }
+    if (pTrigger->vf_008() == 0x1B)
+    {
+        ImGui::SameLine();
+        if (ImGui::SmallButton("put me on it"))
+            Request(REQ_MOUNT, nHandle, 0, 0.0f, 0.0f, 0.0f);
+    }
+    if (pTrigger->vf_008() == 7 || pTrigger->vf_008() == 0x23)
+    {
+        ImGui::SameLine();
+        if (ImGui::SmallButton("drive it"))
+            Request(REQ_VEHSEAT, nHandle, 0, 0.0f, 0.0f, 0.0f);
+        ImGui::SameLine();
+        if (ImGui::SmallButton("ride in it"))
+            Request(REQ_VEHSEAT, nHandle, 3, 0.0f, 0.0f, 0.0f);
+        ImGui::SameLine();
+        if (ImGui::SmallButton("its gun"))
+            Request(REQ_VEHSEAT, nHandle, 1, 0.0f, 0.0f, 0.0f);
+        ImGui::SameLine();
+        if (ImGui::SmallButton("out"))
+            Request(REQ_VEHSEAT, nHandle, 2, 0.0f, 0.0f, 0.0f);
+    }
+    if (pTrigger->vf_008() == 0x1A)
+    {
+        ImGui::SameLine();
+        if (ImGui::SmallButton("get me in (its task)"))
+            Request(REQ_VEHICLE, nHandle, 0, 0.0f, 0.0f, 0.0f);
     }
     ImGui::PopID();
 }
@@ -3805,6 +4638,8 @@ void TrigWebScriptReport(const RwChar *pszWhat, const RwChar *pszLine)
     while (n && (psz[n - 1] == '\n' || psz[n - 1] == '\r'))
         psz[--n] = 0;
     s_dwReports++;
+    if (pszWhat && !strcmp(pszWhat, "print"))
+        plog("script %s", psz);
     TrigLiveLog(psz);
     LeaveCriticalSection(&s_csReport);
 }

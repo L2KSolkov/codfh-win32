@@ -19,6 +19,9 @@
 #include "game/gameloop.h"
 #include "game/functions.h"
 #include "types/PathNode.h"
+#if defined(CODFH_WIN32)
+extern "C" void plog(const RwChar *fmt, ...);
+#endif
 
 
 namespace RWS
@@ -107,6 +110,13 @@ namespace RWS
          CAttributeHandler *pCAttributeHandler = CAttributeHandler::Find(InstanceId);
          if (pCAttributeHandler)
          {
+#if defined(CODFH_WIN32)
+            // (the port: an entity made again under an instance ID already in use replaces it)
+            const RwUInt32 *pId = reinterpret_cast<const RwUInt32 *>(&InstanceId);
+
+            plog("RWS: %s %08X-%08X-%08X-%08X already exists; the old one deleted",
+                 pAttr->GetNameOfClassToCreate(), pId[0], pId[1], pId[2], pId[3]);
+#endif
             delete pCAttributeHandler;
          }
 

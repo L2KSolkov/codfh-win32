@@ -138,11 +138,11 @@ static RtCharset *TrigDrawCharset()
 #define TRIGDRAW_MAXCHARS   48
 
 // The trigger types by their kind (Trigger::vf_008 and its overrides); the
-// kinds no class returns are printed as numbers. 0x1C is both
-// StreamClumpTrigger and LevelClumpBankParamTrigger.
+// kinds no trigger class returns (0x15, 0x1D) are printed as numbers. 0x1C is
+// both StreamClumpTrigger and LevelClumpBankParamTrigger.
 static const RwChar *const s_apszKindNames[0x28] =
 {
-    "Trigger", "PlayerTrigger", "RenderTrigger", 0,
+    "Trigger", "PlayerTrigger", "RenderTrigger", "WorldLight",
     "SectionTrigger", "SoldierTrigger", "DogTrigger", "VehicleTrigger",
     "AnimatedBGTrigger", "ConfinedAreaTrigger", "SoundBankTrigger", "CustomTrigger",
     "StreamTrigger", "PlaySoundTrigger", "StreamVolume", "StopSoundStreamTrigger",
@@ -173,7 +173,9 @@ RwBool g_bTrigDrawShrimps = FALSE;
 RwReal g_fTrigDrawGimpRange = 6000.0f;
 RwInt32 g_nTrigDrawGimpsShown;
 RwInt32 g_nTrigDrawShrimpsShown;
-static void TrigDrawSpawnerLines(Trigger *pTrigger, const RwV3d *pvCentre, const RwMatrix *pCamLtm, RwUInt32 dwColour);
+#define TRIGDRAW_LABEL_LEN      96
+#define TRIGDRAW_SPAWNER_LINES  3
+static RwInt32 TrigDrawSpawnerLines(Trigger *pTrigger, RwChar (*aszOut)[TRIGDRAW_LABEL_LEN]);
 const RwChar *TrigDrawTriggerName(Trigger *pTrigger);   // (trignames.cpp)
 const RwChar *TrigDrawKeyName(RwUInt32 a, RwUInt32 b);
 RwReal g_fTrigDrawTextScale = 0.02f;
@@ -426,20 +428,122 @@ static void TrigDrawText(const RwChar *pszText, const RwV3d *pvAt, const RwMatri
     }
 }
 
-// Writes the trigger's type at its centre (the matrix's position), and the name the level
-// gives it (trignames.cpp), when it has one, on the line above.
-static void TrigDrawLabel(Trigger *pTrigger, const RwMatrix *pCamLtm, RwUInt32 dwColour)
+// The trigger labels placed this frame, as boxes on the view plane (x and y over depth),
+// so that a label is moved up, a line at a time, clear of those already placed (nearest
+// first: TrigDrawLabels), with a leader line back to its trigger.
+RwBool g_bTrigDrawLabelSpread = TRUE;
+
+struct TrigDrawLabelOrder
 {
-    RwV3d vCentre;
+    Trigger *pTrigger;
+    RwReal fDist2;
+};
+
+static int TrigDrawCompareOrder(const void *p0, const void *p1)
+{
+    RwReal f0 = ((const TrigDrawLabelOrder *)p0)->fDist2, f1 = ((const TrigDrawLabelOrder *)p1)->fDist2;
+
+    return f0 < f1 ? -1 : f0 > f1 ? 1 : 0;
+}
+
+#define TRIGDRAW_PLACED 768
+struct TrigDrawBox
+{
+    RwReal x0, y0, x1, y1;
+};
+static TrigDrawBox s_aPlaced[TRIGDRAW_PLACED];
+static RwInt32 s_nPlaced;
+
+static RwBool TrigDrawBoxClear(const TrigDrawBox *b)
+{
+    RwInt32 i;
+
+    for (i = 0; i < s_nPlaced; i++)
+        if (b->x0 < s_aPlaced[i].x1 && b->x1 > s_aPlaced[i].x0 && b->y0 < s_aPlaced[i].y1 && b->y1 > s_aPlaced[i].y0)
+            return FALSE;
+    return TRUE;
+}
+
+// Writes the trigger's type at its centre (the matrix's position), the name the level gives
+// it (trignames.cpp), when it has one, on the line above, and a spawner's counts below; the
+// whole moved up clear of the labels already placed. Its leader line, when moved, into
+// *pvLeader (returns TRUE).
+static RwBool TrigDrawLabel(Trigger *pTrigger, const RwMatrix *pCamLtm, RwUInt32 dwColour, RwV3d *pvLeader)
+{
+    RwChar aszLines[2 + TRIGDRAW_SPAWNER_LINES][TRIGDRAW_LABEL_LEN];
+    RwV3d vCentre, vD;
     const RwChar *pszName = g_bTrigDrawNames ? TrigDrawTriggerName(pTrigger) : NULL;
+    RwInt32 nLines = 0, nTop, nWidest = 0, i, nShift = 0;
+    RtCharsetDesc desc;
 
     vCentre.x = pTrigger->unk_90;
     vCentre.y = pTrigger->unk_94;
     vCentre.z = pTrigger->unk_98;
-    TrigDrawText(TrigDrawKindName(pTrigger), &vCentre, pCamLtm, dwColour);
+    // the lines, from the top: the name, the type, the counts
     if (pszName != NULL)
-        TrigDrawText(pszName, &vCentre, pCamLtm, dwColour, 1.0f);
-    TrigDrawSpawnerLines(pTrigger, &vCentre, pCamLtm, dwColour);
+    {
+        strncpy(aszLines[nLines], pszName, TRIGDRAW_LABEL_LEN - 1);
+        aszLines[nLines++][TRIGDRAW_LABEL_LEN - 1] = 0;
+    }
+    nTop = nLines;              // (the type's line is line 0; those above it count up)
+    strncpy(aszLines[nLines], TrigDrawKindName(pTrigger), TRIGDRAW_LABEL_LEN - 1);
+    aszLines[nLines++][TRIGDRAW_LABEL_LEN - 1] = 0;
+    nLines += TrigDrawSpawnerLines(pTrigger, &aszLines[nLines]);
+    for (i = 0; i < nLines; i++)
+    {
+        RwInt32 n = (RwInt32)strlen(aszLines[i]);
+
+        if (n > TRIGDRAW_MAXCHARS)
+            n = TRIGDRAW_MAXCHARS;
+        if (n > nWidest)
+            nWidest = n;
+    }
+
+    // its box on the view plane, moved up until it is clear
+    vD.x = vCentre.x - pCamLtm->pos.x;
+    vD.y = vCentre.y - pCamLtm->pos.y;
+    vD.z = vCentre.z - pCamLtm->pos.z;
+    if (g_bTrigDrawLabelSpread && TrigDrawCharset() != NULL && RtCharsetGetDesc(TrigDrawCharset(), &desc) != NULL)
+    {
+        RwReal fDepth = RwV3dDotProduct(&vD, &pCamLtm->at);
+        RwReal fDist = RwV3dLength(&vD);
+
+        if (fDepth > 1.0f && s_nPlaced < TRIGDRAW_PLACED)
+        {
+            // (TrigDrawText sizes a line by its distance: on the view plane its height is
+            // the scale, stretched by distance over depth off the screen's centre)
+            RwReal fLine = g_fTrigDrawTextScale * 1.2f * fDist / fDepth;
+            RwReal fChar = g_fTrigDrawTextScale * (RwReal)desc.width / (RwReal)desc.height * fDist / fDepth;
+            RwReal fX = -RwV3dDotProduct(&vD, &pCamLtm->right) / fDepth;
+            RwReal fY = RwV3dDotProduct(&vD, &pCamLtm->up) / fDepth;
+            TrigDrawBox b;
+
+            b.x0 = fX - fChar * (RwReal)nWidest * 0.5f;
+            b.x1 = fX + fChar * (RwReal)nWidest * 0.5f;
+            b.y0 = fY - fLine * ((RwReal)(nLines - nTop) - 0.5f);
+            b.y1 = fY + fLine * ((RwReal)nTop + 0.5f);
+            while (!TrigDrawBoxClear(&b) && nShift < 24)
+            {
+                nShift++;
+                b.y0 += fLine;
+                b.y1 += fLine;
+            }
+            s_aPlaced[s_nPlaced++] = b;
+        }
+    }
+    for (i = 0; i < nLines; i++)
+        TrigDrawText(aszLines[i], &vCentre, pCamLtm, dwColour, (RwReal)(nTop - i + nShift));
+    if (nShift == 0)
+        return FALSE;
+    // (to the bottom of the moved label)
+    {
+        RwReal fH = RwV3dLength(&vD) * g_fTrigDrawTextScale;
+
+        pvLeader->x = vCentre.x + pCamLtm->up.x * fH * 1.2f * ((RwReal)(nTop - nLines + 1 + nShift) - 0.5f);
+        pvLeader->y = vCentre.y + pCamLtm->up.y * fH * 1.2f * ((RwReal)(nTop - nLines + 1 + nShift) - 0.5f);
+        pvLeader->z = vCentre.z + pCamLtm->up.z * fH * 1.2f * ((RwReal)(nTop - nLines + 1 + nShift) - 0.5f);
+    }
+    return TRUE;
 }
 
 // ---- the path nodes ----
@@ -908,6 +1012,28 @@ static void TrigDrawAiMachines()
     {
         s_nMachines = 0;
     }
+}
+
+// The states (type_3D2DB8_6C::unk_10) of the live state machines whose owner is dwHandle, as
+// "a/b/c" in psz (trigtools.cpp's soldier watch); "-" for none.
+void TrigDrawStatesOf(RwUInt32 dwHandle, RwChar *psz, RwInt32 nMax)
+{
+    RwInt32 i, n = 0;
+
+    psz[0] = 0;
+    TrigDrawAiMachines();
+    __try
+    {
+        for (i = 0; i < s_nMachines && n < nMax - 8; i++)
+            if (s_adwMachineOwner[i] == dwHandle && s_apMachine[i]->unk_6C)
+                n += _snprintf(psz + n, nMax - n - 1, "%s%d", n ? "/" : "", s_apMachine[i]->unk_6C->unk_10);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    if (n == 0)
+        strcpy(psz, "-");
+    psz[nMax - 1] = 0;
 }
 
 // A script's file: its name when the word points at text, else its number.
@@ -1784,12 +1910,12 @@ static void TrigDrawShrimps(const RwV3d *pvCam)
     TrigDrawPathFlush();
 }
 
-// The spawn counts under a GimpTrigger's or ShrimpTrigger's label, for TrigDrawLabel: lines
-// written below the type at *pvCentre.
-static void TrigDrawSpawnerLines(Trigger *pTrigger, const RwV3d *pvCentre, const RwMatrix *pCamLtm, RwUInt32 dwColour)
+// The spawn counts under a GimpTrigger's or ShrimpTrigger's label, for TrigDrawLabel: up to
+// TRIGDRAW_SPAWNER_LINES lines into aszOut (each TRIGDRAW_LABEL_LEN), their count returned.
+static RwInt32 TrigDrawSpawnerLines(Trigger *pTrigger, RwChar (*aszOut)[TRIGDRAW_LABEL_LEN])
 {
     RwChar sz[96], szLimit[24];
-    RwInt32 nKind = pTrigger->vf_008();
+    RwInt32 nKind = pTrigger->vf_008(), nOut = 0;
 
     if (nKind == 0x1F && g_bTrigDrawGimps)
     {
@@ -1803,7 +1929,8 @@ static void TrigDrawSpawnerLines(Trigger *pTrigger, const RwV3d *pvCentre, const
         _snprintf(sz, sizeof(sz) - 1, "spawns %s%s, health %.0f", szLimit, pGimps->unk_140 ? ", live once" : "",
                   pGimps->unk_120_r);
         sz[sizeof(sz) - 1] = 0;
-        TrigDrawText(sz, pvCentre, pCamLtm, dwColour, -1.0f);
+        strncpy(aszOut[nOut], sz, TRIGDRAW_LABEL_LEN - 1);
+        aszOut[nOut++][TRIGDRAW_LABEL_LEN - 1] = 0;
         {
             RwChar szName[48], szDef[48], szWeapon[48], szScript[48];
 
@@ -1814,12 +1941,14 @@ static void TrigDrawSpawnerLines(Trigger *pTrigger, const RwV3d *pvCentre, const
             _snprintf(sz, sizeof(sz) - 1, "gimp %s, def %s%s%s", szName[0] ? szName : "-", szDef[0] ? szDef : "-",
                       szWeapon[0] ? ", weapon " : "", szWeapon);
             sz[sizeof(sz) - 1] = 0;
-            TrigDrawText(sz, pvCentre, pCamLtm, dwColour, -2.0f);
+            strncpy(aszOut[nOut], sz, TRIGDRAW_LABEL_LEN - 1);
+        aszOut[nOut++][TRIGDRAW_LABEL_LEN - 1] = 0;
             if (szScript[0])
             {
                 _snprintf(sz, sizeof(sz) - 1, "script %s", szScript);
                 sz[sizeof(sz) - 1] = 0;
-                TrigDrawText(sz, pvCentre, pCamLtm, dwColour, -3.0f);
+                strncpy(aszOut[nOut], sz, TRIGDRAW_LABEL_LEN - 1);
+        aszOut[nOut++][TRIGDRAW_LABEL_LEN - 1] = 0;
             }
         }
     }
@@ -1844,7 +1973,8 @@ static void TrigDrawSpawnerLines(Trigger *pTrigger, const RwV3d *pvCentre, const
         _snprintf(sz, sizeof(sz) - 1, "%d shrimps (%d forward, %d back), spawns %s, chance %.0f%%, speed %.3f",
                   nAlive, nForward, nAlive - nForward, szLimit, pShrimps->unk_DC, pShrimps->unk_D0_r);
         sz[sizeof(sz) - 1] = 0;
-        TrigDrawText(sz, pvCentre, pCamLtm, dwColour, -1.0f);
+        strncpy(aszOut[nOut], sz, TRIGDRAW_LABEL_LEN - 1);
+        aszOut[nOut++][TRIGDRAW_LABEL_LEN - 1] = 0;
         {
             RwChar szModel[48], szPath[48];
             SplinePath *pPath = pShrimps->unk_EC.unk_0C;
@@ -1859,9 +1989,11 @@ static void TrigDrawSpawnerLines(Trigger *pTrigger, const RwV3d *pvCentre, const
             else
                 _snprintf(sz, sizeof(sz) - 1, "model %s, no path yet", szModel[0] ? szModel : "-");
             sz[sizeof(sz) - 1] = 0;
-            TrigDrawText(sz, pvCentre, pCamLtm, dwColour, -2.0f);
+            strncpy(aszOut[nOut], sz, TRIGDRAW_LABEL_LEN - 1);
+        aszOut[nOut++][TRIGDRAW_LABEL_LEN - 1] = 0;
         }
     }
+    return nOut;
 }
 
 // ---- the projectile generators ----
@@ -2620,13 +2752,43 @@ void TrigDrawAll(RwCamera *pCamera)
     }
     if (g_bTrigDrawEnabled && g_bTrigDrawLabels && TrigDrawCharset() != NULL)
     {
-        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+        static TrigDrawLabelOrder s_aOrder[2000];
+        static RwV3d s_avLeader[2000][2];
+        static RwUInt32 s_adwLeader[2000];
+        RwInt32 nOrder = 0, nLeaders = 0;
+
         for (i = 0; i <= dword_429D00 && i < 2000; i++)
         {
             pTrigger = (Trigger *)dword_4CFE30[i];
             if (pTrigger != NULL && TrigDrawInRange(pTrigger, &vCam))
-                TrigDrawLabel(pTrigger, pCamLtm, 0xFF000000 | TrigDrawColour(pTrigger));
+            {
+                RwReal dx = pTrigger->unk_90 - vCam.x, dy = pTrigger->unk_94 - vCam.y, dz = pTrigger->unk_98 - vCam.z;
+
+                s_aOrder[nOrder].pTrigger = pTrigger;
+                s_aOrder[nOrder++].fDist2 = dx * dx + dy * dy + dz * dz;
+            }
         }
+        // (nearest first: the nearer label keeps its place)
+        qsort(s_aOrder, nOrder, sizeof(s_aOrder[0]), TrigDrawCompareOrder);
+        s_nPlaced = 0;
+        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+        for (i = 0; i < nOrder; i++)
+        {
+            RwUInt32 dwColour = 0xFF000000 | TrigDrawColour(s_aOrder[i].pTrigger);
+
+            if (TrigDrawLabel(s_aOrder[i].pTrigger, pCamLtm, dwColour, &s_avLeader[nLeaders][1]))
+            {
+                s_avLeader[nLeaders][0].x = s_aOrder[i].pTrigger->unk_90;
+                s_avLeader[nLeaders][0].y = s_aOrder[i].pTrigger->unk_94;
+                s_avLeader[nLeaders][0].z = s_aOrder[i].pTrigger->unk_98;
+                s_adwLeader[nLeaders++] = (dwColour & 0x00FFFFFF) | 0x90000000;
+            }
+        }
+        // the moved labels' leader lines
+        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+        for (i = 0; i < nLeaders; i++)
+            TrigDrawPathLine(&s_avLeader[i][0], &s_avLeader[i][1], s_adwLeader[i]);
+        TrigDrawPathFlush();
     }
 
     RwRenderStateSet(rwRENDERSTATETEXTURERASTER, pRaster);
