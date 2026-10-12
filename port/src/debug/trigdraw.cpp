@@ -65,6 +65,11 @@
 #include "types/type_3D2E7C.h"
 #include "types/alfaobject.h"
 #include "types/alfasched.h"
+#include "types/type_3D96F0.h"
+#include "types/type_92430.h"
+#include "rw/rpmaterial.h"
+#include "rw/batextur.h"
+#include "trigcoll.h"
 #include "types/GimpTrigger.h"
 #include "types/ShrimpTrigger.h"
 #include "types/type_3DDB98.h"
@@ -191,6 +196,15 @@ RwReal g_fTrigDrawNoclipSpeed = 50.0f;
 static RwIm3DVertex s_aCollVerts[TRIGDRAW_COLLVERTS];
 static RwInt32 s_nCollVerts;
 static RwV3d s_vCollCam;
+
+// The collision material kinds (trigcoll.h), a material-to-kind cache emptied each frame (a
+// level's materials are freed with it), and whether any kind is shown this frame.
+TrigDrawCollKind g_aTrigDrawCollKinds[TRIGDRAW_COLLKINDS];
+RwInt32 g_nTrigDrawCollKinds;
+RwBool g_bTrigDrawCollByKind = FALSE;
+#define TRIGDRAW_COLLMATCACHE 512
+static struct { void *pMaterial; RwInt32 nKind; } s_aCollMatCache[TRIGDRAW_COLLMATCACHE];
+static RwBool s_bCollAnyShown;
 
 static RwIm3DVertex s_aVerts[TRIGDRAW_MAXVERTS];
 static RwInt32 s_nVerts;
@@ -2166,6 +2180,98 @@ static void TrigDrawCollisionFlush()
     s_nCollVerts = 0;
 }
 
+void TrigDrawCollKindsClear()
+{
+    g_nTrigDrawCollKinds = 0;
+    memset(s_aCollMatCache, 0, sizeof(s_aCollMatCache));
+}
+
+const RwChar *TrigDrawCollFlagsText(RwUInt32 dwFlags, RwChar *pszOut, RwInt32 nOut)
+{
+    static const struct { RwUInt32 dwBit; const RwChar *pszName; } s_aBits[] =
+    {
+        { 0x10000, "player" }, { 0x20000, "soldiers" }, { 0x40000, "vehicles" },
+        { 0x80000, "projectiles" }, { 0x100000, "projectiles 2" }, { 0x400000, "AI sight" },
+        { 0x800000, "other vehicles" },
+    };
+    RwUInt32 dwRest = dwFlags & 0xFFFF0000;
+    RwInt32 n = 0, i;
+
+    pszOut[0] = 0;
+    if (!dwRest)
+        return "solid to all";
+    for (i = 0; i < (RwInt32)(sizeof(s_aBits) / sizeof(s_aBits[0])); i++)
+    {
+        if (dwRest & s_aBits[i].dwBit)
+        {
+            n += _snprintf(pszOut + n, nOut - n, "%s%s", n ? ", " : "skipped by ", s_aBits[i].pszName);
+            dwRest &= ~s_aBits[i].dwBit;
+            if (n >= nOut - 1)
+                break;
+        }
+    }
+    if (dwRest && n < nOut - 1)
+        _snprintf(pszOut + n, nOut - n, "%s0x%X", n ? ", " : "", dwRest);
+    pszOut[nOut - 1] = 0;
+    return pszOut;
+}
+
+// The kind of the collision material pMaterial (a new one added while there is room; -1 for
+// none or a full table).
+static RwInt32 TrigDrawCollKindOf(void *pMaterial)
+{
+    RwUInt32 nSlot = (RwUInt32)(((RwUInt32)pMaterial >> 4) % TRIGDRAW_COLLMATCACHE);
+    RpMaterial *pMat = (RpMaterial *)pMaterial;
+    RwUInt32 dwTag, dwRgba;
+    const RwChar *pszTex;
+    RwInt32 i;
+
+    if (pMaterial == NULL)
+        return -1;
+    if (s_aCollMatCache[nSlot].pMaterial == pMaterial)
+        return s_aCollMatCache[nSlot].nKind;
+    dwTag = sub_FC000(pMaterial)->unk_04;
+    dwRgba = ((RwUInt32)pMat->color.red << 24) | ((RwUInt32)pMat->color.green << 16)
+           | ((RwUInt32)pMat->color.blue << 8) | pMat->color.alpha;
+    pszTex = pMat->texture ? pMat->texture->name : "";
+    for (i = 0; i < g_nTrigDrawCollKinds; i++)
+    {
+        if (g_aTrigDrawCollKinds[i].dwTag == dwTag && g_aTrigDrawCollKinds[i].dwRgba == dwRgba
+            && (g_aTrigDrawCollKinds[i].szTexture[0] != 0) == (pszTex[0] != 0)
+            && (pszTex[0] == 0 || !strncmp(g_aTrigDrawCollKinds[i].szTexture, pszTex, 31)))
+            break;
+    }
+    if (i == g_nTrigDrawCollKinds)
+    {
+        if (i >= TRIGDRAW_COLLKINDS)
+            i = -1;
+        else
+        {
+            TrigDrawCollKind *k = &g_aTrigDrawCollKinds[g_nTrigDrawCollKinds++];
+
+            memset(k, 0, sizeof(*k));
+            k->dwTag = dwTag;
+            k->dwRgba = dwRgba;
+            strncpy(k->szTexture, pszTex, sizeof(k->szTexture) - 1);
+        }
+    }
+    if (i >= 0)
+        g_aTrigDrawCollKinds[i].nMaterials++;
+    s_aCollMatCache[nSlot].pMaterial = pMaterial;
+    s_aCollMatCache[nSlot].nKind = i;
+    return i;
+}
+
+// A colour per kind (its index hashed to a hue), for g_bTrigDrawCollByKind.
+static RwUInt32 TrigDrawCollKindColour(RwInt32 nKind)
+{
+    static const RwUInt32 s_aColours[8] =
+    {
+        0x70FF4040, 0x7040FF40, 0x704080FF, 0x70FFFF40, 0x70FF40FF, 0x7040FFFF, 0x70FF9030, 0x70FFFFFF,
+    };
+    return nKind < 0 ? 0x60808080 : s_aColours[nKind % 8];
+}
+
 // A world sector callback: when the sector's box is within
 // g_fTrigDrawCollisionRange of the camera, adds each of its triangles,
 // lifted along its normal and coloured by its facing (green floors, blue
@@ -2193,6 +2299,14 @@ static RpWorldSector *TrigDrawCollisionSector(RpWorldSector *pSector, void *pDat
 
     for (i = 0; i < pSec->wNumTriangles; i++)
     {
+        // (its material's kind: the world's material list, as the game's queries index it)
+        type_96E30 *pWorld = (type_96E30 *)pData;
+        RwInt32 nKind = pWorld && pWorld->unk_10 ? TrigDrawCollKindOf(pWorld->unk_10[pSec->pTriangles[i].matIndex]) : -1;
+
+        if (nKind >= 0)
+            g_aTrigDrawCollKinds[nKind].nTriangles++;
+        if (s_bCollAnyShown && (nKind < 0 || !g_aTrigDrawCollKinds[nKind].bShow))
+            continue;
         vA = pSec->pVertices[pSec->pTriangles[i].vertIndex[0]];
         vB = pSec->pVertices[pSec->pTriangles[i].vertIndex[1]];
         vC = pSec->pVertices[pSec->pTriangles[i].vertIndex[2]];
@@ -2212,6 +2326,8 @@ static RpWorldSector *TrigDrawCollisionSector(RpWorldSector *pSector, void *pDat
             dwColour = 0x60FF4040;
         else
             dwColour = 0x604080FF;
+        if (g_bTrigDrawCollByKind)
+            dwColour = TrigDrawCollKindColour(nKind);
         if (s_nCollVerts + 3 > TRIGDRAW_COLLVERTS)
             TrigDrawCollisionFlush();
         pVert = &s_aCollVerts[s_nCollVerts];
@@ -2236,12 +2352,23 @@ static void TrigDrawCollision(const RwV3d *pvCam)
 
     s_vCollCam = *pvCam;
     s_nCollVerts = 0;
+    // (this frame's counts and material cache; whether any kind is shown)
+    memset(s_aCollMatCache, 0, sizeof(s_aCollMatCache));
+    s_bCollAnyShown = FALSE;
+    for (i = 0; i < g_nTrigDrawCollKinds; i++)
+    {
+        g_aTrigDrawCollKinds[i].nTriangles = 0;
+        g_aTrigDrawCollKinds[i].nMaterials = 0;
+        if (g_aTrigDrawCollKinds[i].bShow)
+            s_bCollAnyShown = TRUE;
+    }
     if (unk_4E5CD8.get_unk_28())
-        RpWorldForAllWorldSectors(unk_4E5CD8.get_unk_28(), TrigDrawCollisionSector, NULL);
+        RpWorldForAllWorldSectors(unk_4E5CD8.get_unk_28(), TrigDrawCollisionSector, unk_4E5CD8.get_unk_28());
     for (i = 0; i < 4; i++)
     {
         if (dword_4E5D30[i].get_unk_00() && dword_4E5D30[i].get_unk_28())
-            RpWorldForAllWorldSectors(dword_4E5D30[i].get_unk_28(), TrigDrawCollisionSector, NULL);
+            RpWorldForAllWorldSectors(dword_4E5D30[i].get_unk_28(), TrigDrawCollisionSector,
+                                      dword_4E5D30[i].get_unk_28());
     }
     TrigDrawCollisionFlush();
 }
@@ -2569,8 +2696,8 @@ void TrigDrawAll(RwCamera *pCamera)
         if (GetEnvironmentVariableA("CODFH_SHRIMPS", NULL, 0))
             g_bTrigDrawShrimps = TRUE;
     }
-    if ((!g_bTrigDrawEnabled && !g_bTrigDrawPathNodes && !g_bTrigDrawAi && !g_bTrigDrawPg && !g_bTrigDrawGimps &&
-         !g_bTrigDrawShrimps) || pCamera == NULL)
+    if ((!g_bTrigDrawEnabled && !g_bTrigDrawCollision && !g_bTrigDrawPathNodes && !g_bTrigDrawAi && !g_bTrigDrawPg &&
+         !g_bTrigDrawGimps && !g_bTrigDrawShrimps) || pCamera == NULL)
         return;
     pCamLtm = RwFrameGetLTM(RwCameraGetFrame(pCamera));
     vCam = pCamLtm->pos;

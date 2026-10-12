@@ -110,6 +110,7 @@ extern RwReal g_fTrigDrawRange;
 extern RwReal g_fTrigDrawTextScale;
 extern RwReal g_fTrigDrawCollisionRange;
 extern RwReal g_fTrigDrawCollisionLift;
+#include "trigcoll.h"
 extern RwBool g_bTrigDrawFreeCam;
 // (trigweb.cpp: the level viewer's live link)
 extern RwBool g_bTrigLive;
@@ -1238,6 +1239,124 @@ static void TabCheats()
     CheatsAudio();
 }
 
+// The collision's material kinds near the camera (trigcoll.h): tick kinds to draw only those,
+// as the invisible blockers (untextured, or flagged).
+static void CollisionKinds()
+{
+    RwInt32 i, nShown = 0;
+
+    if (!ImGui::TreeNode("collision kinds (draw only the ticked ones)"))
+        return;
+    if (!g_bTrigDrawCollision)
+        ImGui::TextDisabled("(drawing the collision fills this table)");
+    for (i = 0; i < g_nTrigDrawCollKinds; i++)
+        nShown += g_aTrigDrawCollKinds[i].bShow ? 1 : 0;
+    ImGui::Text("%d kinds, %d ticked: %s", g_nTrigDrawCollKinds, nShown,
+                nShown ? "only the ticked kinds are drawn" : "every kind is drawn");
+    if (ImGui::SmallButton("untick all"))
+        for (i = 0; i < g_nTrigDrawCollKinds; i++)
+            g_aTrigDrawCollKinds[i].bShow = FALSE;
+    ImGui::SameLine();
+    if (ImGui::SmallButton("tick the untextured"))
+        for (i = 0; i < g_nTrigDrawCollKinds; i++)
+            g_aTrigDrawCollKinds[i].bShow = g_aTrigDrawCollKinds[i].szTexture[0] == 0;
+    ImGui::SameLine();
+    if (ImGui::SmallButton("tick the flagged"))
+        for (i = 0; i < g_nTrigDrawCollKinds; i++)
+            g_aTrigDrawCollKinds[i].bShow = (g_aTrigDrawCollKinds[i].dwTag & 0xFFFF0000) != 0;
+    ImGui::SameLine();
+    if (ImGui::SmallButton("forget the kinds"))
+        TrigDrawCollKindsClear();
+    Check("colour by kind (not by facing)", &g_bTrigDrawCollByKind);
+    if (ImGui::BeginTable("collkinds", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY
+                                              | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable,
+                          ImVec2(0.0f, 260.0f)))
+    {
+        static RwInt32 s_aOrder[TRIGDRAW_COLLKINDS];
+        static RwInt32 s_nSortColumn = 4;
+        static RwBool s_bSortDown = TRUE;
+        RwInt32 n = g_nTrigDrawCollKinds, a, b;
+
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("draw", ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("flags");
+        ImGui::TableSetupColumn("surface");
+        ImGui::TableSetupColumn("texture");
+        ImGui::TableSetupColumn("triangles", ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_PreferSortDescending);
+        ImGui::TableSetupColumn("colour");
+        ImGui::TableSetupColumn("what the flags do", ImGuiTableColumnFlags_NoSort);
+        ImGui::TableHeadersRow();
+        if (ImGuiTableSortSpecs *pSort = ImGui::TableGetSortSpecs())
+        {
+            if (pSort->SpecsCount > 0)
+            {
+                s_nSortColumn = pSort->Specs[0].ColumnIndex;
+                s_bSortDown = pSort->Specs[0].SortDirection == ImGuiSortDirection_Descending;
+            }
+        }
+        for (a = 0; a < n; a++)
+            s_aOrder[a] = a;
+        // (a small insertion sort by the chosen column)
+        for (a = 1; a < n; a++)
+        {
+            RwInt32 v = s_aOrder[a];
+
+            for (b = a; b > 0; b--)
+            {
+                const TrigDrawCollKind *x = &g_aTrigDrawCollKinds[s_aOrder[b - 1]], *y = &g_aTrigDrawCollKinds[v];
+                RwInt32 c = s_nSortColumn == 1 ? (RwInt32)(x->dwTag >> 16) - (RwInt32)(y->dwTag >> 16)
+                          : s_nSortColumn == 2 ? (RwInt32)(x->dwTag & 0xFFFF) - (RwInt32)(y->dwTag & 0xFFFF)
+                          : s_nSortColumn == 3 ? strcmp(x->szTexture, y->szTexture)
+                          : s_nSortColumn == 5 ? (x->dwRgba > y->dwRgba) - (x->dwRgba < y->dwRgba)
+                          : x->nTriangles - y->nTriangles;
+                if (s_bSortDown ? c >= 0 : c <= 0)
+                    break;
+                s_aOrder[b] = s_aOrder[b - 1];
+            }
+            s_aOrder[b] = v;
+        }
+        for (a = 0; a < n; a++)
+        {
+            TrigDrawCollKind *k = &g_aTrigDrawCollKinds[s_aOrder[a]];
+            RwChar szWhat[128];
+            RwUInt32 dwSurface = k->dwTag & 0xFFFF;
+
+            ImGui::PushID(s_aOrder[a]);
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            Check("##draw", &k->bShow);
+            ImGui::TableNextColumn();
+            ImGui::Text("0x%04X", k->dwTag >> 16);
+            ImGui::TableNextColumn();
+            if (dwSurface == 0xFFFF)
+                ImGui::TextDisabled("none");
+            else
+                ImGui::Text("%u", dwSurface);
+            ImGui::TableNextColumn();
+            if (k->szTexture[0])
+                ImGui::TextUnformatted(k->szTexture);
+            else
+                ImGui::TextDisabled("(untextured)");
+            ImGui::TableNextColumn();
+            if (k->nTriangles)
+                ImGui::Text("%d", k->nTriangles);
+            else
+                ImGui::TextDisabled("not near");
+            ImGui::TableNextColumn();
+            ImGui::ColorButton("##c", ImVec4((k->dwRgba >> 24) / 255.0f, ((k->dwRgba >> 16) & 0xFF) / 255.0f,
+                                             ((k->dwRgba >> 8) & 0xFF) / 255.0f, (k->dwRgba & 0xFF) / 255.0f),
+                               ImGuiColorEditFlags_NoTooltip, ImVec2(14.0f, 14.0f));
+            ImGui::SameLine();
+            ImGui::Text("%08X", k->dwRgba);
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(TrigDrawCollFlagsText(k->dwTag, szWhat, sizeof(szWhat)));
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
+    ImGui::TreePop();
+}
+
 static void TabDrawing()
 {
     Check("draw the trigger volumes", &g_bTrigDrawEnabled);
@@ -1251,6 +1370,7 @@ static void TabDrawing()
     Check("draw the collision worlds", &g_bTrigDrawCollision);
     ImGui::SliderFloat("collision draw distance", &g_fTrigDrawCollisionRange, 5.0f, 200.0f, "%.0f");
     ImGui::SliderFloat("collision lift along the normal", &g_fTrigDrawCollisionLift, 0.0f, 0.5f, "%.3f");
+    CollisionKinds();
     ImGui::Separator();
     Check("draw the AI's path nodes", &g_bTrigDrawPathNodes);
     ImGui::SameLine();
