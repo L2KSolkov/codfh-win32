@@ -18,11 +18,14 @@ struct TrigDrawCollKind
     RwInt32 nTriangles;     // the triangles drawn of it in the last frame (all kinds counted)
     RwInt32 nMaterials;     // the materials seen of it
     RwBool bShow;           // drawn while any kind is shown
+    RwUInt32 dwDraw;        // its colour when coloured by kind (0xAARRGGBB, from its tag and texture)
 };
 
 extern TrigDrawCollKind g_aTrigDrawCollKinds[TRIGDRAW_COLLKINDS];
 extern RwInt32 g_nTrigDrawCollKinds;
 extern RwBool g_bTrigDrawCollByKind;    // colour the triangles by their kind, not their facing
+extern RwInt32 g_nTrigDrawCollFill;     // 0 filled, 1 outlines (the edges alone), 2 both
+extern RwReal g_fTrigDrawCollGrid;      // outlines: grid lines across each triangle this far apart (0 none)
 // What the query flags are known to exclude (docs: the web suite's COLLISION_MATERIALS.md):
 // 0x10000 the player's body, 0x20000 the soldiers' and gimps' bodies (and the AI's sight),
 // 0x40000 the vehicles, 0x80000 and 0x100000 the projectiles' line tests, 0x400000 the AI's

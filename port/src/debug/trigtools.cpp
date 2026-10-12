@@ -1,35 +1,39 @@
 // The Win32 port's game debug tools (CODFH_DRAW_TRIGGERS, with the ImGui
 // overlay): the plain build's research web pages (research/trigweb.cpp in
 // C:\codfh-patches\plain-build\draw-triggers.patch) as tabs of an overlay
-// window, live state read straight from memory and the pages' actions:
-//   Drawing     trigdraw.cpp's switches (triggers, collision, the AI's path
-//               nodes, the AI's state, noclip, the free camera) and
-//               the game's own debug menu
-//   Cheats      the developers' switches (the AI ignores me, god mode, next level, no
-//               AI spawns, tank reset), freeze all AI, unlimited ammo, game speed, cheat flags,
-//               the level and render switches (frame step, FOV zoom...), audio mutes
-//   Tunables    the tuning values no code changes (AI, pathing, vehicles, player...), editable
-//   Player      the local player (sub_1745A0(0), a type_10F710)
-//   Inventory   health, the inventory and the 39 weapons, with gives
-//   Weapons     the weapon settings (dword_4C19C0), edited in place
-//   Entities    the entity table (dword_4B6A00): teleport, kill, hp
-//   Triggers    the handle table, nearest first: teleport, spawn soldiers
-//   Trigger     every field of any trigger (triggerfields.inc), editable
-//   Shell       the shell manager's settings (the level's and the front end's), editable
-//   Generators  the projectile generators, nearest first: their state and
-//               target, the scripts' PG_ actions, teleport, a free camera look
-//   Generator   every field of a projectile generator and its trigger, editable
-//   Objectives  the checkpoint and global script registers, the objectives
-//   Scripts     the live state machines, performances and tasks by name; a
-//               picked one's code and (a state machine's) variables, editable
-//   Script log  the scripts' prints and failed checks, the script debugger's
-//               reports (CDebugScript's settings) and the debug switches
-//   VM          the level-script VM's registers, code and stacks, as the last
-//               script to run halted (the overlay draws between runs)
-//   Sections    the section slots, and a section load into one
-//   Loading     the loading queue (AsynchLoadingQueue)
-//   Memory      the section arenas and the script pools
-//   HUD         the HUD's items (151, single player's 101), shown or hidden
+// window, live state read straight from memory and the pages' actions, in five groups of tabs
+// (the last action's result above them):
+//   View     what trigdraw.cpp draws, a tab each: Triggers (volumes, labels, names), Collision
+//            (and its material kinds, trigcoll.h), AI (path nodes, the soldiers' state),
+//            Generators, Gimps (and shrimps), Camera (noclip, the free camera)
+//   Player   Player       the local player (sub_1745A0(0), a type_10F710)
+//            Inventory    health, the inventory and the 39 weapons, with gives
+//            Weapons      the weapon settings (dword_4C19C0), edited in place
+//            Cheats       the developers' switches (the AI ignores me, god mode, next level, no
+//                         AI spawns, tank reset), freeze all AI, unlimited ammo, game speed,
+//                         cheat flags
+//   Level    Entities     the entity table (dword_4B6A00): teleport, kill, hp
+//            Triggers     List: the handle table, nearest first: teleport, spawn soldiers;
+//                         Selected: every field of any trigger (triggerfields.inc), editable
+//            Generators   List: the projectile generators, nearest first: their state and
+//                         target, the scripts' PG_ actions, teleport, a free camera look;
+//                         Selected: every field of one and its trigger, editable
+//            Objectives   the checkpoint and global script registers, the objectives
+//            Sections     the section slots, and a section load into one
+//   Scripts  Scripts      the live state machines, performances and tasks by name; a
+//                         picked one's code and (a state machine's) variables, editable
+//            Script log   the scripts' prints and failed checks, the script debugger's
+//                         reports (CDebugScript's settings) and the debug switches
+//            VM           the level-script VM's registers, code and stacks, as the last
+//                         script to run halted (the overlay draws between runs)
+//   Engine   Level and render  frame step, FOV zoom, far clip, zones...
+//            Audio        the level's mutes and sound warnings
+//            Tunables     the tuning values no code changes (AI, pathing, vehicles, player...)
+//            Shell        the shell manager's settings (the level's and the front end's)
+//            HUD          the HUD's items (151, single player's 101), shown or hidden
+//            Loading      the loading queue (AsynchLoadingQueue)
+//            Memory       the section arenas and the script pools
+//            Links        the web suite's live link, the game's own debug menu
 // (Not the patch's /map and /levels: the second loads a single-player level
 // into the multiplayer build, which its other hooks are for.)
 // The overlay draws from the device's Present, on the game's thread, after
@@ -1170,7 +1174,6 @@ static void TabCheats()
 {
     RwInt32 i;
 
-    ResultLine();
     ImGui::SeparatorText("The developers' switches (nothing in the game sets them)");
     CheckSet("the AI ignores me (byte_4C1940: their target filter refuses players)", &s_bCheatIgnoreMe, FALSE,
              CheatIgnoreOff);
@@ -1235,8 +1238,6 @@ static void TabCheats()
             ImGui::TextDisabled("at 0x%08X (single player: the save's cheats; they stay as set)", (RwUInt32)pdw);
         }
     }
-    CheatsLevelRender();
-    CheatsAudio();
 }
 
 // The collision's material kinds near the camera (trigcoll.h): tick kinds to draw only those,
@@ -1268,6 +1269,19 @@ static void CollisionKinds()
     if (ImGui::SmallButton("forget the kinds"))
         TrigDrawCollKindsClear();
     Check("colour by kind (not by facing)", &g_bTrigDrawCollByKind);
+    ImGui::SameLine();
+    {
+        static const char *const s_apszFill[] = { "filled", "outlines", "filled and outlined" };
+
+        ImGui::SetNextItemWidth(170.0f);
+        ImGui::Combo("drawn as", &g_nTrigDrawCollFill, s_apszFill, 3);
+    }
+    if (g_nTrigDrawCollFill != 0)
+    {
+        ImGui::SetNextItemWidth(240.0f);
+        ImGui::SliderFloat("outline grid every (units, 0 edges only)", &g_fTrigDrawCollGrid, 0.0f, 512.0f, "%.0f",
+                           ImGuiSliderFlags_Logarithmic);
+    }
     if (ImGui::BeginTable("collkinds", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY
                                               | ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable,
                           ImVec2(0.0f, 260.0f)))
@@ -1283,7 +1297,7 @@ static void CollisionKinds()
         ImGui::TableSetupColumn("surface");
         ImGui::TableSetupColumn("texture");
         ImGui::TableSetupColumn("triangles", ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_PreferSortDescending);
-        ImGui::TableSetupColumn("colour");
+        ImGui::TableSetupColumn("material colour");
         ImGui::TableSetupColumn("what the flags do", ImGuiTableColumnFlags_NoSort);
         ImGui::TableHeadersRow();
         if (ImGuiTableSortSpecs *pSort = ImGui::TableGetSortSpecs())
@@ -1325,6 +1339,11 @@ static void CollisionKinds()
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             Check("##draw", &k->bShow);
+            ImGui::SameLine();
+            // (its colour when coloured by kind)
+            ImGui::ColorButton("##kind", ImVec4(((k->dwDraw >> 16) & 0xFF) / 255.0f, ((k->dwDraw >> 8) & 0xFF) / 255.0f,
+                                                (k->dwDraw & 0xFF) / 255.0f, 1.0f),
+                               ImGuiColorEditFlags_NoTooltip, ImVec2(14.0f, 14.0f));
             ImGui::TableNextColumn();
             ImGui::Text("0x%04X", k->dwTag >> 16);
             ImGui::TableNextColumn();
@@ -1357,7 +1376,7 @@ static void CollisionKinds()
     ImGui::TreePop();
 }
 
-static void TabDrawing()
+static void ViewTriggers()
 {
     Check("draw the trigger volumes", &g_bTrigDrawEnabled);
     Check("through walls", &g_bTrigDrawSeeThrough);
@@ -1366,12 +1385,20 @@ static void TabDrawing()
     Check("names (the level's name for a trigger, above its type)", &g_bTrigDrawNames);
     ImGui::SliderFloat("trigger draw distance (0 unlimited)", &g_fTrigDrawRange, 0.0f, 1000.0f, "%.0f");
     ImGui::SliderFloat("label height (of the distance)", &g_fTrigDrawTextScale, 0.005f, 0.1f, "%.3f");
-    ImGui::Separator();
+}
+
+static void ViewCollision()
+{
     Check("draw the collision worlds", &g_bTrigDrawCollision);
     ImGui::SliderFloat("collision draw distance", &g_fTrigDrawCollisionRange, 5.0f, 200.0f, "%.0f");
     ImGui::SliderFloat("collision lift along the normal", &g_fTrigDrawCollisionLift, 0.0f, 0.5f, "%.3f");
     CollisionKinds();
-    ImGui::Separator();
+}
+
+// The AI: its path nodes, then the soldiers' state.
+static void ViewAi()
+{
+    ImGui::SeparatorText("Path nodes");
     Check("draw the AI's path nodes", &g_bTrigDrawPathNodes);
     ImGui::SameLine();
     Check("their links", &g_bTrigDrawPathLinks);
@@ -1409,7 +1436,7 @@ static void TabDrawing()
         else
             ImGui::TextDisabled("(no path graph loaded: multiplayer maps have none)");
     }
-    ImGui::Separator();
+    ImGui::SeparatorText("The soldiers");
     Check("draw the AI's state", &g_bTrigDrawAi);
     ImGui::SameLine();
     Check("text", &g_bTrigDrawAiText);
@@ -1427,7 +1454,10 @@ static void TabDrawing()
                             "then the last lines the game logged about it and the script messages it raised (> ...), "
                             "with their age; lines: red the tracked entity, orange the target point, yellow where it "
                             "aims, green its current node, cyan its path)", g_nTrigDrawAiShown);
-    ImGui::Separator();
+}
+
+static void ViewGenerators()
+{
     Check("draw the projectile generators", &g_bTrigDrawPg);
     ImGui::SameLine();
     Check("their state##pg", &g_bTrigDrawPgText);
@@ -1438,7 +1468,11 @@ static void TabDrawing()
                             "entity, orange a set one, yellow a point, blue its path; the yellow cross where it aims "
                             "with its spread; cyan its turret's facing, magenta while it turns; grey to its "
                             "trigger)", g_nTrigDrawPgShown);
-    ImGui::Separator();
+    ImGui::TextDisabled("(Level, Generators: the list, and each one's settings)");
+}
+
+static void ViewGimps()
+{
     Check("draw the gimps", &g_bTrigDrawGimps);
     ImGui::SameLine();
     Check("the shrimps", &g_bTrigDrawShrimps);
@@ -1453,11 +1487,16 @@ static void TabDrawing()
         ImGui::TextDisabled("(%d shrimps drawn: each shrimp trigger's path in blue from its tick, a cross per shrimp, "
                             "cyan going forward, magenta back; its label adds the count, spawns left, chance and speed)",
                             g_nTrigDrawShrimpsShown);
-    ImGui::Separator();
+}
+
+// Moving about: noclip for the player, the free camera.
+static void ViewCamera()
+{
+    ImGui::SeparatorText("Noclip");
     Check("noclip for the local player", &g_bTrigDrawNoclip);
     ImGui::SliderFloat("noclip speed", &g_fTrigDrawNoclipSpeed, 1.0f, 500.0f, "%.0f");
     ImGui::TextDisabled("(noclip: the left stick moves along the view, Black up, White down)");
-    ImGui::Separator();
+    ImGui::SeparatorText("Free camera");
     Check("free camera", &g_bTrigDrawFreeCam);
     ImGui::SliderFloat("free camera speed (units a second)", &g_fTrigDrawFreeCamSpeed, 50.0f, 10000.0f, "%.0f",
                        ImGuiSliderFlags_Logarithmic);
@@ -1465,7 +1504,12 @@ static void TabDrawing()
     ImGui::TextDisabled("(free camera: the pad is the camera's, not the player's; the left stick (WASD) moves, the "
                         "right (the mouse) looks, Black/White (Q/E) up and down, the right trigger faster, the left "
                         "slower; start and back stay the game's)");
-    ImGui::Separator();
+}
+
+// The web suite's live link, and the game's own debug menu.
+static void EngineLinks()
+{
+    ImGui::SeparatorText("The web suite's live link");
     Check("live link for the level viewer", &g_bTrigLive);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(90.0f);
@@ -1476,7 +1520,7 @@ static void TabDrawing()
                     g_nTrigLiveClients == 1 ? "" : "s");
     ImGui::TextDisabled("(the viewer's Live game panel connects to it; CODFH_LIVE=1 starts with it on; only this "
                         "machine can connect, and only a page served from it may command the game)");
-    ImGui::Separator();
+    ImGui::SeparatorText("The game's own debug menu");
     ImGui::Text("The game's debug menu: %s", unk_4E73A8.unk_14 ? "open" : "closed");
     ImGui::SameLine();
     if (ImGui::Button(unk_4E73A8.unk_14 ? "close it" : "open it"))
@@ -1530,7 +1574,6 @@ static void TabInventory()
     RwUInt32 dwWeapon, dwHand, dwSel;
     RwInt32 i;
 
-    ResultLine();
     if (pPlayer == NULL)
     {
         ImGui::Text("No local player.");
@@ -1971,7 +2014,6 @@ static void TabWeapons()
     }
     if (s_nWeapon < 0 || s_nWeapon >= 39)
         s_nWeapon = (RwInt32)dwHand >= 0 && (RwInt32)dwHand < 39 ? (RwInt32)dwHand : 0;
-    ResultLine();
     // the active weapon: the one in hand (unk_1AE4), its copy's rounds
     if ((RwInt32)dwHand >= 0 && (RwInt32)dwHand < 39)
     {
@@ -2050,7 +2092,7 @@ static int __cdecl TrigByDistance(const void *pA, const void *pB)
 }
 
 // The trigger's row: its type, shape, place, flags, distance and its actions.
-// The trigger the Trigger tab edits (a handle; -1 none), set from here.
+// The trigger Level, Triggers, Selected edits (a handle; -1 none), set from here.
 static RwInt32 s_nTrigEdit = -1;
 
 static void TrigRow(RwInt32 nHandle, Trigger *pTrigger, RwReal fDist)
@@ -2224,7 +2266,6 @@ static void TabGenerators()
     RwV3d vFrom = {0.0f, 0.0f, 0.0f};
     RwInt32 n, i;
 
-    ResultLine();
     if (pPlayer == NULL || !PlayerPosition(pPlayer, &vFrom))
         vFrom.x = vFrom.y = vFrom.z = 0.0f;
     n = PgList(&vFrom);
@@ -2857,7 +2898,7 @@ static void TabTrigger()
         ImGui::EndCombo();
     }
     ImGui::SameLine();
-    ImGui::TextDisabled("at 0x%08X; or edit in the Triggers tab", (RwUInt32)pTrigger);
+    ImGui::TextDisabled("at 0x%08X; or pick one in the List tab", (RwUInt32)pTrigger);
     if (pTrigger == NULL)
     {
         ImGui::Text("No trigger to edit.");
@@ -3291,7 +3332,6 @@ static void TabTriggers()
     RwV3d vPlayer;
     RwBool bPlayer;
 
-    ResultLine();
     bPlayer = pPlayer != NULL && PlayerPosition(pPlayer, &vPlayer);
     nLast = dword_429D00;
     if (nLast >= 2000)
@@ -4232,7 +4272,6 @@ static void TabSections()
     RwInt32 i;
     RwChar sz[48];
 
-    ResultLine();
     if (ImGui::BeginTable("slots", 5, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg))
     {
         ImGui::TableSetupColumn("");
@@ -4327,7 +4366,6 @@ static void TabEntities()
     RwBool bPlayer;
     RwInt32 i, nShown = 0, nLive = 0;
 
-    ResultLine();
     bPlayer = pPlayer != NULL && PlayerPosition(pPlayer, &vPlayer);
     ImGui::Text("Show:");
     ImGui::SameLine();
@@ -4418,7 +4456,6 @@ static void TabObjectives()
     RwInt32 i;
     RwUInt32 dw;
 
-    ResultLine();
     if (ImGui::CollapsingHeader("Checkpoint", ImGuiTreeNodeFlags_DefaultOpen))
     {
         if (ReadU32(&dword_4B8780, &dw))
@@ -4659,7 +4696,6 @@ static void TabHud()
     RwUInt32 dwHud = 0;
     RwInt32 i;
 
-    ResultLine();
     ReadU32(&dword_4B9190, &dwHud);
     if (dwHud == 0)
     {
@@ -4730,6 +4766,79 @@ static void TabHud()
 
 // ---- the window ----
 
+// The window's tabs: five groups (what is drawn, the player, the level's objects, the scripts,
+// the engine), each a row of its own tabs.
+struct ToolTab
+{
+    const RwChar *pszName;
+    void (*pfnDraw)();
+};
+
+static void SubTabs(const RwChar *pszId, const ToolTab *pTabs, RwInt32 nTabs)
+{
+    RwInt32 i;
+
+    if (!ImGui::BeginTabBar(pszId, ImGuiTabBarFlags_FittingPolicyScroll))
+        return;
+    for (i = 0; i < nTabs; i++)
+    {
+        if (ImGui::BeginTabItem(pTabs[i].pszName))
+        {
+            ImGui::BeginChild("tab");
+            pTabs[i].pfnDraw();
+            ImGui::EndChild();
+            ImGui::EndTabItem();
+        }
+    }
+    ImGui::EndTabBar();
+}
+
+// (a list and its selected one, as two tabs of their own)
+static void LevelTriggers()
+{
+    static const ToolTab s_aTabs[] = { { "List", TabTriggers }, { "Selected", TabTrigger } };
+
+    SubTabs("triggers", s_aTabs, 2);
+}
+
+static void LevelGenerators()
+{
+    static const ToolTab s_aTabs[] = { { "List", TabGenerators }, { "Selected", TabGenerator } };
+
+    SubTabs("generators", s_aTabs, 2);
+}
+
+static const ToolTab s_aViewTabs[] =
+{
+    { "Triggers", ViewTriggers }, { "Collision", ViewCollision }, { "AI", ViewAi },
+    { "Generators", ViewGenerators }, { "Gimps", ViewGimps }, { "Camera", ViewCamera },
+};
+static const ToolTab s_aPlayerTabs[] =
+{
+    { "Player", TabPlayer }, { "Inventory", TabInventory }, { "Weapons", TabWeapons }, { "Cheats", TabCheats },
+};
+static const ToolTab s_aLevelTabs[] =
+{
+    { "Entities", TabEntities }, { "Triggers", LevelTriggers }, { "Generators", LevelGenerators },
+    { "Objectives", TabObjectives }, { "Sections", TabSections },
+};
+static const ToolTab s_aScriptTabs[] =
+{
+    { "Scripts", TabScripts }, { "Script log", TabScriptLog }, { "VM", TabVm },
+};
+static const ToolTab s_aEngineTabs[] =
+{
+    { "Level and render", CheatsLevelRender }, { "Audio", CheatsAudio }, { "Tunables", TabTunables },
+    { "Shell", TabShell }, { "HUD", TabHud }, { "Loading", TabLoading }, { "Memory", TabMemory },
+    { "Links", EngineLinks },
+};
+#define TOOL_GROUP(name, tabs) { name, tabs, (RwInt32)(sizeof(tabs) / sizeof(tabs[0])) }
+static const struct { const RwChar *pszName; const ToolTab *pTabs; RwInt32 nTabs; } s_aGroups[] =
+{
+    TOOL_GROUP("View", s_aViewTabs), TOOL_GROUP("Player", s_aPlayerTabs), TOOL_GROUP("Level", s_aLevelTabs),
+    TOOL_GROUP("Scripts", s_aScriptTabs), TOOL_GROUP("Engine", s_aEngineTabs),
+};
+
 // The tools' window, drawn by the overlay each frame it is shown
 // (pd11_imgui.cpp).
 extern "C" void port_debug_tools_window()
@@ -4741,107 +4850,18 @@ extern "C" void port_debug_tools_window()
         ImGui::End();
         return;
     }
-    if (ImGui::BeginTabBar("tabs", ImGuiTabBarFlags_FittingPolicyScroll))
+    ResultLine();
+    if (ImGui::BeginTabBar("groups"))
     {
-        if (ImGui::BeginTabItem("Drawing"))
+        RwInt32 i;
+
+        for (i = 0; i < (RwInt32)(sizeof(s_aGroups) / sizeof(s_aGroups[0])); i++)
         {
-            TabDrawing();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Cheats"))
-        {
-            TabCheats();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Tunables"))
-        {
-            TabTunables();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Player"))
-        {
-            TabPlayer();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Inventory"))
-        {
-            TabInventory();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Weapons"))
-        {
-            TabWeapons();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Entities"))
-        {
-            TabEntities();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Triggers"))
-        {
-            TabTriggers();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Trigger"))
-        {
-            TabTrigger();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Shell"))
-        {
-            TabShell();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Generators"))
-        {
-            TabGenerators();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Generator"))
-        {
-            TabGenerator();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Objectives"))
-        {
-            TabObjectives();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Scripts"))
-        {
-            TabScripts();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Script log"))
-        {
-            TabScriptLog();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("VM"))
-        {
-            TabVm();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Sections"))
-        {
-            TabSections();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Loading"))
-        {
-            TabLoading();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Memory"))
-        {
-            TabMemory();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("HUD"))
-        {
-            TabHud();
-            ImGui::EndTabItem();
+            if (ImGui::BeginTabItem(s_aGroups[i].pszName))
+            {
+                SubTabs(s_aGroups[i].pszName, s_aGroups[i].pTabs, s_aGroups[i].nTabs);
+                ImGui::EndTabItem();
+            }
         }
         ImGui::EndTabBar();
     }
@@ -4849,7 +4869,7 @@ extern "C" void port_debug_tools_window()
 }
 
 // The live link's ways in (trigweb.cpp, on the game thread): a teleport through the action
-// queue, the trigger the Trigger tab edits, and the last action's result.
+// queue, the trigger Level, Triggers, Selected edits, and the last action's result.
 void TrigWebRequestTeleport(const RwV3d *pv)
 {
     Request(REQ_TELEPORT, 0, 0, pv->x, pv->y, pv->z);

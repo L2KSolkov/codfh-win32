@@ -161,7 +161,7 @@ static const RwChar *const s_apszKindNames[0x28] =
 
 static RwIm3DVertex s_aTextVerts[TRIGDRAW_MAXCHARS * 6];
 
-// Switches, set from the overlay's Drawing tab (trigtools.cpp): draw at all
+// Switches, set from the debug tools' View tabs (trigtools.cpp): draw at all
 // (off until asked for: the environment's CODFH_TRIGGERS=1 starts with it on,
 // 2 with the collision too; CODFH_PATHNODES=1 the path nodes),
 // the draw distance from the camera (0 = unlimited), and draw through
@@ -202,6 +202,12 @@ static RwV3d s_vCollCam;
 TrigDrawCollKind g_aTrigDrawCollKinds[TRIGDRAW_COLLKINDS];
 RwInt32 g_nTrigDrawCollKinds;
 RwBool g_bTrigDrawCollByKind = FALSE;
+RwInt32 g_nTrigDrawCollFill = 0;
+RwReal g_fTrigDrawCollGrid = 32.0f;
+// (the outlines' line buffer: two vertices an edge)
+#define TRIGDRAW_COLLLINEVERTS 3000
+static RwIm3DVertex s_aCollLineVerts[TRIGDRAW_COLLLINEVERTS];
+static RwInt32 s_nCollLineVerts;
 #define TRIGDRAW_COLLMATCACHE 512
 static struct { void *pMaterial; RwInt32 nKind; } s_aCollMatCache[TRIGDRAW_COLLMATCACHE];
 static RwBool s_bCollAnyShown;
@@ -2180,6 +2186,121 @@ static void TrigDrawCollisionFlush()
     s_nCollVerts = 0;
 }
 
+// Draws and empties the collision outline buffer.
+static void TrigDrawCollisionLineFlush()
+{
+    if (s_nCollLineVerts == 0)
+        return;
+    if (RwIm3DTransform(s_aCollLineVerts, s_nCollLineVerts, NULL, rwIM3D_VERTEXXYZ | rwIM3D_VERTEXRGBA))
+    {
+        RwIm3DRenderPrimitive(rwPRIMTYPELINELIST);
+        RwIm3DEnd();
+    }
+    s_nCollLineVerts = 0;
+}
+
+// A line into the outline buffer, lifted along vN by fLift.
+static void TrigDrawCollLine(const RwV3d *pP, const RwV3d *pQ, const RwV3d *pvN, RwReal fLift, RwUInt32 dwColour)
+{
+    RwIm3DVertex *pVert;
+
+    if (s_nCollLineVerts + 2 > TRIGDRAW_COLLLINEVERTS)
+        TrigDrawCollisionLineFlush();
+    pVert = &s_aCollLineVerts[s_nCollLineVerts];
+    RwIm3DVertexSetPos(&pVert[0], pP->x + pvN->x * fLift, pP->y + pvN->y * fLift, pP->z + pvN->z * fLift);
+    RwIm3DVertexSetPos(&pVert[1], pQ->x + pvN->x * fLift, pQ->y + pvN->y * fLift, pQ->z + pvN->z * fLift);
+    pVert[0].color = pVert[1].color = dwColour;
+    s_nCollLineVerts += 2;
+}
+
+static RwReal TrigDrawAxis(const RwV3d *pv, RwInt32 nAxis)
+{
+    return nAxis == 0 ? pv->x : nAxis == 1 ? pv->y : pv->z;
+}
+
+// The grid lines across a triangle: where it crosses the planes every fSpacing units along
+// the two axes its normal is least along (a floor's x and z, a wall's y and the other), at
+// most 48 a direction.
+static void TrigDrawCollGrid(const RwV3d *pA, const RwV3d *pB, const RwV3d *pC, const RwV3d *pvN,
+                             RwReal fSpacing, RwReal fLift, RwUInt32 dwColour)
+{
+    const RwV3d *apV[3] = { pA, pB, pC };
+    RwReal fAx = (RwReal)fabs(pvN->x), fAy = (RwReal)fabs(pvN->y), fAz = (RwReal)fabs(pvN->z);
+    RwInt32 nMain = fAy >= fAx && fAy >= fAz ? 1 : fAx >= fAz ? 0 : 2;
+    RwInt32 nAxis, e;
+
+    for (nAxis = 0; nAxis < 3; nAxis++)
+    {
+        RwReal fA, fB, fC, fLo, fHi, t;
+        RwInt32 n;
+
+        if (nAxis == nMain)
+            continue;
+        fA = TrigDrawAxis(pA, nAxis);
+        fB = TrigDrawAxis(pB, nAxis);
+        fC = TrigDrawAxis(pC, nAxis);
+        fLo = fA < fB ? (fA < fC ? fA : fC) : (fB < fC ? fB : fC);
+        fHi = fA > fB ? (fA > fC ? fA : fC) : (fB > fC ? fB : fC);
+        t = (RwReal)ceil(fLo / fSpacing) * fSpacing;
+        for (n = 0; t < fHi && n < 48; t += fSpacing, n++)
+        {
+            RwV3d avHit[2];
+            RwInt32 nHits = 0;
+
+            // (the two edges the plane crosses)
+            for (e = 0; e < 3 && nHits < 2; e++)
+            {
+                const RwV3d *pP = apV[e], *pQ = apV[(e + 1) % 3];
+                RwReal p = TrigDrawAxis(pP, nAxis), q = TrigDrawAxis(pQ, nAxis);
+
+                if ((p <= t && q > t) || (q <= t && p > t))
+                {
+                    RwReal f = (t - p) / (q - p);
+
+                    avHit[nHits].x = pP->x + (pQ->x - pP->x) * f;
+                    avHit[nHits].y = pP->y + (pQ->y - pP->y) * f;
+                    avHit[nHits].z = pP->z + (pQ->z - pP->z) * f;
+                    nHits++;
+                }
+            }
+            if (nHits == 2)
+                TrigDrawCollLine(&avHit[0], &avHit[1], pvN, fLift, dwColour);
+        }
+    }
+}
+
+// A kind's own colour: a hue from a hash (FNV-1a) of its tag and texture name,
+// full and bright, so a kind keeps its colour across levels and a forget.
+static RwUInt32 TrigDrawCollKindHue(RwUInt32 dwTag, const RwChar *pszTexture)
+{
+    RwUInt32 h = 2166136261u;
+    RwReal fHue, f, r, g, b;
+    RwInt32 i, nSector;
+
+    for (i = 0; i < 4; i++)
+        h = (h ^ ((dwTag >> (i * 8)) & 0xFF)) * 16777619u;
+    for (i = 0; pszTexture[i]; i++)
+        h = (h ^ (RwUInt8)pszTexture[i]) * 16777619u;
+    fHue = (RwReal)((h >> 8) % 360u) / 60.0f;
+    nSector = (RwInt32)fHue;
+    f = fHue - nSector;
+    // (the HSV hue at full saturation, value 1)
+    switch (nSector % 6)
+    {
+    case 0: r = 1.0f; g = f; b = 0.0f; break;
+    case 1: r = 1.0f - f; g = 1.0f; b = 0.0f; break;
+    case 2: r = 0.0f; g = 1.0f; b = f; break;
+    case 3: r = 0.0f; g = 1.0f - f; b = 1.0f; break;
+    case 4: r = f; g = 0.0f; b = 1.0f; break;
+    default: r = 1.0f; g = 0.0f; b = 1.0f - f; break;
+    }
+    // (a little white mixed in: the darker hues read better on the dark levels)
+    r = 0.25f + 0.75f * r;
+    g = 0.25f + 0.75f * g;
+    b = 0.25f + 0.75f * b;
+    return 0xFF000000 | ((RwUInt32)(r * 255.0f) << 16) | ((RwUInt32)(g * 255.0f) << 8) | (RwUInt32)(b * 255.0f);
+}
+
 void TrigDrawCollKindsClear()
 {
     g_nTrigDrawCollKinds = 0;
@@ -2252,6 +2373,7 @@ static RwInt32 TrigDrawCollKindOf(void *pMaterial)
             memset(k, 0, sizeof(*k));
             k->dwTag = dwTag;
             k->dwRgba = dwRgba;
+            k->dwDraw = TrigDrawCollKindHue(dwTag, pszTex);
             strncpy(k->szTexture, pszTex, sizeof(k->szTexture) - 1);
         }
     }
@@ -2262,14 +2384,10 @@ static RwInt32 TrigDrawCollKindOf(void *pMaterial)
     return i;
 }
 
-// A colour per kind (its index hashed to a hue), for g_bTrigDrawCollByKind.
+// A kind's drawing colour, see-through (g_bTrigDrawCollByKind); grey for none.
 static RwUInt32 TrigDrawCollKindColour(RwInt32 nKind)
 {
-    static const RwUInt32 s_aColours[8] =
-    {
-        0x70FF4040, 0x7040FF40, 0x704080FF, 0x70FFFF40, 0x70FF40FF, 0x7040FFFF, 0x70FF9030, 0x70FFFFFF,
-    };
-    return nKind < 0 ? 0x60808080 : s_aColours[nKind % 8];
+    return nKind < 0 ? 0x60808080 : (g_aTrigDrawCollKinds[nKind].dwDraw & 0x00FFFFFF) | 0x70000000;
 }
 
 // A world sector callback: when the sector's box is within
@@ -2328,18 +2446,35 @@ static RpWorldSector *TrigDrawCollisionSector(RpWorldSector *pSector, void *pDat
             dwColour = 0x604080FF;
         if (g_bTrigDrawCollByKind)
             dwColour = TrigDrawCollKindColour(nKind);
-        if (s_nCollVerts + 3 > TRIGDRAW_COLLVERTS)
-            TrigDrawCollisionFlush();
-        pVert = &s_aCollVerts[s_nCollVerts];
-        for (k = 0; k < 3; k++)
+        // (filled: the triangle, see-through)
+        if (g_nTrigDrawCollFill != 1)
         {
-            const RwV3d *pv = k == 0 ? &vA : k == 1 ? &vB : &vC;
-            RwIm3DVertexSetPos(&pVert[k], pv->x + vN.x * g_fTrigDrawCollisionLift,
-                               pv->y + vN.y * g_fTrigDrawCollisionLift,
-                               pv->z + vN.z * g_fTrigDrawCollisionLift);
-            pVert[k].color = dwColour;
+            if (s_nCollVerts + 3 > TRIGDRAW_COLLVERTS)
+                TrigDrawCollisionFlush();
+            pVert = &s_aCollVerts[s_nCollVerts];
+            for (k = 0; k < 3; k++)
+            {
+                const RwV3d *pv = k == 0 ? &vA : k == 1 ? &vB : &vC;
+                RwIm3DVertexSetPos(&pVert[k], pv->x + vN.x * g_fTrigDrawCollisionLift,
+                                   pv->y + vN.y * g_fTrigDrawCollisionLift,
+                                   pv->z + vN.z * g_fTrigDrawCollisionLift);
+                pVert[k].color = dwColour;
+            }
+            s_nCollVerts += 3;
         }
-        s_nCollVerts += 3;
+        // (outlines: its three edges, in the colour made opaque, and the grid lines across it a
+        // little fainter; lifted a little more so they sit on the fill)
+        if (g_nTrigDrawCollFill != 0)
+        {
+            RwReal fLift = g_fTrigDrawCollisionLift * 2.0f;
+            RwUInt32 dwLine = dwColour | 0xFF000000;
+
+            TrigDrawCollLine(&vA, &vB, &vN, fLift, dwLine);
+            TrigDrawCollLine(&vB, &vC, &vN, fLift, dwLine);
+            TrigDrawCollLine(&vC, &vA, &vN, fLift, dwLine);
+            if (g_fTrigDrawCollGrid > 0.5f)
+                TrigDrawCollGrid(&vA, &vB, &vC, &vN, g_fTrigDrawCollGrid, fLift, (dwColour & 0x00FFFFFF) | 0xB0000000);
+        }
     }
     return pSector;
 }
@@ -2352,6 +2487,7 @@ static void TrigDrawCollision(const RwV3d *pvCam)
 
     s_vCollCam = *pvCam;
     s_nCollVerts = 0;
+    s_nCollLineVerts = 0;
     // (this frame's counts and material cache; whether any kind is shown)
     memset(s_aCollMatCache, 0, sizeof(s_aCollMatCache));
     s_bCollAnyShown = FALSE;
@@ -2371,6 +2507,7 @@ static void TrigDrawCollision(const RwV3d *pvCam)
                                       dword_4E5D30[i].get_unk_28());
     }
     TrigDrawCollisionFlush();
+    TrigDrawCollisionLineFlush();
 }
 
 // A stick axis as -1..1, with the game's dead zone (flt_42C77C) of 0.25 of
@@ -2424,7 +2561,7 @@ void TrigDrawNoclipMove(RwV3d *pvPos, RwReal fStep)
 
 // ---- the free camera ----
 
-// The free camera (the Drawing tab's switch): the world is drawn from its own
+// The free camera (View, Camera's switch): the world is drawn from its own
 // place and look instead of the game's camera, which is put back after the
 // frame (TrigDrawFreeCamBegin, TrigDrawFreeCamEnd, from sub_125F20), so the
 // game's logic, aiming and sound go on from the player; while it is on, pad
@@ -2606,7 +2743,7 @@ static RwBool TrigDrawInRange(Trigger *pTrigger, const RwV3d *pvCam)
 // Draws every registered trigger within g_fTrigDrawRange of the camera
 // pCamera, outlines first and then their labels; called once a frame after
 // the world (sub_125F20). Saves and restores the render states it changes.
-// Points the free camera at pv from a little way off (the Generators tab).
+// Points the free camera at pv from a little way off (Level, Generators).
 void TrigDrawFreeCamLookAt(const RwV3d *pv)
 {
     RwV3d vFrom, vD;
@@ -2766,7 +2903,7 @@ void TrigDrawAll(RwCamera *pCamera)
 }
 
 // ---- the live link's debug feed (trigweb.cpp, the web suite's level viewer) ----
-// What the Drawing tab's AI, projectile generator and path node drawing reads, as JSON for the
+// What the View tabs' AI, projectile generator and path node drawing reads, as JSON for the
 // viewer to draw with labels: every AI's whole state (TrigDrawAiRead) with its notes, every
 // projectile generator's (TrigDrawPgRead) with its notes, and the path node graph (all of it
 // once, then the nodes whose flags or blocked links changed). While a viewer takes the feed,

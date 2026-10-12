@@ -1,6 +1,6 @@
 // The Win32 port's live link for the web suite's level viewer (C:\cfh-web-suite, web/live-view.js;
 // CODFH_DRAW_TRIGGERS): a WebSocket server, on every interface, that the page connects to directly.
-// Off until asked for: the overlay's Drawing tab, or CODFH_LIVE=1 (the port 8771) or
+// Off until asked for: the debug tools' Engine, Links tab, or CODFH_LIVE=1 (the port 8771) or
 // CODFH_LIVE=<port>.
 //
 // Two channels on the one socket:
@@ -90,7 +90,7 @@ extern RwBool g_bTrigLiveDebug;
 void TrigScriptDbgCommand(const RwChar *pszCmd, RwUInt32 dwObj, RwUInt32 dwAddr, RwInt32 nIndex, RwInt32 nValue, RwInt32 nOn);
 void TrigScriptDbgTick(RwBool bWatched);
 
-// The overlay's switch and port (trigtools.cpp's Drawing tab).
+// The overlay's switch and port (trigtools.cpp's Engine, Links tab).
 RwBool g_bTrigLive = FALSE;
 RwInt32 g_nTrigLivePort = 8771;
 RwInt32 g_nTrigLiveClients = 0;
