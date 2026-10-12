@@ -1,0 +1,301 @@
+diff --git a/tools/testmap/make_flat.py b/tools/testmap/make_flat.py
+--- a/tools/testmap/make_flat.py
++++ b/tools/testmap/make_flat.py
+@@ -23,6 +23,11 @@
+     has no intro movie). A bank read off the disk crashed in sub_190B20.
+ The floor is centred under the source level's PlayerTrigger, at its feet (120 below it).
+ 
++The rocket range (rocket_range: a rocket launcher soldier firing at an enemy that cannot die)
++fires only from a level whose own soldiers carry the rocket launcher, for their character
++definitions and animations: --level L_1_5 (the tank defence), run as codfh.exe -map L_1_5
++-leveldir <folder>. From L_1_1_B (the default) the shooter is the kept soldier armed with it,
++who takes his orders but never fires.
+ """
+ import argparse, math, pathlib, struct, sys
+ 
+@@ -586,6 +591,41 @@
+     return b''.join(out)
+ 
+ 
++# The rocket range (alfa.py tasks too): a target soldier standing at a point 15 m ahead of the
++# player start, which neither explosions nor bullets damage, and a shooter beside the player
++# start with the rocket launcher, firing at it for ever. Each is a copy of the kept soldier's
++# trigger: its own instance ID, name keys (SoldierTrigger command 0, the entity's name, which
++# the spawned soldier registers itself under, unit_134B40.cpp; Trigger command 0, the
++# trigger's), each with a copy of the soldier's name record (GodData kind 9, tag 0x10B6), a
++# name shown over it, a matrix and a task. The shooter's task is the levels' own way to shoot
++# at a named entity (L_1_3_A's tasks): "SetTarget" (the name's two words: SoldierClass looks
++# the entity up, GetEntityFromName, and makes it its target, SetMyTarget), then
++# "SetTaskCommand_ShootAtTarget" (-1: its class's task 25, state 263, attacking standing).
++MSG_SETTARGET, MSG_SHOOTATTARGET = 80, 387
++CMD_INFINITEAMMOCLIP, CMD_SETHITPOINTS = 415, 426
++CMD_SETCAN_DAMAGE = (533, 534, 535, 536)   # explosions, bullets, enemies, allies may damage
++TARGET_GUID = (0xC0DE5001, 'debugging.target')
++# The target is an enemy (a soldier attacks only one): a copy of one of L_1_1_B's German soldiers'
++# triggers, with that character definition (SoldierTrigger command 3, a kind-4 record). Its own
++# trigger, not the kept one's with its definition changed: the German's other commands request
++# the definition's GodData chain in the file's order, before the level's clump bank is read, as
++# the level does; with only command 3 changed the chain's bank models (kinds 1, 9, 58, in
++# cbank_01) are asked for after it, and the level start waits for them for ever. A soldier's team is its
++# definition's kind-8 reference (unk_44; unit_134B40.cpp sets the entity's team, unk_2C, by it):
++# a value record naming L_1_1_B's German team (7C142BB6,197563FC) rather than Puskov's
++# (791426F9,0575446A). (Not D808218A,C8B4C226: its chain reaches B5BDD800,5C428EF3, whose
++# references L_1_1_B's GodData does not hold, so the level start waits for them for ever.)
++ENEMY_CHARACTER = struct.pack('<2I', 0xCDB60D37, 0xB2A6DE7F)
++SHOOTER_GUID = (0xC0DE5002, 'debugging.shooter')
++
++
++def _mark(a, trace, n):
++    """With trace, PrintInt n (codfh.log's "script print" lines)."""
++    if trace:
++        a.push(n, n)
++        a.command(CMD_PRINTINT)
++
++
+ # The setup L_1_3_A's rocket soldiers' tasks begin with (god_BC96F8B7_BAA71723 and the rest),
+ # after Initialize: SoldierClass's function_37 (state 0: a switch on its first argument) with (0,
+ # 1), its field_8, which its task commands (state 1's SetTaskCommand_* handlers) need before
+@@ -603,6 +643,186 @@
+         a.queue(MSG_SETPARAMETER, [n, 0], CMD_GETMYAIOBJECTPOINTER, append=True)
+ 
+ 
++def target_task(ident, trace=False, health=10000, every=0.25):
++    """The target's task: when it starts, the soldiers' setup (_setup: his own targeting off), nothing may damage it (SetCan*Damage(me, 0): flags of
++    its trigger), and then for ever its hit points set to health every every seconds
++    (SetHitPoints(me, health)), so that what does damage it never kills it. trace: marks 101
++    (started), 102 (flags set), 103 (each top-up, the first only)."""
++    import alfa
++    a = alfa.Asm()
++    a.wait_message(MSG_INITIALIZE, 1)
++    _mark(a, trace, 101)
++    _setup(a)                          # (his own targeting off: he stands, not closing in)
++    for cmd in CMD_SETCAN_DAMAGE:
++        a.command(CMD_GETMYAIOBJECTPOINTER)
++        a.push(0)
++        a.command(cmd)
++    _mark(a, trace, 102)
++    a.label('loop')
++    a.command(CMD_GETMYAIOBJECTPOINTER)
++    a.push(health)
++    a.command(CMD_SETHITPOINTS)
++    _wait(a, every)
++    a.jump('loop')
++    a.halt()
++    return alfa.task_image(ident, a.finish())
++
++
++def shooter_task(ident, target_name, again=10.0, trace=False):
++    """The shooter's task: when it starts (and a second on: his class takes a task only once it
++    is up), an endless clip (InfiniteAmmoClip 1), then every again seconds the target by its
++    name (SetTarget, its key's two words) and the order to shoot at it. trace: marks 201
++    (started), 202 (each order)."""
++    import alfa
++    a = alfa.Asm()
++    a.wait_message(MSG_INITIALIZE, 1)
++    _mark(a, trace, 201)
++    _setup(a)
++    _wait(a, 1.0)
++    a.push(1)
++    a.command(CMD_INFINITEAMMOCLIP)
++    a.label('loop')
++    a.queue(MSG_SETTARGET, list(struct.unpack('<2I', target_name)), CMD_GETMYAIOBJECTPOINTER)
++    a.queue(MSG_SHOOTATTARGET, [-1], CMD_GETMYAIOBJECTPOINTER)
++    _mark(a, trace, 202)
++    _wait(a, again)
++    a.jump('loop')
++    a.halt()
++    return alfa.task_image(ident, a.finish())
++
++
++def _wait(a, seconds):
++    """A GenericTimer of seconds (RegisterTimer seconds, GenericTimer, 0), then waiting for it."""
++    import alfa
++    a.push(alfa.f32(seconds))
++    a.push(MSG_GENERICTIMER)
++    a.push(0)
++    a.command(CMD_REGISTERTIMER)
++    a.pop(1)
++    a.wait_message(MSG_GENERICTIMER, 0x26)
++
++
++def renamed_record(chunk, key8):
++    """A copy of a GodData record chunk under the key key8."""
++    c = bytearray(chunk)
++    c[12 + 16:12 + 24] = key8
++    return bytes(c)
++
++
++def soldier_copy(level, god, low, name, pos, facing, task_key, weapon=None, source=None):
++    """A copy of the kept soldier trigger, or of source, another soldier trigger chunk (see the
++    rocket range above): (its chunk, the name records it needs, its entity's name key). low: its
++    instance ID's last word, which keys its names too."""
++    sys.path.insert(0, SUITE)
++    from objects import packet
++    assets = god_records(god)[0]
++    own = next(c for kind, c in chunks_of(level) if kind == 0x704 and packet(c[16:])[1] == SOLDIER)
++    tmpl = source or own
++    cmds = {(o, k): raw for o, k, raw in packet(tmpl[16:])[2]}
++    words = [int(w, 16) for w in SOLDIER.split('-')]
++    records, edits = [], {}
++    for n, owner in enumerate(('SoldierTrigger', 'Trigger')):
++        key = struct.pack('<2I', low, 0xC0DE0000 + n)
++        # (the kept soldier's name records, which every copy has: one asked for and missing
++        # would hold the level start)
++        old = skey({(o, k): raw for o, k, raw in packet(own[16:])[2]}[owner, 0][:8])
++        if old in assets:
++            records.append(renamed_record(assets[old], key))
++        edits[owner, 0] = key
++    fx, fz = facing
++    edits['SoldierTrigger', 1] = name.encode() + b'\0'
++    edits['SoldierTrigger', 8] = task_key
++    edits['CSystemCommands', 1] = struct.pack('<16f', fz, 0, -fx, 0, 0, 1, 0, 0, fx, 0, fz, 0, pos[0], pos[1],
++                                              pos[2], 1)
++    if weapon:
++        edits['SoldierTrigger', 38] = weapon
++    if source:
++        # the kept soldier's: its creation script (BasicCreationTrigger, spawned by
++        # "CreateChild"), its links (Trigger 15) and SoldierTrigger 5 and 9. (Not 4: the German's,
++        # -1, marks its model record as one of the clump bank's, sub_B8000's command 3; with 0
++        # the level start waits for the model's bank parts for ever.)
++        mine = {(o, k): raw for o, k, raw in packet(own[16:])[2]}
++        for key in (('Trigger', 13), ('Trigger', 15), ('SoldierTrigger', 5), ('SoldierTrigger', 9)):
++            edits[key] = mine[key]
++    guid = struct.pack('<4I', words[0], words[1], words[2], low)
++    return rewrite_packet(tmpl, edits, guid), b''.join(records), edits['SoldierTrigger', 0]
++
++
++def soldier_team(assets, cmds):
++    """A soldier trigger's team: its character definition's (SoldierTrigger command 3, a kind-4
++    record of eight 12-byte references, the kind in the first word's top five bits) kind-8
++    reference's value record's key, or None."""
++    rec = assets.get(skey(cmds['SoldierTrigger', 3][:8]))
++    if not rec:
++        return None
++    data = record_data(rec)
++    for i in range(len(data) // 12):
++        w0, a, b = struct.unpack_from('<3I', data, i * 12)
++        if (w0 >> 27) == 8:
++            v = assets.get(skey(struct.pack('<2I', a, b)))
++            return record_data(v)[4:12] if v else None
++    return None
++
++
++def range_sources(level_dff, god):
++    """(shooter, target): the source level's soldier triggers the rocket range copies. The shooter
++    is one of its rocket launcher soldiers (SoldierTrigger 38's key SOLDIER_WEAPON's), of the kept
++    soldier's team if one is, else of any team but the Germans', else any; None if it has none
++    (the kept soldier's copy armed with it then: L_1_1_B, whose soldier never fires it). The
++    target is a soldier of another team (an enemy: a soldier attacks only one), with
++    ENEMY_CHARACTER's definition if one has it."""
++    sys.path.insert(0, SUITE)
++    from objects import packet
++    assets = god_records(god)[0]
++    soldiers = []
++    for kind, c in chunks_of(level_dff):
++        if kind == 0x704:
++            cls, guid, cmds = packet(c[16:])
++            if cls == 'SoldierTrigger':
++                d = {(o, k): raw for o, k, raw in cmds}
++                soldiers.append((c, guid, d, soldier_team(assets, d)))
++    mine = next(t for c, g, d, t in soldiers if g == SOLDIER)
++    german = struct.pack('<2I', 0x7C142BB6, 0x197563FC)
++    rockets = [x for x in soldiers if x[2].get(('SoldierTrigger', 38), b'')[:8] == SOLDIER_WEAPON[:8]]
++    shooter = (next((x for x in rockets if x[3] == mine), None) or
++               next((x for x in rockets if x[3] != german), None) or (rockets[0] if rockets else None))
++    s_team = shooter[3] if shooter else mine
++    enemies = [x for x in soldiers if x[3] != s_team and x not in rockets]
++    target = (next((x for x in enemies if x[2]['SoldierTrigger', 3][:8] == ENEMY_CHARACTER), None) or
++              (enemies[0] if enemies else None))
++    if target is None:
++        raise SystemExit('the source level has no soldier of another team than the shooter')
++    return (shooter[0] if shooter else None), target[0]
++
++
++def rocket_range(level, god, level_dff, matrix, y, template, trace=False):
++    """level and god with the rocket range's target and shooter added."""
++    import alfa
++    at, px, pz = matrix[8:11], matrix[12], matrix[14]
++    flen = math.hypot(at[0], at[2]) or 1.0
++    fx, fz = at[0] / flen, at[2] / flen
++    rx, rz = fz, -fx
++    target_pos = (px + fx * 1500.0, y, pz + fz * 1500.0)
++    shooter_pos = (px + rx * 300.0 + fx * 100.0, y, pz + rz * 300.0 + fz * 100.0)
++    dx, dz = target_pos[0] - shooter_pos[0], target_pos[2] - shooter_pos[2]
++    n = math.hypot(dx, dz) or 1.0
++    t_key = struct.pack('<2I', TARGET_GUID[0], 2)
++    s_key = struct.pack('<2I', SHOOTER_GUID[0], 2)
++    shooter_src, target_src = range_sources(level_dff, god)
++    c, recs, t_name = soldier_copy(level, god, TARGET_GUID[0], TARGET_GUID[1], target_pos, (-fx, -fz), t_key,
++                                   weapon=bytes(8) + struct.pack('<i', 0), source=target_src)
++    level += c
++    god += recs + alfa.god_record(template, t_key, target_task(TASK_ID + 1, trace))
++    c, recs, _ = soldier_copy(level, god, SHOOTER_GUID[0], SHOOTER_GUID[1], shooter_pos, (dx / n, dz / n), s_key,
++                              None if shooter_src else SOLDIER_WEAPON, source=shooter_src)
++    level += c
++    god += recs + alfa.god_record(template, s_key, shooter_task(TASK_ID + 2, t_name, trace=trace))
++    print('rocket range: target at (%.0f, %.0f), shooter at (%.0f, %.0f)%s' % (
++        target_pos[0], target_pos[2], shooter_pos[0], shooter_pos[2],
++        ' (a copy of a rocket launcher soldier)' if shooter_src else ' (the kept soldier armed with it)'))
++    return level, god
++
++
+ def main():
+     ap = argparse.ArgumentParser()
+     ap.add_argument('out')
+@@ -616,6 +836,8 @@
+     ap.add_argument('--bazooka', action='store_true',
+                     help="arm the soldier with the rocket launcher (for the port's -shoot; he cannot walk with it)")
+     ap.add_argument('--trace', action='store_true', help="the task prints its steps (PrintInt: codfh.log's 'script print')")
++    ap.add_argument('--no-range', action='store_true',
++                    help='leave out the rocket range (a target soldier and a rocket launcher soldier firing at it)')
+     ap.add_argument('--source-graph', action='store_true', help="keep the source level's path-node graph")
+     ap.add_argument('--no-script', action='store_true',
+                     help="no patrol task: the soldier's scripts cleared, for the port's -patrol / -shoot")
+@@ -665,6 +887,8 @@
+         level = with_soldier(level, {('SoldierTrigger', 8): TASK_KEY, ('CSystemCommands', 1): m})
+         print('patrol task: the soldier walks (%.0f, %.0f) <-> (%.0f, %.0f)' % (pts[0][0], pts[0][2], pts[1][0],
+                                                                             pts[1][2]))
++        if not a.no_range:
++            level, god = rocket_range(level, god, level_dff, matrix, y, template, a.trace)
+     if not a.source_graph:
+         graph, nodes = path_graph(x, y, z, a.size)
+         god = with_path_graph(god, graph)
+diff --git a/src/recovered/unit_15CCE0.cpp b/src/recovered/unit_15CCE0.cpp
+--- a/src/recovered/unit_15CCE0.cpp
++++ b/src/recovered/unit_15CCE0.cpp
+@@ -541,8 +541,14 @@
+ // vf_168 (times the difficulty's multiplier); its particle systems at the
+ // muzzle, the shot (a grenade's fuse lengthened by the drop's), its sound,
+ // and the time to the next.
++#ifdef CODFH_DRAW_TRIGGERS
++void TrigLogShot(type_15CCE0 *pWeapon, const RwV3d *pv);
++#endif
+ void type_15CCE0::sub_15DE60(RwV3d *arg_0)
+ {
++#ifdef CODFH_DRAW_TRIGGERS
++    TrigLogShot(this, arg_0);
++#endif
+     RwReal var_190;
+     type_15F2C0 *var_18C;
+     type_F2FF0 *var_188;
+diff --git a/port/src/debug/trigtools.cpp b/port/src/debug/trigtools.cpp
+--- a/port/src/debug/trigtools.cpp
++++ b/port/src/debug/trigtools.cpp
+@@ -1534,6 +1534,17 @@
+     plog("pickups: %d made a pickup, %d did not; ids without one:%s", nMade, n, szMissing);
+ }
+ 
++// (an NPC weapon's shot, type_15CCE0::sub_15DE60: the first ten logged, then every tenth)
++void TrigLogShot(type_15CCE0 *pWeapon, const RwV3d *pv)
++{
++    static RwInt32 s_nShotsSeen;
++
++    s_nShotsSeen++;
++    if (s_nShotsSeen <= 10 || s_nShotsSeen % 10 == 0)
++        plog("shot %d: weapon slot %d at (%.0f, %.0f, %.0f)", s_nShotsSeen, pWeapon->unk_04, pv ? pv->x : 0.0f,
++             pv ? pv->y : 0.0f, pv ? pv->z : 0.0f);
++}
++
+ void TrigDrawStatesOf(RwUInt32 dwHandle, RwChar *psz, RwInt32 nMax);
+ // (the soldiers the soldier triggers made: logged every 1200 frames for 60000 frames after -pickups' spawn)
+ static void SoldierWatch()

@@ -1,0 +1,155 @@
+diff --git a/tools/testmap/make_flat.py b/tools/testmap/make_flat.py
+--- a/tools/testmap/make_flat.py
++++ b/tools/testmap/make_flat.py
+@@ -346,6 +346,57 @@
+     return out
+ 
+ 
++# The source level's vehicles in a row in front of the player (--no-vehicles leaves them out):
++# a copy of the first trigger of each model (VehicleTrigger command 2) of its VehicleTriggers
++# (kind 7, spawned by their creation script, BasicCreationTrigger, on "CreateChild") and of its
++# first FlakTrigger (a VehicleTrigger that spawns a flak gun, sub_15A7B0). L_1_5: a T-34, a
++# Kettenkrad, a Panzer IV and a Flak 88; L_1_1_B has none. Each copy: its own instance ID, its
++# links to other triggers (Trigger 15: a count, then 16-byte IDs) and its names (VehicleTrigger
++# 0, Trigger 0) cleared, an unnamed one picked where the model has one, at its place on a line
++# across the player start's view (ahead, spacing apart), facing as the player does (its
++# matrix, CSystemCommands command 1).
++VEHICLE_LOW = 0xC0DEF1A0
++
++
++def vehicle_triggers(level_dff, matrix, y, packet, ahead=1200.0, spacing=800.0):
++    """([vehicle trigger chunks], [their classes]) for the source level's vehicle models."""
++    picked, flak = [], False
++    seen, named_models = set(), {}
++    for kind, c in chunks_of(level_dff):
++        if kind != 0x704:
++            continue
++        cls, guid, cmds = packet(c[16:])
++        if cls == 'FlakTrigger' and not flak:
++            flak = True
++            picked.append((c, cls, guid))
++        elif cls == 'VehicleTrigger':
++            model = next((raw for o, k, raw in cmds if o == 'VehicleTrigger' and k == 2), b'')
++            named = any(o in ('VehicleTrigger', 'Trigger') and k == 0 and any(raw) for o, k, raw in cmds)
++            if model not in seen:
++                seen.add(model)
++                picked.append((c, cls, guid))
++            elif not named and model in named_models:
++                # (an unnamed one in place of a named one: a named vehicle is a soldier's, his
++                # SoldierTrigger 37, L_1_5's T-34 Petrov's, and the player started in its copy)
++                picked[named_models.pop(model)] = (c, cls, guid)
++            if named and model not in named_models and picked[-1][0] is c:
++                named_models[model] = len(picked) - 1
++    at, px, pz = matrix[8:11], matrix[12], matrix[14]
++    flen = math.hypot(at[0], at[2]) or 1.0
++    fx, fz = at[0] / flen, at[2] / flen
++    rx, rz = fz, -fx
++    out = []
++    for i, (c, cls, guid) in enumerate(picked):
++        off = (i - (len(picked) - 1) / 2.0) * spacing
++        pos = (px + fx * ahead + rx * off, y, pz + fz * ahead + rz * off)
++        m = struct.pack('<16f', fz, 0, -fx, 0, 0, 1, 0, 0, fx, 0, fz, 0, pos[0], pos[1], pos[2], 1)
++        words = [int(w, 16) for w in guid.split('-')]
++        out.append(rewrite_packet(c, {('Trigger', 15): struct.pack('<I', 0), ('CSystemCommands', 1): m,
++                                      ('VehicleTrigger', 0): bytes(8), ('Trigger', 0): bytes(8)},
++                                  struct.pack('<4I', words[0], words[1], words[2], VEHICLE_LOW + i)))
++    return out, [cls for c, cls, guid in picked]
++
++
+ # The multiplayer view-model animations (ANIMGRPS\MPA_00\MPA_00D.ads: P02-P05, P14 the Luger's,
+ # P30-P32), which no level's data names: a string asset naming it (a copy of MP_9's "MPA_00C.ads"
+ # record, one letter changed, its own key) put into the CAnimPackSelector's slot 4 (command 0:
+@@ -364,6 +415,13 @@
+     return bytes(c)
+ 
+ 
++# The pack slot MPA_00D.ads takes, per source level: one whose pack a test level does not need.
++# L_1_1_B: Lvl_11K.ads (one scene family, I11). L_1_5: Lvl_15F.ads (vehicle crews, E25, and I15
++# scenes); not its slot 4, Lvl_15E.ads, which its soldiers' attacks need (without it a rocket
++# launcher soldier's fire performance ends at once, no shot: SoldierAnimScript state 150).
++MPA_SLOTS = {'L_1_1_B': 4, 'L_1_5': 5}
++
++
+ def with_anim_slot(level, slot, key8):
+     out = b''
+     for kind, c in chunks_of(level):
+@@ -423,6 +481,10 @@
+ 
+ # The soldier trigger kept for -patrol (L_1_1_B's "Sgt. Puskov", a friendly), by instance ID.
+ SOLDIER = 'F7956219-4C3E0D0E-08011FA3-297B6267'
++# Per source level (--level): the soldier kept (--soldier overrides). L_1_5, the tank defence
++# (its rocket launcher soldiers' animations and character definitions are its own): Sgt.
++# Dimitriy Petrov, a friendly.
++SOLDIERS = {'L_1_1_B': SOLDIER, 'L_1_5': '21E81C13-431FCF53-554BF094-D8FA28C2'}
+ SOLDIER_NAME = 'debugging.games'
+ # Its weapon (SoldierTrigger command 38: a CNPCWeaponBehavior's key and a word, as other
+ # levels' soldiers carry it; the key picks the NPC weapon table's entry, sub_15CB40): slot 2, one
+@@ -607,10 +669,13 @@
+     ap = argparse.ArgumentParser()
+     ap.add_argument('out')
+     ap.add_argument('--level', default='L_1_1_B', help="the source level (the -map level's folder)")
++    ap.add_argument('--soldier', help="the kept soldier trigger's instance ID (default: the level's in SOLDIERS)")
+     ap.add_argument('--pak', default=r'D:\CODFH_DUMP\COD.PAK', help="the data root's COD.PAK")
+     ap.add_argument('--size', type=float, default=20000.0, help='floor width in units (cm)')
+     ap.add_argument('--cells', type=int, default=10, help='grid cells a side (at most 11)')
+     ap.add_argument('--no-pickups', action='store_true', help='leave out the line of every pickup')
++    ap.add_argument('--no-vehicles', action='store_true',
++                    help="leave out the source level's vehicles (one of each, and a flak gun) in front of the player")
+     ap.add_argument('--no-mp-anims', action='store_true',
+                     help="leave out the multiplayer view-model animations (MPA_00D.ads: the Luger's)")
+     ap.add_argument('--bazooka', action='store_true',
+@@ -620,6 +685,8 @@
+     ap.add_argument('--no-script', action='store_true',
+                     help="no patrol task: the soldier's scripts cleared, for the port's -patrol / -shoot")
+     a = ap.parse_args()
++    global SOLDIER
++    SOLDIER = a.soldier or SOLDIERS.get(a.level, SOLDIER)
+     out = pathlib.Path(a.out)
+     pak = Pak(a.pak)
+     src = lambda name: pak.read('LEVELS\\%s\\%s' % (a.level, name))
+@@ -643,10 +710,18 @@
+         level += pickup_triggers(level_dff, by_id, matrix, y, packet)
+         level = with_pool0(level, len(by_id))
+         print('pickups: %d ids in a line: %s' % (len(by_id), ' '.join(map(str, sorted(by_id)))))
++    if not a.no_vehicles:
++        sys.path.insert(0, SUITE)
++        from objects import packet
++        chunks, classes = vehicle_triggers(level_dff, matrix, y, packet)
++        level += b''.join(chunks)
++        print('vehicles: %d in a row 12 m ahead (%s)' % (len(chunks), ', '.join(classes)) if chunks
++              else 'vehicles: %s has none' % a.level)
++    mpa_slot = MPA_SLOTS.get(a.level, 4)
+     if not a.no_mp_anims:
+         god += mpa_00d(pak)
+-        level = with_anim_slot(level, 4, MPA_00D_KEY)
+-        print('animation pack slot 4: MPA_00D.ads (the multiplayer view models: the Luger)')
++        level = with_anim_slot(level, mpa_slot, MPA_00D_KEY)
++        print('animation pack slot %d: MPA_00D.ads (the multiplayer view models: the Luger)' % mpa_slot)
+     if not a.no_script:
+         sys.path.insert(0, str(pathlib.Path(__file__).parent))
+         import alfa
+diff --git a/port/src/debug/trigtools.cpp b/port/src/debug/trigtools.cpp
+--- a/port/src/debug/trigtools.cpp
++++ b/port/src/debug/trigtools.cpp
+@@ -1448,15 +1448,17 @@
+     {
+         Trigger *pTrigger = (Trigger *)dword_4CFE30[i];
+ 
+-        // (pickup triggers, kind 0x18, and soldier triggers, 5: a test level's soldier with its
+-        // creation script kept, make_flat.py's scripted patrol)
+-        if (pTrigger && (pTrigger->vf_008() == 0x18 || pTrigger->vf_008() == 5) && pTrigger->sub_BDF50())
++        // (pickup triggers, kind 0x18, soldier triggers, 5: a test level's soldier with its
++        // creation script kept, make_flat.py's scripted patrol, and vehicle triggers, 7: its
++        // flak gun, a FlakTrigger)
++        if (pTrigger && (pTrigger->vf_008() == 0x18 || pTrigger->vf_008() == 5 || pTrigger->vf_008() == 7)
++            && pTrigger->sub_BDF50())
+         {
+             sub_6B5F0("CreateChild", (type_67620 *)pTrigger->sub_BDF50(), 0, 0, &nZero, 1, true, false);
+             n++;
+         }
+     }
+-    plog("pickups: CreateChild sent to %d pickup and soldier triggers", n);
++    plog("pickups: CreateChild sent to %d pickup, soldier and vehicle triggers", n);
+     for (i = 0; i <= nLast; i++)
+     {
+         Trigger *pTrigger = (Trigger *)dword_4CFE30[i];
