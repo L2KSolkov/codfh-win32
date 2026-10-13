@@ -20,6 +20,7 @@
 #include "../port.h"
 #include "pdev.h"
 #include "pd11.h"
+extern "C" int port_log_verbose;   /* (xpal_core.cpp: -verbose, the diagnostics' lines) */
 
 ID3D11Device *pd11_dev;
 ID3D11DeviceContext *pd11_ctx;
@@ -568,7 +569,7 @@ extern "C" void pdev_present(void)
 {
     static unsigned frame;
     frame++;
-    if (frame % 300 == 0)
+    if (frame % 300 == 0 && port_log_verbose)
         plog("frame %u", frame);
     if (!swap)
         return;

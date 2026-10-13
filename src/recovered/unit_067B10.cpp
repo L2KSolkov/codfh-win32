@@ -1963,16 +1963,22 @@ void sub_19A750(void *arg_0) {}
 void sub_19A750(RwInt16 *arg_0) {}
 void sub_19A750(struct RwStream *arg_0) {}
 void sub_19A750(struct RwStream *arg_0, struct type_141C10 *arg_4) {}
+#ifndef CODFH_SP_LOGS // (CODFH_SP_LOGS: unit_0441B0's, the port's sound log)
 void sub_19A750(struct type_3D3548 *arg_0, RwInt32 arg_4, struct type_3DF8D8_04 arg_8, RwInt32 arg_C) {}
+#endif
 void sub_141C10_kind15(struct RwStream *arg_0, struct type_141C10 *arg_4) {}
 void sub_141C10_kind30(struct RwStream *arg_0, struct type_141C10 *arg_4) {}
+#ifndef CODFH_SP_LOGS // (CODFH_SP_LOGS: unit_144940's, with multiplayer's warnings)
 void sub_144AD0() {}
+#endif
 type_4BFED0::~type_4BFED0() {}
 type_4E5D30::~type_4E5D30() {}
 type_FB6E0::~type_FB6E0() {}
 void type_4B85F8::pDtor() {}
 void type_4F2B68::pDtor() {}
+#ifndef CODFH_SP_LOGS // (CODFH_SP_LOGS: unit_0D5170's, with multiplayer's warning)
 void type_4B83A0::sub_D6550() {}
+#endif
 void type_10F710::operator delete(void *arg_0, void *arg_4) {}
 void type_10F710::operator delete(void *arg_0) {}
 void type_3D32F8::operator delete(void *arg_0) {}

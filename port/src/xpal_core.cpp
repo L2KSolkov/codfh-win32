@@ -372,6 +372,10 @@ extern "C" DWORD WINAPI xpal_GetTickCount(void)
    second in a fight, so off unless the overlay's Logs switch or CODFH_ASTARLOG=1 turns them on. */
 extern "C" int port_log_astar = 0;
 
+/* -verbose (cli.cpp): the port's own diagnostic lines (the renderer's untextured draws, a line
+   every 300 frames, the first sound plays), off otherwise. */
+extern "C" int port_log_verbose = 0;
+
 /* The game's debug prints (its compiled-out logs): formatted with the faults a bad argument
    raises caught (the format alone then), to the log. */
 extern "C" void port_debug_vprint(const char *fmt, va_list ap)

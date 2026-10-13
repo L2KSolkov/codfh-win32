@@ -153,7 +153,7 @@ void sub_144A70()
 
 // match: sub_144AD0 @ 0x00144AD0
 // Warns of what shutdown finds left.
-#ifndef CODFH_SP // single player compiles out the warnings: an empty body, defined in unit_067B10 (SP 0x5A260)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles out the warnings: an empty body, defined in unit_067B10 (SP 0x5A260)
 void sub_144AD0()
 {
     RwInt32 var_4;

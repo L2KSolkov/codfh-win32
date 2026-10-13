@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "../port.h"
+extern "C" int port_log_verbose;   /* (xpal_core.cpp: -verbose, the diagnostics' lines) */
 
 typedef int RwInt32;
 typedef unsigned int RwUInt32;
@@ -823,7 +824,7 @@ extern "C" RwInt32 __stdcall IDirectSoundBuffer_Play(void *buffer, RwUInt32, RwU
 {
     Voice *v = (Voice *)buffer;
     static int logged;
-    if (logged < 40)
+    if (logged < 40 && port_log_verbose)
     {
         logged++;
         plog("audio: play %p tag 0x%X ch %d rate %lu freq %lu flags 0x%lX data %p size %lu region %lu+%lu loop %lu+%lu "

@@ -16241,6 +16241,9 @@ void sp_sub_10D2B0(type_3DF8D8_04 *arg_0);
 void sp_sub_4EB80(RwUInt32 arg_0, type_44350 *arg_4)
 {
     sp_sub_10D060((type_3DF8D8_04 *)&SCRIPT_ARG(arg_4, 1), SCRIPT_ARG(arg_4, 2));
+#ifdef CODFH_SP_LOGS
+    sub_19A750((type_3DF8D8_04 *)&SCRIPT_ARG(arg_4, 1), SCRIPT_ARG(arg_4, 2)); // (multiplayer's log, sub_5FFB0)
+#endif
     sub_44350(arg_4, 0);
 }
 #endif
@@ -16251,6 +16254,9 @@ void sp_sub_4EB80(RwUInt32 arg_0, type_44350 *arg_4)
 void sp_sub_4EBD0(RwUInt32 arg_0, type_44350 *arg_4)
 {
     sp_sub_10D160((type_3DF8D8_04 *)&SCRIPT_ARG(arg_4, 1), SCRIPT_ARG(arg_4, 2));
+#ifdef CODFH_SP_LOGS
+    sub_19A750((type_3DF8D8_04 *)&SCRIPT_ARG(arg_4, 1), SCRIPT_ARG(arg_4, 2)); // (multiplayer's log, sub_5FFB0)
+#endif
     sub_44350(arg_4, 0);
 }
 #endif
@@ -16403,6 +16409,9 @@ void sub_60440(RwUInt32 arg_0, type_44350 *arg_4)
     var_4 = (type_3DF8D8_04 *)&SCRIPT_ARG(arg_4, 1);
 #ifdef CODFH_SP // single player prints the objective (SP 0x4EF78 calls sp_sub_10D2B0)
     sp_sub_10D2B0(var_4);
+#ifdef CODFH_SP_LOGS
+    sub_19A750(var_4); // (and multiplayer's log of its key)
+#endif
 #else
     sub_19A750(var_4);
 #endif
@@ -20229,6 +20238,7 @@ void sub_67200(RwUInt32 arg_0, type_44350 *arg_4)
 
 #ifdef CODFH_WIN32
 extern "C" void port_debug_print(const RwChar *arg_0, ...);
+extern "C" RwInt32 port_log_verbose;   // (port/src/xpal_core.cpp: -verbose)
 #endif
 
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
@@ -20253,14 +20263,16 @@ type_439A48::type_439A48()
 // Functions /OPT:ICF folded into another body (config/aliases.txt), defined here for the
 // authentic link (PLAN M7) with that body; the placement link takes the folded one.
 
-#ifndef CODFH_SP // single player calls these out of line (SP 0x4D840, 0x4EF60): only declared there
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player calls these out of line (SP 0x4D840, 0x4EF60): only declared there
 // ?sub_19A750@@YAXPAUtype_3D3548@@HUtype_3DF8D8_04@@H@Z (folded into 0x19A750)
 void sub_19A750(struct type_3D3548 * arg_0, RwInt32 arg_4, struct type_3DF8D8_04 arg_8, RwInt32 arg_C)
 {
 #ifdef CODFH_WIN32
-    // The sound log (an entity, a level, the sound's key, how it was asked for): the port prints it.
-    port_debug_print("sound 0x%X 0x%X (entity %p, %d, %d)", ((const RwUInt32 *)&arg_8)[0],
-                     ((const RwUInt32 *)&arg_8)[1], arg_0, arg_4, arg_C);
+    // The sound log (an entity, a level, the sound's key, how it was asked for): the port prints
+    // it with -verbose.
+    if (port_log_verbose)
+        port_debug_print("sound 0x%X 0x%X (entity %p, %d, %d)", ((const RwUInt32 *)&arg_8)[0],
+                         ((const RwUInt32 *)&arg_8)[1], arg_0, arg_4, arg_C);
 #endif
 }
 

@@ -945,7 +945,7 @@ RwInt32 type_4B83A0::sub_D64A0(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8)
 }
 
 // match: ?sub_D6550@type_4B83A0@@QAEXXZ @ 0x000D6550
-#ifndef CODFH_SP // single player compiles the debug print out: the body is empty and folded elsewhere (SP 0xA2172 calls the shared empty function)
+#if !defined(CODFH_SP) || defined(CODFH_SP_LOGS) // single player compiles the debug print out: the body is empty and folded elsewhere (SP 0xA2172 calls the shared empty function)
 void type_4B83A0::sub_D6550()
 {
     if (unk_14.in_use())

@@ -29,6 +29,7 @@
 #include "pdev.h"
 #include "xstate.h"
 #include "xvsh.h"
+extern "C" int port_log_verbose;   /* (xpal_core.cpp: -verbose, the diagnostics' lines) */
 
 void port_trace_draw(void);
 /* RenderWare's texture cache (src/rw/driver/xbox/xbcache.c), for diagnostics */
@@ -1360,7 +1361,7 @@ static void *stage_texture(int st)
             else
                 missing_textures++;
             static int told;
-            if (told < 12 && port_frame > 800)
+            if (told < 12 && port_frame > 800 && port_log_verbose)
             {
                 told++;
                 plog("untextured: stage %d op %lu args %lX/%lX alpha op %lu args %lX/%lX; stage 0 tex %p, 1 tex %p op1 %lu; "

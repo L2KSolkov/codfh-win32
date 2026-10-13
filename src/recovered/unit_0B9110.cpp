@@ -252,6 +252,9 @@ void CSoundBankSelector::sub_B9800()
             if (dword_4B1B60[i].unk_00.unk_00 != -1 && dword_4B1B60[i].unk_00.unk_04 != -1)
             {
                 sub_82C70(&dword_4B1B60[i], 0);
+#ifdef CODFH_SP_LOGS
+                sub_19A750("SoundBank Loading end...\n"); // (multiplayer's print, at its end)
+#endif
                 return;
             }
             i++;
@@ -259,6 +262,9 @@ void CSoundBankSelector::sub_B9800()
                 i = 0;
         }
     }
+#ifdef CODFH_SP_LOGS
+    sub_19A750("SoundBank Loading end...\n");
+#endif
 #else
     sub_19A750("SoundBank Loading end...\n");
 #endif

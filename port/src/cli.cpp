@@ -16,6 +16,10 @@
  * type_4F7EB8::sub_1AADF0: the rules' "waiting for host" word cleared, dword_4FB9E0.sub_1B6EF0),
  * without spawning.
  *
+ * -verbose writes the port's own diagnostic lines to codfh.log: the renderer's first untextured
+ * draws ("untextured:"), a "frame N" line every 300 frames and the first sound plays
+ * ("audio: play").
+ *
  * -movie <file> plays a movie from SHELL\MOVIES (Credits.bik, Act_1.bik...) through the game's
  * player (sub_E8AC0, as the credits are played) when the menus first run.
  *
@@ -76,6 +80,8 @@ static const cli_checkpoint_entry cli_checkpoints[] = {
 };
 #endif
 
+extern "C" int port_log_verbose;   /* (xpal_core.cpp: -verbose, the diagnostics' lines) */
+
 /* Reads the options from the command line (WinMain). */
 extern "C" void port_cli_parse(const char *cmd)
 {
@@ -115,6 +121,8 @@ extern "C" void port_cli_parse(const char *cmd)
             strncpy(cli_name, argv[++i], sizeof(cli_name) - 1);
         else if (!_stricmp(argv[i], "-movie") && i + 1 < argc)
             strncpy(cli_movie, argv[++i], sizeof(cli_movie) - 1);
+        else if (!_stricmp(argv[i], "-verbose"))
+            port_log_verbose = 1;
 #ifdef CODFH_SP
         else if (!_stricmp(argv[i], "-main-menu"))
             cli_auto_main_menu_phase = 1;

@@ -811,7 +811,17 @@ void sp_sub_A5C90()
     RpWorld *world;
     RwCamera *camera;
 
+#ifdef CODFH_SP_LOGS
+    // (multiplayer's prints here, sub_DA290's: single player compiled them out)
+    sub_19A750(" ");
+    sub_19A750(" ");
+    sub_19A750("******************************************");
+    sub_19A750("GameFrontEnd Initialization begin....");
+    sub_19A750("******************************************");
+    sub_19A750("GameFrontEndInit: Memory freed on RwFreeList purge - %d", RwFreeListPurgeAllFreeLists());
+#else
     RwFreeListPurgeAllFreeLists();
+#endif
     dword_4B889C = 0;
     sub_19A750();
     world = sub_1331E0();
@@ -868,6 +878,27 @@ void sp_sub_A5C90()
     RpWorldRemoveCamera(world, camera);
     RWS::CameraHelper::Destroy(camera);
     dword_4B88B0 = 0;
+#ifdef CODFH_SP_LOGS
+    // (multiplayer's prints here, sub_DA290's: single player compiled them out)
+    if (!sub_16E5C0(world, 0, 0))
+        sub_19A750("GameFrontEnd world is not empty at shutdown!");
+    RpWorldDestroy(world);
+    sub_19A750("Shutdown: Memory freed on RwFreeList purge - %d", RwFreeListPurgeAllFreeLists());
+    sub_19A750("******************************************");
+    sub_19A750("GameFrontEnd Shutdown end....");
+    sub_19A750("******************************************");
+    sub_19A750(" ");
+    sub_19A750(" ");
+    if (sub_12F080(1))
+    {
+        sub_12F060(1);
+        sub_19A750("***ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!***");
+        sub_19A750("MEMORY LEAK detected during frontend shutdown! Show this to a");
+        sub_19A750("programmer immediately (especially the last one that");
+        sub_19A750("checked in) and tell him that restart/reset is broken.");
+        sub_19A750("***ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!ALERT!***");
+    }
+#else
     sub_16E5C0(world, 0, 0);
     RpWorldDestroy(world);
     RwFreeListPurgeAllFreeLists();
@@ -875,6 +906,7 @@ void sp_sub_A5C90()
     {
         sub_12F060(1);
     }
+#endif
 }
 
 #endif
