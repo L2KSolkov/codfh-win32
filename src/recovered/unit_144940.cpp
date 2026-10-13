@@ -31,6 +31,10 @@
 #include "types/asynchload.h"
 #include "types/type_4B85F8.h"
 #include "rw/baengine.h"
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigdraw.cpp: the trigger view's activity)
+void TrigDrawTriggerEvent(void *pTrigger, RwInt32 nKind, const RwChar *pszName);
+#endif
 #if !defined(CODFH_SP) || CODFH_SP_PART != 2 // single player compiles the rest in another file (src/sp/units/sp_unit_144940_2.cpp)
 
 // Its data definitions (PLAN M5), in the image's address order.
@@ -372,6 +376,9 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
     RwInt32 bp_8;
     type_4E5D30 *bp_4;
 
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawTriggerEvent(arg_4, 0, NULL);
+#endif
     arg_4->sub_BD560(arg_0);
     switch (arg_4->vf_008())
     {
@@ -556,6 +563,9 @@ void sub_145640(type_3D3548 *arg_0, Trigger *arg_4)
 {
     type_10F710 *var_4;
 
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawTriggerEvent(arg_4, 1, NULL);
+#endif
     arg_4->sub_BD780(arg_0);
     switch (arg_4->vf_008())
     {

@@ -63,6 +63,10 @@
 #include "rw/rtquat.h"
 #include "types/type_3DC048.h"
 #include "types/type_3DBC78.h"
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigdraw.cpp: the debug tools' hit view)
+void TrigDrawDamageTaken(void *pEntity, RwReal fAmount);
+#endif
 
 // match: __ehhandler$?sub_134B40@@YAPAUtype_3D3548@@PAU1@@Z>1>8 @ 0x0041DAC8
 // match: __ehhandler$?sub_134B40@@YAPAUtype_3D3548@@PAU1@@Z>1 @ 0x0041DAD0
@@ -3287,6 +3291,9 @@ RwInt32 type_3DAFC8::vf_07C(RwInt8 arg_0, RpIntersection *arg_4, RwReal *arg_8, 
 // third).
 void type_3DAFC8::sub_13C490(RwInt32 arg_0)
 {
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawDamageTaken(this, arg_0);
+#endif
     unk_1D20 -= arg_0;
     if (unk_805 == 2 || unk_805 == 1)
         return;

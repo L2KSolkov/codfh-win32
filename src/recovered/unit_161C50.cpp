@@ -33,6 +33,16 @@
 #include "types/type_3DAFC8.h"
 #include "rws/csystemcommands.h"
 #include "types/type_4B9E90.h"
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigdraw.cpp: the debug tools' hit view)
+void TrigDrawBulletHit(void *pEntity, const RwV3d *pv, RwInt32 nPart, RwReal fDamage);
+#endif
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigdraw.cpp: the debug tools' projectile view)
+void TrigDrawProjectileSpawned(RwInt32 nKind, void *pProjectile);
+void TrigDrawProjectileImpact(void *pProjectile, RwInt32 nSurface, const RwV3d *pv, void *pEntity);
+void TrigDrawProjectileBlast(void *pProjectile, const RwV3d *pv);
+#endif
 
 #ifdef CODFH_SP // static in single player: SP 0x102B90 takes its arguments in registers
 static void sub_164210(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8);
@@ -465,6 +475,9 @@ bool type_3DC8B8::vf_014(RwReal arg_0)
                             var_3E0.unk_28 = 0;
                             var_3E0.unk_2C = 0;
                             var_3E0.unk_24 = var_100.unk_44;
+#ifdef CODFH_DRAW_TRIGGERS
+                            TrigDrawBulletHit(var_194, (const RwV3d *)var_3E0.unk_14, var_3E0.unk_24, var_3E0.unk_28);
+#endif
                             var_194->vf_064(&var_3E0);
                         }
                     }
@@ -850,6 +863,9 @@ void type_3DC798::vf_02C(RwInt32 arg_0, RwMatrix *arg_4, type_3D3548 *arg_8, RwI
     RwInt32 var_C;
     type_4E5E40 *bp_8;
     type_4E5E40_08 *bp_4;
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawProjectileImpact(this, arg_0 & 0xFFFF, &arg_4->pos, arg_8);
+#endif
 
     arg_0 &= 0xFFFF;
     if (arg_0 != 0xFFFF)
@@ -1038,6 +1054,9 @@ bool type_3DC798::vf_014(RwReal arg_0)
                     var_204.unk_28 = var_1D4->unk_04;
                     var_204.unk_2C = var_1D4->unk_04;
                     var_204.unk_24 = var_C8.unk_44;
+#ifdef CODFH_DRAW_TRIGGERS
+                    TrigDrawBulletHit(var_1D0, (const RwV3d *)var_204.unk_14, var_204.unk_24, var_204.unk_28);
+#endif
                     var_1D0->vf_064(&var_204);
                 }
                 vf_028(var_1D0, &var_1C0, var_8);
@@ -1123,6 +1142,9 @@ void type_3DC858::vf_02C(RwInt32 arg_0, RwMatrix *arg_4, type_3D3548 *arg_8, RwI
     RwInt32 var_C;
     type_4E5E40 *bp_8;
     type_4E5E40_08 *bp_4;
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawProjectileImpact(this, arg_0 & 0xFFFF, &arg_4->pos, arg_8);
+#endif
 
     arg_0 &= 0xFFFF;
     if (arg_0 != 0xFFFF)
@@ -1289,6 +1311,9 @@ bool type_3DC858::vf_014(RwReal arg_0)
                 var_1F4.unk_28 = var_1C4->unk_04;
                 var_1F4.unk_2C = var_1C4->unk_04;
                 var_1F4.unk_24 = var_C8.unk_44;
+#ifdef CODFH_DRAW_TRIGGERS
+                TrigDrawBulletHit(var_1C0, (const RwV3d *)var_1F4.unk_14, var_1F4.unk_24, var_1F4.unk_28);
+#endif
                 var_1C0->vf_064(&var_1F4);
             }
             vf_028(var_1C0, &var_1B0, var_8);

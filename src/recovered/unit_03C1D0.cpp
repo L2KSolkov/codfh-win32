@@ -16,6 +16,11 @@
 #include "types/type_3D3548.h"
 #include "types/type_3DAFC8.h"
 #include "types/type_10F710.h"
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigdraw.cpp: the debug tools' hearing view)
+void TrigDrawNoiseMade(const RwV3d *pv, RwInt32 nKind, RwInt32 nClass, RwReal fRange, RwInt32 bLasting);
+void TrigDrawNoiseHeard(const void *pHearer, const RwV3d *pvFrom, RwInt32 nKind);
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003CE658
@@ -159,6 +164,10 @@ void sub_3C4B0(type_3D3548 *arg_0, RwInt32 arg_4, RwV3d *arg_8, RwInt32 arg_C, R
 
     if (((dword_4B86F8 >> 4) & 1) != 0)
         return;
+#ifdef CODFH_DRAW_TRIGGERS
+    if (arg_14 == 0)
+        TrigDrawNoiseMade(arg_8, arg_4, arg_C, arg_10, 0);
+#endif
     if (arg_14 != 0) {
         sub_3C540(arg_0, arg_4, 0, arg_8, arg_C, arg_10, arg_14, arg_18);
     } else {
@@ -176,6 +185,9 @@ void sub_3C540(type_3D3548 *arg_0, RwInt32 arg_4, RwInt32 arg_8, RwV3d *arg_C, R
     type_3C540 *var_4;
     type_3C720 *v8;
     RwInt32 varC;
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawNoiseMade(arg_C, arg_4, arg_10, arg_14, 1);
+#endif
 
     for (v8 = dword_43925C; v8 != 0; v8 = v8->unk_08)
         sub_3C7D0(v8, arg_0, arg_4, arg_C, arg_10, arg_14, arg_18);
@@ -309,6 +321,9 @@ void sub_3C7D0(type_3C720 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwV3d *arg_
     var_1C.unk_10.x = arg_C->x;
     var_1C.unk_10.y = arg_C->y;
     var_1C.unk_10.z = arg_C->z;
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawNoiseHeard(arg_0->unk_00, arg_C, arg_8);
+#endif
     sub_6B5F0("AIAction_HearSound", (type_67620 *)(arg_0->unk_00->vf_098()), 0, 0, (RwInt32 *)(&var_1C), 7, 1, 0);
 }
 

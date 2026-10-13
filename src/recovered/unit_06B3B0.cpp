@@ -180,8 +180,10 @@ void sub_6B510()
 // arg_8, with the arg_C words at arg_10; queued (arg_18, arg_1C as
 // sub_42AF0's).
 #ifdef CODFH_DRAW_TRIGGERS
-// (port/src/debug/trigdraw.cpp: the AI view notes the messages its entities raise)
+// (port/src/debug/trigdraw.cpp: the AI view notes the messages its entities raise; the trigger
+// view the messages triggers send)
 void TrigDrawAiMessage(const RwChar *pszName, type_67620 *pScript);
+void TrigDrawTriggerEvent(void *pTrigger, RwInt32 nKind, const RwChar *pszName);
 #endif
 void sub_6B5F0(const RwChar *arg_0, type_67620 *arg_4, type_42E00_10 *arg_8, type_3D2E7C *arg_C,
                RwInt32 *arg_10, RwInt32 arg_14, bool arg_18, bool arg_1C)
@@ -192,6 +194,7 @@ void sub_6B5F0(const RwChar *arg_0, type_67620 *arg_4, type_42E00_10 *arg_8, typ
 
 #ifdef CODFH_DRAW_TRIGGERS
     TrigDrawAiMessage(arg_0, arg_4);
+    TrigDrawTriggerEvent(arg_8, 2, arg_0);
 #endif
     RtlEnterCriticalSection(&dword_44C048);
     local_8 = sub_6A7F0(arg_0);
@@ -213,6 +216,9 @@ void sub_6B680(RwInt32 arg_0, type_67620 *arg_4, type_42E00_10 *arg_8, type_3D2E
 
     RtlEnterCriticalSection(&dword_44C048);
     local_8 = sub_6A7D0(arg_0);
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawTriggerEvent(arg_8, 2, local_8 ? local_8->unk_00 : NULL);
+#endif
     var_4 = arg_4 == 0;
     varC = sub_6B710(local_8->unk_04, arg_4, 0, arg_8, arg_C, var_4, arg_10, 0);
     sub_42AF0(0, 0x10, *(RwUInt32 *)&varC, arg_18, arg_1C);

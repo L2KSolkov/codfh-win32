@@ -32,6 +32,16 @@
 #include "types/type_3DAFC8.h"
 #include "rws/csystemcommands.h"
 #include "types/type_4B9E90.h"
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigdraw.cpp: the debug tools' hit view)
+void TrigDrawBulletHit(void *pEntity, const RwV3d *pv, RwInt32 nPart, RwReal fDamage);
+#endif
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigdraw.cpp: the debug tools' projectile view)
+void TrigDrawProjectileSpawned(RwInt32 nKind, void *pProjectile);
+void TrigDrawProjectileImpact(void *pProjectile, RwInt32 nSurface, const RwV3d *pv, void *pEntity);
+void TrigDrawProjectileBlast(void *pProjectile, const RwV3d *pv);
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003DC6C0
@@ -362,6 +372,9 @@ type_3DC7F8 *type_4E19F8::sub_15F590(RwInt32 arg_0, type_3D3548 *arg_4, RwMatrix
         lv_10->vf_00C(arg_C);
         lv_10->vf_010(arg_10);
         sub_15F4D0(lv_10);
+#ifdef CODFH_DRAW_TRIGGERS
+        TrigDrawProjectileSpawned(unk_00, lv_10);
+#endif
     }
     return lv_10;
 }
@@ -595,6 +608,9 @@ bool type_3DC7F8::vf_014(RwReal arg_0)
                         var_1E0.unk_28 = var_150->unk_04;
                         var_1E0.unk_2C = var_150->unk_04;
                         var_1E0.unk_24 = var_78.unk_44;
+#ifdef CODFH_DRAW_TRIGGERS
+                        TrigDrawBulletHit(var_148, (const RwV3d *)var_1E0.unk_14, var_1E0.unk_24, var_1E0.unk_28);
+#endif
                         var_148->vf_064(&var_1E0);
                     }
                 }
@@ -1057,6 +1073,10 @@ void type_3DC7F8::sub_1614E0(RwMatrix *arg_0, type_3D3548 *arg_4, type_439A48 *a
     RwReal loc44;
     type_4AE70 var_40;
 
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawProjectileBlast(this, &arg_0->pos);
+#endif
+
     var_40.unk_00 = 0x804;
     if (arg_4)
     {
@@ -1196,6 +1216,10 @@ void type_3DC7F8::vf_02C(RwInt32 arg_0, RwMatrix *arg_4, type_3D3548 *arg_8, RwI
     RwInt32 var_C;
     type_4E5E40 *bp_8;
     type_4E5E40_08 *bp_4;
+
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawProjectileImpact(this, arg_0 & 0xFFFF, &arg_4->pos, arg_8);
+#endif
 
     arg_0 &= 0xFFFF;
     if (arg_0 == 0xFFFF)

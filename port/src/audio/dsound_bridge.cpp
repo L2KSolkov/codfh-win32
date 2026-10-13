@@ -131,6 +131,67 @@ static V3 listener_pos, listener_front = {0, 0, 1}, listener_top = {0, 1, 0};
 static float distance_factor = 1, rolloff_factor = 1;
 static int dsound_object;
 
+/* The debug tools' sound view (port/src/debug/trigdraw.cpp): the playing voices, under the
+   mixer's lock, their positions back in the game's world (RenderWare Audio hands DirectSound
+   x negated, src/rwa/xbox/unit_24EC60.c), with the listener's. */
+struct PortAudioVoiceInfo
+{
+    const void *id;
+    float x, y, z;
+    int is3D, mode3D, looping, channels;
+    float volumeDb, seconds, played, minDistance, maxDistance;
+};
+
+static double frame_bytes(const Voice *v);
+static DWORD region_end(const Voice *v);
+
+extern "C" int port_audio_voices(PortAudioVoiceInfo *out, int max, float *listener)
+{
+    int n = 0;
+    if (!thread)
+        return 0;
+    EnterCriticalSection(&lock);
+    if (listener)
+    {
+        listener[0] = -listener_pos.x;
+        listener[1] = listener_pos.y;
+        listener[2] = listener_pos.z;
+    }
+    for (size_t i = 0; i < voices.size() && n < max; i++)
+    {
+        const Voice *v = voices[i];
+        PortAudioVoiceInfo *o;
+        DWORD rate = v->frequency ? v->frequency : v->format.samplesPerSec;
+        if (!v->playing)
+            continue;
+        o = &out[n++];
+        o->id = v;
+        o->x = -v->position.x;
+        o->y = v->position.y;
+        o->z = v->position.z;
+        o->is3D = v->is3D;
+        o->mode3D = (int)v->mode3D;
+        o->looping = v->looping;
+        o->channels = v->format.channels;
+        o->volumeDb = v->volume / 100.0f;
+        o->minDistance = v->minDistance;
+        o->maxDistance = v->maxDistance;
+        /* (the length of its play region, and how far into it: the mixer's frames, from the region's
+           start; a looping voice's place within it) */
+        {
+            double fb = frame_bytes(v);
+            double startF = fb > 0 ? v->playOffset / fb : 0, endF = fb > 0 ? region_end(v) / fb : 0;
+            double frames = endF - startF, at = v->pos - startF;
+            if (frames > 0 && v->looping && at > frames)
+                at = fmod(at, frames);
+            o->seconds = rate && frames > 0 ? (float)(frames / rate) : 0.0f;
+            o->played = frames > 0 ? (float)(at < 0 ? 0 : at > frames ? 1 : at / frames) : 0.0f;
+        }
+    }
+    LeaveCriticalSection(&lock);
+    return n;
+}
+
 static float db(LONG hundredths)
 {
     if (hundredths <= -10000)

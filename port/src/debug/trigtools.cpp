@@ -3,9 +3,11 @@
 // C:\codfh-patches\plain-build\draw-triggers.patch) as tabs of an overlay
 // window, live state read straight from memory and the pages' actions, in five groups of tabs
 // (the last action's result above them):
-//   View     what trigdraw.cpp draws, a tab each: Triggers (volumes, labels, names), Collision
-//            (and its material kinds, trigcoll.h), AI (path nodes, the soldiers' state),
-//            Generators, Gimps (and shrimps), Camera (noclip, the free camera)
+//   View     every overlay in one list, by topic, its switch beside its name and its page beside
+//            the list: World (triggers with their activity, collision and its material kinds,
+//            splines, lighting zones, lights, sounds), AI (the soldiers' state, path nodes, squads,
+//            hearing, gimps), Combat (the world line tests, hits and bone boxes, projectiles,
+//            generators), Camera (noclip, the free camera)
 //   Player   Player       the local player (sub_1745A0(0), a type_10F710)
 //            Inventory    health, the inventory and the 39 weapons, with gives
 //            Weapons      the weapon settings (dword_4C19C0), edited in place
@@ -115,6 +117,7 @@ extern RwReal g_fTrigDrawTextScale;
 extern RwReal g_fTrigDrawCollisionRange;
 extern RwReal g_fTrigDrawCollisionLift;
 #include "trigcoll.h"
+#include "trigsndproj.h"
 extern RwBool g_bTrigDrawFreeCam;
 // (trigweb.cpp: the level viewer's live link)
 extern RwBool g_bTrigLive;
@@ -148,6 +151,7 @@ const RwChar *TrigDrawPathTypeName(RwInt32 nType);
 extern RwReal g_fTrigDrawFreeCamSpeed;
 extern RwReal g_fTrigDrawFreeCamLook;
 const RwChar *TrigDrawKindName(Trigger *pTrigger);
+const RwChar *TrigDrawTriggerName(Trigger *pTrigger);   // (trignames.cpp)
 // The section slots, the global section, and the starting sections
 // (unit_171DC0, unit_0B0410).
 extern type_4E5D30 dword_4E5D30[4];
@@ -1385,6 +1389,29 @@ static void ViewTriggers()
     Check("names (the level's name for a trigger, above its type)", &g_bTrigDrawNames);
     ImGui::SliderFloat("trigger draw distance (0 unlimited)", &g_fTrigDrawRange, 0.0f, 1000.0f, "%.0f");
     ImGui::SliderFloat("label height (of the distance)", &g_fTrigDrawTextScale, 0.005f, 0.1f, "%.3f");
+    ImGui::SeparatorText("Activity");
+    Check("record and flash as they fire (green in, red out, white a message)", &g_bTrigDrawActivity);
+    ImGui::SameLine();
+    Check("only the ones that fired lately", &g_bTrigDrawActiveOnly);
+    ImGui::SliderFloat("flash and messages stay (seconds)", &g_fTrigDrawActivitySecs, 0.5f, 20.0f, "%.1f");
+    if (ImGui::TreeNode("the last events"))
+    {
+        RwInt32 i, nHandle, nKind;
+        const RwChar *pszName;
+        RwReal fAge;
+
+        if (ImGui::SmallButton("clear##act"))
+            TrigDrawActivityClear();
+        for (i = 0; i < 40 && TrigDrawActivityEvent(i, &nHandle, &nKind, &pszName, &fAge); i++)
+        {
+            Trigger *pTrigger = (Trigger *)dword_4CFE30[nHandle];
+            const RwChar *pszTrig = pTrigger ? TrigDrawTriggerName(pTrigger) : NULL;
+
+            ImGui::Text("%5.1fs  %d %s: %s%s", fAge, nHandle, pszTrig ? pszTrig : (pTrigger ? TrigDrawKindName(pTrigger) : "?"),
+                        nKind == 0 ? "entered" : nKind == 1 ? "left" : "sent ", nKind == 2 ? pszName : "");
+        }
+        ImGui::TreePop();
+    }
 }
 
 static void ViewCollision()
@@ -1487,6 +1514,292 @@ static void ViewGimps()
         ImGui::TextDisabled("(%d shrimps drawn: each shrimp trigger's path in blue from its tick, a cross per shrimp, "
                             "cyan going forward, magenta back; its label adds the count, spawns left, chance and speed)",
                             g_nTrigDrawShrimpsShown);
+}
+
+// The sounds playing: their markers in the world, and the list of every voice (the 2D ones,
+// the music and the HUD's, too).
+static void ViewSounds()
+{
+    RwInt32 i, n3D = 0;
+
+    Check("draw the 3D sounds", &g_bTrigDrawSounds);
+    ImGui::SameLine();
+    Check("their lines##snd", &g_bTrigDrawSoundLabels);
+    ImGui::SameLine();
+    Check("minimum distance rings", &g_bTrigDrawSoundRanges);
+    ImGui::SliderFloat("sound draw distance (0 unlimited)", &g_fTrigDrawSoundRange, 0.0f, 20000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    if (!g_bTrigDrawSounds)
+    {
+        ImGui::TextDisabled("(drawing them fills the list below)");
+        return;
+    }
+    for (i = 0; i < g_nTrigDrawSoundList; i++)
+        n3D += g_aTrigDrawSoundList[i].is3D && g_aTrigDrawSoundList[i].mode3D == 0 ? 1 : 0;
+    ImGui::Text("%d playing, %d in the world; the listener at %.0f, %.0f, %.0f", g_nTrigDrawSoundList, n3D,
+                g_avTrigDrawListener[0], g_avTrigDrawListener[1], g_avTrigDrawListener[2]);
+    ImGui::TextDisabled("(crosses green loud to red quiet; the bridge knows each voice, not which game sound it is: "
+                        "-verbose logs the scripts' sound keys)");
+    if (ImGui::BeginTable("sounds", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+                          ImVec2(0.0f, 300.0f)))
+    {
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("where");
+        ImGui::TableSetupColumn("volume");
+        ImGui::TableSetupColumn("length");
+        ImGui::TableSetupColumn("distance");
+        ImGui::TableSetupColumn("min / max");
+        ImGui::TableSetupColumn("channels");
+        ImGui::TableHeadersRow();
+        for (i = 0; i < g_nTrigDrawSoundList; i++)
+        {
+            const PortAudioVoiceInfo *v = &g_aTrigDrawSoundList[i];
+            RwReal dx = v->x - g_avTrigDrawListener[0], dy = v->y - g_avTrigDrawListener[1],
+                   dz = v->z - g_avTrigDrawListener[2];
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (v->is3D && v->mode3D == 0)
+                ImGui::Text("%.0f, %.0f, %.0f", v->x, v->y, v->z);
+            else
+                ImGui::TextDisabled(v->is3D && v->mode3D == 1 ? "head-relative" : "2D");
+            ImGui::TableNextColumn();
+            ImGui::Text("%.1f dB", v->volumeDb);
+            ImGui::TableNextColumn();
+            ImGui::Text("%.1f s%s (%.0f%%)", v->seconds, v->looping ? " looping" : "", v->played * 100.0f);
+            ImGui::TableNextColumn();
+            if (v->is3D && v->mode3D == 0)
+                ImGui::Text("%.0f", (RwReal)sqrt(dx * dx + dy * dy + dz * dz));
+            else
+                ImGui::TextDisabled("-");
+            ImGui::TableNextColumn();
+            if (v->is3D)
+                ImGui::Text("%.0f / %.0f", v->minDistance, v->maxDistance > 1e8f ? 0.0f : v->maxDistance);
+            else
+                ImGui::TextDisabled("-");
+            ImGui::TableNextColumn();
+            ImGui::Text("%d", v->channels);
+        }
+        ImGui::EndTable();
+    }
+}
+
+// The projectiles: the live ones and their trails, where they hit, and what each pool made.
+static void ViewProjectiles()
+{
+    RwInt32 i;
+    RwBool bImpact;
+    RwInt32 nKind, nSurface;
+    RwReal fAge;
+    RwV3d v;
+
+    Check("draw the projectiles", &g_bTrigDrawProjectiles);
+    ImGui::SameLine();
+    Check("trails", &g_bTrigDrawProjTrails);
+    ImGui::SameLine();
+    Check("label the hits", &g_bTrigDrawProjLabels);
+    ImGui::SliderFloat("trails and hits stay (seconds)", &g_fTrigDrawProjTrail, 0.5f, 30.0f, "%.1f");
+    ImGui::TextDisabled("(a cross on each one in flight in its kind's colour, the trail behind it; an orange cross "
+                        "where one hit, with the surface id; red where one blew up. The counts run whether it is "
+                        "drawn or not)");
+    if (ImGui::SmallButton("reset the counts"))
+        TrigDrawProjReset();
+    ImGui::SameLine();
+    ImGui::Text("%d hits, %d blasts", g_nTrigDrawProjImpacts, g_nTrigDrawProjBlasts);
+    if (ImGui::BeginTable("projpools", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
+    {
+        ImGui::TableSetupColumn("pool (kind)");
+        ImGui::TableSetupColumn("made");
+        ImGui::TableSetupColumn("in flight");
+        ImGui::TableHeadersRow();
+        for (i = 0; i < TRIGDRAW_PROJ_KINDS; i++)
+        {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(TrigDrawProjKindName(i));
+            ImGui::TableNextColumn();
+            ImGui::Text("%d", g_anTrigDrawProjSpawned[i]);
+            ImGui::TableNextColumn();
+            if (g_bTrigDrawProjectiles)
+                ImGui::Text("%d", g_anTrigDrawProjLive[i]);
+            else
+                ImGui::TextDisabled("(drawn only)");
+        }
+        ImGui::EndTable();
+    }
+    if (ImGui::TreeNode("the last hits and blasts"))
+    {
+        for (i = 0; i < 20 && TrigDrawProjEvent(i, &bImpact, &nKind, &nSurface, &fAge, &v); i++)
+        {
+            if (bImpact)
+                ImGui::Text("%.1f s ago: kind %d hit surface %d at %.0f, %.0f, %.0f", fAge, nKind, nSurface, v.x, v.y,
+                            v.z);
+            else
+                ImGui::Text("%.1f s ago: kind %d blew up at %.0f, %.0f, %.0f", fAge, nKind, v.x, v.y, v.z);
+        }
+        ImGui::TreePop();
+    }
+}
+
+// The world line tests the game makes, by their kind (the surface mask they pass).
+static void ViewRays()
+{
+    RwInt32 i;
+
+    Check("draw the line tests", &g_bTrigDrawRays);
+    ImGui::SameLine();
+    Check("the misses too", &g_bTrigDrawRayMisses);
+    ImGui::SliderFloat("they stay (seconds)##rays", &g_fTrigDrawRaySecs, 0.05f, 5.0f, "%.2f");
+    ImGui::TextDisabled("(sub_91F40, the world's line test: a hit drawn to where it hit, red cross there, the rest of "
+                        "the line faint; the AI's and the bullets' tests against entities are not world tests)");
+    for (i = 0; i < 6; i++)
+    {
+        ImGui::PushID(i);
+        Check(TrigDrawRayKindName(i), &g_abTrigDrawRayKinds[i]);
+        ImGui::SameLine(330.0f);
+        if (g_bTrigDrawRays)
+            ImGui::Text("%d a second", g_anTrigDrawRayCount[i]);
+        ImGui::PopID();
+    }
+}
+
+// The bullets' hits on entities, and the bone boxes they test on soldiers.
+static void ViewHits()
+{
+    Check("show the hits (damage and part where each bullet hit)", &g_bTrigDrawHits);
+    ImGui::SliderFloat("they stay (seconds)##hits", &g_fTrigDrawHitSecs, 0.5f, 10.0f, "%.1f");
+    Check("draw the soldiers' bone boxes", &g_bTrigDrawHitBoxes);
+    ImGui::SliderFloat("bone box distance (0 unlimited)", &g_fTrigDrawHitBoxRange, 0.0f, 10000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    if (g_bTrigDrawHitBoxes)
+        ImGui::Text("%d soldiers in range", g_nTrigDrawHitBoxesShown);
+    ImGui::TextDisabled("(the 13 boxes per soldier the player's bullets are tested against (sub_8D660), the head red; "
+                        "only while the soldier is in view: off screen the game tests one box from its size. A hit's "
+                        "number is what the soldier lost when known (sub_13C490), else the bullet's damage)");
+}
+
+// The level's lights.
+static void ViewLights()
+{
+    RwInt32 i;
+
+    Check("draw the lights", &g_bTrigDrawLights);
+    ImGui::SameLine();
+    Check("their lines##lights", &g_bTrigDrawLightLabels);
+    ImGui::SameLine();
+    Check("radii", &g_bTrigDrawLightRadii);
+    ImGui::SliderFloat("light draw distance (0 unlimited)", &g_fTrigDrawLightRange, 0.0f, 50000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    ImGui::TextDisabled("(the level's lights (the world manager's list), the ambient and the directional slots; the "
+                        "directionals as arrows in front of the camera. Most entities are lit by their zone's "
+                        "colours instead, which are not lights)");
+    if (!g_bTrigDrawLights)
+        return;
+    if (ImGui::BeginTable("lights", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+                          ImVec2(0.0f, 260.0f)))
+    {
+        static const RwChar *const s_apszSource[4] = { "the level's", "the ambient", "a directional slot", "the fallback" };
+
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("type");
+        ImGui::TableSetupColumn("from");
+        ImGui::TableSetupColumn("where");
+        ImGui::TableSetupColumn("radius");
+        ImGui::TableSetupColumn("colour");
+        ImGui::TableHeadersRow();
+        for (i = 0; i < g_nTrigDrawLightList; i++)
+        {
+            const TrigDrawLightInfo *l = &g_aTrigDrawLightList[i];
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(l->nType == 1 ? "directional" : l->nType == 2 ? "ambient" : l->nType == 0x80 ? "point"
+                                   : l->nType == 0x81 ? "spot" : l->nType == 0x82 ? "soft spot" : "?");
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(s_apszSource[l->nSource & 3]);
+            ImGui::TableNextColumn();
+            if (l->nType >= 0x80)
+                ImGui::Text("%.0f, %.0f, %.0f", l->vPos.x, l->vPos.y, l->vPos.z);
+            else if (l->nType == 1)
+                ImGui::Text("towards %.2f, %.2f, %.2f", l->vAt.x, l->vAt.y, l->vAt.z);
+            else
+                ImGui::TextDisabled("-");
+            ImGui::TableNextColumn();
+            if (l->nType >= 0x80)
+                ImGui::Text("%.0f", l->fRadius);
+            else
+                ImGui::TextDisabled("-");
+            ImGui::TableNextColumn();
+            ImGui::ColorButton("##lc", ImVec4(l->colour.red, l->colour.green, l->colour.blue, 1.0f),
+                               ImGuiColorEditFlags_NoTooltip, ImVec2(14.0f, 14.0f));
+            ImGui::SameLine();
+            ImGui::Text("%.2f %.2f %.2f", l->colour.red, l->colour.green, l->colour.blue);
+        }
+        ImGui::EndTable();
+    }
+}
+
+// The AI's hearing.
+static void ViewHearing()
+{
+    Check("draw the sounds the AI can hear", &g_bTrigDrawHearing);
+    ImGui::SameLine();
+    Check("listeners' radii", &g_bTrigDrawHearRadii);
+    ImGui::SameLine();
+    Check("labels##hear", &g_bTrigDrawHearLabels);
+    ImGui::SliderFloat("they stay (seconds)##hear", &g_fTrigDrawHearSecs, 0.2f, 10.0f, "%.1f");
+    if (g_bTrigDrawHearing)
+        ImGui::Text("%d sounds a second, %d heard a second", g_nTrigDrawHearNoises, g_nTrigDrawHeardCount);
+    ImGui::TextDisabled("(each sound a cross with a ring of its range, blue the player's, red a soldier's; a green line "
+                        "to each soldier that heard it (\"AIAction_HearSound\"). A soldier hears a sound within the "
+                        "square root of the sound's range squared plus its own radius squared, only of the kinds and "
+                        "sides it listens for, and only in some of its states)");
+}
+
+// The lighting zones and the entity in each.
+static void ViewZones()
+{
+    Check("draw the zones", &g_bTrigDrawZones);
+    ImGui::SameLine();
+    Check("entities' zones", &g_bTrigDrawZoneEntities);
+    ImGui::SameLine();
+    Check("labels##zones", &g_bTrigDrawZoneLabels);
+    ImGui::SliderFloat("zone draw distance (0 unlimited)", &g_fTrigDrawZoneRange, 0.0f, 50000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    if (g_bTrigDrawZones)
+        ImGui::Text("%d of the level's %d zones drawn", g_nTrigDrawZonesShown, g_nTrigDrawZonesAll);
+    ImGui::TextDisabled("(the lighting zones, dword_4B2550: each entity is lit by the smallest zone holding it, its "
+                        "ambient and up to two lights, cross-fading as it moves; a post on each entity in its zone's "
+                        "colour, white the default zone, grey none. Only lighting reads them; Engine, Level and render "
+                        "has the switches that turn them off)");
+}
+
+// The AI squads.
+static void ViewSquads()
+{
+    Check("draw the squads", &g_bTrigDrawSquads);
+    ImGui::SameLine();
+    Check("labels##squads", &g_bTrigDrawSquadLabels);
+    if (g_bTrigDrawSquads)
+        ImGui::Text("%d squads", g_nTrigDrawSquads);
+    ImGui::TextDisabled("(a line from each member to its leader (\"SetSquadLeader\"; its first member when none is "
+                        "set), a ring on the leader; its id, side, members, the targets it sees and its maneuvers: "
+                        "every squad starts with run members, alert stand and the two flagged ones, scripts add pair "
+                        "at a spot and fire and movement)");
+}
+
+// The splines: every SplinePath the level made, its curve, name and length.
+static void ViewSplines()
+{
+    Check("draw the splines", &g_bTrigDrawSplines);
+    ImGui::SameLine();
+    Check("their names##spl", &g_bTrigDrawSplineLabels);
+    ImGui::SliderFloat("spline draw distance (0 unlimited)", &g_fTrigDrawSplineRange, 0.0f, 50000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    if (g_bTrigDrawSplines)
+        ImGui::Text("%d of the level's %d splines drawn", g_nTrigDrawSplinesShown, g_nTrigDrawSplinesAll);
+    ImGui::TextDisabled("(the paths gimps, vehicles, the camera, shrimps and moving props follow: a post at each "
+                        "start, a cross at each end, a colour each)");
 }
 
 // Moving about: noclip for the player, the free camera.
@@ -4766,6 +5079,8 @@ static void TabHud()
 
 // ---- the window ----
 
+void TabPerformance();  // (trigperf.cpp: the game's profiler sections, graphed)
+
 // The window's tabs: five groups (what is drawn, the player, the level's objects, the scripts,
 // the engine), each a row of its own tabs.
 struct ToolTab
@@ -4808,11 +5123,78 @@ static void LevelGenerators()
     SubTabs("generators", s_aTabs, 2);
 }
 
-static const ToolTab s_aViewTabs[] =
+// The View group: every overlay in one list by topic, each with its switch beside its name (the
+// main one: the page has the rest), and the page of the one picked beside the list.
+struct ViewEntry
 {
-    { "Triggers", ViewTriggers }, { "Collision", ViewCollision }, { "AI", ViewAi },
-    { "Generators", ViewGenerators }, { "Gimps", ViewGimps }, { "Camera", ViewCamera },
+    const RwChar *pszTopic;
+    const RwChar *pszName;
+    void (*pfnDraw)();
+    RwBool *pbOn;
 };
+extern RwBool g_bTrigDrawGimps;
+static const ViewEntry s_aViewEntries[] =
+{
+    { "World", "Triggers", ViewTriggers, &g_bTrigDrawEnabled },
+    { "World", "Collision", ViewCollision, &g_bTrigDrawCollision },
+    { "World", "Splines", ViewSplines, &g_bTrigDrawSplines },
+    { "World", "Zones", ViewZones, &g_bTrigDrawZones },
+    { "World", "Lights", ViewLights, &g_bTrigDrawLights },
+    { "World", "Sounds", ViewSounds, &g_bTrigDrawSounds },
+    { "AI", "AI state", ViewAi, &g_bTrigDrawAi },
+    { "AI", "Path nodes", ViewAi, &g_bTrigDrawPathNodes },
+    { "AI", "Squads", ViewSquads, &g_bTrigDrawSquads },
+    { "AI", "Hearing", ViewHearing, &g_bTrigDrawHearing },
+    { "AI", "Gimps", ViewGimps, &g_bTrigDrawGimps },
+    { "Combat", "Rays", ViewRays, &g_bTrigDrawRays },
+    { "Combat", "Hits", ViewHits, &g_bTrigDrawHits },
+    { "Combat", "Projectiles", ViewProjectiles, &g_bTrigDrawProjectiles },
+    { "Combat", "Generators", ViewGenerators, &g_bTrigDrawPg },
+    { "Camera", "Noclip, free camera", ViewCamera, &g_bTrigDrawFreeCam },
+};
+
+static void TabView()
+{
+    static RwInt32 s_nPicked;
+    const RwInt32 nEntries = (RwInt32)(sizeof(s_aViewEntries) / sizeof(s_aViewEntries[0]));
+    const RwChar *pszTopic = NULL;
+    RwInt32 i, nOn = 0;
+
+    ImGui::BeginChild("viewlist", ImVec2(190.0f, 0.0f), ImGuiChildFlags_Borders);
+    for (i = 0; i < nEntries; i++)
+    {
+        const ViewEntry *e = &s_aViewEntries[i];
+
+        if (pszTopic == NULL || strcmp(pszTopic, e->pszTopic))
+        {
+            pszTopic = e->pszTopic;
+            ImGui::SeparatorText(pszTopic);
+        }
+        ImGui::PushID(i);
+        Check("##on", e->pbOn);
+        nOn += *e->pbOn ? 1 : 0;
+        ImGui::SameLine();
+        if (ImGui::Selectable(e->pszName, s_nPicked == i))
+            s_nPicked = i;
+        ImGui::PopID();
+    }
+    ImGui::Separator();
+    if (ImGui::SmallButton("all off"))
+        for (i = 0; i < nEntries; i++)
+            *s_aViewEntries[i].pbOn = FALSE;
+    ImGui::SameLine();
+    ImGui::TextDisabled("%d on", nOn);
+    ImGui::EndChild();
+    ImGui::SameLine();
+    ImGui::BeginChild("viewpage");
+    if (s_nPicked >= 0 && s_nPicked < nEntries)
+    {
+        ImGui::SeparatorText(s_aViewEntries[s_nPicked].pszName);
+        s_aViewEntries[s_nPicked].pfnDraw();
+    }
+    ImGui::EndChild();
+}
+
 static const ToolTab s_aPlayerTabs[] =
 {
     { "Player", TabPlayer }, { "Inventory", TabInventory }, { "Weapons", TabWeapons }, { "Cheats", TabCheats },
@@ -4828,14 +5210,15 @@ static const ToolTab s_aScriptTabs[] =
 };
 static const ToolTab s_aEngineTabs[] =
 {
-    { "Level and render", CheatsLevelRender }, { "Audio", CheatsAudio }, { "Tunables", TabTunables },
+    { "Performance", TabPerformance }, { "Level and render", CheatsLevelRender }, { "Audio", CheatsAudio },
+    { "Tunables", TabTunables },
     { "Shell", TabShell }, { "HUD", TabHud }, { "Loading", TabLoading }, { "Memory", TabMemory },
     { "Links", EngineLinks },
 };
 #define TOOL_GROUP(name, tabs) { name, tabs, (RwInt32)(sizeof(tabs) / sizeof(tabs[0])) }
 static const struct { const RwChar *pszName; const ToolTab *pTabs; RwInt32 nTabs; } s_aGroups[] =
 {
-    TOOL_GROUP("View", s_aViewTabs), TOOL_GROUP("Player", s_aPlayerTabs), TOOL_GROUP("Level", s_aLevelTabs),
+    { "View", NULL, 0 }, TOOL_GROUP("Player", s_aPlayerTabs), TOOL_GROUP("Level", s_aLevelTabs),
     TOOL_GROUP("Scripts", s_aScriptTabs), TOOL_GROUP("Engine", s_aEngineTabs),
 };
 
@@ -4850,6 +5233,8 @@ extern "C" void port_debug_tools_window()
         ImGui::End();
         return;
     }
+    // (every text wraps at the window's edge, or its table column's: the hints are long)
+    ImGui::PushTextWrapPos(0.0f);
     ResultLine();
     if (ImGui::BeginTabBar("groups"))
     {
@@ -4859,12 +5244,17 @@ extern "C" void port_debug_tools_window()
         {
             if (ImGui::BeginTabItem(s_aGroups[i].pszName))
             {
-                SubTabs(s_aGroups[i].pszName, s_aGroups[i].pTabs, s_aGroups[i].nTabs);
+                // (View: the overlay list; the rest their tabs)
+                if (s_aGroups[i].pTabs == NULL)
+                    TabView();
+                else
+                    SubTabs(s_aGroups[i].pszName, s_aGroups[i].pTabs, s_aGroups[i].nTabs);
                 ImGui::EndTabItem();
             }
         }
         ImGui::EndTabBar();
     }
+    ImGui::PopTextWrapPos();
     ImGui::End();
 }
 

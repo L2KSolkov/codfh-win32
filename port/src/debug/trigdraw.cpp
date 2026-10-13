@@ -70,6 +70,17 @@
 #include "rw/rpmaterial.h"
 #include "rw/batextur.h"
 #include "trigcoll.h"
+#include "trigsndproj.h"
+#include "types/projectile.h"
+#include "types/vec4.h"
+#include "game/particles.h"
+#include "types/type_3DF30.h"
+#include "types/type_3CE6D0.h"
+#include "game/data.h"
+#include "types/type_3C540.h"
+#include "rw/rphanim.h"
+#include "rw/rplight.h"
+#include "types/type_3D96F0.h"
 #include "types/GimpTrigger.h"
 #include "types/ShrimpTrigger.h"
 #include "types/type_3DDB98.h"
@@ -161,7 +172,7 @@ static const RwChar *const s_apszKindNames[0x28] =
 
 static RwIm3DVertex s_aTextVerts[TRIGDRAW_MAXCHARS * 6];
 
-// Switches, set from the debug tools' View tabs (trigtools.cpp): draw at all
+// Switches, set from the debug tools' View list (trigtools.cpp): draw at all
 // (off until asked for: the environment's CODFH_TRIGGERS=1 starts with it on,
 // 2 with the collision too; CODFH_PATHNODES=1 the path nodes),
 // the draw distance from the camera (0 = unlimited), and draw through
@@ -268,7 +279,16 @@ static void TrigDrawAddCircle(RwInt32 nAxis, RwReal fRadius, RwReal fOffset, RwU
 // so its containment test always fails), yellow when its proximity checks
 // are off (unk_24_3), magenta when it has been moved (unk_24_15), otherwise
 // a colour by its kind (vf_008).
+static RwUInt32 TrigDrawActColour(Trigger *pTrigger, RwUInt32 dwBase);   // (trigger activity, below)
+static RwUInt32 TrigDrawColourBase(Trigger *pTrigger);
+
+// (with its activity's flash over it)
 static RwUInt32 TrigDrawColour(Trigger *pTrigger)
+{
+    return TrigDrawActColour(pTrigger, TrigDrawColourBase(pTrigger));
+}
+
+static RwUInt32 TrigDrawColourBase(Trigger *pTrigger)
 {
     if (!pTrigger->unk_24_0)
         return 0x80808080;
@@ -448,6 +468,8 @@ static void TrigDrawText(const RwChar *pszText, const RwV3d *pvAt, const RwMatri
 
 // Writes the trigger's type at its centre (the matrix's position), and the name the level
 // gives it (trignames.cpp), when it has one, on the line above.
+static void TrigDrawActLines(Trigger *pTrigger, const RwV3d *pvCentre, const RwMatrix *pCamLtm);
+
 static void TrigDrawLabel(Trigger *pTrigger, const RwMatrix *pCamLtm, RwUInt32 dwColour)
 {
     RwV3d vCentre;
@@ -460,6 +482,7 @@ static void TrigDrawLabel(Trigger *pTrigger, const RwMatrix *pCamLtm, RwUInt32 d
     if (pszName != NULL)
         TrigDrawText(pszName, &vCentre, pCamLtm, dwColour, 1.0f);
     TrigDrawSpawnerLines(pTrigger, &vCentre, pCamLtm, dwColour);
+    TrigDrawActLines(pTrigger, &vCentre, pCamLtm);
 }
 
 // ---- the path nodes ----
@@ -2794,6 +2817,1592 @@ const RwChar *TrigDrawKindName(RwInt32 nKind)
     return nKind >= 0 && nKind < 0x28 ? s_apszKindNames[nKind] : NULL;
 }
 
+static RwReal TrigDrawDist2(const RwV3d *pA, const RwV3d *pB)
+{
+    RwReal dx = pA->x - pB->x, dy = pA->y - pB->y, dz = pA->z - pB->z;
+    return dx * dx + dy * dy + dz * dz;
+}
+
+// ---- the world line tests ----
+
+RwBool g_bTrigDrawRays = FALSE;
+RwBool g_bTrigDrawRayMisses = FALSE;
+RwReal g_fTrigDrawRaySecs = 0.5f;
+RwBool g_abTrigDrawRayKinds[6] = { TRUE, TRUE, FALSE, TRUE, TRUE, FALSE };
+RwInt32 g_anTrigDrawRayCount[6];
+
+#define TRIGDRAW_RAYS 2048
+
+// A test: its line, whether it hit and where, its mask, its kind, the caller, when.
+struct TrigDrawRay
+{
+    RwV3d vStart, vEnd, vHit;
+    RwUInt32 dwMask, dwTick, dwFrame;
+    const void *pCaller;
+    RwInt32 nKind, bHit, nSurface;
+};
+static TrigDrawRay s_aRays[TRIGDRAW_RAYS];
+static RwInt32 s_nRayNext;
+static RwInt32 s_anRayThisSecond[6];
+static RwUInt32 s_dwRaySecond;
+
+const RwChar *TrigDrawRayKindName(RwInt32 nKind)
+{
+    static const RwChar *const s_apsz[6] = { "bullets and grenades (0x180000)", "AI sight (0x420000)",
+                                             "AI paths (0x10000, 0x20000)", "aim (0x590000)",
+                                             "vehicles (0x40000, 0x840000)", "other masks" };
+    return nKind >= 0 && nKind < 6 ? s_apsz[nKind] : "?";
+}
+
+static RwInt32 TrigDrawRayKind(RwUInt32 dwMask)
+{
+    switch (dwMask)
+    {
+    case 0x180000: return 0;
+    case 0x420000: return 1;
+    case 0x10000: case 0x20000: case 0x30000: return 2;
+    case 0x590000: return 3;
+    case 0x40000: case 0x840000: return 4;
+    }
+    return 5;
+}
+
+static const RwUInt32 s_adwRayKind[6] = { 0xFFFFD040, 0xFF40C0FF, 0xFF80FF80, 0xFFFF60FF, 0xFFFF9040, 0xFFC0C0C0 };
+
+// (from sub_91F40's end: one call a collision world, so a test over the four section worlds comes
+// four times; the same line from the same caller in one frame is one test, its nearest hit kept)
+void TrigDrawLineTest(const RwV3d *pvStart, const RwV3d *pvEnd, RwInt32 bHit, RwReal fT, RwUInt32 dwMask,
+                      RwInt32 nSurface, const void *pCaller)
+{
+    TrigDrawRay *r;
+    RwInt32 nKind = TrigDrawRayKind(dwMask), i;
+    RwUInt32 dwNow;
+
+    if (!g_bTrigDrawRays)
+        return;
+    dwNow = GetTickCount();
+    if (dwNow - s_dwRaySecond >= 1000)
+    {
+        memcpy(g_anTrigDrawRayCount, s_anRayThisSecond, sizeof(g_anTrigDrawRayCount));
+        memset(s_anRayThisSecond, 0, sizeof(s_anRayThisSecond));
+        s_dwRaySecond = dwNow;
+    }
+    for (i = 1; i <= 4; i++)
+    {
+        TrigDrawRay *q = &s_aRays[(s_nRayNext + TRIGDRAW_RAYS - i) % TRIGDRAW_RAYS];
+
+        if (q->dwFrame == port_frame && q->pCaller == pCaller && q->vStart.x == pvStart->x && q->vStart.y == pvStart->y
+            && q->vStart.z == pvStart->z && q->vEnd.x == pvEnd->x && q->vEnd.y == pvEnd->y && q->vEnd.z == pvEnd->z)
+        {
+            if (bHit && (!q->bHit || (fT < 1.0f && TrigDrawDist2(pvStart, &q->vHit) >
+                                                       (fT * fT) * TrigDrawDist2(pvStart, pvEnd))))
+            {
+                q->bHit = 1;
+                q->vHit.x = pvStart->x + (pvEnd->x - pvStart->x) * fT;
+                q->vHit.y = pvStart->y + (pvEnd->y - pvStart->y) * fT;
+                q->vHit.z = pvStart->z + (pvEnd->z - pvStart->z) * fT;
+                q->nSurface = nSurface;
+            }
+            return;
+        }
+    }
+    s_anRayThisSecond[nKind]++;
+    r = &s_aRays[s_nRayNext];
+    s_nRayNext = (s_nRayNext + 1) % TRIGDRAW_RAYS;
+    r->vStart = *pvStart;
+    r->vEnd = *pvEnd;
+    r->bHit = bHit;
+    r->nSurface = nSurface;
+    if (bHit)
+    {
+        r->vHit.x = pvStart->x + (pvEnd->x - pvStart->x) * fT;
+        r->vHit.y = pvStart->y + (pvEnd->y - pvStart->y) * fT;
+        r->vHit.z = pvStart->z + (pvEnd->z - pvStart->z) * fT;
+    }
+    r->dwMask = dwMask;
+    r->nKind = nKind;
+    r->pCaller = pCaller;
+    r->dwTick = dwNow ? dwNow : 1;
+    r->dwFrame = port_frame;
+}
+
+// The recent tests: a hit drawn to where it hit in its kind's colour, with a cross there (red),
+// the rest of its line faint; a miss (when shown) faint in its colour; all fading.
+static void TrigDrawRays()
+{
+    RwUInt32 dwNow = GetTickCount(), dwKeep = (RwUInt32)(g_fTrigDrawRaySecs * 1000.0f);
+    RwInt32 i;
+
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (i = 0; i < TRIGDRAW_RAYS; i++)
+    {
+        const TrigDrawRay *r = &s_aRays[i];
+        RwUInt32 dwAge, dwColour, dwAlpha;
+
+        if (!r->dwTick || !g_abTrigDrawRayKinds[r->nKind])
+            continue;
+        dwAge = dwNow - r->dwTick;
+        if (dwAge > dwKeep)
+            continue;
+        dwAlpha = (RwUInt32)(255.0f * (1.0f - (RwReal)dwAge / (dwKeep ? dwKeep : 1)));
+        dwColour = (s_adwRayKind[r->nKind] & 0x00FFFFFF) | (dwAlpha << 24);
+        if (r->bHit)
+        {
+            TrigDrawPathLine(&r->vStart, &r->vHit, dwColour);
+            TrigDrawPathLine(&r->vHit, &r->vEnd, (dwColour & 0x00FFFFFF) | ((dwAlpha / 5) << 24));
+            TrigDrawCross(&r->vHit, 6.0f, 0x00FF3030 | (dwAlpha << 24));
+        }
+        else if (g_bTrigDrawRayMisses)
+            TrigDrawPathLine(&r->vStart, &r->vEnd, (dwColour & 0x00FFFFFF) | ((dwAlpha / 3) << 24));
+    }
+    TrigDrawPathFlush();
+}
+
+// ---- bullet hits and the bone boxes ----
+
+RwBool g_bTrigDrawHits = FALSE;
+RwBool g_bTrigDrawHitBoxes = FALSE;
+RwReal g_fTrigDrawHitSecs = 2.0f;
+RwReal g_fTrigDrawHitBoxRange = 1500.0f;
+RwInt32 g_nTrigDrawHitBoxesShown;
+
+#define TRIGDRAW_HITS 64
+
+struct TrigDrawHit
+{
+    const void *pEntity;
+    RwV3d v;
+    RwReal fDamage, fDealt;     // the bullet's, and what the soldier lost (sub_13C490; -1 unknown)
+    RwInt32 nPart;
+    RwUInt32 dwTick, dwFrame;
+};
+static TrigDrawHit s_aHits[TRIGDRAW_HITS];
+static RwInt32 s_nHitNext;
+
+// (from the projectiles' steps, just before the entity's vf_064)
+void TrigDrawBulletHit(void *pEntity, const RwV3d *pv, RwInt32 nPart, RwReal fDamage)
+{
+    TrigDrawHit *h;
+
+    if (pv == NULL)
+        return;
+    h = &s_aHits[s_nHitNext];
+    s_nHitNext = (s_nHitNext + 1) % TRIGDRAW_HITS;
+    h->pEntity = pEntity;
+    h->v = *pv;
+    h->nPart = nPart;
+    h->fDamage = fDamage;
+    h->fDealt = -1.0f;
+    h->dwTick = GetTickCount();
+    h->dwFrame = port_frame;
+}
+
+// (from the soldiers' sub_13C490: the hit points it takes, put on this frame's hit on it)
+void TrigDrawDamageTaken(void *pEntity, RwReal fAmount)
+{
+    RwInt32 i;
+
+    for (i = 1; i <= TRIGDRAW_HITS; i++)
+    {
+        TrigDrawHit *h = &s_aHits[(s_nHitNext + TRIGDRAW_HITS - i) % TRIGDRAW_HITS];
+
+        if (h->dwFrame != port_frame)
+            break;
+        if (h->pEntity == pEntity && h->fDealt < 0.0f)
+        {
+            h->fDealt = fAmount;
+            return;
+        }
+    }
+}
+
+static const RwChar *TrigDrawPartName(RwInt32 nPart)
+{
+    // (the parts the bone boxes return, dword_428E80: 0 the head; the rest by their order)
+    static const RwChar *const s_apsz[9] = { "head", "chest", "pelvis", "arm", "arm", "forearm", "leg", "leg", "shin" };
+    return nPart >= 0 && nPart < 9 ? s_apsz[nPart] : "body";
+}
+
+// A box's twelve edges, its corners the two given.
+static void TrigDrawBox(const RwV3d *pMin, const RwV3d *pMax, RwUInt32 dwColour)
+{
+    RwV3d c[8];
+    RwInt32 i;
+    static const RwInt32 s_aEdges[12][2] = { {0,1},{1,3},{3,2},{2,0},{4,5},{5,7},{7,6},{6,4},{0,4},{1,5},{2,6},{3,7} };
+
+    for (i = 0; i < 8; i++)
+    {
+        c[i].x = (i & 1) ? pMax->x : pMin->x;
+        c[i].y = (i & 2) ? pMax->y : pMin->y;
+        c[i].z = (i & 4) ? pMax->z : pMin->z;
+    }
+    for (i = 0; i < 12; i++)
+        TrigDrawPathLine(&c[s_aEdges[i][0]], &c[s_aEdges[i][1]], dwColour);
+}
+
+// The soldiers' (and gimps') bone boxes in view, as the bullets test them against the player
+// (sub_8D660: kind 0, the others 0.75 of their size): each bone's box through its matrix to a
+// box in the world (sub_8C410); the head's red. Off screen the game tests one box from the
+// entity's width and height; that one is drawn grey.
+static void TrigDrawHitBoxesAll(const RwV3d *pvCam)
+{
+    RwInt32 i, k;
+
+    g_nTrigDrawHitBoxesShown = 0;
+    for (i = 0; i < 0x300; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+
+        if (pEntity == NULL)
+            continue;
+        __try
+        {
+            RwMatrix *pLtm;
+            RpHAnimHierarchy *pH;
+            RwMatrix *aBones;
+            RwReal dx, dy, dz;
+
+            if (pEntity->unk_58 != 1 || !pEntity->unk_88_1 || pEntity->unk_284 == NULL)
+                continue;
+            pH = pEntity->unk_284->unk_18;
+            if (pH == NULL)
+                continue;
+            aBones = RpHAnimHierarchyGetMatrixArray(pH);
+            if (aBones == NULL)
+                continue;
+            pLtm = &aBones[0];
+            dx = pLtm->pos.x - pvCam->x;
+            dy = pLtm->pos.y - pvCam->y;
+            dz = pLtm->pos.z - pvCam->z;
+            if (g_fTrigDrawHitBoxRange > 0.0f && dx * dx + dy * dy + dz * dz > g_fTrigDrawHitBoxRange * g_fTrigDrawHitBoxRange)
+                continue;
+            g_nTrigDrawHitBoxesShown++;
+            if (!pEntity->unk_28_13)
+                continue;
+            for (k = 0; k < 13; k++)
+            {
+                // (the table's boxes in order, as the game's loop steps through them)
+                const type_4B21D0_60 *pBox = &dword_4B21D0.unk_60[0] + k;
+                __declspec(align(16)) type_8C410 box, world;
+                type_8BFA0 m;
+                RwReal fScale = k == 0 ? 1.0f : 0.75f;
+                RwV3d vMin, vMax;
+                RwInt32 nBone = (RwInt32)pBox->unk_0C;
+
+                if (nBone < 0 || nBone > 255)
+                    continue;
+                m = *(type_8BFA0 *)&aBones[nBone];
+                m.unk_00[0].unk_0C = 0.0f;
+                m.unk_00[1].unk_0C = 0.0f;
+                m.unk_00[2].unk_0C = 0.0f;
+                m.unk_00[3].unk_0C = 1.0f;
+                box.unk_00.unk_00 = fScale * pBox->unk_00;
+                box.unk_00.unk_04 = fScale * pBox->unk_04;
+                box.unk_00.unk_08 = fScale * pBox->unk_08;
+                box.unk_10.unk_00 = fScale * pBox->unk_10;
+                box.unk_10.unk_04 = fScale * pBox->unk_14;
+                box.unk_10.unk_08 = fScale * pBox->unk_18;
+                world = sub_8C410((RwMatrix *)&m, &box.unk_00);
+                vMin.x = world.unk_00.unk_00;
+                vMin.y = world.unk_00.unk_04;
+                vMin.z = world.unk_00.unk_08;
+                vMax.x = world.unk_10.unk_00;
+                vMax.y = world.unk_10.unk_04;
+                vMax.z = world.unk_10.unk_08;
+                TrigDrawBox(&vMin, &vMax, dword_428E80[k].unk_10 == 0 ? 0xC0FF4040 : 0x9040FF80);
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+}
+
+// The recent hits: a cross where the bullet hit, its damage (what the soldier lost when known,
+// else the bullet's) and its part, rising as it fades; a head shot red.
+static void TrigDrawHits(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    RwUInt32 dwNow = GetTickCount(), dwKeep = (RwUInt32)(g_fTrigDrawHitSecs * 1000.0f);
+    RwInt32 i;
+
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (i = 0; i < TRIGDRAW_HITS; i++)
+    {
+        const TrigDrawHit *h = &s_aHits[i];
+        RwUInt32 dwAge;
+
+        if (!h->dwTick)
+            continue;
+        dwAge = dwNow - h->dwTick;
+        if (dwAge > dwKeep)
+            continue;
+        TrigDrawCross(&h->v, 5.0f, h->nPart == 0 ? 0xFFFF3030 : 0xFFFFD040);
+    }
+    TrigDrawPathFlush();
+    if (TrigDrawCharset() == NULL)
+        return;
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+    for (i = 0; i < TRIGDRAW_HITS; i++)
+    {
+        const TrigDrawHit *h = &s_aHits[i];
+        RwUInt32 dwAge;
+        RwChar sz[48];
+        RwV3d vAt;
+        RwReal f;
+
+        if (!h->dwTick)
+            continue;
+        dwAge = dwNow - h->dwTick;
+        if (dwAge > dwKeep)
+            continue;
+        f = (RwReal)dwAge / (dwKeep ? dwKeep : 1);
+        vAt = h->v;
+        vAt.y += 10.0f + 30.0f * f;
+        if (h->fDealt >= 0.0f)
+            _snprintf(sz, sizeof(sz), "-%.0f %s", h->fDealt, TrigDrawPartName(h->nPart));
+        else
+            _snprintf(sz, sizeof(sz), "%.0f %s", h->fDamage, h->nPart >= 0 ? TrigDrawPartName(h->nPart) : "");
+        sz[sizeof(sz) - 1] = 0;
+        TrigDrawText(sz, &vAt, pCamLtm, ((RwUInt32)(255.0f * (1.0f - f)) << 24) | (h->nPart == 0 ? 0xFF4040 : 0xFFE060));
+    }
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+}
+
+// ---- the lights ----
+
+RwBool g_bTrigDrawLights = FALSE;
+RwBool g_bTrigDrawLightLabels = TRUE;
+RwBool g_bTrigDrawLightRadii = TRUE;
+RwReal g_fTrigDrawLightRange = 6000.0f;
+TrigDrawLightInfo g_aTrigDrawLightList[TRIGDRAW_LIGHTS];
+RwInt32 g_nTrigDrawLightList;
+// (render.h's dword_4E5C7C: the level's light list; particles.h's dword_4E5C98, the directional
+// slots, clump the ambient and camera the fallback directional)
+
+static void TrigDrawLightAdd(RpLight *pLight, RwInt32 nSource)
+{
+    TrigDrawLightInfo *o;
+    RwFrame *pFrame;
+    RwInt32 i;
+
+    if (pLight == NULL || g_nTrigDrawLightList >= TRIGDRAW_LIGHTS)
+        return;
+    for (i = 0; i < g_nTrigDrawLightList; i++)
+        if (g_aTrigDrawLightList[i].id == pLight)
+            return;
+    o = &g_aTrigDrawLightList[g_nTrigDrawLightList];
+    memset(o, 0, sizeof(*o));
+    o->id = pLight;
+    o->nType = pLight->object.subType;
+    o->nFlags = pLight->object.flags;
+    o->fRadius = pLight->radius;
+    o->colour = pLight->color;
+    o->fCone = *(const RwReal *)((const RwUInt8 *)pLight + 0x28);   // (minusCosAngle)
+    o->nSource = nSource;
+    pFrame = RpLightGetFrame(pLight);
+    if (pFrame)
+    {
+        RwMatrix *m = RwFrameGetLTM(pFrame);
+
+        o->vPos = m->pos;
+        o->vAt = m->at;
+    }
+    g_nTrigDrawLightList++;
+}
+
+// The lights: the level's list (its own, sub_173800), the ambient, the directional slots and the
+// fallback directional; each point or spot a cross in its colour with its radius as three rings
+// (a spot its cone's axis too), the directionals arrows in front of the camera.
+static void TrigDrawLights(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    RpLight *pLight;
+    RwInt32 i, n;
+
+    g_nTrigDrawLightList = 0;
+    __try
+    {
+        for (pLight = dword_4E5C7C, n = 0; pLight != NULL && n < 512; n++)
+        {
+            TrigDrawLightAdd(pLight, 0);
+            pLight = (RpLight *)((type_3D96FC *)sub_FBDD0(pLight))->unk_1C;
+        }
+        TrigDrawLightAdd(clump, 1);
+        for (i = 0; i < 4; i++)
+            TrigDrawLightAdd(dword_4E5C98[i], 2);
+        TrigDrawLightAdd(camera, 3);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (i = 0; i < g_nTrigDrawLightList; i++)
+    {
+        const TrigDrawLightInfo *l = &g_aTrigDrawLightList[i];
+        RwUInt32 r = (RwUInt32)(l->colour.red > 1.0f ? 255 : l->colour.red < 0.0f ? 0 : l->colour.red * 255.0f);
+        RwUInt32 g = (RwUInt32)(l->colour.green > 1.0f ? 255 : l->colour.green < 0.0f ? 0 : l->colour.green * 255.0f);
+        RwUInt32 b = (RwUInt32)(l->colour.blue > 1.0f ? 255 : l->colour.blue < 0.0f ? 0 : l->colour.blue * 255.0f);
+        RwUInt32 dwColour = 0xFF000000 | (r << 16) | (g << 8) | b;
+        RwV3d vAt;
+
+        // (a dark light still shows)
+        if (r + g + b < 60)
+            dwColour = 0xFF505050;
+        if (l->nType >= 0x80)
+        {
+            RwReal dx = l->vPos.x - pvCam->x, dy = l->vPos.y - pvCam->y, dz = l->vPos.z - pvCam->z;
+
+            if (g_fTrigDrawLightRange > 0.0f && dx * dx + dy * dy + dz * dz > g_fTrigDrawLightRange * g_fTrigDrawLightRange)
+                continue;
+            TrigDrawCross(&l->vPos, 20.0f, dwColour);
+            if (g_bTrigDrawLightRadii && l->fRadius > 0.0f && l->fRadius < 20000.0f)
+            {
+                RwInt32 k;
+
+                for (k = 0; k < 24; k++)
+                {
+                    RwReal a0 = k * 6.2831853f / 24.0f, a1 = (k + 1) * 6.2831853f / 24.0f;
+                    RwReal c0 = (RwReal)cos(a0) * l->fRadius, s0 = (RwReal)sin(a0) * l->fRadius;
+                    RwReal c1 = (RwReal)cos(a1) * l->fRadius, s1 = (RwReal)sin(a1) * l->fRadius;
+                    RwV3d pA = l->vPos, pB = l->vPos;
+                    RwUInt32 dwRing = (dwColour & 0x00FFFFFF) | 0x70000000;
+
+                    pA.x += c0; pA.z += s0; pB.x += c1; pB.z += s1;
+                    TrigDrawPathLine(&pA, &pB, dwRing);
+                    pA = l->vPos; pB = l->vPos;
+                    pA.x += c0; pA.y += s0; pB.x += c1; pB.y += s1;
+                    TrigDrawPathLine(&pA, &pB, dwRing);
+                    pA = l->vPos; pB = l->vPos;
+                    pA.y += c0; pA.z += s0; pB.y += c1; pB.z += s1;
+                    TrigDrawPathLine(&pA, &pB, dwRing);
+                }
+            }
+            if (l->nType > 0x80)
+            {
+                vAt = l->vPos;
+                vAt.x += l->vAt.x * (l->fRadius > 0.0f ? l->fRadius : 200.0f);
+                vAt.y += l->vAt.y * (l->fRadius > 0.0f ? l->fRadius : 200.0f);
+                vAt.z += l->vAt.z * (l->fRadius > 0.0f ? l->fRadius : 200.0f);
+                TrigDrawPathLine(&l->vPos, &vAt, dwColour);
+            }
+        }
+        else if (l->nType == 1)
+        {
+            // (an arrow along its direction, 300 in front of the camera, spread out by slot)
+            RwV3d vBase = *pvCam, vTip;
+
+            vBase.x += pCamLtm->at.x * 300.0f + pCamLtm->right.x * (i * 25.0f - 50.0f);
+            vBase.y += pCamLtm->at.y * 300.0f + 60.0f;
+            vBase.z += pCamLtm->at.z * 300.0f + pCamLtm->right.z * (i * 25.0f - 50.0f);
+            vTip = vBase;
+            vTip.x += l->vAt.x * 40.0f;
+            vTip.y += l->vAt.y * 40.0f;
+            vTip.z += l->vAt.z * 40.0f;
+            TrigDrawPathLine(&vBase, &vTip, dwColour);
+            TrigDrawCross(&vTip, 3.0f, dwColour);
+        }
+    }
+    TrigDrawPathFlush();
+    if (g_bTrigDrawLightLabels && TrigDrawCharset() != NULL)
+    {
+        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+        for (i = 0; i < g_nTrigDrawLightList; i++)
+        {
+            const TrigDrawLightInfo *l = &g_aTrigDrawLightList[i];
+            RwChar sz[96];
+            RwV3d vAt = l->vPos;
+            RwReal dx = l->vPos.x - pvCam->x, dy = l->vPos.y - pvCam->y, dz = l->vPos.z - pvCam->z;
+
+            if (l->nType < 0x80)
+                continue;
+            if (g_fTrigDrawLightRange > 0.0f && dx * dx + dy * dy + dz * dz > g_fTrigDrawLightRange * g_fTrigDrawLightRange)
+                continue;
+            _snprintf(sz, sizeof(sz), "%s light, radius %.0f, %.2f %.2f %.2f", l->nType == 0x80 ? "point" : "spot",
+                      l->fRadius, l->colour.red, l->colour.green, l->colour.blue);
+            sz[sizeof(sz) - 1] = 0;
+            vAt.y += 25.0f;
+            TrigDrawText(sz, &vAt, pCamLtm, 0xFFFFFFFF);
+        }
+        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    }
+}
+
+// ---- the lighting zones ----
+
+RwBool g_bTrigDrawZones = FALSE;
+RwBool g_bTrigDrawZoneEntities = TRUE;
+RwBool g_bTrigDrawZoneLabels = TRUE;
+RwReal g_fTrigDrawZoneRange = 4000.0f;
+RwInt32 g_nTrigDrawZonesAll, g_nTrigDrawZonesShown;
+
+// A colour per zone index (a hue each; the default zone white, none grey).
+static RwUInt32 TrigDrawZoneColour(RwInt32 nZone)
+{
+    static const RwUInt32 s_adw[12] =
+    {
+        0xFF5AC8FA, 0xFFFF9F43, 0xFF7CE07C, 0xFFFF6B9D, 0xFFC490FF, 0xFFFFE066,
+        0xFF4ADEDE, 0xFFFF7A5C, 0xFF9AD24A, 0xFF7A9CFF, 0xFFE07CE0, 0xFFB0B0FF,
+    };
+    if (nZone == -2)
+        return 0xFFFFFFFF;
+    if (nZone < 0)
+        return 0xFF707070;
+    return s_adw[nZone % 12];
+}
+
+// The index of a zone in the table (-2 the default zone, -1 none or unknown).
+static RwInt32 TrigDrawZoneIndex(const type_8F3E0 *pZone)
+{
+    RwInt32 i;
+
+    if (pZone == NULL)
+        return -1;
+    if (pZone == &dword_4E5BE0)
+        return -2;
+    for (i = 0; i < dword_4B2550.unk_00 && i < 256; i++)
+        if (dword_4B2550.get_zone(i) == pZone)
+            return i;
+    return -1;
+}
+
+// The zones' boxes (each a bound: a zone may also be cut by planes) in their colours, labelled
+// with their index and ambient; each entity's mark in its zone's colour (a line to the zone it
+// is fading out of while it does).
+static void TrigDrawZones(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    RwInt32 i;
+
+    g_nTrigDrawZonesAll = 0;
+    g_nTrigDrawZonesShown = 0;
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    __try
+    {
+        g_nTrigDrawZonesAll = dword_4B2550.unk_08 ? dword_4B2550.unk_00 : 0;
+        for (i = 0; i < g_nTrigDrawZonesAll && i < 256; i++)
+        {
+            type_8F3E0 *z = dword_4B2550.get_zone(i);
+            RwV3d vMin, vMax, vMid;
+
+            if (z == NULL)
+                continue;
+            vMin.x = z->unk_00[0].unk_00;
+            vMin.y = z->unk_00[0].unk_04;
+            vMin.z = z->unk_00[0].unk_08;
+            vMax.x = z->unk_00[1].unk_00;
+            vMax.y = z->unk_00[1].unk_04;
+            vMax.z = z->unk_00[1].unk_08;
+            vMid.x = (vMin.x + vMax.x) * 0.5f;
+            vMid.y = (vMin.y + vMax.y) * 0.5f;
+            vMid.z = (vMin.z + vMax.z) * 0.5f;
+            if (g_fTrigDrawZoneRange > 0.0f)
+            {
+                // (the camera's distance from the box)
+                RwReal dx = pvCam->x < vMin.x ? vMin.x - pvCam->x : pvCam->x > vMax.x ? pvCam->x - vMax.x : 0.0f;
+                RwReal dy = pvCam->y < vMin.y ? vMin.y - pvCam->y : pvCam->y > vMax.y ? pvCam->y - vMax.y : 0.0f;
+                RwReal dz = pvCam->z < vMin.z ? vMin.z - pvCam->z : pvCam->z > vMax.z ? pvCam->z - vMax.z : 0.0f;
+
+                if (dx * dx + dy * dy + dz * dz > g_fTrigDrawZoneRange * g_fTrigDrawZoneRange)
+                    continue;
+            }
+            g_nTrigDrawZonesShown++;
+            TrigDrawBox(&vMin, &vMax, (TrigDrawZoneColour(i) & 0x00FFFFFF) | 0xA0000000);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    if (g_bTrigDrawZoneEntities)
+    {
+        for (i = 0; i < 0x300; i++)
+        {
+            type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+
+            if (pEntity == NULL)
+                continue;
+            __try
+            {
+                RwV3d vPos, vTop;
+                RwInt32 nZone;
+
+                if (pEntity->unk_338.unk_08 == NULL)
+                    continue;
+                vPos = RwFrameGetMatrix(pEntity->unk_338.unk_08)->pos;
+                if (g_fTrigDrawZoneRange > 0.0f && TrigDrawDist2(&vPos, pvCam) > g_fTrigDrawZoneRange * g_fTrigDrawZoneRange)
+                    continue;
+                nZone = TrigDrawZoneIndex(pEntity->unk_90.unk_00);
+                vTop = vPos;
+                vTop.y += 90.0f;
+                TrigDrawPathLine(&vPos, &vTop, TrigDrawZoneColour(nZone));
+                TrigDrawCross(&vTop, 6.0f, TrigDrawZoneColour(nZone));
+                if (pEntity->unk_90.unk_08 && pEntity->unk_90.unk_0C > 0.0f)
+                {
+                    // (fading out of its last zone: a line toward that zone's centre)
+                    const type_8F3E0 *zOld = pEntity->unk_90.unk_08;
+                    RwV3d vOld;
+
+                    if (zOld != &dword_4E5BE0)
+                    {
+                        vOld.x = (zOld->unk_00[0].unk_00 + zOld->unk_00[1].unk_00) * 0.5f;
+                        vOld.y = (zOld->unk_00[0].unk_04 + zOld->unk_00[1].unk_04) * 0.5f;
+                        vOld.z = (zOld->unk_00[0].unk_08 + zOld->unk_00[1].unk_08) * 0.5f;
+                        TrigDrawPathLine(&vTop, &vOld, (TrigDrawZoneColour(TrigDrawZoneIndex(zOld)) & 0x00FFFFFF) | 0x60000000);
+                    }
+                }
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+            }
+        }
+    }
+    TrigDrawPathFlush();
+    if (!g_bTrigDrawZoneLabels || TrigDrawCharset() == NULL)
+        return;
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+    __try
+    {
+        for (i = 0; i < g_nTrigDrawZonesAll && i < 256; i++)
+        {
+            type_8F3E0 *z = dword_4B2550.get_zone(i);
+            RwV3d vAt;
+            RwChar sz[80];
+
+            if (z == NULL)
+                continue;
+            vAt.x = (z->unk_00[0].unk_00 + z->unk_00[1].unk_00) * 0.5f;
+            vAt.y = z->unk_00[1].unk_04;
+            vAt.z = (z->unk_00[0].unk_08 + z->unk_00[1].unk_08) * 0.5f;
+            if (g_fTrigDrawZoneRange > 0.0f && TrigDrawDist2(&vAt, pvCam) > g_fTrigDrawZoneRange * g_fTrigDrawZoneRange)
+                continue;
+            _snprintf(sz, sizeof(sz), "zone %d: ambient %.2f %.2f %.2f%s", i, z->unk_30.unk_00, z->unk_30.unk_04,
+                      z->unk_30.unk_08, ((z->unk_8C >> 16) & 0xFF) ? ", cut by planes" : "");
+            sz[sizeof(sz) - 1] = 0;
+            TrigDrawText(sz, &vAt, pCamLtm, TrigDrawZoneColour(i));
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+}
+
+// ---- the squads ----
+
+RwBool g_bTrigDrawSquads = FALSE;
+RwBool g_bTrigDrawSquadLabels = TRUE;
+RwInt32 g_nTrigDrawSquads;
+
+const RwChar *TrigDrawManeuverName(RwInt32 nKind)
+{
+    // (by the maneuver classes sub_3CE20 builds, types/type_3CE6D0.h and the kinds' headers)
+    static const RwChar *const s_apsz[7] =
+    {
+        "run members", "pair at a spot", "(none)", "flag 0x80 members", "flag 0x40000 members",
+        "fire and movement", "alert stand",
+    };
+    return nKind >= 0 && nKind < 7 ? s_apsz[nKind] : "?";
+}
+
+// Every squad: a line from each member to its leader (or, with none set, its first member) in
+// the squad's colour, a ring on the leader; labelled with its id, its side, its members, the
+// targets it sees and its maneuvers (the ones besides the four every squad starts with first).
+static void TrigDrawSquads(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    type_3DF30 *pSquad;
+    RwInt32 n = 0;
+
+    g_nTrigDrawSquads = 0;
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (pSquad = dword_4395F0; pSquad != NULL && n < 64; n++)
+    {
+        type_3DF30 *pNext = NULL;
+
+        __try
+        {
+            type_3D3548 *pLeader, *pMember;
+            RwV3d vLeader, vAt;
+            RwUInt32 dwColour = TrigDrawZoneColour(pSquad->unk_2B4 * 5 + 3);
+            RwInt32 nMembers = 0, k;
+            RwChar sz[160];
+            type_3CE6D0 *pMan;
+
+            pNext = pSquad->unk_2AC;
+            g_nTrigDrawSquads++;
+            pLeader = pSquad->unk_2BC.sub_D4910();
+            if (pLeader == NULL)
+                pLeader = pSquad->unk_00;
+            if (pLeader == NULL || pLeader->unk_338.unk_08 == NULL)
+            {
+                pSquad = pNext;
+                continue;
+            }
+            vLeader = RwFrameGetMatrix(pLeader->unk_338.unk_08)->pos;
+            vLeader.y += 70.0f;
+            for (pMember = pSquad->unk_00, k = 0; pMember != NULL && k < 64; k++)
+            {
+                RwV3d v;
+
+                nMembers++;
+                if (pMember != pLeader && pMember->unk_338.unk_08 != NULL)
+                {
+                    v = RwFrameGetMatrix(pMember->unk_338.unk_08)->pos;
+                    v.y += 70.0f;
+                    TrigDrawPathLine(&v, &vLeader, dwColour);
+                    TrigDrawCross(&v, 6.0f, dwColour);
+                }
+                pMember = pMember->vf_118();
+            }
+            // (the leader's ring: two crossed circles)
+            for (k = 0; k < 16; k++)
+            {
+                RwReal a0 = k * 6.2831853f / 16.0f, a1 = (k + 1) * 6.2831853f / 16.0f;
+                RwV3d pA = vLeader, pB = vLeader;
+
+                pA.x += (RwReal)cos(a0) * 25.0f;
+                pA.z += (RwReal)sin(a0) * 25.0f;
+                pB.x += (RwReal)cos(a1) * 25.0f;
+                pB.z += (RwReal)sin(a1) * 25.0f;
+                TrigDrawPathLine(&pA, &pB, dwColour);
+            }
+            if (g_bTrigDrawSquadLabels && TrigDrawCharset() != NULL && TrigDrawDist2(&vLeader, pvCam) < 6000.0f * 6000.0f)
+            {
+                RwInt32 nLen;
+
+                nLen = _snprintf(sz, sizeof(sz), "squad %d (side %d): %d member%s, %d target%s seen%s", pSquad->unk_2B4,
+                                 pSquad->unk_2B0, nMembers, nMembers == 1 ? "" : "s", pSquad->unk_04.unk_04,
+                                 pSquad->unk_04.unk_04 == 1 ? "" : "s",
+                                 pSquad->unk_2BC.sub_D4910() ? "" : " (no leader set)");
+                vAt = vLeader;
+                vAt.y += 25.0f;
+                TrigDrawPathFlush();
+                RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+                sz[sizeof(sz) - 1] = 0;
+                TrigDrawText(sz, &vAt, pCamLtm, dwColour);
+                // (its maneuvers, by priority)
+                nLen = _snprintf(sz, sizeof(sz), "maneuvers:");
+                for (pMan = sub_3D3E0(pSquad->unk_2A8), k = 0; pMan != NULL && k < 8 && nLen > 0 && nLen < (RwInt32)sizeof(sz) - 24; k++)
+                {
+                    nLen += _snprintf(sz + nLen, sizeof(sz) - nLen, " %s,", TrigDrawManeuverName(pMan->vf_030()));
+                    pMan = sub_3D3E0(pMan->unk_14);
+                }
+                if (nLen > 0 && sz[nLen - 1] == ',')
+                    sz[nLen - 1] = 0;
+                sz[sizeof(sz) - 1] = 0;
+                TrigDrawText(sz, &vAt, pCamLtm, dwColour, -1.0f);
+                RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+        pSquad = pNext;
+    }
+    TrigDrawPathFlush();
+}
+
+// ---- the AI's hearing ----
+
+RwBool g_bTrigDrawHearing = FALSE;
+RwBool g_bTrigDrawHearRadii = FALSE;
+RwBool g_bTrigDrawHearLabels = TRUE;
+RwReal g_fTrigDrawHearSecs = 1.5f;
+RwInt32 g_nTrigDrawHearNoises, g_nTrigDrawHeardCount;
+
+#define TRIGDRAW_NOISES 96
+#define TRIGDRAW_HEARD 128
+
+struct TrigDrawNoise
+{
+    RwV3d v;
+    RwReal fRange;
+    RwInt32 nKind, nClass, bLasting;
+    RwUInt32 dwTick;
+};
+static TrigDrawNoise s_aNoises[TRIGDRAW_NOISES];
+static RwInt32 s_nNoiseNext;
+
+struct TrigDrawHeard
+{
+    const void *pHearer;
+    RwV3d vFrom;
+    RwInt32 nKind;
+    RwUInt32 dwTick;
+};
+static TrigDrawHeard s_aHeard[TRIGDRAW_HEARD];
+static RwInt32 s_nHeardNext;
+static RwInt32 s_nNoisesThisSecond, s_nHeardThisSecond;
+static RwUInt32 s_dwHearSecond;
+
+const RwChar *TrigDrawNoiseKindName(RwInt32 nKind)
+{
+    // (the kinds the game's sounds are played with: the soldiers hear 0x57 unless a script says
+    // otherwise)
+    switch (nKind)
+    {
+    case 0: return "script or blast";
+    case 1: return "player";
+    case 2: return "soldier";
+    case 4: return "vehicle";
+    case 8: return "effect";
+    case 0x10: return "generator";
+    case 0x20: return "ambience";
+    case 0x40: return "impact";
+    }
+    return "?";
+}
+
+static void TrigDrawHearTick()
+{
+    RwUInt32 dwNow = GetTickCount();
+
+    if (dwNow - s_dwHearSecond >= 1000)
+    {
+        g_nTrigDrawHearNoises = s_nNoisesThisSecond;
+        g_nTrigDrawHeardCount = s_nHeardThisSecond;
+        s_nNoisesThisSecond = s_nHeardThisSecond = 0;
+        s_dwHearSecond = dwNow;
+    }
+}
+
+// (from sub_3C4B0 and sub_3C540: a sound the AI can hear, its position copied (it may be a
+// caller's local, or none for ambience))
+void TrigDrawNoiseMade(const RwV3d *pv, RwInt32 nKind, RwInt32 nClass, RwReal fRange, RwInt32 bLasting)
+{
+    TrigDrawNoise *n;
+
+    if (!g_bTrigDrawHearing || pv == NULL)
+        return;
+    TrigDrawHearTick();
+    s_nNoisesThisSecond++;
+    n = &s_aNoises[s_nNoiseNext];
+    s_nNoiseNext = (s_nNoiseNext + 1) % TRIGDRAW_NOISES;
+    n->v = *pv;
+    n->fRange = fRange;
+    n->nKind = nKind;
+    n->nClass = nClass;
+    n->bLasting = bLasting;
+    n->dwTick = GetTickCount();
+}
+
+// (from sub_3C7D0, as it sends the soldier "AIAction_HearSound"; a lasting sound comes every
+// frame, so the same hearer and place only refreshes its line)
+void TrigDrawNoiseHeard(const void *pHearer, const RwV3d *pvFrom, RwInt32 nKind)
+{
+    TrigDrawHeard *h;
+    RwInt32 i;
+    RwUInt32 dwNow;
+
+    if (!g_bTrigDrawHearing || pvFrom == NULL)
+        return;
+    TrigDrawHearTick();
+    dwNow = GetTickCount();
+    for (i = 0; i < TRIGDRAW_HEARD; i++)
+        if (s_aHeard[i].pHearer == pHearer && s_aHeard[i].dwTick && s_aHeard[i].vFrom.x == pvFrom->x
+            && s_aHeard[i].vFrom.y == pvFrom->y && s_aHeard[i].vFrom.z == pvFrom->z)
+        {
+            s_aHeard[i].dwTick = dwNow;
+            return;
+        }
+    s_nHeardThisSecond++;
+    h = &s_aHeard[s_nHeardNext];
+    s_nHeardNext = (s_nHeardNext + 1) % TRIGDRAW_HEARD;
+    h->pHearer = pHearer;
+    h->vFrom = *pvFrom;
+    h->nKind = nKind;
+    h->dwTick = dwNow;
+}
+
+// A flat ring.
+static void TrigDrawFlatRing(const RwV3d *pv, RwReal fR, RwUInt32 dwColour, RwInt32 nSteps)
+{
+    RwInt32 k;
+
+    for (k = 0; k < nSteps; k++)
+    {
+        RwReal a0 = k * 6.2831853f / nSteps, a1 = (k + 1) * 6.2831853f / nSteps;
+        RwV3d pA = *pv, pB = *pv;
+
+        pA.x += (RwReal)cos(a0) * fR;
+        pA.z += (RwReal)sin(a0) * fR;
+        pB.x += (RwReal)cos(a1) * fR;
+        pB.z += (RwReal)sin(a1) * fR;
+        TrigDrawPathLine(&pA, &pB, dwColour);
+    }
+}
+
+// The sounds (a cross, and a ring of their range: a soldier hears one within the square root of
+// its range and its own radius squared), the lines to the soldiers that heard them (green), and
+// with the radii each listener's own hearing ring.
+static void TrigDrawHearing(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    RwUInt32 dwNow = GetTickCount(), dwKeep = (RwUInt32)(g_fTrigDrawHearSecs * 1000.0f);
+    RwInt32 i;
+
+    TrigDrawHearTick();
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (i = 0; i < TRIGDRAW_NOISES; i++)
+    {
+        const TrigDrawNoise *n = &s_aNoises[i];
+        RwUInt32 dwAge, dwAlpha, dwColour;
+
+        if (!n->dwTick || (dwAge = dwNow - n->dwTick) > dwKeep)
+            continue;
+        dwAlpha = (RwUInt32)(255.0f * (1.0f - (RwReal)dwAge / (dwKeep ? dwKeep : 1)));
+        dwColour = (n->nKind == 1 ? 0x0060C0FF : n->nKind == 2 ? 0x00FF6060 : 0x00FFC040) | (dwAlpha << 24);
+        TrigDrawCross(&n->v, 10.0f, dwColour);
+        if (n->fRange > 0.0f && n->fRange < 50000.0f)
+            TrigDrawFlatRing(&n->v, n->fRange, (dwColour & 0x00FFFFFF) | ((dwAlpha / 2) << 24), 32);
+    }
+    for (i = 0; i < TRIGDRAW_HEARD; i++)
+    {
+        const TrigDrawHeard *h = &s_aHeard[i];
+        RwUInt32 dwAge, dwAlpha;
+
+        if (!h->dwTick || (dwAge = dwNow - h->dwTick) > dwKeep)
+            continue;
+        dwAlpha = (RwUInt32)(255.0f * (1.0f - (RwReal)dwAge / (dwKeep ? dwKeep : 1)));
+        __try
+        {
+            const type_3D3548 *pHearer = (const type_3D3548 *)h->pHearer;
+            RwV3d v;
+
+            if (pHearer->unk_338.unk_08 == NULL)
+                continue;
+            v = RwFrameGetMatrix(pHearer->unk_338.unk_08)->pos;
+            v.y += 160.0f;
+            TrigDrawPathLine(&h->vFrom, &v, 0x0040FF60 | (dwAlpha << 24));
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+    if (g_bTrigDrawHearRadii)
+    {
+        type_3C720 *pListener;
+        RwInt32 n = 0;
+
+        __try
+        {
+            for (pListener = dword_43925C; pListener != NULL && n < 64; pListener = pListener->unk_08, n++)
+            {
+                type_3D3548 *pEntity = pListener->unk_00;
+                RwV3d v;
+                RwReal fR;
+
+                if (pEntity == NULL || pEntity->unk_338.unk_08 == NULL)
+                    continue;
+                v = RwFrameGetMatrix(pEntity->unk_338.unk_08)->pos;
+                if (TrigDrawDist2(&v, pvCam) > 8000.0f * 8000.0f)
+                    continue;
+                fR = pEntity->vf_130();
+                if (fR > 0.0f && fR < 50000.0f)
+                    TrigDrawFlatRing(&v, fR, 0x7040FF60, 32);
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+    TrigDrawPathFlush();
+    if (!g_bTrigDrawHearLabels || TrigDrawCharset() == NULL)
+        return;
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+    for (i = 0; i < TRIGDRAW_NOISES; i++)
+    {
+        const TrigDrawNoise *n = &s_aNoises[i];
+        RwUInt32 dwAge;
+        RwChar sz[64];
+        RwV3d vAt;
+
+        if (!n->dwTick || (dwAge = dwNow - n->dwTick) > dwKeep)
+            continue;
+        if (TrigDrawDist2(&n->v, pvCam) > 5000.0f * 5000.0f)
+            continue;
+        _snprintf(sz, sizeof(sz), "%s sound, range %.0f%s", TrigDrawNoiseKindName(n->nKind), n->fRange,
+                  n->bLasting ? ", lasting" : "");
+        sz[sizeof(sz) - 1] = 0;
+        vAt = n->v;
+        vAt.y += 20.0f;
+        TrigDrawText(sz, &vAt, pCamLtm, 0xFFFFE080);
+    }
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+}
+
+// ---- trigger activity ----
+
+RwBool g_bTrigDrawActivity = FALSE;   // (off: nothing recorded until it is turned on)
+RwBool g_bTrigDrawActiveOnly = FALSE;
+RwReal g_fTrigDrawActivitySecs = 2.0f;
+
+#define TRIGDRAW_ACT_EVENTS 128
+#define TRIGDRAW_ACT_NAME   40
+
+// The events, a ring: the handle, the kind, the message's name, when.
+struct TrigDrawActEvent
+{
+    RwInt32 nHandle, nKind;
+    RwUInt32 dwTick;
+    RwChar szName[TRIGDRAW_ACT_NAME];
+};
+static TrigDrawActEvent s_aActEvents[TRIGDRAW_ACT_EVENTS];
+static RwInt32 s_nActNext;
+// (each handle's last event, for the flash: the tick and the kind)
+static RwUInt32 s_adwActTick[2000];
+static RwUInt8 s_abActKind[2000];
+
+// (from sub_6B680 and sub_6B5F0 for a message a trigger sends, from sub_145060 and sub_145640
+// for an entity going in and out; pTrigger checked against the trigger table)
+void TrigDrawTriggerEvent(void *pTrigger, RwInt32 nKind, const RwChar *pszName)
+{
+    TrigDrawActEvent *e;
+    RwInt32 h;
+
+    if (pTrigger == NULL || !g_bTrigDrawActivity)
+        return;
+    __try
+    {
+        h = ((Trigger *)pTrigger)->unk_3C;
+        if (h < 0 || h >= 2000 || dword_4CFE30[h] != pTrigger)
+            return;
+        e = &s_aActEvents[s_nActNext];
+        s_nActNext = (s_nActNext + 1) % TRIGDRAW_ACT_EVENTS;
+        e->nHandle = h;
+        e->nKind = nKind;
+        e->dwTick = GetTickCount();
+        e->szName[0] = 0;
+        if (pszName)
+        {
+            strncpy(e->szName, pszName, TRIGDRAW_ACT_NAME - 1);
+            e->szName[TRIGDRAW_ACT_NAME - 1] = 0;
+        }
+        s_adwActTick[h] = e->dwTick ? e->dwTick : 1;
+        s_abActKind[h] = (RwUInt8)nKind;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+}
+
+RwBool TrigDrawActivityEvent(RwInt32 nIndex, RwInt32 *pnHandle, RwInt32 *pnKind, const RwChar **ppszName,
+                             RwReal *pfAge)
+{
+    const TrigDrawActEvent *e;
+
+    if (nIndex < 0 || nIndex >= TRIGDRAW_ACT_EVENTS)
+        return FALSE;
+    e = &s_aActEvents[(s_nActNext + TRIGDRAW_ACT_EVENTS - 1 - nIndex) % TRIGDRAW_ACT_EVENTS];
+    if (e->dwTick == 0)
+        return FALSE;
+    *pnHandle = e->nHandle;
+    *pnKind = e->nKind;
+    *ppszName = e->szName;
+    *pfAge = (GetTickCount() - e->dwTick) / 1000.0f;
+    return TRUE;
+}
+
+void TrigDrawActivityClear()
+{
+    memset(s_aActEvents, 0, sizeof(s_aActEvents));
+    memset(s_adwActTick, 0, sizeof(s_adwActTick));
+    s_nActNext = 0;
+}
+
+// How far into its flash a trigger is (1 just fired, 0 none), and its kind's colour.
+static RwReal TrigDrawActLevel(RwInt32 h, RwUInt32 *pdwColour)
+{
+    RwUInt32 dwKeep = (RwUInt32)(g_fTrigDrawActivitySecs * 1000.0f), dwAge;
+
+    if (h < 0 || h >= 2000 || !s_adwActTick[h] || !dwKeep)
+        return 0.0f;
+    dwAge = GetTickCount() - s_adwActTick[h];
+    if (dwAge >= dwKeep)
+        return 0.0f;
+    if (pdwColour)
+        *pdwColour = s_abActKind[h] == 0 ? 0x0040FF40 : s_abActKind[h] == 1 ? 0x00FF4040 : 0x00FFFFFF;
+    return 1.0f - (RwReal)dwAge / dwKeep;
+}
+
+// A trigger's colour with its flash over it.
+static RwUInt32 TrigDrawActColour(Trigger *pTrigger, RwUInt32 dwBase)
+{
+    RwUInt32 dwFlash, r, g, b, a;
+    RwReal f;
+
+    if (!g_bTrigDrawActivity)
+        return dwBase;
+    f = TrigDrawActLevel(pTrigger->unk_3C, &dwFlash);
+    if (f <= 0.0f)
+        return dwBase;
+    r = (RwUInt32)(((dwBase >> 16) & 0xFF) * (1.0f - f) + ((dwFlash >> 16) & 0xFF) * f);
+    g = (RwUInt32)(((dwBase >> 8) & 0xFF) * (1.0f - f) + ((dwFlash >> 8) & 0xFF) * f);
+    b = (RwUInt32)((dwBase & 0xFF) * (1.0f - f) + (dwFlash & 0xFF) * f);
+    a = 0xFF;
+    return (a << 24) | (r << 16) | (g << 8) | b;
+}
+
+// Whether a trigger is drawn when only the active ones are.
+static RwBool TrigDrawActShown(Trigger *pTrigger)
+{
+    return !g_bTrigDrawActiveOnly || TrigDrawActLevel(pTrigger->unk_3C, NULL) > 0.0f;
+}
+
+// Its recent messages under its label ("> name 0.4s").
+static void TrigDrawActLines(Trigger *pTrigger, const RwV3d *pvCentre, const RwMatrix *pCamLtm)
+{
+    RwUInt32 dwKeep = (RwUInt32)(g_fTrigDrawActivitySecs * 1000.0f), dwNow = GetTickCount();
+    RwInt32 i, n = 0;
+
+    if (!g_bTrigDrawActivity)
+        return;
+    for (i = 0; i < TRIGDRAW_ACT_EVENTS && n < 4; i++)
+    {
+        const TrigDrawActEvent *e = &s_aActEvents[(s_nActNext + TRIGDRAW_ACT_EVENTS - 1 - i) % TRIGDRAW_ACT_EVENTS];
+        RwChar sz[TRIGDRAW_ACT_NAME + 24];
+
+        if (e->dwTick == 0 || dwNow - e->dwTick > dwKeep)
+            break;
+        if (e->nHandle != pTrigger->unk_3C)
+            continue;
+        if (e->nKind == 2)
+            _snprintf(sz, sizeof(sz), "> %s %.1fs", e->szName, (dwNow - e->dwTick) / 1000.0f);
+        else
+            _snprintf(sz, sizeof(sz), "%s %.1fs", e->nKind == 0 ? "entered" : "left", (dwNow - e->dwTick) / 1000.0f);
+        sz[sizeof(sz) - 1] = 0;
+        n++;
+        TrigDrawText(sz, pvCentre, pCamLtm, e->nKind == 0 ? 0xFF60FF60 : e->nKind == 1 ? 0xFFFF7060 : 0xFFFFFFFF,
+                     -(RwReal)n);
+    }
+}
+
+// ---- splines ----
+
+RwBool g_bTrigDrawSplines = FALSE;
+RwBool g_bTrigDrawSplineLabels = TRUE;
+RwReal g_fTrigDrawSplineRange = 6000.0f;
+RwInt32 g_nTrigDrawSplinesShown, g_nTrigDrawSplinesAll;
+extern SplinePath *dword_4CFA18[0x100];
+extern RwUInt32 dword_4CFE1C;
+
+#define TRIGDRAW_SPLINE_STEPS 64
+
+// Every SplinePath in the level's table (its constructor adds it, the level's start clears
+// it): its curve evaluated at 65 points (sub_BA990), drawn in a colour of its own, a post at
+// its start and a cross at its end; labelled with its name, its index and its length.
+static void TrigDrawSplines(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    RwInt32 i, k, n = (RwInt32)(dword_4CFE1C < 0x100 ? dword_4CFE1C : 0x100);
+
+    g_nTrigDrawSplinesShown = 0;
+    g_nTrigDrawSplinesAll = 0;
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (i = 0; i < n; i++)
+    {
+        SplinePath *pPath = dword_4CFA18[i];
+        RwV3d av[TRIGDRAW_SPLINE_STEPS + 1];
+        RwReal fNear = 1e30f;
+        RwUInt32 dwColour, h;
+        RwChar szName[64];
+
+        if (pPath == NULL)
+            continue;
+        __try
+        {
+            if (pPath->unk_28 == NULL)
+                continue;
+            g_nTrigDrawSplinesAll++;
+            for (k = 0; k <= TRIGDRAW_SPLINE_STEPS; k++)
+            {
+                RwReal dx, dy, dz, d;
+
+                pPath->sub_BA990((RwReal)k / TRIGDRAW_SPLINE_STEPS, &av[k], NULL);
+                dx = av[k].x - pvCam->x;
+                dy = av[k].y - pvCam->y;
+                dz = av[k].z - pvCam->z;
+                d = dx * dx + dy * dy + dz * dz;
+                if (d < fNear)
+                    fNear = d;
+            }
+            if (g_fTrigDrawSplineRange > 0.0f && fNear > g_fTrigDrawSplineRange * g_fTrigDrawSplineRange)
+                continue;
+            g_nTrigDrawSplinesShown++;
+            // (a colour from its name key)
+            h = (pPath->unk_2C.unk_00 * 2654435761u) ^ (pPath->unk_2C.unk_04 * 40503u) ^ (RwUInt32)i;
+            dwColour = 0xE0000000 | (0x40 + (h & 0xBF)) << 16 | (0x40 + ((h >> 8) & 0xBF)) << 8 | (0x40 + ((h >> 16) & 0xBF));
+            for (k = 1; k <= TRIGDRAW_SPLINE_STEPS; k++)
+                TrigDrawPathLine(&av[k - 1], &av[k], dwColour);
+            {
+                RwV3d vPost = av[0];
+
+                vPost.y += 60.0f;
+                TrigDrawPathLine(&av[0], &vPost, dwColour);
+                TrigDrawCross(&av[TRIGDRAW_SPLINE_STEPS], 15.0f, dwColour);
+            }
+            if (g_bTrigDrawSplineLabels && TrigDrawCharset() != NULL)
+            {
+                RwChar sz[96];
+                RwV3d vAt = av[0];
+
+                TrigDrawKeyText(&pPath->unk_2C, szName, sizeof(szName));
+                _snprintf(sz, sizeof(sz), "spline %d %s (%.0f long%s)", i, szName, pPath->unk_24,
+                          pPath->unk_1C_0 == 1 ? ", wraps" : pPath->unk_1C_0 == 2 ? ", turns back" : "");
+                sz[sizeof(sz) - 1] = 0;
+                vAt.y += 70.0f;
+                TrigDrawPathFlush();
+                RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+                TrigDrawText(sz, &vAt, pCamLtm, dwColour | 0xFF000000);
+                RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+    TrigDrawPathFlush();
+}
+
+// ---- the sounds ----
+
+RwBool g_bTrigDrawSounds = FALSE;
+RwBool g_bTrigDrawSoundLabels = TRUE;
+RwBool g_bTrigDrawSoundRanges = FALSE;
+RwReal g_fTrigDrawSoundRange = 6000.0f;
+PortAudioVoiceInfo g_aTrigDrawSoundList[TRIGDRAW_SOUNDS];
+RwInt32 g_nTrigDrawSoundList;
+RwReal g_avTrigDrawListener[3];
+
+// A ring of radius fR around pv, flat (for a voice's minimum distance).
+static void TrigDrawRing(const RwV3d *pv, RwReal fR, RwUInt32 dwColour)
+{
+    RwInt32 i;
+
+    for (i = 0; i < 24; i++)
+    {
+        RwReal a0 = i * 6.2831853f / 24.0f, a1 = (i + 1) * 6.2831853f / 24.0f;
+        RwV3d vA = *pv, vB = *pv;
+
+        vA.x += (RwReal)cos(a0) * fR;
+        vA.z += (RwReal)sin(a0) * fR;
+        vB.x += (RwReal)cos(a1) * fR;
+        vB.z += (RwReal)sin(a1) * fR;
+        TrigDrawPathLine(&vA, &vB, dwColour);
+    }
+}
+
+// The audio bridge's playing voices: the snapshot for the Sounds tab's list (every frame the
+// view is on), and over each 3D voice in the world a cross coloured by its volume (green loud,
+// red quiet), with its lines.
+static void TrigDrawSounds(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    RwInt32 i;
+
+    g_nTrigDrawSoundList = port_audio_voices(g_aTrigDrawSoundList, TRIGDRAW_SOUNDS, g_avTrigDrawListener);
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (i = 0; i < g_nTrigDrawSoundList; i++)
+    {
+        const PortAudioVoiceInfo *v = &g_aTrigDrawSoundList[i];
+        RwV3d vPos, vD;
+        RwReal fDist, fLoud;
+        RwUInt32 dwColour, r, g;
+
+        if (!v->is3D || v->mode3D != 0)
+            continue;
+        vPos.x = v->x;
+        vPos.y = v->y;
+        vPos.z = v->z;
+        vD.x = vPos.x - pvCam->x;
+        vD.y = vPos.y - pvCam->y;
+        vD.z = vPos.z - pvCam->z;
+        fDist = (RwReal)sqrt(vD.x * vD.x + vD.y * vD.y + vD.z * vD.z);
+        if (g_fTrigDrawSoundRange > 0.0f && fDist > g_fTrigDrawSoundRange)
+            continue;
+        // (0 dB green, -40 dB and below red)
+        fLoud = 1.0f + v->volumeDb / 40.0f;
+        fLoud = fLoud < 0.0f ? 0.0f : fLoud > 1.0f ? 1.0f : fLoud;
+        r = (RwUInt32)(255.0f * (1.0f - fLoud));
+        g = (RwUInt32)(255.0f * fLoud);
+        dwColour = 0xFF000000 | (r << 16) | (g << 8) | 0x40;
+        TrigDrawCross(&vPos, 20.0f, dwColour);
+        if (g_bTrigDrawSoundRanges && v->minDistance > 0.0f && v->minDistance < 5000.0f)
+            TrigDrawRing(&vPos, v->minDistance, (dwColour & 0x00FFFFFF) | 0x80000000);
+        if (g_bTrigDrawSoundLabels && TrigDrawCharset() != NULL)
+        {
+            RwChar aszLines[2][TRIGDRAW_AI_NOTE + 16];
+            RwV3d vAt = vPos;
+
+            TrigDrawPathFlush();
+            RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+            _snprintf(aszLines[0], TRIGDRAW_AI_NOTE, "sound %.1f dB, %s%.1f s (%.0f%%)", v->volumeDb,
+                      v->looping ? "looping, " : "", v->seconds, v->played * 100.0f);
+            _snprintf(aszLines[1], TRIGDRAW_AI_NOTE, "%.0f away; min %.0f, max %.0f", fDist, v->minDistance,
+                      v->maxDistance > 1e8f ? 0.0f : v->maxDistance);
+            aszLines[0][TRIGDRAW_AI_NOTE - 1] = aszLines[1][TRIGDRAW_AI_NOTE - 1] = 0;
+            vAt.y += 25.0f;
+            TrigDrawLines(aszLines, 2, 0, &vAt, fDist, pCamLtm);
+            RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+        }
+    }
+    TrigDrawPathFlush();
+}
+
+// ---- the projectiles ----
+
+RwBool g_bTrigDrawProjectiles = FALSE;
+RwBool g_bTrigDrawProjLabels = TRUE;
+RwBool g_bTrigDrawProjTrails = TRUE;
+RwReal g_fTrigDrawProjTrail = 3.0f;
+RwInt32 g_anTrigDrawProjSpawned[TRIGDRAW_PROJ_KINDS];
+RwInt32 g_anTrigDrawProjLive[TRIGDRAW_PROJ_KINDS];
+RwInt32 g_nTrigDrawProjImpacts, g_nTrigDrawProjBlasts;
+
+#define TRIGDRAW_PROJ_TRACKED 192
+#define TRIGDRAW_PROJ_POINTS 32
+#define TRIGDRAW_PROJ_EVENTS 64
+
+// A projectile followed: its points (one a frame it moved), when it was last seen live.
+struct TrigDrawProjTrack
+{
+    const void *pProjectile;
+    RwInt32 nKind;
+    RwV3d av[TRIGDRAW_PROJ_POINTS];
+    RwInt32 n;
+    RwUInt32 dwSeen;
+    RwBool bLive;
+};
+static TrigDrawProjTrack s_aProjTracks[TRIGDRAW_PROJ_TRACKED];
+
+// Where one ended: an impact (its surface) or a blast.
+struct TrigDrawProjHit
+{
+    RwV3d v;
+    RwUInt32 dwTick;
+    const void *pProjectile;
+    RwUInt32 dwFrame;
+    RwInt32 nKind, nSurface;
+    RwBool bImpact;
+};
+static TrigDrawProjHit s_aProjHits[TRIGDRAW_PROJ_EVENTS];
+static RwInt32 s_nProjHitNext;
+
+const RwChar *TrigDrawProjKindName(RwInt32 nKind)
+{
+    // (by the classes the factory builds for each pool, types/projectile.h)
+    static const RwChar *const s_apsz[TRIGDRAW_PROJ_KINDS] =
+    {
+        "0 (base)", "1 (base)", "2 (type_3DC8B8)", "3 (with a model)", "4 (type_3DC858)", "5 (type_3DC8B8)",
+        "6 (type_3DC8B8)", "7 (type_3DC738)", "8 (type_3DC6D8, a model)",
+    };
+    return nKind >= 0 && nKind < TRIGDRAW_PROJ_KINDS ? s_apsz[nKind] : "?";
+}
+
+static const RwUInt32 s_adwProjKind[TRIGDRAW_PROJ_KINDS] =
+{
+    0xFFFFFF60, 0xFFFFD040, 0xFF60FF60, 0xFFFF6060, 0xFF60C0FF, 0xFF40FFC0, 0xFFC080FF, 0xFFFF9030, 0xFFFF60C0,
+};
+
+// The kind of a projectile: the pool whose live list holds it (-1 none).
+static RwInt32 TrigDrawProjKindOf(const void *pProjectile)
+{
+    RwInt32 k, n;
+
+    for (k = 0; k < TRIGDRAW_PROJ_KINDS; k++)
+    {
+        const type_3DC7F8 *p;
+
+        for (p = dword_4E19F8[k].unk_24, n = 0; p != NULL && n < 4096; p = p->unk_40, n++)
+            if (p == pProjectile)
+                return k;
+    }
+    return -1;
+}
+
+void TrigDrawProjectileSpawned(RwInt32 nKind, void *pProjectile)
+{
+    RwInt32 i;
+
+    if (nKind >= 0 && nKind < TRIGDRAW_PROJ_KINDS)
+        g_anTrigDrawProjSpawned[nKind]++;
+    // (a new one where an old one was: its trail starts again)
+    for (i = 0; i < TRIGDRAW_PROJ_TRACKED; i++)
+        if (s_aProjTracks[i].pProjectile == pProjectile)
+            s_aProjTracks[i].pProjectile = NULL;
+}
+
+static void TrigDrawProjEnd(void *pProjectile, const RwV3d *pv, RwInt32 nSurface, RwBool bImpact)
+{
+    TrigDrawProjHit *h;
+    RwInt32 i;
+
+    // (one a frame per projectile: a derived impact calls its base's)
+    for (i = 0; i < TRIGDRAW_PROJ_EVENTS; i++)
+        if (s_aProjHits[i].pProjectile == pProjectile && s_aProjHits[i].dwFrame == port_frame
+            && s_aProjHits[i].bImpact == bImpact)
+            return;
+    if (bImpact)
+        g_nTrigDrawProjImpacts++;
+    else
+        g_nTrigDrawProjBlasts++;
+    h = &s_aProjHits[s_nProjHitNext];
+    s_nProjHitNext = (s_nProjHitNext + 1) % TRIGDRAW_PROJ_EVENTS;
+    h->v = *pv;
+    h->dwTick = GetTickCount();
+    h->dwFrame = port_frame;
+    h->pProjectile = pProjectile;
+    h->nKind = TrigDrawProjKindOf(pProjectile);
+    h->nSurface = nSurface;
+    h->bImpact = bImpact;
+}
+
+void TrigDrawProjectileImpact(void *pProjectile, RwInt32 nSurface, const RwV3d *pv, void *pEntity)
+{
+    (void)pEntity;
+    if (pv)
+        TrigDrawProjEnd(pProjectile, pv, nSurface, TRUE);
+}
+
+void TrigDrawProjectileBlast(void *pProjectile, const RwV3d *pv)
+{
+    if (pv)
+        TrigDrawProjEnd(pProjectile, pv, -1, FALSE);
+}
+
+void TrigDrawProjReset()
+{
+    memset(g_anTrigDrawProjSpawned, 0, sizeof(g_anTrigDrawProjSpawned));
+    g_nTrigDrawProjImpacts = g_nTrigDrawProjBlasts = 0;
+    memset(s_aProjHits, 0, sizeof(s_aProjHits));
+    memset(s_aProjTracks, 0, sizeof(s_aProjTracks));
+}
+
+RwInt32 TrigDrawProjEvent(RwInt32 nIndex, RwBool *pbImpact, RwInt32 *pnKind, RwInt32 *pnSurface, RwReal *pfAge,
+                          RwV3d *pv)
+{
+    const TrigDrawProjHit *h;
+
+    if (nIndex < 0 || nIndex >= TRIGDRAW_PROJ_EVENTS)
+        return FALSE;
+    h = &s_aProjHits[(s_nProjHitNext + TRIGDRAW_PROJ_EVENTS - 1 - nIndex) % TRIGDRAW_PROJ_EVENTS];
+    if (h->dwTick == 0)
+        return FALSE;
+    *pbImpact = h->bImpact;
+    *pnKind = h->nKind;
+    *pnSurface = h->nSurface;
+    *pfAge = (GetTickCount() - h->dwTick) / 1000.0f;
+    *pv = h->v;
+    return TRUE;
+}
+
+// The live projectiles (a cross each, in its kind's colour, and the trail it left), the ones
+// gone a while (their trail fading), and where they hit (orange crosses, their surface id) or
+// blew up (red).
+static void TrigDrawProjectiles(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    RwUInt32 dwNow = GetTickCount(), dwKeep = (RwUInt32)(g_fTrigDrawProjTrail * 1000.0f);
+    RwInt32 i, k, n;
+
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (i = 0; i < TRIGDRAW_PROJ_TRACKED; i++)
+        s_aProjTracks[i].bLive = FALSE;
+    for (k = 0; k < TRIGDRAW_PROJ_KINDS; k++)
+    {
+        const type_3DC7F8 *p;
+
+        g_anTrigDrawProjLive[k] = 0;
+        for (p = dword_4E19F8[k].unk_24, n = 0; p != NULL && n < 4096; p = p->unk_40, n++)
+        {
+            TrigDrawProjTrack *t = NULL, *pFree = NULL;
+
+            g_anTrigDrawProjLive[k]++;
+            for (i = 0; i < TRIGDRAW_PROJ_TRACKED; i++)
+            {
+                if (s_aProjTracks[i].pProjectile == p)
+                {
+                    t = &s_aProjTracks[i];
+                    break;
+                }
+                if (pFree == NULL && (s_aProjTracks[i].pProjectile == NULL || dwNow - s_aProjTracks[i].dwSeen > dwKeep))
+                    pFree = &s_aProjTracks[i];
+            }
+            if (t == NULL && pFree != NULL)
+            {
+                t = pFree;
+                memset(t, 0, sizeof(*t));
+                t->pProjectile = p;
+                t->nKind = k;
+            }
+            if (t == NULL)
+                continue;
+            t->bLive = TRUE;
+            t->dwSeen = dwNow;
+            if (t->n == 0 || (t->av[t->n - 1].x - p->unk_04.x) * (t->av[t->n - 1].x - p->unk_04.x)
+                                 + (t->av[t->n - 1].y - p->unk_04.y) * (t->av[t->n - 1].y - p->unk_04.y)
+                                 + (t->av[t->n - 1].z - p->unk_04.z) * (t->av[t->n - 1].z - p->unk_04.z) > 1.0f)
+            {
+                if (t->n == TRIGDRAW_PROJ_POINTS)
+                {
+                    memmove(&t->av[0], &t->av[1], sizeof(RwV3d) * (TRIGDRAW_PROJ_POINTS - 1));
+                    t->n--;
+                }
+                t->av[t->n++] = p->unk_04;
+            }
+        }
+    }
+    for (i = 0; i < TRIGDRAW_PROJ_TRACKED; i++)
+    {
+        TrigDrawProjTrack *t = &s_aProjTracks[i];
+        RwUInt32 dwColour;
+
+        if (t->pProjectile == NULL || t->n == 0)
+            continue;
+        if (!t->bLive && dwNow - t->dwSeen > dwKeep)
+        {
+            t->pProjectile = NULL;
+            continue;
+        }
+        dwColour = s_adwProjKind[t->nKind];
+        if (!t->bLive)
+        {
+            RwReal fLeft = 1.0f - (RwReal)(dwNow - t->dwSeen) / (dwKeep ? dwKeep : 1);
+
+            dwColour = (dwColour & 0x00FFFFFF) | ((RwUInt32)(fLeft * 200.0f) << 24);
+        }
+        if (g_bTrigDrawProjTrails)
+            for (k = 1; k < t->n; k++)
+                TrigDrawPathLine(&t->av[k - 1], &t->av[k], dwColour);
+        if (t->bLive)
+            TrigDrawCross(&t->av[t->n - 1], 8.0f, dwColour);
+    }
+    for (i = 0; i < TRIGDRAW_PROJ_EVENTS; i++)
+    {
+        const TrigDrawProjHit *h = &s_aProjHits[i];
+        RwV3d vD;
+        RwReal fDist;
+
+        if (h->dwTick == 0 || dwNow - h->dwTick > dwKeep)
+            continue;
+        TrigDrawCross(&h->v, h->bImpact ? 14.0f : 40.0f, h->bImpact ? 0xFFFF9020 : 0xFFFF3030);
+        if (!g_bTrigDrawProjLabels || TrigDrawCharset() == NULL)
+            continue;
+        vD.x = h->v.x - pvCam->x;
+        vD.y = h->v.y - pvCam->y;
+        vD.z = h->v.z - pvCam->z;
+        fDist = (RwReal)sqrt(vD.x * vD.x + vD.y * vD.y + vD.z * vD.z);
+        {
+            RwChar aszLines[1][TRIGDRAW_AI_NOTE + 16];
+            RwV3d vAt = h->v;
+
+            TrigDrawPathFlush();
+            RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+            if (h->bImpact)
+                _snprintf(aszLines[0], TRIGDRAW_AI_NOTE, "hit surface %d (kind %d)", h->nSurface, h->nKind);
+            else
+                _snprintf(aszLines[0], TRIGDRAW_AI_NOTE, "blast (kind %d)", h->nKind);
+            aszLines[0][TRIGDRAW_AI_NOTE - 1] = 0;
+            vAt.y += 15.0f;
+            TrigDrawLines(aszLines, 1, 0, &vAt, fDist, pCamLtm);
+            RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+        }
+    }
+    TrigDrawPathFlush();
+}
+
 void TrigDrawAll(RwCamera *pCamera)
 {
     void *pRaster;
@@ -2832,9 +4441,33 @@ void TrigDrawAll(RwCamera *pCamera)
             g_bTrigDrawGimps = TRUE;
         if (GetEnvironmentVariableA("CODFH_SHRIMPS", NULL, 0))
             g_bTrigDrawShrimps = TRUE;
+        // (CODFH_SOUNDS=1, CODFH_PROJECTILES=1: the sounds playing, the projectiles)
+        if (GetEnvironmentVariableA("CODFH_SOUNDS", NULL, 0))
+            g_bTrigDrawSounds = TRUE;
+        if (GetEnvironmentVariableA("CODFH_PROJECTILES", NULL, 0))
+            g_bTrigDrawProjectiles = TRUE;
+        // (CODFH_RAYS=1, CODFH_HITS=1 (with the bone boxes), CODFH_LIGHTS=1, CODFH_SPLINES=1)
+        if (GetEnvironmentVariableA("CODFH_RAYS", NULL, 0))
+            g_bTrigDrawRays = TRUE;
+        if (GetEnvironmentVariableA("CODFH_HITS", NULL, 0))
+            g_bTrigDrawHits = g_bTrigDrawHitBoxes = TRUE;
+        if (GetEnvironmentVariableA("CODFH_LIGHTS", NULL, 0))
+            g_bTrigDrawLights = TRUE;
+        if (GetEnvironmentVariableA("CODFH_SPLINES", NULL, 0))
+            g_bTrigDrawSplines = TRUE;
+        // (CODFH_ZONES=1, CODFH_SQUADS=1)
+        if (GetEnvironmentVariableA("CODFH_ZONES", NULL, 0))
+            g_bTrigDrawZones = TRUE;
+        if (GetEnvironmentVariableA("CODFH_SQUADS", NULL, 0))
+            g_bTrigDrawSquads = TRUE;
+        if (GetEnvironmentVariableA("CODFH_HEARING", NULL, 0))
+            g_bTrigDrawHearing = g_bTrigDrawHearRadii = TRUE;
     }
     if ((!g_bTrigDrawEnabled && !g_bTrigDrawCollision && !g_bTrigDrawPathNodes && !g_bTrigDrawAi && !g_bTrigDrawPg &&
-         !g_bTrigDrawGimps && !g_bTrigDrawShrimps) || pCamera == NULL)
+         !g_bTrigDrawGimps && !g_bTrigDrawShrimps && !g_bTrigDrawSounds && !g_bTrigDrawProjectiles &&
+         !g_bTrigDrawSplines && !g_bTrigDrawRays && !g_bTrigDrawHits && !g_bTrigDrawHitBoxes && !g_bTrigDrawLights &&
+         !g_bTrigDrawZones && !g_bTrigDrawSquads && !g_bTrigDrawHearing) ||
+        pCamera == NULL)
         return;
     pCamLtm = RwFrameGetLTM(RwCameraGetFrame(pCamera));
     vCam = pCamLtm->pos;
@@ -2871,6 +4504,26 @@ void TrigDrawAll(RwCamera *pCamera)
         TrigDrawGimps(&vCam, pCamLtm);
     if (g_bTrigDrawShrimps)
         TrigDrawShrimps(&vCam);
+    if (g_bTrigDrawSplines)
+        TrigDrawSplines(&vCam, pCamLtm);
+    if (g_bTrigDrawRays)
+        TrigDrawRays();
+    if (g_bTrigDrawHitBoxes)
+        TrigDrawHitBoxesAll(&vCam);
+    if (g_bTrigDrawHits)
+        TrigDrawHits(&vCam, pCamLtm);
+    if (g_bTrigDrawLights)
+        TrigDrawLights(&vCam, pCamLtm);
+    if (g_bTrigDrawZones)
+        TrigDrawZones(&vCam, pCamLtm);
+    if (g_bTrigDrawSquads)
+        TrigDrawSquads(&vCam, pCamLtm);
+    if (g_bTrigDrawHearing)
+        TrigDrawHearing(&vCam, pCamLtm);
+    if (g_bTrigDrawSounds)
+        TrigDrawSounds(&vCam, pCamLtm);
+    if (g_bTrigDrawProjectiles)
+        TrigDrawProjectiles(&vCam, pCamLtm);
     if (!g_bTrigDrawEnabled)
         i = dword_429D00 + 1;
     else
@@ -2879,7 +4532,7 @@ void TrigDrawAll(RwCamera *pCamera)
     for (; i <= dword_429D00 && i < 2000; i++)
     {
         pTrigger = (Trigger *)dword_4CFE30[i];
-        if (pTrigger != NULL && TrigDrawInRange(pTrigger, &vCam))
+        if (pTrigger != NULL && TrigDrawInRange(pTrigger, &vCam) && TrigDrawActShown(pTrigger))
             TrigDrawOne(pTrigger);
     }
     if (g_bTrigDrawEnabled && g_bTrigDrawLabels && TrigDrawCharset() != NULL)
@@ -2888,7 +4541,7 @@ void TrigDrawAll(RwCamera *pCamera)
         for (i = 0; i <= dword_429D00 && i < 2000; i++)
         {
             pTrigger = (Trigger *)dword_4CFE30[i];
-            if (pTrigger != NULL && TrigDrawInRange(pTrigger, &vCam))
+            if (pTrigger != NULL && TrigDrawInRange(pTrigger, &vCam) && TrigDrawActShown(pTrigger))
                 TrigDrawLabel(pTrigger, pCamLtm, 0xFF000000 | TrigDrawColour(pTrigger));
         }
     }
@@ -2903,7 +4556,7 @@ void TrigDrawAll(RwCamera *pCamera)
 }
 
 // ---- the live link's debug feed (trigweb.cpp, the web suite's level viewer) ----
-// What the View tabs' AI, projectile generator and path node drawing reads, as JSON for the
+// What the View list's AI, projectile generator and path node drawing reads, as JSON for the
 // viewer to draw with labels: every AI's whole state (TrigDrawAiRead) with its notes, every
 // projectile generator's (TrigDrawPgRead) with its notes, and the path node graph (all of it
 // once, then the nodes whose flags or blocked links changed). While a viewer takes the feed,

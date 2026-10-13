@@ -22,6 +22,12 @@
 #include "rw/bavector.h"
 #include "types/type_3D3548.h"
 #include "rws/csystemcommands.h"
+#ifdef CODFH_DRAW_TRIGGERS
+#include <intrin.h>
+// (port/src/debug/trigdraw.cpp: the debug tools' line test view)
+void TrigDrawLineTest(const RwV3d *pvStart, const RwV3d *pvEnd, RwInt32 bHit, RwReal fT, RwUInt32 dwMask,
+                      RwInt32 nSurface, const void *pCaller);
+#endif
 
 #ifdef CODFH_SP // static in single player (defined below)
 static bool sub_8F770(type_8BEC0 *arg_0, type_8BEC0 *arg_4);
@@ -815,6 +821,10 @@ RwInt32 sub_91F40(RpWorld *arg_0, RwLine *arg_4, type_91F40 *arg_8, RwInt32 arg_
         arg_8->unk_08.z = local_c.z * arg_8->unk_04 + arg_4->start.z;
         sub_16E740(v358, lv_10, &arg_8->unk_14);
     }
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigDrawLineTest(&arg_4->start, &arg_4->end, v354, l360, (RwUInt32)arg_10, v354 ? (ebp_14 & 0xFFFF) : -1,
+                     _ReturnAddress());
+#endif
     sub_16D850(0x21);
     return v354;
 }

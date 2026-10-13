@@ -234,6 +234,8 @@ static void port_window(int back_w, int back_h)
         ImGui::End();
         return;
     }
+    /* (every text wraps at the window's edge: the hints are long) */
+    ImGui::PushTextWrapPos(0.0f);
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
     /* the frame times: this one, the average, the worst and the 1% low over the last 240 */
@@ -332,6 +334,7 @@ static void port_window(int back_w, int back_h)
     if (ImGui::CollapsingHeader("Logs"))
         check("A* search logs (scheduler, path finder)", &port_log_astar);
     check("ImGui demo", &show_demo);
+    ImGui::PopTextWrapPos();
     ImGui::End();
 }
 
