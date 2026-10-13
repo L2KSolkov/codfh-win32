@@ -182,8 +182,8 @@ void type_4F84B8::sub_1B00F0()
     {
     }
 #if defined(CODFH_WIN32) && !defined(CODFH_SP)
-    // (the port: CODFH_NETOVERLAY=1 shows it, as the release build never does; =2 adds the
-    // voice chat's state, unk_34F1)
+    // (the port: CODFH_NETOVERLAY=1 shows it, as the release build never does. Not its voice
+    // chat part (unk_34F1): the port's voice has no session for it to read)
     {
         static RwInt32 s_nOverlay = -1;
 
@@ -195,9 +195,7 @@ void type_4F84B8::sub_1B00F0()
         }
         if (s_nOverlay <= 0)
             return;
-        // (the voice part only once the local player is in a game: its session is not set up in
-        // the front end)
-        unk_34F1 = s_nOverlay >= 2 && unk_4F7EB8.unk_1A4 != 0;
+        unk_34F1 = 0;
     }
 #else
     return;
