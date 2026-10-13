@@ -320,7 +320,16 @@ struct type_4B1A20
     type_825E0_node *unk_14;
     type_825E0 unk_18;
 };
-extern type_4B1A20 dword_4B1A20[6];
+#ifdef CODFH_WIN32
+// (the port: eight more slots after the six, for a -leveldir test level's extra banks,
+// port_sound_banks; CSoundBankSelector's sub_B9800 loads them)
+#define SOUND_BANK_SLOTS (6 + 8)
+// (and the output stream's wave memory, 3 MB in the game, made room for them: sub_82F50)
+#define SOUND_WAVE_MEMORY 0x1000000
+#else
+#define SOUND_BANK_SLOTS 6
+#endif
+extern type_4B1A20 dword_4B1A20[SOUND_BANK_SLOTS];
 
 // A sound as a bank file stores it (0xF4C bytes): its id, its settings (one
 // word each) and its name in each of fifteen languages.

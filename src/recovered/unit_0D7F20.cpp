@@ -88,10 +88,24 @@ void sub_D7F20(RwChar *arg_0, const RwChar *arg_4)
 {
     sprintf(arg_0, "%s", arg_4);
 }
+#ifdef CODFH_WIN32
+// (the port's -leveldir: the level's files from another folder, port/src/cli.cpp)
+extern "C" const RwChar *port_level_dir;
+#endif
 // match: ?sub_D7F40@@YAXPADPBD@Z @ 0x000D7F40
 // sp-match: ?sub_D7F40@@YAXPADPBD@Z @ 0x000A3440
 void sub_D7F40(RwChar *arg_0, const RwChar *arg_4)
 {
+#ifdef CODFH_WIN32
+    // (its clump banks still the -map level's own, from the pack: a level folder built from
+    // that level, tools/testmap/make_flat.py, keeps its god data and so its banks; a bank read
+    // off the disk instead failed in type_3DF9C4::sub_190B20)
+    if (port_level_dir && _strnicmp(arg_4, "Clumps\\", 7) != 0)
+    {
+        sprintf(arg_0, "LEVELS\\%s\\%s", port_level_dir, arg_4);
+        return;
+    }
+#endif
     sprintf(arg_0, "LEVELS\\%s\\%s", sub_19B060(sub_19B050()), arg_4);
 }
 // match: ?sub_D7F70@@YAXH@Z @ 0x000D7F70

@@ -13,6 +13,11 @@
 #include "game/data.h" // dword_4B8720, for sub_B9800
 #include "types/soundbank.h" // dword_4B1B60, for sub_B9800
 #endif
+#ifdef CODFH_WIN32
+#include "types/soundbank.h" // dword_4B1A20, SOUND_BANK_SLOTS
+// (port/src/cli.cpp: a -leveldir test level's extra sound banks)
+extern "C" RwInt32 port_sound_banks(RwUInt32 *pKeys, RwInt32 *pBanks, RwInt32 nMax);
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003D6554
@@ -242,6 +247,32 @@ void CSoundBankSelector::sub_B9800()
         dword_4B8EF0.sub_E9FB0(5);
         sub_D9450();
     }
+#ifdef CODFH_WIN32
+    {
+        // (the port: a test level's extra banks, port_sound_banks, each into a slot of its own
+        // after the six, unless it is there already)
+        RwUInt32 auKey[2 * (SOUND_BANK_SLOTS - 6)];
+        RwInt32 anBank[SOUND_BANK_SLOTS - 6];
+        RwInt32 i, n = port_sound_banks(auKey, anBank, SOUND_BANK_SLOTS - 6);
+
+        for (i = 0; i < n; i++)
+        {
+            type_825E0 bank;
+
+            bank.unk_00.unk_00 = auKey[i * 2];
+            bank.unk_00.unk_04 = auKey[i * 2 + 1];
+            bank.unk_08 = 6 + i;
+            bank.unk_0C = (RwInt16)anBank[i];
+            if (dword_4B1A20[6 + i].unk_18.unk_00.unk_00 == bank.unk_00.unk_00
+                && dword_4B1A20[6 + i].unk_18.unk_00.unk_04 == bank.unk_00.unk_04)
+                continue;
+            if (dword_4B1A20[6 + i].unk_10)
+                sub_83DE0(6 + i);
+            sub_82C70(&bank, 0);
+            sub_D9450();
+        }
+    }
+#endif
 #ifdef CODFH_SP // single player then loads one bank of the second set, picked by the restart count (SP 0x8DB9D)
     {
         RwInt32 i;
