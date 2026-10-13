@@ -7463,6 +7463,22 @@ static void BotsTick()
                                 s_anBotEventIgnored[e] ? "(ignored some)" : "");
             plog("bots: animation events:%s", szEv);
         }
+        // (the live maneuvers by kind, from their handle table)
+        {
+            RwInt32 anKind[8] = { 0 }, h, nLive = 0;
+
+            for (h = 1; h < MANEUVER_HANDLES; h++)
+                if (dword_4392A8[h].unk_08)
+                {
+                    RwInt32 nK = dword_4392A8[h].unk_04;
+
+                    nLive++;
+                    if (nK >= 0 && nK < 8)
+                        anKind[nK]++;
+                }
+            plog("bots: %d maneuvers live: by kind %d %d %d %d %d %d %d", nLive, anKind[0], anKind[1], anKind[2], anKind[3],
+                 anKind[4], anKind[5], anKind[6]);
+        }
         plog("bots: %d alive bots at cover nodes; %d grenades thrown so far (of %d projectiles)", nAtCover,
              g_anTrigProjectiles[2], g_anTrigProjectiles[0] + g_anTrigProjectiles[1] + g_anTrigProjectiles[2] + g_anTrigProjectiles[3]);
         TrigAnimMissLog(FALSE);

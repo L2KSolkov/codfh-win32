@@ -466,6 +466,12 @@ RwUInt32 sub_3D150(type_3DF30 *arg_0, type_3D410 *arg_4, RwUInt32 arg_8, RwInt32
     // SP 0x2E770 preserves the factory's union return.
     return sub_3CE20(var50);
 #else
+#if defined(CODFH_DRAW_TRIGGERS)
+    // (the port's debug tools: with the bots, no new maneuver while a pool is out; its caller
+    // takes the null handle as none, sub_3E180)
+    if (dword_4395B0.get_unk_18() == 0 || dword_4395D0.get_unk_18() == 0)
+        return fp_40;
+#endif
     // MP 0x3D150.
     return sub_3CE20(var50).unk_00;
 #endif
