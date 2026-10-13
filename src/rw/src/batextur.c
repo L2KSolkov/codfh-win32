@@ -3732,3 +3732,41 @@ _rwTextureOpen(void *instance, RwInt32 offset,
     /* Success */
     RWRETURN(instance);
 }
+
+#ifdef CODFH_ALL_SECTIONS
+/* The port's every-section loading (game/sectionslots.h): the texture dictionaries still linked
+ * whose memory lies in [lo, hi) (the sections' arena, about to be freed), unlinked so the list
+ * outlives the memory, each logged with its first texture; how many. */
+extern void port_debug_print(const RwChar *fmt, ...);
+
+RwInt32
+_rwTexDictionaryUnlinkRange(const void *lo, const void *hi)
+{
+    RwLLLink *cur, *end, *next;
+    RwInt32 n = 0;
+
+    cur = rwLinkListGetFirstLLLink(&RWTEXTUREGLOBAL(texDictList));
+    end = rwLinkListGetTerminator(&RWTEXTUREGLOBAL(texDictList));
+    while (cur != end)
+    {
+        RwTexDictionary *dict = rwLLLinkGetData(cur, RwTexDictionary, lInInstance);
+
+        next = rwLLLinkGetNext(cur);
+        if ((const RwUInt8 *)dict >= (const RwUInt8 *)lo && (const RwUInt8 *)dict < (const RwUInt8 *)hi)
+        {
+            RwLLLink *t = rwLinkListGetFirstLLLink(&dict->texturesInDict);
+            const RwChar *name = "(empty)";
+
+            if (t != rwLinkListGetTerminator(&dict->texturesInDict))
+                name = rwLLLinkGetData(t, RwTexture, lInDictionary)->name;
+            port_debug_print("all sections: texture dictionary %p (first texture %s) left in the freed arena; unlinked",
+                             dict, name);
+            rwLinkListRemoveLLLink(cur);
+            n++;
+        }
+        cur = next;
+    }
+    return n;
+}
+#endif
+

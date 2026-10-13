@@ -367,7 +367,7 @@ void sub_1254D0(RwCamera *arg_0)
     var_C = 0;
     if (!dword_4CF434)
     {
-        for (lv_10 = 0; lv_10 < 4; lv_10++)
+        for (lv_10 = 0; lv_10 < SECTION_SLOTS; lv_10++)
         {
             if (dword_4E5D30[lv_10].get_unk_00())
             {
@@ -385,7 +385,7 @@ void sub_1254D0(RwCamera *arg_0)
     sub_16D7F0(11);
     if (!dword_4CF43C)
     {
-        for (lv_10 = 0; lv_10 < 4; lv_10++)
+        for (lv_10 = 0; lv_10 < SECTION_SLOTS; lv_10++)
         {
             if (dword_4E5D30[lv_10].get_unk_00())
             {
@@ -402,7 +402,7 @@ void sub_1254D0(RwCamera *arg_0)
     if (!dword_4CF438)
     {
         var_C = 0;
-        for (lv_10 = 0; lv_10 < 4; lv_10++)
+        for (lv_10 = 0; lv_10 < SECTION_SLOTS; lv_10++)
         {
             if (dword_4E5D30[lv_10].get_unk_00())
             {
@@ -423,9 +423,14 @@ void sub_1254D0(RwCamera *arg_0)
     sub_16D7F0(12);
     if (!dword_4CF444)
     {
-        for (ebp_34 = 0; ebp_34 < 4; ebp_34++)
+        for (ebp_34 = 0; ebp_34 < SECTION_SLOTS; ebp_34++)
         {
+#ifdef CODFH_ALL_SECTIONS
+            // (the image's order for its four slots, then the port's extra ones in turn)
+            w38 = ebp_34 < 4 ? dword_429BAC[ebp_34] : ebp_34;
+#else
             w38 = dword_429BAC[ebp_34];
+#endif
             if (dword_4E5D30[w38].get_unk_00())
             {
                 bp_8 = dword_4E5D30[w38].unk_20;
@@ -818,7 +823,7 @@ void sub_126770()
 {
     RwInt32 var_4;
 
-    for (var_4 = 0; var_4 < 4; var_4++)
+    for (var_4 = 0; var_4 < SECTION_SLOTS; var_4++)
     {
         if (dword_4E5D30[var_4].get_unk_00())
         {
@@ -891,7 +896,7 @@ void sub_1268D0()
 {
     RwInt32 var_4;
 
-    for (var_4 = 0; var_4 < 4; var_4++)
+    for (var_4 = 0; var_4 < SECTION_SLOTS; var_4++)
     {
         if (dword_4E5D30[var_4].get_unk_00())
         {

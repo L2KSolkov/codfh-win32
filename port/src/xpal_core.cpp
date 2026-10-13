@@ -195,6 +195,17 @@ static void find_data_root(const char *ini)
 
 extern "C" int port_log_astar;   /* (below, with the game's debug prints) */
 
+/* The frame cap ([video] max_fps), for the debug tools' frame-rate view: set live. */
+extern "C" int port_get_max_fps(void)
+{
+    return port_config.maxFps;
+}
+
+extern "C" void port_set_max_fps(int fps)
+{
+    port_config.maxFps = fps < 0 ? 0 : fps;
+}
+
 void port_config_load(void)
 {
     char ini[MAX_PATH];

@@ -31,6 +31,10 @@
 #include "types/type_3D3548.h"
 #include "types/type_4B85F8.h"
 #include <stdio.h>
+#ifdef CODFH_ALL_SECTIONS
+// (src/rw/src/batextur.c: the dictionaries in a range unlinked, before the arena is freed)
+extern "C" RwInt32 _rwTexDictionaryUnlinkRange(const void *lo, const void *hi);
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003DD530
@@ -117,7 +121,7 @@ RwInt32 dword_4E5CC4;
 // Globals with constructors defined here (their initializers and exit
 // functions at the end of .text).
 type_4E5CC8 unk_4E5CC8;
-type_4E5D30 dword_4E5D30[4];
+type_4E5D30 dword_4E5D30[SECTION_SLOTS];
 type_4E5D30 unk_4E5CD8;
 type_D48D0 dword_4E5D1C[4];
 // Its data (PLAN M5): literals, constants and tables where the image has them.
@@ -249,7 +253,7 @@ void sub_171DC0()
         ((type_4E5BE0 *)&dword_4E5BE0)->unk_20[v14].unk_00.unk_08 = 0;
         ((type_4E5BE0 *)&dword_4E5BE0)->unk_20[v14].unk_00.unk_0C = 0;
     }
-    for (v14 = 0; v14 < 4; v14++)
+    for (v14 = 0; v14 < SECTION_SLOTS; v14++)
     {
         dword_4E5D30[v14].sub_174790();
         dword_4E5D30[v14].unk_0A = (RwUInt16)v14;
@@ -380,7 +384,7 @@ void sub_172430()
     type_4E5D30 *var_8;
     RwInt32 l4;
 
-    for (l4 = 0; l4 < 4; l4++)
+    for (l4 = 0; l4 < SECTION_SLOTS; l4++)
     {
         var_8 = &dword_4E5D30[l4];
         sub_174060(var_8, 0);
@@ -545,7 +549,29 @@ RwInt32 sub_172820()
             lcl_28->unk_08 = v2C;
             bp_8 += v2C;
         }
+#ifdef CODFH_ALL_SECTIONS
+        // (the port's extra slots: each the largest of the level's four)
+        {
+            RwInt32 nLargest = 0, i;
+
+            for (i = 0; i < 4; i++)
+                if ((RwInt32)dword_4E5D30[i].unk_10.unk_08 > nLargest)
+                    nLargest = dword_4E5D30[i].unk_10.unk_08;
+            for (i = 4; i < SECTION_SLOTS; i++)
+            {
+                dword_4E5D30[i].unk_10.unk_00 = 0;
+                dword_4E5D30[i].unk_10.unk_04 = 0;
+                dword_4E5D30[i].unk_10.unk_08 = nLargest;
+                bp_8 += nLargest;
+            }
+        }
+#endif
     }
+#ifdef CODFH_ALL_SECTIONS
+    // (the port's extra slots: the shared size grown with them, so each keeps a quarter's share)
+    if (!bp_4)
+        bp_8 = bp_8 / 4 * SECTION_SLOTS;
+#endif
     lv_10 = 0x80;
     if ((lv_10 - 1) & bp_8)
         bp_8 = lv_10 - ((lv_10 - 1) & bp_8) + bp_8;
@@ -570,7 +596,7 @@ RwInt32 sub_172820()
         if (bp_4)
         {
             var_30 = dword_4E5CAC;
-            for (ebp_34 = 0; ebp_34 < 4; ebp_34++)
+            for (ebp_34 = 0; ebp_34 < SECTION_SLOTS; ebp_34++)
             {
                 w38 = &dword_4E5D30[ebp_34].unk_10;
                 w38->unk_00 = var_30;
@@ -598,6 +624,14 @@ void sub_172A80()
 
     if (dword_4E5CB0)
     {
+#ifdef CODFH_ALL_SECTIONS
+        // (the port: no texture dictionary left linked in the memory about to go)
+        {
+            RwUInt32 nFrom = dword_4E5CB0, nTo = dword_4E5CB0 + dword_4E5CB8;
+
+            _rwTexDictionaryUnlinkRange((const void *)nFrom, (const void *)nTo);
+        }
+#endif
         dword_50F250 = 0;
         dword_50F254 = 0;
         RwFree((void *)dword_4E5CB0);
@@ -612,7 +646,7 @@ void sub_172A80()
         set_clump_heap_size(0);
         sub_16FE80(0);
         sub_16FF00(0);
-        for (bp_8 = 0; bp_8 < 4; bp_8++)
+        for (bp_8 = 0; bp_8 < SECTION_SLOTS; bp_8++)
         {
             var_C = &dword_4E5D30[bp_8].unk_10;
             var_C->unk_00 = 0;
@@ -641,7 +675,7 @@ void sub_172BB0()
     RwInt32 bp_8;
     RwUInt32 bp_4;
 
-    bp_8 = (dword_4E5CB4 - dword_4E5BD0.unk_08) / 4;
+    bp_8 = (dword_4E5CB4 - dword_4E5BD0.unk_08) / SECTION_SLOTS;
     if (bp_8 >= 0x80)
     {
         lv_10 = bp_8 / 0x80;
@@ -649,7 +683,7 @@ void sub_172BB0()
         bp_8 = var_C;
     }
     bp_4 = dword_4E5CAC + dword_4E5BD0.unk_08;
-    for (var_14 = 0; var_14 < 4; var_14++)
+    for (var_14 = 0; var_14 < SECTION_SLOTS; var_14++)
     {
         var_18 = &dword_4E5D30[var_14].unk_10;
         var_18->unk_00 = bp_4;
@@ -684,7 +718,7 @@ RwUInt16 sub_172C60(RwFrame *arg_0, type_3D96F0 *arg_4)
     var_C = 0xFFFF;
     lv_10 = 1.0e12f;
     bp_8 = arg_4->unk_04;
-    for (m_18 = 0; m_18 < 4; m_18++)
+    for (m_18 = 0; m_18 < SECTION_SLOTS; m_18++)
     {
         if (dword_4E5D30[m_18].get_unk_00())
         {
@@ -744,7 +778,7 @@ RpWorld *sub_172EB0(RwUInt16 arg_0, type_3D96F0 *arg_4)
 
     bp_4 = 0;
     bp_8 = 0;
-    if ((RwInt16)arg_0 >= 0 && arg_0 < 4)
+    if ((RwInt16)arg_0 >= 0 && arg_0 < SECTION_SLOTS)
         bp_8 = &dword_4E5D30[arg_0];
     else if (arg_0 == 0x7FFF)
         bp_8 = &unk_4E5CD8;
@@ -1143,7 +1177,7 @@ void sub_173750()
 {
     RwInt32 var_4;
 
-    for (var_4 = 0; var_4 < 4; var_4++)
+    for (var_4 = 0; var_4 < SECTION_SLOTS; var_4++)
     {
         if (dword_4E5D30[var_4].get_unk_00())
         {
@@ -1373,7 +1407,7 @@ RwInt32 sub_173CE0(RpWorld *arg_0, RwInt32 arg_4, RwUInt16 arg_8)
     else
     {
         var_C = 0;
-        for (bp_4 = 0; bp_4 < 4; bp_4++)
+        for (bp_4 = 0; bp_4 < SECTION_SLOTS; bp_4++)
         {
             var_C = &dword_4E5D30[bp_4];
             if ((var_C->get_unk_04() || var_C->get_unk_00()) && var_C->get_unk_08() == arg_8)
@@ -1382,10 +1416,10 @@ RwInt32 sub_173CE0(RpWorld *arg_0, RwInt32 arg_4, RwUInt16 arg_8)
                 break;
             }
         }
-        if (bp_4 == 4)
+        if (bp_4 == SECTION_SLOTS)
         {
             var_C = 0;
-            for (bp_4 = 0; bp_4 < 4; bp_4++)
+            for (bp_4 = 0; bp_4 < SECTION_SLOTS; bp_4++)
             {
                 if (!dword_4E5D30[bp_4].get_unk_00() && !dword_4E5D30[bp_4].get_unk_04())
                 {
@@ -1450,16 +1484,16 @@ type_4E5D30 *sub_173F50(RwUInt16 arg_0)
     RwInt32 l4;
 
     var_8 = 0;
-    for (l4 = 0; l4 < 4; l4++)
+    for (l4 = 0; l4 < SECTION_SLOTS; l4++)
     {
         var_8 = &dword_4E5D30[l4];
         if ((var_8->get_unk_04() || var_8->get_unk_00()) && var_8->get_unk_08() == arg_0)
             break;
     }
-    if (l4 == 4)
+    if (l4 == SECTION_SLOTS)
     {
         var_8 = 0;
-        for (l4 = 0; l4 < 4; l4++)
+        for (l4 = 0; l4 < SECTION_SLOTS; l4++)
         {
             if (!dword_4E5D30[l4].get_unk_00() && !dword_4E5D30[l4].get_unk_04())
             {
@@ -1573,16 +1607,16 @@ RwInt32 sub_1742D0(RwTexDictionary *arg_0, RwUInt16 arg_4)
     RwInt32 bp_4;
 
     bp_8 = 0;
-    for (bp_4 = 0; bp_4 < 4; bp_4++)
+    for (bp_4 = 0; bp_4 < SECTION_SLOTS; bp_4++)
     {
         bp_8 = &dword_4E5D30[bp_4];
         if ((bp_8->get_unk_04() || bp_8->get_unk_00()) && bp_8->get_unk_08() == arg_4)
             break;
     }
-    if (bp_4 == 4)
+    if (bp_4 == SECTION_SLOTS)
     {
         bp_8 = 0;
-        for (bp_4 = 0; bp_4 < 4; bp_4++)
+        for (bp_4 = 0; bp_4 < SECTION_SLOTS; bp_4++)
         {
             if (!dword_4E5D30[bp_4].get_unk_00())
             {
@@ -1612,7 +1646,7 @@ RwTexDictionary *sub_1743E0(RwInt32 arg_0)
     type_4E5D30 *var_8;
     RwInt32 l4;
 
-    for (l4 = 0; l4 < 4; l4++)
+    for (l4 = 0; l4 < SECTION_SLOTS; l4++)
     {
         var_8 = &dword_4E5D30[l4];
         if ((var_8->get_unk_00() || var_8->get_unk_04()) && var_8->get_unk_08() == arg_0)
@@ -1738,7 +1772,7 @@ RwInt32 sub_1745F0(RwInt32 arg_0)
 {
     RwInt32 var_4;
 
-    for (var_4 = 0; var_4 < 4; var_4++)
+    for (var_4 = 0; var_4 < SECTION_SLOTS; var_4++)
     {
         if (dword_4E5D30[var_4].get_unk_08() == arg_0)
             return var_4;
@@ -1755,7 +1789,7 @@ RwInt32 sub_174640(RwUInt16 arg_0)
     type_4E5D30 *var_8;
     RwInt32 l4;
 
-    for (l4 = 0; l4 < 4; l4++)
+    for (l4 = 0; l4 < SECTION_SLOTS; l4++)
     {
         var_8 = &dword_4E5D30[l4];
         if (var_8->get_unk_00() && var_8->get_unk_08() == arg_0)

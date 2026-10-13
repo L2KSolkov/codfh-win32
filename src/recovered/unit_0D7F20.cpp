@@ -334,6 +334,14 @@ void sub_D8660()
     RwInt32 bp_4;
 
     dword_4B870C = 1;
+#ifdef CODFH_ALL_SECTIONS
+    // (the port's every-section switch: nothing unloaded, what is missing loaded)
+    if (port_all_sections_on())
+    {
+        port_all_sections_load();
+        return;
+    }
+#endif
     bp_8 = 0;
     var_20 = 0;
     l1C = 0;
@@ -388,7 +396,7 @@ void sub_D8660()
             }
             if (!l1C && bp_4)
             {
-                for (var_20 = 0; var_20 < 4; var_20++)
+                for (var_20 = 0; var_20 < SECTION_SLOTS; var_20++)
                 {
                     if (var_20 != ebp_24->get_unk_0A())
                     {
@@ -412,7 +420,7 @@ void sub_D8660()
     }
     else if (dword_4B6850)
     {
-        for (bp_8 = 0; bp_8 < 4; bp_8++)
+        for (bp_8 = 0; bp_8 < SECTION_SLOTS; bp_8++)
         {
             l1C = 1;
             var_2C = &dword_4E5D30[bp_8];
@@ -449,7 +457,7 @@ void sub_D8660()
     }
     else
     {
-        for (bp_8 = 0; bp_8 < 4; bp_8++)
+        for (bp_8 = 0; bp_8 < SECTION_SLOTS; bp_8++)
         {
             l1C = 1;
             var_30 = &dword_4E5D30[bp_8];

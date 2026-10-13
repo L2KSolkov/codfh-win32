@@ -123,7 +123,7 @@ void sub_1279C0(RwV3d *arg_0, RwV3d *arg_4, RwV3d *arg_8, RwReal arg_C, RwReal a
     var_60.end.x += arg_4->x * 1000.0f;
     var_60.end.y += arg_4->y * 1000.0f;
     var_60.end.z += arg_4->z * 1000.0f;
-    for (var_64 = 0; var_64 < 4; var_64++)
+    for (var_64 = 0; var_64 < SECTION_SLOTS; var_64++)
     {
         var_68 = &dword_4E5D30[var_64];
         if (var_68->get_unk_00() && var_68->get_unk_28())
@@ -272,7 +272,7 @@ void sub_1283E0(RwBBox *arg_0)
 
     dword_4B25B8 = 150;
     bp_4 = dword_4B25B8 * 3;
-    for (bp_8 = 0; bp_8 < 4; bp_8++)
+    for (bp_8 = 0; bp_8 < SECTION_SLOTS; bp_8++)
     {
         var_C = &dword_4E5D30[bp_8];
         if (var_C->get_unk_00() && var_C->get_unk_28())

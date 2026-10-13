@@ -184,6 +184,8 @@ void sub_6B510()
 // view the messages triggers send)
 void TrigDrawAiMessage(const RwChar *pszName, type_67620 *pScript);
 void TrigDrawTriggerEvent(void *pTrigger, RwInt32 nKind, const RwChar *pszName);
+// (port/src/debug/trigtools.cpp: the Scripts tab's Messages, every message as it is made)
+void TrigMsgSent(type_42E00 *pMsg);
 #endif
 void sub_6B5F0(const RwChar *arg_0, type_67620 *arg_4, type_42E00_10 *arg_8, type_3D2E7C *arg_C,
                RwInt32 *arg_10, RwInt32 arg_14, bool arg_18, bool arg_1C)
@@ -259,6 +261,9 @@ type_439E78_00 sub_6B710(RwInt32 arg_0, type_67620 *arg_4, type_3D2E7C *arg_8,
         } else
             memcpy(ebp_C->unk_14, arg_18, var_4 * 4);
     }
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigMsgSent(ebp_C);
+#endif
     return *(type_439E78_00 *)&v8;
 }
 

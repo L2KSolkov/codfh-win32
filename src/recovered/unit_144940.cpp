@@ -383,6 +383,10 @@ void sub_145060(type_3D3548 *arg_0, Trigger *arg_4)
     switch (arg_4->vf_008())
     {
     case 4:
+#ifdef CODFH_ALL_SECTIONS
+        if (port_all_sections_on())
+            break;
+#endif
         if ((arg_0->unk_2C & 0x3FFFFF0) == 0x10)
         {
             m_18 = (SectionTrigger *)arg_4;

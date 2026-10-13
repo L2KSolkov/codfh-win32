@@ -80,6 +80,9 @@
 #include "types/type_3C540.h"
 #include "rw/rphanim.h"
 #include "rw/rplight.h"
+#include "game/clumpdata.h"
+#include "game/godassetmanager.h"
+#include "rw/bavector.h"
 #include "types/type_3D96F0.h"
 #include "types/GimpTrigger.h"
 #include "types/ShrimpTrigger.h"
@@ -110,7 +113,8 @@ struct TrigDrawSector
 };
 typedef RwChar TrigDrawSector_check[sizeof(TrigDrawSector) == 0x88 ? 1 : -1];
 
-extern type_4E5D30 dword_4E5D30[4];
+#include "game/sectionslots.h"
+extern type_4E5D30 dword_4E5D30[SECTION_SLOTS];
 extern type_4E5D30 unk_4E5CD8;
 
 extern "C" volatile unsigned port_frame;
@@ -2469,6 +2473,10 @@ static RpWorldSector *TrigDrawCollisionSector(RpWorldSector *pSector, void *pDat
             dwColour = 0x604080FF;
         if (g_bTrigDrawCollByKind)
             dwColour = TrigDrawCollKindColour(nKind);
+        // (by surface id: the material extension's low word, see-through)
+        if (g_bTrigDrawCollBySurface)
+            dwColour = nKind < 0 ? 0x60808080
+                                 : (TrigDrawSurfaceColour((RwInt32)(g_aTrigDrawCollKinds[nKind].dwTag & 0xFFFF)) & 0x00FFFFFF) | 0x70000000;
         // (filled: the triangle, see-through)
         if (g_nTrigDrawCollFill != 1)
         {
@@ -3173,6 +3181,11 @@ static void TrigDrawHits(const RwV3d *pvCam, const RwMatrix *pCamLtm)
 RwBool g_bTrigDrawLights = FALSE;
 RwBool g_bTrigDrawLightLabels = TRUE;
 RwBool g_bTrigDrawLightRadii = TRUE;
+RwBool g_bTrigDrawLightCones = TRUE;
+RwBool g_bTrigDrawLightRigs = TRUE;
+TrigDrawLightRig g_aTrigDrawLightRigs[TRIGDRAW_LIGHT_RIGS];
+RwInt32 g_nTrigDrawLightRigs;
+RwInt32 g_nTrigDrawLightRigsUnlit;
 RwReal g_fTrigDrawLightRange = 6000.0f;
 TrigDrawLightInfo g_aTrigDrawLightList[TRIGDRAW_LIGHTS];
 RwInt32 g_nTrigDrawLightList;
@@ -3199,6 +3212,19 @@ static void TrigDrawLightAdd(RpLight *pLight, RwInt32 nSource)
     o->colour = pLight->color;
     o->fCone = *(const RwReal *)((const RwUInt8 *)pLight + 0x28);   // (minusCosAngle)
     o->nSource = nSource;
+    // (its extension, plugin 0x42B3: every light has one; the world manager's placement sets
+    // the section, the entity holders the owner)
+    {
+        type_3D96F0 *pExt = sub_FBDD0(pLight);
+        type_3D3548 *pOwner;
+
+        o->bExt = TRUE;
+        o->nSlot = pExt->sub_FC440();
+        o->nSectionId = pExt->get_unk_0A();
+        pOwner = pExt->unk_14.unk_00 ? pExt->unk_14.sub_D4910() : NULL;
+        o->pOwner = pOwner;
+        o->dwOwnerBits = pOwner ? pOwner->unk_2C : 0;
+    }
     pFrame = RpLightGetFrame(pLight);
     if (pFrame)
     {
@@ -3208,6 +3234,109 @@ static void TrigDrawLightAdd(RpLight *pLight, RwInt32 nSource)
         o->vAt = m->at;
     }
     g_nTrigDrawLightList++;
+}
+
+static RwUInt32 TrigDrawRgbaColour(const RwRGBAReal *c, RwUInt32 dwAlpha)
+{
+    RwUInt32 r = (RwUInt32)(c->red > 1.0f ? 255 : c->red < 0.0f ? 0 : c->red * 255.0f);
+    RwUInt32 g = (RwUInt32)(c->green > 1.0f ? 255 : c->green < 0.0f ? 0 : c->green * 255.0f);
+    RwUInt32 b = (RwUInt32)(c->blue > 1.0f ? 255 : c->blue < 0.0f ? 0 : c->blue * 255.0f);
+
+    // (a dark light still shows)
+    if (r + g + b < 60)
+        return (dwAlpha << 24) | 0x505050;
+    return (dwAlpha << 24) | (r << 16) | (g << 8) | b;
+}
+
+// The entities' light rigs in range, as the world render builds them for each model
+// (sub_1227F0: the entity's zones through type_8E670::sub_8E870, which only fills the list it
+// is given): at the entity, a cross in the ambient colour and each directional as a line
+// shining in along its direction, in its colour.
+static void TrigDrawLightRigsAll(const RwV3d *pvCam)
+{
+    RwInt32 i, k;
+
+    g_nTrigDrawLightRigs = 0;
+    g_nTrigDrawLightRigsUnlit = 0;
+    for (i = 0; i < 0x300 && g_nTrigDrawLightRigs < TRIGDRAW_LIGHT_RIGS; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+
+        if (pEntity == NULL)
+            continue;
+        __try
+        {
+            RwFrame *pFrame = pEntity->unk_338.unk_08;
+            __declspec(align(16)) type_8F210 rig;
+            TrigDrawLightRig *o;
+            RwV3d vPos;
+            RwReal dx, dy, dz;
+
+            if (pFrame == NULL || pEntity->unk_25C.unk_08 == NULL)
+                continue;
+            vPos = RwFrameGetLTM(pFrame)->pos;
+            dx = vPos.x - pvCam->x;
+            dy = vPos.y - pvCam->y;
+            dz = vPos.z - pvCam->z;
+            if (g_fTrigDrawLightRange > 0.0f && dx * dx + dy * dy + dz * dz > g_fTrigDrawLightRange * g_fTrigDrawLightRange)
+                continue;
+            if (!pEntity->unk_28_17)
+            {
+                g_nTrigDrawLightRigsUnlit++;
+                continue;
+            }
+            memset(&rig, 0, sizeof(rig));
+            pEntity->unk_90.sub_8E870(&rig);
+            if (rig.unk_00 <= 0 && rig.unk_10[0].unk_10.unk_00 == 0.0f && rig.unk_10[0].unk_10.unk_04 == 0.0f &&
+                rig.unk_10[0].unk_10.unk_08 == 0.0f)
+                continue;
+            o = &g_aTrigDrawLightRigs[g_nTrigDrawLightRigs++];
+            memset(o, 0, sizeof(*o));
+            o->pEntity = pEntity;
+            o->dwBits = pEntity->unk_2C;
+            o->vPos = vPos;
+            o->nLights = rig.unk_00 < 0 ? 0 : rig.unk_00 > 4 ? 4 : rig.unk_00;
+            o->ambient.red = rig.unk_10[0].unk_10.unk_00;
+            o->ambient.green = rig.unk_10[0].unk_10.unk_04;
+            o->ambient.blue = rig.unk_10[0].unk_10.unk_08;
+            o->ambient.alpha = 1.0f;
+            for (k = 0; k < o->nLights; k++)
+            {
+                o->avDir[k].x = rig.unk_10[k + 1].unk_00.unk_00;
+                o->avDir[k].y = rig.unk_10[k + 1].unk_00.unk_04;
+                o->avDir[k].z = rig.unk_10[k + 1].unk_00.unk_08;
+                o->aColour[k].red = rig.unk_10[k + 1].unk_10.unk_00;
+                o->aColour[k].green = rig.unk_10[k + 1].unk_10.unk_04;
+                o->aColour[k].blue = rig.unk_10[k + 1].unk_10.unk_08;
+                o->aColour[k].alpha = 1.0f;
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+    for (i = 0; i < g_nTrigDrawLightRigs; i++)
+    {
+        const TrigDrawLightRig *o = &g_aTrigDrawLightRigs[i];
+        RwV3d vCentre = o->vPos;
+
+        vCentre.y += 40.0f;
+        TrigDrawCross(&vCentre, 6.0f, TrigDrawRgbaColour(&o->ambient, 0xFF));
+        for (k = 0; k < o->nLights; k++)
+        {
+            RwV3d vFrom = vCentre;
+            RwReal fLen = (RwReal)sqrt(o->avDir[k].x * o->avDir[k].x + o->avDir[k].y * o->avDir[k].y +
+                                       o->avDir[k].z * o->avDir[k].z);
+
+            if (fLen < 1e-4f)
+                continue;
+            vFrom.x -= o->avDir[k].x / fLen * 35.0f;
+            vFrom.y -= o->avDir[k].y / fLen * 35.0f;
+            vFrom.z -= o->avDir[k].z / fLen * 35.0f;
+            TrigDrawPathLine(&vFrom, &vCentre, TrigDrawRgbaColour(&o->aColour[k], 0xFF));
+            TrigDrawCross(&vFrom, 2.0f, TrigDrawRgbaColour(&o->aColour[k], 0xFF));
+        }
+    }
 }
 
 // The lights: the level's list (its own, sub_173800), the ambient, the directional slots and the
@@ -3278,11 +3407,59 @@ static void TrigDrawLights(const RwV3d *pvCam, const RwMatrix *pCamLtm)
             }
             if (l->nType > 0x80)
             {
+                RwReal fLen = l->fRadius > 0.0f && l->fRadius < 20000.0f ? l->fRadius : 200.0f;
+
                 vAt = l->vPos;
-                vAt.x += l->vAt.x * (l->fRadius > 0.0f ? l->fRadius : 200.0f);
-                vAt.y += l->vAt.y * (l->fRadius > 0.0f ? l->fRadius : 200.0f);
-                vAt.z += l->vAt.z * (l->fRadius > 0.0f ? l->fRadius : 200.0f);
+                vAt.x += l->vAt.x * fLen;
+                vAt.y += l->vAt.y * fLen;
+                vAt.z += l->vAt.z * fLen;
                 TrigDrawPathLine(&l->vPos, &vAt, dwColour);
+                // (its cone: RenderWare keeps minus the cosine of the half angle; a ring where
+                // the cone meets the radius, and four lines to it)
+                if (g_bTrigDrawLightCones && l->fCone < 0.0f && l->fCone > -1.0f)
+                {
+                    RwReal fCos = -l->fCone, fSin = (RwReal)sqrt(1.0f - fCos * fCos);
+                    RwV3d vRef, vU, vW, vCentre;
+                    RwReal fLenU, fLenW;
+                    RwInt32 k;
+
+                    vRef.x = 0.0f; vRef.y = fabs(l->vAt.y) < 0.9f ? 1.0f : 0.0f; vRef.z = fabs(l->vAt.y) < 0.9f ? 0.0f : 1.0f;
+                    // (two axes across the cone)
+                    vU.x = l->vAt.y * vRef.z - l->vAt.z * vRef.y;
+                    vU.y = l->vAt.z * vRef.x - l->vAt.x * vRef.z;
+                    vU.z = l->vAt.x * vRef.y - l->vAt.y * vRef.x;
+                    fLenU = (RwReal)sqrt(vU.x * vU.x + vU.y * vU.y + vU.z * vU.z);
+                    if (fLenU < 1e-4f)
+                        continue;
+                    vU.x /= fLenU; vU.y /= fLenU; vU.z /= fLenU;
+                    vW.x = l->vAt.y * vU.z - l->vAt.z * vU.y;
+                    vW.y = l->vAt.z * vU.x - l->vAt.x * vU.z;
+                    vW.z = l->vAt.x * vU.y - l->vAt.y * vU.x;
+                    fLenW = (RwReal)sqrt(vW.x * vW.x + vW.y * vW.y + vW.z * vW.z);
+                    if (fLenW < 1e-4f)
+                        continue;
+                    vW.x /= fLenW; vW.y /= fLenW; vW.z /= fLenW;
+                    vCentre.x = l->vPos.x + l->vAt.x * fLen * fCos;
+                    vCentre.y = l->vPos.y + l->vAt.y * fLen * fCos;
+                    vCentre.z = l->vPos.z + l->vAt.z * fLen * fCos;
+                    for (k = 0; k < 24; k++)
+                    {
+                        RwReal a0 = k * 6.2831853f / 24.0f, a1 = (k + 1) * 6.2831853f / 24.0f;
+                        RwReal c0 = (RwReal)cos(a0) * fLen * fSin, s0 = (RwReal)sin(a0) * fLen * fSin;
+                        RwReal c1 = (RwReal)cos(a1) * fLen * fSin, s1 = (RwReal)sin(a1) * fLen * fSin;
+                        RwV3d pA, pB;
+
+                        pA.x = vCentre.x + vU.x * c0 + vW.x * s0;
+                        pA.y = vCentre.y + vU.y * c0 + vW.y * s0;
+                        pA.z = vCentre.z + vU.z * c0 + vW.z * s0;
+                        pB.x = vCentre.x + vU.x * c1 + vW.x * s1;
+                        pB.y = vCentre.y + vU.y * c1 + vW.y * s1;
+                        pB.z = vCentre.z + vU.z * c1 + vW.z * s1;
+                        TrigDrawPathLine(&pA, &pB, dwColour);
+                        if ((k % 6) == 0)
+                            TrigDrawPathLine(&l->vPos, &pA, (dwColour & 0x00FFFFFF) | 0x90000000);
+                    }
+                }
             }
         }
         else if (l->nType == 1)
@@ -3301,6 +3478,8 @@ static void TrigDrawLights(const RwV3d *pvCam, const RwMatrix *pCamLtm)
             TrigDrawCross(&vTip, 3.0f, dwColour);
         }
     }
+    if (g_bTrigDrawLightRigs)
+        TrigDrawLightRigsAll(pvCam);
     TrigDrawPathFlush();
     if (g_bTrigDrawLightLabels && TrigDrawCharset() != NULL)
     {
@@ -3316,11 +3495,281 @@ static void TrigDrawLights(const RwV3d *pvCam, const RwMatrix *pCamLtm)
                 continue;
             if (g_fTrigDrawLightRange > 0.0f && dx * dx + dy * dy + dz * dz > g_fTrigDrawLightRange * g_fTrigDrawLightRange)
                 continue;
-            _snprintf(sz, sizeof(sz), "%s light, radius %.0f, %.2f %.2f %.2f", l->nType == 0x80 ? "point" : "spot",
-                      l->fRadius, l->colour.red, l->colour.green, l->colour.blue);
+            _snprintf(sz, sizeof(sz), "%s light, radius %.0f, %.2f %.2f %.2f%s",
+                      l->nType == 0x80 ? "point" : l->nType == 0x82 ? "soft spot" : "spot",
+                      l->fRadius, l->colour.red, l->colour.green, l->colour.blue,
+                      (l->nFlags & 3) == 0 ? " (lights nothing)" : "");
             sz[sizeof(sz) - 1] = 0;
             vAt.y += 25.0f;
             TrigDrawText(sz, &vAt, pCamLtm, 0xFFFFFFFF);
+        }
+        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    }
+}
+
+// ---- the models' mount points ----
+
+RwBool g_bTrigDrawMounts = FALSE;
+RwBool g_bTrigDrawMountLabels = TRUE;
+RwBool g_bTrigDrawMountAxes = TRUE;
+RwReal g_fTrigDrawMountRange = 1500.0f;
+RwReal g_fTrigDrawMountSize = 8.0f;
+RwChar g_szTrigDrawMountFilter[32];
+TrigDrawMountInfo g_aTrigDrawMountList[TRIGDRAW_MOUNTS];
+RwInt32 g_nTrigDrawMountList;
+RwInt32 g_nTrigDrawMountClumps;
+
+// A mount tag's characters, high byte first, leading zero bytes skipped ('POT' is three).
+static void TrigDrawMountTagText(RwUInt32 dwTag, RwChar *psz)
+{
+    while (dwTag != 0 && (dwTag & 0xFF000000) == 0)
+        dwTag <<= 8;
+    TrigDrawTagText(dwTag, psz);
+}
+
+// What the game uses a tag for, where the code says (sub_EC1F0's and sub_EC2D0's callers); else 0.
+const RwChar *TrigDrawMountMeaning(RwUInt32 dwTag)
+{
+    static const struct { RwUInt32 dwTag; const RwChar *psz; } s_aKnown[] =
+    {
+        { 'FIRE', "muzzle (weapons, soldiers' weapons, generators)" },
+        { 'AFIR', "gun slot A (tanks, flak, gimp vehicles)" },
+        { 'BFIR', "gun slot B" },
+        { 'CFIR', "gun slot C" },
+        { 'FR01', "mounted gun fire point 1" },
+        { 'FR02', "mounted gun fire point 2" },
+        { 'FR03', "mounted gun fire point 3" },
+        { 'FR04', "mounted gun fire point 4" },
+        { 'SHLL', "shell-casing ejection" },
+        { 'POT', "player weapon's pose origin" },
+        { 'ST01', "stand pose 1 (from POT)" },
+        { 'ST02', "stand pose 2 (from POT)" },
+        { 'CR01', "crouch pose 1 (from POT)" },
+        { 'CR02', "crouch pose 2 (from POT)" },
+        { 'PR01', "prone pose 1 (from POT)" },
+        { 'PR02', "prone pose 2 (from POT)" },
+        { 'COM', "centre of mass" },
+        { 'ATMT', "attachment point" },
+        { 'OPR0', "gun operator" },
+    };
+    RwInt32 i;
+
+    for (i = 0; i < (RwInt32)(sizeof(s_aKnown) / sizeof(s_aKnown[0])); i++)
+        if (s_aKnown[i].dwTag == dwTag)
+            return s_aKnown[i].psz;
+    if ((dwTag & 0xFFFFFF00) == 'PGN\0' && (dwTag & 0xFF) >= '0' && (dwTag & 0xFF) <= '9')
+        return "indexed slot (PGN0 + n)";
+    return NULL;
+}
+
+// The clumps already looked at this frame: an open-addressed set of pointers.
+#define TRIGDRAW_MOUNT_SEEN 2048
+static const void *s_apMountSeen[TRIGDRAW_MOUNT_SEEN];
+
+static RwBool TrigDrawMountSeen(const void *p)
+{
+    RwUInt32 h = ((RwUInt32)(size_t)p >> 4) * 2654435761u;
+    RwInt32 i;
+
+    for (i = 0; i < TRIGDRAW_MOUNT_SEEN; i++)
+    {
+        const void **pp = &s_apMountSeen[(h + i) & (TRIGDRAW_MOUNT_SEEN - 1)];
+
+        if (*pp == p)
+            return TRUE;
+        if (*pp == NULL)
+        {
+            *pp = p;
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+// (any case)
+static RwBool TrigDrawMountMatches(const RwChar *pszTag)
+{
+    RwInt32 i, j;
+
+    if (g_szTrigDrawMountFilter[0] == 0)
+        return TRUE;
+    for (i = 0; pszTag[i]; i++)
+    {
+        for (j = 0; g_szTrigDrawMountFilter[j]; j++)
+        {
+            RwChar a = pszTag[i + j], b = g_szTrigDrawMountFilter[j];
+
+            if (a >= 'a' && a <= 'z')
+                a -= 'a' - 'A';
+            if (b >= 'a' && b <= 'z')
+                b -= 'a' - 'A';
+            if (a != b)
+                break;
+        }
+        if (g_szTrigDrawMountFilter[j] == 0)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+struct TrigDrawMountCtx
+{
+    const RwV3d *pvCam;
+};
+
+// One clump's points: each through its hierarchy node to the world as the game places it
+// (sub_EC310), then drawn; listed for the view.
+static void TrigDrawMountClump(RpClump *pClump, const RwV3d *pvCam)
+{
+    type_EC6C0 *pData;
+    RwFrame *pFrame;
+    RpHAnimHierarchy *pH;
+    type_3D3548 *pOwner;
+    RwV3d vClump;
+    RwReal dx, dy, dz;
+    RwUInt32 k;
+
+    if (pClump == NULL || TrigDrawMountSeen(pClump))
+        return;
+    pData = sub_EC6C0(pClump);
+    if (pData->unk_04 == NULL || pData->unk_04->unk_00 == 0 || pData->unk_04->unk_00 > 256)
+        return;
+    pFrame = RpClumpGetFrame(pClump);
+    if (pFrame == NULL)
+        return;
+    g_nTrigDrawMountClumps++;
+    vClump = RwFrameGetLTM(pFrame)->pos;
+    dx = vClump.x - pvCam->x;
+    dy = vClump.y - pvCam->y;
+    dz = vClump.z - pvCam->z;
+    if (g_fTrigDrawMountRange > 0.0f && dx * dx + dy * dy + dz * dz > g_fTrigDrawMountRange * g_fTrigDrawMountRange)
+        return;
+    pH = sub_16D970(pClump);
+    pOwner = sub_FBBB0(pClump);
+    for (k = 0; k < pData->unk_04->unk_00; k++)
+    {
+        const type_EC1F0 *pPoint = &pData->unk_04->unk_10[k];
+        RwChar szTag[8];
+        RwMatrix m;
+        TrigDrawMountInfo *o;
+
+        TrigDrawMountTagText((RwUInt32)pPoint->unk_00, szTag);
+        if (!TrigDrawMountMatches(szTag))
+            continue;
+        // (a point on a bone needs the hierarchy; the game never asks for one without it)
+        if (pPoint->unk_04 != 0 && (pH == NULL || pPoint->unk_04 < 0 || pPoint->unk_04 >= pH->numNodes))
+            continue;
+        if (!sub_EC310(pClump, pH, &m, pPoint->unk_00, 0, 0))
+            continue;
+        if (g_bTrigDrawMountAxes)
+        {
+            RwV3d vX = m.pos, vY = m.pos, vZ = m.pos;
+            RwReal f = g_fTrigDrawMountSize;
+
+            vX.x += m.right.x * f; vX.y += m.right.y * f; vX.z += m.right.z * f;
+            vY.x += m.up.x * f; vY.y += m.up.y * f; vY.z += m.up.z * f;
+            vZ.x += m.at.x * f; vZ.y += m.at.y * f; vZ.z += m.at.z * f;
+            TrigDrawPathLine(&m.pos, &vX, 0xFFFF4040);
+            TrigDrawPathLine(&m.pos, &vY, 0xFF40FF40);
+            TrigDrawPathLine(&m.pos, &vZ, 0xFF4080FF);
+        }
+        else
+            TrigDrawCross(&m.pos, g_fTrigDrawMountSize * 0.5f, 0xFFFFE040);
+        if (g_nTrigDrawMountList >= TRIGDRAW_MOUNTS)
+            continue;
+        o = &g_aTrigDrawMountList[g_nTrigDrawMountList++];
+        o->pClump = pClump;
+        o->pOwner = pOwner;
+        o->dwOwnerBits = pOwner ? pOwner->unk_2C : 0;
+        o->dwTag = (RwUInt32)pPoint->unk_00;
+        o->nBone = pPoint->unk_04;
+        o->vPos = m.pos;
+    }
+}
+
+static RpClump *TrigDrawMountWorldClump(RpClump *pClump, void *pData)
+{
+    __try
+    {
+        TrigDrawMountClump(pClump, ((TrigDrawMountCtx *)pData)->pvCam);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    return pClump;
+}
+
+static void TrigDrawMountWorld(RpWorld *pWorld, TrigDrawMountCtx *pCtx)
+{
+    if (pWorld == NULL || TrigDrawMountSeen(pWorld))
+        return;
+    __try
+    {
+        RpWorldForAllClumps(pWorld, TrigDrawMountWorldClump, pCtx);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+}
+
+// The mount points (the clump data plugin 0x4210's chunk 0x4211, the .sdf models): every
+// entity's two clumps (unk_264, unk_270), then every clump in the live sections' drawn worlds
+// (the global section's and each slot's opaque, second-pass and animated-UV worlds); each
+// point its axes (or a cross) and its tag.
+static void TrigDrawMounts(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    TrigDrawMountCtx ctx;
+    RwInt32 i;
+
+    memset(s_apMountSeen, 0, sizeof(s_apMountSeen));
+    g_nTrigDrawMountList = 0;
+    g_nTrigDrawMountClumps = 0;
+    ctx.pvCam = pvCam;
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (i = 0; i < 0x300; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+
+        if (pEntity == NULL)
+            continue;
+        __try
+        {
+            TrigDrawMountClump(pEntity->unk_25C.unk_08, pvCam);
+            TrigDrawMountClump(pEntity->unk_268.unk_08, pvCam);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+    TrigDrawMountWorld(unk_4E5CD8.unk_20, &ctx);
+    TrigDrawMountWorld(unk_4E5CD8.unk_24, &ctx);
+    TrigDrawMountWorld(unk_4E5CD8.unk_2C, &ctx);
+    for (i = 0; i < SECTION_SLOTS; i++)
+    {
+        if (!dword_4E5D30[i].get_unk_00())
+            continue;
+        TrigDrawMountWorld(dword_4E5D30[i].unk_20, &ctx);
+        TrigDrawMountWorld(dword_4E5D30[i].unk_24, &ctx);
+        TrigDrawMountWorld(dword_4E5D30[i].unk_2C, &ctx);
+    }
+    TrigDrawPathFlush();
+    if (g_bTrigDrawMountLabels && TrigDrawCharset() != NULL)
+    {
+        RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+        for (i = 0; i < g_nTrigDrawMountList; i++)
+        {
+            const TrigDrawMountInfo *o = &g_aTrigDrawMountList[i];
+            RwChar szTag[8], sz[48];
+            RwV3d vAt = o->vPos;
+
+            TrigDrawMountTagText(o->dwTag, szTag);
+            if (o->nBone)
+                _snprintf(sz, sizeof(sz), "%s (bone %d)", szTag, o->nBone);
+            else
+                _snprintf(sz, sizeof(sz), "%s", szTag);
+            sz[sizeof(sz) - 1] = 0;
+            vAt.y += g_fTrigDrawMountSize * 0.6f;
+            TrigDrawText(sz, &vAt, pCamLtm, TrigDrawMountMeaning(o->dwTag) ? 0xFFFFFFFF : 0xFFFFC060);
         }
         RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
     }
@@ -4403,6 +4852,585 @@ static void TrigDrawProjectiles(const RwV3d *pvCam, const RwMatrix *pCamLtm)
     TrigDrawPathFlush();
 }
 
+// ---- the models: the game's RenderWare extensions (plugins 0x42B0 atomic, 0x42B1 clump) ----
+
+RwBool g_bTrigDrawModels = FALSE;
+RwInt32 g_nTrigDrawModelMode = 1;
+RwBool g_bTrigDrawModelLabels = FALSE;
+RwReal g_fTrigDrawModelRange = 3000.0f;
+RwInt32 g_nTrigDrawModels;
+RwInt32 g_anTrigDrawModelsBySlot[SECTION_SLOTS + 2];
+RwInt32 g_nTrigDrawModelsSkipLines, g_nTrigDrawModelsSkipShots;
+RwBool g_bTrigDrawInspect = FALSE;
+RwBool g_bTrigDrawInspectFreeze = FALSE;
+TrigDrawModelInfo g_TrigDrawInspected;
+RwBool g_bTrigDrawSkeletons = FALSE;
+RwBool g_bTrigDrawSkeletonRest = TRUE;
+RwReal g_fTrigDrawSkeletonRange = 1500.0f;
+RwInt32 g_nTrigDrawSkeletons;
+TrigDrawCacheInfo g_aTrigDrawCache[TRIGDRAW_CACHE];
+RwInt32 g_nTrigDrawCache;
+RwBool g_bTrigDrawCollBySurface = FALSE;
+
+// A colour for a section slot (by its index), the global section (white) or none (grey).
+static RwUInt32 TrigDrawSlotColour(RwInt32 nSlot)
+{
+    static const RwUInt32 s_adw[8] = { 0xFFFF6060, 0xFF60FF60, 0xFF6090FF, 0xFFFFE040,
+                                       0xFFFF60FF, 0xFF60FFFF, 0xFFFFA040, 0xFFA0A0FF };
+
+    if (nSlot == 0x7FFF)
+        return 0xFFFFFFFF;
+    if (nSlot < 0 || nSlot >= SECTION_SLOTS)
+        return 0xFF707070;
+    return s_adw[nSlot & 7];
+}
+
+// A colour for a surface id (the material extension's low word): spread by a hash, magenta
+// for untagged (0xFFFF), which the game logs as "non-tagged surface".
+RwUInt32 TrigDrawSurfaceColour(RwInt32 nSurface)
+{
+    RwUInt32 h, r, g, b;
+
+    if (nSurface < 0 || nSurface == 0xFFFF)
+        return 0xFFFF00FF;
+    h = (RwUInt32)(nSurface + 1) * 2654435761u;
+    r = 0x40 + ((h >> 24) & 0xBF);
+    g = 0x40 + ((h >> 16) & 0xBF);
+    b = 0x40 + ((h >> 8) & 0xBF);
+    return 0xFF000000 | (r << 16) | (g << 8) | b;
+}
+
+// A holder list's length (the extension's unk_18: who points at the object).
+static RwInt32 TrigDrawHolders(const type_3D96F0 *pExt)
+{
+    const type_3D96F0_node *p = pExt->unk_18;
+    RwInt32 n = 0;
+
+    while (p != NULL && n < 1000)
+    {
+        n++;
+        p = p->unk_00;
+    }
+    return n;
+}
+
+static RpAtomic *TrigDrawCountAtomic(RpAtomic *pAtomic, void *pData)
+{
+    (*(RwInt32 *)pData)++;
+    return pAtomic;
+}
+
+// An entity's kind in a few words (unk_2C), for the labels.
+static const RwChar *TrigDrawKindWord(RwUInt32 dwBits)
+{
+    if (dwBits & 0x10)
+        return "player";
+    if (dwBits & 0x20)
+        return (dwBits & 2) ? "enemy soldier" : "soldier";
+    if (dwBits & 0x4000)
+        return "pickup";
+    if (dwBits & 0x10000)
+        return "destructible";
+    if (dwBits & 0x100)
+        return "animated bg";
+    return "entity";
+}
+
+static RwUInt32 TrigDrawOwnerColour(const type_3D3548 *pOwner)
+{
+    if (pOwner == NULL)
+        return 0xFF707070;
+    if (pOwner->unk_2C & 0x10)
+        return 0xFF40FF40;
+    if (pOwner->unk_2C & 0x20)
+        return (pOwner->unk_2C & 2) ? 0xFFFF4040 : 0xFF4080FF;
+    if (pOwner->unk_2C & 0x4000)
+        return 0xFFFFE040;
+    return 0xFFFFFFFF;
+}
+
+// The models this frame: each clump once (the entities' two, then every live world's).
+#define TRIGDRAW_MODELS 1024
+static RpClump *s_apModels[TRIGDRAW_MODELS];
+static RwInt32 s_nModels;
+
+static void TrigDrawModelAdd(RpClump *pClump)
+{
+    if (pClump == NULL || s_nModels >= TRIGDRAW_MODELS || TrigDrawMountSeen(pClump))
+        return;
+    s_apModels[s_nModels++] = pClump;
+}
+
+static RpClump *TrigDrawModelWorldClump(RpClump *pClump, void *pData)
+{
+    TrigDrawModelAdd(pClump);
+    return pClump;
+}
+
+static void TrigDrawModelWorld(RpWorld *pWorld)
+{
+    if (pWorld == NULL || TrigDrawMountSeen(pWorld))
+        return;
+    __try
+    {
+        RpWorldForAllClumps(pWorld, TrigDrawModelWorldClump, NULL);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+}
+
+static void TrigDrawModelsGather()
+{
+    RwInt32 i;
+
+    memset(s_apMountSeen, 0, sizeof(s_apMountSeen));
+    s_nModels = 0;
+    for (i = 0; i < 0x300; i++)
+    {
+        type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+
+        if (pEntity == NULL)
+            continue;
+        __try
+        {
+            TrigDrawModelAdd(pEntity->unk_25C.unk_08);
+            TrigDrawModelAdd(pEntity->unk_268.unk_08);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+    TrigDrawModelWorld(unk_4E5CD8.unk_20);
+    TrigDrawModelWorld(unk_4E5CD8.unk_24);
+    TrigDrawModelWorld(unk_4E5CD8.unk_2C);
+    for (i = 0; i < SECTION_SLOTS; i++)
+    {
+        if (!dword_4E5D30[i].get_unk_00())
+            continue;
+        TrigDrawModelWorld(dword_4E5D30[i].unk_20);
+        TrigDrawModelWorld(dword_4E5D30[i].unk_24);
+        TrigDrawModelWorld(dword_4E5D30[i].unk_2C);
+    }
+}
+
+// One model's atomics: drawn by the mode, and tested against the line of sight.
+struct TrigDrawModelPass
+{
+    RpClump *pClump;
+    type_3D96F0 *pClumpExt;
+    const RwV3d *pvCam;
+    const RwMatrix *pCamLtm;
+    RwReal fBestT;                  // the nearest hit along the line of sight so far
+    RpClump *pBestClump;
+    RpAtomic *pBestAtomic;
+    RwV3d vMin, vMax;               // the clump's atomics' spheres' box
+    RwInt32 nAtomics;
+};
+
+static RpAtomic *TrigDrawModelAtomic(RpAtomic *pAtomic, void *pData)
+{
+    TrigDrawModelPass *p = (TrigDrawModelPass *)pData;
+    const RwSphere *pS = RpAtomicGetWorldBoundingSphere(pAtomic);
+    type_3D96F0 *pExt = sub_FB7A0(pAtomic);
+    RwUInt32 dwFlags = pExt->unk_04.unk_00;
+
+    p->nAtomics++;
+    if (pS == NULL || !(pS->radius > 0.0f) || pS->radius > 50000.0f)
+        return pAtomic;
+    if (pS->center.x - pS->radius < p->vMin.x) p->vMin.x = pS->center.x - pS->radius;
+    if (pS->center.y - pS->radius < p->vMin.y) p->vMin.y = pS->center.y - pS->radius;
+    if (pS->center.z - pS->radius < p->vMin.z) p->vMin.z = pS->center.z - pS->radius;
+    if (pS->center.x + pS->radius > p->vMax.x) p->vMax.x = pS->center.x + pS->radius;
+    if (pS->center.y + pS->radius > p->vMax.y) p->vMax.y = pS->center.y + pS->radius;
+    if (pS->center.z + pS->radius > p->vMax.z) p->vMax.z = pS->center.z + pS->radius;
+    if (dwFlags & 8)
+        g_nTrigDrawModelsSkipLines++;
+    if (dwFlags & 0x10)
+        g_nTrigDrawModelsSkipShots++;
+    // (the skip flags: bit 3 the line and sphere queries pass it, bit 4 the projectiles)
+    if (g_bTrigDrawModels && g_nTrigDrawModelMode == 2 && (dwFlags & 0x18))
+    {
+        RwUInt32 dw = (dwFlags & 0x18) == 0x18 ? 0xFFFF4040 : (dwFlags & 8) ? 0xFFFFA040 : 0xFFC060FF;
+
+        TrigDrawFlatRing(&pS->center, pS->radius, dw, 20);
+        TrigDrawCross(&pS->center, pS->radius * 0.3f, dw);
+    }
+    // (the line of sight: the camera's at through the sphere)
+    if (g_bTrigDrawInspect && !g_bTrigDrawInspectFreeze)
+    {
+        RwV3d d;
+        RwReal t, fD2;
+
+        d.x = pS->center.x - p->pvCam->x;
+        d.y = pS->center.y - p->pvCam->y;
+        d.z = pS->center.z - p->pvCam->z;
+        t = d.x * p->pCamLtm->at.x + d.y * p->pCamLtm->at.y + d.z * p->pCamLtm->at.z;
+        fD2 = d.x * d.x + d.y * d.y + d.z * d.z - t * t;
+        if (t > 0.0f && fD2 <= pS->radius * pS->radius)
+        {
+            RwReal fHit = t - (RwReal)sqrt(pS->radius * pS->radius - fD2);
+
+            // (a sphere around the camera (the level's big props, the sky) only when the line
+            // meets nothing else, the smallest such first)
+            if (fHit < 0.0f)
+                fHit = 1e20f + pS->radius;
+            else
+                // (prefer the smaller of two spheres the line meets at about the same distance)
+                fHit += pS->radius * 0.05f;
+            if (fHit < p->fBestT)
+            {
+                p->fBestT = fHit;
+                p->pBestClump = p->pClump;
+                p->pBestAtomic = pAtomic;
+            }
+        }
+    }
+    return pAtomic;
+}
+
+// The inspector's record of the model arg_0 (the atomic arg_4 its line of sight hit).
+static void TrigDrawInspectFill(RpClump *pClump, RpAtomic *pAtomic)
+{
+    TrigDrawModelInfo *o = &g_TrigDrawInspected;
+    type_3D96F0 *pCx = sub_FBA10(pClump);
+    type_3D96F0 *pAx = pAtomic ? sub_FB7A0(pAtomic) : NULL;
+    type_EC6C0 *pData = sub_EC6C0(pClump);
+    RpHAnimHierarchy *pH = sub_16D970(pClump);
+    type_3D3548 *pOwner = sub_FBBB0(pClump);
+    TrigDrawModelPass pass;
+
+    memset(o, 0, sizeof(*o));
+    o->pClump = pClump;
+    o->pAtomic = pAtomic;
+    o->pOwner = pOwner;
+    o->dwOwnerBits = pOwner ? pOwner->unk_2C : 0;
+    o->dwClumpFlags = pCx->unk_04.unk_00;
+    o->nClumpSlot = pCx->sub_FC440();
+    o->nClumpSection = pCx->get_unk_0A();
+    o->nClumpHolders = TrigDrawHolders(pCx);
+    o->nCacheKey = (RwInt32)(size_t)pCx->unk_0C;
+    if (pAx)
+    {
+        const RwSphere *pS = RpAtomicGetWorldBoundingSphere(pAtomic);
+
+        o->dwAtomicFlags = pAx->unk_04.unk_00;
+        o->nAtomicSlot = pAx->sub_FC440();
+        o->nAtomicSection = pAx->get_unk_0A();
+        o->nAtomicHolders = TrigDrawHolders(pAx);
+        o->dwPartMask = (RwUInt32)pAx->unk_10;
+        if (pS)
+        {
+            o->vCentre = pS->center;
+            o->fRadius = pS->radius;
+        }
+    }
+    memset(&pass, 0, sizeof(pass));
+    RpClumpForAllAtomics(pClump, TrigDrawCountAtomic, &pass.nAtomics);
+    o->nAtomics = pass.nAtomics;
+    o->nMounts = pData->unk_04 ? (RwInt32)pData->unk_04->unk_00 : 0;
+    o->nBones = pH ? pH->numNodes : 0;
+    o->nKeepBones = pData->unk_0C;
+    o->bValid = TRUE;
+}
+
+static void TrigDrawModelLabel(const RwV3d *pv, const RwChar *psz, RwUInt32 dwColour, const RwMatrix *pCamLtm)
+{
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)TrigDrawCharset());
+    TrigDrawText(psz, pv, pCamLtm, dwColour);
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+}
+
+// The models: each clump in range drawn by the mode (a ring around its atomics in its section
+// slot's colour or its owner's, or each atomic with a skip flag), the inspected one in yellow.
+static void TrigDrawModels(const RwV3d *pvCam, const RwMatrix *pCamLtm)
+{
+    TrigDrawModelPass best;
+    RwInt32 i;
+
+    TrigDrawModelsGather();
+    g_nTrigDrawModels = s_nModels;
+    memset(g_anTrigDrawModelsBySlot, 0, sizeof(g_anTrigDrawModelsBySlot));
+    g_nTrigDrawModelsSkipLines = 0;
+    g_nTrigDrawModelsSkipShots = 0;
+    memset(&best, 0, sizeof(best));
+    best.fBestT = 1e30f;
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (i = 0; i < s_nModels; i++)
+    {
+        RpClump *pClump = s_apModels[i];
+
+        __try
+        {
+            TrigDrawModelPass pass;
+            type_3D96F0 *pCx = sub_FBA10(pClump);
+            RwFrame *pFrame = RpClumpGetFrame(pClump);
+            RwInt32 nSlot = pCx->sub_FC440();
+            RwV3d vPos, vCentre;
+            RwReal dx, dy, dz, fR;
+            RwUInt32 dwColour;
+
+            if (nSlot >= 0 && nSlot < SECTION_SLOTS)
+                g_anTrigDrawModelsBySlot[nSlot]++;
+            else if (nSlot == 0x7FFF)
+                g_anTrigDrawModelsBySlot[SECTION_SLOTS]++;
+            else
+                g_anTrigDrawModelsBySlot[SECTION_SLOTS + 1]++;
+            if (pFrame == NULL)
+                continue;
+            vPos = RwFrameGetLTM(pFrame)->pos;
+            dx = vPos.x - pvCam->x;
+            dy = vPos.y - pvCam->y;
+            dz = vPos.z - pvCam->z;
+            if (g_fTrigDrawModelRange > 0.0f && dx * dx + dy * dy + dz * dz > g_fTrigDrawModelRange * g_fTrigDrawModelRange)
+                continue;
+            memset(&pass, 0, sizeof(pass));
+            pass.pClump = pClump;
+            pass.pClumpExt = pCx;
+            pass.pvCam = pvCam;
+            pass.pCamLtm = pCamLtm;
+            pass.fBestT = best.fBestT;
+            pass.vMin.x = pass.vMin.y = pass.vMin.z = 1e30f;
+            pass.vMax.x = pass.vMax.y = pass.vMax.z = -1e30f;
+            RpClumpForAllAtomics(pClump, TrigDrawModelAtomic, &pass);
+            if (pass.pBestClump)
+            {
+                best.fBestT = pass.fBestT;
+                best.pBestClump = pass.pBestClump;
+                best.pBestAtomic = pass.pBestAtomic;
+            }
+            if (pass.vMin.x > pass.vMax.x)
+            {
+                vCentre = vPos;
+                fR = 20.0f;
+            }
+            else
+            {
+                vCentre.x = (pass.vMin.x + pass.vMax.x) * 0.5f;
+                vCentre.y = pass.vMin.y;
+                vCentre.z = (pass.vMin.z + pass.vMax.z) * 0.5f;
+                fR = (pass.vMax.x - pass.vMin.x) > (pass.vMax.z - pass.vMin.z) ? (pass.vMax.x - pass.vMin.x) * 0.5f
+                                                                               : (pass.vMax.z - pass.vMin.z) * 0.5f;
+            }
+            if (!g_bTrigDrawModels || (g_nTrigDrawModelMode != 1 && g_nTrigDrawModelMode != 3))
+                continue;
+            dwColour = g_nTrigDrawModelMode == 1 ? TrigDrawSlotColour(nSlot) : TrigDrawOwnerColour(sub_FBBB0(pClump));
+            TrigDrawFlatRing(&vCentre, fR, dwColour, 16);
+            if (g_bTrigDrawModelLabels && TrigDrawCharset() != NULL && dx * dx + dy * dy + dz * dz < 1500.0f * 1500.0f)
+            {
+                RwChar sz[48];
+                RwV3d vAt = vCentre;
+
+                if (g_nTrigDrawModelMode == 1)
+                {
+                    if (nSlot == 0x7FFF)
+                        _snprintf(sz, sizeof(sz), "global");
+                    else if (nSlot >= 0 && nSlot < SECTION_SLOTS)
+                        _snprintf(sz, sizeof(sz), "slot %d S_%d", nSlot, pCx->get_unk_0A());
+                    else
+                        _snprintf(sz, sizeof(sz), "not placed");
+                }
+                else
+                {
+                    type_3D3548 *pOwner = sub_FBBB0(pClump);
+
+                    _snprintf(sz, sizeof(sz), "%s", pOwner ? TrigDrawKindWord(pOwner->unk_2C) : "no owner");
+                }
+                sz[sizeof(sz) - 1] = 0;
+                vAt.y += 5.0f;
+                TrigDrawPathFlush();
+                TrigDrawModelLabel(&vAt, sz, dwColour, pCamLtm);
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+    // (the inspector)
+    if (g_bTrigDrawInspect)
+    {
+        __try
+        {
+            if (!g_bTrigDrawInspectFreeze)
+            {
+                if (best.pBestClump)
+                    TrigDrawInspectFill(best.pBestClump, best.pBestAtomic);
+                else
+                    g_TrigDrawInspected.bValid = FALSE;
+            }
+            if (g_TrigDrawInspected.bValid && g_TrigDrawInspected.fRadius > 0.0f)
+            {
+                RwV3d vUp = g_TrigDrawInspected.vCentre;
+
+                TrigDrawFlatRing(&g_TrigDrawInspected.vCentre, g_TrigDrawInspected.fRadius, 0xFFFFFF40, 24);
+                vUp.y += g_TrigDrawInspected.fRadius;
+                TrigDrawPathLine(&g_TrigDrawInspected.vCentre, &vUp, 0xFFFFFF40);
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            g_TrigDrawInspected.bValid = FALSE;
+        }
+    }
+    TrigDrawPathFlush();
+}
+
+// A bone's world matrix as the game reads it (sub_EC310): the skin's matrix array (through the
+// clump's frame for local-space matrices), else the node frame's LTM.
+static RwBool TrigDrawBoneMatrix(RpClump *pClump, RpHAnimHierarchy *pH, RwBool bSkin, RwInt32 n, RwMatrix *pOut)
+{
+    if (bSkin)
+    {
+        if (pH->pMatrixArray == NULL)
+            return FALSE;
+        if (pH->flags & rpHANIMHIERARCHYLOCALSPACEMATRICES)
+            RwMatrixMultiply(pOut, &pH->pMatrixArray[n], RwFrameGetLTM(RpClumpGetFrame(pClump)));
+        else
+            *pOut = pH->pMatrixArray[n];
+        return TRUE;
+    }
+    if (pH->pNodeInfo == NULL || pH->pNodeInfo[n].pFrame == NULL)
+        return FALSE;
+    *pOut = *RwFrameGetLTM(pH->pNodeInfo[n].pFrame);
+    return TRUE;
+}
+
+// The skeletons: each bone a line from its parent (the hierarchy's push and pop flags give the
+// parents), cyan; with the rest offsets, a cross where the bone's rest translation (chunk
+// 0x4212) puts it under its posed parent: white where the bone is there (the game's own
+// animation scheme 0x1142 always takes its translations from them, sub_7DEB0), orange with a
+// line to the bone where its animation gives the bone a translation of its own.
+static void TrigDrawSkeletonsAll(const RwV3d *pvCam)
+{
+    RwInt32 i;
+
+    g_nTrigDrawSkeletons = 0;
+    TrigDrawModelsGather();
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, (void *)NULL);
+    for (i = 0; i < s_nModels; i++)
+    {
+        RpClump *pClump = s_apModels[i];
+
+        __try
+        {
+            RpHAnimHierarchy *pH = sub_16D970(pClump);
+            RwV3d *avRest = sub_EC270(pClump);
+            RwFrame *pFrame = RpClumpGetFrame(pClump);
+            RwInt32 anParent[256], anStack[64];
+            RwInt32 nTop = 0, nParent = -1, k;
+            RwBool bSkin;
+            RwV3d vPos;
+            RwReal dx, dy, dz;
+            static RwMatrix s_am[256];
+
+            if (pH == NULL || pFrame == NULL || pH->numNodes < 2 || pH->numNodes > 256 || pH->pNodeInfo == NULL)
+                continue;
+            vPos = RwFrameGetLTM(pFrame)->pos;
+            dx = vPos.x - pvCam->x;
+            dy = vPos.y - pvCam->y;
+            dz = vPos.z - pvCam->z;
+            if (g_fTrigDrawSkeletonRange > 0.0f &&
+                dx * dx + dy * dy + dz * dz > g_fTrigDrawSkeletonRange * g_fTrigDrawSkeletonRange)
+                continue;
+            bSkin = RWS::SkinHelper::FindFirstSkin(*pClump) != NULL;
+            for (k = 0; k < pH->numNodes; k++)
+            {
+                anParent[k] = nParent;
+                if ((pH->pNodeInfo[k].flags & 2) && nTop < 64)
+                    anStack[nTop++] = nParent;
+                if (pH->pNodeInfo[k].flags & 1)
+                    nParent = nTop > 0 ? anStack[--nTop] : -1;
+                else
+                    nParent = k;
+                if (!TrigDrawBoneMatrix(pClump, pH, bSkin, k, &s_am[k]))
+                    break;
+            }
+            if (k < pH->numNodes)
+                continue;
+            g_nTrigDrawSkeletons++;
+            for (k = 0; k < pH->numNodes; k++)
+            {
+                const RwMatrix *pParent = anParent[k] >= 0 ? &s_am[anParent[k]] : RwFrameGetLTM(pFrame);
+
+                if (anParent[k] >= 0)
+                    TrigDrawPathLine(&pParent->pos, &s_am[k].pos, 0xFF40E0FF);
+                if (g_bTrigDrawSkeletonRest && avRest)
+                {
+                    RwV3d v;
+                    RwReal ex, ey, ez;
+
+                    RwV3dTransformPoints(&v, &avRest[k], 1, pParent);
+                    ex = v.x - s_am[k].pos.x;
+                    ey = v.y - s_am[k].pos.y;
+                    ez = v.z - s_am[k].pos.z;
+                    if (ex * ex + ey * ey + ez * ez > 0.25f)
+                    {
+                        TrigDrawCross(&v, 1.0f, 0xFFFFA040);
+                        TrigDrawPathLine(&v, &s_am[k].pos, 0xFFFFA040);
+                    }
+                    else
+                        TrigDrawCross(&v, 0.6f, 0x90FFFFFF);
+                }
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+    TrigDrawPathFlush();
+}
+
+// The model cache (the GodAsset manager's file records, dword_4F26D4: a file's key, a value
+// and the clump read for it, reused when the same model is asked for again): each record, the
+// clump's holders, how many entities use that very clump, its atomics and mount points.
+void TrigDrawCacheRefresh()
+{
+    RwInt32 b, i;
+
+    g_nTrigDrawCache = 0;
+    __try
+    {
+        if (dword_4F26D4.unk_30 == NULL)
+            return;
+        for (b = 0; b < dword_4F26D4.unk_04 && b < 4096; b++)
+        {
+            alfahash_node *pNode = dword_4F26D4.unk_30[b];
+            RwInt32 nGuard = 0;
+
+            for (; pNode != NULL && nGuard < 1000 && g_nTrigDrawCache < TRIGDRAW_CACHE; pNode = pNode->unk_04, nGuard++)
+            {
+                const type_4F277C *r = (const type_4F277C *)pNode->unk_00;
+                TrigDrawCacheInfo *o;
+                RpClump *pClump;
+
+                if (r == NULL)
+                    continue;
+                o = &g_aTrigDrawCache[g_nTrigDrawCache++];
+                memset(o, 0, sizeof(*o));
+                o->nFile = r->unk_00;
+                o->nValue = r->unk_04;
+                pClump = (RpClump *)(size_t)r->unk_08;
+                o->pClump = pClump;
+                if (pClump == NULL)
+                    continue;
+                o->nHolders = TrigDrawHolders(sub_FBA10(pClump));
+                RpClumpForAllAtomics(pClump, TrigDrawCountAtomic, &o->nAtomics);
+                o->nMounts = sub_EC6C0(pClump)->unk_04 ? (RwInt32)sub_EC6C0(pClump)->unk_04->unk_00 : 0;
+                for (i = 0; i < 0x300; i++)
+                {
+                    type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+
+                    if (pEntity && (pEntity->unk_25C.unk_08 == pClump || pEntity->unk_268.unk_08 == pClump))
+                        o->nUsers++;
+                }
+            }
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+}
+
 void TrigDrawAll(RwCamera *pCamera)
 {
     void *pRaster;
@@ -4462,11 +5490,26 @@ void TrigDrawAll(RwCamera *pCamera)
             g_bTrigDrawSquads = TRUE;
         if (GetEnvironmentVariableA("CODFH_HEARING", NULL, 0))
             g_bTrigDrawHearing = g_bTrigDrawHearRadii = TRUE;
+        // (CODFH_MOUNTS=1: the models' mount points)
+        if (GetEnvironmentVariableA("CODFH_MOUNTS", NULL, 0))
+            g_bTrigDrawMounts = TRUE;
+        // (CODFH_MODELS=n: the models coloured, 1 by section, 2 the skip flags, 3 by owner;
+        // CODFH_INSPECT=1 the inspector; CODFH_SKELETONS=1 the skeletons)
+        if (GetEnvironmentVariableA("CODFH_MODELS", szValue, sizeof(szValue)))
+        {
+            g_bTrigDrawModels = TRUE;
+            g_nTrigDrawModelMode = atoi(szValue) >= 1 && atoi(szValue) <= 3 ? atoi(szValue) : 1;
+        }
+        if (GetEnvironmentVariableA("CODFH_INSPECT", NULL, 0))
+            g_bTrigDrawInspect = TRUE;
+        if (GetEnvironmentVariableA("CODFH_SKELETONS", NULL, 0))
+            g_bTrigDrawSkeletons = TRUE;
     }
     if ((!g_bTrigDrawEnabled && !g_bTrigDrawCollision && !g_bTrigDrawPathNodes && !g_bTrigDrawAi && !g_bTrigDrawPg &&
          !g_bTrigDrawGimps && !g_bTrigDrawShrimps && !g_bTrigDrawSounds && !g_bTrigDrawProjectiles &&
          !g_bTrigDrawSplines && !g_bTrigDrawRays && !g_bTrigDrawHits && !g_bTrigDrawHitBoxes && !g_bTrigDrawLights &&
-         !g_bTrigDrawZones && !g_bTrigDrawSquads && !g_bTrigDrawHearing) ||
+         !g_bTrigDrawZones && !g_bTrigDrawSquads && !g_bTrigDrawHearing && !g_bTrigDrawMounts &&
+         !g_bTrigDrawModels && !g_bTrigDrawInspect && !g_bTrigDrawSkeletons) ||
         pCamera == NULL)
         return;
     pCamLtm = RwFrameGetLTM(RwCameraGetFrame(pCamera));
@@ -4514,6 +5557,12 @@ void TrigDrawAll(RwCamera *pCamera)
         TrigDrawHits(&vCam, pCamLtm);
     if (g_bTrigDrawLights)
         TrigDrawLights(&vCam, pCamLtm);
+    if (g_bTrigDrawMounts)
+        TrigDrawMounts(&vCam, pCamLtm);
+    if (g_bTrigDrawModels || g_bTrigDrawInspect)
+        TrigDrawModels(&vCam, pCamLtm);
+    if (g_bTrigDrawSkeletons)
+        TrigDrawSkeletonsAll(&vCam);
     if (g_bTrigDrawZones)
         TrigDrawZones(&vCam, pCamLtm);
     if (g_bTrigDrawSquads)

@@ -27,6 +27,9 @@
 #include <string.h>
 
 #include "rpplugin.h"
+#ifdef CODFH_DRAW_TRIGGERS
+#include <intrin.h>
+#endif
 #include "rpdbgerr.h"
 #include "rprandom.h"
 
@@ -261,6 +264,10 @@ RpRandomSeed(RwUInt32 seed)
  */
 // match: _RpRandom @ 0x002E8020
 // sp-match: _RpRandom @ 0x00202AC0
+#ifdef CODFH_DRAW_TRIGGERS
+/* (the port's debug tools: port/src/debug/trigrng.cpp counts the calls) */
+extern void PortRngNote(RwInt32 nGen, const void *pCaller, RwUInt32 dwValue);
+#endif
 RwUInt32
 RpRandom(void)
 {
@@ -297,8 +304,30 @@ RpRandom(void)
     }
     else if (++RWRANDOMGLOBAL(rptr) >= RWRANDOMGLOBAL(end_ptr))
         RWRANDOMGLOBAL(rptr) = RWRANDOMGLOBAL(randomTable);
+#ifdef CODFH_DRAW_TRIGGERS
+    PortRngNote(0, _ReturnAddress(), (RwUInt32)i);
+#endif
     RWRETURN(i);
 }
+
+#ifdef CODFH_DRAW_TRIGGERS
+/* (the port's debug tools: a fingerprint of the state, its table and where its two
+ * pointers are; equal fingerprints, equal numbers to come) */
+RwUInt32
+_rpRandomStateHash(void)
+{
+    RwUInt32            h = 2166136261u;
+    RwInt32             i;
+
+    if (!RWRANDOMGLOBAL(randomTable))
+        return 0;
+    for (i = 0; i < DEG_3; i++)
+        h = (h ^ RWRANDOMGLOBAL(randomTable)[i]) * 16777619u;
+    h = (h ^ (RwUInt32)(RWRANDOMGLOBAL(fptr) - RWRANDOMGLOBAL(randomTable))) * 16777619u;
+    h = (h ^ (RwUInt32)(RWRANDOMGLOBAL(rptr) - RWRANDOMGLOBAL(randomTable))) * 16777619u;
+    return h;
+}
+#endif
 
 /**
  * \ingroup rprandom

@@ -79,9 +79,16 @@ void sub_D95A0()
 }
 // match: ?sub_D9610@@YAXXZ @ 0x000D9610
 // sp-match: ?sub_D9610@@YAXXZ @ 0x000A44A0
+#ifdef CODFH_DRAW_TRIGGERS
+// (the port's debug tools, port/src/debug/trigrng.cpp: a restart for the random numbers)
+void TrigRngOnRestart();
+#endif
 void sub_D9610()
 {
     sub_D95A0();
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigRngOnRestart();
+#endif
 }
 // match: ?sub_D9620@@YAXXZ @ 0x000D9620
 // sp-match: ?sub_D9620@@YAXXZ @ 0x000A44B0

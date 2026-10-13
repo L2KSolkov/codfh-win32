@@ -197,8 +197,9 @@ extern type_4B8600 (&dword_4B8600)[16];
 extern type_4B8600 dword_4B8600[16];
 #endif
 
-// dword_4E5D30: four collision-world entries (type_4E5D30).
-extern type_4E5D30 dword_4E5D30[4];
+// dword_4E5D30: four collision-world entries (type_4E5D30); more with CODFH_ALL_SECTIONS.
+#include "game/sectionslots.h"
+extern type_4E5D30 dword_4E5D30[SECTION_SLOTS];
 
 // The checkpoint register ("SetCheckPointRegister", "GetCheckPointRegister"),
 // the key of the checkpoint object it names (dword_4B914C) and the default

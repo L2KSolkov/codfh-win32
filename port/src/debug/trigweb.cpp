@@ -62,7 +62,8 @@
 #undef bind
 #undef sendto
 
-extern type_4E5D30 dword_4E5D30[4];
+#include "game/sectionslots.h"
+extern type_4E5D30 dword_4E5D30[SECTION_SLOTS];
 extern "C" volatile unsigned port_frame;
 
 // (trigdraw.cpp and trigtools.cpp)

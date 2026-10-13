@@ -988,7 +988,7 @@ RwInt32 sub_142F70(RwStream *arg_0, type_141C10 *arg_4)
     if (stk_C)
         sub_19A750("Received abort of section load...\n");
 #endif
-    if (var_10 >= 0 && var_10 < 4)
+    if (var_10 >= 0 && var_10 < SECTION_SLOTS)
         get_4E5D30(var_10)->unk_04 = 0;
     return var_10;
 }

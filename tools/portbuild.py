@@ -246,6 +246,11 @@ def main():
     # (single player: the debug prints multiplayer kept; --no-sp-logs leaves them out)
     if SINGLE_PLAYER and '--no-sp-logs' not in args:
         PORT_FLAGS.append('/DCODFH_SP_LOGS')
+    # (the game's builds, single player's and multiplayer's: room to load every section of a level
+    # at once, the debug tools' switch (so not the dedicated server, which has no tools);
+    # --no-all-sections leaves it out)
+    if '--dedicated' not in args and '--no-debug-tools' not in args and imgui and '--no-all-sections' not in args:
+        PORT_FLAGS.append('/DCODFH_ALL_SECTIONS')
     os.makedirs(OUT, exist_ok=True)
     only = [args[i + 1] for i, a in enumerate(args) if a == '--only']
     jobs_n = int(args[args.index('--jobs') + 1]) if '--jobs' in args else (os.cpu_count() or 4)

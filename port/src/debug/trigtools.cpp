@@ -60,6 +60,10 @@
 #include "types/type_44350.h"
 #include "types/scriptvm.h"
 #include "types/alfaobject.h"
+#include <dbghelp.h>
+#include "types/alfatimer.h"
+#include "types/alfamessman.h"
+#include "types/type_42AF0.h"
 #include "types/type_10F710.h"
 #include "game/functions.h"
 #include "game/worldmgr.h"
@@ -118,6 +122,10 @@ extern RwReal g_fTrigDrawCollisionRange;
 extern RwReal g_fTrigDrawCollisionLift;
 #include "trigcoll.h"
 #include "trigsndproj.h"
+#include "types/vec4.h"
+#include "rw/rprandom.h"
+#include <float.h>
+#include <stdlib.h>
 extern RwBool g_bTrigDrawFreeCam;
 // (trigweb.cpp: the level viewer's live link)
 extern RwBool g_bTrigLive;
@@ -154,7 +162,8 @@ const RwChar *TrigDrawKindName(Trigger *pTrigger);
 const RwChar *TrigDrawTriggerName(Trigger *pTrigger);   // (trignames.cpp)
 // The section slots, the global section, and the starting sections
 // (unit_171DC0, unit_0B0410).
-extern type_4E5D30 dword_4E5D30[4];
+#include "game/sectionslots.h"
+extern type_4E5D30 dword_4E5D30[SECTION_SLOTS];
 extern type_4E5D30 unk_4E5CD8;
 extern RwInt32 dword_4B6830[4];
 extern RwInt32 dword_4B6840[4];
@@ -954,6 +963,13 @@ static void CheatTick()
 
 // Called each frame on the main thread (sub_D7880): carries out the pending
 // action from a tab, and a weapon give in progress.
+#ifdef CODFH_ALL_SECTIONS
+static void AllSectionsTick();      // (below, with the Sections tab)
+#endif
+
+static void WaitsLogTick();
+static void TrigMsgTick();
+
 void TrigWebTick()
 {
     type_10F710 *pPlayer;
@@ -962,6 +978,12 @@ void TrigWebTick()
     CheatTick();
     TickGive();
     TrigLiveTick();
+    TrigRngFrame();
+    WaitsLogTick();
+    TrigMsgTick();
+#ifdef CODFH_ALL_SECTIONS
+    AllSectionsTick();
+#endif
     if (!s_bReqPending)
         return;
     pPlayer = (type_10F710 *)sub_1745A0(0);
@@ -1414,12 +1436,674 @@ static void ViewTriggers()
     }
 }
 
+static void EntityKind(RwUInt32 dwBits, RwChar *psz);
+
+// ---- Speedrun: the random numbers, the frame timing ----
+
+// The random numbers: who draws them, how many, the generators' state, and seeding.
+static void ViewRng()
+{
+    static const RwChar *const s_apszGen[2] = { "RpRandom", "rand()" };
+    static RwInt32 s_nSort;     // 0 by count, 1 by last frame
+    static RwBool s_bOnlyPerFrame;
+    RwInt32 i, k;
+
+    Check("record the calls", &g_bTrigRngRecord);
+    ImGui::SameLine();
+    if (ImGui::Button("clear"))
+        TrigRngReset();
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("(the game never seeds its generators: RenderWare's RpRandom starts from 0x9A319039 when the "
+                        "engine opens, rand() from 1. So what a run gets depends only on how many numbers were drawn "
+                        "before; anything that draws every frame makes the frame rate change the outcome)");
+    ImGui::PopTextWrapPos();
+    if (ImGui::BeginTable("rngstate", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit))
+    {
+        ImGui::TableSetupColumn("generator");
+        ImGui::TableSetupColumn("state fingerprint");
+        ImGui::TableSetupColumn("calls");
+        ImGui::TableSetupColumn("since the restart");
+        ImGui::TableSetupColumn("last frame");
+        ImGui::TableSetupColumn("a second");
+        ImGui::TableHeadersRow();
+        for (k = 0; k < 2; k++)
+        {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(s_apszGen[k]);
+            ImGui::TableNextColumn();
+            ImGui::Text("%08X", TrigRngStateHash(k));
+            ImGui::TableNextColumn();
+            ImGui::Text("%u", g_anTrigRngTotal[k]);
+            ImGui::TableNextColumn();
+            ImGui::Text("%u", g_anTrigRngSinceRestart[k]);
+            ImGui::TableNextColumn();
+            ImGui::Text("%u", g_anTrigRngLastFrame[k]);
+            ImGui::TableNextColumn();
+            ImGui::Text("%.0f", g_afTrigRngPerSecond[k]);
+        }
+        ImGui::EndTable();
+    }
+    ImGui::TextDisabled("(the fingerprint changes with every number drawn; two runs with the same fingerprint at the "
+                        "same point get the same numbers from there. %d restarts seen)", g_nTrigRngRestarts);
+
+    ImGui::SeparatorText("Seeding");
+    {
+        static RwChar s_szSeed[16] = "12345";
+
+        ImGui::SetNextItemWidth(140.0f);
+        if (ImGui::InputText("seed (decimal, or 0x hex)", s_szSeed, sizeof(s_szSeed)))
+            g_dwTrigRngSeed = (RwUInt32)strtoul(s_szSeed, NULL, 0);
+        if (ImGui::Button("seed both now"))
+            TrigRngSeedNow(g_dwTrigRngSeed);
+        ImGui::SameLine();
+        if (ImGui::Button("back to the game's own seeds"))
+        {
+            RwBool bRecord = g_bTrigRngRecord;
+
+            g_bTrigRngRecord = FALSE;
+            RpRandomSeed(0x9A319039u);
+            srand(1);
+            g_bTrigRngRecord = bRecord;
+        }
+        Check("reseed both at every restart (a level's start, a checkpoint, a death)", &g_bTrigRngSeedOnRestart);
+        ImGui::PushTextWrapPos(0.0f);
+        ImGui::TextDisabled("(for practice: every attempt from a checkpoint then starts from the same numbers, so the "
+                            "same inputs give the same enemies, spreads and effects, as far as the frame timing is the "
+                            "same too. Not for timed runs: the game itself never reseeds)");
+        ImGui::PopTextWrapPos();
+    }
+
+    if (!g_bTrigRngRecord)
+        return;
+    ImGui::SeparatorText("Who draws them");
+    ImGui::RadioButton("by calls", &s_nSort, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("by the last frame", &s_nSort, 1);
+    ImGui::SameLine();
+    Check("only those drawing every frame", &s_bOnlyPerFrame);
+    {
+        RwInt32 aOrder[TRIGRNG_CALLERS];
+        RwInt32 n = 0;
+
+        for (i = 0; i < g_nTrigRngCallers; i++)
+            if (!s_bOnlyPerFrame || g_aTrigRngCallers[i].nLastFrame > 0)
+                aOrder[n++] = i;
+        // (a small insertion sort: at most 256)
+        for (i = 1; i < n; i++)
+        {
+            RwInt32 v = aOrder[i], j = i - 1;
+            RwUInt32 fv = s_nSort ? g_aTrigRngCallers[v].nLastFrame : g_aTrigRngCallers[v].nCount;
+
+            while (j >= 0 && (s_nSort ? g_aTrigRngCallers[aOrder[j]].nLastFrame : g_aTrigRngCallers[aOrder[j]].nCount) < fv)
+            {
+                aOrder[j + 1] = aOrder[j];
+                j--;
+            }
+            aOrder[j + 1] = v;
+        }
+        if (ImGui::BeginTable("rngcallers", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+                              ImVec2(0.0f, 240.0f)))
+        {
+            ImGui::TableSetupScrollFreeze(0, 1);
+            ImGui::TableSetupColumn("caller (the image's address in its name)");
+            ImGui::TableSetupColumn("generator");
+            ImGui::TableSetupColumn("calls");
+            ImGui::TableSetupColumn("last frame");
+            ImGui::TableHeadersRow();
+            for (i = 0; i < n; i++)
+            {
+                TrigRngCaller *p = &g_aTrigRngCallers[aOrder[i]];
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::TextUnformatted(TrigRngCallerName(p));
+                ImGui::TableNextColumn();
+                ImGui::TextUnformatted(s_apszGen[p->nGen & 1]);
+                ImGui::TableNextColumn();
+                ImGui::Text("%u", p->nCount);
+                ImGui::TableNextColumn();
+                if (p->nLastFrame)
+                    ImGui::Text("%u", p->nLastFrame);
+                else
+                    ImGui::TextDisabled("0");
+            }
+            ImGui::EndTable();
+        }
+    }
+    if (ImGui::CollapsingHeader("the last calls"))
+    {
+        if (ImGui::BeginTable("rnglog", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+                              ImVec2(0.0f, 220.0f)))
+        {
+            RwInt32 nShown = g_nTrigRngLogTotal < TRIGRNG_LOG ? (RwInt32)g_nTrigRngLogTotal : TRIGRNG_LOG;
+
+            ImGui::TableSetupScrollFreeze(0, 1);
+            ImGui::TableSetupColumn("frame");
+            ImGui::TableSetupColumn("generator");
+            ImGui::TableSetupColumn("value");
+            ImGui::TableSetupColumn("caller");
+            ImGui::TableHeadersRow();
+            for (i = 1; i <= nShown; i++)
+            {
+                const TrigRngCall *c = &g_aTrigRngLog[(g_nTrigRngLogNext + TRIGRNG_LOG - i) % TRIGRNG_LOG];
+                TrigRngCaller *pName = NULL;
+
+                for (k = 0; k < g_nTrigRngCallers; k++)
+                    if (g_aTrigRngCallers[k].pAddr == c->pAddr && g_aTrigRngCallers[k].nGen == c->nGen)
+                    {
+                        pName = &g_aTrigRngCallers[k];
+                        break;
+                    }
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("%u", c->dwFrame);
+                ImGui::TableNextColumn();
+                ImGui::TextUnformatted(s_apszGen[c->nGen & 1]);
+                ImGui::TableNextColumn();
+                ImGui::Text("%u", c->dwValue);
+                ImGui::TableNextColumn();
+                if (pName)
+                    ImGui::TextUnformatted(TrigRngCallerName(pName));
+                else
+                    ImGui::Text("%p", c->pAddr);
+            }
+            ImGui::EndTable();
+        }
+    }
+}
+
+// The frame timing: game time against real time, the cap, the player's speed by each clock,
+// the random numbers a frame; the frame cap set live and a table to compare frame rates.
+static void ViewFrameRate()
+{
+    static float s_afPlot[TRIGFRAME_SAMPLES];
+    RwInt32 nCap = port_get_max_fps(), i;
+
+    Check("sample the frames", &g_bTrigFrameSample);
+    if (!g_bTrigFrameSample)
+    {
+        ImGui::TextDisabled("(off: nothing is measured)");
+        return;
+    }
+    ImGui::Text("%.1f fps; game time runs at %.3f of real time; %d of the last %d frames hit the cap", g_fTrigFrameFps,
+                g_fTrigFrameGameOverReal, g_nTrigFrameCapped, g_nTrigFrameCount);
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("(the game times a frame in 60ths of a second (deltaTime) and caps it at 5: below 12 fps the "
+                        "game itself slows down. Movement that scales by deltaTime keeps the same speed a game second "
+                        "at any frame rate; anything done once a frame, random numbers included, happens more often "
+                        "at a higher one)");
+    ImGui::PopTextWrapPos();
+
+    ImGui::SeparatorText("Frame cap");
+    {
+        static const RwInt32 s_anCaps[6] = { 20, 30, 60, 120, 144, 0 };
+
+        ImGui::Text("now: %s", nCap > 0 ? "" : "uncapped");
+        if (nCap > 0)
+        {
+            ImGui::SameLine(0.0f, 0.0f);
+            ImGui::Text("%d", nCap);
+        }
+        for (i = 0; i < 6; i++)
+        {
+            RwChar sz[16];
+
+            if (i)
+                ImGui::SameLine();
+            if (s_anCaps[i])
+                sprintf(sz, "%d##cap", s_anCaps[i]);
+            else
+                strcpy(sz, "uncapped##cap");
+            if (ImGui::Button(sz))
+                port_set_max_fps(s_anCaps[i]);
+        }
+        {
+            int n = nCap;
+
+            ImGui::SetNextItemWidth(200.0f);
+            if (ImGui::SliderInt("cap (0 uncapped)", &n, 0, 300))
+                port_set_max_fps(n);
+        }
+        ImGui::TextDisabled("(for this session only; [video] max_fps in codfh.ini keeps one. With vsync on, the "
+                            "display paces frames when it is no faster than the cap)");
+    }
+
+    ImGui::SeparatorText("The last frames");
+    for (i = 0; i < g_nTrigFrameCount; i++)
+        s_afPlot[i] = g_aTrigFrameSamples[(g_nTrigFrameNext + TRIGFRAME_SAMPLES - g_nTrigFrameCount + i) % TRIGFRAME_SAMPLES].fRealMs;
+    ImGui::PlotLines("real ms", s_afPlot, g_nTrigFrameCount, 0, NULL, 0.0f, 100.0f, ImVec2(0.0f, 50.0f));
+    for (i = 0; i < g_nTrigFrameCount; i++)
+        s_afPlot[i] = g_aTrigFrameSamples[(g_nTrigFrameNext + TRIGFRAME_SAMPLES - g_nTrigFrameCount + i) % TRIGFRAME_SAMPLES].fRaw;
+    ImGui::PlotLines("deltaTime before the cap", s_afPlot, g_nTrigFrameCount, 0, NULL, 0.0f, 6.0f, ImVec2(0.0f, 50.0f));
+    for (i = 0; i < g_nTrigFrameCount; i++)
+        s_afPlot[i] = g_aTrigFrameSamples[(g_nTrigFrameNext + TRIGFRAME_SAMPLES - g_nTrigFrameCount + i) % TRIGFRAME_SAMPLES].fSpeedGame;
+    ImGui::PlotLines("speed a game second", s_afPlot, g_nTrigFrameCount, 0, NULL, 0.0f, FLT_MAX, ImVec2(0.0f, 50.0f));
+    for (i = 0; i < g_nTrigFrameCount; i++)
+        s_afPlot[i] = g_aTrigFrameSamples[(g_nTrigFrameNext + TRIGFRAME_SAMPLES - g_nTrigFrameCount + i) % TRIGFRAME_SAMPLES].fSpeedReal;
+    ImGui::PlotLines("speed a real second", s_afPlot, g_nTrigFrameCount, 0, NULL, 0.0f, FLT_MAX, ImVec2(0.0f, 50.0f));
+    if (g_bTrigRngRecord)
+    {
+        for (i = 0; i < g_nTrigFrameCount; i++)
+        {
+            const TrigFrameSample *f =
+                &g_aTrigFrameSamples[(g_nTrigFrameNext + TRIGFRAME_SAMPLES - g_nTrigFrameCount + i) % TRIGFRAME_SAMPLES];
+
+            s_afPlot[i] = (float)(f->anRng[0] + f->anRng[1]);
+        }
+        ImGui::PlotLines("random numbers a frame", s_afPlot, g_nTrigFrameCount, 0, NULL, 0.0f, FLT_MAX, ImVec2(0.0f, 50.0f));
+    }
+    else
+        ImGui::TextDisabled("(turn on recording in the RNG view to plot the random numbers a frame)");
+
+    ImGui::SeparatorText("Compare frame rates");
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("(set a cap, do the same thing for a few seconds (run in a straight line, stand still in a "
+                        "fight), then note it; repeat at another cap. Equal speed a game second and equal random numbers "
+                        "a game second at every cap: the frame rate changes nothing there)");
+    ImGui::PopTextWrapPos();
+    if (ImGui::Button("note the last 240 frames"))
+        TrigFrameNoteNow();
+    ImGui::SameLine();
+    if (ImGui::Button("clear the notes"))
+        g_nTrigFrameNotes = 0;
+    if (g_nTrigFrameNotes > 0 &&
+        ImGui::BeginTable("framenotes", 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit))
+    {
+        ImGui::TableSetupColumn("cap");
+        ImGui::TableSetupColumn("fps");
+        ImGui::TableSetupColumn("game/real");
+        ImGui::TableSetupColumn("capped frames");
+        ImGui::TableSetupColumn("speed/game s");
+        ImGui::TableSetupColumn("speed/real s");
+        ImGui::TableSetupColumn("RpRandom/game s");
+        ImGui::TableSetupColumn("rand()/game s");
+        ImGui::TableHeadersRow();
+        for (i = 0; i < g_nTrigFrameNotes; i++)
+        {
+            const TrigFrameNote *n = &g_aTrigFrameNotes[i];
+
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (n->nMaxFps > 0)
+                ImGui::Text("%d", n->nMaxFps);
+            else
+                ImGui::TextUnformatted("none");
+            ImGui::TableNextColumn();
+            ImGui::Text("%.1f", n->fFps);
+            ImGui::TableNextColumn();
+            ImGui::Text("%.3f", n->fGameOverReal);
+            ImGui::TableNextColumn();
+            ImGui::Text("%d", n->nCapped);
+            ImGui::TableNextColumn();
+            ImGui::Text("%.1f", n->fSpeedGame);
+            ImGui::TableNextColumn();
+            ImGui::Text("%.1f", n->fSpeedReal);
+            ImGui::TableNextColumn();
+            ImGui::Text("%.1f", n->afRngPerGameSecond[0]);
+            ImGui::TableNextColumn();
+            ImGui::Text("%.1f", n->afRngPerGameSecond[1]);
+        }
+        ImGui::EndTable();
+    }
+}
+
+// The collision's surfaces: the surface ids (the material extension's low word) of the kinds
+// seen this frame, their triangles summed, each in its drawing colour.
+static void CollisionSurfaces()
+{
+    struct Surface { RwInt32 nId, nTriangles, nKinds; };
+    static Surface s_a[TRIGDRAW_COLLKINDS];
+    RwInt32 n = 0, i, k;
+
+    Check("colour by surface id", &g_bTrigDrawCollBySurface);
+    ImGui::SameLine();
+    ImGui::TextDisabled("(what footsteps, landings and impact effects look up; magenta: untagged)");
+    for (i = 0; i < g_nTrigDrawCollKinds; i++)
+    {
+        RwInt32 nId = (RwInt32)(g_aTrigDrawCollKinds[i].dwTag & 0xFFFF);
+
+        for (k = 0; k < n; k++)
+            if (s_a[k].nId == nId)
+                break;
+        if (k == n)
+        {
+            if (n >= TRIGDRAW_COLLKINDS)
+                continue;
+            s_a[n].nId = nId;
+            s_a[n].nTriangles = 0;
+            s_a[n].nKinds = 0;
+            n++;
+        }
+        s_a[k].nTriangles += g_aTrigDrawCollKinds[i].nTriangles;
+        s_a[k].nKinds++;
+    }
+    if (!g_bTrigDrawCollBySurface || n == 0)
+        return;
+    if (ImGui::BeginTable("surfaces", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+                          ImVec2(0.0f, 180.0f)))
+    {
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("surface id");
+        ImGui::TableSetupColumn("triangles drawn");
+        ImGui::TableSetupColumn("material kinds");
+        ImGui::TableHeadersRow();
+        for (i = 0; i < n; i++)
+        {
+            RwUInt32 dw = TrigDrawSurfaceColour(s_a[i].nId);
+
+            ImGui::PushID(i);
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::ColorButton("##sc", ImVec4(((dw >> 16) & 0xFF) / 255.0f, ((dw >> 8) & 0xFF) / 255.0f,
+                                              (dw & 0xFF) / 255.0f, 1.0f),
+                               ImGuiColorEditFlags_NoTooltip, ImVec2(14.0f, 14.0f));
+            ImGui::SameLine();
+            if (s_a[i].nId == 0xFFFF)
+                ImGui::TextUnformatted("untagged");
+            else
+                ImGui::Text("%d", s_a[i].nId);
+            ImGui::TableNextColumn();
+            ImGui::Text("%d", s_a[i].nTriangles);
+            ImGui::TableNextColumn();
+            ImGui::Text("%d", s_a[i].nKinds);
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
+}
+
+// The models: what each is and where it went (the game's atomic and clump extensions).
+static void ViewModels()
+{
+    static const RwChar *const s_apszModes[3] = { "by section", "the collision skip flags", "by owner" };
+    RwInt32 i;
+
+    Check("draw the models", &g_bTrigDrawModels);
+    ImGui::SameLine();
+    Check("labels##models", &g_bTrigDrawModelLabels);
+    for (i = 0; i < 3; i++)
+    {
+        if (i)
+            ImGui::SameLine();
+        ImGui::RadioButton(s_apszModes[i], &g_nTrigDrawModelMode, i + 1);
+    }
+    ImGui::SliderFloat("model draw distance (0 unlimited)", &g_fTrigDrawModelRange, 0.0f, 50000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    ImGui::PushTextWrapPos(0.0f);
+    if (g_nTrigDrawModelMode == 1)
+        ImGui::TextDisabled("(a ring under each model in its section slot's colour, from the clump's extension: where "
+                            "the world manager placed it (sub_173080). White the global section, grey not placed)");
+    else if (g_nTrigDrawModelMode == 2)
+        ImGui::TextDisabled("(each atomic with a skip flag: orange bit 3, the line and sphere queries pass through it; "
+                            "purple bit 4, the projectiles do; red both. Nothing in the recovered code sets them, so "
+                            "any shown here were set by data)");
+    else
+        ImGui::TextDisabled("(a ring under each model in its owner's colour: green the player, blue soldiers, red "
+                            "enemies, yellow pickups, white other entities, grey no owner)");
+    ImGui::PopTextWrapPos();
+    if (g_bTrigDrawModels || g_bTrigDrawInspect)
+    {
+        ImGui::Text("%d models; atomics skipping lines %d, skipping projectiles %d", g_nTrigDrawModels,
+                    g_nTrigDrawModelsSkipLines, g_nTrigDrawModelsSkipShots);
+        if (ImGui::BeginTable("modelslots", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit))
+        {
+            ImGui::TableSetupColumn("placed in");
+            ImGui::TableSetupColumn("models");
+            ImGui::TableHeadersRow();
+            for (i = 0; i < SECTION_SLOTS + 2; i++)
+            {
+                RwInt32 nSection = i < SECTION_SLOTS ? (RwInt32)dword_4E5D30[i].unk_08 : 0;
+
+                if (g_anTrigDrawModelsBySlot[i] == 0)
+                    continue;
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                if (i < SECTION_SLOTS)
+                    ImGui::Text("slot %d (S_%d)", i, nSection);
+                else
+                    ImGui::TextUnformatted(i == SECTION_SLOTS ? "the global section" : "not placed");
+                ImGui::TableNextColumn();
+                ImGui::Text("%d", g_anTrigDrawModelsBySlot[i]);
+            }
+            ImGui::EndTable();
+        }
+    }
+
+    ImGui::SeparatorText("Inspector");
+    Check("inspect the model in the line of sight", &g_bTrigDrawInspect);
+    ImGui::SameLine();
+    Check("freeze", &g_bTrigDrawInspectFreeze);
+    if (g_bTrigDrawInspect)
+    {
+        const TrigDrawModelInfo *o = &g_TrigDrawInspected;
+
+        if (!o->bValid)
+            ImGui::TextDisabled("(no model in the line of sight)");
+        else if (ImGui::BeginTable("inspect", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit))
+        {
+            RwChar sz[128];
+
+#define INSPECT_ROW(name, ...) do { ImGui::TableNextRow(); ImGui::TableNextColumn(); ImGui::TextUnformatted(name); \
+                                    ImGui::TableNextColumn(); ImGui::Text(__VA_ARGS__); } while (0)
+            INSPECT_ROW("clump, atomic", "%p, %p", o->pClump, o->pAtomic);
+            if (o->pOwner)
+            {
+                EntityKind(o->dwOwnerBits, sz);
+                INSPECT_ROW("owner", "%p %s", o->pOwner, sz);
+            }
+            else
+                INSPECT_ROW("owner", "none (a world prop or a model no entity holds)");
+            INSPECT_ROW("clump flags", "0x%02X%s%s%s", o->dwClumpFlags, (o->dwClumpFlags & 1) ? " opaque" : "",
+                        (o->dwClumpFlags & 2) ? " alpha" : "", (o->dwClumpFlags & 4) ? " collision" : "");
+            INSPECT_ROW("atomic flags", "0x%02X%s%s%s%s%s", o->dwAtomicFlags, (o->dwAtomicFlags & 1) ? " opaque" : "",
+                        (o->dwAtomicFlags & 2) ? " alpha" : "", (o->dwAtomicFlags & 4) ? " collision" : "",
+                        (o->dwAtomicFlags & 8) ? " skips-lines" : "", (o->dwAtomicFlags & 0x10) ? " skips-shots" : "");
+            if (o->nClumpSlot == 0xFFFF)
+                INSPECT_ROW("clump placed", "not placed");
+            else if (o->nClumpSlot == 0x7FFF)
+                INSPECT_ROW("clump placed", "the global section");
+            else
+                INSPECT_ROW("clump placed", "slot %d (S_%d)", o->nClumpSlot, o->nClumpSection);
+            if (o->nAtomicSlot == 0xFFFF)
+                INSPECT_ROW("atomic placed", "not placed");
+            else if (o->nAtomicSlot == 0x7FFF)
+                INSPECT_ROW("atomic placed", "the global section");
+            else
+                INSPECT_ROW("atomic placed", "slot %d (S_%d)", o->nAtomicSlot, o->nAtomicSection);
+            INSPECT_ROW("holders (clump, atomic)", "%d, %d", o->nClumpHolders, o->nAtomicHolders);
+            if (o->nCacheKey)
+                INSPECT_ROW("model cache key", "0x%08X", (RwUInt32)o->nCacheKey);
+            else
+                INSPECT_ROW("model cache key", "none (a clone, or not from a model file)");
+            INSPECT_ROW("atomics, bones", "%d, %d", o->nAtomics, o->nBones);
+            INSPECT_ROW("mount points, kept-bone list", "%d, %d", o->nMounts, o->nKeepBones);
+            INSPECT_ROW("atomic part mask (unk_10)", "0x%08X", o->dwPartMask);
+            INSPECT_ROW("bounding sphere", "%.0f, %.0f, %.0f r %.1f", o->vCentre.x, o->vCentre.y, o->vCentre.z,
+                        o->fRadius);
+#undef INSPECT_ROW
+            ImGui::EndTable();
+        }
+    }
+
+    ImGui::SeparatorText("Model cache");
+    if (ImGui::CollapsingHeader("the loaded models' file records (dword_4F26D4)"))
+    {
+        TrigDrawCacheRefresh();
+        ImGui::Text("%d records%s", g_nTrigDrawCache, g_nTrigDrawCache >= TRIGDRAW_CACHE ? " (the list is full)" : "");
+        ImGui::PushTextWrapPos(0.0f);
+        ImGui::TextDisabled("(the GodAsset manager keeps the clump read for each model file, keyed by the file, and "
+                            "hands it out again; holders are who points at it, users the entities drawing that very "
+                            "clump. Most entities draw clones, so their own clumps are not here)");
+        ImGui::PopTextWrapPos();
+        if (ImGui::BeginTable("modelcache", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY |
+                                               ImGuiTableFlags_Sortable, ImVec2(0.0f, 260.0f)))
+        {
+            ImGui::TableSetupScrollFreeze(0, 1);
+            ImGui::TableSetupColumn("file key");
+            ImGui::TableSetupColumn("value");
+            ImGui::TableSetupColumn("clump");
+            ImGui::TableSetupColumn("holders");
+            ImGui::TableSetupColumn("users");
+            ImGui::TableSetupColumn("atomics");
+            ImGui::TableSetupColumn("mounts");
+            ImGui::TableHeadersRow();
+            for (i = 0; i < g_nTrigDrawCache; i++)
+            {
+                const TrigDrawCacheInfo *c = &g_aTrigDrawCache[i];
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("0x%08X", (RwUInt32)c->nFile);
+                ImGui::TableNextColumn();
+                ImGui::Text("%d", c->nValue);
+                ImGui::TableNextColumn();
+                ImGui::Text("%p", c->pClump);
+                ImGui::TableNextColumn();
+                ImGui::Text("%d", c->nHolders);
+                ImGui::TableNextColumn();
+                ImGui::Text("%d", c->nUsers);
+                ImGui::TableNextColumn();
+                ImGui::Text("%d", c->nAtomics);
+                ImGui::TableNextColumn();
+                ImGui::Text("%d", c->nMounts);
+            }
+            ImGui::EndTable();
+        }
+    }
+}
+
+// The skeletons and their rest offsets.
+static void ViewSkeletons()
+{
+    Check("draw the skeletons", &g_bTrigDrawSkeletons);
+    ImGui::SameLine();
+    Check("rest offsets", &g_bTrigDrawSkeletonRest);
+    ImGui::SliderFloat("skeleton draw distance (0 unlimited)", &g_fTrigDrawSkeletonRange, 0.0f, 20000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    if (g_bTrigDrawSkeletons)
+        ImGui::Text("%d skeletons drawn", g_nTrigDrawSkeletons);
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("(each bone a cyan line from its parent, as the animation poses it. With the rest offsets "
+                        "(the .sdf's chunk 0x4212, each bone's bind translation): a small white cross where the rest "
+                        "offset puts the bone under its posed parent and the bone is there, as the game's own "
+                        "animation scheme (0x1142) always does; orange with a line to the bone where its animation "
+                        "gives the bone a translation of its own, as standard keyframes can)");
+    ImGui::PopTextWrapPos();
+}
+
+// The zone editor: the zone the player is in, or any by its index; its ambient and its two
+// lights, changed in place (the level's own data, back to how it loaded with restore).
+static void ZoneEditor()
+{
+    struct Saved { type_8F3E0 *pZone; type_8BEC0 a[5]; };
+    static Saved s_aSaved[64];
+    static RwInt32 s_nSaved;
+    static RwInt32 s_nPick = -1;    // -1 the player's
+    type_8F3E0 *pZone = NULL;
+    RwInt32 nAll = dword_4B2550.unk_08 ? dword_4B2550.unk_00 : 0, i, nIndex = -1;
+    type_3D3548 *pPlayer = (type_3D3548 *)sub_1745A0(0);
+    Saved *pSaved = NULL;
+    static const void *s_pTable;
+
+    if (s_pTable != (const void *)dword_4B2550.unk_08)
+    {
+        s_pTable = (const void *)dword_4B2550.unk_08;
+        s_nSaved = 0;
+    }
+    ImGui::SeparatorText("Edit a zone");
+    if (nAll <= 0)
+    {
+        ImGui::TextDisabled("(this level has no zones)");
+        return;
+    }
+    ImGui::RadioButton("the player's zone", &s_nPick, -1);
+    ImGui::SameLine();
+    if (ImGui::RadioButton("by index", s_nPick >= 0) && s_nPick < 0)
+        s_nPick = 0;
+    if (s_nPick >= 0)
+    {
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(160.0f);
+        ImGui::SliderInt("zone##edit", &s_nPick, 0, nAll - 1);
+        pZone = dword_4B2550.get_zone(s_nPick);
+        nIndex = s_nPick;
+    }
+    else if (pPlayer)
+    {
+        __try
+        {
+            pZone = pPlayer->unk_90.unk_00;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            pZone = NULL;
+        }
+        for (i = 0; i < nAll && pZone; i++)
+            if (dword_4B2550.get_zone(i) == pZone)
+            {
+                nIndex = i;
+                break;
+            }
+    }
+    if (pZone == NULL)
+    {
+        ImGui::TextDisabled("(the player is in no zone)");
+        return;
+    }
+    // (its values as the level loaded them, kept the first time it is shown)
+    for (i = 0; i < s_nSaved; i++)
+        if (s_aSaved[i].pZone == pZone)
+            pSaved = &s_aSaved[i];
+    if (pSaved == NULL && s_nSaved < 64)
+    {
+        pSaved = &s_aSaved[s_nSaved++];
+        pSaved->pZone = pZone;
+        pSaved->a[0] = pZone->unk_30;
+        pSaved->a[1] = pZone->unk_40;
+        pSaved->a[2] = pZone->unk_50;
+        pSaved->a[3] = pZone->unk_60;
+        pSaved->a[4] = pZone->unk_70;
+    }
+    ImGui::Text("zone %d", nIndex);
+    ImGui::ColorEdit4("ambient##ze", &pZone->unk_30.unk_00, ImGuiColorEditFlags_Float | ImGuiColorEditFlags_HDR);
+    ImGui::DragFloat3("light 1 direction (all zero: none)##ze", &pZone->unk_40.unk_00, 0.01f, -1.0f, 1.0f, "%.2f");
+    ImGui::ColorEdit4("light 1 colour##ze", &pZone->unk_50.unk_00, ImGuiColorEditFlags_Float | ImGuiColorEditFlags_HDR);
+    ImGui::DragFloat3("light 2 direction (all zero: none)##ze", &pZone->unk_60.unk_00, 0.01f, -1.0f, 1.0f, "%.2f");
+    ImGui::ColorEdit4("light 2 colour##ze", &pZone->unk_70.unk_00, ImGuiColorEditFlags_Float | ImGuiColorEditFlags_HDR);
+    if (pSaved && ImGui::Button("restore this zone"))
+    {
+        pZone->unk_30 = pSaved->a[0];
+        pZone->unk_40 = pSaved->a[1];
+        pZone->unk_50 = pSaved->a[2];
+        pZone->unk_60 = pSaved->a[3];
+        pZone->unk_70 = pSaved->a[4];
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("restore all edited zones"))
+    {
+        for (i = 0; i < s_nSaved; i++)
+        {
+            s_aSaved[i].pZone->unk_30 = s_aSaved[i].a[0];
+            s_aSaved[i].pZone->unk_40 = s_aSaved[i].a[1];
+            s_aSaved[i].pZone->unk_50 = s_aSaved[i].a[2];
+            s_aSaved[i].pZone->unk_60 = s_aSaved[i].a[3];
+            s_aSaved[i].pZone->unk_70 = s_aSaved[i].a[4];
+        }
+    }
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("(the models in the zone change at once: their light rigs are built from these each frame. "
+                        "Edits last until the level unloads; a new level forgets them)");
+    ImGui::PopTextWrapPos();
+}
+
 static void ViewCollision()
 {
     Check("draw the collision worlds", &g_bTrigDrawCollision);
     ImGui::SliderFloat("collision draw distance", &g_fTrigDrawCollisionRange, 5.0f, 200.0f, "%.0f");
     ImGui::SliderFloat("collision lift along the normal", &g_fTrigDrawCollisionLift, 0.0f, 0.5f, "%.3f");
     CollisionKinds();
+    CollisionSurfaces();
 }
 
 // The AI: its path nodes, then the soldiers' state.
@@ -1679,6 +2363,8 @@ static void ViewHits()
 }
 
 // The level's lights.
+static void EntityKind(RwUInt32 dwBits, RwChar *psz);
+
 static void ViewLights()
 {
     RwInt32 i;
@@ -1688,14 +2374,24 @@ static void ViewLights()
     Check("their lines##lights", &g_bTrigDrawLightLabels);
     ImGui::SameLine();
     Check("radii", &g_bTrigDrawLightRadii);
+    ImGui::SameLine();
+    Check("spot cones", &g_bTrigDrawLightCones);
+    ImGui::SameLine();
+    Check("entities' light rigs", &g_bTrigDrawLightRigs);
     ImGui::SliderFloat("light draw distance (0 unlimited)", &g_fTrigDrawLightRange, 0.0f, 50000.0f, "%.0f",
                        ImGuiSliderFlags_Logarithmic);
-    ImGui::TextDisabled("(the level's lights (the world manager's list), the ambient and the directional slots; the "
-                        "directionals as arrows in front of the camera. Most entities are lit by their zone's "
-                        "colours instead, which are not lights)");
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("(RenderWare lights: the level's list, which only WorldLight entities add to (sub_173800), "
+                        "the ambient and the four view-light slots, the directionals as arrows in front of the "
+                        "camera. The level geometry is prelit and uses none of them. The models are lit by their "
+                        "entity's light rig instead: the world render recolours the shared ambient and view lights "
+                        "for each model from its entity's zones (sub_1227F0), so the slots below only show what the "
+                        "last model drawn left in them. The rigs are drawn at each entity: a cross in the ambient "
+                        "colour, each directional a line shining in)");
+    ImGui::PopTextWrapPos();
     if (!g_bTrigDrawLights)
         return;
-    if (ImGui::BeginTable("lights", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+    if (ImGui::BeginTable("lights", 8, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
                           ImVec2(0.0f, 260.0f)))
     {
         static const RwChar *const s_apszSource[4] = { "the level's", "the ambient", "a directional slot", "the fallback" };
@@ -1706,6 +2402,9 @@ static void ViewLights()
         ImGui::TableSetupColumn("where");
         ImGui::TableSetupColumn("radius");
         ImGui::TableSetupColumn("colour");
+        ImGui::TableSetupColumn("lights");
+        ImGui::TableSetupColumn("section");
+        ImGui::TableSetupColumn("owner");
         ImGui::TableHeadersRow();
         for (i = 0; i < g_nTrigDrawLightList; i++)
         {
@@ -1734,6 +2433,165 @@ static void ViewLights()
                                ImGuiColorEditFlags_NoTooltip, ImVec2(14.0f, 14.0f));
             ImGui::SameLine();
             ImGui::Text("%.2f %.2f %.2f", l->colour.red, l->colour.green, l->colour.blue);
+            // (RenderWare's flags: rpLIGHTLIGHTATOMICS 1, rpLIGHTLIGHTWORLD 2)
+            ImGui::TableNextColumn();
+            if ((l->nFlags & 3) == 3)
+                ImGui::TextUnformatted("models, world");
+            else if (l->nFlags & 1)
+                ImGui::TextUnformatted("models");
+            else if (l->nFlags & 2)
+                ImGui::TextUnformatted("world");
+            else
+                ImGui::TextDisabled("nothing");
+            // (its extension's placement: the slot and that section's id)
+            ImGui::TableNextColumn();
+            if (!l->bExt || l->nSlot == 0xFFFF)
+                ImGui::TextDisabled("-");
+            else if (l->nSlot == 0x7FFF)
+                ImGui::TextUnformatted("global");
+            else
+                ImGui::Text("slot %d (S_%d)", l->nSlot, l->nSectionId);
+            ImGui::TableNextColumn();
+            if (l->pOwner)
+            {
+                RwChar szKind[96];
+
+                EntityKind(l->dwOwnerBits, szKind);
+                ImGui::Text("%p %s", l->pOwner, szKind);
+            }
+            else
+                ImGui::TextDisabled("-");
+        }
+        ImGui::EndTable();
+    }
+    if (!g_bTrigDrawLightRigs)
+        return;
+    ImGui::Text("%d entities' light rigs in range; %d more with zone lighting off", g_nTrigDrawLightRigs,
+                g_nTrigDrawLightRigsUnlit);
+    if (ImGui::BeginTable("lightrigs", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+                          ImVec2(0.0f, 220.0f)))
+    {
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("entity");
+        ImGui::TableSetupColumn("ambient");
+        ImGui::TableSetupColumn("directionals (shining along)");
+        ImGui::TableHeadersRow();
+        for (i = 0; i < g_nTrigDrawLightRigs; i++)
+        {
+            const TrigDrawLightRig *o = &g_aTrigDrawLightRigs[i];
+            RwChar szKind[96];
+            RwInt32 k;
+
+            ImGui::PushID(i);
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            EntityKind(o->dwBits, szKind);
+            ImGui::Text("%p %s", o->pEntity, szKind);
+            ImGui::TableNextColumn();
+            ImGui::ColorButton("##ra", ImVec4(o->ambient.red, o->ambient.green, o->ambient.blue, 1.0f),
+                               ImGuiColorEditFlags_NoTooltip, ImVec2(14.0f, 14.0f));
+            ImGui::SameLine();
+            ImGui::Text("%.2f %.2f %.2f", o->ambient.red, o->ambient.green, o->ambient.blue);
+            ImGui::TableNextColumn();
+            if (o->nLights == 0)
+                ImGui::TextDisabled("none");
+            for (k = 0; k < o->nLights; k++)
+            {
+                ImGui::PushID(k);
+                if (k)
+                    ImGui::SameLine();
+                ImGui::ColorButton("##rl", ImVec4(o->aColour[k].red, o->aColour[k].green, o->aColour[k].blue, 1.0f),
+                                   ImGuiColorEditFlags_NoTooltip, ImVec2(14.0f, 14.0f));
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("colour %.2f %.2f %.2f\nalong %.2f, %.2f, %.2f", o->aColour[k].red,
+                                      o->aColour[k].green, o->aColour[k].blue, o->avDir[k].x, o->avDir[k].y,
+                                      o->avDir[k].z);
+                ImGui::PopID();
+            }
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
+}
+
+// The models' mount points.
+static void ViewMounts()
+{
+    RwInt32 i;
+
+    Check("draw the mount points", &g_bTrigDrawMounts);
+    ImGui::SameLine();
+    Check("tags##mounts", &g_bTrigDrawMountLabels);
+    ImGui::SameLine();
+    Check("axes (else a cross)", &g_bTrigDrawMountAxes);
+    ImGui::SliderFloat("mount draw distance (0 unlimited)", &g_fTrigDrawMountRange, 0.0f, 20000.0f, "%.0f",
+                       ImGuiSliderFlags_Logarithmic);
+    ImGui::SliderFloat("axis length##mounts", &g_fTrigDrawMountSize, 1.0f, 100.0f, "%.0f", ImGuiSliderFlags_Logarithmic);
+    ImGui::InputText("only tags containing", g_szTrigDrawMountFilter, sizeof(g_szTrigDrawMountFilter));
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("(the named points the .sdf models carry (the clump data plugin 0x4210, chunk 0x4211): "
+                        "each a tag, the bone it hangs on and an offset, placed as the game places them. x red, "
+                        "y green, z blue; a tag the code is not known to use is drawn orange)");
+    ImGui::PopTextWrapPos();
+    if (!g_bTrigDrawMounts)
+        return;
+    ImGui::Text("%d models with mount points; %d points listed%s", g_nTrigDrawMountClumps, g_nTrigDrawMountList,
+                g_nTrigDrawMountList >= TRIGDRAW_MOUNTS ? " (the list is full)" : "");
+    if (ImGui::BeginTable("mounts", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY,
+                          ImVec2(0.0f, 300.0f)))
+    {
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("tag");
+        ImGui::TableSetupColumn("bone");
+        ImGui::TableSetupColumn("where");
+        ImGui::TableSetupColumn("model's owner");
+        ImGui::TableSetupColumn("what it is for");
+        ImGui::TableHeadersRow();
+        for (i = 0; i < g_nTrigDrawMountList; i++)
+        {
+            const TrigDrawMountInfo *o = &g_aTrigDrawMountList[i];
+            const RwChar *pszMeaning = TrigDrawMountMeaning(o->dwTag);
+            RwUInt32 dwTag = o->dwTag;
+            RwChar szTag[8];
+            RwInt32 n = 0, k;
+
+            // (high byte first, leading zero bytes skipped)
+            while (dwTag != 0 && (dwTag & 0xFF000000) == 0)
+                dwTag <<= 8;
+            for (k = 3; k >= 0; k--)
+            {
+                RwUInt8 c = (RwUInt8)(dwTag >> (k * 8));
+
+                if (c < 0x21 || c > 0x7E)
+                    break;
+                szTag[n++] = (RwChar)c;
+            }
+            szTag[n] = 0;
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::Text("%s", szTag);
+            ImGui::TableNextColumn();
+            if (o->nBone)
+                ImGui::Text("%d", o->nBone);
+            else
+                ImGui::TextDisabled("clump");
+            ImGui::TableNextColumn();
+            ImGui::Text("%.0f, %.0f, %.0f", o->vPos.x, o->vPos.y, o->vPos.z);
+            ImGui::TableNextColumn();
+            if (o->pOwner)
+            {
+                RwChar szKind[96];
+
+                EntityKind(o->dwOwnerBits, szKind);
+                ImGui::Text("%s", szKind);
+            }
+            else
+                ImGui::TextDisabled("-");
+            ImGui::TableNextColumn();
+            if (pszMeaning)
+                ImGui::TextUnformatted(pszMeaning);
+            else
+                ImGui::TextDisabled("not known");
         }
         ImGui::EndTable();
     }
@@ -1772,6 +2630,7 @@ static void ViewZones()
                         "ambient and up to two lights, cross-fading as it moves; a post on each entity in its zone's "
                         "colour, white the default zone, grey none. Only lighting reads them; Engine, Level and render "
                         "has the switches that turn them off)");
+    ZoneEditor();
 }
 
 // The AI squads.
@@ -4136,6 +4995,1072 @@ RwBool TrigWebScriptsJson(RwChar *psz, RwInt32 nMax, void (*pfnImage)(RwUInt32 d
     return TRUE;
 }
 
+// ---- Waits: what each script is waiting for ----
+//
+// Nothing polls the scripts: the VM runs one (sub_68310) only when something hands it work,
+// a message delivered (alfamessman), a timer firing (alfatimer, sub_73650: its messages), an
+// animation ending (a performance's, sub_6DF90), a task woken (opcode 41), returned to or
+// spawned. So a script that is not running is waiting for one of those, and this lists which:
+// the timers by time left, each task's wait (the messages of its call records, any or all of
+// them; a wake; the task it called), each performance's animation or pending switch, each state
+// machine's state and the messages it listens for, and the messages queued for delivery.
+
+// A message kind's name (the loaded script image's table, dword_4492F4), or its number.
+static void WaitMsgName(RwInt32 nKind, RwChar *psz, RwInt32 nMax)
+{
+    type_42E00_00 *pKind = NULL;
+
+    __try
+    {
+        if (nKind >= 0 && nKind < dword_4492F8 && dword_4492F4)
+            pKind = &dword_4492F4[nKind];
+        if (pKind == NULL)
+            pKind = sub_6A7D0(nKind);
+        if (pKind && pKind->unk_00)
+        {
+            ReadText(pKind->unk_00, psz, nMax - 1);
+            psz[nMax - 1] = 0;
+            if (psz[0])
+                return;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    _snprintf(psz, nMax, "message %d", nKind);
+    psz[nMax - 1] = 0;
+}
+
+// Appends "name" (comma-separated) to psz.
+static void WaitAppend(RwChar *psz, RwInt32 nMax, const RwChar *pszAdd)
+{
+    size_t n = strlen(psz);
+
+    if (n + 3 >= (size_t)nMax)
+        return;
+    if (n)
+    {
+        strcat(psz, ", ");
+        n += 2;
+    }
+    strncat(psz, pszAdd, nMax - n - 1);
+}
+
+// The messages of the registration list starting at r, the next by nNextKind (0: unk_0C, a
+// state machine's handlers; 1: unk_08_s, a call record's), into psz; how many.
+static RwInt32 WaitRegistrations(type_6B960 *r, RwInt32 nNextKind, RwChar *psz, RwInt32 nMax)
+{
+    RwInt32 n = 0;
+    RwChar szMsg[64];
+
+    psz[0] = 0;
+    __try
+    {
+        while (r != NULL && n < 32)
+        {
+            WaitMsgName(r->unk_14, szMsg, sizeof(szMsg));
+            WaitAppend(psz, nMax, szMsg);
+            n++;
+            r = get_registration(nNextKind == 0 ? r->unk_0C : r->unk_08_s);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    return n;
+}
+
+// The timers of the object with the handle dwHandle: "X in 2.4 s" each, into psz; how many.
+static RwInt32 WaitTimers(RwUInt32 dwHandle, RwInt32 nGeneration, RwChar *psz, RwInt32 nMax)
+{
+    RwInt32 n = 0;
+    RwChar szMsg[64], sz[96];
+
+    psz[0] = 0;
+    __try
+    {
+        type_73360 *t;
+
+        for (t = dword_449B44; t != NULL && n < 64; t = t->unk_14)
+        {
+            if (t->unk_00 != dwHandle)
+                continue;
+            WaitMsgName(t->unk_04, szMsg, sizeof(szMsg));
+            _snprintf(sz, sizeof(sz), "%s in %.1f s%s", szMsg, (t->unk_10 - dword_449B40) / 60.0f,
+                      t->unk_0C != nGeneration ? " (stale: will not fire)" : "");
+            sz[sizeof(sz) - 1] = 0;
+            WaitAppend(psz, nMax, sz);
+            n++;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    return n;
+}
+
+// The messages queued for delivery (the action queue dword_439904's message actions, kind
+// 0x10), for the object with the handle dwTarget (0: every queued message), into psz.
+static RwInt32 WaitQueued(RwUInt32 dwTarget, RwBool bAll, RwChar *psz, RwInt32 nMax)
+{
+    RwInt32 n = 0, nGuard = 0;
+    RwChar szMsg[64];
+
+    psz[0] = 0;
+    __try
+    {
+        type_42AF0 *a;
+
+        for (a = dword_439904; a != NULL && nGuard < 2000; a = a->unk_0C, nGuard++)
+        {
+            type_42E00 *pMsg;
+            RwUInt32 dwTo;
+
+            if (a->unk_00 != 0x10)
+                continue;
+            pMsg = (type_42E00 *)sub_67620(a->unk_08);
+            if (pMsg == NULL)
+                continue;
+            dwTo = pMsg->unk_04;
+            if (!bAll && dwTo != dwTarget && dwTo != 0)
+                continue;
+            if (pMsg->unk_00 && pMsg->unk_00->unk_00)
+                ReadText(pMsg->unk_00->unk_00, szMsg, sizeof(szMsg) - 1);
+            else
+                strcpy(szMsg, "?");
+            szMsg[sizeof(szMsg) - 1] = 0;
+            if (dwTo == 0 && !bAll)
+                strncat(szMsg, " (to all)", sizeof(szMsg) - strlen(szMsg) - 1);
+            WaitAppend(psz, nMax, szMsg);
+            n++;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    return n;
+}
+
+static void WaitRowStart(RwUInt32 dwObj, const RwChar *pszName, const RwChar *pszKind)
+{
+    RwChar szObj[16];
+
+    ImGui::TableNextRow();
+    ImGui::TableNextColumn();
+    sprintf(szObj, "0x%08X", dwObj);
+    if (ImGui::Selectable(szObj, dwObj == s_dwSelScript, ImGuiSelectableFlags_SpanAllColumns))
+    {
+        s_dwSelScript = dwObj == s_dwSelScript ? 0 : dwObj;
+        s_bSelMachine = strcmp(pszKind, "machine") == 0;
+    }
+    ImGui::TableNextColumn();
+    ImGui::TextUnformatted(pszName);
+    ImGui::TableNextColumn();
+    ImGui::TextUnformatted(pszKind);
+}
+
+static void TabWaits()
+{
+    static RwBool s_bOnlyWaiting = TRUE;
+    static RwBool s_bMachines = FALSE;
+    RwUInt32 dwBase, dwRunning = 0;
+    RwInt32 nStride, nCount, i, nShown = 0;
+    RwChar szName[96], szWhat[512], szTimers[256], szQueued[256];
+
+    ReadU32(&dword_449328, &dwRunning);
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("(nothing polls the scripts: one runs only when a message is delivered, one of its timers "
+                        "fires, its animation ends or it is woken, returned to or spawned. So this lists what each one "
+                        "waits for. The script timers' clock is %.1f s; a timer whose script restarted since is stale "
+                        "and will not fire)", dword_449B40 / 60.0f);
+    ImGui::PopTextWrapPos();
+    Check("only scripts waiting on something", &s_bOnlyWaiting);
+    ImGui::SameLine();
+    Check("state machines too", &s_bMachines);
+    {
+        RwInt32 nQueued = WaitQueued(0, TRUE, szQueued, sizeof(szQueued));
+
+        if (nQueued)
+            ImGui::TextWrapped("%d messages queued for delivery: %s", nQueued, szQueued);
+        else
+            ImGui::TextDisabled("no messages queued for delivery");
+    }
+    if (!ImGui::BeginTable("waits", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY |
+                                       ImGuiTableFlags_Resizable, ImVec2(0.0f, 380.0f)))
+        return;
+    ImGui::TableSetupScrollFreeze(0, 1);
+    ImGui::TableSetupColumn("object", ImGuiTableColumnFlags_WidthFixed);
+    ImGui::TableSetupColumn("name", ImGuiTableColumnFlags_WidthFixed);
+    ImGui::TableSetupColumn("kind", ImGuiTableColumnFlags_WidthFixed);
+    ImGui::TableSetupColumn("waits for");
+    ImGui::TableSetupColumn("its timers");
+    ImGui::TableHeadersRow();
+
+    // (tasks: the waits of their call records)
+    if (PoolFree(&dword_4499F0, &dwBase, &nStride, &nCount))
+        for (i = 0; i < nCount && nShown < 400; i++)
+        {
+            type_3D2E20 *t = (type_3D2E20 *)(dwBase + i * nStride);
+            RwBool bWaiting = FALSE;
+
+            if (s_abFree[i])
+                continue;
+            szWhat[0] = 0;
+            __try
+            {
+                RwChar szMsgs[256];
+                type_3D2E20_118 *rec;
+                RwInt32 nRec = 0;
+
+                if ((RwUInt32)t == dwRunning)
+                    strcpy(szWhat, "running now");
+                else if (t->unk_110 == -1)
+                    strcpy(szWhat, "not started");
+                else if (t->unk_10C)
+                {
+                    bWaiting = TRUE;
+                    if (t->unk_10D == 0)
+                        strcpy(szWhat, "a wake (opcode 41)");
+                    for (rec = t->unk_118; rec != NULL && nRec < 16; rec = rec->unk_04, nRec++)
+                    {
+                        RwChar szRec[300];
+                        RwInt32 nMsgs = WaitRegistrations(rec->unk_00, 1, szMsgs, sizeof(szMsgs));
+
+                        if (nMsgs == 0)
+                            continue;
+                        if (rec->unk_14_1 == 2)
+                            _snprintf(szRec, sizeof(szRec), "interrupt on %s", szMsgs);
+                        else if (nMsgs == 1)
+                            _snprintf(szRec, sizeof(szRec), "%s", szMsgs);
+                        else
+                            _snprintf(szRec, sizeof(szRec), "%s of %s", rec->unk_14_0 ? "any" : "all", szMsgs);
+                        szRec[sizeof(szRec) - 1] = 0;
+                        WaitAppend(szWhat, sizeof(szWhat), szRec);
+                    }
+                    if (szWhat[0] == 0)
+                        strcpy(szWhat, "a message (no call record)");
+                }
+                else if (t->unk_FC.unk_00)
+                {
+                    bWaiting = TRUE;
+                    _snprintf(szWhat, sizeof(szWhat), "the task it called (0x%08X) to return", t->unk_FC.unk_00);
+                }
+                else
+                    strcpy(szWhat, "-");
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                continue;
+            }
+            ScriptName((type_67620 *)t, szName, sizeof(szName));
+            if (s_szScriptFilter[0] && !ReportHas(szName, s_szScriptFilter))
+                continue;
+            WaitTimers(((type_67620 *)t)->unk_04, t->unk_110, szTimers, sizeof(szTimers));
+            if (s_bOnlyWaiting && !bWaiting && szTimers[0] == 0)
+                continue;
+            WaitRowStart((RwUInt32)t, szName, "task");
+            ImGui::TableNextColumn();
+            ImGui::TextWrapped("%s", szWhat);
+            ImGui::TableNextColumn();
+            ImGui::TextWrapped("%s", szTimers);
+            nShown++;
+        }
+
+    // (performances: an animation playing, a switch pending, finished)
+    if (PoolFree(&dword_449A50, &dwBase, &nStride, &nCount))
+        for (i = 0; i < nCount && nShown < 400; i++)
+        {
+            type_3D2CD0 *p = (type_3D2CD0 *)(dwBase + i * nStride);
+            RwBool bWaiting = FALSE;
+
+            if (s_abFree[i])
+                continue;
+            szWhat[0] = 0;
+            __try
+            {
+                RwInt32 *pCode = ((type_3D2C30 *)p)->unk_68;
+
+                if ((RwUInt32)p == dwRunning)
+                    strcpy(szWhat, "running now");
+                else if (p->unk_128)
+                    strcpy(szWhat, "nothing: finished");
+                else if (pCode && (*pCode & 0xFF) == 22)
+                {
+                    RwInt32 *pStack = ((type_3D2C30 *)p)->unk_6C;
+
+                    bWaiting = TRUE;
+                    _snprintf(szWhat, sizeof(szWhat), "its animation (0x%08X) to end, %d plays left",
+                              (RwUInt32)pCode[1], pStack ? pStack[-1] : 0);
+                }
+                else
+                    _snprintf(szWhat, sizeof(szWhat), "an event (performance %d)", p->unk_120);
+                if (p->unk_148 != -1 && !p->unk_128)
+                {
+                    RwChar sz[96];
+
+                    bWaiting = TRUE;
+                    _snprintf(sz, sizeof(sz), "then performance %d%s", p->unk_148,
+                              (p->unk_14C & 0x80) ? " after the animation" : (p->unk_14C & 0x10) ? " after the transition"
+                                                                                                : " next tick");
+                    sz[sizeof(sz) - 1] = 0;
+                    WaitAppend(szWhat, sizeof(szWhat), sz);
+                }
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                continue;
+            }
+            ScriptName((type_67620 *)p, szName, sizeof(szName));
+            if (s_szScriptFilter[0] && !ReportHas(szName, s_szScriptFilter))
+                continue;
+            WaitTimers(((type_67620 *)p)->unk_04, ((type_67620 *)p)->vf_028(), szTimers, sizeof(szTimers));
+            if (s_bOnlyWaiting && !bWaiting && szTimers[0] == 0)
+                continue;
+            WaitRowStart((RwUInt32)p, szName, "performance");
+            ImGui::TableNextColumn();
+            ImGui::TextWrapped("%s", szWhat);
+            ImGui::TableNextColumn();
+            ImGui::TextWrapped("%s", szTimers);
+            nShown++;
+        }
+
+    // (state machines: idle in a state, listening for its messages; shown with their timers,
+    // or all of them with "state machines too")
+    if (PoolFree(&dword_449A30, &dwBase, &nStride, &nCount))
+        for (i = 0; i < nCount && nShown < 400; i++)
+        {
+            type_3D2DB8 *m = (type_3D2DB8 *)(dwBase + i * nStride);
+            RwChar szMsgs[400];
+            RwInt32 nMsgs = 0;
+
+            if (s_abFree[i])
+                continue;
+            __try
+            {
+                nMsgs = WaitRegistrations(m->unk_9C, 0, szMsgs, sizeof(szMsgs));
+                if ((RwUInt32)m == dwRunning)
+                    strcpy(szWhat, "running now");
+                else if (nMsgs)
+                    _snprintf(szWhat, sizeof(szWhat), "state %d: %s", m->unk_90, szMsgs);
+                else
+                    _snprintf(szWhat, sizeof(szWhat), "state %d: no messages", m->unk_90);
+                szWhat[sizeof(szWhat) - 1] = 0;
+                if (m->unk_92 != -1)
+                {
+                    RwChar sz[48];
+
+                    _snprintf(sz, sizeof(sz), "(going to state %d)", m->unk_92);
+                    WaitAppend(szWhat, sizeof(szWhat), sz);
+                }
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                continue;
+            }
+            ScriptName((type_67620 *)m, szName, sizeof(szName));
+            if (s_szScriptFilter[0] && !ReportHas(szName, s_szScriptFilter))
+                continue;
+            WaitTimers(((type_67620 *)m)->unk_04, m->unk_70, szTimers, sizeof(szTimers));
+            if (!s_bMachines && szTimers[0] == 0)
+                continue;
+            WaitRowStart((RwUInt32)m, szName, "machine");
+            ImGui::TableNextColumn();
+            ImGui::TextWrapped("%s", szWhat);
+            ImGui::TableNextColumn();
+            ImGui::TextWrapped("%s", szTimers);
+            nShown++;
+        }
+    ImGui::EndTable();
+    ImGui::TextDisabled("%d shown (up to 400); the name filter above applies", nShown);
+}
+
+// ---- Messages: who sends what, and sending one ----
+//
+// Every script message is made by sub_6B710 (alfamessman): the scripts' action opcode (45,
+// sub_6A4F0), the engine's sends by name (sub_6B5F0) and by index (sub_6B680). TrigMsgSent,
+// from its end, notes each one while recording: its kind, its target (0 for all), its sender
+// and other object, the script running then, its first arguments and the code that sent it.
+
+extern "C" void plog(const char *fmt, ...);
+
+#define TRIGMSG_LOG 512
+#define TRIGMSG_KINDS 512
+#define TRIGMSG_WHO 6
+struct TrigMsgRec
+{
+    RwUInt32 dwFrame;
+    const type_42E00_00 *pKind;
+    RwChar szKind[40];
+    RwChar szTo[48], szFrom[48], szScript[48];
+    RwInt32 nArgs;
+    RwInt32 anArgs[4];
+    void *apCaller[6];
+    RwInt32 nCallers;
+};
+struct TrigMsgKind
+{
+    const type_42E00_00 *pKind;
+    RwChar szKind[40];
+    RwUInt32 nCount, dwLastFrame;
+    RwChar aszFrom[TRIGMSG_WHO][48];
+    RwInt32 nFrom;
+    RwChar aszTo[TRIGMSG_WHO][48];
+    RwInt32 nTo;
+    void *apCode[TRIGMSG_WHO];      // the code that sent it (the first caller past the senders)
+    RwInt32 nCode;
+};
+static TrigMsgRec s_aMsgLog[TRIGMSG_LOG];
+static RwUInt32 s_nMsgLog;
+static TrigMsgKind s_aMsgKinds[TRIGMSG_KINDS];
+static RwInt32 s_nMsgKinds;
+static RwBool s_bMsgRecord;
+static CRITICAL_SECTION s_csMsg;
+static LONG s_nMsgInit;
+
+static void MsgLock()
+{
+    if (InterlockedCompareExchange(&s_nMsgInit, 1, 0) == 0)
+    {
+        InitializeCriticalSection(&s_csMsg);
+        s_nMsgInit = 2;
+    }
+    while (s_nMsgInit != 2)
+        Sleep(0);
+    EnterCriticalSection(&s_csMsg);
+}
+
+// An object's name by its handle (a script, an entity's object, a trigger), or "-".
+static void MsgWho(RwUInt32 dwHandle, RwChar *psz, RwInt32 nMax)
+{
+    type_67620 *p = NULL;
+
+    if (dwHandle == 0)
+    {
+        _snprintf(psz, nMax, "-");
+        psz[nMax - 1] = 0;
+        return;
+    }
+    __try
+    {
+        p = sub_67620(dwHandle);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        p = NULL;
+    }
+    if (p)
+        ScriptName(p, psz, nMax);
+    else
+        _snprintf(psz, nMax, "0x%08X (gone)", dwHandle);
+    psz[nMax - 1] = 0;
+}
+
+static void MsgAddWho(RwChar (*a)[48], RwInt32 *pn, const RwChar *psz)
+{
+    RwInt32 i;
+
+    for (i = 0; i < *pn; i++)
+        if (strcmp(a[i], psz) == 0)
+            return;
+    if (*pn >= TRIGMSG_WHO)
+        return;
+    strncpy(a[*pn], psz, 47);
+    a[*pn][47] = 0;
+    (*pn)++;
+}
+
+// A code address's function and offset (the port's symbols: the sub_XXXXX names give the
+// image's address).
+static void MsgCodeName(void *p, RwChar *psz, RwInt32 nMax)
+{
+    static RwBool s_bSym;
+    RwChar buf[sizeof(SYMBOL_INFO) + 128];
+    SYMBOL_INFO *sym = (SYMBOL_INFO *)buf;
+    DWORD64 disp = 0;
+
+    if (!s_bSym)
+    {
+        SymSetOptions(SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME);
+        SymInitialize(GetCurrentProcess(), NULL, TRUE);
+        s_bSym = TRUE;
+    }
+    memset(buf, 0, sizeof(buf));
+    sym->SizeOfStruct = sizeof(SYMBOL_INFO);
+    sym->MaxNameLen = 127;
+    if (SymFromAddr(GetCurrentProcess(), (DWORD64)(size_t)p, &disp, sym))
+        _snprintf(psz, nMax, "%s+0x%X", sym->Name, (RwUInt32)disp);
+    else
+        _snprintf(psz, nMax, "%p", p);
+    psz[nMax - 1] = 0;
+}
+
+// The first caller that is not one of the senders themselves (sub_6B5F0, sub_6B680, the
+// action opcode sub_6A4F0): the code that decided to send it. Its name into psz.
+static void MsgSenderCode(void *const *apCaller, RwInt32 nCallers, RwChar *psz, RwInt32 nMax, void **ppOut)
+{
+    RwInt32 i;
+
+    psz[0] = 0;
+    if (ppOut)
+        *ppOut = NULL;
+    for (i = 0; i < nCallers; i++)
+    {
+        MsgCodeName(apCaller[i], psz, nMax);
+        if (strncmp(psz, "sub_6B5F0", 9) != 0 && strncmp(psz, "sub_6B680", 9) != 0)
+        {
+            if (strncmp(psz, "sub_6A4F0", 9) == 0)
+                _snprintf(psz, nMax, "the script's action opcode (45)");
+            psz[nMax - 1] = 0;
+            if (ppOut)
+                *ppOut = apCaller[i];
+            return;
+        }
+    }
+}
+
+// From sub_6B710's end: the message pMsg was made.
+void TrigMsgSent(type_42E00 *pMsg)
+{
+    TrigMsgRec *r;
+    TrigMsgKind *k = NULL;
+    RwInt32 i;
+    RwUInt32 dwScript = 0;
+
+    if (!s_bMsgRecord || pMsg == NULL)
+        return;
+    MsgLock();
+    __try
+    {
+        r = &s_aMsgLog[s_nMsgLog % TRIGMSG_LOG];
+        memset(r, 0, sizeof(*r));
+        r->dwFrame = port_frame;
+        r->pKind = pMsg->unk_00;
+        if (r->pKind && r->pKind->unk_00)
+            ReadText(r->pKind->unk_00, r->szKind, sizeof(r->szKind) - 1);
+        else
+            strcpy(r->szKind, "?");
+        if (pMsg->unk_04)
+            MsgWho(pMsg->unk_04, r->szTo, sizeof(r->szTo));
+        else
+            strcpy(r->szTo, "all");
+        MsgWho(pMsg->unk_08, r->szFrom, sizeof(r->szFrom));
+        if (ReadU32(&dword_449328, &dwScript) && dwScript)
+            ScriptName((type_67620 *)dwScript, r->szScript, sizeof(r->szScript));
+        else
+            strcpy(r->szScript, "-");
+        r->nArgs = r->pKind ? r->pKind->unk_10 : 0;
+        for (i = 0; i < r->nArgs && i < 4 && pMsg->unk_14; i++)
+            r->anArgs[i] = pMsg->unk_14[i];
+        // (past this function: its sender, then who called that)
+        r->nCallers = RtlCaptureStackBackTrace(1, 6, r->apCaller, NULL);
+        s_nMsgLog++;
+        for (i = 0; i < s_nMsgKinds; i++)
+            if (s_aMsgKinds[i].pKind == r->pKind)
+            {
+                k = &s_aMsgKinds[i];
+                break;
+            }
+        if (k == NULL && s_nMsgKinds < TRIGMSG_KINDS)
+        {
+            k = &s_aMsgKinds[s_nMsgKinds++];
+            memset(k, 0, sizeof(*k));
+            k->pKind = r->pKind;
+            strcpy(k->szKind, r->szKind);
+        }
+        if (k)
+        {
+            void *pCode = NULL;
+            RwChar szCode[96];
+
+            k->nCount++;
+            k->dwLastFrame = r->dwFrame;
+            // (the sender: the running script when there is one, else the message's sender)
+            MsgAddWho(k->aszFrom, &k->nFrom, strcmp(r->szScript, "-") != 0 ? r->szScript : r->szFrom);
+            MsgAddWho(k->aszTo, &k->nTo, r->szTo);
+            MsgSenderCode(r->apCaller, r->nCallers, szCode, sizeof(szCode), &pCode);
+            for (i = 0; i < k->nCode; i++)
+                if (k->apCode[i] == pCode)
+                    break;
+            if (i == k->nCode && k->nCode < TRIGMSG_WHO && pCode)
+                k->apCode[k->nCode++] = pCode;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    LeaveCriticalSection(&s_csMsg);
+}
+
+// A message to send, picked in the tab, sent on the main thread (TrigMsgTick): its kind's
+// index in the loaded image's table, its target (0 all) and its arguments.
+static struct
+{
+    RwBool bPending;
+    RwInt32 nKind;
+    RwUInt32 dwTarget;
+    RwInt32 anArgs[16];
+    RwChar szResult[128];
+} s_msgSend;
+
+static void TrigMsgTick()
+{
+    static RwInt32 s_nStart = -1;
+
+    static RwUInt32 s_dwSummary;
+
+    if (s_nStart < 0)
+    {
+        // (CODFH_MSGS=1: record from the start, and log who sent what once, 20 seconds in)
+        s_nStart = 0;
+        if (GetEnvironmentVariableA("CODFH_MSGS", NULL, 0))
+        {
+            s_bMsgRecord = TRUE;
+            s_dwSummary = port_frame + 1200;
+        }
+    }
+    if (s_dwSummary && port_frame >= s_dwSummary)
+    {
+        RwInt32 i, k;
+
+        s_dwSummary = 0;
+        MsgLock();
+        plog("msgs: %u messages, %d kinds", s_nMsgLog, s_nMsgKinds);
+        for (i = 0; i < s_nMsgKinds && i < 40; i++)
+        {
+            TrigMsgKind *m = &s_aMsgKinds[i];
+            RwChar szFrom[200], szTo[200], szCode[96];
+
+            szFrom[0] = szTo[0] = 0;
+            for (k = 0; k < m->nFrom; k++)
+                WaitAppend(szFrom, sizeof(szFrom), m->aszFrom[k]);
+            for (k = 0; k < m->nTo; k++)
+                WaitAppend(szTo, sizeof(szTo), m->aszTo[k]);
+            szCode[0] = 0;
+            if (m->nCode)
+                MsgSenderCode(&m->apCode[0], 1, szCode, sizeof(szCode), NULL);
+            plog("msgs: %5u %s from %s to %s (code %s)", m->nCount, m->szKind, szFrom, szTo, szCode);
+        }
+        LeaveCriticalSection(&s_csMsg);
+    }
+    if (!s_msgSend.bPending)
+        return;
+    s_msgSend.bPending = FALSE;
+    __try
+    {
+        type_67620 *pTarget = s_msgSend.dwTarget ? sub_67620(s_msgSend.dwTarget) : NULL;
+        RwChar szKind[48], szTo[64];
+
+        if (s_msgSend.dwTarget && pTarget == NULL)
+        {
+            _snprintf(s_msgSend.szResult, sizeof(s_msgSend.szResult), "not sent: the target is gone");
+            return;
+        }
+        if (s_msgSend.nKind < 0 || s_msgSend.nKind >= dword_4492F8)
+        {
+            _snprintf(s_msgSend.szResult, sizeof(s_msgSend.szResult), "not sent: no such message");
+            return;
+        }
+        WaitMsgName(s_msgSend.nKind, szKind, sizeof(szKind));
+        if (pTarget)
+            ScriptName(pTarget, szTo, sizeof(szTo));
+        else
+            strcpy(szTo, "all");
+        // (queued like the engine's own sends; delivered on the next action tick)
+        sub_6B680(s_msgSend.nKind, pTarget, NULL, NULL, s_msgSend.anArgs, 0, false, false);
+        _snprintf(s_msgSend.szResult, sizeof(s_msgSend.szResult), "sent %s to %s (frame %u)", szKind, szTo, port_frame);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        _snprintf(s_msgSend.szResult, sizeof(s_msgSend.szResult), "not sent: it faulted");
+    }
+    s_msgSend.szResult[sizeof(s_msgSend.szResult) - 1] = 0;
+}
+
+// The scripts to pick a target from: every live one of the three pools, named.
+struct MsgTarget
+{
+    RwUInt32 dwHandle;
+    RwChar szName[80];
+};
+#define MSG_TARGETS 1200
+static MsgTarget s_aMsgTargets[MSG_TARGETS];
+static RwInt32 s_nMsgTargets;
+
+static void MsgTargetsRefresh()
+{
+    type_16C2A0 *apPools[3] = { &dword_4499F0, &dword_449A30, &dword_449A50 };
+    static const RwChar *const s_apszKind[3] = { "task", "machine", "performance" };
+    RwUInt32 dwBase;
+    RwInt32 nStride, nCount, i, p;
+
+    s_nMsgTargets = 0;
+    for (p = 0; p < 3; p++)
+    {
+        if (!PoolFree(apPools[p], &dwBase, &nStride, &nCount))
+            continue;
+        for (i = 0; i < nCount && s_nMsgTargets < MSG_TARGETS; i++)
+        {
+            type_67620 *pObj = (type_67620 *)(dwBase + i * nStride);
+            MsgTarget *t;
+            RwChar szName[64];
+            RwUInt32 dwHandle;
+
+            if (s_abFree[i] || !ReadU32(&pObj->unk_04, &dwHandle))
+                continue;
+            t = &s_aMsgTargets[s_nMsgTargets++];
+            t->dwHandle = dwHandle;
+            ScriptName(pObj, szName, sizeof(szName));
+            _snprintf(t->szName, sizeof(t->szName), "%s (%s)", szName, s_apszKind[p]);
+            t->szName[sizeof(t->szName) - 1] = 0;
+        }
+    }
+}
+
+static void MsgSendUi()
+{
+    static RwChar s_szKindFilter[32], s_szTargetFilter[32];
+    static RwInt32 s_nKind = -1;
+    static RwUInt32 s_dwTarget;
+    static RwChar s_szTarget[80] = "all";
+    static RwBool s_abFloat[16];
+    static float s_afArgs[16];
+    RwChar szKind[64];
+    RwInt32 i, nArgs = 0;
+
+    ImGui::SeparatorText("Send a message");
+    if (dword_4492F8 <= 0 || dword_4492F4 == NULL)
+    {
+        ImGui::TextDisabled("(no script image loaded)");
+        return;
+    }
+    // (its kind)
+    if (s_nKind >= 0 && s_nKind < dword_4492F8)
+        WaitMsgName(s_nKind, szKind, sizeof(szKind));
+    else
+        strcpy(szKind, "(pick one)");
+    ImGui::SetNextItemWidth(260.0f);
+    if (ImGui::BeginCombo("message", szKind))
+    {
+        ImGui::SetNextItemWidth(200.0f);
+        ImGui::InputText("filter##msgkind", s_szKindFilter, sizeof(s_szKindFilter));
+        for (i = 0; i < dword_4492F8 && i < 4000; i++)
+        {
+            RwChar sz[64];
+
+            WaitMsgName(i, sz, sizeof(sz));
+            if (s_szKindFilter[0] && !ReportHas(sz, s_szKindFilter))
+                continue;
+            ImGui::PushID(i);
+            if (ImGui::Selectable(sz, i == s_nKind))
+                s_nKind = i;
+            ImGui::PopID();
+        }
+        ImGui::EndCombo();
+    }
+    // (its target)
+    ImGui::SetNextItemWidth(260.0f);
+    if (ImGui::BeginCombo("to", s_szTarget))
+    {
+        if (ImGui::IsWindowAppearing())
+            MsgTargetsRefresh();
+        ImGui::SetNextItemWidth(200.0f);
+        ImGui::InputText("filter##msgto", s_szTargetFilter, sizeof(s_szTargetFilter));
+        if (ImGui::Selectable("all (every script listening)", s_dwTarget == 0))
+        {
+            s_dwTarget = 0;
+            strcpy(s_szTarget, "all");
+        }
+        for (i = 0; i < s_nMsgTargets; i++)
+        {
+            if (s_szTargetFilter[0] && !ReportHas(s_aMsgTargets[i].szName, s_szTargetFilter))
+                continue;
+            ImGui::PushID(i);
+            if (ImGui::Selectable(s_aMsgTargets[i].szName, s_aMsgTargets[i].dwHandle == s_dwTarget))
+            {
+                s_dwTarget = s_aMsgTargets[i].dwHandle;
+                strncpy(s_szTarget, s_aMsgTargets[i].szName, sizeof(s_szTarget) - 1);
+            }
+            ImGui::PopID();
+        }
+        ImGui::EndCombo();
+    }
+    // (its arguments: as many as the kind takes, each an int or a float)
+    if (s_nKind >= 0 && s_nKind < dword_4492F8)
+    {
+        __try
+        {
+            nArgs = dword_4492F4[s_nKind].unk_10;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            nArgs = 0;
+        }
+        if (nArgs < 0 || nArgs > 16)
+            nArgs = 0;
+    }
+    for (i = 0; i < nArgs; i++)
+    {
+        RwChar szLabel[24];
+
+        ImGui::PushID(100 + i);
+        sprintf(szLabel, "argument %d", i + 1);
+        ImGui::SetNextItemWidth(140.0f);
+        if (s_abFloat[i])
+            ImGui::InputFloat(szLabel, &s_afArgs[i]);
+        else
+        {
+            int n = (int)s_afArgs[i];
+
+            if (ImGui::InputInt(szLabel, &n))
+                s_afArgs[i] = (float)n;
+        }
+        ImGui::SameLine();
+        Check("float", &s_abFloat[i]);
+        ImGui::PopID();
+    }
+    if (nArgs == 0 && s_nKind >= 0)
+        ImGui::TextDisabled("(it takes no arguments)");
+    ImGui::BeginDisabled(s_nKind < 0 || s_msgSend.bPending);
+    if (ImGui::Button("send"))
+    {
+        s_msgSend.nKind = s_nKind;
+        s_msgSend.dwTarget = s_dwTarget;
+        for (i = 0; i < 16; i++)
+        {
+            union { RwInt32 n; RwReal f; } u;
+
+            if (s_abFloat[i])
+                u.f = s_afArgs[i];
+            else
+                u.n = (RwInt32)s_afArgs[i];
+            s_msgSend.anArgs[i] = u.n;
+        }
+        s_msgSend.bPending = TRUE;
+    }
+    ImGui::EndDisabled();
+    if (s_msgSend.szResult[0])
+    {
+        ImGui::SameLine();
+        ImGui::TextUnformatted(s_msgSend.szResult);
+    }
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("(queued as the engine's own sends are, sub_6B680, and delivered on the next action tick: "
+                        "any script listening for it reacts as if the game had sent it. An object handle as an "
+                        "argument is the number in the object column of the Waits and script tables)");
+    ImGui::PopTextWrapPos();
+}
+
+static void TabMessages()
+{
+    static RwChar s_szFilter[32];
+    static RwInt32 s_nSel = -1;
+    static RwBool s_bFollow = TRUE;
+    RwInt32 i, k;
+
+    Check("record the messages sent", &s_bMsgRecord);
+    ImGui::SameLine();
+    if (ImGui::Button("clear##msgs"))
+    {
+        MsgLock();
+        s_nMsgLog = 0;
+        s_nMsgKinds = 0;
+        s_nSel = -1;
+        LeaveCriticalSection(&s_csMsg);
+    }
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(160.0f);
+    ImGui::InputText("message filter", s_szFilter, sizeof(s_szFilter));
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("(every script message as it is made: by a script's action opcode, or by the engine's code by "
+                        "name or index. The sender is the script that was running when there was one; the code is "
+                        "the function that sent it. Waits shows who is waiting for each)");
+    ImGui::PopTextWrapPos();
+
+    ImGui::SeparatorText("Who sends what");
+    MsgLock();
+    if (ImGui::BeginTable("msgkinds", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY |
+                                         ImGuiTableFlags_Resizable, ImVec2(0.0f, 220.0f)))
+    {
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("message", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("sent", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("last frame", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("from");
+        ImGui::TableSetupColumn("to");
+        ImGui::TableHeadersRow();
+        for (i = 0; i < s_nMsgKinds; i++)
+        {
+            TrigMsgKind *m = &s_aMsgKinds[i];
+            RwChar szFrom[320], szTo[320];
+
+            if (s_szFilter[0] && !ReportHas(m->szKind, s_szFilter))
+                continue;
+            szFrom[0] = szTo[0] = 0;
+            for (k = 0; k < m->nFrom; k++)
+                WaitAppend(szFrom, sizeof(szFrom), m->aszFrom[k]);
+            for (k = 0; k < m->nTo; k++)
+                WaitAppend(szTo, sizeof(szTo), m->aszTo[k]);
+            ImGui::PushID(i);
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            if (ImGui::Selectable(m->szKind, i == s_nSel, ImGuiSelectableFlags_SpanAllColumns))
+                s_nSel = i == s_nSel ? -1 : i;
+            ImGui::TableNextColumn();
+            ImGui::Text("%u", m->nCount);
+            ImGui::TableNextColumn();
+            ImGui::Text("%u", m->dwLastFrame);
+            ImGui::TableNextColumn();
+            ImGui::TextWrapped("%s%s", szFrom, m->nFrom >= TRIGMSG_WHO ? ", ..." : "");
+            ImGui::TableNextColumn();
+            ImGui::TextWrapped("%s%s", szTo, m->nTo >= TRIGMSG_WHO ? ", ..." : "");
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
+    if (s_nSel >= 0 && s_nSel < s_nMsgKinds)
+    {
+        TrigMsgKind *m = &s_aMsgKinds[s_nSel];
+
+        ImGui::Text("%s is sent by this code:", m->szKind);
+        for (k = 0; k < m->nCode; k++)
+        {
+            RwChar sz[96];
+            void *p = m->apCode[k];
+
+            MsgSenderCode(&p, 1, sz, sizeof(sz), NULL);
+            ImGui::BulletText("%s", sz);
+        }
+    }
+
+    ImGui::SeparatorText("The last messages");
+    Check("follow the newest", &s_bFollow);
+    if (ImGui::BeginTable("msglog", 7, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY |
+                                       ImGuiTableFlags_Resizable, ImVec2(0.0f, 260.0f)))
+    {
+        RwInt32 nShown = s_nMsgLog < TRIGMSG_LOG ? (RwInt32)s_nMsgLog : TRIGMSG_LOG;
+
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("frame", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("message", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("to");
+        ImGui::TableSetupColumn("from (sender object)");
+        ImGui::TableSetupColumn("while running");
+        ImGui::TableSetupColumn("arguments");
+        ImGui::TableSetupColumn("code");
+        ImGui::TableHeadersRow();
+        for (i = nShown; i >= 1; i--)
+        {
+            const TrigMsgRec *r = &s_aMsgLog[(s_nMsgLog - i) % TRIGMSG_LOG];
+            RwChar szArgs[64], szCode[96];
+
+            if (s_szFilter[0] && !ReportHas(r->szKind, s_szFilter))
+                continue;
+            szArgs[0] = 0;
+            for (k = 0; k < r->nArgs && k < 4; k++)
+            {
+                RwChar sz[16];
+
+                sprintf(sz, "%d", r->anArgs[k]);
+                WaitAppend(szArgs, sizeof(szArgs), sz);
+            }
+            if (r->nArgs > 4)
+                WaitAppend(szArgs, sizeof(szArgs), "...");
+            MsgSenderCode(r->apCaller, r->nCallers, szCode, sizeof(szCode), NULL);
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::Text("%u", r->dwFrame);
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(r->szKind);
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(r->szTo);
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(r->szFrom);
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(r->szScript);
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(szArgs);
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(szCode);
+        }
+        if (s_bFollow && s_bMsgRecord)
+            ImGui::SetScrollHereY(1.0f);
+        ImGui::EndTable();
+    }
+    LeaveCriticalSection(&s_csMsg);
+    MsgSendUi();
+}
+
+// (CODFH_WAITS=1: logs the timers and the waiting tasks once, 20 seconds in)
+extern "C" void plog(const char *fmt, ...);
+static void WaitsLogTick()
+{
+    static RwInt32 s_nStart = -1;
+    static RwUInt32 s_dwAt;
+    RwUInt32 dwBase;
+    RwInt32 nStride, nCount, i, n = 0;
+    RwChar szName[96], szMsg[64], szWhat[512];
+
+    if (s_nStart < 0)
+    {
+        s_nStart = GetEnvironmentVariableA("CODFH_WAITS", NULL, 0) ? 1 : 0;
+        s_dwAt = port_frame + 1200;
+    }
+    if (s_nStart != 1 || port_frame < s_dwAt)
+        return;
+    s_nStart = 2;
+    plog("waits: the timers' clock %.1f s", dword_449B40 / 60.0f);
+    __try
+    {
+        type_73360 *t;
+
+        for (t = dword_449B44; t != NULL && n < 40; t = t->unk_14, n++)
+        {
+            type_67620 *pObj = sub_67620(t->unk_00);
+
+            if (pObj)
+                ScriptName(pObj, szName, sizeof(szName));
+            else
+                strcpy(szName, "(gone)");
+            WaitMsgName(t->unk_04, szMsg, sizeof(szMsg));
+            plog("waits: timer %s for %s in %.1f s", szMsg, szName, (t->unk_10 - dword_449B40) / 60.0f);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    n = 0;
+    if (PoolFree(&dword_4499F0, &dwBase, &nStride, &nCount))
+        for (i = 0; i < nCount && n < 40; i++)
+        {
+            type_3D2E20 *t = (type_3D2E20 *)(dwBase + i * nStride);
+            type_3D2E20_118 *rec;
+            RwInt32 nRec = 0;
+
+            if (s_abFree[i])
+                continue;
+            szWhat[0] = 0;
+            __try
+            {
+                if (!t->unk_10C)
+                    continue;
+                for (rec = t->unk_118; rec != NULL && nRec < 16; rec = rec->unk_04, nRec++)
+                {
+                    RwChar szMsgs[256];
+
+                    if (WaitRegistrations(rec->unk_00, 1, szMsgs, sizeof(szMsgs)))
+                        WaitAppend(szWhat, sizeof(szWhat), szMsgs);
+                }
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                continue;
+            }
+            ScriptName((type_67620 *)t, szName, sizeof(szName));
+            plog("waits: task %s waits for %s", szName, szWhat[0] ? szWhat : (t->unk_10D ? "a message" : "a wake"));
+            n++;
+        }
+}
+
 static void TabScripts()
 {
     RwUInt32 dwRunning;
@@ -4149,6 +6074,16 @@ static void TabScripts()
     ImGui::InputText("name filter##scripts", s_szScriptFilter, sizeof(s_szScriptFilter));
     if (ImGui::BeginTabBar("scriptkinds"))
     {
+        if (ImGui::BeginTabItem("Waits"))
+        {
+            TabWaits();
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Messages"))
+        {
+            TabMessages();
+            ImGui::EndTabItem();
+        }
         if (ImGui::BeginTabItem("State machines"))
         {
             ScriptTable("machines", &dword_449A30, TRUE, dwRunning, nCall);
@@ -4579,11 +6514,82 @@ static void SlotRow(const RwChar *pszName, type_4E5D30 *pSlot)
     ImGui::TextUnformatted(dwColl ? "yes" : "-");
 }
 
+#ifdef CODFH_ALL_SECTIONS
+// Every section at once (game/sectionslots.h): while on, the section triggers and the restarts'
+// reconcile (sub_D8660) unload nothing, and turning it on loads every SECTIONS\S_n.RWS the
+// level has and has not loaded (sub_D7F70, on the game thread), while slots are free.
+static RwBool s_bAllSections;
+static RwBool s_bAllSectionsPending;
+static RwInt32 s_nAllSectionsLoaded;
+
+RwInt32 port_all_sections_on()
+{
+    // (CODFH_ALLSECTIONS=1: on from the start, so a level's start loads them all)
+    static RwInt32 s_nEnv = -1;
+
+    if (s_nEnv < 0)
+    {
+        s_nEnv = GetEnvironmentVariableA("CODFH_ALLSECTIONS", NULL, 0) ? 1 : 0;
+        if (s_nEnv)
+            s_bAllSections = TRUE;
+    }
+    return s_bAllSections != 0;
+}
+
+void port_all_sections_load()
+{
+    RwInt32 n, i, nFree, nLoaded = 0;
+
+    for (n = 1; n <= 64; n++)
+    {
+        if (sub_174640((RwUInt16)n))
+            continue;
+        for (i = 0, nFree = 0; i < SECTION_SLOTS; i++)
+            if (!dword_4E5D30[i].get_unk_00() && dword_4E5D30[i].unk_08 == 0xFFFF)
+                nFree++;
+        if (nFree == 0)
+            break;
+        sub_D7F70(n);
+        if (sub_174640((RwUInt16)n))
+            nLoaded++;
+    }
+    s_nAllSectionsLoaded = nLoaded;
+    sprintf(s_szReqResult, "every section: %d more loaded", nLoaded);
+}
+
+// (from TrigWebTick, on the game thread: the load the switch asked for)
+static void AllSectionsTick()
+{
+    if (!s_bAllSectionsPending)
+        return;
+    s_bAllSectionsPending = FALSE;
+    port_all_sections_load();
+}
+#endif
+
 static void TabSections()
 {
     static int s_nSection, s_nSlot;
     RwInt32 i;
     RwChar sz[48];
+
+#ifdef CODFH_ALL_SECTIONS
+    {
+        RwInt32 nLive = 0;
+        RwBool bWas = s_bAllSections;
+
+        Check("load every section at once", &s_bAllSections);
+        if (s_bAllSections && !bWas)
+            s_bAllSectionsPending = TRUE;
+        for (i = 0; i < SECTION_SLOTS; i++)
+            nLive += dword_4E5D30[i].get_unk_00() ? 1 : 0;
+        ImGui::SameLine();
+        ImGui::TextDisabled("%d of %d slots live", nLive, SECTION_SLOTS);
+        ImGui::TextDisabled("(on: the level's other sections load now, and the section triggers and restarts "
+                            "unload none; off: the triggers stream them again. Only loading and drawing see the "
+                            "extra slots: collision, the AI's paths and the lighting zones keep to the first four)");
+    }
+#endif
 
     if (ImGui::BeginTable("slots", 5, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg))
     {
@@ -4593,8 +6599,11 @@ static void TabSections()
         ImGui::TableSetupColumn("world");
         ImGui::TableSetupColumn("collision");
         ImGui::TableHeadersRow();
-        for (i = 0; i < 4; i++)
+        for (i = 0; i < SECTION_SLOTS; i++)
         {
+            // (the extra slots only while live)
+            if (i >= 4 && !dword_4E5D30[i].get_unk_00())
+                continue;
             sprintf(sz, "slot %d", i);
             SlotRow(sz, &dword_4E5D30[i]);
         }
@@ -5140,6 +7149,9 @@ static const ViewEntry s_aViewEntries[] =
     { "World", "Splines", ViewSplines, &g_bTrigDrawSplines },
     { "World", "Zones", ViewZones, &g_bTrigDrawZones },
     { "World", "Lights", ViewLights, &g_bTrigDrawLights },
+    { "World", "Mount points", ViewMounts, &g_bTrigDrawMounts },
+    { "World", "Models", ViewModels, &g_bTrigDrawModels },
+    { "World", "Skeletons", ViewSkeletons, &g_bTrigDrawSkeletons },
     { "World", "Sounds", ViewSounds, &g_bTrigDrawSounds },
     { "AI", "AI state", ViewAi, &g_bTrigDrawAi },
     { "AI", "Path nodes", ViewAi, &g_bTrigDrawPathNodes },
@@ -5151,6 +7163,8 @@ static const ViewEntry s_aViewEntries[] =
     { "Combat", "Projectiles", ViewProjectiles, &g_bTrigDrawProjectiles },
     { "Combat", "Generators", ViewGenerators, &g_bTrigDrawPg },
     { "Camera", "Noclip, free camera", ViewCamera, &g_bTrigDrawFreeCam },
+    { "Speedrun", "Random numbers", ViewRng, &g_bTrigRngRecord },
+    { "Speedrun", "Frame rate", ViewFrameRate, &g_bTrigFrameSample },
 };
 
 static void TabView()

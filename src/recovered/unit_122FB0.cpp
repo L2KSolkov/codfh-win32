@@ -408,7 +408,7 @@ void sub_1234D0(RwInt32 arg_0)
     {
         dword_4CF330 = 1;
     }
-    for (bp_4 = -1; bp_4 < 4; bp_4++)
+    for (bp_4 = -1; bp_4 < SECTION_SLOTS; bp_4++)
     {
         if (bp_4 == -1 || dword_4E5D30[bp_4].get_unk_00())
         {
