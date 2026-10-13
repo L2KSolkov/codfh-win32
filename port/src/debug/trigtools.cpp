@@ -6360,8 +6360,9 @@ static void PathsTick()
     }
     if (!s_dwIn)
         s_dwIn = port_frame;
-    // (a restart releases the graph, sub_F8270: loaded again)
-    if (unk_4C00E8.unk_64)
+    // (a restart releases the graph, sub_F8270: loaded again. A shipped graph of a few nodes, as
+    // MP_4's 4, is taken as none and replaced)
+    if (unk_4C00E8.unk_64 && (unk_4C00E8.unk_08 >= 50 || s_bHad))
         s_bDone = s_bHad = TRUE;
     else if (s_bHad)
         s_bDone = s_bHad = FALSE;
