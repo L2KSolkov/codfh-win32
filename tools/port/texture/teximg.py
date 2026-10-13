@@ -50,3 +50,54 @@ def write_png(path, w, h, px, alpha=False):
     png = b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', w, h, 8, 6 if alpha else 2, 0, 0, 0))
     png += chunk(b'IDAT', zlib.compress(bytes(raw), 6)) + chunk(b'IEND', b'')
     open(path, 'wb').write(png)
+
+
+def read_png(path):
+    """An 8-bit RGB or RGBA, non-interlaced PNG: (w, h, [(r, g, b, a), ...])."""
+    d = open(path, 'rb').read()
+    assert d[:8] == b'\x89PNG\r\n\x1a\n'
+    pos, idat, w = 8, b'', 0
+    while pos < len(d):
+        n = struct.unpack('>I', d[pos:pos + 4])[0]
+        t = d[pos + 4:pos + 8]
+        body = d[pos + 8:pos + 8 + n]
+        if t == b'IHDR':
+            w, h, depth, ctype, _, _, inter = struct.unpack('>IIBBBBB', body)
+            assert depth == 8 and ctype in (2, 6) and inter == 0, (depth, ctype, inter)
+        elif t == b'IDAT':
+            idat += body
+        pos += 12 + n
+    bpp = 4 if ctype == 6 else 3
+    raw = zlib.decompress(idat)
+    stride = w * bpp
+    prev = bytearray(stride)
+    px = []
+    o = 0
+    for y in range(h):
+        f = raw[o]
+        line = bytearray(raw[o + 1:o + 1 + stride])
+        o += 1 + stride
+        if f == 1:
+            for i in range(bpp, stride):
+                line[i] = (line[i] + line[i - bpp]) & 0xFF
+        elif f == 2:
+            for i in range(stride):
+                line[i] = (line[i] + prev[i]) & 0xFF
+        elif f == 3:
+            for i in range(stride):
+                left = line[i - bpp] if i >= bpp else 0
+                line[i] = (line[i] + ((left + prev[i]) >> 1)) & 0xFF
+        elif f == 4:
+            for i in range(stride):
+                a = line[i - bpp] if i >= bpp else 0
+                b = prev[i]
+                c = prev[i - bpp] if i >= bpp else 0
+                p = a + b - c
+                pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
+                pr = a if pa <= pb and pa <= pc else b if pb <= pc else c
+                line[i] = (line[i] + pr) & 0xFF
+        for x in range(w):
+            k = x * bpp
+            px.append((line[k], line[k + 1], line[k + 2], line[k + 3] if bpp == 4 else 255))
+        prev = line
+    return w, h, px
