@@ -388,6 +388,10 @@ void type_3DF30::sub_3E7C0(type_3D3548 *arg_0)
                 if (stk_14 != 0) {
                     local_20 = arg_0->vf_120();
                     var18 = local_20->unk_574;
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+                    // (the port's debug tools: with the bots a member's maneuver can be gone)
+                    if (sub_3D3E0(var18))
+#endif
                     sub_3D3E0(var18)->vf_014(arg_0);
                 }
                 if (lv_8 != 0)

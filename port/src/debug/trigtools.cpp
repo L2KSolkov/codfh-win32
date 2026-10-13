@@ -103,6 +103,8 @@
 #include "game/data.h"
 #include "types/type_4C00E8.h"
 #include "types/cNetLevelParams.h"
+#include "types/type_3DF30.h"
+#include "types/type_3CE6D0.h"
 #include "rws/debugswitches.h"
 #include "rws/camerahelper.h"
 #include "game/cheats.h"
@@ -6740,6 +6742,8 @@ static void SpawnAiBringNear(type_3D3548 *pSoldier, type_10F710 *pPlayer)
 
 #ifndef CODFH_SP
 #define BOTS_MAX 32
+void sub_3D0B0(type_365A0 arg_0);
+type_3CE6D0 *sub_3D3E0(RwUInt32 arg_0);
 extern RwInt32 g_anTrigProjectiles[8];
 
 // (the pools a soldier takes from: their free counts, CODFH_BOTS' log)
@@ -7462,6 +7466,52 @@ static void BotsTick()
                 n2 += _snprintf(szEv + n2, sizeof(szEv) - n2, " 0x%X:%d%s", s_anBotEventId[e], s_anBotEventCount[e],
                                 s_anBotEventIgnored[e] ? "(ignored some)" : "");
             plog("bots: animation events:%s", szEv);
+        }
+        // (the orphaned maneuvers freed: in no squad's list and no soldier's own, sub_3D0B0)
+        {
+            static RwUInt8 s_abReached[MANEUVER_HANDLES];
+            type_3DF30 *pSq;
+            RwInt32 h, k, nFreed = 0;
+
+            memset(s_abReached, 0, sizeof(s_abReached));
+            __try
+            {
+                for (pSq = dword_4395F0; pSq; pSq = pSq->unk_2AC)
+                {
+                    RwUInt32 dwH = pSq->unk_2A8;
+                    RwInt32 nGuard = 0;
+
+                    while (dwH && nGuard++ < MANEUVER_HANDLES)
+                    {
+                        type_3CE6D0 *pM = sub_3D3E0(dwH);
+
+                        if (pM == NULL)
+                            break;
+                        s_abReached[(RwUInt16)dwH] = 1;
+                        dwH = pM->unk_14;
+                    }
+                }
+                for (k = 0; k < 0x300; k++)
+                {
+                    type_3D3548 *pE = dword_4B6A00[k].unk_04;
+                    AIData *pAi;
+
+                    if (pE && (pE->unk_2C & 0x20) && (pAi = pE->vf_120()) != NULL && pAi->unk_574)
+                        s_abReached[(RwUInt16)pAi->unk_574] = 1;
+                }
+                for (h = 1; h < MANEUVER_HANDLES; h++)
+                    if (dword_4392A8[h].unk_08 && !s_abReached[h])
+                    {
+                        sub_3D0B0(dword_4392A8[h].unk_00);
+                        nFreed++;
+                    }
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                plog("bots: freeing orphaned maneuvers faulted");
+            }
+            if (nFreed)
+                plog("bots: %d orphaned maneuvers freed", nFreed);
         }
         // (the live maneuvers by kind, from their handle table)
         {
