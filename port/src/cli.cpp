@@ -38,6 +38,10 @@
  * (sub_D7F40, the level-file path): a level folder under the data root's LEVELS, played as the
  * -map level is (its number, loading picture and save); its ANIMPACKS.TXT and SOUNDBANKS.TXT
  * name extra animation packs and sound banks to load.
+ *
+ * -autospawn (MP) spawns the local player as soon as the game lets it: the spawn button's own
+ * calls (the fade, then the playing view, which respawns), made by the port while there is no
+ * local soldier (port/src/debug/trigtools.cpp, AutoSpawnTick).
  */
 #include <xtl.h>
 #include <ctype.h>
@@ -67,6 +71,10 @@ static char cli_map[64], cli_type[16], cli_name[64], cli_movie[64];
 static char cli_level_dir[64];
 extern "C" const char *port_level_dir;
 extern "C" const char *port_level_dir = NULL;
+
+/* -autospawn: the local player spawned as soon as the game lets it (port/src/debug/trigtools.cpp). */
+extern "C" int port_autospawn;
+extern "C" int port_autospawn = 0;
 
 /* A -leveldir test level's extra animation packs, past the six its CAnimPackSelector loads: the
  * folder's ANIMPACKS.TXT, a pack's file name a line ("MPA_00Ger.ads"; '#' a comment), read
@@ -231,6 +239,8 @@ extern "C" void port_cli_parse(const char *cmd)
             strncpy(cli_movie, argv[++i], sizeof(cli_movie) - 1);
         else if (!_stricmp(argv[i], "-verbose"))
             port_log_verbose = 1;
+        else if (!_stricmp(argv[i], "-autospawn"))
+            port_autospawn = 1;
         else if (!_stricmp(argv[i], "-leveldir") && i + 1 < argc)
         {
             strncpy(cli_level_dir, argv[++i], sizeof(cli_level_dir) - 1);

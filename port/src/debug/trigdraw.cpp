@@ -2988,12 +2988,31 @@ static TrigDrawHit s_aHits[TRIGDRAW_HITS];
 static RwInt32 s_nHitNext;
 
 // (from the projectiles' steps, just before the entity's vf_064)
+extern "C" void plog(const char *fmt, ...);
+
 void TrigDrawBulletHit(void *pEntity, const RwV3d *pv, RwInt32 nPart, RwReal fDamage)
 {
     TrigDrawHit *h;
+    static RwInt32 s_nLogHits = -1;
 
     if (pv == NULL)
         return;
+    // (CODFH_SPAWNAI's test: every bullet hit on an entity logged, the entity's kind and whether
+    // it is the local player)
+    if (s_nLogHits < 0)
+        s_nLogHits = GetEnvironmentVariableA("CODFH_SPAWNAI", NULL, 0) ? 1 : 0;
+    if (s_nLogHits)
+    {
+        __try
+        {
+            plog("hits: a bullet hit entity %p (kind 0x%X%s), part %d, damage %.1f, at (%.0f, %.0f, %.0f)", pEntity,
+                 ((type_3D3548 *)pEntity)->unk_2C, pEntity == (void *)sub_1745A0(0) ? ", the player" : "", nPart, fDamage,
+                 pv->x, pv->y, pv->z);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
     h = &s_aHits[s_nHitNext];
     s_nHitNext = (s_nHitNext + 1) % TRIGDRAW_HITS;
     h->pEntity = pEntity;
@@ -4662,9 +4681,33 @@ static RwInt32 TrigDrawProjKindOf(const void *pProjectile)
     return -1;
 }
 
+// (CODFH_SPAWNAI's test: the projectiles logged, each spawned and each impact)
+static RwBool TrigLogShots()
+{
+    static RwInt32 s_n = -1;
+
+    if (s_n < 0)
+        s_n = GetEnvironmentVariableA("CODFH_SPAWNAI", NULL, 0) ? 1 : 0;
+    return s_n == 1;
+}
+
 void TrigDrawProjectileSpawned(RwInt32 nKind, void *pProjectile)
 {
     RwInt32 i;
+
+    if (TrigLogShots())
+    {
+        __try
+        {
+            const type_3DC7F8 *p = (const type_3DC7F8 *)pProjectile;
+
+            plog("shots: projectile %p of kind %d spawned at (%.0f, %.0f, %.0f), velocity (%.1f, %.1f, %.1f)", pProjectile,
+                 nKind, p->unk_04.x, p->unk_04.y, p->unk_04.z, p->unk_10.x, p->unk_10.y, p->unk_10.z);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
 
     if (nKind >= 0 && nKind < TRIGDRAW_PROJ_KINDS)
         g_anTrigDrawProjSpawned[nKind]++;
@@ -4701,7 +4744,9 @@ static void TrigDrawProjEnd(void *pProjectile, const RwV3d *pv, RwInt32 nSurface
 
 void TrigDrawProjectileImpact(void *pProjectile, RwInt32 nSurface, const RwV3d *pv, void *pEntity)
 {
-    (void)pEntity;
+    if (TrigLogShots() && pv)
+        plog("shots: projectile %p hit surface %d at (%.0f, %.0f, %.0f)%s", pProjectile, nSurface, pv->x, pv->y, pv->z,
+             pEntity ? " (an entity)" : "");
     if (pv)
         TrigDrawProjEnd(pProjectile, pv, nSurface, TRUE);
 }

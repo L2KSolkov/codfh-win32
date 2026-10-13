@@ -76,6 +76,21 @@
 #include "types/alfaobjman.h"
 #include "types/PlayerTrigger.h"
 #include "types/SoldierTrigger.h"
+#ifndef CODFH_SP
+#include "types/cNetSoldierTrigger.h"
+#include "game/parsedfile.h"
+#include "game/uiglue.h"
+#include "game/liveservice.h"
+#include "game/ingamepages.h"
+#include "game/ingamescreens.h"
+#include "types/type_141C10.h"
+#include "types/type_3DAFC8.h"
+#include "types/type_4B83A0.h"
+#include "types/type_4B85F8.h"
+#include "types/type_4D53F8.h"
+#include "game/netmsg.h"
+#include "types/type_15CCE0.h"
+#endif
 #include "types/type_4B8EF0.h"
 #include "types/VehicleTrigger.h"
 #include "types/type_495F0.h"
@@ -98,6 +113,7 @@
 #include "types/ProjectileGeneratorTrigger.h"
 #include "types/type_3D2E7C.h"
 #include "game/godassetmanager.h"
+#include "types/type_72810.h"
 #include "types/type_3DF8D8.h"
 
 #include "../../third_party/imgui/imgui.h"
@@ -122,6 +138,7 @@ extern RwReal g_fTrigDrawCollisionRange;
 extern RwReal g_fTrigDrawCollisionLift;
 #include "trigcoll.h"
 #include "trigsndproj.h"
+#include "types/animbank.h"
 #include "types/vec4.h"
 #include "rw/rprandom.h"
 #include <float.h>
@@ -487,9 +504,9 @@ static void Teleport(type_10F710 *pPlayer, const RwV3d *pv)
         strcpy(s_szReqResult, "the player has no frame");
         return;
     }
-    RwFrameGetMatrix(pFrame)->pos = *pv;
-    RwFrameUpdateObjects(pFrame);
-    pPlayer->unk_434 = *pv;
+    // (placed as the scripts' teleports place an entity, "TeleportToNamedObject": its vf_0C0,
+    // which keeps its every position, not only its frame's; then its fall forgotten)
+    pPlayer->vf_0C0((RwV3d *)pv);
     pPlayer->unk_440 = *pv;
     pPlayer->unk_510 = -1000000.0f;
     pPlayer->unk_518 = 0.0f;
@@ -533,12 +550,210 @@ static RwBool GroundBelow(RwV3d *pv)
     return TRUE;
 }
 
+// Whether the line from *pA to *pB meets no collision (the global section's world and each live
+// section slot's, as GroundBelow tests).
+static RwBool LineClear(const RwV3d *pA, const RwV3d *pB)
+{
+    RpIntersection is;
+    RwReal fHit = 2.0f;
+    RpWorld *pWorld;
+    RwInt32 i;
+
+    is.type = rpINTERSECTLINE;
+    is.t.line.start = *pA;
+    is.t.line.end = *pB;
+    for (i = 0; i <= 4; i++)
+    {
+        pWorld = i < 4 ? (dword_4E5D30[i].get_unk_00() ? dword_4E5D30[i].get_unk_28() : NULL) : unk_4E5CD8.get_unk_28();
+        if (pWorld)
+            RpCollisionWorldForAllIntersections(pWorld, &is, GroundHit, &fHit);
+    }
+    return fHit > 1.0f;
+}
+
 // Spawns the soldier of the soldier trigger pTrigger (kind 5) at *pv: its
 // place (unk_90) and matrix are moved there for the spawn and put back, and
 // its free-spawn flag (unk_24_18: no starting cover point needed, entity
 // memory past the soldier pool's room) set for it. Its spawn (vf_020) needs
 // the trigger's soldier definition loaded, so a trigger of this map. Returns
-// the soldier, or NULL.
+// the soldier, or NULL. In multiplayer, the map's cNetSoldierTrigger (dword_4F8134) spawns a
+// remote player's soldier, a body only the network moves (sub_1BEBB0): it is spawned as single
+// player spawns a soldier instead (SpawnAiSoldierMp), a soldier with its AI and class script,
+// in the multiplayer character.
+extern "C" void plog(const char *fmt, ...);
+
+// (a faulting spawn's exception: its code, address, the address it touched, and the return
+// addresses up the frame pointers, kept by the filter for the result line)
+static void MsgCodeName(void *p, RwChar *psz, RwInt32 nMax);
+static struct
+{
+    RwUInt32 dwCode;
+    void *pAt;
+    RwUInt32 dwTouched;
+    void *apUp[6];
+    RwInt32 nUp;
+} s_spawnFault;
+
+static int SpawnFaultFilter(EXCEPTION_POINTERS *pEx)
+{
+    RwUInt32 *pFrame = (RwUInt32 *)(size_t)pEx->ContextRecord->Ebp;
+
+    s_spawnFault.dwCode = pEx->ExceptionRecord->ExceptionCode;
+    s_spawnFault.pAt = pEx->ExceptionRecord->ExceptionAddress;
+    s_spawnFault.dwTouched = pEx->ExceptionRecord->NumberParameters >= 2
+                                 ? (RwUInt32)pEx->ExceptionRecord->ExceptionInformation[1] : 0;
+    s_spawnFault.nUp = 0;
+    while (pFrame && s_spawnFault.nUp < 6 && !IsBadReadPtr(pFrame, 8))
+    {
+        s_spawnFault.apUp[s_spawnFault.nUp++] = (void *)(size_t)pFrame[1];
+        if ((RwUInt32 *)(size_t)pFrame[0] <= pFrame)
+            break;
+        pFrame = (RwUInt32 *)(size_t)pFrame[0];
+    }
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+
+static void SpawnFaultText()
+{
+    RwChar sz[96];
+    RwInt32 i, n;
+
+    MsgCodeName(s_spawnFault.pAt, sz, sizeof(sz));
+    n = _snprintf(s_szReqResult, sizeof(s_szReqResult), "the spawn faulted: %08X at %s (touching %08X); from",
+                  s_spawnFault.dwCode, sz, s_spawnFault.dwTouched);
+    for (i = 0; i < s_spawnFault.nUp && n > 0 && n < (RwInt32)sizeof(s_szReqResult) - 2; i++)
+    {
+        MsgCodeName(s_spawnFault.apUp[i], sz, sizeof(sz));
+        n += _snprintf(s_szReqResult + n, sizeof(s_szReqResult) - n, " %s", sz);
+    }
+    s_szReqResult[sizeof(s_szReqResult) - 1] = 0;
+    plog("spawn: %s", s_szReqResult);
+}
+
+#ifndef CODFH_SP
+// A single player soldier in multiplayer: SoldierTrigger::vf_020 and sub_134B40 as they are,
+// but its entity memory from pool 6 (0x2240 bytes, the remote players' soldiers'). Multiplayer
+// never makes one of these (0x2170 bytes): its entity allocator (sub_D56D0) only looks in pools
+// 1 to 5 (at most 0x9B0) for one, then, asked to make room, faults ranking the entities. The
+// entity notes its pool (unk_20, from dword_429264) for its release.
+static type_3DF8D8 *ForeignRead(const RwChar *pszLevel, type_3DF8D8_04 *pKey, RwInt32 nKind);
+
+// An NPC weapon type for an AI soldier in multiplayer: the first whose model is read
+// (sub_15D010 clones its definition's model, kind 26, and gives up without one, and the
+// weapon's take-up, sub_15D3E0, then faults on no clump; one with unk_74 set needs unk_58's
+// object too), or -1; *pnAll the NPC weapons the level has.
+static RwInt32 PickNpcWeapon(RwInt32 *pnAll)
+{
+    RwInt32 k, nWeapon = -1;
+
+    *pnAll = 0;
+    for (k = 0; k < 128; k++)
+    {
+        type_3DF8D8 *pDef;
+
+        if (!dword_4D53F8[k].unk_48.unk_00 && !dword_4D53F8[k].unk_48.unk_04)
+            continue;
+        (*pnAll)++;
+        __try
+        {
+            pDef = sub_198800(&dword_4D53F8[k].unk_48);
+            if (pDef == NULL || pDef->vf_008() != 26 || !definition_model(pDef))
+                continue;
+            if (dword_4D53F8[k].unk_74 && sub_198800(&dword_4D53F8[k].unk_58) == NULL)
+                continue;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            continue;
+        }
+        if (nWeapon < 0)
+            nWeapon = k;
+    }
+    return nWeapon;
+}
+
+static type_3D3548 *SpawnAiSoldierMp(SoldierTrigger *pTrigger)
+{
+    type_3DF8D8 *pDef = sub_198800(&pTrigger->unk_D8);
+    type_1917A0 *pChar;
+    type_3DAFC8 *pSoldier;
+    void *p;
+
+    if (pDef == NULL || pDef->vf_008() != 4)
+    {
+        strcpy(s_szReqResult, "the trigger's soldier definition is not loaded");
+        return NULL;
+    }
+    pChar = (type_1917A0 *)pDef;
+    if (!pChar->sub_1917A0() || !pChar->sub_1917F0())
+    {
+        strcpy(s_szReqResult, "the trigger's soldier definition has no body or head");
+        return NULL;
+    }
+    if (dword_4B83A0[6].unk_00 < 0x2170 || (p = dword_4B83A0[6].sub_D65C0()) == NULL)
+    {
+        strcpy(s_szReqResult, "no entity memory left in the soldiers' pool (6)");
+        return NULL;
+    }
+    // (its weapon: the trigger's weapon type, unk_130, an index into the NPC weapons
+    // (dword_4D53F8, by the weapon's key; SoldierTrigger's command 38). The network player's
+    // trigger has none (players take a loadout): CODFH_SPAWNAI_WEAPON's index, else the first
+    // NPC weapon this level has, for the soldier's making only)
+    RwInt32 nOldWeapon = pTrigger->unk_130, nWeapon = -1, nWeapons = 0;
+    RwChar szWeapon[16];
+
+    nWeapon = PickNpcWeapon(&nWeapons);
+    if (GetEnvironmentVariableA("CODFH_SPAWNAI_WEAPON", szWeapon, sizeof(szWeapon)))
+        nWeapon = atoi(szWeapon);
+    plog("spawn: %d NPC weapons in this level; the soldier gets weapon type %d (the trigger's %d; -1: none with its "
+         "model read)", nWeapons, nWeapon, nOldWeapon);
+    if (!valid_weapon_type(nOldWeapon) && valid_weapon_type(nWeapon))
+        pTrigger->unk_130 = nWeapon;
+    // (its brain single player's: the soldier class every single player soldier trigger names
+    // (command 7: F19B8E76,A9A821C0), read from L_1_1_B's god data when this level lacks it
+    // (ForeignRead, CODFH_SPAWNAI_LEVEL), made the trigger's class (unk_E0) for the soldier's
+    // making, so its set-up starts it (sub_70E10) and registers it with the vision, distance and
+    // other schedulers, as a single player soldier's is; started after, those keep the class it
+    // replaced)
+    type_3DF8D8_04 oldClass = pTrigger->unk_E0;
+    {
+        type_3DF8D8_04 key;
+        RwChar szLevel[32];
+
+        key.unk_00 = (RwInt32)0xF19B8E76; // not an address: a god key
+        key.unk_04 = (RwInt32)0xA9A821C0; // not an address: a god key
+        if (!GetEnvironmentVariableA("CODFH_SPAWNAI_LEVEL", szLevel, sizeof(szLevel)))
+            strcpy(szLevel, "L_1_1_B");
+        if (ForeignRead(szLevel, &key, 0xA))
+            pTrigger->unk_E0 = key;
+        else
+            plog("spawn: single player's soldier class is not there; the soldier keeps the network player's");
+    }
+    dword_429264 = 6;
+    pSoldier = new (p) type_3DAFC8(pTrigger);
+    pTrigger->unk_130 = nOldWeapon;
+    pTrigger->unk_E0 = oldClass;
+    if (pSoldier->unk_28 & 0x400000) // not an address: entity flag
+    {
+        sub_D5A60(pSoldier, 0);
+        strcpy(s_szReqResult, "the soldier removed itself as it was made");
+        return NULL;
+    }
+    // (its side the other one to the local player's: a bullet harms only an entity of another
+    // side than the bullet's, its shooter's, unless friendly fire is on (sub_15F1B0's
+    // get_unk_2C_side test); the network player's trigger may give the soldier the player's own)
+    {
+        type_3D3548 *pPlayer = sub_1745A0(0);
+        RwUInt32 dwMine = pPlayer ? (pPlayer->unk_2C & 7) : 1;
+        RwUInt32 dwTheirs = dwMine == 2 ? 1 : 2;
+
+        pSoldier->unk_2C = (pSoldier->unk_2C & ~7u) | dwTheirs;
+        plog("spawn: the player's side %u; the soldier's %u", dwMine, dwTheirs);
+    }
+    return pSoldier;
+}
+#endif
+
 static type_3D3548 *SpawnSoldierAt(Trigger *pTrigger, const RwV3d *pv)
 {
     RwV3d vPlace, vMatrix;
@@ -557,12 +772,17 @@ static type_3D3548 *SpawnSoldierAt(Trigger *pTrigger, const RwV3d *pv)
     pTrigger->unk_24_18 = 1;
     __try
     {
-        pSoldier = pTrigger->vf_020();
+#ifndef CODFH_SP
+        if ((void *)pTrigger == (void *)dword_4F8134)
+            pSoldier = SpawnAiSoldierMp((SoldierTrigger *)pTrigger);
+        else
+#endif
+            pSoldier = pTrigger->vf_020();
     }
-    __except (EXCEPTION_EXECUTE_HANDLER)
+    __except (SpawnFaultFilter(GetExceptionInformation()))
     {
         pSoldier = NULL;
-        strcpy(s_szReqResult, "the spawn faulted");
+        SpawnFaultText();
     }
     pTrigger->unk_90 = vPlace.x;
     pTrigger->unk_94 = vPlace.y;
@@ -627,7 +847,21 @@ static void SpawnSoldier(RwInt32 n, const RwV3d *pv)
         }
     }
     if (pSoldier)
-        sprintf(s_szReqResult, "spawned a soldier from trigger %d at %.1f, %.1f, %.1f", n, pv->x, pv->y, pv->z);
+    {
+        RwUInt32 dwBits = 0;
+        RwBool bAi = FALSE;
+
+        __try
+        {
+            dwBits = pSoldier->unk_2C;
+            bAi = pSoldier->vf_120() != NULL;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+        sprintf(s_szReqResult, "spawned a soldier from trigger %d at %.1f, %.1f, %.1f (%s, %s)", n, pv->x, pv->y, pv->z,
+                bAi ? "with its AI" : "no AI", (dwBits & 2) ? "enemy" : (dwBits & 1) ? "ally" : "no side");
+    }
     else if (!s_szReqResult[0])
         strcpy(s_szReqResult, n >= 0 ? "no soldier: its definition is not loaded, or no entity memory"
                                      : "no soldier trigger on this map could spawn one");
@@ -951,10 +1185,36 @@ static void CheatFreezeTick()
 
 static void CheatTick()
 {
+    static RwInt32 s_nGodStart = -1;
+
+    // (CODFH_GOD=1: god mode from the start)
+    if (s_nGodStart < 0)
+    {
+        s_nGodStart = 0;
+        if (GetEnvironmentVariableA("CODFH_GOD", NULL, 0))
+            s_bCheatGod = TRUE;
+    }
     if (s_bCheatIgnoreMe)
         byte_4C1940 = 1;
     if (s_bCheatGod)
+    {
+        type_10F710 *pPlayer = (type_10F710 *)sub_1745A0(0);
+
         byte_4F28F8 = 1;
+        // (falls too: the game's god mode spares only bullets and explosions; a fall kills
+        // through its height, unk_510, and its time in the air, unk_518, type_10F710::vf_044)
+        if (pPlayer)
+        {
+            __try
+            {
+                pPlayer->unk_510 = -1000000.0f;
+                pPlayer->unk_518 = 0.0f;
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+            }
+        }
+    }
     if (s_bCheatAmmo)
         dword_4C19AC = 1;
     if (s_bCheatFreezeAi || s_nCheatFrozen)
@@ -969,6 +1229,9 @@ static void AllSectionsTick();      // (below, with the Sections tab)
 
 static void WaitsLogTick();
 static void TrigMsgTick();
+static void SpawnAiTestTick();
+static void AutoSpawnTick();
+static void LogSoldierTriggersTick();
 
 void TrigWebTick()
 {
@@ -981,6 +1244,9 @@ void TrigWebTick()
     TrigRngFrame();
     WaitsLogTick();
     TrigMsgTick();
+    SpawnAiTestTick();
+    AutoSpawnTick();
+    LogSoldierTriggersTick();
 #ifdef CODFH_ALL_SECTIONS
     AllSectionsTick();
 #endif
@@ -1203,7 +1469,7 @@ static void TabCheats()
     ImGui::SeparatorText("The developers' switches (nothing in the game sets them)");
     CheckSet("the AI ignores me (byte_4C1940: their target filter refuses players)", &s_bCheatIgnoreMe, FALSE,
              CheatIgnoreOff);
-    CheckSet("god mode (byte_4F28F8: bullets and explosions take no health)", &s_bCheatGod, FALSE, CheatGodOff);
+    CheckSet("god mode (byte_4F28F8: bullets and explosions take no health; the port adds falls)", &s_bCheatGod, FALSE, CheatGodOff);
     {
         bool b = RWS::DebugSwitches::GetSwitch(0x15);
 
@@ -4995,6 +5261,885 @@ RwBool TrigWebScriptsJson(RwChar *psz, RwInt32 nMax, void (*pfnImage)(RwUInt32 d
     return TRUE;
 }
 
+// ---- CODFH_SPAWNAI=1: a test of the AI soldier spawn (SpawnSoldierAt) ----
+extern "C" void plog(const char *fmt, ...);
+// ---- reading god assets of another level (the AI soldiers in multiplayer: single player's soldier
+// class) ----
+//
+// The GodAsset manager reads an object only while a request for it is open, from whatever
+// stream of god data passes by (sub_198D30 skips the rest). So an object of another level is
+// asked for (sub_198900, as its users ask), then that level's GODDATA.DFF read again through the
+// god data records (chunk 0x719, records of kinds 8 and 9: sub_142BC0, as the section reader's
+// sub_141C10 hands them on), pass after pass while what it reads asks for more (a script's
+// imports). Requests left open after, which no pass could answer, are taken back (the level
+// start, and the loading screen, wait on every open request).
+
+void sub_19A7D0(type_4F26D0 *arg_0);
+void sub_198F40(type_3DF8D8_base *arg_0);
+
+static RwInt32 ForeignOpenRequests()
+{
+    type_4F26D0 *p;
+    RwInt32 n = 0;
+
+    for (p = (type_4F26D0 *)dword_4F26D0; p && n < 100000; p = p->unk_08)
+        n++;
+    return n;
+}
+
+// One pass of the file pszPath's god data records; FALSE when it will not open.
+static RwBool ForeignPass(const RwChar *pszPath)
+{
+    RwChunkHeaderInfo hdr;
+    RwStream *pStream = RwStreamOpen(rwSTREAMFILENAME, rwSTREAMREAD, (void *)pszPath);
+
+    if (pStream == NULL)
+        return FALSE;
+    while (RwStreamReadChunkHeaderInfo(pStream, &hdr))
+    {
+        if (hdr.type == 0x719 && hdr.length >= sizeof(type_141C10))
+        {
+            type_141C10 rec;
+
+            RwStreamRead(pStream, &rec, sizeof(rec));
+            if (rec.unk_00 == 8 || rec.unk_00 == 9)
+            {
+                sub_12F0A0();
+                sub_142BC0(pStream, &rec);
+            }
+            else
+                RwStreamSkip(pStream, hdr.length - sizeof(rec));
+        }
+        else
+            RwStreamSkip(pStream, hdr.length);
+    }
+    RwStreamClose(pStream, (void *)pszPath);
+    return TRUE;
+}
+
+// The object *pKey (of the kind nKind) read from the level folder pszLevel's GODDATA.DFF, with
+// what it imports; the object, or NULL.
+static type_3DF8D8 *ForeignRead(const RwChar *pszLevel, type_3DF8D8_04 *pKey, RwInt32 nKind)
+{
+    type_4F26D0 *apBefore[512];
+    RwInt32 nBefore = 0, nPass, nOpen, nTaken = 0, i;
+    RwChar szPath[128];
+    type_4F26D0 *p, *pNext;
+    type_3DF8D8 *pObject = sub_198800(pKey);
+
+    if (pObject)
+        return pObject;
+    _snprintf(szPath, sizeof(szPath), "LEVELS\\%s\\GODDATA.DFF", pszLevel);
+    szPath[sizeof(szPath) - 1] = 0;
+    // (the requests already open: the level's own, left as they are)
+    for (p = (type_4F26D0 *)dword_4F26D0; p && nBefore < 512; p = p->unk_08)
+        apBefore[nBefore++] = p;
+    sub_198900(pKey, nKind, 0, 0, 0, 0);
+    for (nPass = 0; nPass < 8; nPass++)
+    {
+        nOpen = ForeignOpenRequests();
+        if (!ForeignPass(szPath))
+        {
+            plog("foreign: %s will not open", szPath);
+            break;
+        }
+        plog("foreign: %s pass %d: %d requests open before, %d after", szPath, nPass + 1, nOpen, ForeignOpenRequests());
+        // (a pass that read nothing, and asked for nothing more, is the last; one that asked for
+        // more, an object's imports earlier in the file, is followed by another)
+        if (ForeignOpenRequests() == nOpen || ForeignOpenRequests() <= nBefore)
+            break;
+    }
+    // (ours left open taken back)
+    for (p = (type_4F26D0 *)dword_4F26D0; p; p = pNext)
+    {
+        RwBool bOld = FALSE;
+
+        pNext = p->unk_08;
+        for (i = 0; i < nBefore; i++)
+            if (apBefore[i] == p)
+                bOld = TRUE;
+        if (bOld)
+            continue;
+        plog("foreign: no pass read %08X,%08X (kind %d); its request taken back", p->unk_00->unk_04.unk_00,
+             p->unk_00->unk_04.unk_04, p->unk_00->vf_008());
+        sub_19A7D0(p);
+        sub_198F40(p->unk_00);
+        memset(p, 0, sizeof(*p));
+        dword_4F2708.sub_16C710(p);
+        nTaken++;
+    }
+    pObject = sub_198800(pKey);
+    plog("foreign: %08X,%08X from %s: %s (%d requests taken back)", pKey->unk_00, pKey->unk_04, pszLevel,
+         pObject ? "read" : "not read", nTaken);
+    return pObject;
+}
+
+static void SpawnAiLogScripts(RwUInt32 dwObject);
+static void SpawnAiDiagStart();
+static void SpawnAiDiagLog(RwUInt32 dwObject);
+
+// A flat spot near *pv for a soldier: in rings 2 to 6 m out, 16 directions each, the first
+// place with a floor (GroundBelow) within 1.5 m of the player's height whose floor 1 m off on
+// four sides is within 10 cm of its own; *pv moved there. FALSE when there is none.
+static RwBool LineClear(const RwV3d *pA, const RwV3d *pB);
+static RwBool s_bFlatNeedsSight;
+
+static RwBool FindFlatSpot(RwV3d *pv)
+{
+    static const RwReal s_afRing[4] = { 200.0f, 300.0f, 400.0f, 600.0f };
+    RwInt32 r, k, j;
+
+    for (r = 0; r < 4; r++)
+        for (k = 0; k < 16; k++)
+        {
+            RwReal a = k * 6.2831853f / 16.0f;
+            RwV3d c = *pv;
+            RwBool bFlat = TRUE;
+
+            c.x += (RwReal)cos(a) * s_afRing[r];
+            c.z += (RwReal)sin(a) * s_afRing[r];
+            c.y = pv->y + 100.0f;
+            if (!GroundBelow(&c) || fabs(c.y - pv->y) > 150.0f)
+                continue;
+            for (j = 0; j < 4 && bFlat; j++)
+            {
+                RwV3d e = c;
+
+                e.x += j == 0 ? 100.0f : j == 1 ? -100.0f : 0.0f;
+                e.z += j == 2 ? 100.0f : j == 3 ? -100.0f : 0.0f;
+                e.y = c.y + 100.0f;
+                if (!GroundBelow(&e) || fabs(e.y - c.y) > 10.0f)
+                    bFlat = FALSE;
+            }
+            // (and, for the combat test, a clear line between the two at head height)
+            if (bFlat && s_bFlatNeedsSight)
+            {
+                RwV3d a = *pv, b = c;
+
+                a.y += 20.0f;
+                b.y += 150.0f;
+                bFlat = LineClear(&a, &b);
+            }
+            if (bFlat)
+            {
+                *pv = c;
+                return TRUE;
+            }
+        }
+    return FALSE;
+}
+
+// The god asset named pszName (the GodAsset manager's table of every object, dword_4F2728; an
+// object's name is its unk_14), or NULL.
+static type_3DF8D8 *FindAssetByName(const RwChar *pszName)
+{
+    RwInt32 b;
+
+    __try
+    {
+        if (dword_4F2728.unk_30 == NULL)
+            return NULL;
+        for (b = 0; b < dword_4F2728.unk_04 && b < 65536; b++)
+        {
+            alfahash_node *pNode;
+            RwInt32 nGuard = 0;
+
+            for (pNode = dword_4F2728.unk_30[b]; pNode && nGuard < 10000; pNode = pNode->unk_04, nGuard++)
+            {
+                type_3DF8D8 *pAsset = (type_3DF8D8 *)pNode->unk_00;
+                RwChar szName[64];
+
+                if (pAsset == NULL || pAsset->unk_14 == 0)
+                    continue;
+                ReadText((const RwChar *)pAsset->unk_14, szName, sizeof(szName) - 1);
+                szName[sizeof(szName) - 1] = 0;
+                if (_stricmp(szName, pszName) == 0)
+                    return pAsset;
+            }
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    return NULL;
+}
+
+// -autospawn (port/src/cli.cpp, multiplayer): the local player spawned as soon as the game lets
+// it: the team and weapon screens closed as picking a weapon closes them (sub_1C4B10; the team
+// the game's automatic pick, the weapon the last one), then the spawn button's own calls
+// (type_4F7EB8::sub_1AADF0: the fade, then the playing view, sub_1AB400(0), whose change
+// respawns, sub_1AED30), while there is no local soldier and no
+// respawn under way, with the button's other conditions, at most every five seconds.
+extern "C" int port_autospawn;
+// (CODFH_LOGSOLDIERS=1: three seconds into a level, each soldier trigger's class and task
+// scripts' keys (commands 7 and 8: unk_E0 as kind 0xA, unk_E8 as kind 0xC), the objects read
+// for them, and the key the name "SoldierClass" hashes to, logged once each)
+static void LogSoldierTriggersTick()
+{
+    static RwInt32 s_nStart = -1;
+    static RwUInt32 s_dwAt;
+    RwInt32 i, k, n = 0;
+    RwUInt32 adwSeen[64][4];
+    type_3DF8D8_04 keyName;
+
+    if (s_nStart < 0)
+        s_nStart = GetEnvironmentVariableA("CODFH_LOGSOLDIERS", NULL, 0) ? 0 : 2;
+    if (s_nStart == 2)
+        return;
+    if (sub_1745A0(0) == NULL)
+    {
+        s_dwAt = port_frame + 180;
+        return;
+    }
+    if (port_frame < s_dwAt)
+        return;
+    s_nStart = 2;
+    sub_198A20("SoldierClass", &keyName);
+    plog("soldiers: \"SoldierClass\" hashes to %08X,%08X", keyName.unk_00, keyName.unk_04);
+    for (i = 0; i < 2000 && i <= dword_429D00; i++)
+    {
+        SoldierTrigger *t = (SoldierTrigger *)dword_4CFE30[i];
+
+        __try
+        {
+            type_3DF8D8 *pClass, *pTask;
+
+            if (t == NULL || ((Trigger *)t)->vf_008() != 5)
+                continue;
+            for (k = 0; k < n; k++)
+                if (adwSeen[k][0] == (RwUInt32)t->unk_E0.unk_00 && adwSeen[k][1] == (RwUInt32)t->unk_E0.unk_04
+                    && adwSeen[k][2] == (RwUInt32)t->unk_E8.unk_00 && adwSeen[k][3] == (RwUInt32)t->unk_E8.unk_04)
+                    break;
+            if (k < n || n >= 64)
+                continue;
+            adwSeen[n][0] = t->unk_E0.unk_00;
+            adwSeen[n][1] = t->unk_E0.unk_04;
+            adwSeen[n][2] = t->unk_E8.unk_00;
+            adwSeen[n][3] = t->unk_E8.unk_04;
+            n++;
+            pClass = sub_198800(&t->unk_E0);
+            pTask = sub_198800(&t->unk_E8);
+            plog("soldiers: trigger %d: class %08X,%08X (%s kind %d, script %d), task %08X,%08X (%s kind %d, function %d)",
+                 i, t->unk_E0.unk_00, t->unk_E0.unk_04, pClass ? "read," : "not read,", pClass ? pClass->vf_008() : -1,
+                 pClass ? pClass->get_unk_18() : -1, t->unk_E8.unk_00, t->unk_E8.unk_04, pTask ? "read," : "not read,",
+                 pTask ? pTask->vf_008() : -1, pTask ? pTask->get_unk_18() : -1);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+    plog("soldiers: %d distinct soldier trigger scripts", n);
+}
+
+static void AutoSpawnTick()
+{
+#ifndef CODFH_SP
+    static RwUInt32 s_dwLast;
+
+    // (CODFH_SPAWNPOINT=n: once the player is in, moved to spawn point n, as the respawn places
+    // it at the point it was given: the spawn points' matrix, sub_1C20F0)
+    {
+        static RwInt32 s_nPoint = -2;
+        RwChar szPoint[16];
+
+        static RwInt32 s_nTrigger = -2;
+
+        if (s_nPoint == -2)
+            s_nPoint = GetEnvironmentVariableA("CODFH_SPAWNPOINT", szPoint, sizeof(szPoint)) ? atoi(szPoint) : -1;
+        // (CODFH_SPAWNTRIGGER=n: at trigger n's place instead, unk_90)
+        if (s_nTrigger == -2)
+            s_nTrigger = GetEnvironmentVariableA("CODFH_SPAWNTRIGGER", szPoint, sizeof(szPoint)) ? atoi(szPoint) : -1;
+        static RwUInt32 s_dwIn;
+
+        // (a second after the player is in: the respawn's own placing is done by then)
+        if (unk_4F7EB8.unk_1A4 == NULL)
+            s_dwIn = 0;
+        else if (!s_dwIn)
+            s_dwIn = port_frame;
+        if (s_nTrigger >= 0 && s_dwIn && port_frame - s_dwIn > 60)
+        {
+            Trigger *pTrigger = s_nTrigger < 2000 ? (Trigger *)dword_4CFE30[s_nTrigger] : NULL;
+
+            if (pTrigger)
+            {
+                RwV3d v;
+
+                v.x = pTrigger->unk_90;
+                v.y = pTrigger->unk_94;
+                v.z = pTrigger->unk_98;
+                Teleport((type_10F710 *)unk_4F7EB8.unk_1A4, &v);
+                plog("spawnpoint: the player at trigger %d (kind %d): (%.0f, %.0f, %.0f)", s_nTrigger, pTrigger->vf_008(),
+                     v.x, v.y, v.z);
+            }
+            else
+                plog("spawnpoint: no trigger %d", s_nTrigger);
+            s_nTrigger = -1;
+        }
+        if (s_nPoint >= 0 && s_dwIn && port_frame - s_dwIn > 60)
+        {
+            __try
+            {
+                RwInt32 nPoints = unk_4FBC50.unk_00.unk_08;
+                RwMatrix *pAt = s_nPoint < nPoints ? unk_4FBC50.sub_1C20F0(s_nPoint) : NULL;
+
+                if (pAt)
+                {
+                    RwV3d v = pAt->pos;
+
+                    Teleport((type_10F710 *)unk_4F7EB8.unk_1A4, &v);
+                    plog("spawnpoint: the player at spawn point %d of %d: (%.0f, %.0f, %.0f)", s_nPoint, nPoints, v.x, v.y, v.z);
+                }
+                else
+                    plog("spawnpoint: no spawn point %d (the level has %d)", s_nPoint, nPoints);
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                plog("spawnpoint: placing the player faulted");
+            }
+            s_nPoint = -1;
+        }
+    }
+    if (!port_autospawn)
+        return;
+    // (the spawn's own screens over the game, the in-game screens' 7, the initial team selection,
+    // and 6, the initial weapon selection, answered as pressing A answers them: the team "auto"
+    // (type_217F40::sub_218110) and the weapon shown (type_223280::sub_223830))
+    __try
+    {
+        type_1FF250 *pScreens = dword_5043BC;
+
+        if (pScreens && pScreens->unk_3C && pScreens->unk_10[7] && pScreens->unk_0C == 7)
+        {
+            ((type_217F40 *)pScreens->unk_10[7])->sub_218110();
+            plog("autospawn: team selection answered: auto");
+        }
+        else if (pScreens && pScreens->unk_3C && pScreens->unk_10[6] && pScreens->unk_0C == 6)
+        {
+            ((type_223280 *)pScreens->unk_10[6])->sub_223830();
+            plog("autospawn: weapon selection answered: the weapon shown");
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    // (the weapon screen the game opens as the player spawns: for ten seconds after asking, any
+    // in-game menu that opens is closed the same way; one opened later is the player's own)
+    if (s_dwLast && port_frame - s_dwLast < 600)
+    {
+        __try
+        {
+            type_21A5E0 *pMenu = dword_5051D8;
+
+            // (the pause menu's pages: 1 the weapon selection, 2 the team selection, unk_154 the
+            // one shown; closed as sub_1C4B10 closes the menu, whether or not its flag is up)
+            if (pMenu && (pMenu->unk_154 == 1 || pMenu->unk_154 == 2))
+            {
+                RwInt32 nPage = pMenu->unk_154;
+
+                sub_227560()->set_unk_A4(0);
+                sub_1FF250()->sub_2007A0(0);
+                pMenu->sub_21C360();
+                dword_4FB9E0.sub_1B5250(1);
+                plog("autospawn: closed the %s screen that opened with the spawn", nPage == 1 ? "weapon" : "team");
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+    // (a respawn takes a moment to make the soldier: five seconds before asking again)
+    if (s_dwLast && port_frame - s_dwLast < 300)
+        return;
+    __try
+    {
+        if (unk_4F7EB8.unk_1A4 != NULL || unk_4F7EB8.unk_284 || ((dword_4B86F8 >> 4) & 1)
+            || ((kujuUI::type_1C8DF0_104_00 *)&dword_4FB9E0)->sub_1E3480() != 1)
+            return;
+        s_dwLast = port_frame;
+        // (the team and weapon screens' own end, sub_1C4B10: the in-game menu closed and the
+        // player marked ready, as picking a weapon does; then the spawn button's calls)
+        sub_1C4B10();
+        sub_124EE0(0.5f, 1);
+        unk_4F7EB8.sub_1AB400(0);
+        plog("autospawn: asked to spawn (view %d)", unk_4F7EB8.unk_2A4);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+#endif
+}
+
+static void SpawnAiTestTick()
+{
+    static RwInt32 s_nState = -1;
+    static RwUInt32 s_dwAt, s_dwUntil;
+    static type_3D3548 *s_pSoldier;
+    static RwBool s_bTeleported;
+    static RwBool s_bCombat;   // CODFH_SPAWNAI_COMBAT: in sight of the player, and left to itself
+    type_10F710 *pPlayer;
+    RwV3d v;
+    RwInt32 i;
+
+    if (s_nState < 0)
+        s_nState = GetEnvironmentVariableA("CODFH_SPAWNAI", NULL, 0) ? 0 : 99;
+    if (s_nState == 99)
+        return;
+    pPlayer = (type_10F710 *)sub_1745A0(0);
+    if (pPlayer == NULL || !PlayerPosition(pPlayer, &v))
+    {
+        s_dwAt = port_frame + 120;
+        return;
+    }
+    if (s_nState == 0)
+    {
+        if (port_frame < s_dwAt)
+            return;
+        // (CODFH_SPAWNAI_AT's "x y z": the player teleported there first, and the soldier spawned
+        // a second later, 3 m in front of it; else a flat spot near the player)
+        {
+            RwChar szAt[64];
+            RwV3d vAt;
+
+            s_bCombat = GetEnvironmentVariableA("CODFH_SPAWNAI_COMBAT", NULL, 0) != 0;
+            s_bFlatNeedsSight = s_bCombat;
+            if (!s_bCombat && !s_bTeleported && GetEnvironmentVariableA("CODFH_SPAWNAI_AT", szAt, sizeof(szAt))
+                && sscanf(szAt, "%f %f %f", &vAt.x, &vAt.y, &vAt.z) == 3)
+            {
+                // (exactly there: a place the player stood, its own height above the floor)
+                Teleport(pPlayer, &vAt);
+                plog("spawnai: the player teleported to (%.0f, %.0f, %.0f): %s", vAt.x, vAt.y, vAt.z, s_szReqResult);
+                s_bTeleported = TRUE;
+                s_dwAt = port_frame + 60;
+                return;
+            }
+            if (s_bTeleported)
+            {
+                RwReal fLen = 0.0f;
+
+                __try
+                {
+                    RwMatrix *pLtm = dword_4E5C74 ? RwFrameGetLTM(RwCameraGetFrame((RwCamera *)dword_4E5C74)) : NULL;
+
+                    fLen = pLtm ? (RwReal)sqrt(pLtm->at.x * pLtm->at.x + pLtm->at.z * pLtm->at.z) : 0.0f;
+                    if (fLen > 0.01f)
+                    {
+                        v.x += pLtm->at.x / fLen * 300.0f;
+                        v.z += pLtm->at.z / fLen * 300.0f;
+                    }
+                }
+                __except (EXCEPTION_EXECUTE_HANDLER)
+                {
+                }
+                // (from the player's waist down, so not onto a ledge or roof above it)
+                v.y += 40.0f;
+                if (!GroundBelow(&v))
+                    v.y -= 40.0f;
+                plog("spawnai: 3 m in front of the player: (%.0f, %.0f, %.0f)", v.x, v.y, v.z);
+            }
+            else if (s_bCombat && GetEnvironmentVariableA("CODFH_SPAWNAI_AT", szAt, sizeof(szAt))
+                     && sscanf(szAt, "%f %f %f", &vAt.x, &vAt.y, &vAt.z) == 3)
+            {
+                // (the combat test with CODFH_SPAWNAI_AT: the soldier there, the player left where it is)
+                v = vAt;
+                v.y += 40.0f;
+                if (!GroundBelow(&v))
+                    v.y -= 40.0f;
+                plog("spawnai: the soldier at CODFH_SPAWNAI_AT (%.0f, %.0f, %.0f)", v.x, v.y, v.z);
+            }
+            else
+            {
+                RwV3d vFlat = v;
+
+                if (FindFlatSpot(&vFlat))
+                {
+                    plog("spawnai: a flat spot at (%.0f, %.0f, %.0f)", vFlat.x, vFlat.y, vFlat.z);
+                    v = vFlat;
+                }
+                else
+                {
+                    // (none: 4 m in front of the player, on the floor below its waist)
+                    __try
+                    {
+                        RwMatrix *pLtm = dword_4E5C74 ? RwFrameGetLTM(RwCameraGetFrame((RwCamera *)dword_4E5C74)) : NULL;
+                        RwReal fLen = pLtm ? (RwReal)sqrt(pLtm->at.x * pLtm->at.x + pLtm->at.z * pLtm->at.z) : 0.0f;
+
+                        if (fLen > 0.01f)
+                        {
+                            v.x += pLtm->at.x / fLen * 400.0f;
+                            v.z += pLtm->at.z / fLen * 400.0f;
+                        }
+                    }
+                    __except (EXCEPTION_EXECUTE_HANDLER)
+                    {
+                    }
+                    v.y += 40.0f;
+                    if (!GroundBelow(&v))
+                        v.y -= 40.0f;
+                    plog("spawnai: no flat spot in sight; 4 m in front of the player (%.0f, %.0f, %.0f)", v.x, v.y, v.z);
+                }
+            }
+        }
+        SpawnAiDiagStart();
+        SpawnSoldier(-1, &v);
+        plog("spawnai: %s", s_szReqResult);
+        s_pSoldier = NULL;
+        for (i = 0; i < 768; i++)
+        {
+            type_3D3548 *pEntity = dword_4B6A00[i].unk_04;
+
+            if (pEntity && (pEntity->unk_2C & 0x20) && pEntity != (type_3D3548 *)pPlayer && pEntity->vf_120())
+                s_pSoldier = pEntity;
+        }
+        s_nState = s_pSoldier ? 1 : 99;
+        // (turned about, CODFH_SPAWNAI_TURN, default 180 degrees: its facing set as the scripts'
+        // teleports set it, vf_0D8 with the at vector)
+        if (s_pSoldier)
+        {
+            __try
+            {
+                // (its frame as the scripts' teleports read an entity's, get_unk_340)
+                RwFrame *pFrame = s_pSoldier->get_unk_340();
+                RwChar szTurn[16];
+                RwReal fTurn = GetEnvironmentVariableA("CODFH_SPAWNAI_TURN", szTurn, sizeof(szTurn)) ? (RwReal)atof(szTurn) : 180.0f;
+
+                if (pFrame == NULL)
+                    plog("spawnai: the soldier has no frame to turn");
+                if (pFrame)
+                {
+                    RwMatrix *m = RwFrameGetMatrix(pFrame);
+                    RwV3d at, *pv = s_pSoldier->sub_CD550();
+                    RwReal fLen;
+
+                    // (the combat test: facing the player; else turned by CODFH_SPAWNAI_TURN from its own
+                    // facing. The frame itself turned, upright, and its facing told (vf_0D8): the setter
+                    // alone does not turn the body)
+                    RwV3d vMe;
+
+                    // (the player's place now: v is the soldier's spot by here)
+                    if (s_bCombat && pv && PlayerPosition(pPlayer, &vMe))
+                    {
+                        at.x = vMe.x - pv->x;
+                        at.z = vMe.z - pv->z;
+                    }
+                    else
+                    {
+                        RwReal a = fTurn * 3.14159265f / 180.0f, c = (RwReal)cos(a), sn = (RwReal)sin(a);
+
+                        at.x = m->at.x * c + m->at.z * sn;
+                        at.z = -m->at.x * sn + m->at.z * c;
+                    }
+                    at.y = 0.0f;
+                    fLen = (RwReal)sqrt(at.x * at.x + at.z * at.z);
+                    if (fLen <= 0.01f)
+                        plog("spawnai: no direction to face");
+                    if (fLen > 0.01f)
+                    {
+                        RwV3d pos = m->pos;
+
+                        at.x /= fLen;
+                        at.z /= fLen;
+                        m->at = at;
+                        m->up.x = 0.0f;
+                        m->up.y = 1.0f;
+                        m->up.z = 0.0f;
+                        RwV3dCrossProduct(&m->right, &m->up, &m->at);
+                        m->pos = pos;
+                        RwMatrixUpdate(m);
+                        RwFrameUpdateObjects(pFrame);
+                        s_pSoldier->vf_0D8(&at);
+                        plog("spawnai: facing (%.2f, %.2f)%s", at.x, at.z, s_bCombat ? " (the player)" : "");
+                    }
+                }
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                plog("spawnai: turning it faulted");
+            }
+        }
+        // (its looking on, as "SetAIFlag" sets it (sub_16D70): the Vision Scheduler skips an AI without
+        // flag 0x20, which single player's soldiers get from their level's task scripts; plus
+        // CODFH_SPAWNAI_FLAGS, hex)
+        if (s_pSoldier && s_pSoldier->vf_120())
+        {
+            __try
+            {
+                AIData *pAi = s_pSoldier->vf_120();
+                RwUInt32 dwBefore = pAi->unk_49C, dwAdd = 0x20;
+                RwChar szFlags[16];
+
+                if (GetEnvironmentVariableA("CODFH_SPAWNAI_FLAGS", szFlags, sizeof(szFlags)))
+                    dwAdd |= strtoul(szFlags, NULL, 16);
+                pAi->sub_16D70(dwAdd);
+                plog("spawnai: its AI flags %08X, now %08X; its entity flags (unk_28) %08X", dwBefore, pAi->unk_49C,
+                     s_pSoldier->unk_28);
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                plog("spawnai: setting its AI flags faulted");
+            }
+        }
+        // (the Vision Scheduler's view: the kind lists dword_4B8600[n] holding the player and the
+        // soldier (a soldier looks at list 14, and 9 and 0 with side bit 0, 10 and 1 with side bit
+        // 1, sub_40FB0), whether each has an AI object, and the soldier's looking flag)
+        {
+            RwChar szLists[256];
+            RwInt32 k, n = 0;
+
+            szLists[0] = 0;
+            __try
+            {
+                for (k = 0; k < 16; k++)
+                {
+                    type_3D3548 *e;
+                    RwInt32 nIn = 0, nCount = 0;
+
+                    for (e = dword_4B8600[k].unk_00; e && nCount < 1000; e = e->unk_10, nCount++)
+                    {
+                        if (e == (type_3D3548 *)pPlayer)
+                            nIn |= 1;
+                        if (e == s_pSoldier)
+                            nIn |= 2;
+                    }
+                    if (nCount || nIn)
+                        n += _snprintf(szLists + n, sizeof(szLists) - n, " %d:%d%s%s", k, nCount, (nIn & 1) ? "P" : "",
+                                       (nIn & 2) ? "S" : "");
+                }
+                plog("spawnai: kind lists (P the player, S the soldier):%s; the player's AI object %p, the soldier's looking flag %d",
+                     szLists, ((type_3D3548 *)pPlayer)->vf_120(),
+                     s_pSoldier && s_pSoldier->vf_120() ? (s_pSoldier->vf_120()->unk_49C >> 5) & 1 : -1);
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                plog("spawnai: reading the kind lists faulted");
+            }
+        }
+        // (the collision proxies the bullets test, unk_274's atomic in a section's collision
+        // world: the player's and the soldier's)
+        {
+            type_3D3548 *apWho[2];
+            RwInt32 w;
+
+            apWho[0] = (type_3D3548 *)pPlayer;
+            apWho[1] = s_pSoldier;
+            for (w = 0; w < 2; w++)
+            {
+                __try
+                {
+                    RpAtomic *pAtomic = apWho[w] ? apWho[w]->unk_274.unk_08 : NULL;
+
+                    if (pAtomic == NULL)
+                        plog("spawnai: the %s has no collision proxy", w ? "soldier" : "player");
+                    else
+                        plog("spawnai: the %s's collision proxy %p: flags 0x%X (collision test %d), in world %p, ext flags 0x%X",
+                             w ? "soldier" : "player", pAtomic, RpAtomicGetFlags(pAtomic),
+                             (RpAtomicGetFlags(pAtomic) & rpATOMICCOLLISIONTEST) != 0, RpAtomicGetWorld(pAtomic),
+                             sub_FB7A0(pAtomic)->unk_04.unk_00);
+                }
+                __except (EXCEPTION_EXECUTE_HANDLER)
+                {
+                    plog("spawnai: reading the %s's collision proxy faulted", w ? "soldier" : "player");
+                }
+            }
+        }
+        if (s_pSoldier)
+        {
+            __try
+            {
+                type_3DAFC8 *pSol = (type_3DAFC8 *)s_pSoldier;
+
+                plog("spawnai: its weapon slot %d%s", pSol->unk_3E0.unk_04, s_bCombat ? "; combat test: left to itself" : "");
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+            }
+        }
+        s_dwAt = port_frame;
+        s_dwUntil = port_frame + 3600;
+        return;
+    }
+    // (the combat test, CODFH_SPAWNAI_FACE=1: the soldier turned to face the player every frame
+    // (vf_0D8), as its own turning would)
+    if (s_bCombat && s_pSoldier && s_nState >= 1 && s_nState != 99 && GetEnvironmentVariableA("CODFH_SPAWNAI_FACE", NULL, 0))
+    {
+        __try
+        {
+            RwV3d *pv = s_pSoldier->sub_CD550(), at;
+
+            if (pv)
+            {
+                RwReal fLen;
+
+                at.x = v.x - pv->x;
+                at.y = 0.0f;
+                at.z = v.z - pv->z;
+                fLen = (RwReal)sqrt(at.x * at.x + at.z * at.z);
+                if (fLen > 1.0f)
+                {
+                    at.x /= fLen;
+                    at.z /= fLen;
+                    s_pSoldier->vf_0D8(&at);
+                }
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+    if (port_frame - s_dwAt < 60)
+        return;
+    s_dwAt = port_frame;
+    __try
+    {
+        RwV3d *pv = s_pSoldier->sub_CD550();
+
+        for (i = 0; i < 768; i++)
+            if (dword_4B6A00[i].unk_04 == s_pSoldier)
+                break;
+        if (i == 768)
+        {
+            plog("spawnai: the soldier is gone");
+            s_nState = 99;
+            return;
+        }
+        {
+            AIData *pAi = s_pSoldier->vf_120();
+
+            plog("spawnai: soldier at (%.0f, %.0f, %.0f), hit points %d, kind 0x%X; AI state %d, control %d, "
+                 "maneuver %d, alerted %d, target %p; player at (%.0f, %.0f, %.0f)",
+                 pv ? pv->x : 0.0f, pv ? pv->y : 0.0f, pv ? pv->z : 0.0f, s_pSoldier->vf_174(), s_pSoldier->unk_2C,
+                 pAi ? pAi->unk_578 : -1, pAi ? pAi->unk_51C : -1, pAi ? pAi->unk_58 : -1, pAi ? pAi->unk_520 : -1,
+                 pAi ? (void *)pAi->unk_568 : NULL, v.x, v.y, v.z);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        plog("spawnai: reading the soldier faulted");
+        s_nState = 99;
+    }
+    // (CODFH_SPAWNAI's messages to it: "ReturnToAIControl" at the second look, then
+    // "SetAttitude" with CODFH_SPAWNAI_ATT's value (default 2) at the third; the kinds' argument
+    // counts logged)
+    if (!s_bCombat && (s_nState == 2 || s_nState == 3))
+    {
+        __try
+        {
+            type_3D2E7C *pObject = s_pSoldier->vf_098();
+            const RwChar *pszMsg = s_nState == 2 ? "ReturnToAIControl" : "SetAttitude";
+            type_42E00_00 *pKind = sub_6A7F0(pszMsg);
+            RwInt32 anArgs[8], nArgs = pKind ? pKind->unk_10 : -1;
+            RwChar szAtt[16];
+
+            memset(anArgs, 0, sizeof(anArgs));
+            if (s_nState == 3)
+                anArgs[0] = GetEnvironmentVariableA("CODFH_SPAWNAI_ATT", szAtt, sizeof(szAtt)) ? atoi(szAtt) : 2;
+            if (pObject && pKind && nArgs >= 0 && nArgs <= 8)
+            {
+                sub_6B5F0(pszMsg, (type_67620 *)pObject, 0, 0, anArgs, nArgs, true, false);
+                plog("spawnai: sent %s (%d arguments, the first %d) to its object", pszMsg, nArgs, anArgs[0]);
+            }
+            else
+                plog("spawnai: not sent %s (kind %p, %d arguments)", pszMsg, pKind, nArgs);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            plog("spawnai: sending faulted");
+        }
+    }
+    // (a task at the fourth look, as the levels' scripts give soldiers theirs:
+    // "SetTaskCommand_GoToPoint" (x, y, z, 0) to its object, the player's place, which its
+    // class takes (SetupGotoPoint); CODFH_SPAWNAI_TASK names another message of no arguments)
+    if (!s_bCombat && s_nState == 4)
+    {
+        __try
+        {
+            type_3D2E7C *pObject = s_pSoldier->vf_098();
+            RwChar szTask[64];
+
+            if (GetEnvironmentVariableA("CODFH_SPAWNAI_TASK", szTask, sizeof(szTask)))
+            {
+                RwInt32 nZero = 0;
+
+                sub_6B5F0(szTask, (type_67620 *)pObject, 0, 0, &nZero, 0, true, false);
+                plog("spawnai: sent %s", szTask);
+            }
+            else
+            {
+                RwReal af[4];
+
+                af[0] = v.x;
+                af[1] = v.y;
+                af[2] = v.z;
+                af[3] = 0.0f;
+                sub_6B5F0("SetTaskCommand_GoToPoint", (type_67620 *)pObject, 0, 0, (RwInt32 *)af, 4, true, false);
+                plog("spawnai: sent SetTaskCommand_GoToPoint (%.0f, %.0f, %.0f)", v.x, v.y, v.z);
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            plog("spawnai: sending the task faulted");
+        }
+    }
+    // (its animation: the player its unk_280 names (sub_78AC0), its ring of records, unk_284,
+    // and the animation pools' room)
+    __try
+    {
+        type_78AC0 *pAnim = sub_78AC0(s_pSoldier->unk_280);
+        RwChar szRing[160];
+        RwInt32 k, n = 0;
+
+        szRing[0] = 0;
+        if (pAnim)
+            for (k = 0; k < pAnim->unk_24 && k < 12; k++)
+            {
+                const type_78AC0_34 *r = &pAnim->unk_34[(pAnim->unk_20 + k) % 12];
+
+                n += _snprintf(szRing + n, sizeof(szRing) - n, " %08X/%08X", (RwUInt32)r->unk_00, r->unk_08);
+                if (n < 0 || n >= (RwInt32)sizeof(szRing) - 20)
+                    break;
+            }
+        if (s_pSoldier->vf_120())
+            plog("spawnai:   flags: AI %08X, entity %08X", s_pSoldier->vf_120()->unk_49C, s_pSoldier->unk_28);
+        plog("spawnai:   anim: handle %d, player %p (%d records:%s), unk_284 %p; pools free %d, %d, %d", s_pSoldier->unk_280,
+             pAnim, pAnim ? pAnim->unk_24 : -1, szRing, s_pSoldier->unk_284, get_pool(0).m_pool.unk_18,
+             get_pool(1).m_pool.unk_18, get_pool(2).m_pool.unk_18);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        plog("spawnai:   anim: reading it faulted");
+    }
+    // (its traffic since the last look)
+    __try
+    {
+        type_3D2E7C *pObject = s_pSoldier->vf_098();
+
+        if (pObject)
+            SpawnAiDiagLog(pObject->get_unk_04());
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    // (its scripts, the first five times)
+    if (s_nState >= 1 && s_nState < 6)
+    {
+        __try
+        {
+            type_3D2E7C *pObject = s_pSoldier->vf_098();
+
+            if (pObject)
+                SpawnAiLogScripts(pObject->get_unk_04());
+            else
+                plog("spawnai: the soldier has no script object");
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+        if (s_nState < 6)
+            s_nState++;
+    }
+    if (port_frame > s_dwUntil)
+        s_nState = 99;
+}
+
 // ---- Waits: what each script is waiting for ----
 //
 // Nothing polls the scripts: the VM runs one (sub_68310) only when something hands it work,
@@ -5139,6 +6284,44 @@ static RwInt32 WaitQueued(RwUInt32 dwTarget, RwBool bAll, RwChar *psz, RwInt32 n
     {
     }
     return n;
+}
+
+// (CODFH_SPAWNAI: the state machines of the object dwObject, each its name, state, the
+// messages it listens for and its timers, logged)
+static void SpawnAiLogScripts(RwUInt32 dwObject)
+{
+    RwUInt32 dwBase;
+    RwInt32 nStride, nCount, i, n = 0;
+    RwChar szName[96], szMsgs[1200], szTimers[256];
+
+    if (!PoolFree(&dword_449A30, &dwBase, &nStride, &nCount))
+        return;
+    for (i = 0; i < nCount; i++)
+    {
+        type_3D2DB8 *m = (type_3D2DB8 *)(dwBase + i * nStride);
+        RwInt32 nState = -1;
+
+        if (s_abFree[i])
+            continue;
+        __try
+        {
+            if (m->unk_7C != dwObject)
+                continue;
+            nState = m->unk_90;
+            WaitRegistrations(m->unk_9C, 0, szMsgs, sizeof(szMsgs));
+            WaitTimers(((type_67620 *)m)->unk_04, m->unk_70, szTimers, sizeof(szTimers));
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            continue;
+        }
+        ScriptName((type_67620 *)m, szName, sizeof(szName));
+        plog("spawnai:   script %s: state %d%s%s", szName, nState, szTimers[0] ? "; timers " : "", szTimers);
+        plog("spawnai:     listens for %s", szMsgs[0] ? szMsgs : "nothing");
+        n++;
+    }
+    if (n == 0)
+        plog("spawnai:   no state machine belongs to its object %08X", dwObject);
 }
 
 static void WaitRowStart(RwUInt32 dwObj, const RwChar *pszName, const RwChar *pszKind)
@@ -5392,6 +6575,7 @@ struct TrigMsgRec
     const type_42E00_00 *pKind;
     RwChar szKind[40];
     RwChar szTo[48], szFrom[48], szScript[48];
+    RwUInt32 dwTo, dwFrom, dwScriptObject;  // the handles: its target, its sender, the running script's object
     RwInt32 nArgs;
     RwInt32 anArgs[4];
     void *apCaller[6];
@@ -5544,8 +6728,15 @@ void TrigMsgSent(type_42E00 *pMsg)
         else
             strcpy(r->szTo, "all");
         MsgWho(pMsg->unk_08, r->szFrom, sizeof(r->szFrom));
+        r->dwTo = pMsg->unk_04;
+        r->dwFrom = pMsg->unk_08;
         if (ReadU32(&dword_449328, &dwScript) && dwScript)
+        {
+            type_3D2E7C *pObj = ((type_67620 *)dwScript)->vf_024();
+
             ScriptName((type_67620 *)dwScript, r->szScript, sizeof(r->szScript));
+            r->dwScriptObject = pObj ? pObj->get_unk_04() : 0;
+        }
         else
             strcpy(r->szScript, "-");
         r->nArgs = r->pKind ? r->pKind->unk_10 : 0;
@@ -5988,6 +7179,96 @@ static void TabMessages()
     }
     LeaveCriticalSection(&s_csMsg);
     MsgSendUi();
+}
+
+// ---- the spawn test's diagnostics: the soldier's messages, the animations not found ----
+
+// Each animation asked for (sub_77B70): its id, how often asked and found, the last caller.
+#define TRIGANIM_IDS 512
+static struct
+{
+    RwInt32 nId;
+    RwUInt32 nAsked, nFound, nLogged;
+    void *pCaller;
+} s_aAnimIds[TRIGANIM_IDS];
+static RwInt32 s_nAnimIds;
+static RwBool s_bAnimRecord;
+
+void TrigAnimLookup(RwInt32 nId, RwInt32 bFound, void *pCaller)
+{
+    RwInt32 i;
+
+    if (!s_bAnimRecord)
+        return;
+    for (i = 0; i < s_nAnimIds; i++)
+        if (s_aAnimIds[i].nId == nId)
+            break;
+    if (i == s_nAnimIds)
+    {
+        if (s_nAnimIds >= TRIGANIM_IDS)
+            return;
+        memset(&s_aAnimIds[i], 0, sizeof(s_aAnimIds[i]));
+        s_aAnimIds[i].nId = nId;
+        s_nAnimIds++;
+    }
+    s_aAnimIds[i].nAsked++;
+    if (bFound)
+        s_aAnimIds[i].nFound++;
+    s_aAnimIds[i].pCaller = pCaller;
+}
+
+// Starts recording the messages and the animation lookups (the spawn test).
+static void SpawnAiDiagStart()
+{
+    s_bMsgRecord = TRUE;
+    s_bAnimRecord = TRUE;
+}
+
+// Logs the soldier's traffic since the last call: the messages to its object (dwObject), from
+// it, or sent while one of its scripts ran; and each animation asked for but not found since.
+static void SpawnAiDiagLog(RwUInt32 dwObject)
+{
+    static RwUInt32 s_nNext;
+    RwUInt32 n;
+    RwInt32 i, k;
+    RwChar szCode[96], szArgs[64];
+
+    MsgLock();
+    if (s_nMsgLog - s_nNext > TRIGMSG_LOG)
+        s_nNext = s_nMsgLog - TRIGMSG_LOG;
+    for (n = s_nNext; n < s_nMsgLog; n++)
+    {
+        const TrigMsgRec *r = &s_aMsgLog[n % TRIGMSG_LOG];
+
+        if (r->dwTo != dwObject && r->dwFrom != dwObject && r->dwScriptObject != dwObject)
+            continue;
+        szArgs[0] = 0;
+        for (k = 0; k < r->nArgs && k < 4; k++)
+        {
+            RwChar sz[16];
+
+            sprintf(sz, "%d", r->anArgs[k]);
+            WaitAppend(szArgs, sizeof(szArgs), sz);
+        }
+        MsgSenderCode(r->apCaller, r->nCallers, szCode, sizeof(szCode), NULL);
+        plog("spawnai:   msg %s%s to %s, from %s, while %s ran (%s) [%s]", r->szKind,
+             r->dwTo == dwObject ? " (to it)" : r->dwScriptObject == dwObject ? " (by its script)" : " (from it)",
+             r->szTo, r->szFrom, r->szScript, szArgs, szCode);
+    }
+    s_nNext = s_nMsgLog;
+    LeaveCriticalSection(&s_csMsg);
+    for (i = 0; i < s_nAnimIds; i++)
+    {
+        RwUInt32 nMissed = s_aAnimIds[i].nAsked - s_aAnimIds[i].nFound;
+
+        if (nMissed > s_aAnimIds[i].nLogged)
+        {
+            MsgCodeName(s_aAnimIds[i].pCaller, szCode, sizeof(szCode));
+            plog("spawnai:   animation %08X not found (%u of %u asks), asked by %s", (RwUInt32)s_aAnimIds[i].nId, nMissed,
+                 s_aAnimIds[i].nAsked, szCode);
+            s_aAnimIds[i].nLogged = nMissed;
+        }
+    }
 }
 
 // (CODFH_WAITS=1: logs the timers and the waiting tasks once, 20 seconds in)

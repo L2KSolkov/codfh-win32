@@ -13,6 +13,9 @@
 #include "types/animbank.h"
 #include "types/type_3D3548.h"
 #include "rw/badevice.h"
+#ifdef CODFH_DRAW_TRIGGERS
+#include <intrin.h>
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x00428BEC
@@ -355,6 +358,11 @@ RwInt32 sub_77AC0(type_77D30 *arg_0)
 
 // match: ?sub_77B70@@YAHHPAPAX0@Z @ 0x00077B70
 // sp-match: ?sub_77B70@@YAHHPAPAX0@Z @ 0x00062620
+#ifdef CODFH_DRAW_TRIGGERS
+// (the port's debug tools, port/src/debug/trigtools.cpp: each animation asked for and whether
+// a bank had it)
+void TrigAnimLookup(RwInt32 nId, RwInt32 bFound, void *pCaller);
+#endif
 // Finds the animation arg_0 in the loading banks (sub_77DC0).
 RwInt32 sub_77B70(RwInt32 arg_0, void **arg_4, void **arg_8)
 {
@@ -372,6 +380,9 @@ RwInt32 sub_77B70(RwInt32 arg_0, void **arg_4, void **arg_8)
             break;
         }
     }
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigAnimLookup(arg_0, local_8, _ReturnAddress());
+#endif
     return local_8;
 }
 
