@@ -352,6 +352,22 @@ void sub_3D0B0(type_365A0 arg_0)
         dword_4395B0.sub_16C710(var_4);
     else
         dword_4395D0.sub_16C710(var_4);
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    // (the port's debug tools: with the bots, soldiers can keep a freed maneuver's handle as
+    // theirs (unk_574) and read it unchecked; it is cleared with the maneuver)
+    {
+        RwInt32 k;
+
+        for (k = 0; k < 0x300; k++)
+        {
+            type_3D3548 *pE = dword_4B6A00[k].unk_04;
+            AIData *pAi;
+
+            if (pE && (pE->unk_2C & 0x20) && (pAi = pE->vf_120()) != 0 && pAi->unk_574 == arg_0.unk_00)
+                pAi->unk_574 = 0;
+        }
+    }
+#endif
     sub_3D3A0(arg_0);
 }
 

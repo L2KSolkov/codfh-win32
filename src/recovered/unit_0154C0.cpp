@@ -1608,6 +1608,11 @@ RwInt32 AIData::sub_1A1F0()
         if (var_4 != 0) {
             varC = unk_574;
             v8 = sub_3D3E0(varC);
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+            // (the port's debug tools: with the bots a soldier's maneuver can be gone)
+            if (v8 == 0)
+                return 0;
+#endif
             var_4 = v8->vf_024(unk_568);
         }
     }
