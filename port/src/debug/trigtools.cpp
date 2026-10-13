@@ -7467,52 +7467,6 @@ static void BotsTick()
                                 s_anBotEventIgnored[e] ? "(ignored some)" : "");
             plog("bots: animation events:%s", szEv);
         }
-        // (the orphaned maneuvers freed: in no squad's list and no soldier's own, sub_3D0B0)
-        {
-            static RwUInt8 s_abReached[MANEUVER_HANDLES];
-            type_3DF30 *pSq;
-            RwInt32 h, k, nFreed = 0;
-
-            memset(s_abReached, 0, sizeof(s_abReached));
-            __try
-            {
-                for (pSq = dword_4395F0; pSq; pSq = pSq->unk_2AC)
-                {
-                    RwUInt32 dwH = pSq->unk_2A8;
-                    RwInt32 nGuard = 0;
-
-                    while (dwH && nGuard++ < MANEUVER_HANDLES)
-                    {
-                        type_3CE6D0 *pM = sub_3D3E0(dwH);
-
-                        if (pM == NULL)
-                            break;
-                        s_abReached[(RwUInt16)dwH] = 1;
-                        dwH = pM->unk_14;
-                    }
-                }
-                for (k = 0; k < 0x300; k++)
-                {
-                    type_3D3548 *pE = dword_4B6A00[k].unk_04;
-                    AIData *pAi;
-
-                    if (pE && (pE->unk_2C & 0x20) && (pAi = pE->vf_120()) != NULL && pAi->unk_574)
-                        s_abReached[(RwUInt16)pAi->unk_574] = 1;
-                }
-                for (h = 1; h < MANEUVER_HANDLES; h++)
-                    if (dword_4392A8[h].unk_08 && !s_abReached[h])
-                    {
-                        sub_3D0B0(dword_4392A8[h].unk_00);
-                        nFreed++;
-                    }
-            }
-            __except (EXCEPTION_EXECUTE_HANDLER)
-            {
-                plog("bots: freeing orphaned maneuvers faulted");
-            }
-            if (nFreed)
-                plog("bots: %d orphaned maneuvers freed", nFreed);
-        }
         // (the live maneuvers by kind, from their handle table)
         {
             RwInt32 anKind[8] = { 0 }, h, nLive = 0;

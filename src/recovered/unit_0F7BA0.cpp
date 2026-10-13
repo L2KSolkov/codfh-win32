@@ -98,7 +98,7 @@ alfahash dword_4C0164;
 
 // The occupied alarm nodes (their dynamic initializer builds them with the
 // out-of-line copy of the constructor; its exit function destroys them).
-type_4C01A0 dword_4C01A0[0x80];
+type_4C01A0 dword_4C01A0[OCCUPIED_NODES];
 
 // match: ?sub_F7BA0@@YAHPAUAIData@@PAUtype_F8350@@_N@Z @ 0x000F7BA0
 // match: __ehhandler$?sub_F7BA0@@YAHPAUAIData@@PAUtype_F8350@@_N@Z-0x8 @ 0x00301110
@@ -163,7 +163,7 @@ RwInt32 sub_F7BA0(AIData *arg_0, type_F8350 *arg_4, bool arg_8)
     }
     else if (arg_8)
     {
-        for (var30 = 0; var30 < 0x80; var30++)
+        for (var30 = 0; var30 < OCCUPIED_NODES; var30++)
         {
             if (!dword_4C01A0[var30].unk_08)
             {
@@ -173,6 +173,11 @@ RwInt32 sub_F7BA0(AIData *arg_0, type_F8350 *arg_4, bool arg_8)
                 break;
             }
         }
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+        // (the port's debug tools: a full table takes no more, as the image would write past it)
+        if (var30 == OCCUPIED_NODES)
+            return q28;
+#endif
         dword_4C0164.sub_67850(&dword_4C01A0[var30]);
     }
     return q28;
@@ -185,14 +190,14 @@ void sub_F7DC0()
     RwInt32 var_4;
 
     dword_4C0164.sub_67780();
-    for (var_4 = 0; var_4 < 0x80; var_4++)
+    for (var_4 = 0; var_4 < OCCUPIED_NODES; var_4++)
     {
         dword_4C01A0[var_4].unk_04.sub_D48D0(0);
         dword_4C01A0[var_4].unk_00 = 0;
         dword_4C01A0[var_4].unk_08 = 0;
         dword_4C01A0[var_4].unk_0C = var_4;
     }
-    dword_4C0164.sub_67730(0x80, 0x20, sub_F7E50, sub_F7E60);
+    dword_4C0164.sub_67730(OCCUPIED_NODES, 0x20, sub_F7E50, sub_F7E60);
 }
 
 // match: ?sub_F7E50@@YAIPAX@Z @ 0x000F7E50
@@ -264,14 +269,14 @@ void sub_F7F60()
         sub_F8160();
         sub_F5F10();
         unk_4C00E8.unk_60 = 1;
-        for (var_4 = 0; var_4 < 0x80; var_4++)
+        for (var_4 = 0; var_4 < OCCUPIED_NODES; var_4++)
         {
             dword_4C01A0[var_4].unk_04.sub_D48D0(0);
             dword_4C01A0[var_4].unk_00 = 0;
             dword_4C01A0[var_4].unk_08 = 0;
             dword_4C01A0[var_4].unk_0C = var_4;
         }
-        dword_4C0164.sub_67730(0x80, 0x20, sub_F7E50, sub_F7E60);
+        dword_4C0164.sub_67730(OCCUPIED_NODES, 0x20, sub_F7E50, sub_F7E60);
     }
 }
 

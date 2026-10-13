@@ -35,7 +35,14 @@ struct type_4C01A0
 
 extern type_4C00E8 unk_4C00E8;
 extern alfahash dword_4C0164;
-extern type_4C01A0 dword_4C01A0[0x80];
+// The occupied nodes' table's size: the image's, or with the port's debug tools room for their
+// bots (port/src/debug/trigtools.cpp) on generated graphs with cover.
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+#define OCCUPIED_NODES 0x200
+#else
+#define OCCUPIED_NODES 0x80
+#endif
+extern type_4C01A0 dword_4C01A0[OCCUPIED_NODES];
 
 // Takes (arg_8) or releases the alarm node arg_4 for the AI object arg_0
 // (0: for no one); 0 when another holds it.
