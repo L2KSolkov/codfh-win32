@@ -162,6 +162,8 @@ static void port_window(int back_w, int back_h)
         ImGui::Text("untextured %u, dropped %u", s.untextured, s.dropped);
         ImGui::Text("shaders %.2f  convert %.2f  state %.2f  device %.2f ms", s.shaderMs, s.convertMs, s.stateMs,
                     s.deviceMs);
+        ImGui::Text("vertex cache: %u draws reused, %u converted, %u changing; %.1f MB", s.cacheHits,
+                    s.cacheConverted, s.cacheUncached, s.cacheMB);
         {
             /* (xdraw.cpp's modes: the 3D draws only, in one colour) */
             static const char *const modes[] = {"off", "hidden lines", "over the shaded scene", "through walls"};

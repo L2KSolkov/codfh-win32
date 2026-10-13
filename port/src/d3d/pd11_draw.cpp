@@ -51,6 +51,30 @@ static int ensure_buffers(void)
     return cb_vs && cb_vp && cb_ps;
 }
 
+extern "C" void *pdev_static_vertices(const void *data, int bytes)
+{
+    D3D11_BUFFER_DESC bd;
+    D3D11_SUBRESOURCE_DATA sd;
+    ID3D11Buffer *b = NULL;
+    if (!dev || bytes <= 0)
+        return NULL;
+    memset(&bd, 0, sizeof(bd));
+    bd.Usage = D3D11_USAGE_IMMUTABLE;
+    bd.ByteWidth = (UINT)bytes;
+    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    memset(&sd, 0, sizeof(sd));
+    sd.pSysMem = data;
+    if (FAILED(dev->CreateBuffer(&bd, &sd, &b)))
+        return NULL;
+    return b;
+}
+
+extern "C" void pdev_static_release(void *buffer)
+{
+    if (buffer)
+        ((ID3D11Buffer *)buffer)->Release();
+}
+
 /* Appends data to a ring buffer: no-overwrite while it fits, discard when it wraps. */
 static UINT ring_write(ID3D11Buffer *buf, UINT size, UINT *pos, const void *data, UINT bytes, UINT align)
 {
@@ -78,6 +102,32 @@ static void set_constants(ID3D11Buffer *buf, const void *data, UINT bytes)
         memcpy(m.pData, data, bytes);
         ctx->Unmap(buf, 0);
     }
+}
+
+/* Likewise, but only when the bytes differ from the buffer's last upload (a draw's 5 KB of vertex
+   constants are mostly the last draw's: comparing is far cheaper than a discard-map). */
+struct ConstantShadow
+{
+    ID3D11Buffer *buf;
+    UINT bytes;
+    unsigned char data[320 * 16];
+};
+static ConstantShadow shadow_vs, shadow_vp, shadow_ps;
+
+static void set_constants_if_changed(ConstantShadow *s, ID3D11Buffer *buf, const void *data, UINT bytes)
+{
+    if (bytes > sizeof(s->data))
+    {
+        set_constants(buf, data, bytes);
+        s->buf = NULL;
+        return;
+    }
+    if (s->buf == buf && s->bytes == bytes && !memcmp(s->data, data, bytes))
+        return;
+    set_constants(buf, data, bytes);
+    s->buf = buf;
+    s->bytes = bytes;
+    memcpy(s->data, data, bytes);
 }
 
 /* FNV-1a, 64 bits. */
@@ -302,7 +352,23 @@ template <class D, class S> struct StateCache
         S *state;
     };
     std::unordered_multimap<unsigned long long, Entry> map;
+    /* (the last four found: most draws repeat the last draw's states, or a slot's) */
+    Entry recent[4];
+    int recentCount, recentNext;
     S *get(const D &d, HRESULT (STDMETHODCALLTYPE ID3D11Device::*create)(const D *, S **))
+    {
+        for (int i = 0; i < recentCount; i++)
+            if (!memcmp(&recent[i].desc, &d, sizeof(d)))
+                return recent[i].state;
+        S *s = find(d, create);
+        recent[recentNext].desc = d;
+        recent[recentNext].state = s;
+        recentNext = (recentNext + 1) & 3;
+        if (recentCount < 4)
+            recentCount++;
+        return s;
+    }
+    S *find(const D &d, HRESULT (STDMETHODCALLTYPE ID3D11Device::*create)(const D *, S **))
     {
         unsigned long long h = fnv64(&d, sizeof(d));
         typedef typename std::unordered_multimap<unsigned long long, Entry>::iterator It;
@@ -366,7 +432,7 @@ extern "C" void pdev_draw(const PDevDraw *d)
     }
 
     UINT stride = d->stride ? d->stride : 16;
-    UINT vbytes = d->stride * d->vertexCount;
+    UINT vbytes = d->staticVertices ? 0 : d->stride * d->vertexCount;
     UINT voff = 0;
     if (vbytes)
     {
@@ -390,10 +456,10 @@ extern "C" void pdev_draw(const PDevDraw *d)
             return;
     }
 
-    set_constants(cb_vs, d->vsConstants, 320 * 16);
-    set_constants(cb_vp, d->viewport, 32);
+    set_constants_if_changed(&shadow_vs, cb_vs, d->vsConstants, 320 * 16);
+    set_constants_if_changed(&shadow_vp, cb_vp, d->viewport, 32);
     if (d->psConstants)
-        set_constants(cb_ps, d->psConstants, 16 * 16);
+        set_constants_if_changed(&shadow_ps, cb_ps, d->psConstants, 16 * 16);
     ID3D11Buffer *vsb[2] = {cb_vs, cb_vp};
     ctx->VSSetConstantBuffers(0, 2, vsb);
     ctx->PSSetConstantBuffers(0, 1, &cb_ps);
@@ -401,7 +467,11 @@ extern "C" void pdev_draw(const PDevDraw *d)
     ctx->PSSetShader((ID3D11PixelShader *)d->ps, NULL, 0);
     ctx->IASetInputLayout(vse->layout);
     UINT zero = 0;
-    ctx->IASetVertexBuffers(0, 1, &vb, &stride, &zero);
+    {
+        /* (the vertex cache's buffer, from its start; else the ring's) */
+        ID3D11Buffer *vbuf = d->staticVertices ? (ID3D11Buffer *)d->staticVertices : vb;
+        ctx->IASetVertexBuffers(0, 1, &vbuf, &stride, &zero);
+    }
     ctx->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)d->primitive);
 
     ID3D11ShaderResourceView *srv[4];

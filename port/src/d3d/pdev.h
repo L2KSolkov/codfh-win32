@@ -119,9 +119,14 @@ typedef struct PDevDraw
     int vertexCount;
     const unsigned short *indices;
     int indexCount;
+    void *staticVertices;       /* a pdev_static_vertices buffer holding them (vertices unused) */
 } PDevDraw;
 
 void pdev_draw(const PDevDraw *draw);
+/* A vertex buffer made once from bytes bytes at data, for draws whose vertices do not change
+   (xdraw.cpp's vertex cache); and its release. */
+void *pdev_static_vertices(const void *data, int bytes);
+void pdev_static_release(void *buffer);
 
 /* The renderer's last frame (xdraw.cpp), and its debugging switches (from CODFH_WIREFRAME,
    CODFH_NODEPTH, CODFH_NOCULL and CODFH_NOFOG at start; the overlay changes them). */
@@ -129,6 +134,8 @@ typedef struct PortRenderStats
 {
     unsigned draws, vertices, untextured, dropped;
     float shaderMs, convertMs, stateMs, deviceMs;
+    unsigned cacheHits, cacheConverted, cacheUncached;  /* the vertex cache's draws (xdraw.cpp) */
+    float cacheMB;
 } PortRenderStats;
 extern PortRenderStats port_render_stats;
 /* Shaders compiled and textures uploaded since the counters were last read (the slow-frame log). */

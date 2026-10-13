@@ -253,6 +253,73 @@ static std::vector<float> vtx;
 static unsigned char vtx_regs[16];
 static int vtx_nregs;
 
+/* One element of count vertices (stride bytes apart from p) into out, every step floats: the
+   common types each in a loop of its own (convert_element's results), the rest through it. */
+static void convert_column(const BYTE *p, UINT stride, UINT count, int type, float *out, int step)
+{
+    int ctype = type & 0xF, n = type >> 4;
+    switch (type)
+    {
+    case 0x40: /* D3DCOLOR: B, G, R, A bytes */
+        for (UINT v = 0; v < count; v++, p += stride, out += step)
+        {
+            DWORD c = *(const DWORD *)p;
+            out[0] = ((c >> 16) & 0xFF) * (1.0f / 255.0f);
+            out[1] = ((c >> 8) & 0xFF) * (1.0f / 255.0f);
+            out[2] = (c & 0xFF) * (1.0f / 255.0f);
+            out[3] = ((c >> 24) & 0xFF) * (1.0f / 255.0f);
+        }
+        return;
+    case 0x16: /* NORMPACKED3: 11, 11 and 10 signed bits */
+        for (UINT v = 0; v < count; v++, p += stride, out += step)
+        {
+            DWORD w = *(const DWORD *)p;
+            int x = (int)(w << 21) >> 21, y = (int)(w << 10) >> 21, z = (int)w >> 22;
+            out[0] = x * (1.0f / 1023.0f);
+            out[1] = y * (1.0f / 1023.0f);
+            out[2] = z * (1.0f / 511.0f);
+            out[3] = 1.0f;
+        }
+        return;
+    }
+    if (ctype == 2 && n >= 1 && n <= 4) /* FLOAT1..4: the rest of the register 0, 0, 1 */
+    {
+        for (UINT v = 0; v < count; v++, p += stride, out += step)
+        {
+            const float *f = (const float *)p;
+            out[0] = f[0];
+            out[1] = n > 1 ? f[1] : 0.0f;
+            out[2] = n > 2 ? f[2] : 0.0f;
+            out[3] = n > 3 ? f[3] : 1.0f;
+        }
+        return;
+    }
+    if ((ctype == 1 || ctype == 4 || ctype == 5) && n >= 1 && n <= 4)
+    {
+        for (UINT v = 0; v < count; v++, p += stride, out += step)
+        {
+            out[0] = out[1] = out[2] = 0.0f;
+            out[3] = 1.0f;
+            for (int i = 0; i < n; i++)
+            {
+                if (ctype == 1)
+                {
+                    float f = ((const short *)p)[i] * (1.0f / 32767.0f);
+                    out[i] = f < -1.0f ? -1.0f : f;
+                }
+                else if (ctype == 4)
+                    out[i] = p[i] * (1.0f / 255.0f);
+                else
+                    out[i] = (float)((const short *)p)[i];
+            }
+        }
+        return;
+    }
+    for (UINT v = 0; v < count; v++, p += stride, out += step)
+        convert_element(p, type, out);
+}
+
+
 /* Converts vertices first..first+count-1 (streams, or the UP pointer as stream 0). */
 static int convert_vertices(const XVertexShader *s, UINT first, UINT count, const BYTE *up, UINT upStride)
 {
@@ -272,20 +339,221 @@ static int convert_vertices(const XVertexShader *s, UINT first, UINT count, cons
         base[0] = up;
         stride[0] = upStride;
     }
-    float *out = &vtx[0];
-    for (UINT v = 0; v < count; v++)
-        for (int k = 0; k < s->count; k++, out += 4)
+    /* (an element at a time down every vertex: its converter chosen once, not per vertex) */
+    for (int k = 0; k < s->count; k++)
+    {
+        const XVertexElement &e = s->elements[k];
+        float *out = &vtx[(size_t)k * 4];
+        const int step = s->count * 4;
+        if (!base[e.stream])
         {
-            const XVertexElement &e = s->elements[k];
-            if (!base[e.stream])
+            for (UINT v = 0; v < count; v++, out += step)
             {
                 out[0] = out[1] = out[2] = 0;
                 out[3] = 1;
-                continue;
             }
-            convert_element(base[e.stream] + (size_t)(first + v) * stride[e.stream] + e.offset, e.type, out);
+            continue;
         }
+        convert_column(base[e.stream] + (size_t)first * stride[e.stream] + e.offset, stride[e.stream], count,
+                       e.type, out, step);
+    }
     return 1;
+}
+
+/*
+ * The vertex cache: most draws' vertices come from buffers the game wrote once (the world's,
+ * the models'), so their conversion is kept on the device and reused while the Xbox bytes under
+ * it are the same. A draw's key is its declaration, its streams and its vertex range; a fast hash
+ * of those bytes, read every draw (several times cheaper than converting and uploading them),
+ * tells a change (nothing assumes the game locks a buffer to write it). A range that keeps
+ * changing is left to the per-draw path. CODFH_NOVBCACHE=1 turns it off.
+ */
+#include <unordered_map>
+
+struct VCacheKey
+{
+    const XVertexShader *decl;
+    const BYTE *base[16];
+    UINT stride[16];
+    UINT first, count;
+};
+
+struct VCacheEntry
+{
+    VCacheKey key;
+    unsigned long long content;
+    void *buffer;
+    UINT bytes;
+    unsigned lastFrame, changeFrame, changes;
+    int dynamic;            /* changed too often: converted every draw */
+};
+
+static std::unordered_map<unsigned long long, VCacheEntry> vcache;
+static size_t vcache_bytes;
+unsigned port_vcache_hits, port_vcache_converted, port_vcache_uncached;
+float port_vcache_mb;
+
+static inline unsigned rotl32(unsigned x, int r)
+{
+    return (x << r) | (x >> (32 - r));
+}
+
+/* A fast 64-bit hash of n bytes (two 32-bit lanes, a word each at a time). */
+static unsigned long long vcache_hash(const BYTE *p, size_t n, unsigned long long seed)
+{
+    unsigned a = (unsigned)seed ^ 0x9E3779B9u, b = (unsigned)(seed >> 32) ^ 0x85EBCA6Bu;
+    size_t i = 0;
+    for (; i + 8 <= n; i += 8)
+    {
+        a = rotl32(a ^ *(const unsigned *)(p + i), 13) * 0x01000193u;
+        b = rotl32(b ^ *(const unsigned *)(p + i + 4), 17) * 0xC2B2AE35u;
+    }
+    for (; i < n; i++)
+        a = rotl32(a ^ p[i], 7) * 0x01000193u;
+    a ^= (unsigned)n;
+    return ((unsigned long long)(b ^ rotl32(a, 9)) << 32) | (a ^ rotl32(b, 5));
+}
+
+static int vcache_on(void)
+{
+    static int on = -1;
+    if (on < 0)
+    {
+        char v[8];
+        on = GetEnvironmentVariableA("CODFH_NOVBCACHE", v, sizeof(v)) ? 0 : 1;
+    }
+    return on;
+}
+
+/* Every 300 frames: the entries unused for 300 frames released, then the oldest while over the
+   budget (160 MB). */
+static void vcache_sweep(void)
+{
+    static unsigned last;
+    if (port_frame - last < 300)
+        return;
+    last = port_frame;
+    for (std::unordered_map<unsigned long long, VCacheEntry>::iterator it = vcache.begin(); it != vcache.end();)
+    {
+        if (port_frame - it->second.lastFrame > 300)
+        {
+            pdev_static_release(it->second.buffer);
+            vcache_bytes -= it->second.bytes;
+            it = vcache.erase(it);
+        }
+        else
+            ++it;
+    }
+    while (vcache_bytes > 160u << 20 && !vcache.empty())
+    {
+        std::unordered_map<unsigned long long, VCacheEntry>::iterator oldest = vcache.begin();
+        for (std::unordered_map<unsigned long long, VCacheEntry>::iterator it = vcache.begin(); it != vcache.end(); ++it)
+            if (it->second.lastFrame < oldest->second.lastFrame)
+                oldest = it;
+        pdev_static_release(oldest->second.buffer);
+        vcache_bytes -= oldest->second.bytes;
+        vcache.erase(oldest);
+    }
+    port_vcache_mb = vcache_bytes / (1024.0f * 1024.0f);
+}
+
+/* The draw's vertices: a cached buffer when its bytes are unchanged (vtx then not filled),
+   else converted into vtx (and kept, unless the range keeps changing; NULL then). */
+static void *vcache_vertices(const XVertexShader *s, UINT first, UINT count)
+{
+    VCacheKey k;
+    unsigned used = 0;
+    memset(&k, 0, sizeof(k));
+    k.decl = s;
+    k.first = first;
+    k.count = count;
+    for (int i = 0; i < s->count; i++)
+        used |= 1u << s->elements[i].stream;
+    for (int i = 0; i < 16; i++)
+        if (used & (1u << i))
+        {
+            k.base[i] = xs.streams[i] ? (const BYTE *)(ULONG_PTR)(xs.streams[i]->Data | 0x80000000) : NULL;
+            k.stride[i] = xs.strides[i];
+        }
+    unsigned long long key = vcache_hash((const BYTE *)&k, sizeof(k), 0);
+    unsigned long long content = 0x12345678ull;
+    for (int i = 0; i < 16; i++)
+        if ((used & (1u << i)) && k.base[i])
+        {
+            /* (the range's bytes: a stride of 0 repeats one vertex) */
+            size_t len = k.stride[i] ? (size_t)count * k.stride[i] : 64;
+            content = vcache_hash(k.base[i] + (size_t)first * k.stride[i], len, content);
+        }
+    vcache_sweep();
+    std::unordered_map<unsigned long long, VCacheEntry>::iterator it = vcache.find(key);
+    if (it != vcache.end() && !memcmp(&it->second.key, &k, sizeof(k)))
+    {
+        VCacheEntry &e = it->second;
+        e.lastFrame = port_frame;
+        if (e.content == content && e.buffer)
+        {
+            port_vcache_hits++;
+            return e.buffer;
+        }
+        if (e.content != content)
+        {
+            /* (changed: three changes within 120 frames make it dynamic, for 600 frames) */
+            if (port_frame - e.changeFrame > 120)
+            {
+                e.changeFrame = port_frame;
+                e.changes = 0;
+            }
+            e.changes++;
+            if (e.changes >= 3)
+                e.dynamic = 1;
+        }
+        if (e.dynamic && port_frame - e.changeFrame < 600)
+        {
+            pdev_static_release(e.buffer);
+            vcache_bytes -= e.bytes;
+            e.buffer = NULL;
+            e.bytes = 0;
+            e.content = content;
+            port_vcache_uncached++;
+            convert_vertices(s, first, count, NULL, 0);
+            return NULL;
+        }
+        e.dynamic = 0;
+        convert_vertices(s, first, count, NULL, 0);
+        pdev_static_release(e.buffer);
+        vcache_bytes -= e.bytes;
+        e.bytes = (UINT)(count * s->count * 16);
+        e.buffer = pdev_static_vertices(&vtx[0], (int)e.bytes);
+        if (!e.buffer)
+            e.bytes = 0;
+        vcache_bytes += e.bytes;
+        e.content = content;
+        port_vcache_converted++;
+        return e.buffer;
+    }
+    convert_vertices(s, first, count, NULL, 0);
+    VCacheEntry e;
+    memset(&e, 0, sizeof(e));
+    e.key = k;
+    e.content = content;
+    e.lastFrame = port_frame;
+    e.changeFrame = port_frame;
+    e.bytes = (UINT)(count * s->count * 16);
+    e.buffer = pdev_static_vertices(&vtx[0], (int)e.bytes);
+    if (!e.buffer)
+        e.bytes = 0;
+    vcache_bytes += e.bytes;
+    if (it != vcache.end())
+    {
+        /* (a key hash shared by another range: the newer one takes the slot) */
+        pdev_static_release(it->second.buffer);
+        vcache_bytes -= it->second.bytes;
+        it->second = e;
+    }
+    else
+        vcache[key] = e;
+    port_vcache_converted++;
+    return e.buffer;
 }
 
 /*
@@ -1644,6 +1912,16 @@ void xdraw_frame_stats(void)
         port_render_stats.convertMs = (float)(st.convert - last_convert) * tms;
         port_render_stats.stateMs = (float)(st.state - last_state) * tms;
         port_render_stats.deviceMs = (float)(st.device - last_device) * tms;
+        {
+            static unsigned last_hits, last_conv, last_unc;
+            port_render_stats.cacheHits = port_vcache_hits - last_hits;
+            port_render_stats.cacheConverted = port_vcache_converted - last_conv;
+            port_render_stats.cacheUncached = port_vcache_uncached - last_unc;
+            port_render_stats.cacheMB = port_vcache_mb;
+            last_hits = port_vcache_hits;
+            last_conv = port_vcache_converted;
+            last_unc = port_vcache_uncached;
+        }
         last_draws = st.draws;
         last_vertices = st.vertices;
         last_untextured = untextured;
@@ -1704,20 +1982,21 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
     st.draws++;
     port_trace_draw();
     {
-        /* draws per programmable shader (its instruction count and first word identify it) */
+        /* CODFH_STATS=1: draws per programmable shader (its instruction count and first word
+           identify it), counted only then */
         static std::map<const void *, unsigned> per;
         static unsigned frame_seen;
-        if (xs.programmable && xs.programmable->program)
+        static int on = -1;
+        if (on < 0)
+        {
+            char v[8];
+            on = GetEnvironmentVariableA("CODFH_STATS", v, sizeof(v)) ? 1 : 0;
+        }
+        if (on && xs.programmable && xs.programmable->program)
             per[xs.programmable->program]++;
-        if (port_frame / 300 != frame_seen && port_frame % 300 == 299)
+        if (on && port_frame / 300 != frame_seen && port_frame % 300 == 299)
         {
             frame_seen = port_frame / 300;
-            static int on = -1;
-            if (on < 0)
-            {
-                char v[8];
-                on = GetEnvironmentVariableA("CODFH_STATS", v, sizeof(v)) ? 1 : 0;
-            }
             if (on)
                 for (std::map<const void *, unsigned>::iterator it = per.begin(); it != per.end(); ++it)
                 {
@@ -1729,7 +2008,13 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
         }
     }
     st.vertices += count;
-    convert_vertices(decl, first, count, up, upStride);
+    /* (the vertex cache for buffer draws of 24 vertices or more; the UP draws and the small ones
+       converted as they come) */
+    void *cachedVertices = NULL;
+    if (!up && count >= 24 && vcache_on())
+        cachedVertices = vcache_vertices(decl, first, count);
+    else
+        convert_vertices(decl, first, count, up, upStride);
     LONGLONG t2 = now_ticks();
     st.convert += t2 - t1;
     for (int r = 0; r < 16; r++)
@@ -1758,6 +2043,7 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
     int haveIdx = list_indices(prim, indices, indices ? nidx : count, &topology);
     d.primitive = topology;
     d.vertices = &vtx[0];
+    d.staticVertices = cachedVertices;
     d.stride = decl->count * 16;
     d.vertexCount = count;
     if (haveIdx)
