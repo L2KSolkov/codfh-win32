@@ -405,6 +405,9 @@ void type_3DF30::sub_3E7C0(type_3D3548 *arg_0)
 
 // match: sub_3E8F0 @ 0x0003E8F0
 // sp-match: sub_3E8F0 @ 0x0002F410
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+extern type_16C2A0 dword_4395B0, dword_4395D0;    // the maneuvers' pools (unit_03CA10)
+#endif
 void type_3DF30::sub_3E8F0(RwInt32 arg_0)
 {
     RwUInt32 var_10;
@@ -416,6 +419,12 @@ void type_3DF30::sub_3E8F0(RwInt32 arg_0)
         if (ebp_C->vf_030() == arg_0)
             return;
     }
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    // (the port's debug tools: with the bots, no maneuver started when its pool is out; its
+    // callers find none and go on; sub_3CE20 takes one unchecked)
+    if (dword_4395B0.get_unk_18() == 0 || dword_4395D0.get_unk_18() == 0)
+        return;
+#endif
     v8 = sub_3CE20(arg_0);
     var_4 = sub_3D3E0(unk_2A8);
     var_4->unk_10 = 1;

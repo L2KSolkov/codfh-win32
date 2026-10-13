@@ -6753,6 +6753,12 @@ struct TrigBot
 };
 
 static TrigBot s_aBots[BOTS_MAX];
+
+// The dead bots' bodies, taken away 10 s on (multiplayer never does: the soldiers' memory fills,
+// and their squads' maneuvers with it): each body and the frame it goes.
+#define BOT_BODIES 96
+static type_3D3548 *s_apBotBody[BOT_BODIES];
+static RwUInt32 s_adwBotBodyAt[BOT_BODIES];
 static RwInt32 s_nBots;
 static RwInt32 s_anBotPoint[2];
 
@@ -7544,6 +7550,26 @@ static void BotsTick()
         }
         s_nBots = s_nAllies + s_nEnemies;
     }
+    // (the bodies due taken away: still in the entity table, removed as the game removes one)
+    for (i = 0; i < BOT_BODIES; i++)
+        if (s_apBotBody[i] && port_frame >= s_adwBotBodyAt[i])
+        {
+            RwInt32 k;
+
+            for (k = 0; k < 0x300; k++)
+                if (dword_4B6A00[k].unk_04 == s_apBotBody[i])
+                    break;
+            if (k < 0x300)
+                __try
+                {
+                    sub_D5A60(s_apBotBody[i], 0);
+                }
+                __except (EXCEPTION_EXECUTE_HANDLER)
+                {
+                    plog("bots: taking a body away faulted");
+                }
+            s_apBotBody[i] = NULL;
+        }
     for (i = 0; i < s_nBots; i++)
     {
         TrigBot *b = &s_aBots[i];
@@ -7552,6 +7578,19 @@ static void BotsTick()
         {
             b->dwRespawnAt = port_frame + 300;
             plog("bots: a team %d bot died %u frames after it was made; another in 5 s", b->nTeam, port_frame - b->dwMadeAt);
+            // (its body taken away in 10 s)
+            if (b->pSoldier)
+            {
+                RwInt32 k;
+
+                for (k = 0; k < BOT_BODIES; k++)
+                    if (s_apBotBody[k] == NULL)
+                    {
+                        s_apBotBody[k] = b->pSoldier;
+                        s_adwBotBodyAt[k] = port_frame + 600;
+                        break;
+                    }
+            }
         }
         if (b->dwRespawnAt && port_frame >= b->dwRespawnAt)
         {
