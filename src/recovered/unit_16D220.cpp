@@ -7,6 +7,12 @@
 #include "game/debugmenu.h"
 #include "rws/gftime.h"
 #include <string.h>
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigperf.cpp: the debug tools' performance view, timed finer)
+void TrigPerfBegin(RwInt32 nSection);
+void TrigPerfEnd(RwInt32 nSection);
+void TrigPerfFrame();
+#endif
 
 // Its data definitions (PLAN M5), in the image's address order.
 // 0x003DCD44
@@ -211,6 +217,9 @@ void sub_16D730()
 // Ends the frame, then every section's (sub_16D780).
 void sub_16D740()
 {
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigPerfFrame();
+#endif
     dword_4E23CC.unk_04 = RWS::Time::GetTime();
     dword_4E23CC.unk_08 = dword_4E23CC.unk_04 - dword_4E23CC.unk_00;
     dword_4E23CC.unk_0C = dword_4E23CC.unk_0C + dword_4E23CC.unk_08;
@@ -236,6 +245,9 @@ void sub_16D780()
 // sp-match: ?sub_16D7F0@@YAXH@Z @ 0x0010AC70
 void sub_16D7F0(RwInt32 arg_0)
 {
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigPerfBegin(arg_0);
+#endif
     if (arg_0 >= 0 && arg_0 < 49)
     {
         dword_42A598[arg_0].unk_20 -= RWS::Time::GetTime();
@@ -248,6 +260,9 @@ void sub_16D7F0(RwInt32 arg_0)
 // sp-match: ?sub_16D850@@YAXH@Z @ 0x0010ACC0
 void sub_16D850(RwInt32 arg_0)
 {
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigPerfEnd(arg_0);
+#endif
     if (arg_0 >= 0 && arg_0 < 49)
     {
         if (dword_42A598[arg_0].unk_44 > 0)
