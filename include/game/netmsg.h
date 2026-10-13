@@ -767,6 +767,11 @@ struct dropped_3E24E8 : type_3E24E8
     dropped_3E24E8();
 };
 
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+// (the port's debug tools, port/src/debug/trigtools.cpp: a bullet from an AI soldier dealt to
+// the local player here, as the network's hit messages deal the players' (sub_1ACAB0))
+RwInt32 TrigAiHitPlayer(struct type_17DBD0_player *pPlayer, struct type_75600 *pHit);
+#endif
 // The local player in a network game (0x22B0 bytes, built in entity memory
 // by sub_1B7B20 for its trigger; vtables off_3E25A0 and, for the network
 // part at +0x2260, off_3E2558). Named for the pulse zones' damage
@@ -803,7 +808,11 @@ struct type_17DBD0_player : type_10F710, type_3E24E8
     // to other methods and folded (/OPT:ICF) into sub_32260.
     virtual RwInt32 vf_064(struct type_75600 *arg_0)
     {
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+        return TrigAiHitPlayer(this, arg_0);
+#else
         return 0;
+#endif
     }
 
     // The network part's slots: its state for the network (position, the

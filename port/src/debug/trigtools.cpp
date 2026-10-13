@@ -638,6 +638,65 @@ static void SpawnFaultText()
 // entity notes its pool (unk_20, from dword_429264) for its release.
 static type_3DF8D8 *ForeignRead(const RwChar *pszLevel, type_3DF8D8_04 *pKey, RwInt32 nKind);
 
+// The AI soldiers spawned in multiplayer (TrigIsAiSoldier: their weapons aim as single player's do,
+// src/recovered/unit_15CCE0.cpp's fire); a slot freed is reused.
+#define TRIG_AI_SOLDIERS 64
+static const void *s_apAiSoldiers[TRIG_AI_SOLDIERS];
+
+bool TrigIsAiSoldier(const void *pEntity)
+{
+    RwInt32 i;
+
+    if (pEntity == NULL)
+        return false;
+    for (i = 0; i < TRIG_AI_SOLDIERS; i++)
+        if (s_apAiSoldiers[i] == pEntity)
+            return true;
+    return false;
+}
+
+// A bullet hit on the local player (its vf_064, which deals none: the network's hit messages
+// do, sub_1ACAB0): from an AI soldier, dealt as those do (pvf_03C); killed, the player dies.
+RwInt32 TrigAiHitPlayer(type_17DBD0_player *pPlayer, type_75600 *pHit)
+{
+    if (pHit == NULL || !TrigIsAiSoldier(pHit->unk_0C) || (void *)pPlayer != (void *)unk_4F7EB8.unk_1A4)
+        return 0;
+    if (pPlayer->pvf_03C(pHit))
+    {
+        type_3DA434 msg;
+
+        // (the kill as the network's bullet kills take it, sub_1ACBA0: sent, shown and scored; as
+        // the player's own, there being no peer that fired)
+        msg.unk_04 = 0;
+        msg.unk_08 = (RwUInt8)pHit->unk_24;
+        msg.unk_0C = pHit->unk_2C;
+        sub_1ACBA0(unk_4F7EB8.sub_1AEC70(), &msg);
+        plog("aihit: an AI soldier's bullet killed the local player");
+        return 1;
+    }
+    plog("aihit: an AI soldier's bullet hit the local player: health %.2f", pPlayer->unk_19DC);
+    return 0;
+}
+
+static void TrigAddAiSoldier(const void *pEntity)
+{
+    RwInt32 i, k;
+
+    // (a slot whose entity is gone from the entity table is free)
+    for (i = 0; i < TRIG_AI_SOLDIERS; i++)
+    {
+        if (s_apAiSoldiers[i] == NULL)
+            break;
+        for (k = 0; k < 0x300; k++)
+            if (dword_4B6A00[k].unk_04 == s_apAiSoldiers[i])
+                break;
+        if (k == 0x300)
+            break;
+    }
+    if (i < TRIG_AI_SOLDIERS)
+        s_apAiSoldiers[i] = pEntity;
+}
+
 // An NPC weapon type for an AI soldier in multiplayer: the first whose model is read
 // (sub_15D010 clones its definition's model, kind 26, and gives up without one, and the
 // weapon's take-up, sub_15D3E0, then faults on no clump; one with unk_74 set needs unk_58's
@@ -733,6 +792,7 @@ static type_3D3548 *SpawnAiSoldierMp(SoldierTrigger *pTrigger)
     pSoldier = new (p) type_3DAFC8(pTrigger);
     pTrigger->unk_130 = nOldWeapon;
     pTrigger->unk_E0 = oldClass;
+    TrigAddAiSoldier(pSoldier);
     if (pSoldier->unk_28 & 0x400000) // not an address: entity flag
     {
         sub_D5A60(pSoldier, 0);
@@ -6099,6 +6159,37 @@ static void SpawnAiTestTick()
             }
         if (s_pSoldier->vf_120())
             plog("spawnai:   flags: AI %08X, entity %08X", s_pSoldier->vf_120()->unk_49C, s_pSoldier->unk_28);
+        // (the player's health and what the bullets' hit (type_10F710::vf_064) checks: unk_19FC (no
+        // hits at all), unk_19EC (none while positive), unk_19DC the health, unk_19E0 its scale)
+        __try
+        {
+            plog("spawnai:   the player: health %.2f, hit points %d, unk_19FC %d, unk_19EC %.2f, god %d",
+                 pPlayer->unk_19DC, pPlayer->unk_19E0, pPlayer->unk_19FC, pPlayer->unk_19EC, (RwInt32)byte_4F28F8);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+        // (its weapon's aim: firing at its target (unk_A0), a point given (unk_CC, unk_D0), and its AI's target)
+        __try
+        {
+            type_3DAFC8 *pSol = (type_3DAFC8 *)s_pSoldier;
+            AIData *pAi = s_pSoldier->vf_120();
+
+            plog("spawnai:   weapon: at target %d, point given %d (%.0f, %.0f, %.0f); AI target %p", pSol->unk_3E0.unk_A0,
+                 pSol->unk_3E0.unk_CC, pSol->unk_3E0.unk_D0.x, pSol->unk_3E0.unk_D0.y, pSol->unk_3E0.unk_D0.z,
+                 pAi ? (void *)pAi->get_unk_1374() : NULL);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+        // (where it would shoot the player: the target's vf_110, as "SetAdvancedShotLocation" asks)
+        {
+            RwV3d vAim;
+
+            ((type_3D3548 *)pPlayer)->vf_110(&vAim, s_pSoldier, 0);
+            plog("spawnai:   the player's shot point (vf_110) (%.0f, %.0f, %.0f); the player at (%.0f, %.0f, %.0f)", vAim.x,
+                 vAim.y, vAim.z, v.x, v.y, v.z);
+        }
         plog("spawnai:   anim: handle %d, player %p (%d records:%s), unk_284 %p; pools free %d, %d, %d", s_pSoldier->unk_280,
              pAnim, pAnim ? pAnim->unk_24 : -1, szRing, s_pSoldier->unk_284, get_pool(0).m_pool.unk_18,
              get_pool(1).m_pool.unk_18, get_pool(2).m_pool.unk_18);

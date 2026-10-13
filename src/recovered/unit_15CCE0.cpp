@@ -11,6 +11,11 @@
 #include "game/functions.h"
 #include "game/clumpdata.h"
 #include "game/frand.h"
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+// (the port's debug tools, port/src/debug/trigtools.cpp: an AI soldier the debug tools spawned in
+// multiplayer, which aims at a point as single player's soldiers do)
+bool TrigIsAiSoldier(const void *pEntity);
+#endif
 #include "types/AIData.h"
 #include "types/type_1227C0.h"
 #include "game/data.h"
@@ -371,6 +376,14 @@ void type_15CCE0::sub_15D600(RwReal arg_0)
             if (unk_88 <= 0.0f && unk_78.sub_D4910() && unk_78.sub_D4910()->vf_008())
             {
                 var_C = unk_78.sub_D4910()->vf_008();
+#if defined(CODFH_DRAW_TRIGGERS)
+                // (the port: an AI soldier the debug tools spawned fires where it aims, at its AI's
+                // target, as single player's soldiers do (no point: sub_15E9E0); unk_818_v is the
+                // shot point the network gives multiplayer's own)
+                if (TrigIsAiSoldier(var_C))
+                    sub_15DE60(0);
+                else
+#endif
                 sub_15DE60(&var_C->unk_818_v);
             }
         }
@@ -379,6 +392,12 @@ void type_15CCE0::sub_15D600(RwReal arg_0)
             if (unk_78.sub_D4910() && unk_78.sub_D4910()->vf_008())
             {
                 var_10 = unk_78.sub_D4910()->vf_008();
+#if defined(CODFH_DRAW_TRIGGERS)
+                // (the port: as above, an AI soldier the debug tools spawned fires where it aims)
+                if (TrigIsAiSoldier(var_10))
+                    sub_15DE60(0);
+                else
+#endif
                 sub_15DE60(&var_10->unk_818_v);
             }
             unk_88 = 0;
@@ -604,6 +623,14 @@ void type_15CCE0::sub_15DE60(RwV3d *arg_0)
 #ifdef CODFH_SP // single player (SP 0x100C21: fsub before RwV3dNormalize) aims along the muzzle-to-target difference, not the target point
     RwV3dSub(&var_88, &var_70, &var_7C);
 #else
+#if defined(CODFH_DRAW_TRIGGERS)
+    // (the port: an AI soldier the debug tools spawned aims at a point, its target's, as single
+    // player's do: along the muzzle-to-target difference; multiplayer's own soldiers keep the
+    // image's direction)
+    if (TrigIsAiSoldier(var_C))
+        RwV3dSub(&var_88, &var_70, &var_7C);
+    else
+#endif
     var_88 = var_70;
 #endif
     RwV3dNormalize(&var_88, &var_88);
