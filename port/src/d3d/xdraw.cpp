@@ -1516,8 +1516,169 @@ static void dump_bmp(const char *name, const DWORD *px, int w, int h)
     fclose(f);
 }
 
+/*
+ * Texture dumps and replacements, by the texture's name (RenderWare's texture read hands it over
+ * with the D3D header, port_texture_named): CODFH_TEXDUMP=1 writes each named texture's first
+ * level once as textures_dump\<name>.tga; a textures\<name>.tga (32-bit, any size) is uploaded
+ * in its place, with its levels made by halving.
+ */
+struct TexName
+{
+    std::string name;
+    DWORD data;     /* the header's memory when it was named: a header given to another texture since is not it */
+};
+static std::map<const void *, TexName> tex_names;
+
+extern "C" void port_texture_named(const void *header, const char *name)
+{
+    TexName n;
+    char clean[64];
+    int i;
+
+    for (i = 0; name[i] && i < 63; i++)
+    {
+        char c = name[i];
+        clean[i] = (c == '\\' || c == '/' || c == ':' || c == '*' || c == '?' || c == '"' || c == '<' || c == '>' || c == '|') ? '_' : c;
+    }
+    clean[i] = 0;
+    n.name = clean;
+    n.data = ((const D3DBaseTexture *)header)->Data;
+    tex_names[header] = n;
+}
+
+static const char *texture_name(const D3DBaseTexture *t)
+{
+    std::map<const void *, TexName>::iterator it = tex_names.find(t);
+    if (it == tex_names.end() || it->second.data != t->Data || it->second.name.empty())
+        return NULL;
+    return it->second.name.c_str();
+}
+
+static void write_tga(const char *path, const DWORD *px, int w, int h)
+{
+    FILE *f = fopen(path, "wb");
+    unsigned char hd[18];
+
+    if (!f)
+        return;
+    memset(hd, 0, sizeof(hd));
+    hd[2] = 2;              /* uncompressed true colour */
+    hd[12] = (unsigned char)w;
+    hd[13] = (unsigned char)(w >> 8);
+    hd[14] = (unsigned char)h;
+    hd[15] = (unsigned char)(h >> 8);
+    hd[16] = 32;
+    hd[17] = 0x28;          /* 8 alpha bits, rows from the top */
+    fwrite(hd, 1, 18, f);
+    fwrite(px, 4, (size_t)w * h, f);   /* B, G, R, A */
+    fclose(f);
+}
+
+/* A 32-bit (or 24-bit) uncompressed TGA as B, G, R, A words, rows from the top; FALSE on another kind. */
+static bool read_tga(const char *path, std::vector<DWORD> &px, int &w, int &h)
+{
+    FILE *f = fopen(path, "rb");
+    unsigned char hd[18];
+
+    if (!f)
+        return false;
+    if (fread(hd, 1, 18, f) != 18 || hd[2] != 2 || (hd[16] != 32 && hd[16] != 24))
+    {
+        fclose(f);
+        return false;
+    }
+    fseek(f, hd[0], SEEK_CUR);
+    w = hd[12] | hd[13] << 8;
+    h = hd[14] | hd[15] << 8;
+    int bpp = hd[16] / 8;
+    std::vector<unsigned char> raw((size_t)w * h * bpp);
+    bool ok = fread(&raw[0], 1, raw.size(), f) == raw.size();
+    fclose(f);
+    if (!ok || w <= 0 || h <= 0)
+        return false;
+    px.resize((size_t)w * h);
+    bool top = (hd[17] & 0x20) != 0;
+    for (int y = 0; y < h; y++)
+    {
+        const unsigned char *row = &raw[(size_t)(top ? y : h - 1 - y) * w * bpp];
+        for (int x = 0; x < w; x++)
+        {
+            const unsigned char *p = row + x * bpp;
+            px[(size_t)y * w + x] = p[0] | p[1] << 8 | p[2] << 16 | (DWORD)(bpp == 4 ? p[3] : 255) << 24;
+        }
+    }
+    return true;
+}
+
+/* The named texture's replacement uploaded (every level, halving), or NULL without one. */
+static void *replace_texture(const char *name, int cube)
+{
+    static std::map<std::string, int> s_missing;
+    char path[MAX_PATH];
+    std::vector<DWORD> px, half;
+    int w, h, levels = 1;
+
+    if (cube || s_missing.count(name))
+        return NULL;
+    _snprintf(path, sizeof(path), "textures\\%s.tga", name);
+    path[sizeof(path) - 1] = 0;
+    if (!read_tga(path, px, w, h))
+    {
+        s_missing[name] = 1;
+        return NULL;
+    }
+    for (int lw = w, lh = h; lw > 1 || lh > 1; lw = lw > 1 ? lw / 2 : 1, lh = lh > 1 ? lh / 2 : 1)
+        levels++;
+    void *dt = pdev_texture_create(w, h, levels, PDEV_TEX_BGRA8, 0);
+    if (!dt)
+        return NULL;
+    for (int lv = 0; lv < levels; lv++)
+    {
+        pdev_texture_upload(dt, lv, 0, &px[0], w * 4);
+        if (lv + 1 == levels)
+            break;
+        int nw = w > 1 ? w / 2 : 1, nh = h > 1 ? h / 2 : 1;
+        half.resize((size_t)nw * nh);
+        for (int y = 0; y < nh; y++)
+            for (int x = 0; x < nw; x++)
+            {
+                unsigned s[4] = {0, 0, 0, 0};
+                for (int k = 0; k < 4; k++)
+                {
+                    int sx = x * 2 + (k & 1), sy = y * 2 + (k >> 1);
+                    DWORD c = px[(size_t)(sy < h ? sy : h - 1) * w + (sx < w ? sx : w - 1)];
+                    for (int ch = 0; ch < 4; ch++)
+                        s[ch] += (c >> (ch * 8)) & 0xFF;
+                }
+                half[(size_t)y * nw + x] = (s[0] / 4) | (s[1] / 4) << 8 | (s[2] / 4) << 16 | (DWORD)(s[3] / 4) << 24;
+            }
+        px.swap(half);
+        w = nw;
+        h = nh;
+    }
+    plog("textures: %s replaced from %s", name, path);
+    return dt;
+}
+
 static void *upload_texture(const D3DBaseTexture *t, const DWORD *pal)
 {
+    static int s_texdump = -1;
+    static std::map<std::string, int> s_dumped;
+    const char *tname = texture_name(t);
+
+    if (s_texdump < 0)
+    {
+        s_texdump = GetEnvironmentVariableA("CODFH_TEXDUMP", NULL, 0) ? 1 : 0;
+        if (s_texdump)
+            CreateDirectoryA("textures_dump", NULL);
+    }
+    if (tname)
+    {
+        void *rt = replace_texture(tname, (t->Format & 4) != 0);
+
+        if (rt)
+            return rt;
+    }
     DWORD fmt = (t->Format >> 8) & 0xFF;
     {
         /* each format once, and its first texture's shape (finding formats still to add) */
@@ -1549,6 +1710,35 @@ static void *upload_texture(const D3DBaseTexture *t, const DWORD *pal)
         for (int lw = w, lh = h; n < levels && !(lw & 3) && !(lh & 3); n++, lw = lw > 1 ? lw / 2 : 1, lh = lh > 1 ? lh / 2 : 1)
             ;
         levels = n ? n : 1;
+    }
+    if (s_texdump && tname && !cube && !s_dumped.count(tname))
+    {
+        const BYTE *m0 = (const BYTE *)(ULONG_PTR)(t->Data | 0x80000000);
+        int bpp0 = port_xb_format_bpp(fmt) / 8;
+        char path[MAX_PATH];
+
+        s_dumped[tname] = 1;
+        tex_scratch.resize((size_t)w * h);
+        if (dxt)
+            decode_dxt(fmt, m0 + off, w, h, &tex_scratch[0]);
+        else
+        {
+            const BYTE *rows = m0 + off;
+            int pitch = p;
+            if (!linear)
+            {
+                tex_linear.resize(((size_t)w * h * bpp0 + 3) / 4 + 1);
+                XGUnswizzleRect(m0 + off, w, h, NULL, &tex_linear[0], w * bpp0, NULL, bpp0);
+                rows = (const BYTE *)&tex_linear[0];
+                pitch = w * bpp0;
+            }
+            for (int y = 0; y < h; y++)
+                for (int x = 0; x < w; x++)
+                    tex_scratch[y * w + x] = argb_from(fmt, rows + y * pitch + x * bpp0, pal);
+        }
+        _snprintf(path, sizeof(path), "textures_dump\\%s.tga", tname);
+        path[sizeof(path) - 1] = 0;
+        write_tga(path, &tex_scratch[0], w, h);
     }
     void *dt = pdev_texture_create(w, h, levels, blocks ? (fmt == 0x0C ? PDEV_TEX_BC1 : fmt == 0x0E ? PDEV_TEX_BC2 : PDEV_TEX_BC3)
                                                     : PDEV_TEX_BGRA8, cube);

@@ -319,6 +319,12 @@ _rwXbNativeTextureWrite(void *streamIn, void *textureIn,
     return TRUE;
 }
 
+#ifdef CODFH_WIN32
+/* (port/src/d3d/xdraw.cpp: a texture's name with its D3D header, for the port's texture dumps
+   and replacements) */
+void port_texture_named(const void *pHeader, const char *pszName);
+#endif
+
 // match: __rwXbNativeTextureRead @ 0x002BA100
 // sp-match: __rwXbNativeTextureRead @ 0x001D5510
 RwBool
@@ -572,6 +578,11 @@ _rwXbNativeTextureRead(void *streamIn, void *textureIn,
     RwTextureSetAddressingV(texture, (nativeTexture.filterAndAddress >> 12) & 0x0F);
     RwTextureSetName(texture, nativeTexture.name);
     RwTextureSetMaskName(texture, nativeTexture.mask);
+#ifdef CODFH_WIN32
+    rasExt = RASTEREXTFROMRASTER(raster);
+    if (rasExt && rasExt->texture)
+        port_texture_named(rasExt->texture, nativeTexture.name);
+#endif
 
     *((RwTexture **)textureIn) = texture;
 
