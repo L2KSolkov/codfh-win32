@@ -726,8 +726,17 @@ void sub_786A0()
 
     sub_7DE10();
     sub_7FC90();
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    // (the port's debug tools: the soldiers' animation players room for the bots, 96 of the
+    // large and 48 of the middle, port/src/debug/trigtools.cpp)
+    for (var_4 = 0; var_4 < 3; var_4++)
+        byte_44A508[var_4].sub_78BB0(var_4, dword_428BEC[var_4].unk_00,
+                                     var_4 == 2 && dword_428BEC[var_4].unk_04 < 96 ? 96
+                                     : var_4 == 1 && dword_428BEC[var_4].unk_04 < 48 ? 48 : dword_428BEC[var_4].unk_04);
+#else
     for (var_4 = 0; var_4 < 3; var_4++)
         byte_44A508[var_4].sub_78BB0(var_4, dword_428BEC[var_4].unk_00, dword_428BEC[var_4].unk_04);
+#endif
     sub_79260();
     sub_7A410(-1, sub_78D10);
     sub_7A4E0(sub_134320);

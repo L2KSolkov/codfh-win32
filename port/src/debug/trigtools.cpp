@@ -5773,7 +5773,7 @@ static void CoverStatsTick()
 // CODFH_PATHS=1 makes one when the map has none (CODFH_SPAWNAI does too); CODFH_PATHS=regen
 // makes it again over the saved one; CODFH_PATHS=off neither makes nor loads one.
 // CODFH_PATHS_STEP sets the lattice step (cm), CODFH_PATHS_DRAW=1 turns on the path view, and
-// CODFH_PATHS_COVER=1 adds cover nodes (PathCover; off for now).
+// CODFH_PATHS_COVER=1 adds cover nodes (PathCover; on MP_5 by default, else off).
 
 #ifndef CODFH_SP
 void sub_F8350(RwStream *arg_0);
@@ -6153,9 +6153,14 @@ static void PathGenerate(RwReal fStep)
                 PathLink(i, j);
                 PathLink(j, i);
             }
-    // (cover nodes only with CODFH_PATHS_COVER=1, for now)
-    if (GetEnvironmentVariableA("CODFH_PATHS_COVER", NULL, 0))
-        PathCover();
+    // (cover nodes with CODFH_PATHS_COVER=1, and on MP_5 unless CODFH_PATHS_COVER=0)
+    {
+        RwChar szCover[8];
+
+        if (GetEnvironmentVariableA("CODFH_PATHS_COVER", szCover, sizeof(szCover)) ? atoi(szCover) != 0
+                                                                                    : port_map_name && !_stricmp(port_map_name, "MP_5"))
+            PathCover();
+    }
 }
 
 // A growing byte buffer.
