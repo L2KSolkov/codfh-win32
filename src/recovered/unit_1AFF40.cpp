@@ -195,7 +195,9 @@ void type_4F84B8::sub_1B00F0()
         }
         if (s_nOverlay <= 0)
             return;
-        unk_34F1 = s_nOverlay >= 2;
+        // (the voice part only once the local player is in a game: its session is not set up in
+        // the front end)
+        unk_34F1 = s_nOverlay >= 2 && unk_4F7EB8.unk_1A4 != 0;
     }
 #else
     return;
