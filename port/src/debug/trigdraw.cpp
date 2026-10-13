@@ -4132,10 +4132,19 @@ static void TrigDrawHearTick()
 
 // (from sub_3C4B0 and sub_3C540: a sound the AI can hear, its position copied (it may be a
 // caller's local, or none for ambience))
+// (the spawn test's counts: every noise made and heard, the view on or not; the last noise made)
+RwInt32 g_nTrigNoisesMade, g_nTrigNoisesHeard;
+RwInt32 g_nTrigLastNoiseKind, g_nTrigLastNoiseClass;
+RwReal g_fTrigLastNoiseRange;
+
 void TrigDrawNoiseMade(const RwV3d *pv, RwInt32 nKind, RwInt32 nClass, RwReal fRange, RwInt32 bLasting)
 {
     TrigDrawNoise *n;
 
+    g_nTrigNoisesMade++;
+    g_nTrigLastNoiseKind = nKind;
+    g_nTrigLastNoiseClass = nClass;
+    g_fTrigLastNoiseRange = fRange;
     if (!g_bTrigDrawHearing || pv == NULL)
         return;
     TrigDrawHearTick();
@@ -4158,6 +4167,7 @@ void TrigDrawNoiseHeard(const void *pHearer, const RwV3d *pvFrom, RwInt32 nKind)
     RwInt32 i;
     RwUInt32 dwNow;
 
+    g_nTrigNoisesHeard++;
     if (!g_bTrigDrawHearing || pvFrom == NULL)
         return;
     TrigDrawHearTick();

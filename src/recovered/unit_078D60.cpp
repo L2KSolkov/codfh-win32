@@ -350,6 +350,10 @@ bool type_7C8D0::sub_79CE0(RwInt32 arg_0, bool arg_4)
     return var_1;
 }
 RwInt32 sub_170ED0(RwReal arg_0);
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+// (port/src/debug/trigtools.cpp: whether the entity is one of the debug tools' AI soldiers)
+bool TrigIsAiSoldier(const void *pEntity);
+#endif
 // match: ?sub_79D50@type_7C8D0@@QAE_NPAURwV3d@@0@Z @ 0x00079D50
 // sp-match: ?sub_79D50@type_7C8D0@@QAE_NPAURwV3d@@0@Z @ 0x00063AD0
 bool type_7C8D0::sub_79D50(RwV3d *arg_0, RwV3d *arg_4)
@@ -811,6 +815,10 @@ void type_7C8D0::sub_7A580(RwReal arg_0, RwV3d *arg_4, bool arg_8)
         // The root motion's frame update, disabled (`if (0)`, still emitted).
 #ifdef CODFH_SP // single player moves the root unless unk_12's bit 0 is set or the hierarchy has no bone 100 (SP 0x654B0)
         if (!(lv_44 & 1) && lv_c != -1) {
+#elif defined(CODFH_DRAW_TRIGGERS)
+        // (the port's debug tools: an AI soldier in multiplayer moves and turns by its root, as in
+        // single player)
+        if (TrigIsAiSoldier((const void *)unk_1C) && !(lv_44 & 1) && lv_c != -1) {
 #else
         if (0) {
 #endif

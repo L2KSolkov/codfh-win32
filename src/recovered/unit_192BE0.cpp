@@ -31,6 +31,11 @@
 #include "game/data.h"
 #include "types/musicplayer.h"
 #include "types/soundbank.h"
+#ifdef CODFH_DRAW_TRIGGERS
+// (port/src/debug/trigtools.cpp: each sound alias played, its source and whether the AI hear it)
+void TrigSoundAliasPlayed(const void *pAlias, const void *pSource, RwInt32 nKind, RwInt32 bHeard, RwInt32 bAtOnce,
+                          RwReal fRange, RwInt32 nVoice);
+#endif
 #include "types/type_8A980.h"
 #include "game/textmanager.h"
 #include "types/type_DC400.h"
@@ -272,6 +277,9 @@ RwInt32 type_3DFC34::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8
         else if (l4)
             sub_3C540(arg_4, arg_8, l4, arg_C, var_8, unk_1E * 100.0f, 0, 0);
     }
+#ifdef CODFH_DRAW_TRIGGERS
+    TrigSoundAliasPlayed(this, arg_4, arg_8, unk_17, unk_18, unk_1E * 100.0f, l4);
+#endif
     return l4;
 }
 // match: ??0type_3DFCA0@@QAE@ABUtype_3DF8D8_04@@@Z @ 0x001932D0

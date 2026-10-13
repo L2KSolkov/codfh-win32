@@ -108,6 +108,7 @@
 #include "game/gameloop.h"
 #include "game/savestate.h"
 #include "types/AIData.h"
+#include "types/type_3C540.h"
 #include "types/type_3DBC78_450.h"
 #include "types/type_1227C0.h"
 #include "types/ProjectileGeneratorTrigger.h"
@@ -5591,6 +5592,10 @@ static void LogSoldierTriggersTick()
     plog("soldiers: %d distinct soldier trigger scripts", n);
 }
 
+// (set when the player is placed at CODFH_SPAWNTRIGGER's trigger: the spawn test's soldier is
+// brought back in front of it, SpawnAiTestTick)
+static RwBool s_bSpawnAiBringNear;
+
 static void AutoSpawnTick()
 {
 #ifndef CODFH_SP
@@ -5610,13 +5615,18 @@ static void AutoSpawnTick()
         if (s_nTrigger == -2)
             s_nTrigger = GetEnvironmentVariableA("CODFH_SPAWNTRIGGER", szPoint, sizeof(szPoint)) ? atoi(szPoint) : -1;
         static RwUInt32 s_dwIn;
+        static RwBool s_bPlaced;
 
-        // (a second after the player is in: the respawn's own placing is done by then)
+        // (a second after the player is in: the respawn's own placing is done by then; again each
+        // life)
         if (unk_4F7EB8.unk_1A4 == NULL)
+        {
             s_dwIn = 0;
+            s_bPlaced = FALSE;
+        }
         else if (!s_dwIn)
             s_dwIn = port_frame;
-        if (s_nTrigger >= 0 && s_dwIn && port_frame - s_dwIn > 60)
+        if (s_nTrigger >= 0 && !s_bPlaced && s_dwIn && port_frame - s_dwIn > 60)
         {
             Trigger *pTrigger = s_nTrigger < 2000 ? (Trigger *)dword_4CFE30[s_nTrigger] : NULL;
 
@@ -5630,10 +5640,14 @@ static void AutoSpawnTick()
                 Teleport((type_10F710 *)unk_4F7EB8.unk_1A4, &v);
                 plog("spawnpoint: the player at trigger %d (kind %d): (%.0f, %.0f, %.0f)", s_nTrigger, pTrigger->vf_008(),
                      v.x, v.y, v.z);
+                s_bSpawnAiBringNear = TRUE;
             }
             else
+            {
                 plog("spawnpoint: no trigger %d", s_nTrigger);
-            s_nTrigger = -1;
+                s_nTrigger = -1;
+            }
+            s_bPlaced = TRUE;
         }
         if (s_nPoint >= 0 && s_dwIn && port_frame - s_dwIn > 60)
         {
@@ -5729,6 +5743,134 @@ static void AutoSpawnTick()
 #endif
 }
 
+// (from the sound aliases' play, type_3DFC34::vf_00C, unit_192BE0: CODFH_SPAWNAI's test logs the
+// first few plays of each alias from the player, and whether the AI hear it (unk_17))
+void TrigSoundAliasPlayed(const void *pAlias, const void *pSource, RwInt32 nKind, RwInt32 bHeard, RwInt32 bAtOnce,
+                          RwReal fRange, RwInt32 nVoice)
+{
+    static RwInt32 s_bOn = -1;
+    static const void *s_apSeen[64];
+    static RwInt32 s_anSeen[64], s_nSeen;
+    RwInt32 i;
+
+    if (s_bOn < 0)
+        s_bOn = GetEnvironmentVariableA("CODFH_SPAWNAI", NULL, 0) ? 1 : 0;
+    if (!s_bOn)
+        return;
+    for (i = 0; i < s_nSeen; i++)
+        if (s_apSeen[i] == pAlias)
+            break;
+    if (i == s_nSeen)
+    {
+        if (s_nSeen >= 64)
+            return;
+        s_apSeen[s_nSeen] = pAlias;
+        s_anSeen[s_nSeen++] = 0;
+    }
+    if (s_anSeen[i]++ >= 3)
+        return;
+    __try
+    {
+        const type_3DF8D8 *p = (const type_3DF8D8 *)pAlias;
+
+        plog("sounds: %s played alias %08X,%08X (kind %d): heard by the AI %d, at once %d, range %.0f, voice %d",
+             pSource == NULL ? "nothing" : pSource == (const void *)sub_1745A0(0) ? "the player" : "an entity",
+             p->unk_04.unk_00, p->unk_04.unk_04, nKind, bHeard, bAtOnce, fRange, nVoice);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+}
+
+// (port/src/debug/trigdraw.cpp's noise counts; AIHearing's listeners and its noise, unit_03C1D0)
+extern RwInt32 g_nTrigNoisesMade, g_nTrigNoisesHeard;
+extern RwInt32 g_nTrigLastNoiseKind, g_nTrigLastNoiseClass;
+extern RwReal g_fTrigLastNoiseRange;
+extern type_3C720 *dword_43925C;
+void sub_3C4B0(type_3D3548 *arg_0, RwInt32 arg_4, RwV3d *arg_8, RwInt32 arg_C, RwReal arg_10,
+               RwInt32 arg_14, RwReal arg_18);
+
+// The soldier pSoldier turned to face the point pvAt: its frame upright towards it, and its facing
+// told (vf_0D8).
+static void SpawnAiFace(type_3D3548 *pSoldier, const RwV3d *pvAt)
+{
+    RwFrame *pFrame = pSoldier->get_unk_340();
+    RwV3d *pv = pSoldier->sub_CD550(), at;
+    RwReal fLen;
+
+    if (pFrame == NULL || pv == NULL)
+        return;
+    at.x = pvAt->x - pv->x;
+    at.y = 0.0f;
+    at.z = pvAt->z - pv->z;
+    fLen = (RwReal)sqrt(at.x * at.x + at.z * at.z);
+    if (fLen > 0.01f)
+    {
+        RwMatrix *m = RwFrameGetMatrix(pFrame);
+        RwV3d pos = m->pos;
+
+        at.x /= fLen;
+        at.z /= fLen;
+        m->at = at;
+        m->up.x = 0.0f;
+        m->up.y = 1.0f;
+        m->up.z = 0.0f;
+        RwV3dCrossProduct(&m->right, &m->up, &m->at);
+        m->pos = pos;
+        RwMatrixUpdate(m);
+        RwFrameUpdateObjects(pFrame);
+        pSoldier->vf_0D8(&at);
+    }
+}
+
+// The soldier pSoldier moved 3 m in front of the player (its view, on the floor below its waist)
+// and turned to face it.
+static void SpawnAiBringNear(type_3D3548 *pSoldier, type_10F710 *pPlayer)
+{
+    RwV3d v, vMe;
+
+    if (!PlayerPosition(pPlayer, &vMe))
+        return;
+    v = vMe;
+    __try
+    {
+        RwMatrix *pLtm = dword_4E5C74 ? RwFrameGetLTM(RwCameraGetFrame((RwCamera *)dword_4E5C74)) : NULL;
+        RwFrame *pBody = pPlayer->get_unk_340();
+        RwMatrix *pBodyLtm = pBody ? RwFrameGetLTM(pBody) : NULL;
+        // (the player's body's facing; the camera's only when it has none)
+        RwV3d *pAt = pBodyLtm ? &pBodyLtm->at : pLtm ? &pLtm->at : NULL;
+        RwReal fLen = pAt ? (RwReal)sqrt(pAt->x * pAt->x + pAt->z * pAt->z) : 0.0f;
+
+        plog("spawnai: facings: camera (%.2f, %.2f), body (%.2f, %.2f)", pLtm ? pLtm->at.x : 0.0f, pLtm ? pLtm->at.z : 0.0f,
+             pBodyLtm ? pBodyLtm->at.x : 0.0f, pBodyLtm ? pBodyLtm->at.z : 0.0f);
+        if (fLen > 0.01f)
+        {
+            v.x += pAt->x / fLen * 300.0f;
+            v.z += pAt->z / fLen * 300.0f;
+        }
+        v.y += 40.0f;
+        if (!GroundBelow(&v))
+            v.y -= 40.0f;
+        pSoldier->vf_0C0(&v);
+        SpawnAiFace(pSoldier, &vMe);
+        plog("spawnai: the soldier brought 3 m in front of the player: (%.0f, %.0f, %.0f)", v.x, v.y, v.z);
+        {
+            RwFrame *pFrame = pSoldier->get_unk_340();
+            RwV3d vFeet = vMe;
+
+            if (pFrame)
+                plog("spawnai:   its frame at (%.0f, %.0f, %.0f), its position (%.0f, %.0f, %.0f)",
+                     RwFrameGetLTM(pFrame)->pos.x, RwFrameGetLTM(pFrame)->pos.y, RwFrameGetLTM(pFrame)->pos.z,
+                     pSoldier->sub_CD550()->x, pSoldier->sub_CD550()->y, pSoldier->sub_CD550()->z);
+            plog("spawnai:   the player's floor %s %.0f", GroundBelow(&vFeet) ? "at" : "not found; at", vFeet.y);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        plog("spawnai: bringing the soldier near faulted");
+    }
+}
+
 static void SpawnAiTestTick()
 {
     static RwInt32 s_nState = -1;
@@ -5809,8 +5951,11 @@ static void SpawnAiTestTick()
             else
             {
                 RwV3d vFlat = v;
+                RwChar szDist[16];
+                // (CODFH_SPAWNAI_DIST: that far in front of the player, in cm, no flat spot looked for)
+                RwReal fDist = GetEnvironmentVariableA("CODFH_SPAWNAI_DIST", szDist, sizeof(szDist)) ? (RwReal)atof(szDist) : 0.0f;
 
-                if (FindFlatSpot(&vFlat))
+                if (fDist <= 0.0f && FindFlatSpot(&vFlat))
                 {
                     plog("spawnai: a flat spot at (%.0f, %.0f, %.0f)", vFlat.x, vFlat.y, vFlat.z);
                     v = vFlat;
@@ -5825,17 +5970,17 @@ static void SpawnAiTestTick()
 
                         if (fLen > 0.01f)
                         {
-                            v.x += pLtm->at.x / fLen * 400.0f;
-                            v.z += pLtm->at.z / fLen * 400.0f;
+                            v.x += pLtm->at.x / fLen * (fDist > 0.0f ? fDist : 400.0f);
+                            v.z += pLtm->at.z / fLen * (fDist > 0.0f ? fDist : 400.0f);
                         }
                     }
                     __except (EXCEPTION_EXECUTE_HANDLER)
                     {
                     }
-                    v.y += 40.0f;
+                    v.y += fDist > 0.0f ? 300.0f : 40.0f;
                     if (!GroundBelow(&v))
-                        v.y -= 40.0f;
-                    plog("spawnai: no flat spot in sight; 4 m in front of the player (%.0f, %.0f, %.0f)", v.x, v.y, v.z);
+                        v.y -= fDist > 0.0f ? 300.0f : 40.0f;
+                    plog("spawnai: no flat spot in sight (or CODFH_SPAWNAI_DIST); in front of the player (%.0f, %.0f, %.0f)", v.x, v.y, v.z);
                 }
             }
         }
@@ -5880,6 +6025,12 @@ static void SpawnAiTestTick()
                     {
                         at.x = vMe.x - pv->x;
                         at.z = vMe.z - pv->z;
+                        // (CODFH_SPAWNAI_AWAY=1: its back to the player, the hearing test)
+                        if (GetEnvironmentVariableA("CODFH_SPAWNAI_AWAY", NULL, 0))
+                        {
+                            at.x = -at.x;
+                            at.z = -at.z;
+                        }
                     }
                     else
                     {
@@ -6045,6 +6196,21 @@ static void SpawnAiTestTick()
         {
         }
     }
+    {
+        static RwUInt32 s_dwBring;
+
+        if (s_bSpawnAiBringNear && s_pSoldier && s_nState >= 1 && s_nState != 99)
+        {
+            if (!s_dwBring)
+                s_dwBring = port_frame + 30;
+            else if (port_frame >= s_dwBring)
+            {
+                s_bSpawnAiBringNear = FALSE;
+                s_dwBring = 0;
+                SpawnAiBringNear(s_pSoldier, pPlayer);
+            }
+        }
+    }
     if (port_frame - s_dwAt < 60)
         return;
     s_dwAt = port_frame;
@@ -6069,6 +6235,28 @@ static void SpawnAiTestTick()
                  pv ? pv->x : 0.0f, pv ? pv->y : 0.0f, pv ? pv->z : 0.0f, s_pSoldier->vf_174(), s_pSoldier->unk_2C,
                  pAi ? pAi->unk_578 : -1, pAi ? pAi->unk_51C : -1, pAi ? pAi->unk_58 : -1, pAi ? pAi->unk_520 : -1,
                  pAi ? (void *)pAi->unk_568 : NULL, v.x, v.y, v.z);
+            // (its facing: its frame's at, and toward the player)
+            {
+                RwFrame *pFrame = s_pSoldier->get_unk_340();
+
+                if (pFrame && pv)
+                {
+                    RwMatrix *m = RwFrameGetMatrix(pFrame);
+                    RwReal dx = v.x - pv->x, dz = v.z - pv->z, d = (RwReal)sqrt(dx * dx + dz * dz);
+
+                    plog("spawnai:   facing (%.2f, %.2f); the player is toward (%.2f, %.2f)", m->at.x, m->at.z,
+                         d > 0.0f ? dx / d : 0.0f, d > 0.0f ? dz / d : 0.0f);
+                    // (the turn's aim, as SetTurnMode reads it: the turn location unk_500 under flag 30,
+                    // else the target point unk_4F0; the animation's turn, GetTurnAmount's)
+                    if (pAi)
+                        plog("spawnai:   turn: flag30 %d, location (%.0f, %.0f, %.0f), target point %s (%.0f, %.0f, %.0f), "
+                             "animation turn %.1f deg",
+                             (pAi->unk_49C >> 30) & 1, pAi->unk_500.x, pAi->unk_500.y, pAi->unk_500.z,
+                             pAi->unk_4F0 ? "set" : "none", pAi->unk_4F0 ? pAi->unk_4F0->x : 0.0f,
+                             pAi->unk_4F0 ? pAi->unk_4F0->y : 0.0f, pAi->unk_4F0 ? pAi->unk_4F0->z : 0.0f,
+                             s_pSoldier->unk_284 ? (RwReal)atan2(s_pSoldier->unk_284->unk_1A0, s_pSoldier->unk_284->unk_1A8) * 2.0f * 57.29578f : -1.0f);
+                }
+            }
         }
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
@@ -6168,6 +6356,45 @@ static void SpawnAiTestTick()
         }
         __except (EXCEPTION_EXECUTE_HANDLER)
         {
+        }
+        // (hearing: the noises made and heard so far, the last one's kind, class and range; the
+        // sound flag (dword_4B86F8 bit 4: none made); whether it listens, and for what)
+        __try
+        {
+            AIData *pAi = s_pSoldier->vf_120();
+            type_3C720 *pL;
+            RwInt32 nListeners = 0, bListens = 0;
+
+            for (pL = dword_43925C; pL && nListeners < 1000; pL = pL->unk_08)
+            {
+                nListeners++;
+                if (pL->unk_00 == s_pSoldier)
+                    bListens = 1;
+            }
+            plog("spawnai:   hearing: %d noises made, %d heard; last kind %d class %d range %.0f; sounds off %d; "
+                 "%d listeners (it %s); it hears classes 0x%X kinds 0x%X sides 0x%X, radius %.0f",
+                 g_nTrigNoisesMade, g_nTrigNoisesHeard, g_nTrigLastNoiseKind, g_nTrigLastNoiseClass,
+                 g_fTrigLastNoiseRange, (dword_4B86F8 >> 4) & 1, nListeners, bListens ? "one" : "not",
+                 pAi ? pAi->unk_538 : -1, pAi ? pAi->unk_53C : -1, pAi ? pAi->unk_540 : -1, s_pSoldier->vf_130());
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            plog("spawnai:   reading the hearing state faulted");
+        }
+        {
+            static RwInt32 s_nLooks;
+
+            // (the fourth look: a noise at the player, as a gunshot's alias makes one: kind 1, class 2)
+            if (++s_nLooks == 4 && GetEnvironmentVariableA("CODFH_SPAWNAI_NOISE", NULL, 0))
+            {
+                RwV3d vMe;
+
+                if (PlayerPosition(pPlayer, &vMe))
+                {
+                    plog("spawnai:   a test noise at the player (%.0f, %.0f, %.0f)", vMe.x, vMe.y, vMe.z);
+                    sub_3C4B0((type_3D3548 *)pPlayer, 1, &vMe, 2, 3000.0f, 0, 0.0f);
+                }
+            }
         }
         // (its weapon's aim: firing at its target (unk_A0), a point given (unk_CC, unk_D0), and its AI's target)
         __try

@@ -119,6 +119,21 @@ extern "C" int port_anim_packs(const char *const **pppNames)
                 fclose(pFile);
             }
         }
+        // (CODFH_ANIMPACKS: extra packs for any level, comma separated; the debug tools' AI
+        // soldiers in multiplayer take single player's animations from them)
+        if (s_n == 0)
+        {
+            char szEnv[512], *p;
+
+            if (GetEnvironmentVariableA("CODFH_ANIMPACKS", szEnv, sizeof(szEnv)))
+                for (p = strtok(szEnv, ", "); p && s_n < PORT_ANIM_PACKS; p = strtok(NULL, ", "))
+                {
+                    strncpy(s_aszName[s_n], p, sizeof(s_aszName[s_n]) - 1);
+                    s_apszName[s_n] = s_aszName[s_n];
+                    plog("animation packs: extra pack %d (bank %d): %s (CODFH_ANIMPACKS)", s_n, 6 + s_n, s_aszName[s_n]);
+                    s_n++;
+                }
+        }
     }
     *pppNames = s_apszName;
     return s_n;
