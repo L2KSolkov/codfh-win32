@@ -31,7 +31,7 @@ extern const RwReal flt_3CE528 = 16.666666f;
 // 0x00438E88
 type_365A0 *dword_438E88;
 // 0x00438E90
-type_438E90 dword_438E90[97];
+type_438E90 dword_438E90[DISTANCE_HANDLES];
 // 0x00439198
 RwInt32 dword_439198;
 // End of its data definitions.
@@ -95,7 +95,12 @@ type_35120 *sub_36700(type_365A0 arg_0);
 // sp-match: sub_34FA0 @ 0x0002A390
 void sub_34FA0()
 {
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    // (the port's debug tools: room for the bots, port/src/debug/trigtools.cpp)
+    dword_4391EC.sub_16C2C0(384, 0x24, "m_freeDistanceParams", 4, 0);
+#else
     dword_4391EC.sub_16C2C0(0x61, 0x24, "m_freeDistanceParams", 4, 0);
+#endif
     dword_4391A0.sub_71F20(0x20, 1, 3, 0, sub_353A0, sub_35A60);
     dword_439210.sub_71F20(0x40, 1, 0x15, 0, sub_353A0, sub_35A60);
     memset(dword_438E90, 0, sizeof(dword_438E90));
@@ -843,7 +848,7 @@ RwUInt32 sub_365A0(type_35120 *arg_0)
         v8 = 1;
         dword_438E88 = 0;
     } else {
-        for (var_4 = 1; var_4 < 0x61; var_4++) {
+        for (var_4 = 1; var_4 < DISTANCE_HANDLES; var_4++) {
             if (dword_438E90[var_4].unk_00.unk_00 == 0 && dword_438E90[var_4].unk_04 == 0) {
                 if (dword_439198 == 0)
                     dword_439198 = 1;

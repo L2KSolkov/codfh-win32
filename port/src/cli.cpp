@@ -83,7 +83,7 @@ extern "C" int port_autospawn = 0;
  * folder's ANIMPACKS.TXT, a pack's file name a line ("MPA_00Ger.ads"; '#' a comment), read
  * once; each loaded into a bank of its own after the six (src/recovered/unit_0A02D0.cpp's
  * CAnimBankInfo and unit_0A0A50.cpp's CAnimPackSelector). Its count; *pppNames their names. */
-#define PORT_ANIM_PACKS 8
+#define PORT_ANIM_PACKS 16
 extern "C" int port_anim_packs(const char *const **pppNames)
 {
     static char s_aszName[PORT_ANIM_PACKS][32];

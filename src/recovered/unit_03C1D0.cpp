@@ -65,7 +65,12 @@ RwInt32 sub_3C980(type_3D3548 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwInt32
 // sp-match: sub_3C1D0 @ 0x0002DBF0
 void sub_3C1D0()
 {
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    // (the port's debug tools: room for the bots' listeners, port/src/debug/trigtools.cpp)
+    dword_439264.sub_16C2C0(96, 0xC, "m_freeHearingParams", 4, 0);
+#else
     dword_439264.sub_16C2C0(0x19, 0xC, "m_freeHearingParams", 4, 0);
+#endif
     dword_439284.sub_16C2C0(0xA, 0x24, "m_freeLongSound", 4, 0);
     dword_43925C = 0;
     dword_439260 = 0;
@@ -80,7 +85,11 @@ void sub_3C220()
     type_3C540 *var_4;
     type_3C540 *local_8;
 
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    if (dword_439264.get_unk_18() != 96)
+#else
     if (dword_439264.get_unk_18() != 0x19)
+#endif
         sub_3C290();
     var_4 = dword_439260;
     while (var_4 != 0) {

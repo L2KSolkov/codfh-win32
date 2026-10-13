@@ -249,6 +249,16 @@ void type_3DF30::sub_3E3B0(RwUInt32 arg_0)
         x8 = rC;
         rC = sub_3D3E0(rC->get_unk_14().unk_00);
     }
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    // (the port's debug tools: with the bots' crowded squads a maneuver to take out can be gone
+    // from the list already, or the list's head stale; nothing to unlink then, the members still
+    // let go below)
+    if (bp_4 == 0)
+        return;
+    if (rC == 0 || (!x8 && sub_3D3E0(unk_2A8) == 0))
+        ;
+    else
+#endif
     if (x8)
         x8->set_unk_14(rC->get_unk_14());
     else
@@ -505,6 +515,9 @@ void sub_3EC40()
 #ifdef CODFH_SP
     // Single player's squad pool has 5 slots, not 25 (SP 0x2F7C9).
     dword_4395F8.sub_16C2C0(5, 0x2E0, "m_freeSquadList", 4, 0);
+#elif defined(CODFH_DRAW_TRIGGERS)
+    // (the port's debug tools: room for the bots, port/src/debug/trigtools.cpp)
+    dword_4395F8.sub_16C2C0(64, 0x2E0, "m_freeSquadList", 4, 0);
 #else
     dword_4395F8.sub_16C2C0(0x19, 0x2E0, "m_freeSquadList", 4, 0);
 #endif
@@ -615,6 +628,19 @@ void sub_3EE10(type_3D3548 *arg_0)
         }
     }
     for (l10 = dword_4395F0; l10 != 0; l10 = l10->unk_2AC) {
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+        // (the port's debug tools: the bots in squads of four at most, as single player's are
+        // small; one squad of a whole team makes maneuvers faster than they end)
+        {
+            RwInt32 nMembers = 0;
+            type_3D3548 *pMember;
+
+            for (pMember = l10->unk_00; pMember && nMembers < 100; pMember = pMember->vf_118())
+                nMembers++;
+            if (nMembers >= 4)
+                continue;
+        }
+#endif
         stk_14 = l10->sub_3E710(arg_0);
         if (stk_14 > var_4) {
             var_4 = stk_14;

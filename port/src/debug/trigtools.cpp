@@ -703,6 +703,28 @@ static void TrigAddAiSoldier(const void *pEntity)
 // (sub_15D010 clones its definition's model, kind 26, and gives up without one, and the
 // weapon's take-up, sub_15D3E0, then faults on no clump; one with unk_74 set needs unk_58's
 // object too), or -1; *pnAll the NPC weapons the level has.
+// Whether NPC weapon type k can be given (its model read, and unk_58's object when unk_74 asks).
+static RwBool NpcWeaponUsable(RwInt32 k)
+{
+    type_3DF8D8 *pDef;
+
+    if (k < 0 || k >= 128 || (!dword_4D53F8[k].unk_48.unk_00 && !dword_4D53F8[k].unk_48.unk_04))
+        return FALSE;
+    __try
+    {
+        pDef = sub_198800(&dword_4D53F8[k].unk_48);
+        if (pDef == NULL || pDef->vf_008() != 26 || !definition_model(pDef))
+            return FALSE;
+        if (dword_4D53F8[k].unk_74 && sub_198800(&dword_4D53F8[k].unk_58) == NULL)
+            return FALSE;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+    return TRUE;
+}
+
 static RwInt32 PickNpcWeapon(RwInt32 *pnAll)
 {
     RwInt32 k, nWeapon = -1;
@@ -733,8 +755,10 @@ static RwInt32 PickNpcWeapon(RwInt32 *pnAll)
     return nWeapon;
 }
 
-// (nonzero: the side SpawnAiSoldierMp gives the soldier, the bots')
+// (nonzero: the side SpawnAiSoldierMp gives the soldier, the bots'; 0 or more: the NPC weapon
+// type it gives it)
 static RwUInt32 s_dwSpawnSide;
+static RwInt32 s_nSpawnWeapon = -1;
 
 static type_3D3548 *SpawnAiSoldierMp(SoldierTrigger *pTrigger)
 {
@@ -769,6 +793,8 @@ static type_3D3548 *SpawnAiSoldierMp(SoldierTrigger *pTrigger)
     nWeapon = PickNpcWeapon(&nWeapons);
     if (GetEnvironmentVariableA("CODFH_SPAWNAI_WEAPON", szWeapon, sizeof(szWeapon)))
         nWeapon = atoi(szWeapon);
+    if (s_nSpawnWeapon >= 0)
+        nWeapon = s_nSpawnWeapon;
     plog("spawn: %d NPC weapons in this level; the soldier gets weapon type %d (the trigger's %d; -1: none with its "
          "model read)", nWeapons, nWeapon, nOldWeapon);
     if (!valid_weapon_type(nOldWeapon) && valid_weapon_type(nWeapon))
@@ -1297,7 +1323,10 @@ static void TrigMsgTick();
 static void SpawnAiTestTick();
 static void AutoSpawnTick();
 static void PathsTick();
+static void CoverStatsTick();
 static void BotsTick();
+static void TrigAnimMissLog(RwBool bStart);
+static void TrigAnimWatch(RwUInt32 dwUntil);
 static void LogSoldierTriggersTick();
 
 void TrigWebTick()
@@ -1312,6 +1341,7 @@ void TrigWebTick()
     WaitsLogTick();
     TrigMsgTick();
     PathsTick();
+    CoverStatsTick();
 #ifndef CODFH_SP
     BotsTick();
 #endif
@@ -5604,6 +5634,131 @@ static void LogSoldierTriggersTick()
     plog("soldiers: %d distinct soldier trigger scripts", n);
 }
 
+// ---- the shipped cover nodes measured (CODFH_COVERSTATS=1): how they stand to their walls ----
+//
+// For a cover generator's conventions: each node of a cover type (3 to 5, 9, 11 to 14, 19) whose
+// floor is loaded, its flags, its orientation's local X and Z on the ground, and the distance to
+// the collision along +Z, -Z, +X and -X at 50, 120 and 180 cm above it (up to 4 m; -1 none).
+
+// The fraction along *pA to *pB of the nearest collision, or 2 for none.
+static RwReal RayHit(const RwV3d *pA, const RwV3d *pB)
+{
+    RpIntersection is;
+    RwReal fHit = 2.0f;
+    RpWorld *pWorld;
+    RwInt32 i;
+
+    is.type = rpINTERSECTLINE;
+    is.t.line.start = *pA;
+    is.t.line.end = *pB;
+    for (i = 0; i <= 4; i++)
+    {
+        pWorld = i < 4 ? (dword_4E5D30[i].get_unk_00() ? dword_4E5D30[i].get_unk_28() : NULL) : unk_4E5CD8.get_unk_28();
+        if (pWorld)
+            RpCollisionWorldForAllIntersections(pWorld, &is, GroundHit, &fHit);
+    }
+    return fHit;
+}
+
+// The vector *pv turned by the quaternion q (imag x, y, z, real w).
+static void QuatTurn(const RwReal *q, const RwV3d *pv, RwV3d *pOut)
+{
+    RwReal x = q[0], y = q[1], z = q[2], w = q[3];
+    RwV3d t, u;
+
+    // t = 2 (q.xyz x v); v' = v + w t + q.xyz x t
+    t.x = 2.0f * (y * pv->z - z * pv->y);
+    t.y = 2.0f * (z * pv->x - x * pv->z);
+    t.z = 2.0f * (x * pv->y - y * pv->x);
+    u.x = y * t.z - z * t.y;
+    u.y = z * t.x - x * t.z;
+    u.z = x * t.y - y * t.x;
+    pOut->x = pv->x + w * t.x + u.x;
+    pOut->y = pv->y + w * t.y + u.y;
+    pOut->z = pv->z + w * t.z + u.z;
+}
+
+static void CoverStatsTick()
+{
+    static RwInt32 s_nState = -1;
+    static RwUInt32 s_dwAt;
+    RwInt32 nId, nLogged = 0, k, h;
+
+    if (s_nState < 0)
+        s_nState = GetEnvironmentVariableA("CODFH_COVERSTATS", NULL, 0) ? 0 : 2;
+    if (s_nState != 0 || !unk_4C00E8.unk_64 || unk_4C00E8.unk_2C == NULL)
+        return;
+    if (!s_dwAt)
+        s_dwAt = port_frame + 300;
+    if (port_frame < s_dwAt)
+        return;
+    s_nState = 1;
+    for (nId = 1; nId < unk_4C00E8.unk_08 && nLogged < 400; nId++)
+    {
+        type_F8350 *pNode = unk_4C00E8.unk_2C[nId];
+        RwInt32 nType;
+        RwV3d vA, vB, avAxis[4], vLocal;
+        RwReal afQ[4], afD[3][4];
+        RwChar sz[256];
+
+        if (pNode == NULL)
+            continue;
+        nType = pNode->unk_04;
+        if (!(nType >= 3 && nType <= 5) && nType != 9 && !(nType >= 11 && nType <= 14) && nType != 19)
+            continue;
+        // (its floor loaded: something within 1 m under it)
+        vA = pNode->unk_10;
+        vA.y += 30.0f;
+        vB = pNode->unk_10;
+        vB.y -= 70.0f;
+        if (RayHit(&vA, &vB) > 1.0f)
+            continue;
+        if (pNode->unk_00 & 1)
+            memcpy(afQ, &pNode->unk_1C, sizeof(afQ));
+        else
+        {
+            afQ[0] = afQ[1] = afQ[2] = 0.0f;
+            afQ[3] = 1.0f;
+        }
+        vLocal.x = 0.0f;
+        vLocal.y = 0.0f;
+        vLocal.z = 1.0f;
+        QuatTurn(afQ, &vLocal, &avAxis[0]);
+        avAxis[1].x = -avAxis[0].x;
+        avAxis[1].y = -avAxis[0].y;
+        avAxis[1].z = -avAxis[0].z;
+        vLocal.x = 1.0f;
+        vLocal.z = 0.0f;
+        QuatTurn(afQ, &vLocal, &avAxis[2]);
+        avAxis[3].x = -avAxis[2].x;
+        avAxis[3].y = -avAxis[2].y;
+        avAxis[3].z = -avAxis[2].z;
+        for (h = 0; h < 3; h++)
+            for (k = 0; k < 4; k++)
+            {
+                RwReal f;
+
+                vA = pNode->unk_10;
+                vA.y += h == 0 ? 50.0f : h == 1 ? 120.0f : 180.0f;
+                vB.x = vA.x + avAxis[k].x * 400.0f;
+                vB.y = vA.y;
+                vB.z = vA.z + avAxis[k].z * 400.0f;
+                f = RayHit(&vA, &vB);
+                afD[h][k] = f > 1.0f ? -1.0f : f * 400.0f;
+            }
+        _snprintf(sz, sizeof(sz),
+                  "coverstats: %d type %d flags 0x%X at (%.0f, %.0f, %.0f) z (%.2f, %.2f) x (%.2f, %.2f); "
+                  "+z %.0f/%.0f/%.0f -z %.0f/%.0f/%.0f +x %.0f/%.0f/%.0f -x %.0f/%.0f/%.0f",
+                  nId, nType, pNode->unk_00, pNode->unk_10.x, pNode->unk_10.y, pNode->unk_10.z, avAxis[0].x, avAxis[0].z,
+                  avAxis[2].x, avAxis[2].z, afD[0][0], afD[1][0], afD[2][0], afD[0][1], afD[1][1], afD[2][1], afD[0][2],
+                  afD[1][2], afD[2][2], afD[0][3], afD[1][3], afD[2][3]);
+        sz[sizeof(sz) - 1] = 0;
+        plog("%s", sz);
+        nLogged++;
+    }
+    plog("coverstats: %d cover nodes with their floor loaded", nLogged);
+}
+
 // ---- path graphs for the multiplayer maps (the AI soldiers' A*) ----
 //
 // The multiplayer maps ship an empty path record (GodData kind 13: its 28-byte header alone), so
@@ -5617,7 +5772,8 @@ static void LogSoldierTriggersTick()
 //
 // CODFH_PATHS=1 makes one when the map has none (CODFH_SPAWNAI does too); CODFH_PATHS=regen
 // makes it again over the saved one; CODFH_PATHS=off neither makes nor loads one.
-// CODFH_PATHS_STEP sets the lattice step (cm), CODFH_PATHS_DRAW=1 turns on the path view.
+// CODFH_PATHS_STEP sets the lattice step (cm), CODFH_PATHS_DRAW=1 turns on the path view, and
+// CODFH_PATHS_COVER=1 adds cover nodes (PathCover; off for now).
 
 #ifndef CODFH_SP
 void sub_F8350(RwStream *arg_0);
@@ -5633,8 +5789,11 @@ extern "C" const char *port_map_name;
 
 struct PathGenNode
 {
-    RwInt32 ix, iz;
+    RwInt32 ix, iz;             // its lattice point (a cover node: none, 0x7FFFFFFF)
     RwV3d v;
+    RwUInt32 dwFlags;           // its flags (bit 0: an orientation, bit 1: cover, bits 8 and 10 its stance)
+    RwUInt16 nType;             // 1 a waypoint; 3 and 4 corners; 5 over-top cover
+    RwReal afQuat[4];           // its orientation (imag x, y, z, real), local +Z at the cover
     RwInt32 nLinks;
     RwUInt16 anLinks[PATH_MAX_LINKS];
 };
@@ -5753,6 +5912,8 @@ static RwInt32 PathAdd(RwInt32 ix, RwInt32 iz, const RwV3d *pv)
     p->ix = ix;
     p->iz = iz;
     p->v = *pv;
+    p->nType = 1;
+    p->afQuat[3] = 1.0f;
     return s_nPathGen++;
 }
 
@@ -5782,6 +5943,131 @@ static void PathSeed(const RwV3d *pv, RwReal fStep)
                 return;
             }
         }
+}
+
+// Whether a knee-high line from (x, y, z) along (dx, dz) meets something within fRange: its
+// distance in *pfAt.
+static RwBool PathRay(RwReal x, RwReal y, RwReal z, RwReal dx, RwReal dz, RwReal fRange, RwReal *pfAt)
+{
+    RwV3d a, b;
+    RwReal f;
+
+    a.x = x;
+    a.y = y;
+    a.z = z;
+    b.x = x + dx * fRange;
+    b.y = y;
+    b.z = z + dz * fRange;
+    f = RayHit(&a, &b);
+    if (f > 1.0f)
+        return FALSE;
+    if (pfAt)
+        *pfAt = f * fRange;
+    return TRUE;
+}
+
+// The cover nodes, as the shipped ones stand (CODFH_COVERSTATS' measures of L_1_1_B): 40 cm from
+// a wall a waypoint looks at within 1.5 m, local +Z at the wall. A wall hit at 50 and 120 cm but
+// clear at 180 is over-top cover, standing (type 5, flag bit 8); hit at 50 but clear at 120,
+// crouching (type 5, bit 10); hit at 180 too, a corner where it ends within 70 cm to one side
+// (type 3 peeks to local +X, 4 to -X; bit 8). Each linked both ways to the waypoints within
+// 2.5 m it walks to; none within 1.2 m of another.
+static void PathCover()
+{
+    static const RwInt32 s_anDir[8][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 } };
+    RwInt32 nWaypoints = s_nPathGen, i, k, j, nCover = 0, anKind[3] = { 0, 0, 0 };
+
+    for (i = 0; i < nWaypoints; i++)
+        for (k = 0; k < 8; k++)
+        {
+            RwReal dx = (RwReal)s_anDir[k][0], dz = (RwReal)s_anDir[k][1], fLen = (RwReal)sqrt(dx * dx + dz * dz), fAt, y;
+            RwReal rx, rz, fTheta;
+            RwV3d v, *pFrom = &s_aPathGen[i].v;
+            RwUInt16 nType;
+            RwUInt32 dwFlags;
+            RwInt32 nNew;
+            RwBool bClose = FALSE;
+
+            dx /= fLen;
+            dz /= fLen;
+            if (!PathRay(pFrom->x, pFrom->y + 50.0f, pFrom->z, dx, dz, 150.0f, &fAt) || fAt < 45.0f)
+                continue;
+            v.x = pFrom->x + dx * (fAt - 40.0f);
+            v.z = pFrom->z + dz * (fAt - 40.0f);
+            if (!PathFloor(v.x, pFrom->y + PATH_STEP_UP, v.z, PATH_STEP_UP + PATH_DROP, &y) || fabs(y - pFrom->y) > 40.0f)
+                continue;
+            v.y = y;
+            for (j = nWaypoints; j < s_nPathGen && !bClose; j++)
+                bClose = (s_aPathGen[j].v.x - v.x) * (s_aPathGen[j].v.x - v.x) + (s_aPathGen[j].v.z - v.z) * (s_aPathGen[j].v.z - v.z)
+                             < 120.0f * 120.0f && fabs(s_aPathGen[j].v.y - v.y) < 100.0f;
+            if (bClose || !PathClear(v.x, v.y + 20.0f, v.z, v.x, v.y + PATH_HEAD, v.z))
+                continue;
+            // (the wall's height in front, 40 cm out: at 50 cm it is there)
+            if (!PathRay(v.x, v.y + 50.0f, v.z, dx, dz, 80.0f, NULL))
+                continue;
+            // (local +X: the right of facing +Z, (z, -x))
+            rx = dz;
+            rz = -dx;
+            if (!PathRay(v.x, v.y + 120.0f, v.z, dx, dz, 80.0f, NULL))
+            {
+                // (low: crouching; the top open beyond)
+                if (PathRay(v.x, v.y + 140.0f, v.z, dx, dz, 300.0f, NULL))
+                    continue;
+                nType = 5;
+                dwFlags = 0x403;
+                anKind[0]++;
+            }
+            else if (!PathRay(v.x, v.y + 180.0f, v.z, dx, dz, 80.0f, NULL))
+            {
+                if (PathRay(v.x, v.y + 190.0f, v.z, dx, dz, 300.0f, NULL))
+                    continue;
+                nType = 5;
+                dwFlags = 0x103;
+                anKind[1]++;
+            }
+            else
+            {
+                // (a full wall: a corner when it ends within 70 cm to a side, that side clear)
+                RwBool bPlus = !PathRay(v.x + rx * 70.0f, v.y + 120.0f, v.z + rz * 70.0f, dx, dz, 100.0f, NULL)
+                               && PathClear(v.x, v.y + 120.0f, v.z, v.x + rx * 70.0f, v.y + 120.0f, v.z + rz * 70.0f);
+                RwBool bMinus = !PathRay(v.x - rx * 70.0f, v.y + 120.0f, v.z - rz * 70.0f, dx, dz, 100.0f, NULL)
+                                && PathClear(v.x, v.y + 120.0f, v.z, v.x - rx * 70.0f, v.y + 120.0f, v.z - rz * 70.0f);
+
+                if (bPlus == bMinus)
+                    continue;
+                nType = bPlus ? 3 : 4;
+                dwFlags = 0x103;
+                anKind[2]++;
+            }
+            nNew = PathAdd(0x7FFFFFFF, 0x7FFFFFFF, &v);
+            if (nNew < 0)
+                return;
+            fTheta = (RwReal)atan2(dx, dz);
+            s_aPathGen[nNew].nType = nType;
+            s_aPathGen[nNew].dwFlags = dwFlags;
+            s_aPathGen[nNew].afQuat[0] = 0.0f;
+            s_aPathGen[nNew].afQuat[1] = (RwReal)sin(fTheta * 0.5f);
+            s_aPathGen[nNew].afQuat[2] = 0.0f;
+            s_aPathGen[nNew].afQuat[3] = (RwReal)cos(fTheta * 0.5f);
+            nCover++;
+            // (its links: the waypoints within 2.5 m it walks to and from)
+            for (j = 0; j < nWaypoints; j++)
+            {
+                RwReal fDx = s_aPathGen[j].v.x - v.x, fDz = s_aPathGen[j].v.z - v.z, yTo, yBack;
+
+                if (fDx * fDx + fDz * fDz > 250.0f * 250.0f || fabs(s_aPathGen[j].v.y - v.y) > 150.0f)
+                    continue;
+                if (!PathWalk(&v, s_aPathGen[j].v.x, s_aPathGen[j].v.z, &yTo) || fabs(yTo - s_aPathGen[j].v.y) > 30.0f)
+                    continue;
+                if (!PathWalk(&s_aPathGen[j].v, v.x, v.z, &yBack) || fabs(yBack - v.y) > 30.0f)
+                    continue;
+                PathLink(nNew, j);
+                PathLink(j, nNew);
+            }
+            if (s_aPathGen[nNew].nLinks == 0)
+                PathLink(nNew, i), PathLink(i, nNew);
+        }
+    plog("paths: %d cover nodes: %d low over-top, %d high over-top, %d corners", nCover, anKind[0], anKind[1], anKind[2]);
 }
 
 // The graph made: the flood from the seeds, then the longer links.
@@ -5867,6 +6153,9 @@ static void PathGenerate(RwReal fStep)
                 PathLink(i, j);
                 PathLink(j, i);
             }
+    // (cover nodes only with CODFH_PATHS_COVER=1, for now)
+    if (GetEnvironmentVariableA("CODFH_PATHS_COVER", NULL, 0))
+        PathCover();
 }
 
 // A growing byte buffer.
@@ -5951,11 +6240,13 @@ static RwBool PathPack(PathBuf *pOut)
         RwUInt32 dwZero = 0;
 
         PathPutU32(&aPart[1], (RwUInt32)aPart[2].n);
-        PathPutU32(&aPart[2], 0);               // flags
-        PathPutU32(&aPart[2], 1);               // type 1, a waypoint (and the reserved half)
-        PathPutU32(&aPart[2], dwZero);          // the runtime words
+        PathPutU32(&aPart[2], s_aPathGen[i].dwFlags);   // flags
+        PathPutU32(&aPart[2], s_aPathGen[i].nType);     // its type (and the reserved half)
+        PathPutU32(&aPart[2], dwZero);                  // the runtime words
         PathPutU32(&aPart[2], dwZero);
         PathPut(&aPart[2], &s_aPathGen[i].v, sizeof(RwV3d));
+        if (s_aPathGen[i].dwFlags & 1)
+            PathPut(&aPart[2], s_aPathGen[i].afQuat, sizeof(s_aPathGen[i].afQuat));
         for (k = 0; k < s_aPathGen[i].nLinks; k++)
             anTo[k] = (RwUInt16)(s_aPathGen[i].anLinks[k] + 1);
         PathPutLinks(&aPart[2], anTo, s_aPathGen[i].nLinks);
@@ -6111,14 +6402,22 @@ static void PathsTick()
             s_aPathGen = (PathGenNode *)malloc(PATH_MAX_NODES * sizeof(PathGenNode));
         if (s_aPathGen == NULL)
             return;
-        __try
+        // (a map too large for the node IDs at this step: made again a third wider, until it fits)
+        for (;;)
         {
-            PathGenerate(fStep);
-        }
-        __except (EXCEPTION_EXECUTE_HANDLER)
-        {
-            plog("paths: making the graph faulted (%d nodes so far)", s_nPathGen);
-            return;
+            __try
+            {
+                PathGenerate(fStep);
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                plog("paths: making the graph faulted (%d nodes so far)", s_nPathGen);
+                return;
+            }
+            if (s_nPathGen < PATH_MAX_NODES || fStep > 600.0f)
+                break;
+            plog("paths: %d nodes at %.0f cm fill the graph; again at %.0f cm", s_nPathGen, fStep, fStep * 1.33f);
+            fStep *= 1.33f;
         }
         for (i = 0; i < s_nPathGen; i++)
             nLinks += s_aPathGen[i].nLinks;
@@ -6435,7 +6734,12 @@ static void SpawnAiBringNear(type_3D3548 *pSoldier, type_10F710 *pPlayer)
 // (AI flag 0x20). A dead bot's place is taken by a new one 5 s later, at a spawn point again.
 
 #ifndef CODFH_SP
-#define BOTS_MAX 16
+#define BOTS_MAX 32
+extern RwInt32 g_anTrigProjectiles[8];
+
+// (the pools a soldier takes from: their free counts, CODFH_BOTS' log)
+extern type_16C2A0 dword_439264, dword_4395F8, dword_43988C, dword_4395B0, dword_4395D0, dword_44BA54, dword_4391EC,
+    dword_449A10;
 
 struct TrigBot
 {
@@ -6444,6 +6748,8 @@ struct TrigBot
     RwUInt32 dwSide;        // its entity side (unk_2C & 7)
     RwUInt32 dwRespawnAt;   // the frame it is made again (0: alive or not yet made)
     RwUInt32 dwMadeAt;
+    RwInt32 nWeapon;        // its NPC weapon type
+    RwInt32 nGrenade;       // its grenades' (-1: none)
 };
 
 static TrigBot s_aBots[BOTS_MAX];
@@ -6555,9 +6861,64 @@ static void BotSpawn(TrigBot *b)
     v.y += 40.0f;
     if (!GroundBelow(&v))
         v.y -= 40.0f;
+    // (its weapon: one of its team's (the level's network settings' five, sub_1B79A0), at random,
+    // of those this level can give; else of every NPC weapon it can)
+    {
+        RwInt32 anPick[128], nPick = 0, k;
+
+        for (k = 0; unk_4F7EB8.unk_280 && k < 5; k++)
+        {
+            RwInt32 nType = unk_4F7EB8.unk_280->sub_1B79A0(b->nTeam, k);
+
+            // (not a grenade: those are its second weapon, below)
+            if (NpcWeaponUsable(nType) && sub_15EFA0(nType) != 8)
+                anPick[nPick++] = nType;
+        }
+        if (nPick == 0)
+            for (k = 0; k < 128; k++)
+                if (NpcWeaponUsable(k) && sub_15EFA0(k) != 8)
+                    anPick[nPick++] = k;
+        s_nSpawnWeapon = nPick ? anPick[rand() % nPick] : -1;
+        // (CODFH_BOTS_WEAPON=n: every bot NPC weapon type n, to test one)
+        {
+            RwChar szW[16];
+
+            if (GetEnvironmentVariableA("CODFH_BOTS_WEAPON", szW, sizeof(szW)))
+                s_nSpawnWeapon = atoi(szW);
+        }
+    }
+    // (its grenades: the trigger's second weapon (unk_134) a grenade, kind 8 (sub_15EFA0), which
+    // the soldier takes up as unk_4E0 and throws when its shooting check says so ("MaybeThrowAGrenade");
+    // one of its team's if any is, else any this level can give; CODFH_BOTS_GRENADES=0: none)
+    RwInt32 nOldSecond = pTrigger->unk_134;
+    {
+        RwInt32 anPick[128], nPick = 0, k;
+        RwChar szG[8];
+
+        if (!GetEnvironmentVariableA("CODFH_BOTS_GRENADES", szG, sizeof(szG)) || atoi(szG) != 0)
+        {
+            for (k = 0; unk_4F7EB8.unk_280 && k < 5; k++)
+            {
+                RwInt32 nType = unk_4F7EB8.unk_280->sub_1B79A0(b->nTeam, k);
+
+                if (sub_15EFA0(nType) == 8 && NpcWeaponUsable(nType))
+                    anPick[nPick++] = nType;
+            }
+            if (nPick == 0)
+                for (k = 0; k < 128; k++)
+                    if (sub_15EFA0(k) == 8 && NpcWeaponUsable(k))
+                        anPick[nPick++] = k;
+            if (nPick)
+                pTrigger->unk_134 = anPick[rand() % nPick];
+        }
+    }
     s_dwSpawnSide = (RwInt32)b->dwSide;
     pSoldier = SpawnSoldierAt((Trigger *)pTrigger, &v);
     s_dwSpawnSide = 0;
+    b->nGrenade = pTrigger->unk_134;
+    pTrigger->unk_134 = nOldSecond;
+    b->nWeapon = s_nSpawnWeapon;
+    s_nSpawnWeapon = -1;
     pTrigger->unk_D8 = oldDef;
     if (pSoldier == NULL)
     {
@@ -6566,6 +6927,35 @@ static void BotSpawn(TrigBot *b)
     }
     b->pSoldier = pSoldier;
     b->dwRespawnAt = 0;
+    // (its looking and fighting, as the trigger gave them (SetAIParam's), logged once, then as set:
+    // CODFH_BOTS_VISION multiplies its view ranges (its vision multiplier, unk_880),
+    // CODFH_BOTS_ALLROUND=1 lets it see all round (unk_874, vf_0FC's and vf_100's cones),
+    // CODFH_BOTS_RANGE multiplies the range it likes to fight from (unk_884, vf_114's factor))
+    __try
+    {
+        static RwBool s_bLogged;
+        type_3DAFC8 *pSol = (type_3DAFC8 *)pSoldier;
+        RwChar szV[16];
+
+        if (!s_bLogged)
+        {
+            s_bLogged = TRUE;
+            plog("bots: a bot's looking: cones %.0f and %.0f degrees, view %.0f m (alerted %.0f m), multiplier %.2f; "
+                 "fights from %.2f of its alerted view; hears %.0f m; aim spread %.2f and %.2f degrees",
+                 2.0f * (RwReal)acos(pSol->unk_86C) * 57.29578f, 2.0f * (RwReal)acos(pSol->unk_870) * 57.29578f,
+                 pSol->unk_878 / 100.0f, pSol->unk_87C / 100.0f, pSol->unk_880, pSol->unk_884, pSol->unk_888 / 100.0f,
+                 pSol->unk_88C, pSol->unk_890);
+        }
+        // (the defaults keen: 1.5 times the view, all round, fighting from 0.3 of it, hearing twice
+        // as far (CODFH_BOTS_HEARING))
+        pSol->unk_880 = GetEnvironmentVariableA("CODFH_BOTS_VISION", szV, sizeof(szV)) ? (RwReal)atof(szV) : 1.5f;
+        pSol->unk_874 = GetEnvironmentVariableA("CODFH_BOTS_ALLROUND", szV, sizeof(szV)) ? atoi(szV) != 0 : 1;
+        pSol->unk_884 *= GetEnvironmentVariableA("CODFH_BOTS_RANGE", szV, sizeof(szV)) ? (RwReal)atof(szV) : 0.3f;
+        pSol->unk_888 *= GetEnvironmentVariableA("CODFH_BOTS_HEARING", szV, sizeof(szV)) ? (RwReal)atof(szV) : 2.0f;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
     b->dwMadeAt = port_frame;
     __try
     {
@@ -6581,9 +6971,376 @@ static void BotSpawn(TrigBot *b)
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
     }
-    plog("bots: a team %d bot (side %u, %s, its definition %s) at (%.0f, %.0f, %.0f)", b->nTeam, b->dwSide,
+    plog("bots: a team %d bot (side %u, %s, its definition %s, weapon %d, grenades %d) at (%.0f, %.0f, %.0f)", b->nTeam, b->dwSide,
          b->nTeam == unk_4F7EB8.unk_29C ? "the player's team" : "the other team", bTeamDef ? "its team's" : "the trigger's",
-         v.x, v.y, v.z);
+         b->nWeapon, b->nGrenade, v.x, v.y, v.z);
+}
+
+// The map's middle for the bots to make for (CODFH_BOTS_CENTER, on by default): the middle of the
+// path graph's waypoints, moved onto the waypoint nearest it; FALSE without a graph.
+void sub_3C7D0(type_3C720 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8, RwV3d *arg_C, RwInt32 arg_10, RwReal arg_14,
+               RwInt32 arg_18);
+
+static RwBool BotsCenter(RwV3d *pv)
+{
+    RwReal fMinX = 1e30f, fMaxX = -1e30f, fMinZ = 1e30f, fMaxZ = -1e30f, fBest = 1e30f;
+    RwInt32 n, nBest = -1;
+
+    if (!unk_4C00E8.unk_64 || unk_4C00E8.unk_2C == NULL)
+        return FALSE;
+    for (n = 1; n < unk_4C00E8.unk_08; n++)
+    {
+        type_F8350 *p = unk_4C00E8.unk_2C[n];
+
+        if (p == NULL || p->unk_04 != 1)
+            continue;
+        fMinX = p->unk_10.x < fMinX ? p->unk_10.x : fMinX;
+        fMaxX = p->unk_10.x > fMaxX ? p->unk_10.x : fMaxX;
+        fMinZ = p->unk_10.z < fMinZ ? p->unk_10.z : fMinZ;
+        fMaxZ = p->unk_10.z > fMaxZ ? p->unk_10.z : fMaxZ;
+    }
+    for (n = 1; n < unk_4C00E8.unk_08; n++)
+    {
+        type_F8350 *p = unk_4C00E8.unk_2C[n];
+        RwReal dx, dz;
+
+        if (p == NULL || p->unk_04 != 1)
+            continue;
+        dx = p->unk_10.x - (fMinX + fMaxX) * 0.5f;
+        dz = p->unk_10.z - (fMinZ + fMaxZ) * 0.5f;
+        if (dx * dx + dz * dz < fBest)
+        {
+            fBest = dx * dx + dz * dz;
+            nBest = n;
+        }
+    }
+    if (nBest < 0)
+        return FALSE;
+    *pv = unk_4C00E8.unk_2C[nBest]->unk_10;
+    return TRUE;
+}
+
+// Each bot with no target hears a noise at its nearest enemy: another team's living bot, or the
+// player when it is on the other team (sub_3C7D0, as BotsToCenter's), so the bots hunt each other.
+static void BotsHunt()
+{
+    RwInt32 i, k;
+    type_3C720 *pL;
+    RwV3d vMe;
+    RwBool bMe = unk_4F7EB8.unk_1A4 && PlayerPosition((type_10F710 *)unk_4F7EB8.unk_1A4, &vMe);
+
+    for (i = 0; i < s_nBots; i++)
+    {
+        type_3D3548 *pSoldier = s_aBots[i].pSoldier;
+        AIData *pAi;
+        RwV3d *pv, vBest;
+        RwReal fBest = 1e30f, d;
+
+        if (!BotAlive(pSoldier) || (pAi = pSoldier->vf_120()) == NULL || pAi->get_unk_1374() != NULL
+            || (pv = pSoldier->sub_CD550()) == NULL)
+            continue;
+        for (k = 0; k < s_nBots; k++)
+        {
+            RwV3d *pvE;
+
+            if (s_aBots[k].nTeam == s_aBots[i].nTeam || !BotAlive(s_aBots[k].pSoldier)
+                || (pvE = s_aBots[k].pSoldier->sub_CD550()) == NULL)
+                continue;
+            d = (pvE->x - pv->x) * (pvE->x - pv->x) + (pvE->z - pv->z) * (pvE->z - pv->z);
+            if (d < fBest)
+            {
+                fBest = d;
+                vBest = *pvE;
+            }
+        }
+        if (bMe && s_aBots[i].nTeam != unk_4F7EB8.unk_29C)
+        {
+            d = (vMe.x - pv->x) * (vMe.x - pv->x) + (vMe.z - pv->z) * (vMe.z - pv->z);
+            if (d < fBest)
+            {
+                fBest = d;
+                vBest = vMe;
+            }
+        }
+        if (fBest >= 1e30f)
+            continue;
+        for (pL = dword_43925C; pL; pL = pL->unk_08)
+            if (pL->unk_00 == pSoldier)
+                break;
+        if (pL == NULL)
+            continue;
+        __try
+        {
+            pL->unk_04 = 0;
+            sub_3C7D0(pL, NULL, 1, &vBest, 1, 30000.0f, 0);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+}
+
+// Every 10 s, each bot with no target hears a noise a few metres from the map's middle (heard
+// as a sound the AI hears, sub_3C7D0: the soldier class goes to look, by a path), so the bots
+// make for the middle and meet there.
+static void BotsToCenter()
+{
+    static RwInt32 s_bOn = -1;
+    static RwV3d s_vCenter;
+    static RwBool s_bCenter;
+    RwInt32 i;
+    type_3C720 *pL;
+
+    // (CODFH_BOTS_GOAL: "enemy", the default, each at its nearest enemy; "center", the map's
+    // middle; "off". CODFH_BOTS_CENTER=0: off; "x y z": that point; else MP_5's chosen middle, or the graph's)
+    static RwInt32 s_bHunt = -1;
+
+    if (s_bHunt < 0)
+    {
+        RwChar sz[16];
+
+        s_bHunt = 1;
+        if (GetEnvironmentVariableA("CODFH_BOTS_GOAL", sz, sizeof(sz)))
+        {
+            if (!_stricmp(sz, "off"))
+                s_bOn = 0;
+            s_bHunt = !_stricmp(sz, "enemy");
+        }
+        plog("bots: idle bots make for %s", s_bOn == 0 ? "nothing" : s_bHunt ? "their nearest enemy" : "the map's middle");
+    }
+    if (s_bOn < 0)
+    {
+        RwChar sz[64];
+
+        s_bOn = 1;
+        if (GetEnvironmentVariableA("CODFH_BOTS_CENTER", sz, sizeof(sz)))
+        {
+            if (sscanf(sz, "%f %f %f", &s_vCenter.x, &s_vCenter.y, &s_vCenter.z) == 3)
+                s_bCenter = TRUE;
+            else
+                s_bOn = atoi(sz) != 0;
+        }
+        else if (port_map_name && !_stricmp(port_map_name, "MP_5"))
+        {
+            s_vCenter.x = -23761.0f;
+            s_vCenter.y = 818.0f;
+            s_vCenter.z = -795.0f;
+            s_bCenter = TRUE;
+        }
+        if (s_bCenter)
+            plog("bots: the map's middle: (%.0f, %.0f, %.0f)", s_vCenter.x, s_vCenter.y, s_vCenter.z);
+    }
+    if (!s_bOn || port_frame % 600 != 300)
+        return;
+    if (s_bHunt)
+    {
+        BotsHunt();
+        return;
+    }
+    if (!s_bCenter)
+    {
+        s_bCenter = BotsCenter(&s_vCenter);
+        if (!s_bCenter)
+            return;
+        plog("bots: the map's middle: (%.0f, %.0f, %.0f)", s_vCenter.x, s_vCenter.y, s_vCenter.z);
+    }
+    for (i = 0; i < s_nBots; i++)
+    {
+        type_3D3548 *pSoldier = s_aBots[i].pSoldier;
+        AIData *pAi;
+
+        if (!BotAlive(pSoldier) || (pAi = pSoldier->vf_120()) == NULL || pAi->get_unk_1374() != NULL)
+            continue;
+        for (pL = dword_43925C; pL; pL = pL->unk_08)
+            if (pL->unk_00 == pSoldier)
+                break;
+        if (pL == NULL)
+            continue;
+        __try
+        {
+            RwV3d v = s_vCenter;
+
+            v.x += (RwReal)(rand() % 1200 - 600);
+            v.z += (RwReal)(rand() % 1200 - 600);
+            pL->unk_04 = 0;
+            // (a sound of class 1 from no one, which every side hears: as far as the map is wide)
+            sub_3C7D0(pL, NULL, 1, &v, 1, 30000.0f, 0);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
+}
+
+// The bots' aim spread (the soldier's vf_164 and vf_168, angles a shot is turned by at random)
+// scaled by CODFH_BOTS_ACCURACY (default 0.25: closer to the target's middle); others' as it is.
+RwReal TrigBotSpread(const void *pEntity, RwReal fSpread)
+{
+    static RwReal s_fScale = -1.0f;
+
+    if (s_fScale < 0.0f)
+    {
+        RwChar sz[16];
+
+        s_fScale = GetEnvironmentVariableA("CODFH_BOTS_ACCURACY", sz, sizeof(sz)) ? (RwReal)atof(sz) : 0.25f;
+        if (s_fScale < 0.0f)
+            s_fScale = 0.0f;
+    }
+    return s_nBots && TrigIsAiSoldier(pEntity) ? fSpread * s_fScale : fSpread;
+}
+
+// The bots' odds of throwing a grenade when asked (type_3DAFC8::sub_136EC0's, in 10000): the
+// trigger's mode's (2: 120 an ask) times CODFH_BOTS_GRENADE_ODDS (default 10), in place of the
+// difficulty's multiplier (0 in multiplayer); the crowd around the target still scales it.
+static RwInt32 s_nGrenadeRolls, s_nGrenadePrompts, s_nGrenadeThrows;
+RwInt32 g_anTrigGrenadeEvents[2];
+
+RwInt32 TrigBotGrenadeOdds(const void *pEntity, RwInt32 nBase, RwInt32 nOdds)
+{
+    static RwInt32 s_nScale = -1;
+
+    s_nGrenadeRolls++;
+    if (s_nScale < 0)
+    {
+        RwChar sz[16];
+
+        s_nScale = GetEnvironmentVariableA("CODFH_BOTS_GRENADE_ODDS", sz, sizeof(sz)) ? atoi(sz) : 10;
+        if (s_nScale < 0)
+            s_nScale = 0;
+    }
+    return s_nBots && TrigIsAiSoldier(pEntity) ? nBase * s_nScale : nOdds;
+}
+
+// The bots' weapons made keener once (CODFH_BOTS_AGGRESSION, default 3): each NPC weapon type's
+// burst (its shot count, unk_134 to unk_138) that many times longer, and its pause after one
+// (unk_11C to unk_120, and the range bands' extra, unk_154 to unk_15C) that many times shorter.
+// Multiplayer's NPC weapons are the bots' alone.
+static void BotsAggression()
+{
+    RwChar sz[16];
+    RwReal f = GetEnvironmentVariableA("CODFH_BOTS_AGGRESSION", sz, sizeof(sz)) ? (RwReal)atof(sz) : 3.0f;
+    RwInt32 k;
+
+    if (f <= 0.0f || f == 1.0f)
+        return;
+    for (k = 0; k < 128; k++)
+    {
+        type_4D53F8 *w = &dword_4D53F8[k];
+
+        if (!NpcWeaponUsable(k))
+            continue;
+        w->unk_134 = (RwInt32)(w->unk_134 * f + 0.5f);
+        w->unk_138 = (RwInt32)(w->unk_138 * f + 0.5f);
+        if (w->unk_134 < 1)
+            w->unk_134 = 1;
+        if (w->unk_138 < 1)
+            w->unk_138 = 1;
+        w->unk_11C /= f;
+        w->unk_120 /= f;
+        w->unk_154 /= f;
+        w->unk_158 /= f;
+        w->unk_15C /= f;
+    }
+    plog("bots: weapons' bursts %.1f times longer, their pauses %.1f times shorter", f, f);
+}
+
+// The bot's animation state machine, the one whose states throw (34 on): its object dwObject's
+// child machine of kind 1 (the class's machine is kind 0); NULL when none.
+static type_3D2DB8 *BotAnimMachine(RwUInt32 dwObject)
+{
+    RwUInt32 dwBase;
+    RwInt32 nStride, nCount, i;
+
+    if (!PoolFree(&dword_449A30, &dwBase, &nStride, &nCount))
+        return NULL;
+    for (i = 0; i < nCount; i++)
+    {
+        type_3D2DB8 *m = (type_3D2DB8 *)(dwBase + i * nStride);
+
+        if (!s_abFree[i] && m->unk_7C == dwObject && m->unk_96 == 1)
+            return m;
+    }
+    return NULL;
+}
+
+// Every second, each bot with grenades (unk_5E0) and a target 8 to 35 m off is asked whether it
+// throws one, as its shooting check asks when its line to the target is blocked (sub_31C50's
+// "MaybeThrowAGrenade"; its class decides and throws). CODFH_BOTS_GRENADES=0: none.
+static void BotsGrenades()
+{
+    RwInt32 i;
+
+    if (port_frame % 60 != 15)
+        return;
+    for (i = 0; i < s_nBots; i++)
+    {
+        type_3DAFC8 *pSol = (type_3DAFC8 *)s_aBots[i].pSoldier;
+
+        if (s_aBots[i].nGrenade < 0 || !BotAlive((type_3D3548 *)pSol))
+            continue;
+        __try
+        {
+            AIData *pAi = pSol->vf_120();
+            type_3D3548 *pTarget = pAi ? pAi->get_unk_1374() : NULL;
+            RwV3d *pv = pSol->sub_CD550(), *pvT;
+            RwReal d2;
+
+            if (pTarget == NULL || !pSol->get_unk_5E0() || pv == NULL || (pvT = pTarget->sub_CD550()) == NULL)
+                continue;
+            d2 = (pvT->x - pv->x) * (pvT->x - pv->x) + (pvT->z - pv->z) * (pvT->z - pv->z);
+            if (d2 < 800.0f * 800.0f || d2 > 3500.0f * 3500.0f)
+                continue;
+            if (pSol->vf_098())
+            {
+                // (its own decision asked, ShouldIThrowAGrenade's (sub_136EC0); a throw is its
+                // animation script sent to its throw state, 34, as that script's own handler of
+                // "MaybeThrowAGrenade" does, which hears it only while firing)
+                s_nGrenadePrompts++;
+                if (pSol->sub_136EC0(1))
+                {
+                    type_3D2DB8 *m = BotAnimMachine(pSol->vf_098()->get_unk_04());
+                    static RwInt32 s_nYesLogged;
+
+                    // (the first few yeses: the object's machines, their scripts and states)
+                    if (s_nYesLogged++ < 2)
+                    {
+                        RwUInt32 dwBase, dwObject = pSol->vf_098()->get_unk_04();
+                        RwInt32 nStride, nCount, j;
+                        RwChar szName[96];
+
+                        plog("bots: a bot would throw; its animation machine %s; its machines:", m ? "found" : "not found");
+                        if (PoolFree(&dword_449A30, &dwBase, &nStride, &nCount))
+                            for (j = 0; j < nCount; j++)
+                            {
+                                type_3D2DB8 *mm = (type_3D2DB8 *)(dwBase + j * nStride);
+
+                                if (s_abFree[j] || mm->unk_7C != dwObject)
+                                    continue;
+                                ScriptName((type_67620 *)mm, szName, sizeof(szName));
+                                plog("bots:   machine %p: script %d (%s), state %d, kind %d", mm, mm->unk_64, szName, mm->unk_90,
+                                     mm->unk_96);
+                            }
+                    }
+
+                    if (m)
+                    {
+                        // (the first throws watched: their animations, for a second)
+                        if (s_nGrenadeThrows < 3)
+                        {
+                            plog("bots: bot %d throws (watched)", i);
+                            TrigAnimWatch(port_frame + 60);
+                        }
+                        m->sub_6F500(34);
+                        m->sub_6F490();
+                        s_nGrenadeThrows++;
+                    }
+                }
+            }
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+        }
+    }
 }
 
 // Each frame: the bots made once the player is in (one each quarter second), and dead ones
@@ -6611,10 +7368,81 @@ static void BotsTick()
                 s_nEnemies = BOTS_MAX - s_nAllies;
             }
             plog("bots: %d on the player's team, %d on the other", s_nAllies, s_nEnemies);
+            TrigAnimMissLog(TRUE);
         }
     }
     if (s_nAllies + s_nEnemies == 0)
         return;
+    // (every 5 s: the bots alive, and the pools' free counts)
+    if (s_nBots && port_frame % 300 == 0)
+    {
+        RwInt32 nAlive = 0;
+
+        RwInt32 nAtCover = 0, n;
+
+        for (i = 0; i < s_nBots; i++)
+        {
+            RwV3d *pv;
+
+            if (!BotAlive(s_aBots[i].pSoldier))
+                continue;
+            nAlive++;
+            // (standing on a cover node: within 60 cm of one, the graph's)
+            pv = s_aBots[i].pSoldier->sub_CD550();
+            for (n = 1; pv && unk_4C00E8.unk_64 && n < unk_4C00E8.unk_08; n++)
+            {
+                type_F8350 *pNode = unk_4C00E8.unk_2C[n];
+
+                if (pNode && pNode->unk_04 != 1 && (pNode->unk_10.x - pv->x) * (pNode->unk_10.x - pv->x)
+                    + (pNode->unk_10.z - pv->z) * (pNode->unk_10.z - pv->z) < 60.0f * 60.0f && fabs(pNode->unk_10.y - pv->y) < 100.0f)
+                {
+                    nAtCover++;
+                    break;
+                }
+            }
+        }
+        // (the grenade decision's state: asks sent, rolls reached (sub_136EC0 past its checks), and
+        // the first bot with grenades' timer (unk_5E4, 120 needed), its AI flag 15 (none then) and target)
+        for (i = 0; i < s_nBots; i++)
+            if (s_aBots[i].nGrenade >= 0 && BotAlive(s_aBots[i].pSoldier))
+            {
+                __try
+                {
+                    type_3DAFC8 *pSol = (type_3DAFC8 *)s_aBots[i].pSoldier;
+
+                    plog("bots: grenades: events %d taken in hand, %d thrown; %d asks, %d rolls, %d throws started; bot %d: grenades %d, timer %.0f, AI flag 15 %d, target %p",
+                         g_anTrigGrenadeEvents[1], g_anTrigGrenadeEvents[0], s_nGrenadePrompts, s_nGrenadeRolls, s_nGrenadeThrows, i, pSol->unk_5E0, pSol->unk_5E4,
+                         (pSol->vf_120()->unk_49C >> 15) & 1, (void *)pSol->vf_120()->get_unk_1374());
+                }
+                __except (EXCEPTION_EXECUTE_HANDLER)
+                {
+                }
+                break;
+            }
+        plog("bots: %d alive bots at cover nodes; %d grenades thrown so far (of %d projectiles)", nAtCover,
+             g_anTrigProjectiles[2], g_anTrigProjectiles[0] + g_anTrigProjectiles[1] + g_anTrigProjectiles[2] + g_anTrigProjectiles[3]);
+        TrigAnimMissLog(FALSE);
+        // (each bot's weapon, and whether it is firing at a target)
+        for (i = 0; i < s_nBots; i++)
+            if (BotAlive(s_aBots[i].pSoldier))
+                __try
+                {
+                    type_3DAFC8 *pSol = (type_3DAFC8 *)s_aBots[i].pSoldier;
+                    AIData *pAi = pSol->vf_120();
+
+                    plog("bots:   bot %d (team %d): weapon %d (slot %d), at target %d, AI target %p, AI state %d", i,
+                         s_aBots[i].nTeam, s_aBots[i].nWeapon, pSol->unk_3E0.unk_04, pSol->unk_3E0.unk_A0,
+                         pAi ? (void *)pAi->get_unk_1374() : NULL, pAi ? pAi->unk_578 : -1);
+                }
+                __except (EXCEPTION_EXECUTE_HANDLER)
+                {
+                }
+        plog("bots: %d of %d alive; free: soldiers' memory %d of %d, hearing %d, squads %d, vision %d, distance %d, "
+             "maneuvers %d and %d, animation interpolators %d, AI objects %d",
+             nAlive, s_nBots, dword_4B83A0[6].unk_04 - dword_4B83A0[6].unk_10, dword_4B83A0[6].unk_04,
+             dword_439264.get_unk_18(), dword_4395F8.get_unk_18(), dword_43988C.get_unk_18(), dword_4391EC.get_unk_18(),
+             dword_4395B0.get_unk_18(), dword_4395D0.get_unk_18(), dword_44BA54.get_unk_18(), dword_449A10.get_unk_18());
+    }
     if (unk_4F7EB8.unk_1A4 == NULL)
     {
         if (s_nBots == 0)
@@ -6624,7 +7452,14 @@ static void BotsTick()
     if (!s_dwIn)
         s_dwIn = port_frame;
     // (after the path graph, PathsTick's, and the player's own placing)
-    if (port_frame - s_dwIn < 90 || port_frame < s_dwNext)
+    if (port_frame - s_dwIn < 90)
+        return;
+    if (s_nBots)
+    {
+        BotsToCenter();
+        BotsGrenades();
+    }
+    if (port_frame < s_dwNext)
         return;
     if (s_nBots == 0)
     {
@@ -6633,6 +7468,29 @@ static void BotsTick()
         RwInt32 nMine = unk_4F7EB8.unk_29C == 4 ? 4 : 2;
 
         plog("bots: the player is on team %d (side %u)", unk_4F7EB8.unk_29C, dwMine);
+        BotsAggression();
+        // (the network soldier trigger's grenade mode, which its soldiers read as they decide:
+        // 2, the keenest)
+        if (dword_4F8134)
+            ((SoldierTrigger *)dword_4F8134)->unk_13C = 2;
+        // (each team's weapons, and whether this level can give them)
+        if (unk_4F7EB8.unk_280)
+        {
+            RwInt32 t, k;
+
+            for (t = 2; t <= 4; t += 2)
+                for (k = 0; k < 5; k++)
+                {
+                    RwInt32 nType = unk_4F7EB8.unk_280->sub_1B79A0(t, k);
+
+                    if (nType >= 0)
+                        plog("bots:   team %d's weapon %d: NPC weapon type %d%s", t, k, nType,
+                             NpcWeaponUsable(nType) ? "" : " (not loaded: not given)");
+                }
+            for (k = 0, t = 0; k < 128; k++)
+                t += NpcWeaponUsable(k) ? 1 : 0;
+            plog("bots:   %d NPC weapon types can be given in all", t);
+        }
         // (the game type's spawn lists: whom each serves and how many points)
         {
             RwUInt32 k;
@@ -8315,9 +9173,20 @@ static struct
 static RwInt32 s_nAnimIds;
 static RwBool s_bAnimRecord;
 
+// (a throw's watch: every lookup in the frames after a bot's throw starts, logged)
+static RwUInt32 s_dwAnimWatchUntil;
+
 void TrigAnimLookup(RwInt32 nId, RwInt32 bFound, void *pCaller)
 {
     RwInt32 i;
+
+    if (s_dwAnimWatchUntil && port_frame <= s_dwAnimWatchUntil)
+    {
+        RwChar szCode[96];
+
+        MsgCodeName(pCaller, szCode, sizeof(szCode));
+        plog("bots:   throw watch: animation %08X %s, asked by %s", (RwUInt32)nId, bFound ? "found" : "NOT FOUND", szCode);
+    }
 
     if (!s_bAnimRecord)
         return;
@@ -8336,6 +9205,37 @@ void TrigAnimLookup(RwInt32 nId, RwInt32 bFound, void *pCaller)
     if (bFound)
         s_aAnimIds[i].nFound++;
     s_aAnimIds[i].pCaller = pCaller;
+}
+
+static void TrigAnimWatch(RwUInt32 dwUntil)
+{
+    s_dwAnimWatchUntil = dwUntil;
+}
+
+// The bots' animation log: bStart starts recording the lookups; else each animation asked for
+// but not found since the last call, how often, and who asked.
+static void TrigAnimMissLog(RwBool bStart)
+{
+    RwInt32 i;
+    RwChar szCode[96];
+
+    if (bStart)
+    {
+        s_bAnimRecord = TRUE;
+        return;
+    }
+    for (i = 0; i < s_nAnimIds; i++)
+    {
+        RwUInt32 nMissed = s_aAnimIds[i].nAsked - s_aAnimIds[i].nFound;
+
+        if (nMissed > s_aAnimIds[i].nLogged)
+        {
+            MsgCodeName(s_aAnimIds[i].pCaller, szCode, sizeof(szCode));
+            plog("bots:   animation %08X not found (%u of %u asks), asked by %s", (RwUInt32)s_aAnimIds[i].nId, nMissed,
+                 s_aAnimIds[i].nAsked, szCode);
+            s_aAnimIds[i].nLogged = nMissed;
+        }
+    }
 }
 
 // Starts recording the messages and the animation lookups (the spawn test).

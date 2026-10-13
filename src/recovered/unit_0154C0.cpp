@@ -3360,7 +3360,7 @@ void AIData::sub_1FC70()
     if (unk_568 != 0)
         sub_31E00(unk_568->vf_098());
 }
-#ifdef CODFH_SP
+#if defined(CODFH_SP) || defined(CODFH_DRAW_TRIGGERS) // single player; and multiplayer's debug tools' bots (their grenades)
 // sp-match: ?sp_sub_16540@AIData@@QAEHPAUtype_3D3548@@PAURwV3d@@@Z @ 0x00016540
 RwInt32 AIData::sp_sub_16540(type_3D3548 *arg_0, RwV3d *arg_4)
 {

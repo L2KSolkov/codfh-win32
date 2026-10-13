@@ -775,7 +775,7 @@ void type_3DAFC8::sub_136DA0(RwInt32 arg_0)
     unk_3E0.sub_15D010(this, arg_0);
     unk_3E0.sub_15D3E0();
 }
-#ifdef CODFH_SP
+#if defined(CODFH_SP) || defined(CODFH_DRAW_TRIGGERS) // single player; and multiplayer's debug tools' bots (their grenades)
 // Single player's grenade throw (message 0x76C of vf_170, SP 0xEB880): multiplayer has
 // none (its tunables flt_429C40..flt_429C84 stay unreferenced there).
 extern RwReal flt_429C40;
@@ -803,7 +803,7 @@ void type_3DAFC8::sp_sub_E4B50()
 }
 #endif
 
-#ifdef CODFH_SP
+#if defined(CODFH_SP) || defined(CODFH_DRAW_TRIGGERS) // single player; and multiplayer's debug tools' bots (their grenades)
 // sp-match: ?sp_sub_E4B60@type_3DAFC8@@QAEXPAURwV3d@@MMMM@Z @ 0x000E4B60
 // Single player only (SP 0xE4B60): throws the grenade in hand at *arg_0 (arg_4 and arg_8
 // whole, then arg_C and arg_10, with the timer override unk_5FC) and restarts the
@@ -816,7 +816,7 @@ void type_3DAFC8::sp_sub_E4B60(RwV3d *arg_0, RwReal arg_4, RwReal arg_8, RwReal 
 }
 #endif
 
-#ifdef CODFH_SP
+#if defined(CODFH_SP) || defined(CODFH_DRAW_TRIGGERS) // single player; and multiplayer's debug tools' bots (their grenades)
 // sp-match: ?sp_sub_E4BB0@type_3DAFC8@@QAEXXZ @ 0x000E4BB0
 // Single player only (SP 0xE4BB0): throws a grenade at its target (or at the throw
 // point unk_5EC when one is set, else 1100 ahead): at the target's record position
@@ -965,6 +965,16 @@ void type_3DAFC8::sp_sub_E4BB0()
 }
 #endif
 
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+// (port/src/debug/trigtools.cpp: the debug tools' bots' aim spread scaled, CODFH_BOTS_ACCURACY)
+RwReal TrigBotSpread(const void *pEntity, RwReal fSpread);
+// (whether the entity is one of the debug tools' AI soldiers)
+bool TrigIsAiSoldier(const void *pEntity);
+// (the bots' grenade events counted: 0 a throw, 1 a grenade taken in hand)
+extern RwInt32 g_anTrigGrenadeEvents[2];
+// (and their grenades' odds, in 10000, scaled: CODFH_BOTS_GRENADE_ODDS)
+RwInt32 TrigBotGrenadeOdds(const void *pEntity, RwInt32 nBase, RwInt32 nOdds);
+#endif
 // match: ?sub_136E00@type_3DAFC8@@QAEXXZ @ 0x00136E00
 // sp-match: ?sub_136E00@type_3DAFC8@@QAEXXZ @ 0x000E5070
 // "DropGrenade": drops the grenade in hand 20 units above its clump's
@@ -1104,7 +1114,18 @@ RwInt32 type_3DAFC8::sub_136EC0(RwInt32 arg_0)
         }
         break;
     }
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    // (the debug tools' bots: their own odds, not the difficulty's multiplier, which is 0 in
+    // multiplayer)
+    {
+        RwInt32 nBase = var18;
+
+        var18 = var18 * get_grenade_multiplier();
+        var18 = TrigBotGrenadeOdds(this, nBase, var18);
+    }
+#else
     var18 = var18 * get_grenade_multiplier();
+#endif
     if ((RwReal)(RpRandom() % 10000 + 1) > var18 * l20)
         return 0;
     return 1;
@@ -2789,6 +2810,23 @@ void type_3DAFC8::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
         }
         break;
 #else
+#if defined(CODFH_DRAW_TRIGGERS)
+        // (the port's debug tools: an AI soldier's grenade events taken as single player takes
+        // them, port/src/debug/trigtools.cpp's bots)
+        if (TrigIsAiSoldier(this))
+        {
+            var_8C = (type_13AE40_msg *)arg_4;
+            if (var_8C->unk_00 >= 0 && var_8C->unk_00 < 2)
+                g_anTrigGrenadeEvents[var_8C->unk_00]++;
+            if (var_8C->unk_00 == 0)
+                sp_sub_E4BB0();
+            else if (var_8C->unk_00 == 1)
+            {
+                sp_sub_E4B50();
+                unk_5E8 = var_8C->unk_04 == 1 ? 0x9B : 0xFF;
+            }
+        }
+#endif
         break;
         // Unreachable: the image has no code here, but its three slots
         // (-0x8C..-0x94) and the registers the next case uses need four
@@ -3991,13 +4029,21 @@ void type_3DAFC8::vf_1C4(RwInt32 arg_0)
 // sp-match: ?vf_164@type_3DAFC8@@UAEMXZ @ 0x000E8BB0
 RwReal type_3DAFC8::vf_164()
 {
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    return TrigBotSpread(this, unk_88C);
+#else
     return unk_88C;
+#endif
 }
 // match: ?vf_168@type_3DAFC8@@UAEMXZ @ 0x0013E330
 // sp-match: ?vf_168@type_3DAFC8@@UAEMXZ @ 0x000E8BC0
 RwReal type_3DAFC8::vf_168()
 {
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    return TrigBotSpread(this, unk_890);
+#else
     return unk_890;
+#endif
 }
 // match: ?vf_16C@type_3DAFC8@@UAEHHH@Z @ 0x0013E350
 // sp-match: ?vf_16C@type_3DAFC8@@UAEHHH@Z @ 0x000E8BD0

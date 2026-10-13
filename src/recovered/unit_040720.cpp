@@ -42,7 +42,7 @@ RwInt32 dword_42767C = 1;
 // 0x00427680
 RwReal flt_427680 = 4000000.0f;
 // 0x00439618
-type_439618 dword_439618[66];
+type_439618 dword_439618[VISION_HANDLES];
 // 0x00439828
 RwInt32 dword_439828;
 // 0x0043982C
@@ -126,7 +126,12 @@ void sub_426E0(type_3D3548 *arg_0, type_3D3548 *arg_4, type_409A0 *arg_8, RwInt3
 void sub_40720()
 {
     dword_43983C = 0.0f;
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    // (the port's debug tools: room for the bots, port/src/debug/trigtools.cpp)
+    dword_43988C.sub_16C2C0(256, 0x20, "m_freeVisionParams", 4, 0);
+#else
     dword_43988C.sub_16C2C0(0x40, 0x20, "m_freeVisionParams", 4, 0);
+#endif
     dword_439840.sub_71F20(0x20, 1, 1, 1, sub_40FB0, sub_41390);
     dword_4398B0.sub_71F20(0x20, 1, 1, 1, sub_40F00, sub_41390);
     memset(dword_439618, 0, sizeof(dword_439618));
@@ -997,7 +1002,7 @@ RwUInt32 sub_42870(type_409A0 *arg_0)
     type_365A0 varC;
 
     v8 = 0;
-    for (var_4 = 1; var_4 < 0x42; var_4++) {
+    for (var_4 = 1; var_4 < VISION_HANDLES; var_4++) {
         if (dword_439618[var_4].unk_00.unk_00 == 0 && dword_439618[var_4].unk_04 == 0) {
             if (dword_439838 == 0)
                 dword_439838 = 1;

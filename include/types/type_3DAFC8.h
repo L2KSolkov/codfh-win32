@@ -283,7 +283,7 @@ struct type_3DAFC8 : type_3D3548
 #else
     virtual RwV3d *vf_244(RwV3d *arg_0);
 #endif
-#ifdef CODFH_SP
+#if defined(CODFH_SP) || defined(CODFH_DRAW_TRIGGERS) // single player; and multiplayer's debug tools' bots (their grenades)
     // Single player only: the grenade throw and its helpers (SP 0xE4B50, 0xE4B60, 0xE4BB0;
     // case 0x76C of vf_170 calls them).
     void sp_sub_E4B50();

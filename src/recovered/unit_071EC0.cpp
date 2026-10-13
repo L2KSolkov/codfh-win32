@@ -41,7 +41,13 @@ void alfasched::sub_71F20(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 a
     unk_40 = arg_14;
     unk_44 = 0;
     unk_48 = 0;
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    // (the port's debug tools: every scheduler room for the bots, port/src/debug/trigtools.cpp;
+    // its entries are taken unchecked, sub_72050)
+    m_freeList.sub_16C2C0(arg_0 * 4, 0x1C, "alfasched::m_freeList", 4, 0);
+#else
     m_freeList.sub_16C2C0(arg_0, 0x1C, "alfasched::m_freeList", 4, 0);
+#endif
 }
 
 // match: ?sub_71FA0@alfasched@@QAEHXZ @ 0x00071FA0

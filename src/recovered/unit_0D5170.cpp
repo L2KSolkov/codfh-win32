@@ -234,6 +234,11 @@ void sub_D5320(RwInt32 *arg_0)
         {
             var_10 = dword_3D7130[bp_4].unk_04;
         }
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+        // (the port's debug tools: the soldiers' pool room for the bots, port/src/debug/trigtools.cpp)
+        if (bp_4 == 6 && var_10 < 96)
+            var_10 = 96;
+#endif
         dword_4B83A0[bp_4].sub_D64A0(bp_4, bp_8, var_10);
         var_C = dword_3D7130[bp_4].unk_00;
     }

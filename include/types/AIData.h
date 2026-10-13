@@ -316,9 +316,11 @@ struct AIData
     type_14D180 *sub_23100(type_154C0_12F4 *arg_0);
     // Clears +0x4C and +0x50, then works through the owner (unk_568).
     void sub_1FC70();
-#ifdef CODFH_SP
+#if defined(CODFH_SP) || defined(CODFH_DRAW_TRIGGERS) // single player; and multiplayer's debug tools' bots (their grenades)
     // Single player only (SP 0x16540; its caller is SP 0xE4C59).
     RwInt32 sp_sub_16540(type_3D3548 *arg_0, RwV3d *arg_4);
+#endif
+#ifdef CODFH_SP
     // The unk_574 object's vf_030, or -1: an inline MP expands in sub_34E60 and single
     // player keeps out of line (SP 0x1CEF0); defined in unit_0348D0.
     RwInt32 sp_sub_1CEF0();

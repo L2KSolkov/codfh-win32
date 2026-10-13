@@ -41,7 +41,7 @@ type_427628 off_427628[7] = {
     { sub_32700, 52 },
 };
 // 0x004392A8
-type_4392A8 dword_4392A8[64];
+type_4392A8 dword_4392A8[MANEUVER_HANDLES];
 // 0x004395A8
 RwInt32 dword_4395A8;
 // 0x004395AC
@@ -54,7 +54,7 @@ RwInt32 dword_4395AC;
 type_16C2A0 dword_4395B0;
 type_16C2A0 dword_4395D0;
 #else
-extern type_4392A8 dword_4392A8[64];
+extern type_4392A8 dword_4392A8[MANEUVER_HANDLES];
 #endif
 // Its data (PLAN M5): literals, constants and tables where the image has them.
 // match: ?flt_3CE6CC@@3MB @ 0x003CE6CC
@@ -207,6 +207,10 @@ void sub_3CBF0()
     // Single player's pools hold 5 large and 15 normal maneuvers (SP 0x2E4D0).
     dword_4395B0.sub_16C2C0(5, v8, "m_freeManeuversLarge", 4, 0);
     dword_4395D0.sub_16C2C0(15, var_4, "m_freeManeuversNormal", 4, 0);
+#elif defined(CODFH_DRAW_TRIGGERS)
+    // (the port's debug tools: room for the bots, port/src/debug/trigtools.cpp)
+    dword_4395B0.sub_16C2C0(96, v8, "m_freeManeuversLarge", 4, 0);
+    dword_4395D0.sub_16C2C0(96, var_4, "m_freeManeuversNormal", 4, 0);
 #else
     dword_4395B0.sub_16C2C0(0x20, v8, "m_freeManeuversLarge", 4, 0);
     dword_4395D0.sub_16C2C0(0x20, var_4, "m_freeManeuversNormal", 4, 0);
@@ -215,7 +219,7 @@ void sub_3CBF0()
     // single player's handle table has 20 entries (SP 0x2E4D0, 0x2E540, 0x2E400)
     for (var_10 = 0; var_10 < 20; var_10++) {
 #else
-    for (var_10 = 0; var_10 < 0x40; var_10++) {
+    for (var_10 = 0; var_10 < MANEUVER_HANDLES; var_10++) {
 #endif
         ebp_C.unk_00_lo = var_10;
         sub_3D3A0(ebp_C);
@@ -236,7 +240,7 @@ void sub_3CC80()
     // single player's handle table has 20 entries (SP 0x2E4D0, 0x2E540, 0x2E400)
     for (local_8 = 0; local_8 < 20; local_8++) {
 #else
-    for (local_8 = 0; local_8 < 0x40; local_8++) {
+    for (local_8 = 0; local_8 < MANEUVER_HANDLES; local_8++) {
 #endif
         var_4.unk_00_lo = local_8;
         sub_3D3A0(var_4);
@@ -484,7 +488,7 @@ type_365A0 sub_3D2E0(type_3CE6D0 *arg_0, RwInt32 arg_4)
     // single player's handle table has 20 entries (SP 0x2E4D0, 0x2E540, 0x2E400)
     for (varC = 1; varC < 20; varC++) {
 #else
-    for (varC = 1; varC < 0x40; varC++) {
+    for (varC = 1; varC < MANEUVER_HANDLES; varC++) {
 #endif
         if (dword_4392A8[varC].unk_00.unk_00 == 0 && dword_4392A8[varC].unk_08 == 0) {
             v8.unk_00_lo = varC;

@@ -177,7 +177,7 @@ void CAnimBankInfo::HandleEvents(RWS::CMsg &pMsg)
         // after the six, which CAnimPackSelector's HandleEvents loads them into)
         const RwChar *const *ppszExtra;
         RwInt32 nExtra = port_anim_packs(&ppszExtra), i;
-        RwUInt32 auSize[6 + 8];
+        RwUInt32 auSize[6 + 16];
 
         for (i = 0; i < 6; i++)
             auSize[i] = sub_A0A20()[i];

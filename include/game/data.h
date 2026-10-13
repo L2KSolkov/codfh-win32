@@ -483,6 +483,19 @@ inline RwReal get_dword_4B87C8()
     return r;
 }
 
+// The AI schedulers' handle tables' sizes: the image's, or with the port's debug tools room for
+// their bots (port/src/debug/trigtools.cpp; each soldier takes two vision handles, two or three
+// distance ones, and a maneuver's).
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+#define VISION_HANDLES 258
+#define DISTANCE_HANDLES 385
+#define MANEUVER_HANDLES 192
+#else
+#define VISION_HANDLES 66
+#define DISTANCE_HANDLES 97
+#define MANEUVER_HANDLES 64
+#endif
+
 // The Distance Scheduler (sub_34FA0 sets it up): its two alfasched,
 // dword_4391A0 (32 entries) and dword_439210 (64), its registrations' pool
 // dword_4391EC ("m_freeDistanceParams", 97 of type_35120), and the handle
@@ -492,7 +505,7 @@ inline RwReal get_dword_4B87C8()
 extern alfasched dword_4391A0;
 extern alfasched dword_439210;
 extern type_16C2A0 dword_4391EC;
-extern type_438E90 dword_438E90[97];
+extern type_438E90 dword_438E90[DISTANCE_HANDLES];
 extern type_365A0 *dword_438E88;
 extern RwInt32 dword_439198;
 
@@ -507,7 +520,7 @@ extern RwInt32 dword_439198;
 extern alfasched dword_439840;
 extern type_16C2A0 dword_43988C;
 extern alfasched dword_4398B0;
-extern type_439618 dword_439618[66];
+extern type_439618 dword_439618[VISION_HANDLES];
 extern RwInt32 dword_439828;
 extern RwInt32 dword_439838;
 extern RwReal dword_43983C;
@@ -1207,7 +1220,7 @@ struct type_4392A8
     RwInt32 unk_04;
     type_3CE6D0 *unk_08;
 };
-extern type_4392A8 dword_4392A8[64];
+extern type_4392A8 dword_4392A8[MANEUVER_HANDLES];
 
 struct type_3DF30;
 

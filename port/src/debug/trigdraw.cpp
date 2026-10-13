@@ -4701,9 +4701,15 @@ static RwBool TrigLogShots()
     return s_n == 1;
 }
 
+// (every projectile spawned, by its kind: 0 bullets, 2 grenades; the bots' log reads them)
+RwInt32 g_anTrigProjectiles[8];
+
 void TrigDrawProjectileSpawned(RwInt32 nKind, void *pProjectile)
 {
     RwInt32 i;
+
+    if (nKind >= 0 && nKind < 8)
+        g_anTrigProjectiles[nKind]++;
 
     if (TrigLogShots())
     {
