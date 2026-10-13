@@ -125,15 +125,27 @@ void sub_71360()
 // Sets the pools up.
 void sub_713E0()
 {
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    // (the port's debug tools: room for the bots' scripts, port/src/debug/trigtools.cpp; their
+    // machines' data is taken unchecked, sub_71CE0)
+    dword_449A50.sub_16C2C0(400, 0x150, "m_pobjectPool", 4, 0);
+#else
     dword_449A50.sub_16C2C0(100, 0x150, "m_pobjectPool", 4, 0);
+#endif
     dword_449A10.sub_16C2C0(1100, 0x2C, "m_aiObjectPool", 4, 0);
     dword_449A30.sub_16C2C0(1000, 0xA0, "m_stateMachineObjectPool", 4, 0);
     dword_4499F0.sub_16C2C0(dword_4498C8, 0x124, "m_taskObjectPool", 4, 0);
     dword_4499D0.sub_16C2C0(dword_4498C8, 0xC, "m_taskTreeDataPool", 4, 0);
     dword_4499B0.sub_16C2C0((RwInt32)(dword_4498C8 * dword_449400), 0x18, "m_inputListPool", 4, 0);
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    dword_449950[0].sub_16C2C0(2700, 0x20, "m_memPools[0]", 4, 0);
+    dword_449950[1].sub_16C2C0(512, 0x80, "m_memPools[1]", 4, 0);
+    dword_449950[2].sub_16C2C0(384, 0x180, "m_memPools[2]", 4, 0);
+#else
     dword_449950[0].sub_16C2C0(900, 0x20, "m_memPools[0]", 4, 0);
     dword_449950[1].sub_16C2C0(128, 0x80, "m_memPools[1]", 4, 0);
     dword_449950[2].sub_16C2C0(75, 0x180, "m_memPools[2]", 4, 0);
+#endif
 }
 
 // match: sub_714F0 @ 0x000714F0
