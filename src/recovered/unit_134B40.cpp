@@ -972,6 +972,7 @@ RwReal TrigBotSpread(const void *pEntity, RwReal fSpread);
 bool TrigIsAiSoldier(const void *pEntity);
 // (the bots' grenade events counted: 0 a throw, 1 a grenade taken in hand)
 extern RwInt32 g_anTrigGrenadeEvents[2];
+void TrigBotAnimEvent(RwInt32 nEvent, RwInt32 bIgnored);
 // (and their grenades' odds, in 10000, scaled: CODFH_BOTS_GRENADE_ODDS)
 RwInt32 TrigBotGrenadeOdds(const void *pEntity, RwInt32 nBase, RwInt32 nOdds);
 #endif
@@ -2694,6 +2695,11 @@ void type_3DAFC8::vf_170(RwInt32 arg_0, RwInt32 arg_4, RwInt32 arg_8, RwInt32 ar
     type_3D3548 *var_100;
     type_3DBC78 *var_104;
 
+#if defined(CODFH_DRAW_TRIGGERS) && !defined(CODFH_SP)
+    // (the debug tools: the bots' animation events counted by id, port/src/debug/trigtools.cpp)
+    if (TrigIsAiSoldier(this))
+        TrigBotAnimEvent(arg_0, unk_88_13);
+#endif
     if (unk_88_13)
         return;
     switch ((RwUInt32)arg_0)

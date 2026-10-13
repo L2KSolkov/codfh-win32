@@ -7195,6 +7195,29 @@ RwReal TrigBotSpread(const void *pEntity, RwReal fSpread)
 static RwInt32 s_nGrenadeRolls, s_nGrenadePrompts, s_nGrenadeThrows;
 RwInt32 g_anTrigGrenadeEvents[2];
 
+// The bots' animation events (their vf_170's), by id: how many, and how many it ignored
+// (unk_88_13); the bots' 5 s log shows them.
+#define BOT_EVENT_IDS 64
+static RwInt32 s_anBotEventId[BOT_EVENT_IDS], s_anBotEventCount[BOT_EVENT_IDS], s_anBotEventIgnored[BOT_EVENT_IDS], s_nBotEventIds;
+
+void TrigBotAnimEvent(RwInt32 nEvent, RwInt32 bIgnored)
+{
+    RwInt32 i;
+
+    for (i = 0; i < s_nBotEventIds; i++)
+        if (s_anBotEventId[i] == nEvent)
+            break;
+    if (i == s_nBotEventIds)
+    {
+        if (s_nBotEventIds >= BOT_EVENT_IDS)
+            return;
+        s_anBotEventId[s_nBotEventIds++] = nEvent;
+    }
+    s_anBotEventCount[i]++;
+    if (bIgnored)
+        s_anBotEventIgnored[i]++;
+}
+
 RwInt32 TrigBotGrenadeOdds(const void *pEntity, RwInt32 nBase, RwInt32 nOdds)
 {
     static RwInt32 s_nScale = -1;
@@ -7419,6 +7442,16 @@ static void BotsTick()
                 }
                 break;
             }
+        {
+            RwChar szEv[600];
+            RwInt32 n2 = 0, e;
+
+            szEv[0] = 0;
+            for (e = 0; e < s_nBotEventIds && n2 < (RwInt32)sizeof(szEv) - 32; e++)
+                n2 += _snprintf(szEv + n2, sizeof(szEv) - n2, " 0x%X:%d%s", s_anBotEventId[e], s_anBotEventCount[e],
+                                s_anBotEventIgnored[e] ? "(ignored some)" : "");
+            plog("bots: animation events:%s", szEv);
+        }
         plog("bots: %d alive bots at cover nodes; %d grenades thrown so far (of %d projectiles)", nAtCover,
              g_anTrigProjectiles[2], g_anTrigProjectiles[0] + g_anTrigProjectiles[1] + g_anTrigProjectiles[2] + g_anTrigProjectiles[3]);
         TrigAnimMissLog(FALSE);
