@@ -102,6 +102,7 @@
 #include "types/type_4D1DB8.h"
 #include "game/data.h"
 #include "types/type_4C00E8.h"
+#include "types/cNetLevelParams.h"
 #include "rws/debugswitches.h"
 #include "rws/camerahelper.h"
 #include "game/cheats.h"
@@ -732,6 +733,9 @@ static RwInt32 PickNpcWeapon(RwInt32 *pnAll)
     return nWeapon;
 }
 
+// (nonzero: the side SpawnAiSoldierMp gives the soldier, the bots')
+static RwUInt32 s_dwSpawnSide;
+
 static type_3D3548 *SpawnAiSoldierMp(SoldierTrigger *pTrigger)
 {
     type_3DF8D8 *pDef = sub_198800(&pTrigger->unk_D8);
@@ -806,7 +810,7 @@ static type_3D3548 *SpawnAiSoldierMp(SoldierTrigger *pTrigger)
     {
         type_3D3548 *pPlayer = sub_1745A0(0);
         RwUInt32 dwMine = pPlayer ? (pPlayer->unk_2C & 7) : 1;
-        RwUInt32 dwTheirs = dwMine == 2 ? 1 : 2;
+        RwUInt32 dwTheirs = s_dwSpawnSide ? s_dwSpawnSide : dwMine == 2 ? 1 : 2;
 
         pSoldier->unk_2C = (pSoldier->unk_2C & ~7u) | dwTheirs;
         plog("spawn: the player's side %u; the soldier's %u", dwMine, dwTheirs);
@@ -1292,6 +1296,8 @@ static void WaitsLogTick();
 static void TrigMsgTick();
 static void SpawnAiTestTick();
 static void AutoSpawnTick();
+static void PathsTick();
+static void BotsTick();
 static void LogSoldierTriggersTick();
 
 void TrigWebTick()
@@ -1305,6 +1311,10 @@ void TrigWebTick()
     TrigRngFrame();
     WaitsLogTick();
     TrigMsgTick();
+    PathsTick();
+#ifndef CODFH_SP
+    BotsTick();
+#endif
     SpawnAiTestTick();
     AutoSpawnTick();
     LogSoldierTriggersTick();
@@ -5567,6 +5577,8 @@ static void LogSoldierTriggersTick()
 
             if (t == NULL || ((Trigger *)t)->vf_008() != 5)
                 continue;
+            plog("soldiers: trigger %d at (%.0f, %.0f, %.0f): definition %08X,%08X (%s), weapon %d", i, t->unk_90, t->unk_94,
+                 t->unk_98, t->unk_D8.unk_00, t->unk_D8.unk_04, sub_198800(&t->unk_D8) ? "read" : "not read", t->unk_130);
             for (k = 0; k < n; k++)
                 if (adwSeen[k][0] == (RwUInt32)t->unk_E0.unk_00 && adwSeen[k][1] == (RwUInt32)t->unk_E0.unk_04
                     && adwSeen[k][2] == (RwUInt32)t->unk_E8.unk_00 && adwSeen[k][3] == (RwUInt32)t->unk_E8.unk_04)
@@ -5590,6 +5602,548 @@ static void LogSoldierTriggersTick()
         }
     }
     plog("soldiers: %d distinct soldier trigger scripts", n);
+}
+
+// ---- path graphs for the multiplayer maps (the AI soldiers' A*) ----
+//
+// The multiplayer maps ship an empty path record (GodData kind 13: its 28-byte header alone), so
+// the A* finds nothing. Here one is made from the map's collision, in the layout sub_F8350 reads
+// (C:\cfh-web-suite\PATHFINDING.md): a lattice of waypoints (type 1) every PATH_STEP cm over
+// the floor the players can walk from the spawn points, each linked to the lattice neighbours
+// (and the ones two out) it can walk to: steps no higher than PATH_STEP_UP, no drops deeper
+// than PATH_DROP, nothing in the way at knee or chest height. The graph's grid lists each
+// cell's nodes, as the shipped graphs' do. It is saved as paths\<map>.pth beside the exe and
+// read back from there next time; loaded through sub_F8350 itself, from a memory stream.
+//
+// CODFH_PATHS=1 makes one when the map has none (CODFH_SPAWNAI does too); CODFH_PATHS=regen
+// makes it again over the saved one; CODFH_PATHS=off neither makes nor loads one.
+// CODFH_PATHS_STEP sets the lattice step (cm), CODFH_PATHS_DRAW=1 turns on the path view.
+
+#ifndef CODFH_SP
+void sub_F8350(RwStream *arg_0);
+extern "C" const char *port_map_name;
+
+#define PATH_STEP       150.0f
+#define PATH_STEP_UP    60.0f   // the most a soldier steps up between two samples
+#define PATH_DROP       100.0f  // the deepest it steps down
+#define PATH_HEAD       170.0f  // the headroom a node needs
+#define PATH_MAX_NODES  4000    // node IDs are 12 bits, 0 the null node
+#define PATH_MAX_LINKS  24
+#define PATH_CELL       500
+
+struct PathGenNode
+{
+    RwInt32 ix, iz;
+    RwV3d v;
+    RwInt32 nLinks;
+    RwUInt16 anLinks[PATH_MAX_LINKS];
+};
+
+static PathGenNode *s_aPathGen;
+static RwInt32 s_nPathGen;
+
+// The floor below (x, fTop, z), within fRange under it: its height in *pfY.
+static RwBool PathFloor(RwReal x, RwReal fTop, RwReal z, RwReal fRange, RwReal *pfY)
+{
+    RpIntersection is;
+    RwReal fHit = 2.0f;
+    RpWorld *pWorld;
+    RwInt32 i;
+
+    is.type = rpINTERSECTLINE;
+    is.t.line.start.x = is.t.line.end.x = x;
+    is.t.line.start.z = is.t.line.end.z = z;
+    is.t.line.start.y = fTop;
+    is.t.line.end.y = fTop - fRange;
+    for (i = 0; i <= 4; i++)
+    {
+        pWorld = i < 4 ? (dword_4E5D30[i].get_unk_00() ? dword_4E5D30[i].get_unk_28() : NULL) : unk_4E5CD8.get_unk_28();
+        if (pWorld)
+            RpCollisionWorldForAllIntersections(pWorld, &is, GroundHit, &fHit);
+    }
+    if (fHit > 1.0f)
+        return FALSE;
+    *pfY = fTop - fRange * fHit;
+    return TRUE;
+}
+
+static RwBool PathClear(RwReal ax, RwReal ay, RwReal az, RwReal bx, RwReal by, RwReal bz)
+{
+    RwV3d a, b;
+
+    a.x = ax;
+    a.y = ay;
+    a.z = az;
+    b.x = bx;
+    b.y = by;
+    b.z = bz;
+    return LineClear(&a, &b);
+}
+
+// Whether a soldier walks from *pA (on the floor) to the column (bx, bz): the floor sampled
+// along the way, each step up at most PATH_STEP_UP and down at most PATH_DROP, and nothing at
+// knee or chest height between the samples; the floor's height there in *pfY.
+static RwBool PathWalk(const RwV3d *pA, RwReal bx, RwReal bz, RwReal *pfY)
+{
+    RwReal fLast = pA->y, fLen = (RwReal)sqrt((bx - pA->x) * (bx - pA->x) + (bz - pA->z) * (bz - pA->z));
+    RwReal px = pA->x, pz = pA->z;
+    RwInt32 n = (RwInt32)(fLen / 75.0f) + 1, k;
+
+    for (k = 1; k <= n; k++)
+    {
+        RwReal t = (RwReal)k / n, x = pA->x + (bx - pA->x) * t, z = pA->z + (bz - pA->z) * t, y;
+
+        if (!PathFloor(x, fLast + PATH_STEP_UP, z, PATH_STEP_UP + PATH_DROP, &y))
+            return FALSE;
+        if (!PathClear(px, fLast + 50.0f, pz, x, y + 50.0f, z) || !PathClear(px, fLast + 130.0f, pz, x, y + 130.0f, z))
+            return FALSE;
+        fLast = y;
+        px = x;
+        pz = z;
+    }
+    *pfY = fLast;
+    return TRUE;
+}
+
+// Whether a node may stand at *pv: headroom, and no wall within 25 cm at knee height.
+static RwBool PathStand(const RwV3d *pv)
+{
+    static const RwReal s_af[4][2] = { { 25.0f, 0.0f }, { -25.0f, 0.0f }, { 0.0f, 25.0f }, { 0.0f, -25.0f } };
+    RwInt32 i;
+
+    if (!PathClear(pv->x, pv->y + 20.0f, pv->z, pv->x, pv->y + PATH_HEAD, pv->z))
+        return FALSE;
+    for (i = 0; i < 4; i++)
+        if (!PathClear(pv->x, pv->y + 50.0f, pv->z, pv->x + s_af[i][0], pv->y + 50.0f, pv->z + s_af[i][1]))
+            return FALSE;
+    return TRUE;
+}
+
+// The node at lattice (ix, iz) within 120 cm of the height y, or -1.
+static RwInt32 PathFind(RwInt32 ix, RwInt32 iz, RwReal y)
+{
+    RwInt32 i;
+
+    // (a linear search: the lattice is a few thousand nodes, made once)
+    for (i = 0; i < s_nPathGen; i++)
+        if (s_aPathGen[i].ix == ix && s_aPathGen[i].iz == iz && fabs(s_aPathGen[i].v.y - y) < 120.0f)
+            return i;
+    return -1;
+}
+
+static void PathLink(RwInt32 a, RwInt32 b)
+{
+    RwInt32 i;
+
+    for (i = 0; i < s_aPathGen[a].nLinks; i++)
+        if (s_aPathGen[a].anLinks[i] == b)
+            return;
+    if (s_aPathGen[a].nLinks < PATH_MAX_LINKS)
+        s_aPathGen[a].anLinks[s_aPathGen[a].nLinks++] = (RwUInt16)b;
+}
+
+static RwInt32 PathAdd(RwInt32 ix, RwInt32 iz, const RwV3d *pv)
+{
+    PathGenNode *p;
+
+    if (s_nPathGen >= PATH_MAX_NODES)
+        return -1;
+    p = &s_aPathGen[s_nPathGen];
+    memset(p, 0, sizeof(*p));
+    p->ix = ix;
+    p->iz = iz;
+    p->v = *pv;
+    return s_nPathGen++;
+}
+
+// A seed: the lattice point nearest *pv (on the floor) that it walks to.
+static void PathSeed(const RwV3d *pv, RwReal fStep)
+{
+    RwInt32 ix = (RwInt32)floor(pv->x / fStep + 0.5f), iz = (RwInt32)floor(pv->z / fStep + 0.5f), dx, dz;
+    RwV3d vFloor = *pv;
+
+    if (!PathFloor(pv->x, pv->y + 100.0f, pv->z, 400.0f, &vFloor.y))
+        return;
+    for (dz = 0; dz <= 1; dz++)
+        for (dx = 0; dx <= 1; dx++)
+        {
+            RwReal y;
+            RwV3d v;
+            RwInt32 jx = ix + (dx ? (pv->x / fStep > ix ? 1 : -1) : 0), jz = iz + (dz ? (pv->z / fStep > iz ? 1 : -1) : 0);
+
+            v.x = jx * fStep;
+            v.z = jz * fStep;
+            if (!PathWalk(&vFloor, v.x, v.z, &y))
+                continue;
+            v.y = y;
+            if (PathFind(jx, jz, y) < 0 && PathStand(&v))
+            {
+                PathAdd(jx, jz, &v);
+                return;
+            }
+        }
+}
+
+// The graph made: the flood from the seeds, then the longer links.
+static void PathGenerate(RwReal fStep)
+{
+    static const RwInt32 s_anDir[8][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }, { 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 } };
+    RwInt32 i, k, nHead, nPoints = 0, dx, dz;
+    type_10F710 *pPlayer = (type_10F710 *)sub_1745A0(0);
+    RwV3d v;
+
+    s_nPathGen = 0;
+    // (the seeds: every spawn point, and the player where it is)
+    __try
+    {
+        nPoints = unk_4FBC50.unk_00.unk_08;
+        for (i = 0; i < nPoints && i < 256; i++)
+        {
+            RwMatrix *pAt = unk_4FBC50.sub_1C20F0(i);
+
+            if (pAt)
+                PathSeed(&pAt->pos, fStep);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        plog("paths: reading the spawn points faulted");
+    }
+    if (pPlayer && PlayerPosition(pPlayer, &v))
+        PathSeed(&v, fStep);
+    plog("paths: %d seeds from %d spawn points and the player", s_nPathGen, nPoints);
+    // (the flood: each node's eight lattice neighbours it walks to, both ways)
+    for (nHead = 0; nHead < s_nPathGen; nHead++)
+    {
+        for (k = 0; k < 8; k++)
+        {
+            RwInt32 jx = s_aPathGen[nHead].ix + s_anDir[k][0], jz = s_aPathGen[nHead].iz + s_anDir[k][1], j;
+            RwReal y, yBack;
+            RwV3d vTo;
+
+            if (!PathWalk(&s_aPathGen[nHead].v, jx * fStep, jz * fStep, &y))
+                continue;
+            vTo.x = jx * fStep;
+            vTo.y = y;
+            vTo.z = jz * fStep;
+            if (!PathWalk(&vTo, s_aPathGen[nHead].v.x, s_aPathGen[nHead].v.z, &yBack) || fabs(yBack - s_aPathGen[nHead].v.y) > 30.0f)
+                continue;
+            j = PathFind(jx, jz, y);
+            if (j < 0)
+            {
+                if (!PathStand(&vTo))
+                    continue;
+                j = PathAdd(jx, jz, &vTo);
+                if (j < 0)
+                    break;
+            }
+            PathLink(nHead, j);
+            PathLink(j, nHead);
+        }
+    }
+    // (the longer links: the nodes two lattice steps out, and a knight's move, walked both ways)
+    for (i = 0; i < s_nPathGen; i++)
+        for (dz = -2; dz <= 2; dz++)
+            for (dx = -2; dx <= 2; dx++)
+            {
+                RwInt32 j;
+                RwReal y, yBack;
+
+                if (dx > -2 && dx < 2 && dz > -2 && dz < 2)
+                    continue;
+                if (s_aPathGen[i].nLinks >= PATH_MAX_LINKS)
+                    break;
+                for (j = 0; j < s_nPathGen; j++)
+                    if (j > i && s_aPathGen[j].ix == s_aPathGen[i].ix + dx && s_aPathGen[j].iz == s_aPathGen[i].iz + dz
+                        && fabs(s_aPathGen[j].v.y - s_aPathGen[i].v.y) < 250.0f)
+                        break;
+                if (j >= s_nPathGen)
+                    continue;
+                if (!PathWalk(&s_aPathGen[i].v, s_aPathGen[j].v.x, s_aPathGen[j].v.z, &y) || fabs(y - s_aPathGen[j].v.y) > 30.0f)
+                    continue;
+                if (!PathWalk(&s_aPathGen[j].v, s_aPathGen[i].v.x, s_aPathGen[i].v.z, &yBack)
+                    || fabs(yBack - s_aPathGen[i].v.y) > 30.0f)
+                    continue;
+                PathLink(i, j);
+                PathLink(j, i);
+            }
+}
+
+// A growing byte buffer.
+struct PathBuf
+{
+    RwUInt8 *p;
+    RwInt32 n, nMax;
+};
+
+static void PathPut(PathBuf *b, const void *pData, RwInt32 n)
+{
+    if (b->n + n > b->nMax)
+    {
+        RwInt32 nMax = (b->nMax ? b->nMax * 2 : 65536) + n;
+        RwUInt8 *p = (RwUInt8 *)realloc(b->p, nMax);
+
+        if (p == NULL)
+            return;
+        b->p = p;
+        b->nMax = nMax;
+    }
+    memcpy(b->p + b->n, pData, n);
+    b->n += n;
+}
+
+static void PathPutU32(PathBuf *b, RwUInt32 dw)
+{
+    PathPut(b, &dw, 4);
+}
+
+// A link list: two 12-bit IDs a word, ended by a zero ID (a zero word after an even count).
+static void PathPutLinks(PathBuf *b, const RwUInt16 *pn, RwInt32 n)
+{
+    RwInt32 i;
+
+    for (i = 0; i < n; i += 2)
+        PathPutU32(b, (RwUInt32)pn[i] | (i + 1 < n ? (RwUInt32)pn[i + 1] << 12 : 0));
+    if (!(n & 1))
+        PathPutU32(b, 0);
+}
+
+// A structure chunk (ID 1).
+static void PathPutChunk(PathBuf *b, const PathBuf *pData)
+{
+    PathPutU32(b, 1);
+    PathPutU32(b, (RwUInt32)pData->n);
+    PathPutU32(b, 0x1803FFFF);  // (the library stamp the level files carry)
+    PathPut(b, pData->p, pData->n);
+}
+
+// The graph made into the six structures sub_F8350 reads, into *pOut.
+static RwBool PathPack(PathBuf *pOut)
+{
+    PathBuf aPart[6];
+    RwInt32 i, nCells, nLists = 0, nMinX, nMinZ, nW, nH;
+    RwReal fMinX = 1e30f, fMinZ = 1e30f, fMaxX = -1e30f, fMaxZ = -1e30f;
+    RwUInt16 *pnCell;
+    RwUInt32 adwHeader[24];
+
+    memset(aPart, 0, sizeof(aPart));
+    for (i = 0; i < s_nPathGen; i++)
+    {
+        fMinX = s_aPathGen[i].v.x < fMinX ? s_aPathGen[i].v.x : fMinX;
+        fMinZ = s_aPathGen[i].v.z < fMinZ ? s_aPathGen[i].v.z : fMinZ;
+        fMaxX = s_aPathGen[i].v.x > fMaxX ? s_aPathGen[i].v.x : fMaxX;
+        fMaxZ = s_aPathGen[i].v.z > fMaxZ ? s_aPathGen[i].v.z : fMaxZ;
+    }
+    nMinX = (RwInt32)floor(fMinX / PATH_CELL) - 1;
+    nMinZ = (RwInt32)floor(fMinZ / PATH_CELL) - 1;
+    nW = (RwInt32)floor(fMaxX / PATH_CELL) + 2 - nMinX;
+    nH = (RwInt32)floor(fMaxZ / PATH_CELL) + 2 - nMinZ;
+    nCells = nW * nH;
+    pnCell = (RwUInt16 *)malloc(nCells * sizeof(RwUInt16));
+    if (pnCell == NULL)
+        return FALSE;
+    // (the nodes, IDs from 1: the null node's offset first)
+    PathPutU32(&aPart[1], 0);
+    for (i = 0; i < s_nPathGen; i++)
+    {
+        RwUInt16 anTo[PATH_MAX_LINKS];
+        RwInt32 k;
+        RwUInt32 dwZero = 0;
+
+        PathPutU32(&aPart[1], (RwUInt32)aPart[2].n);
+        PathPutU32(&aPart[2], 0);               // flags
+        PathPutU32(&aPart[2], 1);               // type 1, a waypoint (and the reserved half)
+        PathPutU32(&aPart[2], dwZero);          // the runtime words
+        PathPutU32(&aPart[2], dwZero);
+        PathPut(&aPart[2], &s_aPathGen[i].v, sizeof(RwV3d));
+        for (k = 0; k < s_aPathGen[i].nLinks; k++)
+            anTo[k] = (RwUInt16)(s_aPathGen[i].anLinks[k] + 1);
+        PathPutLinks(&aPart[2], anTo, s_aPathGen[i].nLinks);
+    }
+    // (the grid: each cell's own nodes)
+    for (i = 0; i < nCells; i++)
+    {
+        RwUInt16 anIn[512];
+        RwInt32 n = 0, k, cx = i % nW, cz = i / nW;
+
+        for (k = 0; k < s_nPathGen && n < 511; k++)
+            if ((RwInt32)floor(s_aPathGen[k].v.x / PATH_CELL) - nMinX == cx
+                && (RwInt32)floor(s_aPathGen[k].v.z / PATH_CELL) - nMinZ == cz)
+                anIn[n++] = (RwUInt16)(k + 1);
+        if (n == 0)
+        {
+            pnCell[i] = 0xFFFF;
+            continue;
+        }
+        pnCell[i] = (RwUInt16)nLists++;
+        PathPutU32(&aPart[4], (RwUInt32)aPart[5].n);
+        PathPutLinks(&aPart[5], anIn, n);
+    }
+    PathPut(&aPart[3], pnCell, nCells * sizeof(RwUInt16));
+    free(pnCell);
+    // (the header: the format, the cell size, the node count with the null node, the grid, the
+    // structures' sizes; the pointer slots zero)
+    memset(adwHeader, 0, sizeof(adwHeader));
+    adwHeader[0] = 5;
+    adwHeader[1] = PATH_CELL;
+    adwHeader[2] = (RwUInt32)(s_nPathGen + 1);
+    {
+        RwReal afOrigin[3];
+
+        afOrigin[0] = (RwReal)(nMinX * PATH_CELL);
+        afOrigin[1] = 0.0f;
+        afOrigin[2] = (RwReal)(nMinZ * PATH_CELL);
+        memcpy(&adwHeader[6], afOrigin, sizeof(afOrigin));
+    }
+    adwHeader[9] = (RwUInt32)nW;
+    adwHeader[10] = (RwUInt32)nH;
+    adwHeader[12] = (RwUInt32)aPart[1].n;
+    adwHeader[14] = (RwUInt32)aPart[2].n;
+    adwHeader[16] = (RwUInt32)aPart[3].n;
+    adwHeader[17] = (RwUInt32)nLists;
+    adwHeader[19] = (RwUInt32)aPart[4].n;
+    adwHeader[21] = (RwUInt32)aPart[5].n;
+    PathPut(&aPart[0], adwHeader, sizeof(adwHeader));
+    for (i = 0; i < 6; i++)
+    {
+        PathPutChunk(pOut, &aPart[i]);
+        free(aPart[i].p);
+    }
+    plog("paths: packed %d nodes, a %d x %d grid of %d cm cells from (%d, %d), %d cell lists, %d bytes", s_nPathGen, nW, nH,
+         PATH_CELL, nMinX * PATH_CELL, nMinZ * PATH_CELL, nLists, pOut->n);
+    return TRUE;
+}
+
+// The structures pData (n bytes) loaded as the level's graph (sub_F8350, from a memory stream).
+static RwBool PathLoad(void *pData, RwInt32 n)
+{
+    RwMemory mem;
+    RwStream *pStream;
+
+    mem.start = (RwUInt8 *)pData;
+    mem.length = (RwUInt32)n;
+    pStream = RwStreamOpen(rwSTREAMMEMORY, rwSTREAMREAD, &mem);
+    if (pStream == NULL)
+        return FALSE;
+    sub_F8350(pStream);
+    RwStreamClose(pStream, &mem);
+    plog("paths: loaded: %d nodes, a %d x %d grid; ready %d", unk_4C00E8.unk_08 - 1, unk_4C00E8.unk_24, unk_4C00E8.unk_28,
+         unk_4C00E8.unk_64);
+    return unk_4C00E8.unk_64 != 0;
+}
+
+#endif
+
+// Each frame: once the player is in a map with no graph, the saved one loaded, or one made.
+static void PathsTick()
+{
+#ifndef CODFH_SP
+    static RwInt32 s_nMode = -1;    // 0 off, 1 load, 2 make when none is saved, 3 make again
+    static RwUInt32 s_dwIn;
+    static RwBool s_bDone, s_bHad;
+    RwChar szEnv[32], szPath[MAX_PATH];
+
+    if (s_nMode < 0)
+    {
+        s_nMode = 1;
+        if (GetEnvironmentVariableA("CODFH_PATHS", szEnv, sizeof(szEnv)))
+            s_nMode = !_stricmp(szEnv, "off") ? 0 : !_stricmp(szEnv, "regen") ? 3 : 2;
+        else if (GetEnvironmentVariableA("CODFH_SPAWNAI", NULL, 0) || GetEnvironmentVariableA("CODFH_BOTS", NULL, 0))
+            s_nMode = 2;
+        if (GetEnvironmentVariableA("CODFH_PATHS_DRAW", NULL, 0))
+            g_bTrigDrawPathNodes = TRUE;
+    }
+    if (s_nMode == 0 || port_map_name == NULL || !port_map_name[0])
+        return;
+    if (unk_4F7EB8.unk_1A4 == NULL)
+    {
+        s_dwIn = 0;
+        return;
+    }
+    if (!s_dwIn)
+        s_dwIn = port_frame;
+    // (a restart releases the graph, sub_F8270: loaded again)
+    if (unk_4C00E8.unk_64)
+        s_bDone = s_bHad = TRUE;
+    else if (s_bHad)
+        s_bDone = s_bHad = FALSE;
+    if (s_bDone || port_frame - s_dwIn < 10)
+        return;
+    s_bDone = TRUE;
+    CreateDirectoryA("paths", NULL);
+    _snprintf(szPath, sizeof(szPath), "paths\\%s.pth", port_map_name);
+    szPath[sizeof(szPath) - 1] = 0;
+    if (s_nMode != 3)
+    {
+        FILE *pFile = fopen(szPath, "rb");
+
+        if (pFile)
+        {
+            RwInt32 n;
+            void *p;
+
+            fseek(pFile, 0, SEEK_END);
+            n = ftell(pFile);
+            fseek(pFile, 0, SEEK_SET);
+            p = malloc(n > 0 ? n : 1);
+            if (p && fread(p, 1, n, pFile) == (size_t)n)
+            {
+                plog("paths: %s (%d bytes)", szPath, n);
+                PathLoad(p, n);
+            }
+            free(p);
+            fclose(pFile);
+            return;
+        }
+        if (s_nMode == 1)
+            return;
+    }
+    {
+        RwChar szStep[16];
+        RwReal fStep = GetEnvironmentVariableA("CODFH_PATHS_STEP", szStep, sizeof(szStep)) ? (RwReal)atof(szStep) : PATH_STEP;
+        RwUInt32 dwStart = GetTickCount();
+        PathBuf out;
+        RwInt32 i, nLinks = 0;
+
+        if (fStep < 100.0f)
+            fStep = PATH_STEP;
+        if (s_aPathGen == NULL)
+            s_aPathGen = (PathGenNode *)malloc(PATH_MAX_NODES * sizeof(PathGenNode));
+        if (s_aPathGen == NULL)
+            return;
+        __try
+        {
+            PathGenerate(fStep);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            plog("paths: making the graph faulted (%d nodes so far)", s_nPathGen);
+            return;
+        }
+        for (i = 0; i < s_nPathGen; i++)
+            nLinks += s_aPathGen[i].nLinks;
+        plog("paths: made %d nodes%s, %d links, every %.0f cm, in %u ms", s_nPathGen,
+             s_nPathGen >= PATH_MAX_NODES ? " (the most there can be: a larger CODFH_PATHS_STEP covers more)" : "", nLinks,
+             fStep, GetTickCount() - dwStart);
+        if (s_nPathGen < 2)
+            return;
+        memset(&out, 0, sizeof(out));
+        if (!PathPack(&out))
+            return;
+        {
+            FILE *pFile = fopen(szPath, "wb");
+
+            if (pFile)
+            {
+                fwrite(out.p, 1, out.n, pFile);
+                fclose(pFile);
+                plog("paths: saved %s", szPath);
+            }
+        }
+        PathLoad(out.p, out.n);
+        free(out.p);
+    }
+#endif
 }
 
 // (set when the player is placed at CODFH_SPAWNTRIGGER's trigger: the spawn test's soldier is
@@ -5870,6 +6424,255 @@ static void SpawnAiBringNear(type_3D3548 *pSoldier, type_10F710 *pPlayer)
         plog("spawnai: bringing the soldier near faulted");
     }
 }
+
+// ---- bots: AI soldiers on both teams, at their teams' spawn points (CODFH_BOTS) ----
+//
+// CODFH_BOTS=n puts n AI soldiers on each team, CODFH_BOTS=a,e a on the local player's and e on
+// the other. Each is single player's soldier (SpawnAiSoldierMp) made from the network player's
+// trigger dressed as a remote player of its team is (sub_1AED80: the level's network settings
+// give the team's soldier definition, sub_1B7910), on its team's side, at one of its team's
+// spawn points (the game type's lists, sub_1C2050) facing the way the point does, its vision on
+// (AI flag 0x20). A dead bot's place is taken by a new one 5 s later, at a spawn point again.
+
+#ifndef CODFH_SP
+#define BOTS_MAX 16
+
+struct TrigBot
+{
+    type_3D3548 *pSoldier;
+    RwInt32 nTeam;          // the team's code: 2 or 4
+    RwUInt32 dwSide;        // its entity side (unk_2C & 7)
+    RwUInt32 dwRespawnAt;   // the frame it is made again (0: alive or not yet made)
+    RwUInt32 dwMadeAt;
+};
+
+static TrigBot s_aBots[BOTS_MAX];
+static RwInt32 s_nBots;
+static RwInt32 s_anBotPoint[2];
+
+// Whether the entity is still in the entity table.
+static RwBool BotAlive(type_3D3548 *pSoldier)
+{
+    RwInt32 k;
+
+    if (pSoldier == NULL)
+        return FALSE;
+    for (k = 0; k < 0x300; k++)
+        if (dword_4B6A00[k].unk_04 == pSoldier)
+            break;
+    if (k == 0x300)
+        return FALSE;
+    __try
+    {
+        return pSoldier->vf_174() > 0;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return FALSE;
+    }
+}
+
+// A spawn point of team nTeam's list (or of all, with none) away from the other team, as the
+// game's default rule picks (farthest from the nearest enemy): one of the four farthest from
+// the nearest living enemy bot (and the player, when it is one), at random; its matrix.
+static RwMatrix *BotPoint(RwInt32 nTeam)
+{
+    RwInt32 nList = unk_4FBC50.sub_1C2050(nTeam, -1), nCount, i, k, n = 0;
+    type_1C0F60 *pList = nList >= 0 ? &unk_4FBC50.unk_26C[nList] : &unk_4FBC50.unk_00;
+    RwMatrix *apBest[4];
+    RwReal afBest[4];
+    RwV3d vMe;
+    RwBool bMe = unk_4F7EB8.unk_1A4 && nTeam != unk_4F7EB8.unk_29C && PlayerPosition((type_10F710 *)unk_4F7EB8.unk_1A4, &vMe);
+
+    nCount = pList->unk_08;
+    for (i = 0; i < nCount; i++)
+    {
+        RwMatrix *m = pList->sub_1C1B80(i);
+        RwReal fNear = 1e30f, d;
+
+        RwBool bTaken = FALSE;
+
+        if (m == NULL)
+            continue;
+        for (k = 0; k < s_nBots; k++)
+            if (BotAlive(s_aBots[k].pSoldier))
+            {
+                RwV3d *pv = s_aBots[k].pSoldier->sub_CD550();
+
+                d = pv ? (pv->x - m->pos.x) * (pv->x - m->pos.x) + (pv->z - m->pos.z) * (pv->z - m->pos.z) : 1e30f;
+                // (a point a bot stands on is taken: kept only when every point is)
+                if (d < 200.0f * 200.0f)
+                    bTaken = TRUE;
+                if (s_aBots[k].nTeam != nTeam)
+                    fNear = d < fNear ? d : fNear;
+            }
+        if (bTaken)
+            fNear = -1.0f;
+        if (bMe)
+        {
+            d = (vMe.x - m->pos.x) * (vMe.x - m->pos.x) + (vMe.z - m->pos.z) * (vMe.z - m->pos.z);
+            fNear = d < fNear ? d : fNear;
+        }
+        // (kept among the four farthest, farthest first)
+        if (n == 4 && fNear <= afBest[3])
+            continue;
+        k = n < 4 ? n++ : 3;
+        for (; k > 0 && afBest[k - 1] < fNear; k--)
+        {
+            apBest[k] = apBest[k - 1];
+            afBest[k] = afBest[k - 1];
+        }
+        apBest[k] = m;
+        afBest[k] = fNear;
+    }
+    return n ? apBest[rand() % n] : NULL;
+}
+
+// Bot b made: dressed as its team's remote players, at one of its team's points.
+static void BotSpawn(TrigBot *b)
+{
+    SoldierTrigger *pTrigger = (SoldierTrigger *)dword_4F8134;
+    RwMatrix *m = BotPoint(b->nTeam);
+    type_3DF8D8_04 oldDef;
+    type_3D3548 *pSoldier;
+    RwV3d v, vAt;
+
+    b->pSoldier = NULL;
+    if (pTrigger == NULL || m == NULL)
+    {
+        plog("bots: no %s", pTrigger ? "spawn point" : "network soldier trigger");
+        return;
+    }
+    RwBool bTeamDef = FALSE;
+
+    oldDef = pTrigger->unk_D8;
+    if (unk_4F7EB8.unk_280 && sub_198800((type_3DF8D8_04 *)unk_4F7EB8.unk_280->sub_1B7910(b->nTeam)))
+    {
+        pTrigger->unk_D8 = *(type_3DF8D8_04 *)unk_4F7EB8.unk_280->sub_1B7910(b->nTeam);
+        bTeamDef = TRUE;
+    }
+    v = m->pos;
+    v.y += 40.0f;
+    if (!GroundBelow(&v))
+        v.y -= 40.0f;
+    s_dwSpawnSide = (RwInt32)b->dwSide;
+    pSoldier = SpawnSoldierAt((Trigger *)pTrigger, &v);
+    s_dwSpawnSide = 0;
+    pTrigger->unk_D8 = oldDef;
+    if (pSoldier == NULL)
+    {
+        plog("bots: a team %d bot could not be made: %s", b->nTeam, s_szReqResult);
+        return;
+    }
+    b->pSoldier = pSoldier;
+    b->dwRespawnAt = 0;
+    b->dwMadeAt = port_frame;
+    __try
+    {
+        AIData *pAi = pSoldier->vf_120();
+
+        if (pAi)
+            pAi->sub_16D70(0x20);
+        vAt.x = v.x + m->at.x * 100.0f;
+        vAt.y = v.y;
+        vAt.z = v.z + m->at.z * 100.0f;
+        SpawnAiFace(pSoldier, &vAt);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    plog("bots: a team %d bot (side %u, %s, its definition %s) at (%.0f, %.0f, %.0f)", b->nTeam, b->dwSide,
+         b->nTeam == unk_4F7EB8.unk_29C ? "the player's team" : "the other team", bTeamDef ? "its team's" : "the trigger's",
+         v.x, v.y, v.z);
+}
+
+// Each frame: the bots made once the player is in (one each quarter second), and dead ones
+// made again.
+static void BotsTick()
+{
+    static RwInt32 s_nAllies = -1, s_nEnemies;
+    static RwUInt32 s_dwIn, s_dwNext;
+    RwInt32 i;
+
+    if (s_nAllies < 0)
+    {
+        RwChar sz[32];
+
+        s_nAllies = s_nEnemies = 0;
+        if (GetEnvironmentVariableA("CODFH_BOTS", sz, sizeof(sz)))
+        {
+            RwChar *pComma = strchr(sz, ',');
+
+            s_nAllies = atoi(sz);
+            s_nEnemies = pComma ? atoi(pComma + 1) : s_nAllies;
+            if (s_nAllies + s_nEnemies > BOTS_MAX)
+            {
+                s_nAllies = s_nAllies * BOTS_MAX / (s_nAllies + s_nEnemies);
+                s_nEnemies = BOTS_MAX - s_nAllies;
+            }
+            plog("bots: %d on the player's team, %d on the other", s_nAllies, s_nEnemies);
+        }
+    }
+    if (s_nAllies + s_nEnemies == 0)
+        return;
+    if (unk_4F7EB8.unk_1A4 == NULL)
+    {
+        if (s_nBots == 0)
+            s_dwIn = 0;
+        return;
+    }
+    if (!s_dwIn)
+        s_dwIn = port_frame;
+    // (after the path graph, PathsTick's, and the player's own placing)
+    if (port_frame - s_dwIn < 90 || port_frame < s_dwNext)
+        return;
+    if (s_nBots == 0)
+    {
+        type_3D3548 *pPlayer = sub_1745A0(0);
+        RwUInt32 dwMine = pPlayer ? (pPlayer->unk_2C & 7) : 1;
+        RwInt32 nMine = unk_4F7EB8.unk_29C == 4 ? 4 : 2;
+
+        plog("bots: the player is on team %d (side %u)", unk_4F7EB8.unk_29C, dwMine);
+        // (the game type's spawn lists: whom each serves and how many points)
+        {
+            RwUInt32 k;
+
+            plog("bots: %d spawn points, %u lists", unk_4FBC50.unk_00.unk_08, unk_4FBC50.unk_268);
+            for (k = 0; k < unk_4FBC50.unk_268 && k < 10; k++)
+                plog("bots:   list %u: serves %d, group %d, %d points", k, unk_4FBC50.unk_26C[k].unk_00,
+                     unk_4FBC50.unk_26C[k].unk_04, unk_4FBC50.unk_26C[k].unk_08);
+        }
+        for (i = 0; i < s_nAllies + s_nEnemies; i++)
+        {
+            RwBool bAlly = i < s_nAllies;
+
+            s_aBots[i].nTeam = bAlly ? nMine : (nMine == 4 ? 2 : 4);
+            s_aBots[i].dwSide = bAlly ? dwMine : (dwMine == 2 ? 1 : 2);
+            s_aBots[i].pSoldier = NULL;
+            s_aBots[i].dwRespawnAt = port_frame + i * 15;
+        }
+        s_nBots = s_nAllies + s_nEnemies;
+    }
+    for (i = 0; i < s_nBots; i++)
+    {
+        TrigBot *b = &s_aBots[i];
+
+        if (b->dwRespawnAt == 0 && !BotAlive(b->pSoldier))
+        {
+            b->dwRespawnAt = port_frame + 300;
+            plog("bots: a team %d bot died %u frames after it was made; another in 5 s", b->nTeam, port_frame - b->dwMadeAt);
+        }
+        if (b->dwRespawnAt && port_frame >= b->dwRespawnAt)
+        {
+            BotSpawn(b);
+            if (b->pSoldier == NULL)
+                b->dwRespawnAt = port_frame + 300;
+            s_dwNext = port_frame + 15;
+            return;
+        }
+    }
+}
+#endif
 
 static void SpawnAiTestTick()
 {

@@ -66,6 +66,9 @@ extern type_sp_AE5D0 *sp_dword_3B4724;
 #include "port.h"
 
 static char cli_map[64], cli_type[16], cli_name[64], cli_movie[64];
+/* The -map argument (the debug tools' path graphs are saved by it). */
+extern "C" const char *port_map_name;
+extern "C" const char *port_map_name = cli_map;
 
 /* -leveldir's folder, or NULL (src/recovered/unit_0D7F20.cpp, sub_D7F40). */
 static char cli_level_dir[64];

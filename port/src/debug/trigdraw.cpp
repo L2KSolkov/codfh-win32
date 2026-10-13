@@ -3000,7 +3000,7 @@ void TrigDrawBulletHit(void *pEntity, const RwV3d *pv, RwInt32 nPart, RwReal fDa
     // (CODFH_SPAWNAI's test: every bullet hit on an entity logged, the entity's kind and whether
     // it is the local player)
     if (s_nLogHits < 0)
-        s_nLogHits = GetEnvironmentVariableA("CODFH_SPAWNAI", NULL, 0) ? 1 : 0;
+        s_nLogHits = GetEnvironmentVariableA("CODFH_SPAWNAI", NULL, 0) || GetEnvironmentVariableA("CODFH_BOTS", NULL, 0) ? 1 : 0;
     if (s_nLogHits)
     {
         __try
