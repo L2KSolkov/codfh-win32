@@ -346,6 +346,15 @@ bool sp_sub_B39F0(Rt2dObject **arg_0, RwUInt32 arg_4, const RwChar *arg_8)
                     break;
                 }
             }
+#ifdef CODFH_EXTRA_LOGS // (the PS2 front end, SPS.BIN 0x14C388: a key the table did not have)
+            for (k = 0; k < arg_4; k++)
+            {
+                const RwChar *text = Rt2dObjectStringGetText(arg_0[k]);
+
+                if (text && text[0] == '$' && strcmp(text, "$builddate"))
+                    sub_19A750("No localization map found for tag \"%s\"!\n", text);
+            }
+#endif
             return true;
         }
     }

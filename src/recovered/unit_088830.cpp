@@ -841,11 +841,19 @@ RwInt32 type_8A980::sub_8A440(type_199010 *arg_0, RwInt32 arg_4, RwInt32 arg_8, 
     var_18 = 0;
     if (!arg_4)
     {
+#ifdef CODFH_EXTRA_LOGS // (the PS2 front end, SPS.BIN 0x142310: the sound's wave, sub_840D0's, not loaded)
+        sub_19A750("VoiceManager: No wave to play\n");
+#endif
         return 0;
     }
     var_18 = sub_89B00(arg_8, arg_C);
     if (!var_18)
     {
+#ifdef CODFH_EXTRA_LOGS // (the PS2 front end, SPS.BIN 0x14232C-0x14234C: then the alias, as below)
+        sub_19A750("WARNING: No available voice to play a wave on\n");
+        sub_19A750("AUDIO::VoiceManager:: While trying to play alias 0x%X, 0x%X\n", arg_0->unk_04.unk_00,
+                   arg_0->unk_04.unk_04);
+#endif
         if (dword_44E860 && dword_44E86C)
         {
             sprintf(var_120, "AUDIO::VoiceManager:: While trying to play alias 0x%X, 0x%X",
