@@ -69,10 +69,47 @@ static void load_xinput(void)
     plog("controllers: no XInput; keyboard only");
 }
 
+/* Windows' XInputGetState on a port with no controller is slow (it looks for the device each
+   time), and the game asks every frame, and for the device changes as often: a port found empty
+   is not asked again for a second. A connected pad is read every call. */
+/* The overlay's switch for both input caches (this one and key_front/key_down's); off, every
+   poll asks Windows as it comes (CODFH_INPUTCACHE=0 starts so). */
+extern "C" int port_input_cache = -1;
+
+static int input_cache_on(void)
+{
+    if (port_input_cache < 0)
+    {
+        char v[8];
+        port_input_cache = GetEnvironmentVariableA("CODFH_INPUTCACHE", v, sizeof(v)) ? atoi(v) != 0 : 1;
+    }
+    return port_input_cache;
+}
+
+static int poll_pad(DWORD port, WinXInputState *s)
+{
+    static DWORD empty_since[4];
+    static int empty[4];
+    if (!win_get_state || port > 3)
+        return 0;
+    if (!input_cache_on())
+        return win_get_state(port, s) == ERROR_SUCCESS;
+    if (empty[port] && GetTickCount() - empty_since[port] < 1000)
+        return 0;
+    if (win_get_state(port, s) == ERROR_SUCCESS)
+    {
+        empty[port] = 0;
+        return 1;
+    }
+    empty[port] = 1;
+    empty_since[port] = GetTickCount();
+    return 0;
+}
+
 static int pad_connected(DWORD port)
 {
     WinXInputState s;
-    return win_get_state && win_get_state(port, &s) == ERROR_SUCCESS;
+    return poll_pad(port, &s);
 }
 
 /* The ports with a controller: the XInput pads, and port 0 always (the keyboard). */
@@ -152,6 +189,42 @@ extern "C" int port_imgui_wants_mouse(void);
 extern "C" int port_imgui_wants_keyboard(void);
 #endif
 
+/* The window in front and the keys' states, read at most every 4 ms: the game polls the pad
+   several times a frame, and each poll asked Windows once a key (GetAsyncKeyState and
+   GetForegroundWindow are calls into the kernel). */
+extern "C" DWORD WINAPI xpal_GetTickCount(void);    /* (xpal_core.cpp: a millisecond tick) */
+
+static int key_front(void)
+{
+    static DWORD at;
+    static int front;
+    DWORD now = xpal_GetTickCount();
+    if (!input_cache_on())
+        return port_hwnd && GetForegroundWindow() == (HWND)port_hwnd;
+    if (!at || now - at >= 4)
+    {
+        at = now ? now : 1;
+        front = port_hwnd && GetForegroundWindow() == (HWND)port_hwnd;
+    }
+    return front;
+}
+
+static int key_down(int vk)
+{
+    static DWORD at[256];
+    static unsigned char down[256];
+    DWORD now = xpal_GetTickCount();
+    vk &= 0xFF;
+    if (!input_cache_on())
+        return (GetAsyncKeyState(vk) & 0x8000) ? 1 : 0;
+    if (!at[vk] || now - at[vk] >= 4)
+    {
+        at[vk] = now ? now : 1;
+        down[vk] = (GetAsyncKeyState(vk) & 0x8000) ? 1 : 0;
+    }
+    return down[vk];
+}
+
 static int key(int vk)
 {
 #ifdef CODFH_IMGUI
@@ -159,7 +232,7 @@ static int key(int vk)
     if ((vk == VK_LBUTTON || vk == VK_RBUTTON || vk == VK_MBUTTON) ? port_imgui_wants_mouse() : port_imgui_wants_keyboard())
         return 0;
 #endif
-    return port_hwnd && GetForegroundWindow() == (HWND)port_hwnd && (GetAsyncKeyState(vk) & 0x8000);
+    return key_front() && key_down(vk);
 }
 
 /* The keyboard as a controller: WASD the left stick, the arrows the right, IJKL the d-pad;
@@ -197,15 +270,17 @@ static Binding bindings[] = {
 };
 static int bindings_loaded;
 
+static const struct { const char *name; int vk; } key_names[] = {
+    {"SPACE", VK_SPACE}, {"ENTER", VK_RETURN}, {"RETURN", VK_RETURN}, {"ESCAPE", VK_ESCAPE}, {"ESC", VK_ESCAPE},
+    {"TAB", VK_TAB}, {"BACKSPACE", VK_BACK}, {"SHIFT", VK_SHIFT}, {"LSHIFT", VK_LSHIFT}, {"RSHIFT", VK_RSHIFT},
+    {"CTRL", VK_CONTROL}, {"LCTRL", VK_LCONTROL}, {"RCTRL", VK_RCONTROL}, {"ALT", VK_MENU},
+    {"UP", VK_UP}, {"DOWN", VK_DOWN}, {"LEFT", VK_LEFT}, {"RIGHT", VK_RIGHT},
+    {"MOUSE1", VK_LBUTTON}, {"MOUSE2", VK_RBUTTON}, {"MOUSE3", VK_MBUTTON},
+};
+
 static int key_code(const char *n)
 {
-    static const struct { const char *name; int vk; } names[] = {
-        {"SPACE", VK_SPACE}, {"ENTER", VK_RETURN}, {"RETURN", VK_RETURN}, {"ESCAPE", VK_ESCAPE}, {"ESC", VK_ESCAPE},
-        {"TAB", VK_TAB}, {"BACKSPACE", VK_BACK}, {"SHIFT", VK_SHIFT}, {"LSHIFT", VK_LSHIFT}, {"RSHIFT", VK_RSHIFT},
-        {"CTRL", VK_CONTROL}, {"LCTRL", VK_LCONTROL}, {"RCTRL", VK_RCONTROL}, {"ALT", VK_MENU},
-        {"UP", VK_UP}, {"DOWN", VK_DOWN}, {"LEFT", VK_LEFT}, {"RIGHT", VK_RIGHT},
-        {"MOUSE1", VK_LBUTTON}, {"MOUSE2", VK_RBUTTON}, {"MOUSE3", VK_MBUTTON},
-    };
+    const size_t nNames = sizeof(key_names) / sizeof(key_names[0]);
     if (!n[0])
         return 0;
     if (!n[1] && ((n[0] >= 'A' && n[0] <= 'Z') || (n[0] >= '0' && n[0] <= '9')))
@@ -218,9 +293,9 @@ static int key_code(const char *n)
     }
     if (!_strnicmp(n, "VK", 2) && n[2] >= '0' && n[2] <= '9')
         return atoi(n + 2);
-    for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); i++)
-        if (!_stricmp(n, names[i].name))
-            return names[i].vk;
+    for (size_t i = 0; i < nNames; i++)
+        if (!_stricmp(n, key_names[i].name))
+            return key_names[i].vk;
     return 0;
 }
 
@@ -260,6 +335,104 @@ static void load_bindings(void)
     }
     if (changed)
         plog("input: %d key bindings from codfh.ini", changed);
+}
+
+/*
+ * The overlay's key binding editor (pd11_imgui.cpp, its Input section): the actions, their keys,
+ * a change applied at once and written to codfh.ini's [keys] (a reset removes the line, so the
+ * default holds again).
+ */
+static void bindings_ini(char *ini, size_t n)
+{
+    GetModuleFileNameA(NULL, ini, (DWORD)n);
+    char *slash = strrchr(ini, '\\');
+    strcpy(slash ? slash + 1 : ini, "codfh.ini");
+}
+
+/* A key's name as codfh.ini takes it: the first name in key_names, a letter or digit, F1-F12,
+   else VK<number>. */
+extern "C" void port_key_name(int vk, char *out, int n)
+{
+    if (n <= 0)
+        return;
+    out[0] = 0;
+    if ((vk >= 'A' && vk <= 'Z') || (vk >= '0' && vk <= '9'))
+        _snprintf(out, n, "%c", vk);
+    else if (vk >= VK_F1 && vk <= VK_F12)
+        _snprintf(out, n, "F%d", vk - VK_F1 + 1);
+    else
+    {
+        for (size_t i = 0; i < sizeof(key_names) / sizeof(key_names[0]); i++)
+            if (key_names[i].vk == vk)
+            {
+                _snprintf(out, n, "%s", key_names[i].name);
+                break;
+            }
+        if (!out[0])
+            _snprintf(out, n, "VK%d", vk);
+    }
+    out[n - 1] = 0;
+}
+
+extern "C" int port_bind_count(void)
+{
+    if (!bindings_loaded)
+        load_bindings();
+    return (int)(sizeof(bindings) / sizeof(bindings[0]));
+}
+
+extern "C" const char *port_bind_action(int i)
+{
+    return i >= 0 && i < port_bind_count() ? bindings[i].action : "";
+}
+
+/* Its keys into keys[4]; how many. */
+extern "C" int port_bind_keys(int i, int *keys)
+{
+    int n = 0;
+    if (i < 0 || i >= port_bind_count())
+        return 0;
+    for (int k = 0; k < BIND_KEYS; k++)
+    {
+        keys[k] = bindings[i].keys[k];
+        if (keys[k])
+            n++;
+    }
+    return n;
+}
+
+/* Its keys set (up to four), and written to codfh.ini. */
+extern "C" void port_bind_set(int i, const int *keys, int n)
+{
+    char ini[MAX_PATH], line[128] = "", name[16];
+    if (i < 0 || i >= port_bind_count())
+        return;
+    memset(bindings[i].keys, 0, sizeof(bindings[i].keys));
+    int k = 0;
+    for (int j = 0; j < n && k < BIND_KEYS; j++)
+        if (keys[j])
+        {
+            bindings[i].keys[k++] = keys[j];
+            port_key_name(keys[j], name, sizeof(name));
+            if (line[0])
+                strcat(line, ", ");
+            strcat(line, name);
+        }
+    bindings_ini(ini, sizeof(ini));
+    /* (no keys: written as an empty value, so the action stays unbound rather than default) */
+    WritePrivateProfileStringA("keys", bindings[i].action, line, ini);
+    plog("input: %s = %s", bindings[i].action, line[0] ? line : "(none)");
+}
+
+/* Its default keys back, its line removed from codfh.ini. */
+extern "C" void port_bind_reset(int i)
+{
+    char ini[MAX_PATH];
+    if (i < 0 || i >= port_bind_count())
+        return;
+    parse_keys(&bindings[i], bindings[i].defaults);
+    bindings_ini(ini, sizeof(ini));
+    WritePrivateProfileStringA("keys", bindings[i].action, NULL, ini);
 }
 
 static void keyboard_state(XINPUT_GAMEPAD *g)
@@ -310,7 +483,7 @@ static int direct_look_ready(void)
 {
     if (script_count_fwd() > 0)
         return 1;   /* (scripted input: in front or not) */
-    if (!port_hwnd || GetForegroundWindow() != (HWND)port_hwnd)
+    if (!key_front())
         return 0;
 #ifdef CODFH_IMGUI
     if (port_imgui_wants_mouse())
@@ -350,7 +523,7 @@ static void mouse_state(XINPUT_GAMEPAD *g)
     if (port_imgui_wants_mouse())
         return;
 #endif
-    if (!port_hwnd || GetForegroundWindow() != (HWND)port_hwnd)
+    if (!key_front())
         return;
     float s = port_config.mouseSensitivity > 0 ? port_config.mouseSensitivity : 1.0f;
     float x = dx * s * 1300.0f, y = -dy * s * 1300.0f;
@@ -494,7 +667,7 @@ extern "C" DWORD WINAPI XInputGetState(HANDLE hDevice, PXINPUT_STATE pState)
 #ifdef CODFH_DEDICATED
     int have = 0;       /* (the server reads no controllers) */
 #else
-    int have = win_get_state && win_get_state(port, &w) == ERROR_SUCCESS;
+    int have = poll_pad(port, &w);
 #endif
     if (have)
     {

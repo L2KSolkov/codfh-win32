@@ -101,6 +101,130 @@ static void check(const char *label, int *v)
         *v = b ? 1 : 0;
 }
 
+/* The key binding editor (xpal_sys.cpp's bindings): each action's keys as buttons (a click
+   removes one), "+" to take the next key or mouse button (a mouse button only away from the
+   overlay, so its own buttons can be clicked), reset to the default. */
+extern "C" void port_key_name(int vk, char *out, int n);
+extern "C" int port_input_cache;   /* (xpal_sys.cpp: the input polling caches, -1 not read yet) */
+extern "C" int port_bind_count(void);
+extern "C" const char *port_bind_action(int i);
+extern "C" int port_bind_keys(int i, int *keys);
+extern "C" void port_bind_set(int i, const int *keys, int n);
+extern "C" void port_bind_reset(int i);
+
+static const char *bind_label(const char *action)
+{
+    static const struct { const char *action, *label; } labels[] = {
+        {"forward", "move forward"}, {"back", "move back"}, {"left", "strafe left"}, {"right", "strafe right"},
+        {"look_up", "look up"}, {"look_down", "look down"}, {"look_left", "look left"}, {"look_right", "look right"},
+        {"dpad_up", "d-pad up"}, {"dpad_down", "d-pad down"}, {"dpad_left", "d-pad left"}, {"dpad_right", "d-pad right"},
+        {"start", "start (pause)"}, {"back_button", "back"}, {"left_stick", "left stick click (sprint)"},
+        {"right_stick", "right stick click"}, {"a", "A (jump, use)"}, {"b", "B (crouch)"}, {"x", "X (reload)"},
+        {"y", "Y (switch weapon)"}, {"black", "Black"}, {"white", "White"}, {"aim", "left trigger (aim)"},
+        {"fire", "right trigger (fire)"},
+    };
+    for (size_t i = 0; i < sizeof(labels) / sizeof(labels[0]); i++)
+        if (!strcmp(labels[i].action, action))
+            return labels[i].label;
+    return action;
+}
+
+static void key_bindings(void)
+{
+    static int capturing = -1, released;
+    int n = port_bind_count();
+    if (capturing >= 0)
+    {
+        /* (every key up first, then the first one down) */
+        int down = 0, any = 0;
+        for (int vk = 1; vk < 255 && !down; vk++)
+        {
+            if (vk == VK_SHIFT || vk == VK_CONTROL || vk == VK_MENU)
+                continue;   /* (their left and right keys are reported too) */
+            if (!(GetAsyncKeyState(vk) & 0x8000))
+                continue;
+            any = 1;
+            int mouse = vk == VK_LBUTTON || vk == VK_RBUTTON || vk == VK_MBUTTON;
+            if (released && (!mouse || !ImGui::GetIO().WantCaptureMouse))
+                down = vk;
+        }
+        if (!any)
+            released = 1;
+        if (down)
+        {
+            int keys[4], k = port_bind_keys(capturing, keys);
+            int dup = 0;
+            for (int j = 0; j < k; j++)
+                dup |= keys[j] == down;
+            if (!dup && k < 4)
+            {
+                keys[k++] = down;
+                port_bind_set(capturing, keys, k);
+            }
+            capturing = -1;
+        }
+    }
+    ImGui::TextDisabled("(click a key to remove it; + then press a key, or click a mouse button away from this "
+                        "window; saved to codfh.ini's [keys])");
+    if (capturing >= 0)
+    {
+        ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.3f, 1.0f), "press a key for \"%s\"...",
+                           bind_label(port_bind_action(capturing)));
+        ImGui::SameLine();
+        if (ImGui::SmallButton("cancel"))
+            capturing = -1;
+    }
+    if (ImGui::BeginTable("binds", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp))
+    {
+        ImGui::TableSetupColumn("action", ImGuiTableColumnFlags_WidthFixed, 150.0f);
+        ImGui::TableSetupColumn("keys");
+        ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 40.0f);
+        for (int i = 0; i < n; i++)
+        {
+            int keys[4], k = port_bind_keys(i, keys);
+            char name[16];
+            ImGui::PushID(i);
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(bind_label(port_bind_action(i)));
+            ImGui::TableNextColumn();
+            for (int j = 0; j < k; j++)
+            {
+                port_key_name(keys[j], name, sizeof(name));
+                ImGui::PushID(j);
+                if (ImGui::SmallButton(name))
+                {
+                    for (int m = j; m < k - 1; m++)
+                        keys[m] = keys[m + 1];
+                    port_bind_set(i, keys, k - 1);
+                    ImGui::PopID();
+                    break;
+                }
+                ImGui::PopID();
+                ImGui::SameLine();
+            }
+            if (k < 4 && ImGui::SmallButton("+"))
+            {
+                capturing = i;
+                released = 0;
+            }
+            if (!k && capturing != i)
+            {
+                ImGui::SameLine();
+                ImGui::TextDisabled("(unbound)");
+            }
+            ImGui::TableNextColumn();
+            if (ImGui::SmallButton("reset"))
+                port_bind_reset(i);
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
+    if (ImGui::SmallButton("reset all keys"))
+        for (int i = 0; i < n; i++)
+            port_bind_reset(i);
+}
+
 static void port_window(int back_w, int back_h)
 {
     ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
@@ -190,7 +314,21 @@ static void port_window(int back_w, int back_h)
         check("hide 2D (HUD, menus)", &port_render_debug.hide2D);
     }
     if (ImGui::CollapsingHeader("Input"))
+    {
         ImGui::SliderFloat("mouse sensitivity", &port_config.mouseSensitivity, 0.1f, 5.0f, "%.2f");
+        {
+            /* (xpal_sys.cpp: the empty controller ports asked once a second, the keys and the window
+               in front read once every 4 ms; -1 until the first poll reads CODFH_INPUTCACHE) */
+            int on = port_input_cache != 0;
+            check("input polling caches (empty pads once a second, keys every 4 ms)", &on);
+            port_input_cache = on;
+        }
+        if (ImGui::TreeNode("key bindings"))
+        {
+            key_bindings();
+            ImGui::TreePop();
+        }
+    }
     if (ImGui::CollapsingHeader("Logs"))
         check("A* search logs (scheduler, path finder)", &port_log_astar);
     check("ImGui demo", &show_demo);
