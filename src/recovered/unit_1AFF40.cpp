@@ -6,6 +6,7 @@
 #include <xtl.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <vector>
 
 #include "game/startup.h"
@@ -180,7 +181,25 @@ void type_4F84B8::sub_1B00F0()
     if (!unk_34F4)
     {
     }
+#if defined(CODFH_WIN32) && !defined(CODFH_SP)
+    // (the port: CODFH_NETOVERLAY=1 shows it, as the release build never does; =2 adds the
+    // voice chat's state, unk_34F1)
+    {
+        static RwInt32 s_nOverlay = -1;
+
+        if (s_nOverlay < 0)
+        {
+            RwChar sz[8];
+
+            s_nOverlay = GetEnvironmentVariableA("CODFH_NETOVERLAY", sz, sizeof(sz)) ? atoi(sz) : 0;
+        }
+        if (s_nOverlay <= 0)
+            return;
+        unk_34F1 = s_nOverlay >= 2;
+    }
+#else
     return;
+#endif
     for (ebp_14 = 0; ebp_14 < dword_3E1A60[unk_00] && ebp_14 < unk_14[unk_04]; ebp_14++)
     {
         x1A4 = (ebp_14 + unk_20[unk_04]) % 50;
