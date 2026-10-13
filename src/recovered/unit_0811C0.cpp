@@ -375,6 +375,10 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
 #else
             sub_19A750("****\n**** BEGIN %s %s load at %d\n****\n", l12C, p10C->unk_00, RWS::Time::GetTime());
 #endif
+#ifdef CODFH_EXTRA_LOGS // (the GameCube build, main.dol 0x8006A6E4: the request's start time and kind)
+            RwUInt32 extra_start = RWS::Time::GetTime();
+            RwInt32 extra_type = p10C->unk_40;
+#endif
             switch (p10C->unk_40)
             {
             case 0:
@@ -568,6 +572,10 @@ RwUInt32 __stdcall sub_81590(void *arg_0)
             sp_debug_print("", l12C, p10C->unk_00, RWS::Time::GetTime());
 #else
             sub_19A750("****\n**** DONE %s %s load at %d\n****\n", l12C, p10C->unk_00, RWS::Time::GetTime());
+#endif
+#ifdef CODFH_EXTRA_LOGS // (the GameCube build, main.dol 0x8006AAE8)
+            sub_19A750("Done reading type %d time=%.2f\n", extra_type,
+                       (RwReal)(RWS::Time::GetTime() - extra_start) * 0.001f);
 #endif
             dword_44BF98 = 1;
             RtlEnterCriticalSection(&dword_44BAB4);

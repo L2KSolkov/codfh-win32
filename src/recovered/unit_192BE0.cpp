@@ -467,6 +467,10 @@ RwInt32 type_3DFD40::vf_00C(type_8A980 *arg_0, type_3D3548 *arg_4, RwInt32 arg_8
         bp_4 = sub_198800(&unk_10[var_24]);
         if (bp_4)
             dword_4B1CA0[var_C].sub_85A00((type_825E0_id *)&bp_4->unk_04, (RwReal)unk_14[var_24]);
+#ifdef CODFH_EXTRA_LOGS // (the GameCube build, main.dol 0x800C6260)
+        else if (sub_198770(&unk_10[var_24]))
+            sub_19A750("Asset still loading!\n");
+#endif
     }
     dword_4B1CA0[var_C].unk_08 = *arg_C;
     return 0;

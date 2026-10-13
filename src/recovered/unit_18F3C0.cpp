@@ -293,6 +293,15 @@ type_3DF8F0::type_3DF8F0(const type_3DF8D8_04 &arg_0)
     unk_28.unk_00 = 0xFF;
 }
 
+#ifdef CODFH_EXTRA_LOGS
+// (the GameCube build, main.dol 0x800C294C): a platform-independent dictionary's texture.
+static RwTexture *extra_log_texture(RwTexture *arg_0, void *arg_4)
+{
+    sub_19A750("PLATFORM INDEPENDENT texture: %s\n", arg_0->name);
+    return arg_0;
+}
+#endif
+
 // match: ?vf_000@type_3DF8F0@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x0018F9E0
 // sp-match: ?vf_000@type_3DF8F0@@UAEHPAURwStream@@PAUtype_3DF8D8_ev@@@Z @ 0x00122420
 // Local names state their slots; plain var_N names reorder them (docs/toolchain.md).
@@ -349,6 +358,11 @@ RwInt32 type_3DF8F0::vf_000(RwStream *arg_0, type_3DF8D8_ev *arg_4)
             var_30 = RtPITexDictionaryStreamRead(arg_0);
             unk_24 = var_30;
             RwTexDictionarySetCurrent(unk_24);
+#ifdef CODFH_EXTRA_LOGS // (the GameCube build, main.dol 0x800C2AAC, 0x800C2968: each texture, then an assert)
+            if (unk_24)
+                RwTexDictionaryForAllTextures(unk_24, extra_log_texture, 0);
+            sub_19A750("%s(%d): platform independent texture\n", __FILE__, __LINE__);
+#endif
             break;
         }
         v2C = (type_3DF8D8 *)sub_198900((type_3DF8D8_04 *)&unk_28.unk_04, 6, 0, 0, 0, 0);
@@ -889,6 +903,10 @@ RwInt32 type_3DF9C4::sub_190B20(RwStream *arg_0, type_3DF8D8_ev *arg_4)
     if (!sub_198710(&var_17C.unk_0C.unk_04))
     {
         RtlEnterCriticalSection(&dword_44BFB8);
+#ifdef CODFH_EXTRA_LOGS // (the GameCube build, main.dol 0x800C3B48)
+        sub_19A750("\t\tCreating GodAsset: UV Anim (%x,%x)", var_17C.unk_0C.unk_04.unk_00,
+                   var_17C.unk_0C.unk_04.unk_04);
+#endif
         bp_4 = (type_3DF8D8_base *)sub_199010(&var_17C.unk_0C.unk_04, 0x3A);
         bp_4->unk_0C = 2;
         sub_2DAAF0(get_unk_10());
@@ -900,7 +918,13 @@ RwInt32 type_3DF9C4::sub_190B20(RwStream *arg_0, type_3DF8D8_ev *arg_4)
         RtlLeaveCriticalSection(&dword_44BFB8);
     }
     else
+    {
+#ifdef CODFH_EXTRA_LOGS // (the GameCube build, main.dol 0x800C3BD4)
+        sub_19A750("\t\tGodAsset exists: UV Anim (%x,%x)", var_17C.unk_0C.unk_04.unk_00,
+                   var_17C.unk_0C.unk_04.unk_04);
+#endif
         RwStreamSkip(arg_0, var_17C.unk_08 - 0x1C);
+    }
 
     RwStreamRead(arg_0, &var_17C, 0x1C);
     if (!sub_198710(&var_17C.unk_0C.unk_04))
@@ -926,7 +950,13 @@ RwInt32 type_3DF9C4::sub_190B20(RwStream *arg_0, type_3DF8D8_ev *arg_4)
         RtlLeaveCriticalSection(&dword_44BFB8);
     }
     else
+    {
+#ifdef CODFH_EXTRA_LOGS // (the GameCube build, main.dol 0x800C3D30)
+        sub_19A750("\t\tGodAsset exists: texture dictionary (%x,%x)", var_17C.unk_0C.unk_04.unk_00,
+                   var_17C.unk_0C.unk_04.unk_04);
+#endif
         RwStreamSkip(arg_0, var_17C.unk_08 - 0x1C);
+    }
 
     RwStreamRead(arg_0, &var_17C, 0x1C);
     if (!sub_198710(&var_17C.unk_0C.unk_04))
@@ -952,7 +982,13 @@ RwInt32 type_3DF9C4::sub_190B20(RwStream *arg_0, type_3DF8D8_ev *arg_4)
         RtlLeaveCriticalSection(&dword_44BFB8);
     }
     else
+    {
+#ifdef CODFH_EXTRA_LOGS // (the GameCube build, main.dol 0x800C3E80)
+        sub_19A750("\t\tGodAsset exists: DFF geometry (%x,%x)", var_17C.unk_0C.unk_04.unk_00,
+                   var_17C.unk_0C.unk_04.unk_04);
+#endif
         RwStreamSkip(arg_0, var_17C.unk_08 - 0x1C);
+    }
 
     RwStreamRead(arg_0, &var_17C, 0x1C);
     if (!sub_198710(&var_17C.unk_0C.unk_04))
@@ -974,7 +1010,13 @@ RwInt32 type_3DF9C4::sub_190B20(RwStream *arg_0, type_3DF8D8_ev *arg_4)
         RtlLeaveCriticalSection(&dword_44BFB8);
     }
     else
+    {
+#ifdef CODFH_EXTRA_LOGS // (the GameCube build, main.dol 0x800C3FAC)
+        sub_19A750("\t\tGodAsset exists: DFF collide (%x,%x)", var_17C.unk_0C.unk_04.unk_00,
+                   var_17C.unk_0C.unk_04.unk_04);
+#endif
         RwStreamSkip(arg_0, var_17C.unk_08 - 0x1C);
+    }
 
     RwTexDictionarySetCurrent(0);
     return 1;

@@ -158,6 +158,13 @@ void *type_16C2A0::sub_16C5A0(RwInt32 arg_0)
         ((RwInt32 *)var_8)[unk_10 >> 2] = 0x2F2F2F2F; // not an address: the guard word
     if (unk_0C - unk_18 > unk_14)
         unk_14 = unk_0C - unk_18;
+#ifdef CODFH_EXTRA_LOGS // (the GameCube build, main.dol 0x80135C50: CFreeList::GetFreeElem (freelist.cpp, line 323))
+    if (unk_18 < 0)
+    {
+        sub_19A750("CFreeList::GetFreeElem() m_maxElements=%d m_freeCount=%d\n", unk_0C, unk_18);
+        sub_19A750("GetFreeElem %d/%d\n", unk_0C, unk_18);
+    }
+#endif
     return var_8;
 }
 

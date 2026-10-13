@@ -528,6 +528,10 @@ void sub_7D2F0(type_7CBD0 *arg_0, type_80300 *arg_4)
             stk_54C = m_570->unk_74[x190];
             m_2C0 = stk_54C;
             w8A0 = m_554[stk_54C].unk_06 / 59.999f;
+#ifdef CODFH_EXTRA_LOGS // (the GameCube build, main.dol 0x80068A6C)
+            if (w8A0 > m_570->unk_E4)
+                sub_19A750("%s: Anim goes back!!!\n", "SkelKeyFrameUncompress");
+#endif
             while (w8A0 < m_570->unk_E4)
             {
                 m_2C0 = stk_54C;
@@ -2126,6 +2130,10 @@ RwInt32 sub_80910(type_80300 *arg_0, RwReal arg_4, RwUInt8 arg_8)
                 bp_6C = arg_0->unk_74[var_34];
                 stk_58 = bp_6C;
                 yC8 = l78[bp_6C].unk_06 / 59.999f;
+#ifdef CODFH_EXTRA_LOGS // (the GameCube build, main.dol 0x80063238)
+                if (yC8 > arg_0->unk_E4)
+                    sub_19A750("%s: Anim goes back!!!\n", "SAnimInterpolatorAddAnimTime");
+#endif
                 while (yC8 < arg_0->unk_E4)
                 {
                     stk_58 = bp_6C;
