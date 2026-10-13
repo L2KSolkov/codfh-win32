@@ -506,7 +506,7 @@ RwReal g_fTrigDrawPathRange = 3000.0f;
 RwInt32 g_nTrigDrawPathType = -1;           // -1 all
 RwInt32 g_nTrigDrawPathShown, g_nTrigDrawPathLinksShown;
 
-#define TRIGDRAW_PATHVERTS  4000
+#define TRIGDRAW_PATHVERTS  1000
 static RwIm3DVertex s_aPathVerts[TRIGDRAW_PATHVERTS];
 static RwInt32 s_nPathVerts;
 
