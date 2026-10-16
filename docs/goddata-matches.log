@@ -33011,3 +33011,191 @@
 2026-10-15 16:00:51	god	62F56F70,12DA36E3	SCRIPTS+TASKLIST+L_2_2_B_STUKABOMBIMPACT_WESTPLANE_1+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
 2026-10-15 16:00:51	god	E067665A,12DA36E3	SCRIPTS+TASKLIST+L_2_2_B_STUKABOMBIMPACT_WESTPLANE_3+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
 2026-10-15 16:00:51	god	777F7377,12DA36E3	SCRIPTS+TASKLIST+L_2_2_B_STUKABOMBIMPACT_WESTPLANE_2+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 16:06:42	god	86FA3ECF,6D04E979	SCRIPTS+TASKLIST+L_3_3_BUDDY_SHERMAN_MAKER+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 16:14:42	god	62963B69,C483190E	Scripts+TaskList+L_3_3_BUDDY_SHERMAN_MAKER_02+Filename	script name: grown word list	
+2026-10-15 16:14:42	god	62963B69,27BB393B	Scripts+TaskList+L_3_3_BUDDY_SHERMAN_MAKER_03+Filename	script name: grown word list	
+2026-10-15 16:16:24	god	2D81389C,4F249E53	SCRIPTS+TASKLIST+L_3_5_B_GRAVESTREET_PANZERCORNER+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 16:16:24	god	5FB217D5,65EB92B8	SCRIPTS+TASKLIST+L_3_5_B_GRAVEYARD_PANZERATTACKER01+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 16:16:24	god	5FB217D5,A3F8FEFF	SCRIPTS+TASKLIST+L_3_5_B_GRAVEYARD_PANZERATTACKER02+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 16:16:24	god	0877DFAC,467971F1	SCRIPTS+TASKLIST+L_3_5_B_ROADBLOCKSTREET_PANZERCORNER02+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 16:16:24	god	37CB4D24,A23FD5A1	SCRIPTS+TASKLIST+L_3_5_B_WAREHOUSE_RUNATTACKER02+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 16:16:25	god	8865BCD9,A23FD5A1	SCRIPTS+TASKLIST+L_3_5_B_WAREHOUSE_RUNATTACKER03+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 16:16:25	god	F2C8C1D4,B6896221	SCRIPTS+TASKLIST+L_3_5_B_ROADBLOCKSTREET_PANZERCORNER+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 16:16:25	god	F01AE8E2,5150C84B	SCRIPTS+TASKLIST+L_3_5_B_WAREHOUSE_RUNATTACKER+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 16:56:33	god	81410D9E,ACE9FFF3	SCRIPTS+TASKLIST+L_3_1B_LADDEROBJECTIVEREMINDER+FILENAME	next-token guesser (known-name token chains, box CPU)	
+2026-10-15 17:08:02	god	705922D2,B5122C44	SCRIPTS+TASKLIST+L_2_1_A_MARKETHT_RIDER+FILENAME	next-token guesser (known-name token chains, box CPU)	
+2026-10-15 17:08:12	god	F066EB82,AF0369C8	GAMECHARACTERS+L3_1_US_PRIVATE_1ST	Codex GPU run on the box (soldier / prefix templates)	
+2026-10-15 17:08:12	god	2FF72513,61FB678A	GAMECHARACTERS+L3_1_US_PRIVATE_1ST+BODY	field of a soldier found by Codex	
+2026-10-15 17:08:12	god	2F10BBA6,6BFB77D5	GAMECHARACTERS+L3_1_US_PRIVATE_1ST+HEAD	field of a soldier found by Codex	
+2026-10-15 17:08:12	god	3C3C57E0,D8DDAF00	GAMECHARACTERS+L3_1_US_PRIVATE_1ST+HELMET	field of a soldier found by Codex	
+2026-10-15 17:08:12	god	C978430C,974CE31E	GAMECHARACTERS+L3_1_US_PRIVATE_1ST+ALIGNMENT	field of a soldier found by Codex	
+2026-10-15 17:08:12	god	83E62E4A,6A537087	GAMECHARACTERS+L3_1_US_PRIVATE_1ST+HELMETOFFSETX	field of a soldier found by Codex	
+2026-10-15 17:08:12	god	83E62E4B,6A537087	GAMECHARACTERS+L3_1_US_PRIVATE_1ST+HELMETOFFSETY	field of a soldier found by Codex	
+2026-10-15 17:08:12	god	83E62E48,6A537087	GAMECHARACTERS+L3_1_US_PRIVATE_1ST+HELMETOFFSETZ	field of a soldier found by Codex	
+2026-10-15 17:08:12	god	57F45835,A62E7E52	GAMECHARACTERS+L3_1_US_PRIVATE_1ST+PARTSFIELD	field of a soldier found by Codex	
+2026-10-15 17:13:57	god	3A23E305,DCE97968	SCRIPTS+TASKLIST+L_2_1_A_MARKETHT_GUNNER+FILENAME	script sibling recombination (same-level parts, renumbering) (box CPU)	
+2026-10-15 17:31:18	god	AB03F0EB,5172DB18	GAMECHARACTERS+L3_1_US_CORPORAL_1ST	next-token guesser (known-name token chains, box CPU)	
+2026-10-15 17:31:18	god	0173EDCB,8667233D	GAMECHARACTERS+L3_1_US_CORPORAL_1ST+BODY	next-token guesser (known-name token chains, box CPU) (field of the object name)	
+2026-10-15 17:31:18	god	048E47BF,A83044AA	GAMECHARACTERS+L3_1_US_CORPORAL_1ST+HELMET	next-token guesser (known-name token chains, box CPU) (field of the object name)	
+2026-10-15 17:31:18	god	0773F740,854D8984	GAMECHARACTERS+L3_1_US_CORPORAL_1ST+HEAD	next-token guesser (known-name token chains, box CPU) (field of the object name)	
+2026-10-15 17:31:18	god	230AE234,796225EC	GAMECHARACTERS+L3_1_US_CORPORAL_1ST+HELMETOFFSETX	next-token guesser (known-name token chains, box CPU) (field of the object name)	
+2026-10-15 17:31:18	god	230AE234,796225ED	GAMECHARACTERS+L3_1_US_CORPORAL_1ST+HELMETOFFSETY	next-token guesser (known-name token chains, box CPU) (field of the object name)	
+2026-10-15 17:31:18	god	230AE234,796225EE	GAMECHARACTERS+L3_1_US_CORPORAL_1ST+HELMETOFFSETZ	next-token guesser (known-name token chains, box CPU) (field of the object name)	
+2026-10-15 17:31:18	god	47AE6701,C7370CD2	GAMECHARACTERS+L3_1_US_CORPORAL_1ST+ALIGNMENT	next-token guesser (known-name token chains, box CPU) (field of the object name)	
+2026-10-15 17:31:18	god	A20DD55D,141BC51F	GAMECHARACTERS+L3_1_US_CORPORAL_1ST+PARTSFIELD	next-token guesser (known-name token chains, box CPU) (field of the object name)	
+2026-10-15 18:57:11	god	0F081080,F3048937	SCRIPTS+TASKLIST+L_3_5_B_INTROCUTSCENE_SHERMAN01COMMANDER+FILENAME	GPU script template: level tag + three known-name pieces, one compound join (local Quadro)	
+2026-10-15 19:02:55	god	96CFEDCC,220D77D8	SCRIPTS+TASKLIST+L_3_5_B_ROADBLOCK_CAFEPANZER+FILENAME	GPU script template: level tag + three known-name pieces, one compound join (local Quadro)	
+2026-10-15 19:08:42	god	6C7DC135,47C5D53B	SCRIPTS+TASKLIST+L13B_SHOOTINGGALLERY_TANKMONITORPROGRAM+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 19:14:40	god	15AC1955,40AC1487	SCRIPTS+TASKLIST+L_1_3_HQATTACK_TANKMONITORPROGRAM+FILENAME	script sibling recombination (same-level parts, renumbering) (box CPU)	
+2026-10-15 19:14:40	god	7B2CBE54,6FF003E3	SCRIPTS+TASKLIST+L_1_3_PANZERFIGHT_TANKMONITORPROGRAM+FILENAME	script sibling recombination (same-level parts, renumbering) (box CPU)	
+2026-10-15 19:14:40	god	3720EBD7,E5D7740E	SCRIPTS+TASKLIST+L_1_3_REDSQUARE_TANKMONITORPROGRAM+FILENAME	script sibling recombination (same-level parts, renumbering) (box CPU)	
+2026-10-15 19:54:46	god	F8091EC9,79A21DF1	SCRIPTS+TASKLIST+L_1_1_TRENCH_RUNNERLEFTGO+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 19:54:46	god	0CF739AD,0C15D2BA	SCRIPTS+TASKLIST+L_1_1_TRENCH_RUNNERRIGHTGO+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 19:54:46	god	CFA4E9BD,448C7D28	SCRIPTS+TASKLIST+L_1_1_REFINERY_TURKEYGIMPRUN+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 19:54:46	god	22285B85,13B828C4	SCRIPTS+TASKLIST+L_1_1_MGNEST_CCESSRELAY+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:00:31	god	2CA0EA90,17320FC1	SCRIPTS+TASKLIST+L_1_2_NAZIFLANKER_02+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:00:32	god	2CA0EA90,C1CF2956	SCRIPTS+TASKLIST+L_1_2_NAZIFLANKER_01+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:00:32	god	36A662BE,814F6E87	SCRIPTS+TASKLIST+L_1_2_TRACTORFACTORY_ALLYDEFEND2+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:00:32	god	57DE9523,15609C0B	SCRIPTS+TASKLIST+L_1_2_A_LASTRUN_SPLINE+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:00:32	god	427004F3,8BEE4613	SCRIPTS+TASKLIST+L_1_2_ESCAPESCENE_GERMANGIMP+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:00:32	god	C604DAA5,A153B98B	SCRIPTS+TASKLIST+L_1_2_FACTORY_ENDSCENECAMERA+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:00:32	god	14001F1B,095F976C	SCRIPTS+TASKLIST+L_1_2_A_SEWER_BACKUPGUY+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	D65051B8,3017B1BA	SCRIPTS+TASKLIST+L_1_3_HQATTACK_GENERICINFANTRY+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	24B021C0,04220996	SCRIPTS+TASKLIST+L_1_3_REDSQUARE_GERMANGIMPR+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	4038F41E,04220996	SCRIPTS+TASKLIST+L_1_3_REDSQUARE_GERMANGIMPL+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	676FEAFE,3A35DEB4	SCRIPTS+TASKLIST+L_1_3_TANYASCENE_DIRECTOR+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	B5BD85C9,45F4335B	SCRIPTS+TASKLIST+L_1_3_REDSQUARE_RUSSIANMONITORPROGRAM+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	B19B5A21,921C3F30	SCRIPTS+TASKLIST+L_1_3_HQATTACK_PANZERSHRECKPLATFORM+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	DBE8FB4E,34584559	SCRIPTS+TASKLIST+L_1_3_FYODOR_DIES+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	3681E412,61D50FF9	SCRIPTS+TASKLIST+L_1_3_PANZERFIGHT_SOLDIERMONITORPROGRAM+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	9CCB8478,83B067F7	SCRIPTS+TASKLIST+L_1_3_SNIPERTOWER_SOLDIERMONITORPROGRAM+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	FEAB5124,3CA3C11B	SCRIPTS+TASKLIST+L_1_3_TANYACUTSCENE_CAMERA+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	0103B1C6,A4F8EB13	SCRIPTS+TASKLIST+L_1_3_R2RS_GERMANSCHRECK04+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	0103B1C6,A87DAB70	SCRIPTS+TASKLIST+L_1_3_R2RS_GERMANSCHRECK03+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	0103B1C6,E9B69145	SCRIPTS+TASKLIST+L_1_3_R2RS_GERMANSCHRECK02+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	0103B1C6,25EFA25A	SCRIPTS+TASKLIST+L_1_3_R2RS_GERMANSCHRECK01+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	F58301E4,915F7F20	SCRIPTS+TASKLIST+L_1_3_OBJECTIVE6_HELPMESSAGE+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	B40A841D,72B5F49C	SCRIPTS+TASKLIST+L_1_3_REDSQUARE_GERMANMONITORPROGRAM+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	88850E60,F61BC0D7	SCRIPTS+TASKLIST+L_1_3_SHOOTINGGALLERY_ATTACKCORNER+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	AF072B71,5AA7781A	SCRIPTS+TASKLIST+L_1_3_HQATTACK_EXPLOSIONBLAST+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	39FBB676,C084F59C	SCRIPTS+TASKLIST+L_1_3_FYODORDIESCUTSCENE_CAMERA+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	7C95BC52,E5C97026	SCRIPTS+TASKLIST+L_1_3_BREAKDOWN_GENERICINFANTRY+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:06:17	god	FABEF31D,5F162B63	SCRIPTS+TASKLIST+L_1_3_HQATTACK_RUSSIANGROUND+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:17:50	god	70E05E36,F6327599	SCRIPTS+TASKLIST+L_1_5_BATTLE2_MONITORPROGRAM+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:17:50	god	62DDF554,F6327599	SCRIPTS+TASKLIST+L_1_5_BATTLE4_MONITORPROGRAM+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:17:50	god	DCEE2513,F6327599	SCRIPTS+TASKLIST+L_1_5_BATTLE1_MONITORPROGRAM+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:17:50	god	6C30BCE1,F6327599	SCRIPTS+TASKLIST+L_1_5_BATTLE3_MONITORPROGRAM+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:17:50	god	6167E54F,F6327599	SCRIPTS+TASKLIST+L_1_5_BATTLE5_MONITORPROGRAM+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:17:50	god	65EEDE8F,1261854C	SCRIPTS+TASKLIST+L_1_5_INVISIBLEHDOOR_WAREHOUSEFIGHT+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:18:03	god	36A662BE,9C4615AA	SCRIPTS+TASKLIST+L_1_2_TRACTORFACTORY_ALLYDEFEND3+FILENAME	script sibling recombination (same-level parts, renumbering) (box CPU)	
+2026-10-15 20:18:03	god	36A662BE,D946F9A1	SCRIPTS+TASKLIST+L_1_2_TRACTORFACTORY_ALLYDEFEND4+FILENAME	script sibling recombination (same-level parts, renumbering) (box CPU)	
+2026-10-15 20:23:37	god	26684708,0DEE2469	SCRIPTS+TASKLIST+L_2_1_BOB_FORTRESSSCENE+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:23:37	god	F82770E7,3BCB161C	SCRIPTS+TASKLIST+L_2_1_B_JEEPGUNNER_PG+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:23:37	god	4EFC5858,C0E70835	SCRIPTS+TASKLIST+L_2_1_TELEPORTTRACKER_INIT+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:23:37	god	3F85F60C,12C955C5	SCRIPTS+TASKLIST+L_2_1_B_SIDESTAIRS_BALCONYRUNNERA+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:23:37	god	DA181163,12C955C5	SCRIPTS+TASKLIST+L_2_1_B_SIDESTAIRS_BALCONYRUNNERB+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:23:37	god	D4A106BE,6812038E	SCRIPTS+TASKLIST+L_2_1_WHITERABBIT_THROUGHCOMMPOST+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:23:37	god	D3EDD123,68EB3083	SCRIPTS+TASKLIST+L_2_1_BOB_GUARDPOSTBATTACK+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:23:37	god	EE161679,D46AFB78	SCRIPTS+TASKLIST+L_2_1_WHITERABBIT_HALFTRACKFIGHT+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:23:37	god	03731143,6B172B7D	SCRIPTS+TASKLIST+L_2_1_B_JEEPDRIVER_ESCAPE+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:23:37	god	C0D3E022,E6D47FEB	SCRIPTS+TASKLIST+L_1_2_JUNKER_FLYBY+FILENAME	GPU script template: level tag + 2-4 of that level's own tokens (local Quadro/iGPU)	
+2026-10-15 20:29:24	god	1ACE3305,D9317C78	SCRIPTS+TASKLIST+L_2_2_ENC07_DESTROYTRUCKB+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:29:24	god	3DBC221A,D9317C78	SCRIPTS+TASKLIST+L_2_2_ENC07_DESTROYTRUCKA+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:29:24	god	184E0538,0F795825	SCRIPTS+TASKLIST+L_2_2_B_TOWER_FORCEATTACKPLAYER+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:41:07	god	9190B130,D9317C78	SCRIPTS+TASKLIST+L_2_2_ENC07_DESTROYTRUCKC+FILENAME	script sibling recombination (same-level parts, renumbering) (box CPU)	
+2026-10-15 20:46:41	god	02139494,FE722800	SCRIPTS+TASKLIST+L_3_1C_ALLEYENEMY_MMG+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:46:41	god	8D126CE8,9EB0E59E	SCRIPTS+TASKLIST+L_3_1_DOOMROOM_MMGENEMYSTART+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:46:41	god	87FE3E7E,0415379F	SCRIPTS+TASKLIST+L_3_1_SEWEREND_ENEMYA+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:46:41	god	AFEA42CB,8DAA447F	SCRIPTS+TASKLIST+L_3_1C_FINALSCENE_DIRECTOR+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:52:26	god	8297F852,A3FB1C19	SCRIPTS+TASKLIST+L_3_1_C_CATHEDRAL_DUMMYTARGETS+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 20:58:12	god	78E75BC9,56914EE6	SCRIPTS+TASKLIST+L_1_3_REDSQUARE_CELEBRATION+FILENAME	GPU script template: level tag + 2-4 of that level's own tokens (local Quadro/iGPU)	
+2026-10-15 21:09:42	god	F1856F8B,7C5B3083	SCRIPTS+TASKLIST+L_3_5_B_WAREHOUSEINT_BALCONYENEMIES+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 21:09:42	god	A2AEE429,AC6C4D4C	SCRIPTS+TASKLIST+L_3_5_LARGEROADBLOCK_ENEMYMCP+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 21:21:25	god	EC8631B3,B58417C9	SCRIPTS+TASKLIST+L_3_5_B_WAREHOUSEINT_BALCONYENEMIES02+FILENAME	script sibling recombination (same-level parts, renumbering) (box CPU)	
+2026-10-15 22:13:08	god	4688AE65,14D6D351	SCRIPTS+TASKLIST+L_2_1_LEAVINGCOMMPOSTTELEPORTTRACKER+FILENAME	GPU script template: level tag + whole words / known-name tokens (persistent runner)	
+2026-10-15 23:22:25	god	4F3183C6,473DD291	SCRIPTS+TASKLIST+L_2_2_B_ARCHWAY_BOMB+FILENAME	GPU script template: level tag + 2-4 of that level's own tokens (local Quadro/iGPU)	
+2026-10-16 07:15:03	god	44F3DCB4,702D682F	COD_HELMETS+HGS01_NURSERAG	unknown-object GPU mask, held for review, accepted on review (HGS01_ helmet pattern; field key also matches)	
+2026-10-16 07:15:03	god	0CDE2A36,ACBCAF02	COD_HELMETS+HGS01_NURSERAG+COLLISIONDFF	unknown-object GPU mask, held for review, accepted on review (HGS01_ helmet pattern; field key also matches)	
+2026-10-16 07:19:43	god	34545E5F,0205FB15	COD_HELMETS+HGS04_TANKERHELMET+COLLISIONDFF	GPU helmet brute force: COD_HELMETS+HGS<NN>_ + known-name pieces (local Quadro)	
+2026-10-16 07:19:43	god	47C5A61F,4219BDB1	COD_HELMETS+HGS04_TANKERHELMET+UVANIM	GPU helmet brute force: COD_HELMETS+HGS<NN>_ + known-name pieces (local Quadro)	
+2026-10-16 07:19:43	god	7EE79CDC,B77B78EB	COD_HELMETS+HGS04_TANKERHELMET+SURFACETAG	GPU helmet brute force: COD_HELMETS+HGS<NN>_ + known-name pieces (local Quadro)	
+2026-10-16 07:19:43	god	B21160EC,0B3A1E38	COD_HELMETS+HGS04_TANKERHELMET+PARTSFIELD	GPU helmet brute force: COD_HELMETS+HGS<NN>_ + known-name pieces (local Quadro)	
+2026-10-16 07:19:43	god	CDEA271E,C7C4BC29	COD_HELMETS+HGS04_TANKERHELMET+TEXTUREDICTIONARY	GPU helmet brute force: COD_HELMETS+HGS<NN>_ + known-name pieces (local Quadro)	
+2026-10-16 07:19:43	god	E6F6833D,9900843E	COD_HELMETS+HGS04_TANKERHELMET	GPU helmet brute force: COD_HELMETS+HGS<NN>_ + known-name pieces (local Quadro)	
+2026-10-16 07:19:43	god	F1256046,BD9CDE88	COD_HELMETS+HGS04_TANKERHELMET+DFF	GPU helmet brute force: COD_HELMETS+HGS<NN>_ + known-name pieces (local Quadro)	
+2026-10-16 07:46:09	god	0097D6AD,1094A639	COD_PICKUPS+TEDDYBEARGREN_SMALL+TYPE	GPU body/pickup brute force from recovered name patterns (local Quadro)	
+2026-10-16 07:46:09	god	039C02AB,43A6FD70	COD_PICKUPS+TEDDYBEARGREN_SMALL+MESH+SURFACETAG	GPU body/pickup brute force from recovered name patterns (local Quadro)	
+2026-10-16 07:46:09	god	5F6D35FC,1CBA366A	COD_PICKUPS+TEDDYBEARGREN_SMALL+MESH+UVANIM	GPU body/pickup brute force from recovered name patterns (local Quadro)	
+2026-10-16 07:46:09	god	619B6263,9F2EE232	COD_PICKUPS+TEDDYBEARGREN_SMALL	GPU body/pickup brute force from recovered name patterns (local Quadro)	
+2026-10-16 07:46:09	god	657D8095,FDE53F21	COD_PICKUPS+TEDDYBEARGREN_SMALL+MESH+DFF	GPU body/pickup brute force from recovered name patterns (local Quadro)	
+2026-10-16 07:46:09	god	806607C7,EEAFB4C2	COD_PICKUPS+TEDDYBEARGREN_SMALL+MESH+TEXTUREDICTIONARY	GPU body/pickup brute force from recovered name patterns (local Quadro)	
+2026-10-16 07:46:09	god	A6AB7C1B,CEC4E82F	COD_PICKUPS+TEDDYBEARGREN_SMALL+MESH+PARTSFIELD	GPU body/pickup brute force from recovered name patterns (local Quadro)	
+2026-10-16 07:46:09	god	C26B732B,DD8A90B4	COD_BODIES+BM23_AVG_COMMANDER+COLLISIONDFF	GPU body/pickup brute force from recovered name patterns (local Quadro)	
+2026-10-16 07:46:09	god	E9C4E366,C37FB8C0	COD_PICKUPS+TEDDYBEARGREN_SMALL+MESH+COLLISIONDFF	GPU body/pickup brute force from recovered name patterns (local Quadro)	
+2026-10-16 07:46:09	god	EC97B724,197D5AD5	COD_PICKUPS+TEDDYBEARGREN_SMALL+MESH	GPU body/pickup brute force from recovered name patterns (local Quadro)	
+2026-10-16 07:46:09	god	F8942E9C,8C5E2DB6	COD_BODIES+BM23_AVG_COMMANDER	GPU body/pickup brute force from recovered name patterns (local Quadro)	
+2026-10-16 08:57:56	god	C3716402,EEA09A53	SCRIPTS+TASKLIST+L_1_1_PARK_GERMANPILLBOXC_MG+FILENAME	shared-lane mining: named key with the other lane's characters changed	
+2026-10-16 11:35:44	god	6FA8B2B0,494E8153	GAMECHARACTERS+L3_1_AVG_PARATROOPER	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	1ED20BCD,B6DB86D3	GAMECHARACTERS+L3_1_AVG_PARATROOPER+HEAD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	24D214A2,B5C1ED5A	GAMECHARACTERS+L3_1_AVG_PARATROOPER+BODY	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	48A885D8,538975D7	GAMECHARACTERS+L3_1_AVG_PARATROOPER+HELMET	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	AC65E4B6,DC1ABC35	GAMECHARACTERS+L3_1_AVG_PARATROOPER+ALIGNMENT	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	6DDC2C3F,48057F3F	GAMECHARACTERS+L3_1_AVG_PARATROOPER+HELMETOFFSETX	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	6DDC2C3F,48057F3E	GAMECHARACTERS+L3_1_AVG_PARATROOPER+HELMETOFFSETY	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	6DDC2C3F,48057F3D	GAMECHARACTERS+L3_1_AVG_PARATROOPER+HELMETOFFSETZ	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	9551767A,DACC3C96	GAMECHARACTERS+L3_1_AVG_PARATROOPER+PARTSFIELD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	66BF34E2,6ABBC837	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWA	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	3C54734F,8AAFB8D7	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWA+HEAD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	365469C0,71BE9C06	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWA+BODY	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	3EF17766,F6A7F8D3	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWA+HELMET	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	9B8CAF20,4157ACB1	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWA+ALIGNMENT	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,BE79DF1B	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWA+HELMETOFFSETX	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,BE79DF1A	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWA+HELMETOFFSETY	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,BE79DF19	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWA+HELMETOFFSETZ	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	7BBB98BC,836CE3CA	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWA+PARTSFIELD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	66BF34E2,6ABBC834	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWB	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	3C54734F,86779CB0	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWB+HEAD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	365469C0,9F68B941	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWB+BODY	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	3EF17766,C1577DFE	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWB+HELMET	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	9B8CAF20,7CBF0F56	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWB+ALIGNMENT	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,5BF16AF0	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWB+HELMETOFFSETX	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,5BF16AF1	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWB+HELMETOFFSETY	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,5BF16AF2	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWB+HELMETOFFSETZ	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	7BBB98BC,CBB32A6B	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWB+PARTSFIELD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	66BF34E2,6ABBC835	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWC	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	3C54734F,46A46615	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWC+HEAD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	365469C0,45BC69A8	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWC+BODY	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	3EF17766,42AC547D	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWC+HELMET	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	9B8CAF20,EBDAABEF	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWC+ALIGNMENT	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,9750ECDD	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWC+HELMETOFFSETX	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,9750ECDC	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWC+HELMETOFFSETY	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,9750ECDF	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWC+HELMETOFFSETZ	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	7BBB98BC,FA777304	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWC+PARTSFIELD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	66BF34E2,6ABBC832	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	3C54734F,207FE796	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWD+HEAD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	365469C0,21665143	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWD+BODY	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	3EF17766,FE3E1DF0	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWD+HELMET	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	9B8CAF20,42430EDC	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWD+ALIGNMENT	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,6B85991A	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWD+HELMETOFFSETX	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,6B85991B	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWD+HELMETOFFSETY	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,6B859918	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWD+HELMETOFFSETZ	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	7BBB98BC,CD862565	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWD+PARTSFIELD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	66BF34E2,6ABBC833	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWE	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	3C54734F,BA7DFA33	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWE+HEAD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	365469C0,B96460BA	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWE+BODY	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	3EF17766,2C44B177	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWE+HELMET	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	9B8CAF20,6AD934D5	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWE+ALIGNMENT	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,C9A33B5F	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWE+HELMETOFFSETX	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,C9A33B5E	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWE+HELMETOFFSETY	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	F5EBE969,C9A33B5D	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWE+HELMETOFFSETZ	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 11:35:44	god	7BBB98BC,D4A5A536	GAMECHARACTERS+L1_1_AVG_ROWBOAT_CREWE+PARTSFIELD	GPU soldier pattern search (local Quadro) and its numbered/lettered siblings with the soldier fields	
+2026-10-16 13:08:26	god	68DC1C31,CA214290	SCRIPTS+TASKLIST+L_1_1_HILL_ARTILLERYBOMBARDMENT2_CP+FILENAME	GPU per-level script search with numbered/lettered word variants (local iGPU)	
+2026-10-16 13:35:04	god	B820CE93,E98F868D	SCRIPTS+TASKLIST+L_3_1C_FINALSCENE_ACTOR_M12+FILENAME	GPU per-level script search with numbered/lettered word variants (local Quadro)	
+2026-10-16 13:35:04	god	78B29044,8F9D59F3	SCRIPTS+TASKLIST+L_3_1C_FINALSCENE_ACTOR_CAMERA+FILENAME	GPU per-level script search with numbered/lettered word variants (local Quadro)	
+2026-10-16 13:35:10	god	0BB237F8,ADCCF00B	SCRIPTS+TASKLIST+L_3_1C_FINALSCENE_ACTOR_GENERIC+FILENAME	sibling of a per-level script hit (scene actor + known word or person name)	
+2026-10-16 13:57:42	god	AFA36C84,C3939B67	SCRIPTS+TASKLIST+MP_TARGETA_TASK+FILENAME	GPU multiplayer script search (local Quadro)	
+2026-10-16 13:57:42	god	AFA36C84,D47E3098	SCRIPTS+TASKLIST+MP_TARGETB_TASK+FILENAME	GPU multiplayer script search (local Quadro)	
+2026-10-16 13:57:42	god	A5513DBB,411FDA83	SCRIPTS+TASKLIST+MP_BOMBA_TASK+FILENAME	GPU multiplayer script search (local Quadro)	
+2026-10-16 13:57:42	god	A5513DBB,91DFACE4	SCRIPTS+TASKLIST+MP_BOMBB_TASK+FILENAME	GPU multiplayer script search (local Quadro)	
+2026-10-16 13:58:05	god	477A6D7E,1367E523	SCRIPTS+TASKLIST+MP_HUSKA_TASK+FILENAME	sibling of the MP_<target>_TASK scripts (known word + letter/number + ending)	
+2026-10-16 13:58:05	god	477A6D7E,4184C184	SCRIPTS+TASKLIST+MP_HUSKB_TASK+FILENAME	sibling of the MP_<target>_TASK scripts (known word + letter/number + ending)	
