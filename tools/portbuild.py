@@ -352,6 +352,9 @@ endlocal & exit /b %GAME_EXIT%
     rel = os.path.relpath(OUT, ROOT).replace(os.sep, '/')
     print('%d units: %d compile, %d fail, %d up to date (%s/errors.md, %s/compile.log)' % (
         len(results), len(results) - len(failed) - skipped, len(failed), skipped, rel, rel))
+    # (the git revision the executable is built from, for its log: an object of its own)
+    if not failed and (not only or '--link' in args):
+        every.append(git_revision_object())
     # (--link: link after a partial compile, with the other units' objects as they are; not when
     # the executable is newer than every object)
     if not failed and (not only or '--link' in args):
@@ -369,6 +372,32 @@ endlocal & exit /b %GAME_EXIT%
 
 LIBS = ['kernel32.lib', 'user32.lib', 'gdi32.lib', 'winmm.lib', 'd3d11.lib', 'dxgi.lib', 'd3dcompiler.lib', 'xaudio2.lib', 'ws2_32.lib',
         'ntdll.lib', 'ole32.lib', 'shell32.lib', 'bcrypt.lib', 'iphlpapi.lib', 'dbghelp.lib', 'mfplat.lib', 'mfreadwrite.lib', 'mfuuid.lib', 'advapi32.lib', 'imm32.lib', 'dwmapi.lib']
+
+
+def git_revision_object():
+    """build/port*/gitrev.c: codfh_git_rev, "<commit> <branch>", with "+N" for N changed tracked
+    files. The file and its object are rewritten only when the revision changes (so a changed
+    revision links again, an unchanged one does not)."""
+    def git(*a):
+        r = subprocess.run(['git'] + list(a), cwd=ROOT, capture_output=True, text=True, errors='replace')
+        return r.stdout.strip() if r.returncode == 0 else ''
+    rev = git('rev-parse', '--short', 'HEAD') or 'unknown'
+    branch = git('rev-parse', '--abbrev-ref', 'HEAD')
+    changed = len([l for l in git('status', '--porcelain', '--untracked-files=no').splitlines() if l.strip()])
+    text = rev + (' ' + branch if branch and branch != 'HEAD' else '') + (' +%d' % changed if changed else '')
+    src = os.path.join(OUT, 'gitrev.c')
+    obj = os.path.join(OBJ, 'gitrev.obj')
+    body = '/* written by tools/portbuild.py */\nconst char codfh_git_rev[] = "%s";\n' % text.replace('"', "'")
+    old = open(src).read() if os.path.exists(src) else None
+    if old != body:
+        open(src, 'w').write(body)
+    if old != body or not os.path.exists(obj):
+        r = subprocess.run([CL, '/nologo', '/c', '/TC', '/Fo' + obj, src], capture_output=True, text=True,
+                           errors='replace')
+        if r.returncode:
+            sys.exit('gitrev.c: ' + r.stdout + r.stderr)
+    print('revision: ' + text)
+    return obj
 
 
 def link(objs):

@@ -28,6 +28,8 @@
 
 #include "port.h"
 
+extern "C" const char codfh_git_rev[];  /* (gitrev.c beside the executable, written by tools/portbuild.py) */
+
 static const char crash_window_class[] = "CODFHCrashDialog";
 
 enum { ID_FULL_DUMP = 1002, ID_DUMP_TEXT = 1003 };
@@ -505,7 +507,7 @@ static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep)
     EXCEPTION_RECORD *er = ep->ExceptionRecord;
     char where[512];
     describe((DWORD64)(ULONG_PTR)er->ExceptionAddress, where, sizeof(where));
-    plog("CRASH: exception 0x%08lX at %s, frame %u", er->ExceptionCode, where, port_frame);
+    plog("CRASH: exception 0x%08lX at %s, frame %u, build %s", er->ExceptionCode, where, port_frame, codfh_git_rev);
     if (er->ExceptionCode == EXCEPTION_ACCESS_VIOLATION && er->NumberParameters >= 2)
         plog("  %s address %08lX", er->ExceptionInformation[0] ? "writing" : "reading",
              (unsigned long)er->ExceptionInformation[1]);
