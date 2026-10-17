@@ -1039,14 +1039,16 @@ extern "C" DWORD WINAPI XGetAudioFlags(VOID)
 /*
  * Physical memory: RenderWare keeps an address's low 31 bits and restores bit 31 (the Xbox's
  * contiguous mapping), so the memory comes from the top of the address space, where bit 31 is
- * set (the executable is large-address aware).
+ * set (the executable is large-address aware). Each allocation gets a page more: on the Xbox a
+ * read past the end lands in the next memory, and some draws' declarations reach past their
+ * stream's last vertex (a 20-byte stride under a 28-byte declaration read 8 bytes beyond it).
  */
 
 extern "C" LPVOID WINAPI XPhysicalAlloc(SIZE_T dwSize, ULONG_PTR, ULONG_PTR ulAlignment, DWORD flProtect)
 {
     (void)ulAlignment;      /* (allocations are 64 KB aligned) */
     (void)flProtect;
-    void *p = VirtualAlloc(NULL, dwSize, MEM_RESERVE | MEM_COMMIT | MEM_TOP_DOWN, PAGE_READWRITE);
+    void *p = VirtualAlloc(NULL, dwSize + 4096, MEM_RESERVE | MEM_COMMIT | MEM_TOP_DOWN, PAGE_READWRITE);
     if (p && !((ULONG_PTR)p & 0x80000000))
     {
         plog("XPhysicalAlloc: %lu bytes at %p, below 2 GB (the driver's addresses would break)",
