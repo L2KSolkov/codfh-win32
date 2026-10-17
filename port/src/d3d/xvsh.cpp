@@ -249,10 +249,10 @@ std::string assemble(const Gen &g)
     s += "    VSOut o;\n"
          "    /* screen space back to clip space */\n"
          "    float w = oPos.w;\n"
-         /* (w exactly 0: RenderWare's 2D shader passes an Im2D vertex's rhw as w, and the game
-            leaves it 0 on some (the message boxes' frames); the Xbox rasterizes screen space
-            whatever w is, where a clip-space w of 5e-20 had Direct3D 11 drop the triangles) */
-         "    if (w == 0) w = 1;\n"
+         /* (w 0 or not finite: RenderWare's 2D shader takes w as 1 / an Im2D vertex's rhw, and
+            the game leaves rhw 0 on some (the message boxes' frames), so w is infinite; the
+            Xbox rasterizes screen space whatever w is, where Direct3D 11 dropped them) */
+         "    if (w == 0 || !(abs(w) <= 3.402823e38)) w = 1;\n"
          "    else if (abs(w) < 5.42101e-20) w = w < 0 ? -5.42101e-20 : 5.42101e-20;\n"
          "    float2 ndc = (oPos.xy - vpOffset.xy) / vpScale.xy;\n"
          "    float nz = vpScale.z != 0 ? (oPos.z - vpOffset.z) / vpScale.z : 0;\n"
