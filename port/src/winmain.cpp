@@ -40,8 +40,14 @@ static int fullscreen;
 static RECT windowed_rect;
 static const DWORD windowed_style = WS_OVERLAPPEDWINDOW;
 
-static void set_fullscreen(HWND hwnd, int on)
+/* (WM_APP_FULLSCREEN: the overlay's switch, from the thread that presents, as the window's own
+   message; wparam fullscreen or not) */
+enum { WM_APP_FULLSCREEN = WM_APP + 0x11 };
+
+static void set_fullscreen(HWND hwnd, int on, int keep)
 {
+    if (keep)
+        port_config_set_windowed(!on);    /* (the next start opens as this one is now) */
     if (on == fullscreen)
         return;
     if (on)
@@ -114,6 +120,12 @@ static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         if (r == 1)
             return 0;
     }
+    /* F11 (and Alt+Enter): windowed and fullscreen */
+    if (msg == WM_KEYDOWN && wp == VK_F11 && !(lp & (1 << 30)))
+    {
+        set_fullscreen(hwnd, !fullscreen, 1);
+        return 0;
+    }
 #ifdef CODFH_IMGUI
     /* F1 shows and hides the overlay; while it is shown the cursor is free and ImGui has the
        window's messages first */
@@ -165,10 +177,13 @@ static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         /* Alt+Enter: windowed and fullscreen (a borderless window over the monitor) */
         if (wp == VK_RETURN && (lp & (1 << 29)) && !(lp & (1 << 30)))
         {
-            set_fullscreen(hwnd, !fullscreen);
+            set_fullscreen(hwnd, !fullscreen, 1);
             return 0;
         }
         break;
+    case WM_APP_FULLSCREEN:
+        set_fullscreen(hwnd, (int)wp, 1);
+        return 0;
     case WM_SETCURSOR:
         if (LOWORD(lp) == HTCLIENT)
         {
@@ -183,6 +198,17 @@ static LRESULT CALLBACK wndproc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
         break;
     }
     return DefWindowProcA(hwnd, msg, wp, lp);
+}
+
+extern "C" int port_fullscreen(void)
+{
+    return fullscreen;
+}
+
+extern "C" void port_set_fullscreen(int on)
+{
+    if (port_hwnd)
+        PostMessageA((HWND)port_hwnd, WM_APP_FULLSCREEN, on ? 1 : 0, 0);
 }
 
 extern "C" int port_pump_messages(void)
@@ -226,7 +252,7 @@ static void create_window(HINSTANCE inst)
                               w, h, NULL, NULL, inst, NULL);
 #ifndef CODFH_DEDICATED
     if (!port_config.windowed)
-        set_fullscreen(hwnd, 1);
+        set_fullscreen(hwnd, 1, 0);
 #endif
 #ifdef CODFH_DEDICATED
     /* (the server's window is never shown: it only carries the messages) */

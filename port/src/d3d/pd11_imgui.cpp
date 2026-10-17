@@ -324,6 +324,10 @@ static void port_window(int back_w, int back_h)
                 ImGui::SameLine();
                 ImGui::TextDisabled("(widescreen fills it already)");
             }
+            /* (F11 and Alt+Enter do the same; kept in codfh.ini's [video] windowed) */
+            bool full = port_fullscreen() != 0;
+            if (ImGui::Checkbox("fullscreen (F11, Alt+Enter)", &full))
+                port_set_fullscreen(full);
         }
     }
     if (ImGui::CollapsingHeader("Input"))

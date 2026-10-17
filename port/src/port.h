@@ -52,6 +52,12 @@ extern PortConfig port_config;
 void port_config_load(void);
 /* [video] fill set now and kept in codfh.ini (the overlay's Renderer switch). */
 void port_config_set_fill(int on);
+/* [video] windowed set and kept in codfh.ini (F11, Alt+Enter, the overlay's switch). */
+void port_config_set_windowed(int on);
+
+/* Fullscreen (a borderless window over the monitor) or windowed; winmain.cpp. */
+int port_fullscreen(void);
+void port_set_fullscreen(int on);
 
 /* The game's window (created by WinMain, used by the device). */
 extern void *port_hwnd;

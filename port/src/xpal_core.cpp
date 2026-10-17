@@ -215,6 +215,15 @@ void port_config_set_fill(int on)
     WritePrivateProfileStringA("video", "fill", on ? "1" : "0", ini);
 }
 
+void port_config_set_windowed(int on)
+{
+    char ini[MAX_PATH];
+    exe_dir(ini, sizeof(ini));
+    strcat(ini, "codfh.ini");
+    port_config.windowed = on ? 1 : 0;
+    WritePrivateProfileStringA("video", "windowed", on ? "1" : "0", ini);
+}
+
 void port_config_load(void)
 {
     char ini[MAX_PATH];
