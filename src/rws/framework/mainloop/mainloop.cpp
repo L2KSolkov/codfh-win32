@@ -19,6 +19,9 @@
 #include "rws/camerahelper.h"
 #include "rws/clumphelper.h"
 #include "game/gameloop.h"
+#ifdef CODFH_WIN32
+#include "types/type_DA580.h"   // (the port's Rt2d close: the fonts' brush)
+#endif
 // Its data (PLAN M5): literals, constants and tables where the image has them.
 // match: ??_C@_0P@HKNDODAH@iMsgStopSystem?$AA@ @ 0x003DAAE8
 // match: ??_C@_0BA@BDABNIDG@iMsgStartSystem?$AA@ @ 0x003DAAF8
@@ -255,6 +258,13 @@ void RWS::MainLoop::Close(void)
 
          Rt2dAnimClose();
          Rt2dClose();
+#ifdef CODFH_WIN32
+         // (the port: Rt2dClose frees every brush, the fonts' shared one (type_DA580's brush)
+         // with them, which sub_DA680 keeps while it is set: forgotten here, as at the front
+         // end's Rt2dClose (unit_0DA290), the next font makes a new one, where it wrote its white
+         // (255.0, 0x437F0000) into the next level's freed memory)
+         ::brush = 0;
+#endif
 
          CameraHelper::Destroy(MainLoop::Render::GetCamera());
          MainLoop::Render::SetCamera(0);
