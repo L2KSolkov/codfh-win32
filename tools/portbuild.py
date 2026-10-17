@@ -368,6 +368,36 @@ endlocal & exit /b %GAME_EXIT%
             print('link: up to date (%s is newer than every object)' % os.path.relpath(exe, ROOT).replace(os.sep, '/'))
         else:
             link(every)
+    # (the launcher beside it, port/launcher: with every build that links, or alone with --launcher)
+    if '--dedicated' not in args and (not failed and (not only or '--link' in args) or '--launcher' in args):
+        build_launcher()
+
+
+LAUNCHER_SRC = 'port/launcher/launcher.cpp'
+
+
+def build_launcher():
+    """Builds codfh_launcher.exe beside codfh.exe (port/launcher/launcher.cpp: the port's command line
+    and environment options in a window), when its source is newer than it."""
+    exe = os.path.join(OUT, 'codfh_launcher.exe')
+    rel = os.path.relpath(exe, ROOT).replace(os.sep, '/')
+    if not FORCE and os.path.exists(exe) and os.path.getmtime(exe) >= os.path.getmtime(LAUNCHER_SRC):
+        print('launcher: up to date (%s)' % rel)
+        return
+    obj = os.path.join(OUT, 'launcher_obj')
+    os.makedirs(obj, exist_ok=True)
+    env = dict(os.environ)
+    env['INCLUDE'] = ';'.join(SYSTEM_INCLUDES)
+    env['LIB'] = ';'.join(SYSTEM_LIBS)
+    env['PATH'] = (os.path.dirname(CL) + os.pathsep + os.path.join(MSVC, 'bin', 'Hostx64', 'x64') + os.pathsep
+                   + env['PATH'])
+    cmd = [CL, '/nologo', '/O2', '/MT', '/EHsc', '/W3', '/D_CRT_SECURE_NO_WARNINGS', '/Fo' + obj + os.sep,
+           '/Fe' + exe, LAUNCHER_SRC, '/link', '/SUBSYSTEM:WINDOWS', 'user32.lib', 'gdi32.lib', 'shell32.lib',
+           'ole32.lib', 'comctl32.lib']
+    r = subprocess.run(cmd, capture_output=True, text=True, errors='replace', env=env)
+    open(os.path.join(OUT, 'launcher.log'), 'w', encoding='utf-8').write(' '.join(cmd) + '\n' + r.stdout + r.stderr)
+    print('launcher: exit %d (%s; %s)' % (r.returncode, rel,
+                                           os.path.relpath(os.path.join(OUT, 'launcher.log'), ROOT).replace(os.sep, '/')))
 
 
 LIBS = ['kernel32.lib', 'user32.lib', 'gdi32.lib', 'winmm.lib', 'd3d11.lib', 'dxgi.lib', 'd3dcompiler.lib', 'xaudio2.lib', 'ws2_32.lib',
