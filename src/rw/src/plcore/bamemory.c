@@ -1292,6 +1292,56 @@ RwFreeListPurgeAllFreeLists(void)
     RWRETURN(memoryFreed);
 }
 
+#ifdef CODFH_WIN32
+/* The port's crash report (port/src/crashinfo.cpp, not in the image): each free list's entry
+ * size, entries a block, blocks and entries in use (a block is its link, its in-use bitmap and
+ * its entries), four words a list into out, at most max lists; read without the lists' locks and
+ * at most so many links (the caller guards the reads); the lists. */
+RwInt32
+_rwFreeListStats(RwUInt32 *out, RwInt32 max)
+{
+    RwLLLink *cur, *end;
+    RwInt32 n = 0;
+
+    cur = rwLinkListGetFirstLLLink(&_freeListList);
+    end = rwLinkListGetTerminator(&_freeListList);
+    while (cur != end && cur && n < max)
+    {
+        RwFreeList *freeList = rwLLLinkGetData(cur, RwFreeList, link);
+        RwLLLink *b = rwLinkListGetFirstLLLink(&freeList->blockList);
+        RwLLLink *bend = rwLinkListGetTerminator(&freeList->blockList);
+        RwUInt32 blocks = 0, used = 0;
+
+        while (b != bend && b && blocks < 100000)
+        {
+            const RwUInt8 *heap = (const RwUInt8 *)(b + 1);
+            RwUInt32 i, inBlock = 0;
+
+            for (i = 0; i < freeList->heapSize; i++)
+            {
+                RwUInt8 bits = heap[i];
+
+                while (bits)
+                {
+                    inBlock += bits & 1;
+                    bits >>= 1;
+                }
+            }
+            used += inBlock < freeList->entriesPerBlock ? inBlock : freeList->entriesPerBlock;
+            blocks++;
+            b = rwLLLinkGetNext(b);
+        }
+        out[n * 4 + 0] = freeList->entrySize;
+        out[n * 4 + 1] = freeList->entriesPerBlock;
+        out[n * 4 + 2] = blocks;
+        out[n * 4 + 3] = used;
+        n++;
+        cur = rwLLLinkGetNext(cur);
+    }
+    return n;
+}
+#endif
+
 /* This is just a call to malloc which accepts memory hint too */
 // match: _HMalloc @ 0x002A97E0
 // sp-match: _HMalloc @ 0x001C3140

@@ -3770,3 +3770,49 @@ _rwTexDictionaryUnlinkRange(const void *lo, const void *hi)
 }
 #endif
 
+#ifdef CODFH_WIN32
+/* The port's crash report (port/src/crashinfo.cpp, not in the image): the texture dictionaries
+ * linked, their textures and their rasters' bytes (every mip level), read without the texture
+ * lock (the loading thread may hold it) and at most so many links, as a dictionary left in a
+ * freed arena can leave the list dangling (the caller guards the reads); the dictionaries. */
+extern RwUInt32 _rwXbRasterGetSize(RwRaster *raster, RwUInt8 mipLevel);
+
+RwInt32
+_rwTexDictionaryStats(RwInt32 *pnTextures, RwUInt32 *pnBytes)
+{
+    RwLLLink *cur, *end;
+    RwInt32 nDicts = 0, nTextures = 0, nLinks = 0;
+    RwUInt32 nBytes = 0;
+
+    cur = rwLinkListGetFirstLLLink(&RWTEXTUREGLOBAL(texDictList));
+    end = rwLinkListGetTerminator(&RWTEXTUREGLOBAL(texDictList));
+    while (cur != end && cur && nDicts < 4096)
+    {
+        RwTexDictionary *dict = rwLLLinkGetData(cur, RwTexDictionary, lInInstance);
+        RwLLLink *t = rwLinkListGetFirstLLLink(&dict->texturesInDict);
+        RwLLLink *tend = rwLinkListGetTerminator(&dict->texturesInDict);
+
+        nDicts++;
+        while (t != tend && t && nLinks++ < 65536)
+        {
+            RwTexture *tex = rwLLLinkGetData(t, RwTexture, lInDictionary);
+            RwRaster *raster = tex->raster;
+
+            nTextures++;
+            if (raster)
+            {
+                RwInt32 levels = RwRasterGetNumLevels(raster), i;
+
+                for (i = 0; i < levels && i < 16; i++)
+                    nBytes += _rwXbRasterGetSize(raster, (RwUInt8)i);
+            }
+            t = rwLLLinkGetNext(t);
+        }
+        cur = rwLLLinkGetNext(cur);
+    }
+    *pnTextures = nTextures;
+    *pnBytes = nBytes;
+    return nDicts;
+}
+#endif
+

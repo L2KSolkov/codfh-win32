@@ -30,6 +30,8 @@
 #include <psapi.h>
 #include <tlhelp32.h>
 #include <commctrl.h>
+#include <intrin.h>
+#include <dxgi.h>
 
 #include "port.h"
 
@@ -363,11 +365,21 @@ static int dump_mode(void)
 }
 
 // CODFH_CRASHTEST: a thread that crashes after that many seconds
+static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep);
+
 static DWORD WINAPI crash_test_thread(LPVOID arg)
 {
     Sleep((DWORD)(ULONG_PTR)arg * 1000);
     plog("crash test: crashing on purpose (CODFH_CRASHTEST)");
-    *(volatile int *)0 = 0;
+    // (the handler through this filter: as an unhandled crash does, and under a debugger too, which
+    // the unhandled-exception filter skips)
+    __try
+    {
+        *(volatile int *)0 = 0;
+    }
+    __except (on_crash(GetExceptionInformation()), EXCEPTION_CONTINUE_SEARCH)
+    {
+    }
     return 0;
 }
 
@@ -382,6 +394,8 @@ static DWORD WINAPI crash_test_thread(LPVOID arg)
  * Memory page.
  */
 extern "C" volatile LONG port_xphys_blocks, port_xphys_bytes, port_xphys_peak;   /* (xpal_sys.cpp) */
+extern "C" void port_crash_game_state(char *buf, size_t n);                        /* (crashinfo.cpp) */
+extern "C" void port_crash_rw_stats(char *buf, size_t n);
 static unsigned crash_frame;   /* (the frame of the crash, read once: the game's thread goes on counting) */
 static char mem_report[12 * 1024];
 static int mem_at;
@@ -453,18 +467,11 @@ typedef BOOL(WINAPI *GetProcessMemoryInfoFn)(HANDLE, PPROCESS_MEMORY_COUNTERS, D
 
 static void memory_report(EXCEPTION_RECORD *er)
 {
-    HANDLE proc = GetCurrentProcess();
     PROCESS_MEMORY_COUNTERS_EX pmc;
     GetProcessMemoryInfoFn get_pmi;
-    MEMORYSTATUSEX ms;
-    ULONG64 committed = 0, reserved = 0, freed = 0, largest = 0, image = 0, mapped = 0, priv = 0, above1 = 0,
-            above2 = 0;
-    ULONG_PTR largest_at = 0, highest = 0, a = 0x10000;
-    int regions = 0;
 
     mem_at = 0;
     mem_report[0] = 0;
-    mr("Build %s, built %s; frame %u\r\n\r\n", codfh_git_rev, port_build_time(), crash_frame);
 
     // the exception's addresses
     region_line("Instruction", (ULONG_PTR)er->ExceptionAddress);
@@ -473,126 +480,181 @@ static void memory_report(EXCEPTION_RECORD *er)
                                                                                                        : "Read of",
                     (ULONG_PTR)er->ExceptionInformation[1]);
 
-    // the process's memory
+    // the game's memory
     get_pmi = (GetProcessMemoryInfoFn)GetProcAddress(GetModuleHandleA("kernel32.dll"), "K32GetProcessMemoryInfo");
     memset(&pmc, 0, sizeof(pmc));
     pmc.cb = sizeof(pmc);
-    if (get_pmi && get_pmi(proc, (PPROCESS_MEMORY_COUNTERS)&pmc, sizeof(pmc)))
-    {
-        mr("\r\nProcess memory\r\n");
-        mr("  working set      %9.1f MB (peak %.1f MB)\r\n", mb(pmc.WorkingSetSize), mb(pmc.PeakWorkingSetSize));
-        mr("  committed        %9.1f MB (peak %.1f MB)\r\n", mb(pmc.PrivateUsage), mb(pmc.PeakPagefileUsage));
-        mr("  page faults      %9lu\r\n", (unsigned long)pmc.PageFaultCount);
-    }
-
-    // the address space, region by region
-    while (a < 0xFFFF0000u && regions < 200000)
-    {
-        MEMORY_BASIC_INFORMATION mbi;
-        ULONG_PTR end;
-
-        if (!VirtualQuery((LPCVOID)a, &mbi, sizeof(mbi)) || !mbi.RegionSize)
-            break;
-        end = (ULONG_PTR)mbi.BaseAddress + mbi.RegionSize;
-        regions++;
-        if (mbi.State == MEM_FREE)
-        {
-            freed += mbi.RegionSize;
-            if (mbi.RegionSize > largest)
-                largest = mbi.RegionSize, largest_at = (ULONG_PTR)mbi.BaseAddress;
-        }
-        else if (mbi.State == MEM_RESERVE)
-            reserved += mbi.RegionSize;
-        else
-        {
-            committed += mbi.RegionSize;
-            if (mbi.Type == MEM_IMAGE)
-                image += mbi.RegionSize;
-            else if (mbi.Type == MEM_MAPPED)
-                mapped += mbi.RegionSize;
-            else
-                priv += mbi.RegionSize;
-            if ((ULONG_PTR)mbi.BaseAddress >= 0x40000000u)
-                above1 += mbi.RegionSize;
-            if ((ULONG_PTR)mbi.BaseAddress >= 0x80000000u)
-                above2 += mbi.RegionSize;
-            if (end > highest)
-                highest = end;
-        }
-        if (end <= a)
-            break;
-        a = end;
-    }
-    mr("\r\nAddress space (%d regions)\r\n", regions);
-    mr("  committed        %9.1f MB (private %.1f, images %.1f, mapped %.1f)\r\n", mb(committed), mb(priv), mb(image),
-       mb(mapped));
-    mr("  reserved         %9.1f MB\r\n", mb(reserved));
-    mr("  free             %9.1f MB, the largest block %.1f MB at %08lX\r\n", mb(freed), mb(largest),
-       (unsigned long)largest_at);
-    mr("  committed above 1 GB %.1f MB, above 2 GB %.1f MB; the highest ends at %08lX\r\n", mb(above1), mb(above2),
-       (unsigned long)highest);
-
-    // the Xbox's physical memory (XPhysicalAlloc: RenderWare's vertex and texture memory)
-    mr("\r\nXbox physical memory (XPhysicalAlloc)\r\n");
-    mr("  out              %9.1f MB in %ld blocks (peak %.1f MB)\r\n", mb((ULONG)port_xphys_bytes),
+    mr("\r\nThe game\r\n");
+    if (get_pmi && get_pmi(GetCurrentProcess(), (PPROCESS_MEMORY_COUNTERS)&pmc, sizeof(pmc)))
+        mr("  memory           %9.1f MB in use (peak %.1f MB)\r\n", mb(pmc.PrivateUsage), mb(pmc.PeakPagefileUsage));
+    // (the Xbox's physical memory: XPhysicalAlloc, RenderWare's vertex and texture memory)
+    mr("  Xbox physical    %9.1f MB in %ld blocks (peak %.1f MB)\r\n", mb((ULONG)port_xphys_bytes),
        (long)port_xphys_blocks, mb((ULONG)port_xphys_peak));
 
-    // the system
-    ms.dwLength = sizeof(ms);
-    if (GlobalMemoryStatusEx(&ms))
+    // RenderWare's free lists and textures (crashinfo.cpp)
     {
-        mr("\r\nSystem\r\n");
-        mr("  physical memory  %9.1f MB free of %.1f MB (%lu%% in use)\r\n", mb(ms.ullAvailPhys), mb(ms.ullTotalPhys),
-           (unsigned long)ms.dwMemoryLoad);
-        mr("  commit           %9.1f MB free of %.1f MB\r\n", mb(ms.ullAvailPageFile), mb(ms.ullTotalPageFile));
-        mr("  the process's address space %.1f MB, %.1f MB free\r\n", mb(ms.ullTotalVirtual), mb(ms.ullAvailVirtual));
-    }
+        static char rw[4 * 1024];
 
-    // threads, handles, window objects, times
-    {
-        HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-        THREADENTRY32 te;
-        int threads = 0;
-        DWORD handles = 0, pid = GetCurrentProcessId();
-        FILETIME created, exited, kernel, user, now;
-        SYSTEMTIME st;
-
-        if (snap != INVALID_HANDLE_VALUE)
-        {
-            te.dwSize = sizeof(te);
-            if (Thread32First(snap, &te))
-                do
-                    threads += te.th32OwnerProcessID == pid;
-                while (Thread32Next(snap, &te));
-            CloseHandle(snap);
-        }
-        GetProcessHandleCount(proc, &handles);
-        mr("\r\nProcess\r\n");
-        mr("  threads %d, handles %lu, GDI objects %lu, USER objects %lu\r\n", threads, (unsigned long)handles,
-           (unsigned long)GetGuiResources(proc, GR_GDIOBJECTS), (unsigned long)GetGuiResources(proc, GR_USEROBJECTS));
-        if (GetProcessTimes(proc, &created, &exited, &kernel, &user))
-        {
-            ULONG64 c = ((ULONG64)created.dwHighDateTime << 32) | created.dwLowDateTime, n, k, u;
-
-            GetSystemTime(&st);
-            SystemTimeToFileTime(&st, &now);
-            n = ((ULONG64)now.dwHighDateTime << 32) | now.dwLowDateTime;
-            k = ((ULONG64)kernel.dwHighDateTime << 32) | kernel.dwLowDateTime;
-            u = ((ULONG64)user.dwHighDateTime << 32) | user.dwLowDateTime;
-            n = n > c ? (n - c) / 10000000 : 0;
-            mr("  up %lu:%02lu:%02lu, CPU %.1f s in the game, %.1f s in the system\r\n", (unsigned long)(n / 3600),
-               (unsigned long)(n / 60 % 60), (unsigned long)(n % 60), u / 1e7, k / 1e7);
-        }
+        port_crash_rw_stats(rw, sizeof(rw));
+        mr("\r\n%s", rw);
     }
 }
 
-// The memory report's lines in the log (before its tail is read for the dump and the zip).
-static void log_memory_report(void)
+/*
+ * The system: Windows, the CPU, the memory, every display adapter with its driver's version, the
+ * command line and the CODFH_ variables, gathered at the start (the DXGI factory and the
+ * environment's copy allocate, which a crash may not); at the crash, the display's mode and the
+ * game window's size are added.
+ */
+static char sys_startup[6 * 1024], sys_report[8 * 1024];
+
+static void sys_add(char *buf, size_t size, const char *fmt, ...)
+{
+    size_t at = strlen(buf);
+    va_list a;
+
+    if (at + 1 >= size)
+        return;
+    va_start(a, fmt);
+    _vsnprintf(buf + at, size - 1 - at, fmt, a);
+    va_end(a);
+    buf[size - 1] = 0;
+}
+
+typedef LONG(WINAPI *RtlGetVersionFn)(RTL_OSVERSIONINFOW *);
+
+static void system_info_startup(void)
+{
+    RTL_OSVERSIONINFOW os;
+    RtlGetVersionFn get_version;
+    char product[128] = "", display_version[64] = "";
+    DWORD ubr = 0, size;
+    int regs[4];
+    char brand[49];
+    SYSTEM_INFO si;
+    MEMORYSTATUSEX ms;
+
+    sys_startup[0] = 0;
+    // Windows
+    memset(&os, 0, sizeof(os));
+    os.dwOSVersionInfoSize = sizeof(os);
+    get_version = (RtlGetVersionFn)GetProcAddress(GetModuleHandleA("ntdll.dll"), "RtlGetVersion");
+    if (get_version)
+        get_version(&os);
+    size = sizeof(product);
+    RegGetValueA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "ProductName", RRF_RT_REG_SZ,
+                 NULL, product, &size);
+    size = sizeof(display_version);
+    RegGetValueA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "DisplayVersion",
+                 RRF_RT_REG_SZ, NULL, display_version, &size);
+    size = sizeof(ubr);
+    RegGetValueA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", "UBR", RRF_RT_REG_DWORD, NULL,
+                 &ubr, &size);
+    // (the registry's product name says Windows 10 on 11 too: the build number tells, 22000 on)
+    sys_add(sys_startup, sizeof(sys_startup), "Windows %lu.%lu build %lu.%lu%s%s%s%s%s\r\n",
+            (unsigned long)os.dwMajorVersion, (unsigned long)os.dwMinorVersion, (unsigned long)os.dwBuildNumber,
+            (unsigned long)ubr, product[0] ? " (" : "", product, display_version[0] ? " " : "", display_version,
+            product[0] ? ")" : "");
+
+    // the CPU and the memory
+    memset(brand, 0, sizeof(brand));
+    __cpuid(regs, 0x80000000);
+    if ((unsigned)regs[0] >= 0x80000004u)
+        for (int i = 0; i < 3; i++)
+        {
+            __cpuid(regs, 0x80000002 + i);
+            memcpy(brand + i * 16, regs, 16);
+        }
+    GetNativeSystemInfo(&si);
+    ms.dwLength = sizeof(ms);
+    GlobalMemoryStatusEx(&ms);
+    {
+        char *b = brand;
+
+        while (*b == ' ')
+            b++;
+        sys_add(sys_startup, sizeof(sys_startup), "CPU %s, %lu logical processors\r\n", b[0] ? b : "(unknown)",
+                (unsigned long)si.dwNumberOfProcessors);
+    }
+    sys_add(sys_startup, sizeof(sys_startup), "Memory %.0f MB\r\n", mb(ms.ullTotalPhys));
+
+    // the display adapters, with their drivers' versions
+    {
+        IDXGIFactory1 *factory = NULL;
+
+        if (SUCCEEDED(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void **)&factory)))
+        {
+            IDXGIAdapter1 *adapter;
+
+            for (UINT i = 0; factory->EnumAdapters1(i, &adapter) == S_OK; i++)
+            {
+                DXGI_ADAPTER_DESC1 d;
+                LARGE_INTEGER umd;
+                char name[128];
+
+                if (SUCCEEDED(adapter->GetDesc1(&d)))
+                {
+                    WideCharToMultiByte(CP_ACP, 0, d.Description, -1, name, sizeof(name), NULL, NULL);
+                    sys_add(sys_startup, sizeof(sys_startup), "Adapter %u: %s, %.0f MB, vendor %04X device %04X", i,
+                            name, mb(d.DedicatedVideoMemory), d.VendorId, d.DeviceId);
+                    if (SUCCEEDED(adapter->CheckInterfaceSupport(__uuidof(IDXGIDevice), &umd)))
+                        sys_add(sys_startup, sizeof(sys_startup), ", driver %u.%u.%u.%u",
+                                (unsigned)HIWORD(umd.HighPart), (unsigned)LOWORD(umd.HighPart),
+                                (unsigned)HIWORD(umd.LowPart), (unsigned)LOWORD(umd.LowPart));
+                    sys_add(sys_startup, sizeof(sys_startup), "%s\r\n",
+                            (d.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) ? " (software)" : "");
+                }
+                adapter->Release();
+            }
+            factory->Release();
+        }
+    }
+
+    // the command line and the port's variables
+    sys_add(sys_startup, sizeof(sys_startup), "\r\nCommand line: %s\r\n", GetCommandLineA());
+    {
+        char *env = GetEnvironmentStringsA();
+        int n = 0;
+
+        sys_add(sys_startup, sizeof(sys_startup), "Variables:");
+        for (char *p = env; p && *p; p += strlen(p) + 1)
+            if (!_strnicmp(p, "CODFH_", 6))
+            {
+                sys_add(sys_startup, sizeof(sys_startup), "%s %s", n ? "," : "", p);
+                n++;
+            }
+        sys_add(sys_startup, sizeof(sys_startup), "%s\r\n", n ? "" : " no CODFH_ variable set");
+        if (env)
+            FreeEnvironmentStringsA(env);
+    }
+}
+
+static void system_info_crash(void)
+{
+    DEVMODEA dm;
+    RECT rc;
+
+    strcpy(sys_report, sys_startup);
+    memset(&dm, 0, sizeof(dm));
+    dm.dmSize = sizeof(dm);
+    if (EnumDisplaySettingsA(NULL, ENUM_CURRENT_SETTINGS, &dm))
+        sys_add(sys_report, sizeof(sys_report), "\r\nDisplay %lux%lu, %lu Hz, %lu bits\r\n",
+                (unsigned long)dm.dmPelsWidth, (unsigned long)dm.dmPelsHeight, (unsigned long)dm.dmDisplayFrequency,
+                (unsigned long)dm.dmBitsPerPel);
+    if (port_hwnd && GetClientRect((HWND)port_hwnd, &rc))
+        sys_add(sys_report, sizeof(sys_report), "Game window %ldx%ld\r\n", rc.right - rc.left, rc.bottom - rc.top);
+}
+
+// The game state (crashinfo.cpp).
+static char game_report[8 * 1024];
+
+// A report's lines in the log (before its tail is read for the dump and the zip).
+static void log_report(const char *title, const char *text)
 {
     char line[512];
-    const char *p = mem_report;
+    const char *p = text;
 
-    plog("  memory report:");
+    plog("  %s:", title);
     while (*p)
     {
         const char *e = strstr(p, "\r\n");
@@ -608,17 +670,24 @@ static void log_memory_report(void)
     }
 }
 
-enum { ID_TABS = 1006, ID_MEMORY = 1004, ID_LOG = 1005, ID_TRACE = 1001 };
+// The other threads' stacks (threads_report, below).
+static char thread_report[160 * 1024];
 
-// The dialog's pages: the stack trace, the memory report, the log's tail.
+enum { ID_TABS = 1006, ID_MEMORY = 1004, ID_LOG = 1005, ID_TRACE = 1001, ID_THREADS = 1007, ID_GAME = 1008,
+       ID_SYSTEM = 1009 };
+
+// The dialog's pages, in their tabs' order: the stack trace, the other threads, the memory, the
+// game, the system, the log's tail.
+static const int page_ids[6] = {ID_TRACE, ID_THREADS, ID_MEMORY, ID_GAME, ID_SYSTEM, ID_LOG};
+static const char *const page_names[6] = {"Stack trace", "Threads", "Memory", "Game", "System", "Log"};
+
 static void show_page(HWND hwnd, int page)
 {
     HWND log = GetDlgItem(hwnd, ID_LOG);
 
-    ShowWindow(GetDlgItem(hwnd, ID_TRACE), page == 0 ? SW_SHOW : SW_HIDE);
-    ShowWindow(GetDlgItem(hwnd, ID_MEMORY), page == 1 ? SW_SHOW : SW_HIDE);
-    ShowWindow(log, page == 2 ? SW_SHOW : SW_HIDE);
-    if (page == 2 && log)
+    for (int i = 0; i < 6; i++)
+        ShowWindow(GetDlgItem(hwnd, page_ids[i]), page == i ? SW_SHOW : SW_HIDE);
+    if (page == 5 && log)
     {
         // (the log at its end, the crash's lines: scrolled once it shows, as a hidden edit does not)
         SendMessageA(log, EM_SETSEL, (WPARAM)-1, (LPARAM)-1);
@@ -713,14 +782,13 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
     RECT page = {14, 46, 14 + 656, 46 + 386};
     if (tabs)
     {
-        static const char *const names[3] = {"Stack trace", "Memory", "Log"};
         TCITEMA ti;
         SendMessageA(tabs, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), TRUE);
         memset(&ti, 0, sizeof(ti));
         ti.mask = TCIF_TEXT;
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 6; i++)
         {
-            ti.pszText = (LPSTR)names[i];
+            ti.pszText = (LPSTR)page_names[i];
             TabCtrl_InsertItem(tabs, i, &ti);
         }
         TabCtrl_AdjustRect(tabs, FALSE, &page);
@@ -755,6 +823,25 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
             mono = CreateFontA(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, FIXED_PITCH, "Consolas");
         if (memory)
             SendMessageA(memory, WM_SETFONT, (WPARAM)(mono ? mono : GetStockObject(ANSI_FIXED_FONT)), TRUE);
+        // (the threads', the game's and the system's pages: text as the memory's)
+        {
+            static const struct { int id; const char *text; } pages[3] = {
+                {ID_THREADS, thread_report}, {ID_GAME, game_report}, {ID_SYSTEM, sys_report}};
+            for (int i = 0; i < 3; i++)
+            {
+                HWND h = CreateWindowExA(WS_EX_CLIENTEDGE, "EDIT", "",
+                                         WS_CHILD | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_READONLY
+                                             | ES_AUTOVSCROLL | ES_AUTOHSCROLL,
+                                         page.left, page.top, page.right - page.left, page.bottom - page.top, hwnd,
+                                         (HMENU)(INT_PTR)pages[i].id, instance, NULL);
+                if (h)
+                {
+                    SendMessageA(h, EM_SETLIMITTEXT, 0, 0);
+                    SendMessageA(h, WM_SETFONT, (WPARAM)(mono ? mono : GetStockObject(ANSI_FIXED_FONT)), TRUE);
+                    SetWindowTextA(h, pages[i].text);
+                }
+            }
+        }
         if (log)
         {
             SendMessageA(log, EM_SETLIMITTEXT, 0, 0);
@@ -840,6 +927,254 @@ static void describe(DWORD64 addr, char *out, size_t n)
     out[n - 1] = 0;
 }
 
+/*
+ * The other threads' stacks. Each thread is suspended only for its context and a copy of its
+ * stack's top 64 KB (nothing that takes a lock: a suspended thread may hold the heap's or the
+ * log's), then resumed; its stack is walked from that copy afterwards, with the symbols.
+ */
+enum { SNAP_MAX = 64, SNAP_STACK = 64 * 1024, SNAP_FRAMES = 32 };
+static struct
+{
+    DWORD id;
+    CONTEXT ctx;
+    ULONG_PTR stack_at;
+    DWORD stack_bytes;
+    int ok;
+} snaps[SNAP_MAX];
+static BYTE snap_stacks[SNAP_MAX][SNAP_STACK];
+static int snap_count, snap_walking;
+
+// (StackWalk64's reads: the copied stack where the walk is in it, else the process's memory now)
+static BOOL CALLBACK snap_read(HANDLE proc, DWORD64 addr, PVOID buf, DWORD size, LPDWORD got)
+{
+    // (32-bit arithmetic: StackWalk64's addresses are 64-bit, and the copy is checked against its
+    // own size too; the mixed check let a read past the copy through, for a stack near 4 GB)
+    int s = snap_walking;
+    ULONG_PTR a = (ULONG_PTR)addr, lo = snaps[s].stack_at;
+    DWORD bytes = snaps[s].stack_bytes > SNAP_STACK ? SNAP_STACK : snaps[s].stack_bytes;
+
+    if (s >= 0 && s < snap_count && a >= lo && a - lo <= bytes && size <= bytes - (a - lo))
+    {
+        memcpy(buf, snap_stacks[s] + (a - lo), size);
+        *got = size;
+        return TRUE;
+    }
+    SIZE_T n = 0;
+    BOOL ok = ReadProcessMemory(proc, (LPCVOID)a, buf, size, &n);
+    *got = (DWORD)n;
+    return ok;
+}
+
+// (a copy that cannot fault: ReadProcessMemory on the game itself, a kernel call with no user-mode
+// lock, as much as is readable; a guarded memcpy faulted on a thread's stack at the top of the
+// address space, past its __try)
+static DWORD copy_guarded(void *dst, const void *src, DWORD n)
+{
+    SIZE_T got = 0;
+
+    if (!ReadProcessMemory(GetCurrentProcess(), src, dst, n, &got))
+    {
+        // (a partial read fails whole: the first page at least, then what follows page by page)
+        got = 0;
+        while (got < n)
+        {
+            SIZE_T part = 0, step = 4096 - (((ULONG_PTR)src + got) & 4095);
+
+            if (step > n - got)
+                step = n - got;
+            if (!ReadProcessMemory(GetCurrentProcess(), (const BYTE *)src + got, (BYTE *)dst + got, step, &part))
+                break;
+            got += part;
+        }
+    }
+    return (DWORD)got;
+}
+
+typedef HRESULT(WINAPI *GetThreadDescriptionFn)(HANDLE, PWSTR *);
+
+static void threads_report(DWORD crashed)
+{
+    HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0), proc = GetCurrentProcess();
+    DWORD self = GetCurrentThreadId(), pid = GetCurrentProcessId(), window = 0;
+    THREADENTRY32 te;
+    GetThreadDescriptionFn get_name =
+        (GetThreadDescriptionFn)GetProcAddress(GetModuleHandleA("kernel32.dll"), "GetThreadDescription");
+    size_t at = 0;
+
+    if (port_hwnd)
+        window = GetWindowThreadProcessId((HWND)port_hwnd, NULL);
+    thread_report[0] = 0;
+    snap_count = 0;
+    // (the snapshot's ids first: the toolhelp snapshot allocates, so before anything is suspended)
+    if (snap != INVALID_HANDLE_VALUE)
+    {
+        te.dwSize = sizeof(te);
+        if (Thread32First(snap, &te))
+            do
+                if (te.th32OwnerProcessID == pid && te.th32ThreadID != self && snap_count < SNAP_MAX)
+                    snaps[snap_count++].id = te.th32ThreadID;
+            while (Thread32Next(snap, &te));
+        CloseHandle(snap);
+    }
+    // (one at a time: suspended, its context and stack copied, resumed)
+    for (int i = 0; i < snap_count; i++)
+    {
+        HANDLE th = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION, FALSE,
+                               snaps[i].id);
+        MEMORY_BASIC_INFORMATION mbi;
+
+        snaps[i].ok = 0;
+        if (!th)
+            continue;
+        if (SuspendThread(th) != (DWORD)-1)
+        {
+            memset(&snaps[i].ctx, 0, sizeof(snaps[i].ctx));
+            snaps[i].ctx.ContextFlags = CONTEXT_FULL;
+            if (GetThreadContext(th, &snaps[i].ctx))
+            {
+                ULONG_PTR sp = snaps[i].ctx.Esp, end = sp;
+
+                if (VirtualQuery((LPCVOID)sp, &mbi, sizeof(mbi)) && mbi.State == MEM_COMMIT)
+                    end = (ULONG_PTR)mbi.BaseAddress + mbi.RegionSize;
+                snaps[i].stack_at = sp;
+                snaps[i].stack_bytes =
+                    copy_guarded(snap_stacks[i], (const void *)sp, (DWORD)(end - sp > SNAP_STACK ? SNAP_STACK : end - sp));
+                snaps[i].ok = 1;
+            }
+            ResumeThread(th);
+        }
+        CloseHandle(th);
+    }
+    // (now walked, with names and symbols: every thread runs again)
+#define TR(...) (at += _snprintf(thread_report + at, at < sizeof(thread_report) - 1 ? sizeof(thread_report) - 1 - at : 0, __VA_ARGS__), \
+                 at = at > sizeof(thread_report) - 1 ? sizeof(thread_report) - 1 : at, thread_report[at] = 0)
+    // (only the game's own threads, and only their frames in the game's executable: the system's,
+    // the drivers' and the libraries' threads and frames left out)
+    ULONG_PTR exe_lo = (ULONG_PTR)GetModuleHandleA(NULL), exe_hi = exe_lo;
+    {
+        const IMAGE_NT_HEADERS *nt =
+            (const IMAGE_NT_HEADERS *)(exe_lo + ((const IMAGE_DOS_HEADER *)exe_lo)->e_lfanew);
+        exe_hi = exe_lo + nt->OptionalHeader.SizeOfImage;
+    }
+    int shown = 0;
+    for (int i = 0; i < snap_count; i++)
+    {
+        static char frames[16 * 1024];
+        size_t fat = 0;
+        int game_frames = 0;
+        char name[128] = "";
+        HANDLE th;
+        STACKFRAME64 sf;
+        CONTEXT ctx = snaps[i].ctx;
+
+        if (!snaps[i].ok)
+            continue;
+        frames[0] = 0;
+        memset(&sf, 0, sizeof(sf));
+        sf.AddrPC.Offset = ctx.Eip;
+        sf.AddrPC.Mode = AddrModeFlat;
+        sf.AddrFrame.Offset = ctx.Ebp;
+        sf.AddrFrame.Mode = AddrModeFlat;
+        sf.AddrStack.Offset = ctx.Esp;
+        sf.AddrStack.Mode = AddrModeFlat;
+        snap_walking = i;
+        for (int f = 0; f < SNAP_FRAMES; f++)
+        {
+            char where[512];
+            ULONG_PTR pc;
+            int n;
+
+            if (!StackWalk64(IMAGE_FILE_MACHINE_I386, proc, GetCurrentThread(), &sf, &ctx, snap_read,
+                             SymFunctionTableAccess64, SymGetModuleBase64, NULL) || !sf.AddrPC.Offset)
+                break;
+            pc = (ULONG_PTR)sf.AddrPC.Offset;
+            if (pc < exe_lo || pc >= exe_hi)
+                continue;
+            describe(pc, where, sizeof(where));
+            n = _snprintf(frames + fat, sizeof(frames) - 1 - fat, "  %s\r\n", where);
+            fat = n < 0 ? sizeof(frames) - 1 : fat + n;
+            frames[fat] = 0;
+            game_frames++;
+        }
+        if (!game_frames)
+            continue;
+        th = OpenThread(THREAD_QUERY_LIMITED_INFORMATION, FALSE, snaps[i].id);
+        if (th && get_name)
+        {
+            PWSTR w = NULL;
+
+            if (SUCCEEDED(get_name(th, &w)) && w)
+            {
+                WideCharToMultiByte(CP_ACP, 0, w, -1, name, sizeof(name), NULL, NULL);
+                LocalFree(w);
+            }
+        }
+        if (th)
+            CloseHandle(th);
+        TR("%sThread %lu%s%s%s%s\r\n%s", shown ? "\r\n" : "", (unsigned long)snaps[i].id, name[0] ? " \"" : "", name,
+           name[0] ? "\"" : "", snaps[i].id == window ? " (the game's window thread)" : "", frames);
+        shown++;
+    }
+    if (!shown)
+        TR("No other thread is running the game's code.\r\n");
+#undef TR
+}
+
+// A report's part run guarded: a fault inside it (a crash leaves anything broken) is logged with
+// its address and costs only that part, not the rest of the report and the dialog.
+static DWORD guard_code;
+static ULONG_PTR guard_at, guard_data, guard_write;
+static CONTEXT guard_ctx;
+
+static int guard_filter(EXCEPTION_POINTERS *ep)
+{
+    guard_code = ep->ExceptionRecord->ExceptionCode;
+    guard_at = (ULONG_PTR)ep->ExceptionRecord->ExceptionAddress;
+    guard_data = ep->ExceptionRecord->NumberParameters >= 2 ? ep->ExceptionRecord->ExceptionInformation[1] : 0;
+    guard_write = ep->ExceptionRecord->NumberParameters >= 2 ? ep->ExceptionRecord->ExceptionInformation[0] : 0;
+    guard_ctx = *ep->ContextRecord;
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+
+static void guarded(const char *what, void (*part)(void *), void *arg)
+{
+    __try
+    {
+        part(arg);
+    }
+    __except (guard_filter(GetExceptionInformation()))
+    {
+        char where[512];
+
+        describe((DWORD64)guard_at, where, sizeof(where));
+        plog("  (the crash report's %s faulted: exception 0x%08lX at %s, %s %08lX)", what, (unsigned long)guard_code,
+             where, guard_write ? "writing" : "reading", (unsigned long)guard_data);
+        // (where in the report: the fault's own callers)
+        STACKFRAME64 sf;
+        CONTEXT ctx = guard_ctx;
+        memset(&sf, 0, sizeof(sf));
+        sf.AddrPC.Offset = ctx.Eip;
+        sf.AddrPC.Mode = AddrModeFlat;
+        sf.AddrFrame.Offset = ctx.Ebp;
+        sf.AddrFrame.Mode = AddrModeFlat;
+        sf.AddrStack.Offset = ctx.Esp;
+        sf.AddrStack.Mode = AddrModeFlat;
+        for (int i = 0; i < 6; i++)
+        {
+            if (!StackWalk64(IMAGE_FILE_MACHINE_I386, GetCurrentProcess(), GetCurrentThread(), &sf, &ctx, NULL,
+                             SymFunctionTableAccess64, SymGetModuleBase64, NULL) || !sf.AddrPC.Offset)
+                break;
+            describe(sf.AddrPC.Offset, where, sizeof(where));
+            plog("    #%d %s", i, where);
+        }
+    }
+}
+
+static void part_threads(void *) { threads_report(crash_thread); }
+static void part_memory(void *er) { memory_report((EXCEPTION_RECORD *)er); }
+static void part_game(void *) { port_crash_game_state(game_report, sizeof(game_report)); }
+static void part_system(void *) { system_info_crash(); }
+
 static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep)
 {
     static volatile LONG once;
@@ -879,9 +1214,17 @@ static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep)
         plog("  #%02d %s", i, trace[trace_count]);
         trace_count++;
     }
-    // (the memory report, logged before the log's tail is read: so the dump's comment and the zip have it)
-    memory_report(er);
-    log_memory_report();
+    // (the reports, logged before the log's tail is read: so the dump's comment and the zip have them;
+    // the threads first, the longest, so the tail keeps the rest)
+    crash_thread = GetCurrentThreadId();
+    guarded("threads", part_threads, NULL);
+    log_report("other threads", thread_report);
+    guarded("memory report", part_memory, er);
+    log_report("memory report", mem_report);
+    guarded("game state", part_game, NULL);
+    log_report("game state", game_report);
+    guarded("system information", part_system, NULL);
+    log_report("system", sys_report);
     // (the dump: the default, or the full one, or none, CODFH_CRASHDUMP)
     char dump_text[MAX_PATH + 96];
     int mode = dump_mode();
@@ -907,6 +1250,7 @@ extern "C" void port_crash_handler_install(void)
     char v[16];
 
     SetUnhandledExceptionFilter(on_crash);
+    system_info_startup();
     if (GetEnvironmentVariableA("CODFH_CRASHTEST", v, sizeof(v)) && atoi(v) > 0)
     {
         HANDLE th = CreateThread(NULL, 0, crash_test_thread, (LPVOID)(ULONG_PTR)atoi(v), 0, NULL);
