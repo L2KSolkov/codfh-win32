@@ -33,6 +33,8 @@ typedef struct PortConfig
     int windowed;
     int vsync;
     int widescreen;
+    int fill;               /* [video] fill: the 4:3 frame stretched to the window's shape, no black
+                               bars (widescreen fills too, and tells the game it is 16:9) */
     float mouseSensitivity;
     char adapter[64];       /* [video] adapter: a part of the GPU's name ("" the high-performance one) */
     float renderScale;      /* [video] render_scale: the frame drawn at 640x480 times this (0: as
@@ -48,6 +50,8 @@ typedef struct PortConfig
 
 extern PortConfig port_config;
 void port_config_load(void);
+/* [video] fill set now and kept in codfh.ini (the overlay's Renderer switch). */
+void port_config_set_fill(int on);
 
 /* The game's window (created by WinMain, used by the device). */
 extern void *port_hwnd;

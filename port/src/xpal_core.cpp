@@ -206,6 +206,15 @@ extern "C" void port_set_max_fps(int fps)
     port_config.maxFps = fps < 0 ? 0 : fps;
 }
 
+void port_config_set_fill(int on)
+{
+    char ini[MAX_PATH];
+    exe_dir(ini, sizeof(ini));
+    strcat(ini, "codfh.ini");
+    port_config.fill = on ? 1 : 0;
+    WritePrivateProfileStringA("video", "fill", on ? "1" : "0", ini);
+}
+
 void port_config_load(void)
 {
     char ini[MAX_PATH];
@@ -235,6 +244,7 @@ void port_config_load(void)
     port_config.windowed = ini_int(ini, "video", "windowed", 1);
     port_config.vsync = ini_int(ini, "video", "vsync", 1);
     port_config.widescreen = ini_int(ini, "video", "widescreen", 0);
+    port_config.fill = ini_int(ini, "video", "fill", 0);
     port_config.language = ini_int(ini, "game", "language", 0);
     {
         char user[64] = "Player";

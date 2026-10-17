@@ -8,7 +8,8 @@
  * coordinates stay 640x480 and only the device's viewports are scaled, so everything it draws
  * comes out at the larger size. The swap chain is the
  * window's size; the frame keeps its 4:3 shape in it (black bars), or fills it with [video]
- * widescreen.
+ * widescreen (the game told it is 16:9) or [video] fill (the 4:3 frame stretched; the overlay's
+ * Renderer switch).
  */
 #include <d3d11.h>
 #include <d3dcompiler.h>
@@ -191,9 +192,9 @@ static void final_pass(void)
     ctx->OMSetRenderTargets(1, &back_rtv, NULL);
     float bars[4] = {0, 0, 0, 1};
     ctx->ClearRenderTargetView(back_rtv, bars);
-    /* the frame's 4:3 in the window, centred */
+    /* the frame's 4:3 in the window, centred; or the whole window ([video] fill, widescreen) */
     float w = (float)back_w, h = (float)back_h, x = 0, y = 0;
-    if (!fill_window)
+    if (!fill_window && !port_config.fill)
     {
         if (w * frame_h > h * frame_w)
         {
@@ -620,7 +621,7 @@ extern "C" int pdev_window_to_frame(int x, int y, float *fx, float *fy)
     float w = (float)back_w, h = (float)back_h, ox = 0, oy = 0;
     if (!back_w || !back_h || !frame_w || !frame_h)
         return 0;
-    if (!fill_window)
+    if (!fill_window && !port_config.fill)
     {
         if (w * frame_h > h * frame_w)
         {

@@ -314,6 +314,17 @@ static void port_window(int back_w, int back_h)
         check("hide particles", &port_render_debug.hideParticles);
         ImGui::SameLine();
         check("hide 2D (HUD, menus)", &port_render_debug.hide2D);
+        {
+            /* (no black bars: the 4:3 frame stretched to the window; kept in codfh.ini's [video] fill) */
+            bool fill = port_config.fill != 0;
+            if (ImGui::Checkbox("fill the window (no black bars, stretched)", &fill))
+                port_config_set_fill(fill);
+            if (port_config.widescreen)
+            {
+                ImGui::SameLine();
+                ImGui::TextDisabled("(widescreen fills it already)");
+            }
+        }
     }
     if (ImGui::CollapsingHeader("Input"))
     {
