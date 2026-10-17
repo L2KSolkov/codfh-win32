@@ -357,6 +357,24 @@ static BOOL write_dump(int full, char *result, size_t n)
     return job.ok;
 }
 
+// The dump beside the dialog: written on a thread of its own, its result posted to the dialog
+// (WM_DUMP_DONE) once it is there; a dialog made after the dump is done takes the result at once.
+enum { WM_DUMP_DONE = WM_APP + 1 };
+static HANDLE dump_worker_thread;
+static int dump_full;
+static volatile LONG dump_done;
+static HWND dump_dialog;
+static char dump_result[MAX_PATH + 96];
+
+static DWORD WINAPI dump_worker(LPVOID)
+{
+    write_dump(dump_full, dump_result, sizeof(dump_result));
+    InterlockedExchange(&dump_done, 1);
+    if (dump_dialog)
+        PostMessageA(dump_dialog, WM_DUMP_DONE, 0, 0);
+    return 0;
+}
+
 static int dump_mode(void)
 {
     char v[8];
@@ -702,6 +720,12 @@ static LRESULT CALLBACK crash_window_proc(HWND hwnd, UINT message, WPARAM wparam
         show_page(hwnd, TabCtrl_GetCurSel(GetDlgItem(hwnd, ID_TABS)));
         return 0;
     }
+    if (message == WM_DUMP_DONE)
+    {
+        SetDlgItemTextA(hwnd, ID_DUMP_TEXT, dump_result);
+        EnableWindow(GetDlgItem(hwnd, ID_FULL_DUMP), TRUE);
+        return 0;
+    }
     if (message == WM_COMMAND && LOWORD(wparam) == ID_FULL_DUMP)
     {
         char result[MAX_PATH + 96];
@@ -858,6 +882,18 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
                                  14, 442, 430, 28, hwnd, (HMENU)ID_DUMP_TEXT, instance, NULL);
     dump_button = CreateWindowExA(0, "BUTTON", "Save full dump", WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON,
                                   452, 442, 112, 28, hwnd, (HMENU)ID_FULL_DUMP, instance, NULL);
+    // (the dump being written beside it: its result posted here; already done, taken now)
+    if (dump_worker_thread)
+    {
+        dump_dialog = hwnd;
+        if (dump_done)
+        {
+            if (dump_label)
+                SetWindowTextA(dump_label, dump_result);
+        }
+        else if (dump_button)
+            EnableWindow(dump_button, FALSE);
+    }
     if (!summary || !list || !close_button)
     {
         DestroyWindow(hwnd);
@@ -1233,15 +1269,29 @@ static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep)
     crash_thread = GetCurrentThreadId();
     main_module = GetModuleHandleA(NULL);
     read_log_tail();
+    // (the dump and its zip written beside the dialog, not before it: they take a second or more,
+    // which the dialog no longer waits for; its label says so and is set when they are done)
     if (mode)
     {
         if (mode != 2)
             crash_regions();
-        write_dump(mode == 2, dump_text, sizeof(dump_text));
+        dump_full = mode == 2;
+        dump_worker_thread = CreateThread(NULL, 0, dump_worker, NULL, 0, NULL);
+        if (dump_worker_thread)
+            strcpy(dump_text, "Writing the crash dump...");
+        else
+            write_dump(dump_full, dump_text, sizeof(dump_text));
     }
     else
         strcpy(dump_text, "No crash dump written (CODFH_CRASHDUMP=0).");
     show_crash_dialog(er->ExceptionCode, where, crash_frame, trace, trace_count, dump_text);
+    // (closed before the dump was done: it is finished first, as the process ends after)
+    if (dump_worker_thread)
+    {
+        WaitForSingleObject(dump_worker_thread, 120000);
+        CloseHandle(dump_worker_thread);
+        dump_worker_thread = NULL;
+    }
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
