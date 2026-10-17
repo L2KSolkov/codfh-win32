@@ -439,6 +439,7 @@ static void keyboard_state(XINPUT_GAMEPAD *g)
 {
     if (!bindings_loaded)
         load_bindings();
+    int sticks = 0;     /* (the stick axes keys deflect: 1 << axis) */
     for (size_t i = 0; i < sizeof(bindings) / sizeof(bindings[0]); i++)
     {
         const Binding &b = bindings[i];
@@ -454,6 +455,7 @@ static void keyboard_state(XINPUT_GAMEPAD *g)
         else
         {
             SHORT v = (b.value & 1) ? 32767 : -32768;
+            sticks |= 1 << (b.value >> 1);
             switch (b.value >> 1)
             {
             case 0: g->sThumbLX = v; break;
@@ -462,6 +464,19 @@ static void keyboard_state(XINPUT_GAMEPAD *g)
             default: g->sThumbRY = v; break;
             }
         }
+    }
+    /* (two keys on a stick, a diagonal, deflect it as far as a stick's round gate does: 0.71 on
+       each axis, not full on both. The game moves by each axis on its own, sub_109110's forward
+       and sub_109660's strafe, so full on both walked 1.41 times as fast as a pad's diagonal) */
+    if ((sticks & 3) == 3)
+    {
+        g->sThumbLX = (SHORT)(g->sThumbLX * 0.70710678f);
+        g->sThumbLY = (SHORT)(g->sThumbLY * 0.70710678f);
+    }
+    if ((sticks & 12) == 12)
+    {
+        g->sThumbRX = (SHORT)(g->sThumbRX * 0.70710678f);
+        g->sThumbRY = (SHORT)(g->sThumbRY * 0.70710678f);
     }
 }
 
