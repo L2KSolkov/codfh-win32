@@ -3816,3 +3816,54 @@ _rwTexDictionaryStats(RwInt32 *pnTextures, RwUInt32 *pnBytes)
 }
 #endif
 
+
+#ifdef CODFH_WIN32
+/* The port's crash report (CODFH_WIN32 crash report, port/src/crashinfo.cpp, not in the image):
+ * every linked dictionary's textures to cb (its name, its raster or NULL, its bytes over every mip
+ * level and its Xbox DXT format, 0 none), and the dictionary's index; as _rwTexDictionaryStats,
+ * without the texture lock and at most so many links; the dictionaries. */
+typedef void (*_rwTextureVisit)(const RwChar *name, const RwRaster *raster, RwUInt32 bytes, RwInt32 dxt,
+                                RwInt32 dict, void *data);
+extern RwInt32 _RwXbRasterExtOffset;
+
+RwInt32
+_rwTexDictionaryWalk(_rwTextureVisit cb, void *data, RwTexDictionary **current)
+{
+    RwLLLink *cur, *end;
+    RwInt32 nDicts = 0, nLinks = 0;
+
+    *current = RWTEXTUREGLOBAL(currentTexDict);
+    cur = rwLinkListGetFirstLLLink(&RWTEXTUREGLOBAL(texDictList));
+    end = rwLinkListGetTerminator(&RWTEXTUREGLOBAL(texDictList));
+    while (cur != end && cur && nDicts < 4096)
+    {
+        RwTexDictionary *dict = rwLLLinkGetData(cur, RwTexDictionary, lInInstance);
+        RwLLLink *t = rwLinkListGetFirstLLLink(&dict->texturesInDict);
+        RwLLLink *tend = rwLinkListGetTerminator(&dict->texturesInDict);
+
+        while (t != tend && t && nLinks++ < 65536)
+        {
+            RwTexture *tex = rwLLLinkGetData(t, RwTexture, lInDictionary);
+            RwRaster *raster = tex->raster;
+            RwUInt32 bytes = 0;
+            RwInt32 dxt = 0;
+
+            if (raster)
+            {
+                /* (the Xbox raster extension's DXT format, a byte at +0x11: xbraster.h) */
+                const RwUInt8 *ext = (const RwUInt8 *)raster + _RwXbRasterExtOffset;
+                RwInt32 levels = RwRasterGetNumLevels(raster), i;
+
+                for (i = 0; i < levels && i < 16; i++)
+                    bytes += _rwXbRasterGetSize(raster, (RwUInt8)i);
+                dxt = ext[0x11];
+            }
+            cb(tex->name, raster, bytes, dxt, nDicts, data);
+            t = rwLLLinkGetNext(t);
+        }
+        nDicts++;
+        cur = rwLLLinkGetNext(cur);
+    }
+    return nDicts;
+}
+#endif

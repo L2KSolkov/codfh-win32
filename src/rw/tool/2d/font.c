@@ -3724,3 +3724,23 @@ Rt2dFontTexDictionaryGet( void )
 
     RWRETURN(Rt2dGlobals.currFontTexDictionary);
 }
+
+#ifdef CODFH_WIN32
+/* The port's crash report (CODFH_WIN32 crash report, port/src/crashinfo.cpp, not in the image):
+ * the font dictionary's names, at most max of them into names; how many there are. */
+RwInt32
+_rt2dFontNames(const RwChar **names, RwInt32 max)
+{
+    _rt2dFontDictionaryNode *node = Rt2dGlobals.fontDictionary;
+    RwInt32 n = 0;
+
+    while (node && n < 1024)
+    {
+        if (n < max)
+            names[n] = node->name;
+        n++;
+        node = node->next;
+    }
+    return n;
+}
+#endif

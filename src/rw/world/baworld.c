@@ -2982,3 +2982,63 @@ RpWorldPluginAttach(void)
     /* Hurrah */
     RWRETURN(TRUE);
 }
+
+#ifdef CODFH_WIN32
+/* The port's crash report (CODFH_WIN32 crash report, port/src/crashinfo.cpp, not in the image):
+ * a world's sectors, clumps (its count), atomics, lights (local and directional), and its
+ * sectors' triangles and vertices, into out[0..6]; walked without locks, capped (the caller
+ * guards the reads). */
+void
+_rwWorldStats(const RpWorld *world, RwInt32 *out)
+{
+    const RpSector *stack[rpWORLDMAXBSPDEPTH + 1];
+    const RpSector *sect = world->rootSector;
+    RwInt32 n = 0, guard = 0;
+    const RwLLLink *cur, *end;
+
+    out[0] = out[1] = out[2] = out[3] = out[4] = out[5] = out[6] = 0;
+    out[1] = world->numClumpsInWorld;
+    while (sect && guard++ < 100000)
+    {
+        if (sect->type < 0)
+        {
+            const RpWorldSector *ws = (const RpWorldSector *)sect;
+
+            out[0]++;
+            out[5] += ws->numTriangles;
+            out[6] += ws->numVertices;
+            if (n <= 0)
+                break;
+            sect = stack[--n];
+        }
+        else
+        {
+            const RpPlaneSector *plane = (const RpPlaneSector *)sect;
+
+            if (n < rpWORLDMAXBSPDEPTH)
+                stack[n++] = plane->rightSubTree;
+            sect = plane->leftSubTree;
+        }
+    }
+    cur = rwLinkListGetFirstLLLink(&world->clumpList);
+    end = rwLinkListGetTerminator(&world->clumpList);
+    for (guard = 0; cur != end && cur && guard < 100000; guard++, cur = rwLLLinkGetNext(cur))
+    {
+        const RpClump *clump = rwLLLinkGetConstData(cur, RpClump, inWorldLink);
+        const RwLLLink *a = rwLinkListGetFirstLLLink(&clump->atomicList);
+        const RwLLLink *aend = rwLinkListGetTerminator(&clump->atomicList);
+        RwInt32 g2;
+
+        for (g2 = 0; a != aend && a && g2 < 10000; g2++, a = rwLLLinkGetNext(a))
+            out[2]++;
+    }
+    cur = rwLinkListGetFirstLLLink(&world->lightList);
+    end = rwLinkListGetTerminator(&world->lightList);
+    for (guard = 0; cur != end && cur && guard < 100000; guard++, cur = rwLLLinkGetNext(cur))
+        out[3]++;
+    cur = rwLinkListGetFirstLLLink(&world->directionalLightList);
+    end = rwLinkListGetTerminator(&world->directionalLightList);
+    for (guard = 0; cur != end && cur && guard < 100000; guard++, cur = rwLLLinkGetNext(cur))
+        out[4]++;
+}
+#endif

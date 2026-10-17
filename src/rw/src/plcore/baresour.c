@@ -832,3 +832,15 @@ RwResourcesEmptyArena(void)
     /* Done */
     RWRETURN(TRUE);
 }
+
+#ifdef CODFH_WIN32
+/* The port's crash report (CODFH_WIN32 crash report, port/src/crashinfo.cpp, not in the image):
+ * the resources arena's size, what is in it, and what is kept for reuse. */
+void
+_rwResourcesStats(RwInt32 *maxSize, RwInt32 *currentSize, RwInt32 *reusageSize)
+{
+    *maxSize = RWRESOURCESGLOBAL(res.maxSize);
+    *currentSize = RWRESOURCESGLOBAL(res.currentSize);
+    *reusageSize = RWRESOURCESGLOBAL(res.reusageSize);
+}
+#endif

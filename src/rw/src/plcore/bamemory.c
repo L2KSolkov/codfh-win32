@@ -220,6 +220,39 @@ _rwFreeListEnable(RwBool enabled)
     (( (RwUInt32)(_addr) + ((_alignment) - 1) ) & ~((_alignment) - 1))
 
 static RwLinkList _freeListList;
+
+#ifdef CODFH_WIN32
+/* The port's crash report (CODFH_WIN32 crash report, port/src/crashinfo.cpp, not in the image):
+ * each free list's creator, the address its create call returns to, so the report names the list
+ * by the function that made it (_rwTextureOpen, _rt2dBrushOpen...). */
+#include <intrin.h>
+static struct { RwFreeList *freeList; void *creator; } _rwFreeListCreators[512];
+
+static void
+_rwFreeListRecord(RwFreeList *freeList, void *creator)
+{
+    RwInt32 i, empty = -1;
+
+    for (i = 0; i < 512; i++)
+    {
+        if (_rwFreeListCreators[i].freeList == freeList)
+        {
+            if (creator)
+                _rwFreeListCreators[i].creator = creator;
+            else
+                _rwFreeListCreators[i].freeList = NULL;
+            return;
+        }
+        if (empty < 0 && !_rwFreeListCreators[i].freeList)
+            empty = i;
+    }
+    if (creator && freeList && empty >= 0)
+    {
+        _rwFreeListCreators[empty].freeList = freeList;
+        _rwFreeListCreators[empty].creator = creator;
+    }
+}
+#endif
 static RwBool     _freeListModuleOpen = FALSE;
 static RwFreeList _masterFreeList; /* free list for the free lists */
 static RwFreeList *_masterFreeListPtr = NULL;
@@ -513,7 +546,15 @@ RwFreeListCreate(RwInt32 entrySize, RwInt32 entriesPerBlock,
     RWASSERT(entrySize);
     RWASSERT(entriesPerBlock);
     RWASSERT(!(alignment & (alignment - 1))); /* Assert power of 2 */
+#ifdef CODFH_WIN32
+    {
+        RwFreeList *freeList = FreeListCreate(entrySize, entriesPerBlock, alignment, 1, NULL, hint);
+        _rwFreeListRecord(freeList, _ReturnAddress());
+        RWRETURN(freeList);
+    }
+#else
     RWRETURN(FreeListCreate(entrySize, entriesPerBlock, alignment, 1, NULL, hint));
+#endif
 }
 #endif /* (defined(RWDEBUG) && !defined(DOXYGEN)) */
 
@@ -570,8 +611,17 @@ RwFreeListCreateAndPreallocateSpace(RwInt32 entrySize,
     RWASSERT(entrySize);
     RWASSERT(entriesPerBlock);
     RWASSERT(!(alignment & (alignment - 1))); /* Assert power of 2 */
+#ifdef CODFH_WIN32
+    {
+        RwFreeList *freeList = FreeListCreate(entrySize, entriesPerBlock, alignment, numBlocksToPreallocate,
+                                              inPlaceSpaceForFreeListStruct, hint);
+        _rwFreeListRecord(freeList, _ReturnAddress());
+        RWRETURN(freeList);
+    }
+#else
     RWRETURN(FreeListCreate(entrySize, entriesPerBlock, alignment,
         numBlocksToPreallocate, inPlaceSpaceForFreeListStruct, hint));
+#endif
 }
 
 
@@ -644,6 +694,9 @@ RwFreeListDestroy(RwFreeList * freeList)
 
     /* remove from list of freelists */
     rwLinkListRemoveLLLink(&freeList->link);
+#ifdef CODFH_WIN32
+    _rwFreeListRecord(freeList, NULL);
+#endif
 
     /* free it */
     _RwFreeListFree(freeList);
@@ -1295,8 +1348,9 @@ RwFreeListPurgeAllFreeLists(void)
 #ifdef CODFH_WIN32
 /* The port's crash report (port/src/crashinfo.cpp, not in the image): each free list's entry
  * size, entries a block, blocks and entries in use (a block is its link, its in-use bitmap and
- * its entries), four words a list into out, at most max lists; read without the lists' locks and
- * at most so many links (the caller guards the reads); the lists. */
+ * its entries) and its creator (0 when not recorded), five words a list into out, at most max
+ * lists; read without the lists' locks and at most so many links (the caller guards the reads);
+ * the lists. */
 RwInt32
 _rwFreeListStats(RwUInt32 *out, RwInt32 max)
 {
@@ -1331,10 +1385,18 @@ _rwFreeListStats(RwUInt32 *out, RwInt32 max)
             blocks++;
             b = rwLLLinkGetNext(b);
         }
-        out[n * 4 + 0] = freeList->entrySize;
-        out[n * 4 + 1] = freeList->entriesPerBlock;
-        out[n * 4 + 2] = blocks;
-        out[n * 4 + 3] = used;
+        out[n * 5 + 0] = freeList->entrySize;
+        out[n * 5 + 1] = freeList->entriesPerBlock;
+        out[n * 5 + 2] = blocks;
+        out[n * 5 + 3] = used;
+        out[n * 5 + 4] = 0;
+        {
+            RwInt32 i;
+
+            for (i = 0; i < 512; i++)
+                if (_rwFreeListCreators[i].freeList == freeList)
+                    out[n * 5 + 4] = (RwUInt32)_rwFreeListCreators[i].creator;
+        }
         n++;
         cur = rwLLLinkGetNext(cur);
     }

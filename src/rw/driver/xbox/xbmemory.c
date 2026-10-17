@@ -980,3 +980,25 @@ RwXbVertexBufferLockDiscard(D3DVertexBuffer *vertexBuffer, RwUInt32 size)
 
     return bufferMem;
 }
+
+#ifdef CODFH_WIN32
+/* The port's crash report (CODFH_WIN32 crash report, port/src/crashinfo.cpp, not in the image):
+ * the driver's physical memory, its blocks created and their bytes, the free entries and their
+ * bytes, the dynamic vertex buffers and their bytes, into out[0..5]; walked capped (the caller
+ * guards the reads). */
+void
+_rwXbMemoryStats(RwUInt32 *out)
+{
+    const _rwXboxMemoryBlockEntry *e;
+    const XbAllocatedVB *vb;
+    RwInt32 guard;
+
+    out[0] = out[1] = out[2] = out[3] = out[4] = out[5] = 0;
+    for (e = _rwXboxMemoryBlocklist, guard = 0; e && guard < 100000; e = e->next, guard++)
+        out[0]++, out[1] += e->size;
+    for (e = _rwXboxMemoryBlockFreelist, guard = 0; e && guard < 100000; e = e->next, guard++)
+        out[2]++, out[3] += e->size;
+    for (vb = AllocatedVertexBuffers, guard = 0; vb && guard < 100000; vb = vb->next, guard++)
+        out[4]++, out[5] += vb->size;
+}
+#endif

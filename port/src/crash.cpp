@@ -512,14 +512,27 @@ static void memory_report(EXCEPTION_RECORD *er)
     // (the Xbox's physical memory: XPhysicalAlloc, RenderWare's vertex and texture memory)
     mr("  Xbox physical    %9.1f MB in %ld blocks (peak %.1f MB)\r\n", mb((ULONG)port_xphys_bytes),
        (long)port_xphys_blocks, mb((ULONG)port_xphys_peak));
+}
 
-    // RenderWare's free lists and textures (crashinfo.cpp)
-    {
-        static char rw[4 * 1024];
+// RenderWare's page (crashinfo.cpp): the engine, the free lists, the textures, the worlds, the
+// fonts, the driver's memory.
+static char rw_report[24 * 1024];
 
-        port_crash_rw_stats(rw, sizeof(rw));
-        mr("\r\n%s", rw);
-    }
+// A code address's function (no offset), for crashinfo.cpp's free lists' creators.
+extern "C" void port_crash_symbol(const void *addr, char *out, size_t n)
+{
+    char buf[sizeof(SYMBOL_INFO) + 256];
+    SYMBOL_INFO *sym = (SYMBOL_INFO *)buf;
+    DWORD64 displacement = 0;
+
+    memset(buf, 0, sizeof(buf));
+    sym->SizeOfStruct = sizeof(SYMBOL_INFO);
+    sym->MaxNameLen = 255;
+    if (SymFromAddr(GetCurrentProcess(), (DWORD64)(ULONG_PTR)addr, &displacement, sym))
+        _snprintf(out, n, "%s", sym->Name);
+    else
+        _snprintf(out, n, "%08lX", (unsigned long)(ULONG_PTR)addr);
+    out[n - 1] = 0;
 }
 
 /*
@@ -695,26 +708,19 @@ static void log_report(const char *title, const char *text)
 // The other threads' stacks (threads_report, below).
 static char thread_report[160 * 1024];
 
-enum { ID_TABS = 1006, ID_MEMORY = 1004, ID_LOG = 1005, ID_TRACE = 1001, ID_THREADS = 1007, ID_GAME = 1008,
-       ID_SYSTEM = 1009 };
+enum { ID_TABS = 1006, ID_MEMORY = 1004, ID_TRACE = 1001, ID_THREADS = 1007, ID_RW = 1010 };
 
-// The dialog's pages, in their tabs' order: the stack trace, the other threads, the memory, the
-// game, the system, the log's tail.
-static const int page_ids[6] = {ID_TRACE, ID_THREADS, ID_MEMORY, ID_GAME, ID_SYSTEM, ID_LOG};
-static const char *const page_names[6] = {"Stack trace", "Threads", "Memory", "Game", "System", "Log"};
+// The dialog's pages, in their tabs' order: the stack trace, the game's other threads, the
+// memory, RenderWare. (The game's state, the system and the log's tail are in the log and the
+// dump's zip, not here.)
+enum { PAGES = 4 };
+static const int page_ids[PAGES] = {ID_TRACE, ID_THREADS, ID_MEMORY, ID_RW};
+static const char *const page_names[PAGES] = {"Stack trace", "Threads", "Memory", "RenderWare"};
 
 static void show_page(HWND hwnd, int page)
 {
-    HWND log = GetDlgItem(hwnd, ID_LOG);
-
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < PAGES; i++)
         ShowWindow(GetDlgItem(hwnd, page_ids[i]), page == i ? SW_SHOW : SW_HIDE);
-    if (page == 5 && log)
-    {
-        // (the log at its end, the crash's lines: scrolled once it shows, as a hidden edit does not)
-        SendMessageA(log, EM_SETSEL, (WPARAM)-1, (LPARAM)-1);
-        SendMessageA(log, EM_SCROLLCARET, 0, 0);
-    }
 }
 
 static LRESULT CALLBACK crash_window_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
@@ -814,7 +820,7 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
         SendMessageA(tabs, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), TRUE);
         memset(&ti, 0, sizeof(ti));
         ti.mask = TCIF_TEXT;
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < PAGES; i++)
         {
             ti.pszText = (LPSTR)page_names[i];
             TabCtrl_InsertItem(tabs, i, &ti);
@@ -827,35 +833,20 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
                            (HMENU)ID_TRACE, instance, NULL);
     {
         static HFONT mono;
-        static char log_view[sizeof(log_tail) * 2];
         HWND memory = CreateWindowExA(WS_EX_CLIENTEDGE, "EDIT", mem_report,
                                       WS_CHILD | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL
                                           | ES_AUTOHSCROLL,
                                       page.left, page.top, page.right - page.left, page.bottom - page.top, hwnd,
                                       (HMENU)ID_MEMORY, instance, NULL);
-        HWND log = CreateWindowExA(WS_EX_CLIENTEDGE, "EDIT", "",
-                                   WS_CHILD | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL
-                                       | ES_AUTOHSCROLL,
-                                   page.left, page.top, page.right - page.left, page.bottom - page.top, hwnd,
-                                   (HMENU)ID_LOG, instance, NULL);
-        // (the log's lines with CR LF, as an edit control shows them)
-        size_t o = 0;
-        for (const char *p = log_tail; *p && o < sizeof(log_view) - 3; p++)
-        {
-            if (*p == '\n' && (p == log_tail || p[-1] != '\r'))
-                log_view[o++] = '\r';
-            log_view[o++] = *p;
-        }
-        log_view[o] = 0;
         if (!mono)
             mono = CreateFontA(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, FIXED_PITCH, "Consolas");
         if (memory)
             SendMessageA(memory, WM_SETFONT, (WPARAM)(mono ? mono : GetStockObject(ANSI_FIXED_FONT)), TRUE);
-        // (the threads', the game's and the system's pages: text as the memory's)
+        // (the threads' and RenderWare's pages: text as the memory's)
         {
-            static const struct { int id; const char *text; } pages[3] = {
-                {ID_THREADS, thread_report}, {ID_GAME, game_report}, {ID_SYSTEM, sys_report}};
-            for (int i = 0; i < 3; i++)
+            static const struct { int id; const char *text; } pages[2] = {
+                {ID_THREADS, thread_report}, {ID_RW, rw_report}};
+            for (int i = 0; i < 2; i++)
             {
                 HWND h = CreateWindowExA(WS_EX_CLIENTEDGE, "EDIT", "",
                                          WS_CHILD | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_READONLY
@@ -869,14 +860,6 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
                     SetWindowTextA(h, pages[i].text);
                 }
             }
-        }
-        if (log)
-        {
-            SendMessageA(log, EM_SETLIMITTEXT, 0, 0);
-            SendMessageA(log, WM_SETFONT, (WPARAM)(mono ? mono : GetStockObject(ANSI_FIXED_FONT)), TRUE);
-            SetWindowTextA(log, log_view);
-            SendMessageA(log, EM_SETSEL, (WPARAM)-1, (LPARAM)-1);
-            SendMessageA(log, EM_SCROLLCARET, 0, 0);
         }
     }
     close_button = CreateWindowExA(0, "BUTTON", "Close",
@@ -1214,6 +1197,7 @@ static void part_threads(void *) { threads_report(crash_thread); }
 static void part_memory(void *er) { memory_report((EXCEPTION_RECORD *)er); }
 static void part_game(void *) { port_crash_game_state(game_report, sizeof(game_report)); }
 static void part_system(void *) { system_info_crash(); }
+static void part_rw(void *) { port_crash_rw_stats(rw_report, sizeof(rw_report)); }
 
 static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep)
 {
@@ -1264,6 +1248,8 @@ static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep)
     log_report("other threads", thread_report);
     guarded("memory report", part_memory, er);
     log_report("memory report", mem_report);
+    guarded("RenderWare report", part_rw, NULL);
+    log_report("RenderWare", rw_report);
     guarded("game state", part_game, NULL);
     log_report("game state", game_report);
     guarded("system information", part_system, NULL);
