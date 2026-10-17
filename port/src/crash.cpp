@@ -25,10 +25,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "port.h"
 
 extern "C" const char codfh_git_rev[];  /* (gitrev.c beside the executable, written by tools/portbuild.py) */
+
+/* The executable's link time, its header's TimeDateStamp (the linker writes it; no /Brepro), as
+   local time "2026-10-16 18:30:12": when the build was made. Kept from its first call (the
+   startup's log line), so a crash only reads the string. */
+extern "C" const char *port_build_time(void)
+{
+    static char s[32];
+    if (!s[0])
+    {
+        const BYTE *base = (const BYTE *)GetModuleHandleA(NULL);
+        const IMAGE_NT_HEADERS *nt = (const IMAGE_NT_HEADERS *)(base + ((const IMAGE_DOS_HEADER *)base)->e_lfanew);
+        __time64_t t = nt->FileHeader.TimeDateStamp;
+        struct tm lt;
+        if (_localtime64_s(&lt, &t) || !strftime(s, sizeof(s), "%Y-%m-%d %H:%M:%S", &lt))
+            strcpy(s, "unknown time");
+    }
+    return s;
+}
 
 static const char crash_window_class[] = "CODFHCrashDialog";
 
@@ -407,7 +426,8 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
     }
 
     char title[160];
-    _snprintf(title, sizeof(title), "Call of Duty: Finest Hour - Crash Report (build %s)", codfh_git_rev);
+    _snprintf(title, sizeof(title), "Call of Duty: Finest Hour - Crash Report (build %s, %s)", codfh_git_rev,
+              port_build_time());
     title[sizeof(title) - 1] = 0;
     hwnd = CreateWindowExA(WS_EX_DLGMODALFRAME | WS_EX_TOPMOST, crash_window_class, title,
                            WS_CAPTION | WS_SYSMENU | WS_CLIPCHILDREN,
@@ -440,8 +460,8 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
 
     char detail[640];
     /* (the build on a line of its own: the commit a crash report is matched to) */
-    _snprintf(detail, sizeof(detail), "Exception 0x%08lX at %s (frame %u)\nBuild %s", code, where, frame,
-              codfh_git_rev);
+    _snprintf(detail, sizeof(detail), "Exception 0x%08lX at %s (frame %u)\nBuild %s, built %s", code, where, frame,
+              codfh_git_rev, port_build_time());
     detail[sizeof(detail) - 1] = 0;
     SetWindowTextA(summary, detail);
     for (int i = 0; i < trace_count; i++)
@@ -511,7 +531,8 @@ static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep)
     EXCEPTION_RECORD *er = ep->ExceptionRecord;
     char where[512];
     describe((DWORD64)(ULONG_PTR)er->ExceptionAddress, where, sizeof(where));
-    plog("CRASH: exception 0x%08lX at %s, frame %u, build %s", er->ExceptionCode, where, port_frame, codfh_git_rev);
+    plog("CRASH: exception 0x%08lX at %s, frame %u, build %s (%s)", er->ExceptionCode, where, port_frame,
+         codfh_git_rev, port_build_time());
     if (er->ExceptionCode == EXCEPTION_ACCESS_VIOLATION && er->NumberParameters >= 2)
         plog("  %s address %08lX", er->ExceptionInformation[0] ? "writing" : "reading",
              (unsigned long)er->ExceptionInformation[1]);

@@ -17,6 +17,7 @@ extern "C" void port_audio_shutdown(void);
 int main();
 extern "C" void port_crash_handler_install(void);
 extern "C" const char codfh_git_rev[];  /* (gitrev.c beside the executable, written by tools/portbuild.py) */
+extern "C" const char *port_build_time(void);  /* (crash.cpp: the executable's link time) */
 
 /* The mouse's movement since the controllers last read it (xpal_sys.cpp turns it into the right
    stick). */
@@ -312,7 +313,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR cmd, int)
     timeBeginPeriod(1);
     create_window(inst);
     port_pump_messages();
-    plog("starting the game (build %s)", codfh_git_rev);
+    plog("starting the game (build %s, built %s)", codfh_git_rev, port_build_time());
     int r = main();
     plog("main returned %d", r);
     return r;
