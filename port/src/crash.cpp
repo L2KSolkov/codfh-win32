@@ -26,6 +26,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdarg.h>
+#include <psapi.h>
+#include <tlhelp32.h>
+#include <commctrl.h>
 
 #include "port.h"
 
@@ -369,8 +373,266 @@ static DWORD WINAPI crash_test_thread(LPVOID arg)
 
 // ---- the report window ----
 
+/*
+ * The memory report: the faulting address's region, the process's memory, its 4 GB address space
+ * walked (committed, reserved, free, the largest free block, what lies above 1 GB and 2 GB: the
+ * Xbox's 30- and 31-bit pointers break up there), the Xbox physical memory out, the system's
+ * memory, the threads, handles and window objects, the uptime and CPU time. Written with fixed
+ * buffers only (the heap may be what broke), logged line by line and shown on the dialog's
+ * Memory page.
+ */
+extern "C" volatile LONG port_xphys_blocks, port_xphys_bytes, port_xphys_peak;   /* (xpal_sys.cpp) */
+static unsigned crash_frame;   /* (the frame of the crash, read once: the game's thread goes on counting) */
+static char mem_report[12 * 1024];
+static int mem_at;
+
+static void mr(const char *fmt, ...)
+{
+    va_list a;
+    int n;
+
+    va_start(a, fmt);
+    n = _vsnprintf(mem_report + mem_at, sizeof(mem_report) - 1 - mem_at, fmt, a);
+    va_end(a);
+    mem_at = n < 0 ? (int)sizeof(mem_report) - 1 : mem_at + n;
+    mem_report[mem_at] = 0;
+}
+
+static double mb(ULONG64 n)
+{
+    return (double)n / (1024.0 * 1024.0);
+}
+
+static const char *protect_name(DWORD p)
+{
+    switch (p & 0xFF)
+    {
+    case PAGE_NOACCESS: return "no access";
+    case PAGE_READONLY: return "read-only";
+    case PAGE_READWRITE: return "read/write";
+    case PAGE_WRITECOPY: return "write-copy";
+    case PAGE_EXECUTE: return "execute";
+    case PAGE_EXECUTE_READ: return "execute/read";
+    case PAGE_EXECUTE_READWRITE: return "execute/read/write";
+    case PAGE_EXECUTE_WRITECOPY: return "execute/write-copy";
+    }
+    return p ? "other" : "-";
+}
+
+// One address's region: committed, reserved or free, its protection and kind, its allocation,
+// and the module it is in.
+static void region_line(const char *what, ULONG_PTR addr)
+{
+    MEMORY_BASIC_INFORMATION mbi;
+    char module[MAX_PATH] = "";
+
+    if (!VirtualQuery((LPCVOID)addr, &mbi, sizeof(mbi)))
+    {
+        mr("%s %08lX: not in the address space\r\n", what, (unsigned long)addr);
+        return;
+    }
+    if (mbi.Type == MEM_IMAGE && GetModuleFileNameA((HMODULE)mbi.AllocationBase, module, sizeof(module)))
+    {
+        char *slash = strrchr(module, '\\');
+        if (slash)
+            memmove(module, slash + 1, strlen(slash));
+    }
+    mr("%s %08lX: %s", what, (unsigned long)addr,
+       mbi.State == MEM_FREE ? "free (nothing there)" : mbi.State == MEM_RESERVE ? "reserved, not committed" : "committed");
+    if (mbi.State == MEM_COMMIT)
+        mr(", %s%s", protect_name(mbi.Protect), (mbi.Protect & PAGE_GUARD) ? " (guard page)" : "");
+    if (mbi.State != MEM_FREE)
+        mr(", %s, allocation %08lX, region %08lX-%08lX%s%s",
+           mbi.Type == MEM_IMAGE ? "image" : mbi.Type == MEM_MAPPED ? "mapped" : "private",
+           (unsigned long)(ULONG_PTR)mbi.AllocationBase, (unsigned long)(ULONG_PTR)mbi.BaseAddress,
+           (unsigned long)((ULONG_PTR)mbi.BaseAddress + mbi.RegionSize - 1), module[0] ? ", " : "", module);
+    mr("\r\n");
+}
+
+typedef BOOL(WINAPI *GetProcessMemoryInfoFn)(HANDLE, PPROCESS_MEMORY_COUNTERS, DWORD);
+
+static void memory_report(EXCEPTION_RECORD *er)
+{
+    HANDLE proc = GetCurrentProcess();
+    PROCESS_MEMORY_COUNTERS_EX pmc;
+    GetProcessMemoryInfoFn get_pmi;
+    MEMORYSTATUSEX ms;
+    ULONG64 committed = 0, reserved = 0, freed = 0, largest = 0, image = 0, mapped = 0, priv = 0, above1 = 0,
+            above2 = 0;
+    ULONG_PTR largest_at = 0, highest = 0, a = 0x10000;
+    int regions = 0;
+
+    mem_at = 0;
+    mem_report[0] = 0;
+    mr("Build %s, built %s; frame %u\r\n\r\n", codfh_git_rev, port_build_time(), crash_frame);
+
+    // the exception's addresses
+    region_line("Instruction", (ULONG_PTR)er->ExceptionAddress);
+    if (er->ExceptionCode == EXCEPTION_ACCESS_VIOLATION && er->NumberParameters >= 2)
+        region_line(er->ExceptionInformation[0] == 1 ? "Write to" : er->ExceptionInformation[0] == 8 ? "Execute at"
+                                                                                                       : "Read of",
+                    (ULONG_PTR)er->ExceptionInformation[1]);
+
+    // the process's memory
+    get_pmi = (GetProcessMemoryInfoFn)GetProcAddress(GetModuleHandleA("kernel32.dll"), "K32GetProcessMemoryInfo");
+    memset(&pmc, 0, sizeof(pmc));
+    pmc.cb = sizeof(pmc);
+    if (get_pmi && get_pmi(proc, (PPROCESS_MEMORY_COUNTERS)&pmc, sizeof(pmc)))
+    {
+        mr("\r\nProcess memory\r\n");
+        mr("  working set      %9.1f MB (peak %.1f MB)\r\n", mb(pmc.WorkingSetSize), mb(pmc.PeakWorkingSetSize));
+        mr("  committed        %9.1f MB (peak %.1f MB)\r\n", mb(pmc.PrivateUsage), mb(pmc.PeakPagefileUsage));
+        mr("  page faults      %9lu\r\n", (unsigned long)pmc.PageFaultCount);
+    }
+
+    // the address space, region by region
+    while (a < 0xFFFF0000u && regions < 200000)
+    {
+        MEMORY_BASIC_INFORMATION mbi;
+        ULONG_PTR end;
+
+        if (!VirtualQuery((LPCVOID)a, &mbi, sizeof(mbi)) || !mbi.RegionSize)
+            break;
+        end = (ULONG_PTR)mbi.BaseAddress + mbi.RegionSize;
+        regions++;
+        if (mbi.State == MEM_FREE)
+        {
+            freed += mbi.RegionSize;
+            if (mbi.RegionSize > largest)
+                largest = mbi.RegionSize, largest_at = (ULONG_PTR)mbi.BaseAddress;
+        }
+        else if (mbi.State == MEM_RESERVE)
+            reserved += mbi.RegionSize;
+        else
+        {
+            committed += mbi.RegionSize;
+            if (mbi.Type == MEM_IMAGE)
+                image += mbi.RegionSize;
+            else if (mbi.Type == MEM_MAPPED)
+                mapped += mbi.RegionSize;
+            else
+                priv += mbi.RegionSize;
+            if ((ULONG_PTR)mbi.BaseAddress >= 0x40000000u)
+                above1 += mbi.RegionSize;
+            if ((ULONG_PTR)mbi.BaseAddress >= 0x80000000u)
+                above2 += mbi.RegionSize;
+            if (end > highest)
+                highest = end;
+        }
+        if (end <= a)
+            break;
+        a = end;
+    }
+    mr("\r\nAddress space (%d regions)\r\n", regions);
+    mr("  committed        %9.1f MB (private %.1f, images %.1f, mapped %.1f)\r\n", mb(committed), mb(priv), mb(image),
+       mb(mapped));
+    mr("  reserved         %9.1f MB\r\n", mb(reserved));
+    mr("  free             %9.1f MB, the largest block %.1f MB at %08lX\r\n", mb(freed), mb(largest),
+       (unsigned long)largest_at);
+    mr("  committed above 1 GB %.1f MB, above 2 GB %.1f MB; the highest ends at %08lX\r\n", mb(above1), mb(above2),
+       (unsigned long)highest);
+
+    // the Xbox's physical memory (XPhysicalAlloc: RenderWare's vertex and texture memory)
+    mr("\r\nXbox physical memory (XPhysicalAlloc)\r\n");
+    mr("  out              %9.1f MB in %ld blocks (peak %.1f MB)\r\n", mb((ULONG)port_xphys_bytes),
+       (long)port_xphys_blocks, mb((ULONG)port_xphys_peak));
+
+    // the system
+    ms.dwLength = sizeof(ms);
+    if (GlobalMemoryStatusEx(&ms))
+    {
+        mr("\r\nSystem\r\n");
+        mr("  physical memory  %9.1f MB free of %.1f MB (%lu%% in use)\r\n", mb(ms.ullAvailPhys), mb(ms.ullTotalPhys),
+           (unsigned long)ms.dwMemoryLoad);
+        mr("  commit           %9.1f MB free of %.1f MB\r\n", mb(ms.ullAvailPageFile), mb(ms.ullTotalPageFile));
+        mr("  the process's address space %.1f MB, %.1f MB free\r\n", mb(ms.ullTotalVirtual), mb(ms.ullAvailVirtual));
+    }
+
+    // threads, handles, window objects, times
+    {
+        HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+        THREADENTRY32 te;
+        int threads = 0;
+        DWORD handles = 0, pid = GetCurrentProcessId();
+        FILETIME created, exited, kernel, user, now;
+        SYSTEMTIME st;
+
+        if (snap != INVALID_HANDLE_VALUE)
+        {
+            te.dwSize = sizeof(te);
+            if (Thread32First(snap, &te))
+                do
+                    threads += te.th32OwnerProcessID == pid;
+                while (Thread32Next(snap, &te));
+            CloseHandle(snap);
+        }
+        GetProcessHandleCount(proc, &handles);
+        mr("\r\nProcess\r\n");
+        mr("  threads %d, handles %lu, GDI objects %lu, USER objects %lu\r\n", threads, (unsigned long)handles,
+           (unsigned long)GetGuiResources(proc, GR_GDIOBJECTS), (unsigned long)GetGuiResources(proc, GR_USEROBJECTS));
+        if (GetProcessTimes(proc, &created, &exited, &kernel, &user))
+        {
+            ULONG64 c = ((ULONG64)created.dwHighDateTime << 32) | created.dwLowDateTime, n, k, u;
+
+            GetSystemTime(&st);
+            SystemTimeToFileTime(&st, &now);
+            n = ((ULONG64)now.dwHighDateTime << 32) | now.dwLowDateTime;
+            k = ((ULONG64)kernel.dwHighDateTime << 32) | kernel.dwLowDateTime;
+            u = ((ULONG64)user.dwHighDateTime << 32) | user.dwLowDateTime;
+            n = n > c ? (n - c) / 10000000 : 0;
+            mr("  up %lu:%02lu:%02lu, CPU %.1f s in the game, %.1f s in the system\r\n", (unsigned long)(n / 3600),
+               (unsigned long)(n / 60 % 60), (unsigned long)(n % 60), u / 1e7, k / 1e7);
+        }
+    }
+}
+
+// The memory report's lines in the log (before its tail is read for the dump and the zip).
+static void log_memory_report(void)
+{
+    char line[512];
+    const char *p = mem_report;
+
+    plog("  memory report:");
+    while (*p)
+    {
+        const char *e = strstr(p, "\r\n");
+        size_t n = e ? (size_t)(e - p) : strlen(p);
+
+        if (n >= sizeof(line))
+            n = sizeof(line) - 1;
+        memcpy(line, p, n);
+        line[n] = 0;
+        if (line[0])
+            plog("    %s", line);
+        p = e ? e + 2 : p + strlen(p);
+    }
+}
+
+enum { ID_TABS = 1006, ID_MEMORY = 1004, ID_LOG = 1005, ID_TRACE = 1001 };
+
+// The dialog's pages: the stack trace, the memory report, the log's tail.
+static void show_page(HWND hwnd, int page)
+{
+    HWND log = GetDlgItem(hwnd, ID_LOG);
+
+    ShowWindow(GetDlgItem(hwnd, ID_TRACE), page == 0 ? SW_SHOW : SW_HIDE);
+    ShowWindow(GetDlgItem(hwnd, ID_MEMORY), page == 1 ? SW_SHOW : SW_HIDE);
+    ShowWindow(log, page == 2 ? SW_SHOW : SW_HIDE);
+    if (page == 2 && log)
+    {
+        // (the log at its end, the crash's lines: scrolled once it shows, as a hidden edit does not)
+        SendMessageA(log, EM_SETSEL, (WPARAM)-1, (LPARAM)-1);
+        SendMessageA(log, EM_SCROLLCARET, 0, 0);
+    }
+}
+
 static LRESULT CALLBACK crash_window_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
+    if (message == WM_NOTIFY && ((NMHDR *)lparam)->idFrom == ID_TABS && ((NMHDR *)lparam)->code == TCN_SELCHANGE)
+    {
+        show_page(hwnd, TabCtrl_GetCurSel(GetDlgItem(hwnd, ID_TABS)));
+        return 0;
+    }
     if (message == WM_COMMAND && LOWORD(wparam) == ID_FULL_DUMP)
     {
         char result[MAX_PATH + 96];
@@ -441,9 +703,67 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
     summary = CreateWindowExA(0, "STATIC", "The game encountered an unhandled exception. Stack trace:",
                               WS_CHILD | WS_VISIBLE | SS_LEFT, 14, 10, 656, 30,
                               hwnd, NULL, instance, NULL);
+    // (the pages: a tab control, and inside it the stack trace, the memory report and the log's tail)
+    INITCOMMONCONTROLSEX icc;
+    icc.dwSize = sizeof(icc);
+    icc.dwICC = ICC_TAB_CLASSES;
+    InitCommonControlsEx(&icc);
+    HWND tabs = CreateWindowExA(0, WC_TABCONTROLA, "", WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_TABSTOP,
+                                14, 46, 656, 386, hwnd, (HMENU)ID_TABS, instance, NULL);
+    RECT page = {14, 46, 14 + 656, 46 + 386};
+    if (tabs)
+    {
+        static const char *const names[3] = {"Stack trace", "Memory", "Log"};
+        TCITEMA ti;
+        SendMessageA(tabs, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), TRUE);
+        memset(&ti, 0, sizeof(ti));
+        ti.mask = TCIF_TEXT;
+        for (int i = 0; i < 3; i++)
+        {
+            ti.pszText = (LPSTR)names[i];
+            TabCtrl_InsertItem(tabs, i, &ti);
+        }
+        TabCtrl_AdjustRect(tabs, FALSE, &page);
+    }
     list = CreateWindowExA(WS_EX_CLIENTEDGE, "LISTBOX", NULL,
                            WS_CHILD | WS_VISIBLE | WS_TABSTOP | LBS_NOINTEGRALHEIGHT,
-                           14, 46, 656, 386, hwnd, (HMENU)1001, instance, NULL);
+                           page.left, page.top, page.right - page.left, page.bottom - page.top, hwnd,
+                           (HMENU)ID_TRACE, instance, NULL);
+    {
+        static HFONT mono;
+        static char log_view[sizeof(log_tail) * 2];
+        HWND memory = CreateWindowExA(WS_EX_CLIENTEDGE, "EDIT", mem_report,
+                                      WS_CHILD | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL
+                                          | ES_AUTOHSCROLL,
+                                      page.left, page.top, page.right - page.left, page.bottom - page.top, hwnd,
+                                      (HMENU)ID_MEMORY, instance, NULL);
+        HWND log = CreateWindowExA(WS_EX_CLIENTEDGE, "EDIT", "",
+                                   WS_CHILD | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL
+                                       | ES_AUTOHSCROLL,
+                                   page.left, page.top, page.right - page.left, page.bottom - page.top, hwnd,
+                                   (HMENU)ID_LOG, instance, NULL);
+        // (the log's lines with CR LF, as an edit control shows them)
+        size_t o = 0;
+        for (const char *p = log_tail; *p && o < sizeof(log_view) - 3; p++)
+        {
+            if (*p == '\n' && (p == log_tail || p[-1] != '\r'))
+                log_view[o++] = '\r';
+            log_view[o++] = *p;
+        }
+        log_view[o] = 0;
+        if (!mono)
+            mono = CreateFontA(-12, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET, 0, 0, 0, FIXED_PITCH, "Consolas");
+        if (memory)
+            SendMessageA(memory, WM_SETFONT, (WPARAM)(mono ? mono : GetStockObject(ANSI_FIXED_FONT)), TRUE);
+        if (log)
+        {
+            SendMessageA(log, EM_SETLIMITTEXT, 0, 0);
+            SendMessageA(log, WM_SETFONT, (WPARAM)(mono ? mono : GetStockObject(ANSI_FIXED_FONT)), TRUE);
+            SetWindowTextA(log, log_view);
+            SendMessageA(log, EM_SETSEL, (WPARAM)-1, (LPARAM)-1);
+            SendMessageA(log, EM_SCROLLCARET, 0, 0);
+        }
+    }
     close_button = CreateWindowExA(0, "BUTTON", "Close",
                                    WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_DEFPUSHBUTTON,
                                    574, 442, 96, 28, hwnd, (HMENU)IDOK, instance, NULL);
@@ -531,7 +851,8 @@ static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep)
     EXCEPTION_RECORD *er = ep->ExceptionRecord;
     char where[512];
     describe((DWORD64)(ULONG_PTR)er->ExceptionAddress, where, sizeof(where));
-    plog("CRASH: exception 0x%08lX at %s, frame %u, build %s (%s)", er->ExceptionCode, where, port_frame,
+    crash_frame = port_frame;
+    plog("CRASH: exception 0x%08lX at %s, frame %u, build %s (%s)", er->ExceptionCode, where, crash_frame,
          codfh_git_rev, port_build_time());
     if (er->ExceptionCode == EXCEPTION_ACCESS_VIOLATION && er->NumberParameters >= 2)
         plog("  %s address %08lX", er->ExceptionInformation[0] ? "writing" : "reading",
@@ -558,6 +879,9 @@ static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep)
         plog("  #%02d %s", i, trace[trace_count]);
         trace_count++;
     }
+    // (the memory report, logged before the log's tail is read: so the dump's comment and the zip have it)
+    memory_report(er);
+    log_memory_report();
     // (the dump: the default, or the full one, or none, CODFH_CRASHDUMP)
     char dump_text[MAX_PATH + 96];
     int mode = dump_mode();
@@ -574,7 +898,7 @@ static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep)
     }
     else
         strcpy(dump_text, "No crash dump written (CODFH_CRASHDUMP=0).");
-    show_crash_dialog(er->ExceptionCode, where, port_frame, trace, trace_count, dump_text);
+    show_crash_dialog(er->ExceptionCode, where, crash_frame, trace, trace_count, dump_text);
     return EXCEPTION_CONTINUE_SEARCH;
 }
 

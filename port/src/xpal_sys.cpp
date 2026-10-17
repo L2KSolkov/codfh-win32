@@ -1044,6 +1044,11 @@ extern "C" DWORD WINAPI XGetAudioFlags(VOID)
  * stream's last vertex (a 20-byte stride under a 28-byte declaration read 8 bytes beyond it).
  */
 
+/* (what is out: blocks, bytes (each block's pages, its padding page too) and the bytes' peak, for
+   the crash report's memory page, crash.cpp) */
+extern "C" volatile LONG port_xphys_blocks, port_xphys_bytes, port_xphys_peak;
+volatile LONG port_xphys_blocks, port_xphys_bytes, port_xphys_peak;
+
 extern "C" LPVOID WINAPI XPhysicalAlloc(SIZE_T dwSize, ULONG_PTR, ULONG_PTR ulAlignment, DWORD flProtect)
 {
     (void)ulAlignment;      /* (allocations are 64 KB aligned) */
@@ -1056,10 +1061,24 @@ extern "C" LPVOID WINAPI XPhysicalAlloc(SIZE_T dwSize, ULONG_PTR, ULONG_PTR ulAl
         VirtualFree(p, 0, MEM_RELEASE);
         return NULL;
     }
+    if (p)
+    {
+        LONG bytes = (LONG)((dwSize + 4096 + 4095) & ~(SIZE_T)4095), now, peak;
+        InterlockedIncrement(&port_xphys_blocks);
+        now = InterlockedExchangeAdd(&port_xphys_bytes, bytes) + bytes;
+        while ((peak = port_xphys_peak) < now && InterlockedCompareExchange(&port_xphys_peak, now, peak) != peak)
+            ;
+    }
     return p;
 }
 
 extern "C" VOID WINAPI XPhysicalFree(LPVOID lpAddress)
 {
+    MEMORY_BASIC_INFORMATION mbi;
+    if (lpAddress && VirtualQuery(lpAddress, &mbi, sizeof(mbi)) && mbi.State == MEM_COMMIT)
+    {
+        InterlockedDecrement(&port_xphys_blocks);
+        InterlockedExchangeAdd(&port_xphys_bytes, -(LONG)mbi.RegionSize);
+    }
     VirtualFree(lpAddress, 0, MEM_RELEASE);
 }

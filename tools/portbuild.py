@@ -401,7 +401,7 @@ def build_launcher():
 
 
 LIBS = ['kernel32.lib', 'user32.lib', 'gdi32.lib', 'winmm.lib', 'd3d11.lib', 'dxgi.lib', 'd3dcompiler.lib', 'xaudio2.lib', 'ws2_32.lib',
-        'ntdll.lib', 'ole32.lib', 'shell32.lib', 'bcrypt.lib', 'iphlpapi.lib', 'dbghelp.lib', 'mfplat.lib', 'mfreadwrite.lib', 'mfuuid.lib', 'advapi32.lib', 'imm32.lib', 'dwmapi.lib']
+        'ntdll.lib', 'ole32.lib', 'shell32.lib', 'bcrypt.lib', 'iphlpapi.lib', 'dbghelp.lib', 'mfplat.lib', 'mfreadwrite.lib', 'mfuuid.lib', 'advapi32.lib', 'imm32.lib', 'dwmapi.lib', 'comctl32.lib']
 
 
 def git_revision_object():
