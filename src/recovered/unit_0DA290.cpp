@@ -18,6 +18,9 @@
 #if defined(CODFH_SP) && defined(CODFH_WIN32)
 extern "C" void port_cli_frame(void);
 #endif
+#if defined(CODFH_WIN32) && !defined(CODFH_SP)
+#include "types/type_DA580.h"   // (the port's Rt2d close: the fonts' brush)
+#endif
 #ifdef CODFH_SP
 #include <string.h>
 #include "rw/baframe.h"
@@ -765,6 +768,13 @@ void sub_DA290()
     sub_19A750();
     Rt2dAnimClose();
     Rt2dClose();
+#ifdef CODFH_WIN32
+    // (the port: Rt2dClose frees every brush, and the fonts' shared one (type_DA580's brush)
+    // with them, which sub_DA680 keeps while it is set: forgotten here, the next level's first
+    // font makes a new one, where the fonts wrote their white (255.0, 0x437F0000) into freed
+    // memory, the next level's UV animations, splines and GodData; caught under page heap)
+    brush = 0;
+#endif
     RpWorldRemoveCamera(var_C, bp_8);
     RWS::CameraHelper::Destroy(bp_8);
     dword_4B88B0 = 0;
@@ -875,6 +885,13 @@ void sp_sub_A5C90()
     sp_sub_A5580();
     Rt2dAnimClose();
     Rt2dClose();
+#ifdef CODFH_WIN32
+    // (the port: Rt2dClose frees every brush, and the fonts' shared one (type_DA580's brush)
+    // with them, which sub_DA680 keeps while it is set: forgotten here, the next level's first
+    // font makes a new one, where the fonts wrote their white (255.0, 0x437F0000) into freed
+    // memory, the next level's UV animations, splines and GodData; caught under page heap)
+    brush = 0;
+#endif
     RpWorldRemoveCamera(world, camera);
     RWS::CameraHelper::Destroy(camera);
     dword_4B88B0 = 0;
