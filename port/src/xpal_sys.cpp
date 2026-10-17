@@ -468,6 +468,8 @@ static void keyboard_state(XINPUT_GAMEPAD *g)
 static DWORD packets[4];
 
 extern volatile LONG port_mouse_dx, port_mouse_dy;
+/* The game's stick dead zone (unit_19D920's sub_19DA80 and sub_19DB10). */
+extern float flt_42C77C;
 
 /* The mouse's movement as the right stick: counts per read scaled by the sensitivity, full
    deflection at about 25 counts a frame at 1.0 (codfh.ini [input] mouse_sensitivity). */
@@ -527,6 +529,16 @@ static void mouse_state(XINPUT_GAMEPAD *g)
         return;
     float s = port_config.mouseSensitivity > 0 ? port_config.mouseSensitivity : 1.0f;
     float x = dx * s * 1300.0f, y = -dy * s * 1300.0f;
+    /* (the game drops each axis inside its dead zone, flt_42C77C's 0.32 of a deflection, so the
+       mouse's movement starts just past it: the slightest movement turns a vehicle or a mounted
+       gun, which take the stick rather than the direct look) */
+    {
+        float dz = (flt_42C77C + 0.01f) * 32767.0f, span = 32767.0f - dz;
+        if (x)
+            x = x > 0 ? dz + x * span / 32767.0f : -dz + x * span / 32767.0f;
+        if (y)
+            y = y > 0 ? dz + y * span / 32767.0f : -dz + y * span / 32767.0f;
+    }
     if (x || y)
     {
         float nx = g->sThumbRX + x, ny = g->sThumbRY + y;

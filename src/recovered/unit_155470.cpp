@@ -28,6 +28,10 @@
 #include "types/CGlobalSounds.h"
 #include "types/type_62A60.h"
 #include "game/frand.h"
+#ifdef CODFH_WIN32
+extern "C" RwReal port_mouse_yaw(void);
+extern "C" RwReal port_mouse_pitch(void);
+#endif
 #include "types/type_4C19C0.h"
 #include "types/type_15B110.h"
 #include "rw/rtdict.h"
@@ -621,6 +625,10 @@ void type_3DC048::vf_03C(RwReal arg_0)
     RwInt32 var_C;
     type_10F710 *bp_8;
     type_712B0_3DBC78 *bp_4;
+#ifdef CODFH_WIN32
+    RwReal mouse_yaw = 0.0f;
+    RwReal mouse_pitch = 0.0f;
+#endif
 
     type_3DBC78::vf_03C(arg_0);
     sub_15A160();
@@ -629,6 +637,17 @@ void type_3DC048::vf_03C(RwReal arg_0)
     bp_8 = (type_10F710 *)sub_1745A0(0);
     bp_4 = (type_712B0_3DBC78 *)get_unk_34C();
     var_C = bp_8 == unk_118C.sub_D4910();
+#ifdef CODFH_WIN32
+    // (the local player's turret: the mouse's movement in degrees, straight onto the turret's
+    // or the view's angles below, as on foot; vf_294's tests: no aim while the controls are off,
+    // and a driver's seat with no turret steers with the stick)
+    if (var_C && bp_8->unk_3D8 == 0 && !unk_2994 && unk_DC0 && !(unk_28E0 != -1 && unk_28DC == -1 && unk_DC4)
+        && !unk_2998)
+    {
+        mouse_yaw = port_mouse_yaw();
+        mouse_pitch = port_mouse_pitch();
+    }
+#endif
     if (var_C && !bp_8->unk_4D0)
     {
         lv_10 = unk_4B9308.sub_EE8F0(bp_8->unk_3D8, 6);
@@ -689,6 +708,9 @@ void type_3DC048::vf_03C(RwReal arg_0)
 #else
         unk_2890 += lcl_28 * bp_4->unk_19C_f * (arg_0 / 60.0f) * unk_2898;
 #endif
+#ifdef CODFH_WIN32
+        unk_2890 += mouse_yaw;
+#endif
         if (unk_2890 < 0.0f)
             unk_2890 = 360.0f + unk_2890;
         if (unk_2890 > 360.0f)
@@ -698,6 +720,11 @@ void type_3DC048::vf_03C(RwReal arg_0)
         unk_289C += unk_28A4 * (var30 * (bp_4->unk_19C_f * (arg_0 / 60.0f)));
 #else
         unk_289C += var30 * bp_4->unk_19C_f * (arg_0 / 60.0f) * unk_28A4;
+#endif
+#ifdef CODFH_WIN32
+        unk_289C += mouse_pitch;
+        mouse_yaw = 0.0f;   // (the view's, not the turret's too)
+        mouse_pitch = 0.0f;
 #endif
         unk_289C = sub_22C20(unk_289C, flt_429DF0, flt_429DF4);
         unk_2874 = 0.0f;
@@ -731,6 +758,9 @@ void type_3DC048::vf_03C(RwReal arg_0)
 #else
         unk_2870 += local_40 * bp_4->unk_19C_f * (arg_0 / 60.0f) * unk_2884;
 #endif
+#ifdef CODFH_WIN32
+        unk_2870 += mouse_pitch;
+#endif
         if (!bp_8->unk_4D0)
             var_50 = -18.0f;
         else
@@ -756,6 +786,9 @@ void type_3DC048::vf_03C(RwReal arg_0)
         unk_2868 += local_40 * (bp_4->unk_19C_f * (unk_2878 * (arg_0 / 60.0f)));
 #else
         unk_2868 += local_40 * bp_4->unk_19C_f * (arg_0 / 60.0f) * unk_2878;
+#endif
+#ifdef CODFH_WIN32
+        unk_2868 += mouse_yaw;   // (wrapped and limited below)
 #endif
         if (unk_2868 < 0.0f)
             unk_2868 = 360.0f + unk_2868;

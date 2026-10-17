@@ -5712,6 +5712,11 @@ void type_10F710::sub_109AE0(RwReal arg_0, RwReal arg_4)
                 sub_112DA0(&unk_3EC, m_18, &unk_3F4, bp_4->unk_22C, bp_4->unk_230, lv_30, arg_4);
             }
             q28->unk_3BC += unk_3EC;
+#ifdef CODFH_WIN32
+            // (the local player's mounted gun: the mouse's turn straight onto it, as on foot)
+            if (unk_3D8 == 0)
+                q28->unk_3BC += port_mouse_yaw();
+#endif
             r34 = q28->sub_16A890();
             if (r34 != 180.0f)
             {
@@ -5941,6 +5946,10 @@ void type_10F710::sub_10A330(RwReal arg_0, RwReal arg_4)
                 sub_112DA0(&unk_3F0, fp_2C, &unk_3F8, bp_4->unk_22C, bp_4->unk_230, t20, arg_4);
             }
             m_18->unk_3B8 += unk_3F0;
+#ifdef CODFH_WIN32
+            if (unk_3D8 == 0)
+                m_18->unk_3B8 += port_mouse_pitch();
+#endif
             frm_24 = m_18->sub_16A790();
             if (frm_24 != 180.0f)
             {
