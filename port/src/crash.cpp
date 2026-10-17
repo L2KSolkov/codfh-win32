@@ -406,8 +406,10 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
         return;
     }
 
-    hwnd = CreateWindowExA(WS_EX_DLGMODALFRAME | WS_EX_TOPMOST, crash_window_class,
-                           "Call of Duty: Finest Hour - Crash Report",
+    char title[160];
+    _snprintf(title, sizeof(title), "Call of Duty: Finest Hour - Crash Report (build %s)", codfh_git_rev);
+    title[sizeof(title) - 1] = 0;
+    hwnd = CreateWindowExA(WS_EX_DLGMODALFRAME | WS_EX_TOPMOST, crash_window_class, title,
                            WS_CAPTION | WS_SYSMENU | WS_CLIPCHILDREN,
                            CW_USEDEFAULT, CW_USEDEFAULT, width, height, owner, NULL, instance, NULL);
     if (!hwnd)
@@ -417,11 +419,11 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
     }
 
     summary = CreateWindowExA(0, "STATIC", "The game encountered an unhandled exception. Stack trace:",
-                              WS_CHILD | WS_VISIBLE | SS_LEFT, 14, 12, 650, 24,
+                              WS_CHILD | WS_VISIBLE | SS_LEFT, 14, 10, 656, 30,
                               hwnd, NULL, instance, NULL);
     list = CreateWindowExA(WS_EX_CLIENTEDGE, "LISTBOX", NULL,
                            WS_CHILD | WS_VISIBLE | WS_TABSTOP | LBS_NOINTEGRALHEIGHT,
-                           14, 42, 656, 390, hwnd, (HMENU)1001, instance, NULL);
+                           14, 46, 656, 386, hwnd, (HMENU)1001, instance, NULL);
     close_button = CreateWindowExA(0, "BUTTON", "Close",
                                    WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_DEFPUSHBUTTON,
                                    574, 442, 96, 28, hwnd, (HMENU)IDOK, instance, NULL);
@@ -437,7 +439,9 @@ static void show_crash_dialog(DWORD code, const char *where, unsigned frame,
     }
 
     char detail[640];
-    _snprintf(detail, sizeof(detail), "Exception 0x%08lX at %s (frame %u)", code, where, frame);
+    /* (the build on a line of its own: the commit a crash report is matched to) */
+    _snprintf(detail, sizeof(detail), "Exception 0x%08lX at %s (frame %u)\nBuild %s", code, where, frame,
+              codfh_git_rev);
     detail[sizeof(detail) - 1] = 0;
     SetWindowTextA(summary, detail);
     for (int i = 0; i < trace_count; i++)
