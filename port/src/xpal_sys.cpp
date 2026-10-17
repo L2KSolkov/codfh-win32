@@ -465,18 +465,14 @@ static void keyboard_state(XINPUT_GAMEPAD *g)
             }
         }
     }
-    /* (two keys on a stick, a diagonal, deflect it as far as a stick's round gate does: 0.71 on
-       each axis, not full on both. The game moves by each axis on its own, sub_109110's forward
-       and sub_109660's strafe, so full on both walked 1.41 times as fast as a pad's diagonal) */
+    /* (two movement keys, a diagonal, deflect the left stick as far as a stick's round gate does:
+       0.71 on each axis, not full on both. The game moves by each axis on its own, sub_109110's
+       forward and sub_109660's strafe, so full on both walked 1.41 times as fast as a pad's
+       diagonal. The look keys keep full on both: turning and pitching are separate rates) */
     if ((sticks & 3) == 3)
     {
         g->sThumbLX = (SHORT)(g->sThumbLX * 0.70710678f);
         g->sThumbLY = (SHORT)(g->sThumbLY * 0.70710678f);
-    }
-    if ((sticks & 12) == 12)
-    {
-        g->sThumbRX = (SHORT)(g->sThumbRX * 0.70710678f);
-        g->sThumbRY = (SHORT)(g->sThumbRY * 0.70710678f);
     }
 }
 
