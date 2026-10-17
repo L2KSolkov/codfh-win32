@@ -294,8 +294,22 @@ static void mark_work_start(void)
         QueryPerformanceCounter(work_start_slot);
 }
 
+extern "C" volatile LONG port_crash_frozen;   /* (crash.cpp: set once a crash is being reported) */
+extern "C" void port_audio_shutdown(void);
+
 extern "C" HRESULT WINAPI IDirect3DDevice8_Present(D3DDevice *, const RECT *, const RECT *, void *, void *)
 {
+    /* (a crash on another thread: the game stops here, its sound off, the window's messages still
+       handled while the crash dialog is up; the process ends when the dialog closes) */
+    if (port_crash_frozen)
+    {
+        port_audio_shutdown();
+        for (;;)
+        {
+            port_pump_messages();
+            Sleep(30);
+        }
+    }
     if (port_trace_on())
     {
         trace_flush();

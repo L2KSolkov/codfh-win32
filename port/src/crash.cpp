@@ -385,6 +385,10 @@ static int dump_mode(void)
 // CODFH_CRASHTEST: a thread that crashes after that many seconds
 static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep);
 
+// (set once a crash is being reported: the game's frame stops on it, d3d8_bridge.cpp)
+extern "C" volatile LONG port_crash_frozen;
+volatile LONG port_crash_frozen;
+
 static DWORD WINAPI crash_test_thread(LPVOID arg)
 {
     Sleep((DWORD)(ULONG_PTR)arg * 1000);
@@ -1216,6 +1220,9 @@ static LONG WINAPI on_crash(EXCEPTION_POINTERS *ep)
     static volatile LONG once;
     if (InterlockedExchange(&once, 1))
         return EXCEPTION_CONTINUE_SEARCH;
+    // (the game stops at its next frame, d3d8_bridge.cpp's present: a crash on another thread no
+    // longer leaves it running behind the dialog)
+    InterlockedExchange(&port_crash_frozen, 1);
     HANDLE proc = GetCurrentProcess(), thread = GetCurrentThread();
     SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME);
     SymInitialize(proc, NULL, TRUE);
