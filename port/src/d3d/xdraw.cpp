@@ -327,18 +327,26 @@ static int convert_vertices(const XVertexShader *s, UINT first, UINT count, cons
     for (int k = 0; k < s->count; k++)
         vtx_regs[k] = s->elements[k].reg;
     vtx.resize((size_t)count * s->count * 4 + 4);
-    const BYTE *base[16];
-    UINT stride[16];
-    for (int i = 0; i < 16; i++)
-    {
-        base[i] = xs.streams[i] ? (const BYTE *)(ULONG_PTR)(xs.streams[i]->Data | 0x80000000) : NULL;
-        stride[i] = xs.strides[i];
-    }
+    /* (only the streams the declaration reads, and not stream 0 under a UP draw: a stream
+       left bound may be a freed buffer, as RenderWare frees dynamic buffers to make room for
+       textures without unbinding them, which the Xbox never reads) */
+    const BYTE *base[16] = {0};
+    UINT stride[16] = {0};
+    unsigned used = 0;
+    for (int k = 0; k < s->count; k++)
+        used |= 1u << s->elements[k].stream;
     if (up)
     {
+        used &= ~1u;
         base[0] = up;
         stride[0] = upStride;
     }
+    for (int i = 0; i < 16; i++)
+        if (used & (1u << i))
+        {
+            base[i] = xs.streams[i] ? (const BYTE *)(ULONG_PTR)(xs.streams[i]->Data | 0x80000000) : NULL;
+            stride[i] = xs.strides[i];
+        }
     /* (an element at a time down every vertex: its converter chosen once, not per vertex) */
     for (int k = 0; k < s->count; k++)
     {
@@ -2261,7 +2269,7 @@ static void submit(D3DPRIMITIVETYPE prim, UINT first, UINT count, const WORD *in
                             const float *C = d.vsConstants + (96 + r) * 4;
                             plog("  c[%d] %g %g %g %g", r, C[0], C[1], C[2], C[3]);
                         }
-                    if ((int)id == detail && !xs.programmable && xs.streams[0])
+                    if ((int)id == detail && !xs.programmable && !up && xs.streams[0])
                     {
                         const float *src = (const float *)(ULONG_PTR)(xs.streams[0]->Data | 0x80000000) + (size_t)first * xs.strides[0] / sizeof(float);
                         float p[4] = {src[0], src[1], src[2], 1.0f};
