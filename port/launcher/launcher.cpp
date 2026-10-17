@@ -4,7 +4,7 @@
  * in its own folder, from that folder. Its settings are kept in codfh_launcher.ini beside it.
  *
  * Every option is a row of g_aOpt, on one of four tabs: the command line port/src/cli.cpp reads
- * (-map, -checkpoint, -cpvalue, -main-menu, -no-main-menu, -movie, -gametype, -name, -verbose) and
+ * (-map, -difficulty, -checkpoint, -cpvalue, -main-menu, -no-main-menu, -movie, -gametype, -name, -verbose) and
  * every CODFH_ variable the port reads (port/src: the data root, the console, the overlay, the
  * live link, System Link between instances, crash dumps; the debug tools' views at start; the
  * renderer's switches; the logs, captures and scripted input). A field takes any other argument,
@@ -67,7 +67,7 @@ static const char *const g_apszButton[] = {
 // The options cli.cpp reads, for "other arguments" (and how many words each takes).
 static const struct { const char *name; int args; } g_aKnownArg[] = {
     {"-map", 1}, {"-gametype", 1}, {"-name", 1}, {"-movie", 1}, {"-verbose", 0}, {"-main-menu", 0},
-    {"-no-main-menu", 0}, {"-checkpoint", 1}, {"-cp", 1}, {"-cpvalue", 1},
+    {"-no-main-menu", 0}, {"-difficulty", 1}, {"-checkpoint", 1}, {"-cp", 1}, {"-cpvalue", 1},
 };
 
 enum Page { P_GAME, P_VIEWS, P_RENDER, P_LOGS, P_COUNT };
@@ -109,6 +109,7 @@ static const Opt g_aOpt[] = {
     // ---- the command line (port/src/cli.cpp) ----
     {P_GAME, K_ARG, "-map", "Level (-map)", NULL, F_MAP},
     {P_GAME, K_ARG, "-movie", "Movie (-movie)", NULL, F_MOVIE},
+    {P_GAME, K_ARGLIST, "-difficulty", "Difficulty (SP)", "default|easy|medium|hard", F_SP},
     {P_GAME, K_ARG, "-checkpoint", "Checkpoint (SP, 0 lists)", NULL, F_UINT | F_SP},
     {P_GAME, K_ARG, "-cpvalue", "Checkpoint register (SP)", NULL, F_INT | F_SP},
     {P_GAME, K_ARGLIST, "", "Front end (SP)", "default|-main-menu (no title)|-no-main-menu", F_SP},
@@ -194,6 +195,7 @@ static const int g_nOpt = (int)(sizeof(g_aOpt) / sizeof(g_aOpt[0]));
 static const struct { const char *name, *tip; } g_aTip[] = {
     {"-map", "The level to start in, skipping the front end: its number in the list (the campaign table's index, or the multiplayer list's), or part of its name (the first level whose name holds it). Only levels COD.PAK has are listed."},
     {"-movie", "A movie from the data root's SHELL\\MOVIES played through the game's own player once a level is up (the credits, an act's intro...)."},
+    {"-difficulty", "Single player: the difficulty for the command line's level (default: the profile's, or medium). Needs a level."},
     {"-checkpoint", "Single player: start the level at its checkpoint n, from 1, as a death restarts it there (the scripts' SetCheckPointRegister and the rest, made two seconds in). 0 lists the level's checkpoints in codfh.log. Needs a level."},
     {"-cpvalue", "Single player: the checkpoint register's value where the level's script computes it (the player's health on L_1_2); else the level's own, or 100."},
     {"", "Single player: -main-menu skips Press Start and picks the first saved profile; -no-main-menu keeps the normal title. A level on the command line goes straight in either way."},
@@ -663,6 +665,8 @@ static void Validate(std::vector<std::string> &errs, std::vector<std::string> &w
     // what a level on the command line overrides or needs
     if (!map.empty() && Sel(ID_OPT + OptIndex("")) > 0)
         warns.push_back("Front end: ignored with a level (-map starts it straight away)");
+    if (map.empty() && Sel(ID_OPT + OptIndex("-difficulty")) > 0)
+        warns.push_back("Difficulty: used only with a level (-map)");
     if (map.empty() && Sel(ID_OPT + OptIndex("-gametype")) > 0)
         warns.push_back("Game type: used only with a level (-map)");
     if (map.empty() && !OptValue("-name").empty())

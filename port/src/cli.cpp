@@ -33,6 +33,10 @@
  * restarts it. The scripts then see its register and GetNumberOfRestarts() == 1, and the restart
  * loads its sections, clump bank and animation groups. -cpvalue <v> gives the register where the
  * script computes it (the player's health on L_1_2); else the one the level set already, or 100.
+ *
+ * SP: -difficulty <easy|medium|hard> (or 0, 1, 2) plays the -map level at that difficulty. It is the
+ * state's (sp_sub_1291D0, as the options and the profile set it), taken
+ * by the level when it starts (sub_19AAB0's dword_42B714); without it the profile's, or medium.
  */
 #include <xtl.h>
 #include <ctype.h>
@@ -60,6 +64,20 @@ static int cli_pending;
 #ifdef CODFH_SP
 static int cli_auto_main_menu_phase;
 static int cli_checkpoint = -1, cli_checkpoint_level, cli_checkpoint_value = -1;
+static int cli_difficulty = -1;
+void sp_sub_1291D0(RwInt32 arg_0);   /* (unit_19AAB0: the state's difficulty) */
+
+/* -difficulty's argument: 0 to 2, or a part of a name; -1 for neither. */
+static int cli_parse_difficulty(const char *a)
+{
+    static const char *const names[3] = {"easy", "medium", "hard"};
+    if (a[0] >= '0' && a[0] <= '2' && !a[1])
+        return a[0] - '0';
+    for (int i = 0; i < 3; i++)
+        if (!_stricmp(a, names[i]))
+            return i;
+    return -1;
+}
 
 /* The levels' checkpoints (generated from their scripts). */
 #define CLI_CP_UNKNOWN 0x7FFFFFFF
@@ -132,6 +150,12 @@ extern "C" void port_cli_parse(const char *cmd)
             cli_checkpoint = atoi(argv[++i]);
         else if (!_stricmp(argv[i], "-cpvalue") && i + 1 < argc)
             cli_checkpoint_value = atoi(argv[++i]);
+        else if (!_stricmp(argv[i], "-difficulty") && i + 1 < argc)
+        {
+            cli_difficulty = cli_parse_difficulty(argv[++i]);
+            if (cli_difficulty < 0)
+                plog("command line: -difficulty %s: not easy, medium or hard (0, 1, 2); ignored", argv[i]);
+        }
 #endif
     }
 #ifdef CODFH_DEDICATED
@@ -159,6 +183,11 @@ extern "C" void port_cli_parse(const char *cmd)
     }
     else if (cli_checkpoint >= 0)
         plog("command line: checkpoint %d", cli_checkpoint);
+    if (cli_difficulty >= 0 && !cli_pending)
+    {
+        plog("command line: -difficulty needs -map; ignored");
+        cli_difficulty = -1;
+    }
 #endif
 }
 
@@ -326,6 +355,13 @@ extern "C" void port_cli_present(void)
 #endif
 #ifdef CODFH_SP
     checkpoint_frame();
+    /* (the difficulty the level took, once it is up) */
+    if (cli_difficulty >= 0 && cli_checkpoint_level && dword_4B8710 && dword_4E5C74
+        && sub_19B050() == cli_checkpoint_level)
+    {
+        plog("command line: the level plays at difficulty %d", dword_42B714);
+        cli_difficulty = -1;
+    }
 #endif
     static int playing;
     if (cli_movie[0] && dword_4E5C74 && port_frame > 30 && !playing)
@@ -408,6 +444,12 @@ extern "C" void port_cli_frame(void)
     plog("command line: starting SP level %s (index %d, game level %d)",
          sub_19B060(level), level - 1, level);
     cli_checkpoint_level = level;
+    if (cli_difficulty >= 0)
+    {
+        static const char *const names[3] = {"easy", "medium", "hard"};
+        sp_sub_1291D0(cli_difficulty);
+        plog("command line: difficulty %d (%s)", cli_difficulty, names[cli_difficulty]);
+    }
     sub_D8CC0(level);
     /* The SP front end owns a blocking frame loop. Leave it so the shared
        game-loop fade callback can finish and consume the level change. */
