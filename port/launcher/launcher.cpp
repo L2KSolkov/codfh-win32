@@ -15,7 +15,8 @@
  * a checkpoint that level has, a movie in the data root, numbers where numbers go, the scripted
  * input's buttons and the menu clicks' points, the options of the build beside the launcher (SP
  * or MP, every-section loading or not). Errors are listed under the command line and stop the
- * launch; warnings (an option the game will ignore) are listed but do not.
+ * launch; warnings (an option the game will ignore) are listed but do not. Each option has a
+ * tooltip (g_aTip) on its field and its label.
  */
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -189,10 +190,100 @@ static const Opt g_aOpt[] = {
 };
 static const int g_nOpt = (int)(sizeof(g_aOpt) / sizeof(g_aOpt[0]));
 
+// What each option does, shown when the pointer rests on it or its label.
+static const struct { const char *name, *tip; } g_aTip[] = {
+    {"-map", "The level to start in, skipping the front end: its number in the list (the campaign table's index, or the multiplayer list's), or part of its name (the first level whose name holds it). Only levels COD.PAK has are listed."},
+    {"-movie", "A movie from the data root's SHELL\\MOVIES played through the game's own player once a level is up (the credits, an act's intro...)."},
+    {"-checkpoint", "Single player: start the level at its checkpoint n, from 1, as a death restarts it there (the scripts' SetCheckPointRegister and the rest, made two seconds in). 0 lists the level's checkpoints in codfh.log. Needs a level."},
+    {"-cpvalue", "Single player: the checkpoint register's value where the level's script computes it (the player's health on L_1_2); else the level's own, or 100."},
+    {"", "Single player: -main-menu skips Press Start and picks the first saved profile; -no-main-menu keeps the normal title. A level on the command line goes straight in either way."},
+    {"-gametype", "Multiplayer: the game type for the command line's level: DeathMatch, Team DeathMatch, Capture the Flag, Search and Destroy or Supremacy (default DeathMatch)."},
+    {"-name", "Multiplayer: host a System Link game on the command line's level under this name as soon as the menus are up, as the create-match page's Start Session does."},
+    {"CODFH_NETLOOP", "Multiplayer: System Link between instances on this machine. Instance n is the console at 127.0.0.n; give each running game its own number (1-4)."},
+    {"CODFH_LIVE", "The debug tools' live link to the web suite: 1 on the port 8771, or a port of your own. The Engine, Links tab turns it on later too."},
+    {"CODFH_CRASHDUMP", "What a crash writes beside the log: the default small dump, none (0), or the full memory (2, large, everything a debugger needs)."},
+    {"CODFH_CRASHTEST", "Crash a thread of its own on purpose this many seconds after the start, to try the crash dialog, the dump and the log's crash lines."},
+    {"CODFH_DATA", "The data root: the folder holding COD.PAK, LEVELS, SHELL and the rest. codfh.ini's [data] root, when set, is taken first; the executable's folder when neither is."},
+    {"-verbose", "The port's own diagnostic lines in codfh.log: the first untextured draws, a frame line every 300 frames, the first sound plays."},
+    {"CODFH_CONSOLE", "A console window beside the game showing the log as it is written (off here sets it to 0; codfh.ini's default is on)."},
+    {"CODFH_OVERLAY", "The Dear ImGui overlay (the debug tools) shown from the start; F1 shows and hides it."},
+    {"CODFH_INPUTCACHE", "Ask Windows for the pad and keys at every poll instead of once a frame (the input cache off; slower, for checking input)."},
+    {"CODFH_TRIGGERS", "The triggers drawn from the start, with their activity; 2 with the collision too."},
+    {"CODFH_AI", "The soldiers' AI drawn from the start: 1 their state and notes, 2 with their cover and fighting."},
+    {"CODFH_MODELS", "The models coloured from the start: 1 by section, 2 by their skip flags, 3 by owner."},
+    {"CODFH_FREECAM", "Start with the free camera on (fly around the level; the debug tools' Camera)."},
+    {"CODFH_PATHNODES", "The AI's path nodes drawn, with their labels."},
+    {"CODFH_PG", "The projectile generators drawn (the scripted guns, mortars and the like)."},
+    {"CODFH_PROJECTILES", "The projectiles in flight drawn."},
+    {"CODFH_RAYS", "The world line tests drawn (the sight and bullet rays)."},
+    {"CODFH_HITS", "The hits drawn, with the characters' bone boxes."},
+    {"CODFH_SOUNDS", "The sounds playing drawn where they play."},
+    {"CODFH_HEARING", "What the AI hears drawn, with the hearing radii."},
+    {"CODFH_LIGHTS", "The lights drawn."},
+    {"CODFH_SPLINES", "The splines drawn (the paths vehicles and scripted movers follow)."},
+    {"CODFH_ZONES", "The lighting zones drawn."},
+    {"CODFH_SQUADS", "The AI squads drawn."},
+    {"CODFH_GIMPS", "The gimps drawn (the debug tools' AI, Gimps view)."},
+    {"CODFH_SHRIMPS", "The shrimps drawn (the debug tools' AI, Shrimps view)."},
+    {"CODFH_MOUNTS", "The models' mount points drawn (where weapons and attachments sit)."},
+    {"CODFH_SKELETONS", "The characters' skeletons drawn."},
+    {"CODFH_INSPECT", "The inspector on from the start (what the camera looks at, named)."},
+    {"CODFH_ALLSECTIONS", "Load every section of a level at once, from the level's start (needs a build with every-section loading: not --no-all-sections)."},
+    {"CODFH_WIREFRAME", "The 3D draws as wireframe, hidden lines removed."},
+    {"CODFH_NODEPTH", "No depth test: everything drawn in draw order."},
+    {"CODFH_NOCULL", "No back-face culling."},
+    {"CODFH_NOFOG", "No fog."},
+    {"CODFH_FULLBRIGHT", "Textures at full brightness, the lighting left out."},
+    {"CODFH_LIGHTINGONLY", "The lighting alone, the textures left out."},
+    {"CODFH_NOALPHATEST", "No alpha test (cut-out textures drawn whole)."},
+    {"CODFH_NOBLEND", "No blending (transparent draws opaque)."},
+    {"CODFH_POINTFILTER", "Point texture filtering (no smoothing)."},
+    {"CODFH_HIDEPARTICLES", "The particles not drawn."},
+    {"CODFH_HIDE2D", "The 2D draws (HUD, menus, text) not drawn."},
+    {"CODFH_NOGAMMA", "No gamma correction."},
+    {"CODFH_NOVBCACHE", "No vertex cache: every draw's vertices converted every frame (slower, for checking the cache)."},
+    {"CODFH_QUADTEX", "Particles (quad lists) drawn with their texture alone, opaque: what the stages and the blend make of them left out."},
+    {"CODFH_TRACE", "Frame n's render-target changes, viewports, clears and draw counts in the log."},
+    {"CODFH_DRAWID", "From frame n every draw is a flat colour from its index (red the low byte, green the high), each draw's state logged: a capture's pixel names its draw."},
+    {"CODFH_DRAWID_TO", "The last frame of the draw ids (DRAWID), each logged."},
+    {"CODFH_DRAWDETAIL", "The draw with this id (from DRAWID's log) logged in detail, its stage textures written as tex_<stage>_<level>.bmp."},
+    {"CODFH_SHOT", "Frame n written to shot.bmp beside the executable."},
+    {"CODFH_SHOT_EVERY", "After SHOT's frame, a screenshot every n frames (numbered files)."},
+    {"CODFH_SHOT_FROM", "The first frame SHOT_EVERY captures."},
+    {"CODFH_SHOT_TO", "The last frame SHOT_EVERY captures."},
+    {"CODFH_SPDUMP", "Single player: the menu screen's items and the focus logged every 40 frames from frame n."},
+    {"CODFH_WAV", "The mixed sound recorded to this file (48 kHz stereo 16-bit WAV), a path from the game's folder or a full one."},
+    {"CODFH_INPUT", "Scripted pad presses: frame:BUTTON,... each held for 8 frames (A B X Y BLACK WHITE LT RT START BACK UP DOWN LEFT RIGHT, LUP LDOWN LLEFT LRIGHT the left stick, MUP MDOWN MLEFT MRIGHT the mouse). At most 256."},
+    {"CODFH_SPMOUSE", "Single player: scripted menu pointing: frame:x:y, or frame:x:y:c to click, in the 640x480 frame. At most 64."},
+    {"CODFH_STATS", "Draw statistics in the log every 300 frames, and the draws per programmable shader."},
+    {"CODFH_PROFILE", "A sampling profiler for slow frames: a frame whose work took over 25 ms gets the functions its samples fell in, most first, in the log."},
+    {"CODFH_ASTARLOG", "The path finding's lines in the log (many a second in a fight)."},
+    {"CODFH_AUDIOTRACE", "Every sound play in the log, with its 3D state, mix bins and gains."},
+    {"CODFH_FONTTRACE", "The font draws in the log."},
+    {"CODFH_MSGS", "The messages recorded from the start; who sent what logged once, 20 seconds in."},
+    {"CODFH_RNG", "The random numbers recorded from the start; their callers summed up in the log once, 20 seconds in."},
+    {"CODFH_FRAMES", "The frames' timing sampled from the start (the debug tools' frame timing)."},
+    {"CODFH_WAITS", "The timers and the waiting tasks logged once, 20 seconds in."},
+    {"CODFH_SHOT_WINDOW", "Screenshots of the window's buffer (with the overlay and the window's scaling) instead of the game's 640x480 frame."},
+    {"CODFH_DRAWID_NOALPHA", "The draw ids (DRAWID) without the draws' alpha test: every pixel a draw covers gets its colour."},
+    {"extraenv", "Any other variables, NAME=value a line (# starts a comment). They are set for the game after the options above."},
+    {"extraargs", "Any other command-line arguments, after the options above."},
+    {"preview", "What the launch runs: the variables it sets, then codfh.exe and its arguments."},
+    {"status", "The inputs checked: errors stop the launch, warnings (an option the game will ignore) do not."},
+};
+
+static const char *Tip(const char *name)
+{
+    for (size_t i = 0; i < sizeof(g_aTip) / sizeof(g_aTip[0]); i++)
+        if (!strcmp(g_aTip[i].name, name))
+            return g_aTip[i].tip;
+    return NULL;
+}
+
 enum { ID_TAB = 90, ID_OPT = 100, ID_BROWSE = 900, ID_EXTRAARGS, ID_EXTRAENV, ID_PREVIEW, ID_LAUNCH, ID_SAVE,
        ID_STATUS };
 
-static HWND g_hWnd, g_hTab;
+static HWND g_hWnd, g_hTab, g_hTip;
 static HFONT g_hFont;
 static char g_szDir[MAX_PATH], g_szIni[MAX_PATH], g_szExe[MAX_PATH];
 static std::vector<std::pair<HWND, int> > g_aPaged;    // each control on a tab, and its tab
@@ -263,6 +354,28 @@ static HWND Make(const char *cls, const char *text, DWORD style, int x, int y, i
     else
         ShowWindow(hCtl, SW_SHOW);
     return hCtl;
+}
+
+static void AddTip(HWND hCtl, const char *tip)
+{
+    TTTOOLINFOA ti;
+    HWND hEdit;
+
+    if (!tip || !g_hTip)
+        return;
+    memset(&ti, 0, sizeof(ti));
+    // (the first version's size: the launcher has no manifest, so comctl32 5)
+    ti.cbSize = TTTOOLINFOA_V1_SIZE;
+    ti.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
+    ti.hwnd = g_hWnd;
+    ti.uId = (UINT_PTR)hCtl;
+    ti.lpszText = (LPSTR)tip;
+    SendMessageA(g_hTip, TTM_ADDTOOLA, 0, (LPARAM)&ti);
+    if ((hEdit = GetWindow(hCtl, GW_CHILD)) != NULL)
+    {
+        ti.uId = (UINT_PTR)hEdit;
+        SendMessageA(g_hTip, TTM_ADDTOOLA, 0, (LPARAM)&ti);
+    }
 }
 
 static void ComboItems(int id, const std::vector<std::string> &items)
@@ -1051,16 +1164,16 @@ static void BuildPage(int page)
         {
             if (col)
                 y += 28, col = 0;
-            Make("STATIC", o.label, 0, 16, y + 3, LABELW + 60, 18, -1, page);
+            AddTip(Make("STATIC", o.label, SS_NOTIFY, 16, y + 3, LABELW + 60, 18, -1, page), Tip(o.name));
             int fw = W - 16 - (16 + LABELW + 60) - ((o.flags & F_BROWSE) ? 80 : 0);
-            Make("EDIT", "", ES_AUTOHSCROLL | WS_TABSTOP, 16 + LABELW + 60, y, fw, 22, id, page);
+            AddTip(Make("EDIT", "", ES_AUTOHSCROLL | WS_TABSTOP, 16 + LABELW + 60, y, fw, 22, id, page), Tip(o.name));
             if (o.flags & F_BROWSE)
                 Make("BUTTON", "Browse...", BS_PUSHBUTTON | WS_TABSTOP, W - 16 - 74, y, 74, 22, ID_BROWSE, page);
             y += 28;
             continue;
         }
         x = 16 + col * COLW;
-        Make("STATIC", o.label, 0, x, y + 3, LABELW, 18, -1, page);
+        AddTip(Make("STATIC", o.label, SS_NOTIFY, x, y + 3, LABELW, 18, -1, page), Tip(o.name));
         if (o.kind == K_ARGLIST || o.kind == K_ENVLIST)
         {
             std::vector<std::string> items = Choices(o.choices);
@@ -1083,6 +1196,7 @@ static void BuildPage(int page)
         else
             Make("EDIT", "", ES_AUTOHSCROLL | WS_TABSTOP | ((o.flags & F_UINT) ? ES_NUMBER : 0), x + LABELW, y, FIELDW, 22,
                  id, page);
+        AddTip(GetDlgItem(g_hWnd, id), Tip(o.name));
         if (++col == 2)
             y += 28, col = 0;
     }
@@ -1095,7 +1209,8 @@ static void BuildPage(int page)
 
         if (o.page != page || (o.kind != K_ARGFLAG && o.kind != K_ENVFLAG))
             continue;
-        Make("BUTTON", o.label, BS_AUTOCHECKBOX | WS_TABSTOP, 16 + col * COLW, y, COLW - 8, 20, ID_OPT + i, page);
+        AddTip(Make("BUTTON", o.label, BS_AUTOCHECKBOX | WS_TABSTOP, 16 + col * COLW, y, COLW - 8, 20, ID_OPT + i, page),
+               Tip(o.name));
         if (++col == 2)
             y += 24, col = 0;
     }
@@ -1116,21 +1231,28 @@ static void Build()
         ti.pszText = (LPSTR)g_apszPage[p];
         TabCtrl_InsertItem(g_hTab, p, &ti);
     }
+    g_hTip = CreateWindowExA(WS_EX_TOPMOST, TOOLTIPS_CLASSA, NULL, WS_POPUP | TTS_ALWAYSTIP | TTS_NOPREFIX,
+                             CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, g_hWnd, NULL,
+                             GetModuleHandleA(NULL), NULL);
+    SendMessageA(g_hTip, TTM_SETMAXTIPWIDTH, 0, 420);
+    SendMessageA(g_hTip, TTM_SETDELAYTIME, TTDT_AUTOPOP, 30000);
     for (int p = 0; p < P_COUNT; p++)
         BuildPage(p);
     y = 8 + TABH + 10;
-    Make("STATIC", "Other variables (NAME=value a line)", 0, 8, y + 3, 200, 18, -1, -1);
-    Make("EDIT", "", ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN | WS_TABSTOP, 210, y, W - 210, 52,
-         ID_EXTRAENV, -1);
+    AddTip(Make("STATIC", "Other variables (NAME=value a line)", SS_NOTIFY, 8, y + 3, 200, 18, -1, -1), Tip("extraenv"));
+    AddTip(Make("EDIT", "", ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL | ES_WANTRETURN | WS_TABSTOP, 210, y, W - 210,
+                52, ID_EXTRAENV, -1), Tip("extraenv"));
     y += 58;
-    Make("STATIC", "Other arguments", 0, 8, y + 3, 200, 18, -1, -1);
-    Make("EDIT", "", ES_AUTOHSCROLL | WS_TABSTOP, 210, y, W - 210, 22, ID_EXTRAARGS, -1);
+    AddTip(Make("STATIC", "Other arguments", SS_NOTIFY, 8, y + 3, 200, 18, -1, -1), Tip("extraargs"));
+    AddTip(Make("EDIT", "", ES_AUTOHSCROLL | WS_TABSTOP, 210, y, W - 210, 22, ID_EXTRAARGS, -1), Tip("extraargs"));
     y += 34;
     Make("STATIC", "Command line", 0, 8, y, 200, 18, -1, -1);
     y += 20;
-    Make("EDIT", "", ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL, 8, y, W - 8, 58, ID_PREVIEW, -1);
+    AddTip(Make("EDIT", "", ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL, 8, y, W - 8, 58, ID_PREVIEW, -1),
+           Tip("preview"));
     y += 64;
-    Make("EDIT", "", ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL, 8, y, W - 8, 62, ID_STATUS, -1);
+    AddTip(Make("EDIT", "", ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL, 8, y, W - 8, 62, ID_STATUS, -1),
+           Tip("status"));
     y += 70;
     Make("BUTTON", "Launch", BS_DEFPUSHBUTTON | WS_TABSTOP, W - 168, y, 80, 28, ID_LAUNCH, -1);
     Make("BUTTON", "Save", BS_PUSHBUTTON | WS_TABSTOP, W - 80, y, 80, 28, ID_SAVE, -1);
@@ -1218,7 +1340,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
     }
     CoInitialize(NULL);
     icc.dwSize = sizeof(icc);
-    icc.dwICC = ICC_TAB_CLASSES;
+    icc.dwICC = ICC_TAB_CLASSES | ICC_WIN95_CLASSES;
     InitCommonControlsEx(&icc);
     ncm.cbSize = sizeof(ncm);
     SystemParametersInfoA(SPI_GETNONCLIENTMETRICS, sizeof(ncm), &ncm, 0);
