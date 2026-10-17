@@ -10,6 +10,12 @@
  * renderer's switches; the logs, captures and scripted input). A field takes any other argument,
  * NAME=value lines any other variable. A variable left off is taken out of the game's
  * environment (most are read as set or not, whatever their value).
+ *
+ * The inputs are checked as they change (Validate), against what the game takes: a level it has,
+ * a checkpoint that level has, a movie in the data root, numbers where numbers go, the scripted
+ * input's buttons and the menu clicks' points, the options of the build beside the launcher (SP
+ * or MP, every-section loading or not). Errors are listed under the command line and stop the
+ * launch; warnings (an option the game will ignore) are listed but do not.
  */
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -39,6 +45,30 @@ static const struct { int n; const char *name, *title; } g_aSpLevel[] = {
     {37, "L_3_5_C", "Into the Heartland"},
 };
 
+// The whole campaign table (sub_19B060(1) to (38)), for -map's name match as cli.cpp makes it (the
+// first level whose name holds the text), and the levels' checkpoints (cli_checkpoints.inc: 1 to
+// n each; the others have none).
+static const char *const g_apszSpTable[38] = {
+    "L_1_1", "L_1_1_B", "L_1_1_C", "L_1_2", "L_1_2_B", "L_1_2_C", "L_1_3_A", "L_1_3_B", "L_1_3_C", "L_1_4",
+    "L_1_5", "L_1_5_B", "L_1_5_C", "L_2_1", "L_2_1_B", "L_2_1_C", "L_2_2", "L_2_2_B", "L_2_2_C", "L_2_3",
+    "L_2_4", "L_2_5", "L_2_6", "L_3_1", "L_3_1_B", "L_3_1_C", "L_3_2", "L_3_2_B", "L_3_2_C", "L_3_3",
+    "L_3_3_B", "L_3_3_C", "L_3_4", "L_3_4_B", "L_3_4_C", "L_3_5", "L_3_5_B", "L_3_5_C",
+};
+static const struct { const char *name; int n; } g_aCheckpoints[] = {
+    {"L_1_1", 1}, {"L_1_1_B", 1}, {"L_1_2", 1}, {"L_1_3_B", 1}, {"L_1_5_B", 1}, {"L_2_1", 1},
+    {"L_3_1", 1}, {"L_3_1_B", 1}, {"L_3_1_C", 1}, {"L_3_3", 2}, {"L_3_5", 1}, {"L_3_5_B", 1},
+};
+// The buttons CODFH_INPUT presses (xpal_sys.cpp's scripted input).
+static const char *const g_apszButton[] = {
+    "A", "B", "X", "Y", "BLACK", "WHITE", "LT", "RT", "START", "BACK", "UP", "DOWN", "LEFT", "RIGHT",
+    "LUP", "LDOWN", "LLEFT", "LRIGHT", "MUP", "MDOWN", "MLEFT", "MRIGHT",
+};
+// The options cli.cpp reads, for "other arguments" (and how many words each takes).
+static const struct { const char *name; int args; } g_aKnownArg[] = {
+    {"-map", 1}, {"-gametype", 1}, {"-name", 1}, {"-movie", 1}, {"-verbose", 0}, {"-main-menu", 0},
+    {"-no-main-menu", 0}, {"-checkpoint", 1}, {"-cp", 1}, {"-cpvalue", 1},
+};
+
 enum Page { P_GAME, P_VIEWS, P_RENDER, P_LOGS, P_COUNT };
 static const char *const g_apszPage[P_COUNT] = {"Game", "Debug views", "Renderer", "Logs and capture"};
 
@@ -58,6 +88,10 @@ enum
     F_MOVIE = 4,    // SHELL\MOVIES's files
     F_BROWSE = 8,   // a folder browser beside it
     F_OFF0 = 16,    // K_ENVFLAG: 0 when not checked (not taken out)
+    F_UINT = 32,    // a number from 0 (digits only)
+    F_INT = 64,     // a number, negative too
+    F_SP = 128,     // single player's only
+    F_MP = 256,     // multiplayer's only
 };
 
 struct Opt
@@ -74,15 +108,15 @@ static const Opt g_aOpt[] = {
     // ---- the command line (port/src/cli.cpp) ----
     {P_GAME, K_ARG, "-map", "Level (-map)", NULL, F_MAP},
     {P_GAME, K_ARG, "-movie", "Movie (-movie)", NULL, F_MOVIE},
-    {P_GAME, K_ARG, "-checkpoint", "Checkpoint (SP, 0 lists)", NULL, 0},
-    {P_GAME, K_ARG, "-cpvalue", "Checkpoint register (SP)", NULL, 0},
-    {P_GAME, K_ARGLIST, "", "Front end (SP)", "default|-main-menu (no title)|-no-main-menu", 0},
-    {P_GAME, K_ARGLIST, "-gametype", "Game type (MP)", "default|DM|TDM|CTF|SD|SUP", 0},
-    {P_GAME, K_ARG, "-name", "Host as (MP, -name)", NULL, 0},
-    {P_GAME, K_ENVLIST, "CODFH_NETLOOP", "Link instance (MP)", "off|1|2|3|4", 0},
+    {P_GAME, K_ARG, "-checkpoint", "Checkpoint (SP, 0 lists)", NULL, F_UINT | F_SP},
+    {P_GAME, K_ARG, "-cpvalue", "Checkpoint register (SP)", NULL, F_INT | F_SP},
+    {P_GAME, K_ARGLIST, "", "Front end (SP)", "default|-main-menu (no title)|-no-main-menu", F_SP},
+    {P_GAME, K_ARGLIST, "-gametype", "Game type (MP)", "default|DM|TDM|CTF|SD|SUP", F_MP},
+    {P_GAME, K_ARG, "-name", "Host as (MP, -name)", NULL, F_MP},
+    {P_GAME, K_ENVLIST, "CODFH_NETLOOP", "Link instance (MP)", "off|1|2|3|4", F_MP},
     {P_GAME, K_ENV, "CODFH_LIVE", "Live link (1, or a port)", NULL, 0},
     {P_GAME, K_ENVLIST, "CODFH_CRASHDUMP", "Crash dump", "default (small)|0 (none)|2 (full memory)", 0},
-    {P_GAME, K_ENV, "CODFH_CRASHTEST", "Crash test after (s)", NULL, 0},
+    {P_GAME, K_ENV, "CODFH_CRASHTEST", "Crash test after (s)", NULL, F_UINT},
     {P_GAME, K_ENV, "CODFH_DATA", "Data root (CODFH_DATA)", NULL, F_WIDE | F_BROWSE},
     {P_GAME, K_ARGFLAG, "-verbose", "Port diagnostics in the log (-verbose)", NULL, 0},
     {P_GAME, K_ENVFLAG, "CODFH_CONSOLE", "Console window (CONSOLE)", NULL, F_OFF0},
@@ -129,18 +163,18 @@ static const Opt g_aOpt[] = {
     {P_RENDER, K_ENVFLAG, "CODFH_QUADTEX", "Particles' texture alone (QUADTEX)", NULL, 0},
 
     // ---- logs, captures and scripted input ----
-    {P_LOGS, K_ENV, "CODFH_TRACE", "Render log frame (TRACE)", NULL, 0},
-    {P_LOGS, K_ENV, "CODFH_DRAWID", "Draw ids from (DRAWID)", NULL, 0},
-    {P_LOGS, K_ENV, "CODFH_DRAWID_TO", "To frame (DRAWID_TO)", NULL, 0},
-    {P_LOGS, K_ENV, "CODFH_DRAWDETAIL", "Detail (DRAWDETAIL)", NULL, 0},
-    {P_LOGS, K_ENV, "CODFH_SHOT", "Screenshot frame (SHOT)", NULL, 0},
-    {P_LOGS, K_ENV, "CODFH_SHOT_EVERY", "Every n (SHOT_EVERY)", NULL, 0},
-    {P_LOGS, K_ENV, "CODFH_SHOT_FROM", "From (SHOT_FROM)", NULL, 0},
-    {P_LOGS, K_ENV, "CODFH_SHOT_TO", "To (SHOT_TO)", NULL, 0},
-    {P_LOGS, K_ENV, "CODFH_SPDUMP", "Menu dump from (SP)", NULL, 0},
+    {P_LOGS, K_ENV, "CODFH_TRACE", "Render log frame (TRACE)", NULL, F_UINT},
+    {P_LOGS, K_ENV, "CODFH_DRAWID", "Draw ids from (DRAWID)", NULL, F_UINT},
+    {P_LOGS, K_ENV, "CODFH_DRAWID_TO", "To frame (DRAWID_TO)", NULL, F_UINT},
+    {P_LOGS, K_ENV, "CODFH_DRAWDETAIL", "Detail (DRAWDETAIL)", NULL, F_UINT},
+    {P_LOGS, K_ENV, "CODFH_SHOT", "Screenshot frame (SHOT)", NULL, F_UINT},
+    {P_LOGS, K_ENV, "CODFH_SHOT_EVERY", "Every n (SHOT_EVERY)", NULL, F_UINT},
+    {P_LOGS, K_ENV, "CODFH_SHOT_FROM", "From (SHOT_FROM)", NULL, F_UINT},
+    {P_LOGS, K_ENV, "CODFH_SHOT_TO", "To (SHOT_TO)", NULL, F_UINT},
+    {P_LOGS, K_ENV, "CODFH_SPDUMP", "Menu dump from (SP)", NULL, F_UINT | F_SP},
     {P_LOGS, K_ENV, "CODFH_WAV", "Record the sound to (WAV)", NULL, F_WIDE},
     {P_LOGS, K_ENV, "CODFH_INPUT", "Pad presses (frame:button,...)", NULL, F_WIDE},
-    {P_LOGS, K_ENV, "CODFH_SPMOUSE", "Menu clicks (SP, frame:x:y[:c],...)", NULL, F_WIDE},
+    {P_LOGS, K_ENV, "CODFH_SPMOUSE", "Menu clicks (SP, frame:x:y[:c],...)", NULL, F_WIDE | F_SP},
     {P_LOGS, K_ENVFLAG, "CODFH_STATS", "Draw statistics (STATS)", NULL, 0},
     {P_LOGS, K_ENVFLAG, "CODFH_PROFILE", "Slow-frame profiler (PROFILE)", NULL, 0},
     {P_LOGS, K_ENVFLAG, "CODFH_ASTARLOG", "Path finding (ASTARLOG)", NULL, 0},
@@ -155,12 +189,19 @@ static const Opt g_aOpt[] = {
 };
 static const int g_nOpt = (int)(sizeof(g_aOpt) / sizeof(g_aOpt[0]));
 
-enum { ID_TAB = 90, ID_OPT = 100, ID_BROWSE = 900, ID_EXTRAARGS, ID_EXTRAENV, ID_PREVIEW, ID_LAUNCH, ID_SAVE };
+enum { ID_TAB = 90, ID_OPT = 100, ID_BROWSE = 900, ID_EXTRAARGS, ID_EXTRAENV, ID_PREVIEW, ID_LAUNCH, ID_SAVE,
+       ID_STATUS };
 
 static HWND g_hWnd, g_hTab;
 static HFONT g_hFont;
 static char g_szDir[MAX_PATH], g_szIni[MAX_PATH], g_szExe[MAX_PATH];
 static std::vector<std::pair<HWND, int> > g_aPaged;    // each control on a tab, and its tab
+// The build beside the launcher: 1 multiplayer, 0 single player, -1 not known (no codfh.exe);
+// whether it has every-section loading; codfh.ini's data root, which the game takes before
+// CODFH_DATA (xpal_core.cpp's port_config_load).
+static int g_nMp = -1, g_nAllSections = -1;
+static char g_szIniRoot[MAX_PATH];
+static int g_nErrors, g_nWarnings;
 
 // ---- the controls ----
 
@@ -324,6 +365,372 @@ static std::string Value(int i)
     return v;
 }
 
+static std::string Arguments();
+
+// ---- the checks ----
+
+static int OptIndex(const char *name)
+{
+    for (int i = 0; i < g_nOpt; i++)
+        if (!strcmp(g_aOpt[i].name, name))
+            return i;
+    return -1;
+}
+
+static std::string OptValue(const char *name)
+{
+    int i = OptIndex(name);
+    return i < 0 ? std::string() : Value(i);
+}
+
+static bool IsUInt(const std::string &v)
+{
+    if (v.empty() || v.size() > 9)
+        return false;
+    for (size_t i = 0; i < v.size(); i++)
+        if (v[i] < '0' || v[i] > '9')
+            return false;
+    return true;
+}
+
+static bool IsInt(const std::string &v)
+{
+    return v.size() > 1 && v[0] == '-' ? IsUInt(v.substr(1)) : IsUInt(v);
+}
+
+static bool ContainsNoCase(const std::string &hay, const std::string &needle)
+{
+    std::string a = hay, b = needle;
+
+    for (size_t i = 0; i < a.size(); i++)
+        a[i] = (char)tolower((unsigned char)a[i]);
+    for (size_t i = 0; i < b.size(); i++)
+        b[i] = (char)tolower((unsigned char)b[i]);
+    return a.find(b) != std::string::npos;
+}
+
+// Whether the file holds the text (the build's marks: PauseMenu.layout is multiplayer's front end,
+// "load every section at once" the debug tools' every-section switch).
+static int FileHas(const char *path, const char *text)
+{
+    FILE *f = fopen(path, "rb");
+    std::vector<char> buf(1 << 20);
+    size_t n, keep = 0, len = strlen(text);
+    int found = 0;
+
+    if (!f)
+        return -1;
+    while (!found && (n = fread(&buf[keep], 1, buf.size() - keep, f)) > 0)
+    {
+        n += keep;
+        for (size_t i = 0; i + len <= n && !found; i++)
+            found = !memcmp(&buf[i], text, len);
+        keep = n < len ? n : len - 1;
+        memmove(&buf[0], &buf[n - keep], keep);
+    }
+    fclose(f);
+    return found;
+}
+
+// The data root the game will use: codfh.ini's, else CODFH_DATA's field, else its own folder.
+static std::string DataRoot()
+{
+    std::string v = OptValue("CODFH_DATA");
+
+    if (g_szIniRoot[0])
+        return g_szIniRoot;
+    return v.empty() ? std::string(g_szDir) : v;
+}
+
+static bool Exists(const std::string &path, bool folder)
+{
+    DWORD a = GetFileAttributesA(path.c_str());
+    return a != INVALID_FILE_ATTRIBUTES && ((a & FILE_ATTRIBUTE_DIRECTORY) != 0) == folder;
+}
+
+// The single player's level -map names (cli.cpp's sp_map_level), or NULL; *pbFiles whether the
+// pack has it.
+static const char *SpLevel(const std::string &v, bool *pbFiles)
+{
+    const char *name = NULL;
+
+    if (IsUInt(v))
+        name = atoi(v.c_str()) < 38 ? g_apszSpTable[atoi(v.c_str())] : NULL;
+    else
+        for (int i = 0; i < 38 && !name; i++)
+            if (ContainsNoCase(g_apszSpTable[i], v))
+                name = g_apszSpTable[i];
+    *pbFiles = false;
+    for (size_t i = 0; name && i < sizeof(g_aSpLevel) / sizeof(g_aSpLevel[0]); i++)
+        if (!strcmp(g_aSpLevel[i].name, name))
+            *pbFiles = true;
+    return name;
+}
+
+static void Validate(std::vector<std::string> &errs, std::vector<std::string> &warns)
+{
+    std::string map = OptValue("-map"), v;
+    const char *level = NULL;
+    bool files = false;
+
+    // (each option for the other build: the game ignores it)
+    for (int i = 0; i < g_nOpt; i++)
+    {
+        const Opt &o = g_aOpt[i];
+        bool set = (o.kind == K_ARG || o.kind == K_ENV) ? !Value(i).empty()
+                   : (o.kind == K_ARGFLAG || o.kind == K_ENVFLAG) ? Checked(ID_OPT + i) : Sel(ID_OPT + i) > 0;
+
+        if (!set)
+            continue;
+        if ((o.flags & F_SP) && g_nMp == 1)
+            warns.push_back(std::string(o.label) + ": single player's only; this is the multiplayer build");
+        if ((o.flags & F_MP) && g_nMp == 0)
+            warns.push_back(std::string(o.label) + ": multiplayer's only; this is the single-player build");
+        if ((o.flags & F_UINT) && !IsUInt(Value(i)))
+            errs.push_back(std::string(o.label) + ": a whole number from 0");
+        if ((o.flags & F_INT) && !IsInt(Value(i)))
+            errs.push_back(std::string(o.label) + ": a whole number");
+        if (o.kind == K_ARG && Value(i).size() > 63)
+            errs.push_back(std::string(o.label) + ": at most 63 characters (the game keeps 64)");
+    }
+
+    // the level
+    if (!map.empty() && g_nMp != 1)
+    {
+        level = SpLevel(map, &files);
+        if (!level)
+            errs.push_back("Level: no single-player level is \"" + map + "\" (a number from the list, or part of a name)");
+        else if (!files)
+            errs.push_back(std::string("Level: ") + level + " has no files in COD.PAK");
+    }
+    else if (!map.empty())
+    {
+        HWND h = GetDlgItem(g_hWnd, ID_OPT + OptIndex("-map"));
+        int n = (int)SendMessageA(h, CB_GETCOUNT, 0, 0) - 1, found = 0;
+
+        for (int i = 1; i <= n && !found; i++)
+        {
+            char sz[256];
+
+            SendMessageA(h, CB_GETLBTEXT, i, (LPARAM)sz);
+            found = IsUInt(map) ? atoi(sz) == atoi(map.c_str()) : ContainsNoCase(sz, map);
+        }
+        if (n <= 0)
+            warns.push_back("Level: the multiplayer levels are not known yet (the game lists them in codfh.log once it has run)");
+        else if (!found)
+            errs.push_back("Level: no multiplayer level is \"" + map + "\"");
+    }
+
+    // the checkpoint
+    if (!(v = OptValue("-checkpoint")).empty() && IsUInt(v))
+    {
+        if (map.empty())
+            errs.push_back("Checkpoint: needs a level (-map)");
+        else if (level && files && atoi(v.c_str()) > 0)
+        {
+            int n = 0;
+
+            for (size_t i = 0; i < sizeof(g_aCheckpoints) / sizeof(g_aCheckpoints[0]); i++)
+                if (!strcmp(g_aCheckpoints[i].name, level))
+                    n = g_aCheckpoints[i].n;
+            if (!n)
+                errs.push_back(std::string("Checkpoint: ") + level + " has no checkpoints");
+            else if (atoi(v.c_str()) > n)
+            {
+                char sz[160];
+
+                sprintf(sz, "Checkpoint: %s has %d checkpoint%s (1%s)", level, n, n > 1 ? "s" : "", n > 1 ? " to 2" : "");
+                errs.push_back(sz);
+            }
+        }
+    }
+    if (!OptValue("-cpvalue").empty() && OptValue("-checkpoint").empty())
+        warns.push_back("Checkpoint register: used only with a checkpoint");
+
+    // what a level on the command line overrides or needs
+    if (!map.empty() && Sel(ID_OPT + OptIndex("")) > 0)
+        warns.push_back("Front end: ignored with a level (-map starts it straight away)");
+    if (map.empty() && Sel(ID_OPT + OptIndex("-gametype")) > 0)
+        warns.push_back("Game type: used only with a level (-map)");
+    if (map.empty() && !OptValue("-name").empty())
+        warns.push_back("Host as: hosts only with a level (-map)");
+
+    // the data root and the movie
+    if (!(v = OptValue("CODFH_DATA")).empty())
+    {
+        if (g_szIniRoot[0])
+            warns.push_back(std::string("Data root: codfh.ini's [data] root (") + g_szIniRoot + ") is taken before CODFH_DATA");
+        else if (!Exists(v, true))
+            errs.push_back("Data root: no folder " + v);
+        else if (!Exists(v + "\\COD.PAK", false))
+            errs.push_back("Data root: no COD.PAK in " + v);
+    }
+    if (!(v = OptValue("-movie")).empty() && !Exists(DataRoot() + "\\SHELL\\MOVIES\\" + v, false))
+        errs.push_back("Movie: no " + v + " in " + DataRoot() + "\\SHELL\\MOVIES");
+
+    // the live link's port
+    if (!(v = OptValue("CODFH_LIVE")).empty() && !(v == "1" || (IsUInt(v) && atoi(v.c_str()) >= 1024 && atoi(v.c_str()) <= 65535)))
+        errs.push_back("Live link: 1 (the port 8771) or a port from 1024 to 65535");
+    if (!(v = OptValue("CODFH_CRASHTEST")).empty() && IsUInt(v) && atoi(v.c_str()) == 0)
+        errs.push_back("Crash test: from 1 second (0 does nothing)");
+
+    // the frame ranges
+    if (!OptValue("CODFH_DRAWID_TO").empty() && OptValue("CODFH_DRAWID").empty())
+        warns.push_back("Draw ids: DRAWID_TO is used only with DRAWID");
+    else if (IsUInt(OptValue("CODFH_DRAWID_TO")) && IsUInt(OptValue("CODFH_DRAWID")) &&
+             atoi(OptValue("CODFH_DRAWID_TO").c_str()) < atoi(OptValue("CODFH_DRAWID").c_str()))
+        errs.push_back("Draw ids: the last frame (DRAWID_TO) is before the first (DRAWID)");
+    if (!OptValue("CODFH_DRAWID").empty() && IsUInt(OptValue("CODFH_DRAWID")) && !atoi(OptValue("CODFH_DRAWID").c_str()))
+        errs.push_back("Draw ids from: from frame 1 (0 is off)");
+    if (!OptValue("CODFH_SHOT").empty() && IsUInt(OptValue("CODFH_SHOT")) && !atoi(OptValue("CODFH_SHOT").c_str()))
+        errs.push_back("Screenshot frame: from frame 1 (0 is off)");
+    if ((!OptValue("CODFH_SHOT_FROM").empty() || !OptValue("CODFH_SHOT_TO").empty()) && OptValue("CODFH_SHOT_EVERY").empty())
+        warns.push_back("Screenshots: SHOT_FROM and SHOT_TO are used only with SHOT_EVERY");
+    if (IsUInt(OptValue("CODFH_SHOT_FROM")) && IsUInt(OptValue("CODFH_SHOT_TO")) &&
+        atoi(OptValue("CODFH_SHOT_TO").c_str()) < atoi(OptValue("CODFH_SHOT_FROM").c_str()))
+        errs.push_back("Screenshots: SHOT_TO is before SHOT_FROM");
+    if (!OptValue("CODFH_SHOT_EVERY").empty() && OptValue("CODFH_SHOT").empty())
+        warns.push_back("Screenshots: SHOT_EVERY is used only with SHOT");
+
+    // the sound recording's folder
+    if (!(v = OptValue("CODFH_WAV")).empty())
+    {
+        std::string path = v.size() > 1 && (v[1] == ':' || v[0] == '\\') ? v : std::string(g_szDir) + "\\" + v;
+        size_t slash = path.find_last_of("\\/");
+
+        if (slash != std::string::npos && !Exists(path.substr(0, slash), true))
+            errs.push_back("Record the sound to: no folder " + path.substr(0, slash));
+    }
+
+    // the scripted input: frame:BUTTON,...
+    if (!(v = OptValue("CODFH_INPUT")).empty())
+    {
+        std::string s = v;
+        int n = 0;
+
+        while (!s.empty())
+        {
+            size_t c = s.find(','), colon;
+            std::string tok = Trim(s.substr(0, c)), button;
+            bool ok = false;
+
+            s = c == std::string::npos ? std::string() : s.substr(c + 1);
+            n++;
+            colon = tok.find(':');
+            if (colon != std::string::npos && IsUInt(tok.substr(0, colon)))
+            {
+                button = tok.substr(colon + 1);
+                for (size_t b = 0; b < sizeof(g_apszButton) / sizeof(g_apszButton[0]); b++)
+                    ok = ok || button == g_apszButton[b];
+            }
+            if (!ok)
+            {
+                errs.push_back("Pad presses: \"" + tok + "\" is not frame:BUTTON (A B X Y BLACK WHITE LT RT START "
+                               "BACK UP DOWN LEFT RIGHT LUP LDOWN LLEFT LRIGHT MUP MDOWN MLEFT MRIGHT)");
+                break;
+            }
+        }
+        if (n > 256)
+            errs.push_back("Pad presses: at most 256");
+        if (v.size() > 4095)
+            errs.push_back("Pad presses: at most 4095 characters");
+    }
+
+    // the menu clicks: frame:x:y[:c],...
+    if (!(v = OptValue("CODFH_SPMOUSE")).empty())
+    {
+        std::string s = v;
+        int n = 0;
+
+        while (!s.empty())
+        {
+            size_t c = s.find(',');
+            std::string tok = Trim(s.substr(0, c));
+            unsigned frame;
+            float x, y;
+            char k = 0, extra = 0;
+            int got = sscanf(tok.c_str(), "%u:%f:%f:%c%c", &frame, &x, &y, &k, &extra);
+
+            s = c == std::string::npos ? std::string() : s.substr(c + 1);
+            n++;
+            if (got < 3 || got == 5 || (got == 4 && k != 'c') || x < 0 || x >= 640 || y < 0 || y >= 480)
+            {
+                errs.push_back("Menu clicks: \"" + tok + "\" is not frame:x:y or frame:x:y:c (x below 640, y below 480)");
+                break;
+            }
+        }
+        if (n > 64)
+            errs.push_back("Menu clicks: at most 64");
+    }
+
+    // every section at once, in a build without it
+    if (Checked(ID_OPT + OptIndex("CODFH_ALLSECTIONS")) && g_nAllSections == 0)
+        warns.push_back("Every section at once: this build has no every-section loading (built with --no-all-sections)");
+
+    // the other variables and arguments
+    {
+        std::string extra = Text(ID_EXTRAENV);
+
+        while (!extra.empty())
+        {
+            size_t p = extra.find('\n'), eq;
+            std::string line = Trim(extra.substr(0, p));
+            bool ok = true;
+
+            extra = p == std::string::npos ? std::string() : extra.substr(p + 1);
+            if (line.empty() || line[0] == '#')
+                continue;
+            eq = line.find('=');
+            ok = eq != std::string::npos && eq > 0;
+            for (size_t j = 0; ok && j < eq; j++)
+                ok = isalnum((unsigned char)line[j]) || line[j] == '_';
+            if (!ok)
+                errs.push_back("Other variables: \"" + line + "\" is not NAME=value");
+        }
+    }
+    {
+        std::string a = Trim(Text(ID_EXTRAARGS));
+        std::vector<std::string> words;
+        size_t i = 0;
+
+        while (i < a.size())
+        {
+            while (i < a.size() && a[i] == ' ')
+                i++;
+            if (i >= a.size())
+                break;
+            size_t j = a[i] == '"' ? a.find('"', i + 1) : a.find(' ', i);
+            words.push_back(a.substr(a[i] == '"' ? i + 1 : i, j == std::string::npos ? std::string::npos : j - (a[i] == '"' ? i + 1 : i)));
+            i = j == std::string::npos ? a.size() : j + 1;
+        }
+        for (size_t w = 0; w < words.size(); w++)
+        {
+            int known = -1;
+
+            for (size_t k = 0; k < sizeof(g_aKnownArg) / sizeof(g_aKnownArg[0]); k++)
+                if (!_stricmp(words[w].c_str(), g_aKnownArg[k].name))
+                    known = g_aKnownArg[k].args;
+            if (known < 0)
+                warns.push_back("Other arguments: the game ignores \"" + words[w] + "\"");
+            else
+                w += known;
+        }
+    }
+    {
+        // (cli.cpp's parse: a 1024-character line, 32 words)
+        std::string a = Arguments();
+        int words = 0;
+
+        for (size_t i = 0; i < a.size(); i++)
+            if (a[i] != ' ' && (i == 0 || a[i - 1] == ' '))
+                words++;
+        if (a.size() > 1000)
+            errs.push_back("Command line: longer than the game reads (1024 characters)");
+        if (words > 32)
+            errs.push_back("Command line: more than the game reads (32 words)");
+    }
+}
+
 // ---- the command line and the environment ----
 
 static std::string Quote(const std::string &s)
@@ -399,9 +806,26 @@ static std::string Preview()
     return s + "codfh.exe" + Arguments();
 }
 
+static std::string Problems()
+{
+    std::vector<std::string> errs, warns;
+    std::string s;
+
+    Validate(errs, warns);
+    g_nErrors = (int)errs.size();
+    g_nWarnings = (int)warns.size();
+    for (size_t i = 0; i < errs.size(); i++)
+        s += "Error: " + errs[i] + "\r\n";
+    for (size_t i = 0; i < warns.size(); i++)
+        s += "Warning: " + warns[i] + "\r\n";
+    return s.empty() ? std::string("No problems found.") : s;
+}
+
 static void UpdatePreview()
 {
     SetDlgItemTextA(g_hWnd, ID_PREVIEW, Preview().c_str());
+    SetDlgItemTextA(g_hWnd, ID_STATUS, Problems().c_str());
+    InvalidateRect(GetDlgItem(g_hWnd, ID_STATUS), NULL, TRUE);
 }
 
 // The launcher's environment with the variables it sets put in (or taken out, for an empty value).
@@ -551,6 +975,13 @@ static void Launch()
     PROCESS_INFORMATION pi;
 
     Save();
+    Problems();
+    if (g_nErrors)
+    {
+        MessageBoxA(g_hWnd, ("Not launched: fix the errors first.\n\n" + Problems()).c_str(), "CODFH launcher",
+                    MB_ICONWARNING);
+        return;
+    }
     line.push_back(0);
     memset(&si, 0, sizeof(si));
     si.cb = sizeof(si);
@@ -607,7 +1038,7 @@ static void BuildPage(int page)
     char szMovies[MAX_PATH];
     int y = TOP, col = 0;
 
-    _snprintf(szMovies, sizeof(szMovies), "%s\\SHELL\\MOVIES", g_szDir);
+    _snprintf(szMovies, sizeof(szMovies), "%s\\SHELL\\MOVIES", g_szIniRoot[0] ? g_szIniRoot : g_szDir);
     szMovies[sizeof(szMovies) - 1] = 0;
     for (int i = 0; i < g_nOpt; i++)
     {
@@ -650,7 +1081,8 @@ static void BuildPage(int page)
             SendDlgItemMessageA(g_hWnd, id, CB_SETDROPPEDWIDTH, (o.flags & F_MAP) ? 300 : 220, 0);
         }
         else
-            Make("EDIT", "", ES_AUTOHSCROLL | WS_TABSTOP, x + LABELW, y, FIELDW, 22, id, page);
+            Make("EDIT", "", ES_AUTOHSCROLL | WS_TABSTOP | ((o.flags & F_UINT) ? ES_NUMBER : 0), x + LABELW, y, FIELDW, 22,
+                 id, page);
         if (++col == 2)
             y += 28, col = 0;
     }
@@ -697,7 +1129,9 @@ static void Build()
     Make("STATIC", "Command line", 0, 8, y, 200, 18, -1, -1);
     y += 20;
     Make("EDIT", "", ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL, 8, y, W - 8, 58, ID_PREVIEW, -1);
-    y += 66;
+    y += 64;
+    Make("EDIT", "", ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL, 8, y, W - 8, 62, ID_STATUS, -1);
+    y += 70;
     Make("BUTTON", "Launch", BS_DEFPUSHBUTTON | WS_TABSTOP, W - 168, y, 80, 28, ID_LAUNCH, -1);
     Make("BUTTON", "Save", BS_PUSHBUTTON | WS_TABSTOP, W - 80, y, 80, 28, ID_SAVE, -1);
     // (the console's default in the ini is on; the launcher's is off until checked)
@@ -741,6 +1175,9 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
             UpdatePreview();
         return 0;
     case WM_CTLCOLORSTATIC:
+        // (the problems: red with an error, amber with only warnings, green with none)
+        if ((HWND)lParam == GetDlgItem(hWnd, ID_STATUS))
+            SetTextColor((HDC)wParam, g_nErrors ? RGB(190, 0, 0) : g_nWarnings ? RGB(160, 100, 0) : RGB(0, 120, 0));
         SetBkMode((HDC)wParam, TRANSPARENT);
         return (LRESULT)GetSysColorBrush(COLOR_BTNFACE);
     case WM_CLOSE:
@@ -759,7 +1196,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
     WNDCLASSA wc;
     MSG msg;
     char *p;
-    RECT rc = {0, 0, W + 8, 8 + TABH + 10 + 58 + 34 + 20 + 66 + 28 + 10};
+    RECT rc = {0, 0, W + 8, 8 + TABH + 10 + 58 + 34 + 20 + 64 + 70 + 28 + 10};
     NONCLIENTMETRICSA ncm;
     INITCOMMONCONTROLSEX icc;
 
@@ -770,6 +1207,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
     _snprintf(g_szIni, sizeof(g_szIni), "%s\\codfh_launcher.ini", g_szDir);
     _snprintf(g_szExe, sizeof(g_szExe), "%s\\codfh.exe", g_szDir);
     g_szIni[sizeof(g_szIni) - 1] = g_szExe[sizeof(g_szExe) - 1] = 0;
+    g_nMp = FileHas(g_szExe, "PauseMenu.layout");
+    g_nAllSections = FileHas(g_szExe, "load every section at once");
+    {
+        char szGameIni[MAX_PATH];
+
+        _snprintf(szGameIni, sizeof(szGameIni), "%s\\codfh.ini", g_szDir);
+        szGameIni[sizeof(szGameIni) - 1] = 0;
+        GetPrivateProfileStringA("data", "root", "", g_szIniRoot, sizeof(g_szIniRoot), szGameIni);
+    }
     CoInitialize(NULL);
     icc.dwSize = sizeof(icc);
     icc.dwICC = ICC_TAB_CLASSES;
