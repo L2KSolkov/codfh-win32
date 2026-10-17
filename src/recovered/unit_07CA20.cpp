@@ -11,6 +11,11 @@
 #include "types/animobjpool.h"
 #include "types/type_3D3548.h"
 #include "rw/badevice.h"
+#ifdef CODFH_WIN32
+// (the port: the shared key tables' words, port/src/animkeyref.cpp)
+int port_anim_key_pack(void *p);
+void *port_anim_key_unpack(int v);
+#endif
 
 #if !defined(CODFH_SP) || CODFH_SP_PART != 2 // single player compiles the interpolators (sub_7FC90 on)
                                              // in another file (src/sp/units/sp_unit_07CA20_2.cpp)
@@ -517,7 +522,11 @@ void sub_7D2F0(type_7CBD0 *arg_0, type_80300 *arg_4)
             }
             if (*slot_2BC & 0x80000000)
             {
+#ifdef CODFH_WIN32
+                m_554 = (type_7DCA0 *)port_anim_key_unpack(*slot_2BC);
+#else
                 m_554 = (type_7DCA0 *)(*slot_2BC & 0x3FFFFFFF);
+#endif
                 r568 = slot_2BC + 1;
             }
             else
@@ -572,7 +581,11 @@ void sub_7D2F0(type_7CBD0 *arg_0, type_80300 *arg_4)
             }
             if (*slot_2BC & 0x80000000)
             {
+#ifdef CODFH_WIN32
+                q56C = (type_7DCA0 *)port_anim_key_unpack(*slot_2BC);
+#else
                 q56C = (type_7DCA0 *)(*slot_2BC & 0x3FFFFFFF);
+#endif
                 r568 = slot_2BC + 1;
             }
             else
@@ -1788,7 +1801,12 @@ void sub_801C0(RtAnimAnimation *arg_0, type_7CBD0_hdr **arg_4, RwInt32 arg_8)
                 local_C = (*stk_14 & 0x3F000000) >> 24;
                 local_28 = var18[var_1C];
                 bp_2C = sub_800F0(local_28, local_C, var_4);
+#ifdef CODFH_WIN32
+                // (the port: an index for the address, which may be over 1 GB: port/src/animkeyref.cpp)
+                *stk_14 = port_anim_key_pack(bp_2C);
+#else
                 *stk_14 = (RwInt32)bp_2C | 0x80000000;
+#endif
             }
             local_24 = stk_14 + 1;
         }
@@ -2115,7 +2133,11 @@ RwInt32 sub_80910(type_80300 *arg_0, RwReal arg_4, RwUInt8 arg_8)
                 }
                 if (*p5C & 0x80000000)
                 {
+#ifdef CODFH_WIN32
+                    l78 = (type_7DCA0 *)port_anim_key_unpack(*p5C);
+#else
                     l78 = (type_7DCA0 *)(*p5C & 0x3FFFFFFF);
+#endif
                     lv_90 = p5C + 1;
                 }
                 else
@@ -2169,7 +2191,11 @@ RwInt32 sub_80910(type_80300 *arg_0, RwReal arg_4, RwUInt8 arg_8)
                 }
                 if (*p5C & 0x80000000)
                 {
+#ifdef CODFH_WIN32
+                    lcl_8C = (type_7DCA0 *)port_anim_key_unpack(*p5C);
+#else
                     lcl_8C = (type_7DCA0 *)(*p5C & 0x3FFFFFFF);
+#endif
                     lv_90 = p5C + 1;
                 }
                 else
