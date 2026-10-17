@@ -13,8 +13,8 @@
 #include "rw/badevice.h"
 #ifdef CODFH_WIN32
 // (the port: the shared key tables' words, port/src/animkeyref.cpp)
-int port_anim_key_pack(void *p);
-void *port_anim_key_unpack(int v);
+RwInt32 port_anim_key_pack(void *p);
+void *port_anim_key_unpack(RwInt32 v);
 #endif
 
 #if !defined(CODFH_SP) || CODFH_SP_PART != 2 // single player compiles the interpolators (sub_7FC90 on)
