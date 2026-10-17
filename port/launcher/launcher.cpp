@@ -26,12 +26,17 @@
 // sp_map_level: n is unit_19AAB0.cpp's sub_19B060(n + 1)), only those COD.PAK has. The table's
 // other names (L_1_1_C, L_1_2_C, L_1_3_C, L_1_4, L_1_5_C, L_2_1_C, L_2_2_C, L_2_3 to L_2_6,
 // L_3_2 to L_3_2_C, L_3_3_B, L_3_3_C, L_3_4_B, L_3_4_C) have no files; L_3_4 has no GODDATA.DFF
-// and the campaign skips it.
-static const struct { int n; const char *name; } g_aSpLevel[] = {
-    {0, "L_1_1"}, {1, "L_1_1_B"}, {3, "L_1_2"}, {4, "L_1_2_B"}, {6, "L_1_3_A"}, {7, "L_1_3_B"},
-    {10, "L_1_5"}, {11, "L_1_5_B"}, {13, "L_2_1"}, {14, "L_2_1_B"}, {16, "L_2_2"}, {17, "L_2_2_B"},
-    {23, "L_3_1"}, {24, "L_3_1_B"}, {25, "L_3_1_C"}, {29, "L_3_3"}, {35, "L_3_5"}, {36, "L_3_5_B"},
-    {37, "L_3_5_C"},
+// and the campaign skips it. Each with its title, the front end's (SHELL\FEND\FEND.CSV, $1_1a
+// for L_1_1 and on: English). (The multiplayer levels' names are MP_1 and the rest: GLOBAL.LOC
+// has no other English names for them.)
+static const struct { int n; const char *name, *title; } g_aSpLevel[] = {
+    {0, "L_1_1", "Not One Step Back"}, {1, "L_1_1_B", "The Flag Must Fall"}, {3, "L_1_2", "Dead in Her Sights"},
+    {4, "L_1_2_B", "Defend the Factory"}, {6, "L_1_3_A", "Breakdown"}, {7, "L_1_3_B", "Into Red Square"},
+    {10, "L_1_5", "Op. Little Saturn"}, {11, "L_1_5_B", "Airfield Ambush"}, {13, "L_2_1", "Mission: Matmata"},
+    {14, "L_2_1_B", "Depot Saboteurs"}, {16, "L_2_2", "A Desert Ride"}, {17, "L_2_2_B", "Raiding the Fortress"},
+    {23, "L_3_1", "First City to Fall"}, {24, "L_3_1_B", "Underground Passage"}, {25, "L_3_1_C", "Surrender at Aachen"},
+    {29, "L_3_3", "Come Out Fighting"}, {35, "L_3_5", "Road to Remagen"}, {36, "L_3_5_B", "Last Bridge Standing"},
+    {37, "L_3_5_C", "Into the Heartland"},
 };
 
 enum Page { P_GAME, P_VIEWS, P_RENDER, P_LOGS, P_COUNT };
@@ -294,9 +299,9 @@ static std::vector<std::string> MapEntries()
         return out;
     for (int i = 0; i < (int)(sizeof(g_aSpLevel) / sizeof(g_aSpLevel[0])); i++)
     {
-        char sz[32];
+        char sz[80];
 
-        sprintf(sz, "%d  %s", g_aSpLevel[i].n, g_aSpLevel[i].name);
+        sprintf(sz, "%d  %s  %s", g_aSpLevel[i].n, g_aSpLevel[i].name, g_aSpLevel[i].title);
         out.push_back(sz);
     }
     return out;
@@ -505,10 +510,21 @@ static void Load()
             if (!strcmp(o.name, "CODFH_LIVE") && v == "0")
                 v.clear();
         }
-        // (a level kept from before that the list no longer has, one with no files: dropped)
-        if ((o.flags & F_MAP) && v.find("  ") != std::string::npos &&
-            SendDlgItemMessageA(g_hWnd, ID_OPT + i, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)v.c_str()) == CB_ERR)
-            v.clear();
+        // (a level kept from before: the list's entry it starts (one saved without its title), or
+        // none when the list no longer has it, one with no files)
+        if ((o.flags & F_MAP) && v.find("  ") != std::string::npos)
+        {
+            LRESULT n = SendDlgItemMessageA(g_hWnd, ID_OPT + i, CB_FINDSTRING, (WPARAM)-1, (LPARAM)v.c_str());
+            char sz[256];
+
+            if (n == CB_ERR || SendDlgItemMessageA(g_hWnd, ID_OPT + i, CB_GETLBTEXTLEN, n, 0) >= (LRESULT)sizeof(sz))
+                v.clear();
+            else
+            {
+                SendDlgItemMessageA(g_hWnd, ID_OPT + i, CB_GETLBTEXT, n, (LPARAM)sz);
+                v = sz;
+            }
+        }
         if (o.kind == K_ARGFLAG || o.kind == K_ENVFLAG)
             CheckDlgButton(g_hWnd, ID_OPT + i, atoi(v.c_str()) ? BST_CHECKED : BST_UNCHECKED);
         else if (o.kind == K_ARGLIST || o.kind == K_ENVLIST)
@@ -631,7 +647,7 @@ static void BuildPage(int page)
             Make("COMBOBOX", "", CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP, x + LABELW, y, FIELDW, 300,
                  id, page);
             ComboItems(id, items);
-            SendDlgItemMessageA(g_hWnd, id, CB_SETDROPPEDWIDTH, 220, 0);
+            SendDlgItemMessageA(g_hWnd, id, CB_SETDROPPEDWIDTH, (o.flags & F_MAP) ? 300 : 220, 0);
         }
         else
             Make("EDIT", "", ES_AUTOHSCROLL | WS_TABSTOP, x + LABELW, y, FIELDW, 22, id, page);
