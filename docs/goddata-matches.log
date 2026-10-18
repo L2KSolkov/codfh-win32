@@ -33664,3 +33664,105 @@
 2026-10-17 13:44:09	god	2363E5D5,0BE39D06	GAMECHARACTERS+AXIS_WEHRMACHTA+ALIGNMENT	soldier grammar without level tag (local Quadro): AXIS_<unit><letter>; with the soldier fields	
 2026-10-17 14:01:34	god	B518A956,417D9387	SCRIPTS+TASKLIST+L_1_2_TANYAOUTSIDEMONITOR+FILENAME	script-name grammar across levels: every levels segments applied to every level (local Quadro)	
 2026-10-17 14:04:35	god	73A0F999,E515686B	SCRIPTS+TASKLIST+L_3_3_TOWNBFOLLOWPLAYERCONTINUEA+FILENAME	script-name grammar across levels: every levels segments applied to every level (local Quadro)	
+2026-10-17 14:39:11	god	07F2E42D,97952317	COD_PICKUPS+BROWNING30CAL	pickups: TYPE value traced to the pickup ID table (cfh-web-suite PICKUP_IDS.md, from the recovered collection switches), named in the existing pickup style; with fields	
+2026-10-17 14:39:11	god	CB6D1807,5E453D2C	COD_PICKUPS+BROWNING30CAL+TYPE	pickups: TYPE value traced to the pickup ID table (cfh-web-suite PICKUP_IDS.md, from the recovered collection switches), named in the existing pickup style; with fields	
+2026-10-17 14:39:11	god	BF6D0516,155A9050	COD_PICKUPS+BROWNING30CAL+MESH	pickups: TYPE value traced to the pickup ID table (cfh-web-suite PICKUP_IDS.md, from the recovered collection switches), named in the existing pickup style; with fields	
+2026-10-17 14:39:11	god	C305567B,62063A52	COD_PICKUPS+BROWNING30CAL+MESH+DFF	pickups: TYPE value traced to the pickup ID table (cfh-web-suite PICKUP_IDS.md, from the recovered collection switches), named in the existing pickup style; with fields	
+2026-10-17 14:39:11	god	442C5594,5097719F	COD_PICKUPS+BROWNING30CAL+MESH+COLLISIONDFF	pickups: TYPE value traced to the pickup ID table (cfh-web-suite PICKUP_IDS.md, from the recovered collection switches), named in the existing pickup style; with fields	
+2026-10-17 14:39:11	god	6F7EA7D9,0C670993	COD_PICKUPS+BROWNING30CAL+MESH+TEXTUREDICTIONARY	pickups: TYPE value traced to the pickup ID table (cfh-web-suite PICKUP_IDS.md, from the recovered collection switches), named in the existing pickup style; with fields	
+2026-10-17 14:39:11	god	DEAC427A,2DA60947	COD_PICKUPS+BROWNING30CAL+MESH+UVANIM	pickups: TYPE value traced to the pickup ID table (cfh-web-suite PICKUP_IDS.md, from the recovered collection switches), named in the existing pickup style; with fields	
+2026-10-17 14:39:11	god	C2CA6AC9,5B6D349D	COD_PICKUPS+BROWNING30CAL+MESH+SURFACETAG	pickups: TYPE value traced to the pickup ID table (cfh-web-suite PICKUP_IDS.md, from the recovered collection switches), named in the existing pickup style; with fields	
+2026-10-17 14:39:11	god	C59FB4E9,C73841DA	COD_PICKUPS+BROWNING30CAL+MESH+PARTSFIELD	pickups: TYPE value traced to the pickup ID table (cfh-web-suite PICKUP_IDS.md, from the recovered collection switches), named in the existing pickup style; with fields	
+2026-10-17 14:40:19	god	65BBCADE,AEC80093	COD_PICKUPS+BROWNING30CAL_AMMO_LG	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	60FDDA46,BF0A54B0	COD_PICKUPS+BROWNING30CAL_AMMO_LG+TYPE	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	5CFDD3FF,B5F8FD64	COD_PICKUPS+BROWNING30CAL_AMMO_LG+MESH	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	6C522D84,96AC6E46	COD_PICKUPS+BROWNING30CAL_AMMO_LG+MESH+DFF	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	CB110EAD,36FEEFB3	COD_PICKUPS+BROWNING30CAL_AMMO_LG+MESH+COLLISIONDFF	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	E3A96A08,F61ED147	COD_PICKUPS+BROWNING30CAL_AMMO_LG+MESH+TEXTUREDICTIONARY	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	231E671D,3B99DC63	COD_PICKUPS+BROWNING30CAL_AMMO_LG+MESH+UVANIM	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	CB69E9BA,28BE1461	COD_PICKUPS+BROWNING30CAL_AMMO_LG+MESH+SURFACETAG	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	AC408E12,7D34F17E	COD_PICKUPS+BROWNING30CAL_AMMO_LG+MESH+PARTSFIELD	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	5CBBBCF3,AEC80099	COD_PICKUPS+BROWNING30CAL_AMMO_SM	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	4FC4DCFD,6DE9C3B6	COD_PICKUPS+BROWNING30CAL_AMMO_SM+TYPE	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	5BC4EFD4,A1287CBE	COD_PICKUPS+BROWNING30CAL_AMMO_SM+MESH	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	24802C25,57142C08	COD_PICKUPS+BROWNING30CAL_AMMO_SM+MESH+DFF	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	350B5D56,E104A095	COD_PICKUPS+BROWNING30CAL_AMMO_SM+MESH+COLLISIONDFF	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	3F5D7857,DB17B8A9	COD_PICKUPS+BROWNING30CAL_AMMO_SM+MESH+TEXTUREDICTIONARY	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	D8CEFF2C,58E8BE31	COD_PICKUPS+BROWNING30CAL_AMMO_SM+MESH+UVANIM	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	2016163B,B99FAD6B	COD_PICKUPS+BROWNING30CAL_AMMO_SM+MESH+SURFACETAG	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	4EF332CB,0D5E52B8	COD_PICKUPS+BROWNING30CAL_AMMO_SM+MESH+PARTSFIELD	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	66BBCCCB,B5D8E461	COD_PICKUPS+BROWNING30CAL_AMMO_MED	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	D7341CB8,660C38AB	COD_PICKUPS+BROWNING30CAL_AMMO_MED+TYPE	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	CDFBB5FC,520C193A	COD_PICKUPS+BROWNING30CAL_AMMO_MED+MESH	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	AF1B944E,5B838627	COD_PICKUPS+BROWNING30CAL_AMMO_MED+MESH+DFF	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	9D9B410B,4A2DBAD0	COD_PICKUPS+BROWNING30CAL_AMMO_MED+MESH+COLLISIONDFF	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	FEE738FF,85428675	COD_PICKUPS+BROWNING30CAL_AMMO_MED+MESH+TEXTUREDICTIONARY	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	AA92A1DB,5A0DDB2E	COD_PICKUPS+BROWNING30CAL_AMMO_MED+MESH+UVANIM	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	A41699B9,79B6036D	COD_PICKUPS+BROWNING30CAL_AMMO_MED+MESH+SURFACETAG	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 14:40:19	god	F88D7756,65464E6D	COD_PICKUPS+BROWNING30CAL_AMMO_MED+MESH+PARTSFIELD	pickups: TYPE value traced to the pickup ID table, any word + pickup endings (CPU); with fields	
+2026-10-17 15:25:27	god	101BCC65,527F875D	COD_MOVIES+L_1_2_MONTAGE	movie strings: pooled-string descriptors holding Bink file names, COD_MOVIES family (local Quadro)	
+2026-10-17 15:25:27	god	132337C7,527F875D	COD_MOVIES+L_2_1_MONTAGE	movie strings: pooled-string descriptors holding Bink file names, COD_MOVIES family (local Quadro)	
+2026-10-17 15:25:27	god	46CE0C22,527F875D	COD_MOVIES+L_3_3_MONTAGE	movie strings: pooled-string descriptors holding Bink file names, COD_MOVIES family (local Quadro)	
+2026-10-17 15:25:27	god	48AB0CDC,527F875D	COD_MOVIES+L_3_5_MONTAGE	movie strings: pooled-string descriptors holding Bink file names, COD_MOVIES family (local Quadro)	
+2026-10-17 15:25:27	god	9B7B16BA,527F875D	COD_MOVIES+L_1_5_MONTAGE	movie strings: pooled-string descriptors holding Bink file names, COD_MOVIES family (local Quadro)	
+2026-10-17 15:25:27	god	9C1AE2F4,527F875D	COD_MOVIES+L_1_3_MONTAGE	movie strings: pooled-string descriptors holding Bink file names, COD_MOVIES family (local Quadro)	
+2026-10-17 15:25:27	god	A2BFACCC,527F875D	COD_MOVIES+L_2_2_MONTAGE	movie strings: pooled-string descriptors holding Bink file names, COD_MOVIES family (local Quadro)	
+2026-10-17 15:25:27	god	BA412EFC,BABB9499	COD_MOVIES+END_GAME	movie strings: pooled-string descriptors holding Bink file names, COD_MOVIES family (local Quadro)	
+2026-10-17 15:25:27	god	C3256A06,527F875D	COD_MOVIES+L_1_1_MONTAGE	movie strings: pooled-string descriptors holding Bink file names, COD_MOVIES family (local Quadro)	
+2026-10-17 15:25:27	god	DF736E70,527F875D	COD_MOVIES+L_3_1_MONTAGE	movie strings: pooled-string descriptors holding Bink file names, COD_MOVIES family (local Quadro)	
+2026-10-17 15:27:26	god	5DBD9526,4AF80C63	COD_MOVIES+ACT_2_INTRO	movie strings: COD_MOVIES act descriptors (Act_2.bik / Act_3.bik), CPU	
+2026-10-17 15:27:26	god	D762F535,4AF80C63	COD_MOVIES+ACT_3_INTRO	movie strings: COD_MOVIES act descriptors (Act_2.bik / Act_3.bik), CPU	
+2026-10-17 15:35:38	god	CC76B920,AC3CCEBF	COD_MOVIES+L_1_1_MONTAGE+XBOX	movie strings: COD_MOVIES descriptor text field (local Quadro, two words), applied to every descriptor	
+2026-10-17 15:35:38	god	B123FDBB,AC3CCEBF	COD_MOVIES+L_1_2_MONTAGE+XBOX	movie strings: COD_MOVIES descriptor text field (local Quadro, two words), applied to every descriptor	
+2026-10-17 15:35:38	god	7173344A,AC3CCEBF	COD_MOVIES+L_1_3_MONTAGE+XBOX	movie strings: COD_MOVIES descriptor text field (local Quadro, two words), applied to every descriptor	
+2026-10-17 15:35:38	god	009BF33C,AC3CCEBF	COD_MOVIES+L_1_5_MONTAGE+XBOX	movie strings: COD_MOVIES descriptor text field (local Quadro, two words), applied to every descriptor	
+2026-10-17 15:35:38	god	3CE97199,AC3CCEBF	COD_MOVIES+L_2_1_MONTAGE+XBOX	movie strings: COD_MOVIES descriptor text field (local Quadro, two words), applied to every descriptor	
+2026-10-17 15:35:38	god	65C765D2,AC3CCEBF	COD_MOVIES+L_2_2_MONTAGE+XBOX	movie strings: COD_MOVIES descriptor text field (local Quadro, two words), applied to every descriptor	
+2026-10-17 15:35:38	god	94B1A77E,AC3CCEBF	COD_MOVIES+L_3_1_MONTAGE+XBOX	movie strings: COD_MOVIES descriptor text field (local Quadro, two words), applied to every descriptor	
+2026-10-17 15:35:38	god	37F662B4,AC3CCEBF	COD_MOVIES+L_3_3_MONTAGE+XBOX	movie strings: COD_MOVIES descriptor text field (local Quadro, two words), applied to every descriptor	
+2026-10-17 15:35:38	god	D28AD8C2,AC3CCEBF	COD_MOVIES+L_3_5_MONTAGE+XBOX	movie strings: COD_MOVIES descriptor text field (local Quadro, two words), applied to every descriptor	
+2026-10-17 15:35:38	god	2D110178,A18D2FD7	COD_MOVIES+END_GAME+XBOX	movie strings: COD_MOVIES descriptor text field (local Quadro, two words), applied to every descriptor	
+2026-10-17 15:35:38	god	251EDDC0,D09B8381	COD_MOVIES+ACT_2_INTRO+XBOX	movie strings: COD_MOVIES descriptor text field (local Quadro, two words), applied to every descriptor	
+2026-10-17 15:35:38	god	B3F8FA2B,D09B8381	COD_MOVIES+ACT_3_INTRO+XBOX	movie strings: COD_MOVIES descriptor text field (local Quadro, two words), applied to every descriptor	
+2026-10-17 15:48:37	god	F04209B4,70AD6F95	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	218F62B3,B816E151	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_CHI	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	1C8F5B4F,D3170BD6	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_DUT	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	1B8F59CF,BE16EAC7	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_ENG	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	1E8F5E0F,B716DFC2	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_FIN	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	1E8F5E04,D2170A43	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_FRE	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	1D8F5CFC,C316F2E6	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_GER	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	178F537D,D4170DA5	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_ITA	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	1A8F57A5,BF16EC5A	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_JAP	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	198F5630,BD16E970	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_KOR	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	168F51FB,BD16E970	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_NOR	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	108F4865,BD16E970	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_POR	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	95E97AC3,DD7DEE42	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_SOFTFRE	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	96E97C4B,F47E12B7	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_SOFTGER	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	AAE99BD4,DF7DF1A4	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_SOFTSPA	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:48:37	god	AAE99BD0,E27DF61D	COD_HELPMESSAGES+L_1_5B+PICKUPSECRETDOCS+MSG_SOFTSWE	two-word search for the remaining typed pickups / the intel help message (local Quadro + iGPU); with fields	
+2026-10-17 15:51:42	god	4ECCEED4,907C1560	SCRIPTS+TASKLIST+L_2_1_BOB_GUARDPOSTBATTACKSCENE+FILENAME	task scripts named from the named scripts that call them: caller name / caller prefix + any word (rented RTX 4090)	
+2026-10-17 15:51:42	god	795EC9B8,86AF112A	SCRIPTS+TASKLIST+L_1_1_TRAIN_ROLLINGCHARGE_CHEERHELPER+FILENAME	task scripts named from the named scripts that call them: caller name / caller prefix + any word (rented RTX 4090)	
+2026-10-17 15:51:42	god	7E709121,3D0AE724	SCRIPTS+TASKLIST+L_1_2_FACTORYPROJGENS+FILENAME	task scripts named from the named scripts that call them: caller name / caller prefix + any word (rented RTX 4090)	
+2026-10-17 15:51:42	god	C28213A1,AD718359	SCRIPTS+TASKLIST+L_1_3_PANZERFIGHT_PANZER01CODRIVER+FILENAME	task scripts named from the named scripts that call them: caller name / caller prefix + any word (rented RTX 4090)	
+2026-10-17 15:51:42	god	C5AEA14D,23E1091C	SCRIPTS+TASKLIST+L_1_3_SNIPERTOWER_GERMANINFCHARGE1+FILENAME	task scripts named from the named scripts that call them: caller name / caller prefix + any word (rented RTX 4090)	
+2026-10-17 15:51:42	god	C5AEA14D,D7BFD973	SCRIPTS+TASKLIST+L_1_3_SNIPERTOWER_GERMANINFCHARGE2+FILENAME	task scripts named from the named scripts that call them: caller name / caller prefix + any word (rented RTX 4090)	
+2026-10-17 15:51:42	god	C5AEA14D,F3A07646	SCRIPTS+TASKLIST+L_1_3_SNIPERTOWER_GERMANINFCHARGE3+FILENAME	task scripts named from the named scripts that call them: caller name / caller prefix + any word (rented RTX 4090)	
+2026-10-17 16:53:53	god	16B0D245,89649DB7	SCRIPTS+TASKLIST+L_1_1_DOCK_OARSMENSTARBOARD2SKIP+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 16:53:53	god	339F29AD,CA574C84	SCRIPTS+TASKLIST+L_1_1_DOCK_OARSMENPORT2SKIP+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 16:53:53	god	F8E77717,DA820472	SCRIPTS+TASKLIST+L_1_1_MGNEST_GERMANREGULAR+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 16:59:58	god	5BE6F5DB,618E040F	SCRIPTS+TASKLIST+L_1_1_TRAIN_TURKEYSHOOTCLEANUP+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:03:02	god	5E0180F9,F86607D2	SCRIPTS+TASKLIST+L_1_2_TRACTORFACTORY_PANZERS_DOORKILL+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:06:06	god	23414181,4D23F827	SCRIPTS+TASKLIST+L_1_3_PANZERFIGHT_TANK01_CHASEPLAYER+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:06:06	god	23414181,78D61B79	SCRIPTS+TASKLIST+L_1_3_PANZERFIGHT_TANK03_CHASEPLAYER+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:06:06	god	3CB41EC9,FCAC407E	SCRIPTS+TASKLIST+L_1_3_REDSQUARE_FINALPUSH+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:06:06	god	E65FFDE6,2A92381E	SCRIPTS+TASKLIST+L_1_3_PANZERFIGHT_BLOCKERTANKRELEASE+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:06:06	god	FC744FB1,A14BFFE1	SCRIPTS+TASKLIST+L_1_3_REDSQUARE_DELETECELEBRATION+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:06:06	god	23414181,E8BA4BB4	SCRIPTS+TASKLIST+L_1_3_PANZERFIGHT_TANK02_CHASEPLAYER+FILENAME	number/letter/tag variant of a found script name	
+2026-10-17 17:06:06	god	23414181,C2A11F86	SCRIPTS+TASKLIST+L_1_3_PANZERFIGHT_TANK04_CHASEPLAYER+FILENAME	number/letter/tag variant of a found script name	
+2026-10-17 17:15:35	god	AE4B9F7B,10F86FD9	SCRIPTS+TASKLIST+L_2_1_B_JEEPDRIVER_GIMPSTART+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:27:43	god	B6107942,5C4DE118	SCRIPTS+TASKLIST+L_3_1_SEWEREND_ENEMYFREE+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:30:46	god	1C7F04EB,5A385C3A	SCRIPTS+TASKLIST+L_3_1_SEWERS_PINNEDDOWN_2NDWAVERELEASE+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:30:46	god	34909B30,BFF494D8	SCRIPTS+TASKLIST+L_3_1_SEWERS_PINNEDDOWN_PLAYERSKIPPED+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:30:46	god	49F73166,46A5C905	SCRIPTS+TASKLIST+L_3_1_DOOMROOM_MMGENEMYROAM+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:30:46	god	CFB0B7E2,DFB4D2DA	SCRIPTS+TASKLIST+L_3_1_SEWERS_PINNEDDOWN_CP_BUDDIESKILLED+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
+2026-10-17 17:30:46	god	F9A09EC8,F03D8F39	SCRIPTS+TASKLIST+L_3_1_SEWERS_BUDDIESRESCUED+FILENAME	rented RTX 4090 queue (script references x words, word+digit+word scripts, pickups/bodies, Maxim)	
