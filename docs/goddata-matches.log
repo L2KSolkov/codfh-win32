@@ -34438,3 +34438,10 @@
 2026-10-20 14:35:53	god	F88F2183,257ABB00	COD_ANIMATEDOBJECTS+L1_3_JUNKER88+UVANIM	box object MITM (model container + level tag + chars) and aircraft-name follow-up	
 2026-10-20 14:35:53	god	76159E40,BC8C7D2F	COD_ANIMATEDOBJECTS+L3_1_P51	box object MITM (model container + level tag + chars) and aircraft-name follow-up	
 2026-10-20 14:35:53	god	604D8CAA,B2824602	COD_ANIMATEDOBJECTS+L3_1_P51+COLLISIONDFF	box object MITM (model container + level tag + chars) and aircraft-name follow-up	
+2026-10-20 14:39:02	god	F14ADE80,6CE83458	COD_ANIMATEDOBJECTS+L2_1_ANTNENNAS_ART	box object MITM (model container + level tag + chars, K3) and follow-up	
+2026-10-20 14:39:02	god	531137EA,74F52687	COD_ANIMATEDOBJECTS+L2_1_ANTNENNAS_ART+COLLISIONDFF	box object MITM (model container + level tag + chars, K3) and follow-up	
+2026-10-20 14:39:02	god	97EDAA69,E2057B2A	COD_ANIMATEDOBJECTS+L2_1_ANTNENNAS_ART+DFF	box object MITM (model container + level tag + chars, K3) and follow-up	
+2026-10-20 14:39:02	god	07E19927,EB27B9C2	COD_ANIMATEDOBJECTS+L2_1_ANTNENNAS_ART+PARTSFIELD	box object MITM (model container + level tag + chars, K3) and follow-up	
+2026-10-20 14:39:02	god	A57AECC7,A00BDA25	COD_ANIMATEDOBJECTS+L2_1_ANTNENNAS_ART+SURFACETAG	box object MITM (model container + level tag + chars, K3) and follow-up	
+2026-10-20 14:39:02	god	3E07AE4B,B7C00E3B	COD_ANIMATEDOBJECTS+L2_1_ANTNENNAS_ART+TEXTUREDICTIONARY	box object MITM (model container + level tag + chars, K3) and follow-up	
+2026-10-20 14:39:02	god	2104D198,34789F6F	COD_ANIMATEDOBJECTS+L2_1_ANTNENNAS_ART+UVANIM	box object MITM (model container + level tag + chars, K3) and follow-up	
