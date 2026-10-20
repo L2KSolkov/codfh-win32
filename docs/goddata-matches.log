@@ -34389,3 +34389,31 @@
 2026-10-20 09:11:41	god	2487E56C,8A7D3D9B	COD_ENEMYWEAPONS+MP40+ENEMYWEAPONMESH+PARTSFIELD	COD_ENEMYWEAPONS+<weapon>+<mesh kind> parts	
 2026-10-20 09:11:41	god	06F991DF,E76DC42B	COD_ENEMYWEAPONS+MP40+ENEMYWEAPONMESH+SURFACETAG	COD_ENEMYWEAPONS+<weapon>+<mesh kind> parts	
 2026-10-20 09:11:41	god	58B5C67D,3909BB7C	COD_ENEMYWEAPONS+MP40+ENEMYWEAPONMESH+UVANIM	COD_ENEMYWEAPONS+<weapon>+<mesh kind> parts	
+2026-10-20 09:34:20	god	08B7D3EA,042A7B04	SCRIPTS+TASKLIST+L_1_1_REFINERY_COVER1GOTOTURKEY+FILENAME	box script stem search	
+2026-10-20 09:34:20	god	22687E87,042A7B04	SCRIPTS+TASKLIST+L_1_1_REFINERY_COVER2GOTOTURKEY+FILENAME	box script stem search	
+2026-10-20 09:34:20	god	7D5D3095,042A7B04	SCRIPTS+TASKLIST+L_1_1_REFINERY_COVER4GOTOTURKEY+FILENAME	box script stem search	
+2026-10-20 09:34:20	god	9CBF58A0,042A7B04	SCRIPTS+TASKLIST+L_1_1_REFINERY_COVER3GOTOTURKEY+FILENAME	box script stem search	
+2026-10-20 09:46:57	god	8A66168D,373DD19B	GAMECHARACTERS+L3_1_US_PRIVATE_26TH+ALIGNMENT	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	17124657,89781F34	GAMECHARACTERS+L3_1_US_PRIVATE_26TH+BODY	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	0D123614,72870549	GAMECHARACTERS+L3_1_US_PRIVATE_26TH+HEAD	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	B0AB2FF3,34818349	GAMECHARACTERS+L3_1_US_PRIVATE_26TH+HELMET	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	D640C058,6C94D3D9	GAMECHARACTERS+L3_1_US_PRIVATE_26TH+HELMETOFFSETX	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	D640C058,6C94D3D8	GAMECHARACTERS+L3_1_US_PRIVATE_26TH+HELMETOFFSETY	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	D640C058,6C94D3DB	GAMECHARACTERS+L3_1_US_PRIVATE_26TH+HELMETOFFSETZ	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	74F85729,E9E92988	GAMECHARACTERS+L3_1_US_PRIVATE_26TH+PARTSFIELD	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	632A88C4,A607E3D7	GAMECHARACTERS+L3_1_US_CORPORAL_26TH+ALIGNMENT	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	3B5799CB,5A76087D	GAMECHARACTERS+L3_1_US_CORPORAL_26TH+BODY	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	5A48C00E,5475FEF6	GAMECHARACTERS+L3_1_US_CORPORAL_26TH+HEAD	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	4D9352E8,F4C06B39	GAMECHARACTERS+L3_1_US_CORPORAL_26TH+HELMET	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	74AC5362,29F177DA	GAMECHARACTERS+L3_1_US_CORPORAL_26TH+HELMETOFFSETX	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	74AC5363,29F177DA	GAMECHARACTERS+L3_1_US_CORPORAL_26TH+HELMETOFFSETY	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	74AC5360,29F177DA	GAMECHARACTERS+L3_1_US_CORPORAL_26TH+HELMETOFFSETZ	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	7080B6DD,89960BCB	GAMECHARACTERS+L3_1_US_CORPORAL_26TH+PARTSFIELD	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	A3289A02,5D8F004B	GAMECHARACTERS+L3_1_US_PRIVATE_26TH_2+ALIGNMENT	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	B439DFCE,5D27BA44	GAMECHARACTERS+L3_1_US_PRIVATE_26TH_2+BODY	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	AE39D661,C635D719	GAMECHARACTERS+L3_1_US_PRIVATE_26TH_2+HEAD	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	AD0C85EC,40B50479	GAMECHARACTERS+L3_1_US_PRIVATE_26TH_2+HELMET	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	18BFA4C3,F9363509	GAMECHARACTERS+L3_1_US_PRIVATE_26TH_2+HELMETOFFSETX	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	18BFA4C3,F9363508	GAMECHARACTERS+L3_1_US_PRIVATE_26TH_2+HELMETOFFSETY	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	18BFA4C3,F936350B	GAMECHARACTERS+L3_1_US_PRIVATE_26TH_2+HELMETOFFSETZ	character objects: grouped unnamed records + nation/rank/unit sweep	
+2026-10-20 09:46:57	god	C8105656,E42AD898	GAMECHARACTERS+L3_1_US_PRIVATE_26TH_2+PARTSFIELD	character objects: grouped unnamed records + nation/rank/unit sweep	
