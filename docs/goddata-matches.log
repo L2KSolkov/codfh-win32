@@ -34446,3 +34446,11 @@
 2026-10-20 14:39:02	god	3E07AE4B,B7C00E3B	COD_ANIMATEDOBJECTS+L2_1_ANTNENNAS_ART+TEXTUREDICTIONARY	box object MITM (model container + level tag + chars, K3) and follow-up	
 2026-10-20 14:39:02	god	2104D198,34789F6F	COD_ANIMATEDOBJECTS+L2_1_ANTNENNAS_ART+UVANIM	box object MITM (model container + level tag + chars, K3) and follow-up	
 2026-10-20 14:46:47	god	94C712F0,ADFE310B	SCRIPTS+TASKLIST+L_1_5_SIMPLEKETTENKRADBLOW+FILENAME	box script stem search	
+2026-10-20 16:27:05	god	CA6CD338,F80DC02A	COD_ENEMYWEAPONS+TT34	box object MITM (plain container roots) and weapon-name follow-up	
+2026-10-20 16:27:05	god	D746CA2A,D79219D4	COD_ENEMYWEAPONS+TT34+ENEMYWEAPONMESH	box object MITM (plain container roots) and weapon-name follow-up	
+2026-10-20 16:27:05	god	C157F601,3713C756	COD_ENEMYWEAPONS+TT34+ENEMYWEAPONMESH+COLLISIONDFF	box object MITM (plain container roots) and weapon-name follow-up	
+2026-10-20 16:27:05	god	911E8894,99F97A25	COD_ENEMYWEAPONS+TT34+ENEMYWEAPONMESH+DFF	box object MITM (plain container roots) and weapon-name follow-up	
+2026-10-20 16:27:05	god	0D2578A4,5E3360CB	COD_ENEMYWEAPONS+TT34+ENEMYWEAPONMESH+PARTSFIELD	box object MITM (plain container roots) and weapon-name follow-up	
+2026-10-20 16:27:05	god	0F9757F7,2F56443B	COD_ENEMYWEAPONS+TT34+ENEMYWEAPONMESH+SURFACETAG	box object MITM (plain container roots) and weapon-name follow-up	
+2026-10-20 16:27:05	god	77AAB125,EB54F257	COD_ENEMYWEAPONS+TT34+ENEMYWEAPONMESH+TEXTUREDICTIONARY	box object MITM (plain container roots) and weapon-name follow-up	
+2026-10-20 16:27:05	god	0AE9F795,72BBFD2C	COD_ENEMYWEAPONS+TT34+ENEMYWEAPONMESH+UVANIM	box object MITM (plain container roots) and weapon-name follow-up	
