@@ -34429,3 +34429,12 @@
 2026-10-20 13:41:22	god	68CB286B,F3DE6A44	SCRIPTS+TASKLIST+L_3_4_TOWNCENTRANCEENCOUNTER_TANK02_GO+FILENAME	local GPU brute (stems)	
 2026-10-20 13:41:22	god	73672E11,F3DE6A44	SCRIPTS+TASKLIST+L_3_4_TOWNCENTRANCEENCOUNTER_TANK04_GO+FILENAME	local GPU brute (stems)	
 2026-10-20 13:56:43	god	1D6CE763,C24AFB47	SCRIPTS+TASKLIST+L_3_5_B_WAREHOUSEEXTERIOR_ENEMYRETREAT+FILENAME	box script stem search	
+2026-10-20 14:35:53	god	051D33C4,F9089CF8	COD_ANIMATEDOBJECTS+L1_3_JUNKER88	box object MITM (model container + level tag + chars) and aircraft-name follow-up	
+2026-10-20 14:35:53	god	011F2093,D9E12DD2	COD_ANIMATEDOBJECTS+L1_3_JUNKER88+COLLISIONDFF	box object MITM (model container + level tag + chars) and aircraft-name follow-up	
+2026-10-20 14:35:53	god	B32C16E6,57BB5541	COD_ANIMATEDOBJECTS+L1_3_JUNKER88+DFF	box object MITM (model container + level tag + chars) and aircraft-name follow-up	
+2026-10-20 14:35:53	god	92F0D41E,F2D839BF	COD_ANIMATEDOBJECTS+L1_3_JUNKER88+PARTSFIELD	box object MITM (model container + level tag + chars) and aircraft-name follow-up	
+2026-10-20 14:35:53	god	3E79F701,5F0284BF	COD_ANIMATEDOBJECTS+L1_3_JUNKER88+SURFACETAG	box object MITM (model container + level tag + chars) and aircraft-name follow-up	
+2026-10-20 14:35:53	god	46186F27,6AA69D13	COD_ANIMATEDOBJECTS+L1_3_JUNKER88+TEXTUREDICTIONARY	box object MITM (model container + level tag + chars) and aircraft-name follow-up	
+2026-10-20 14:35:53	god	F88F2183,257ABB00	COD_ANIMATEDOBJECTS+L1_3_JUNKER88+UVANIM	box object MITM (model container + level tag + chars) and aircraft-name follow-up	
+2026-10-20 14:35:53	god	76159E40,BC8C7D2F	COD_ANIMATEDOBJECTS+L3_1_P51	box object MITM (model container + level tag + chars) and aircraft-name follow-up	
+2026-10-20 14:35:53	god	604D8CAA,B2824602	COD_ANIMATEDOBJECTS+L3_1_P51+COLLISIONDFF	box object MITM (model container + level tag + chars) and aircraft-name follow-up	
