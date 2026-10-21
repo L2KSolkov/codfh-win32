@@ -34519,3 +34519,5 @@
 2026-10-20 18:07:06	god	483A7F72,4F333F46	MOUNTEDWEAPONS+MG42LOWRES+WEAPONMESH+SURFACETAG	box object MITM (plain container roots) and LOWRES weapon follow-up	
 2026-10-20 18:07:06	god	DAD14250,B016F000	MOUNTEDWEAPONS+MG42LOWRES+WEAPONMESH+TEXTUREDICTIONARY	box object MITM (plain container roots) and LOWRES weapon follow-up	
 2026-10-20 18:07:06	god	0BC5AE65,3F0AA574	MOUNTEDWEAPONS+MG42LOWRES+WEAPONMESH+UVANIM	box object MITM (plain container roots) and LOWRES weapon follow-up	
+2026-10-21 05:30:22	god	DF9A20D3,A61D01CF	COD_ANIMATEDOBJECTS+L2_1_JEEP_PPA_C	one-character variant of a known name (JEEP_PPA_A -> _C) and lettered siblings	
+2026-10-21 05:30:22	god	0E4066A6,FD5F41BD	COD_ANIMATEDOBJECTS+L2_1_JEEP_PPA_C+COLLISIONDFF	one-character variant of a known name (JEEP_PPA_A -> _C) and lettered siblings	
