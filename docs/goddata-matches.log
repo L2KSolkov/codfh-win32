@@ -34631,3 +34631,9 @@
 2026-10-21 15:55:02	god	EA84308B,572E8440	SCRIPTS+TASKLIST+L_1_3_TRAINSTATIONBUDDIES_SOLDIERB+FILENAME	box script search from the script source-file vocabulary	
 2026-10-21 16:02:13	god	4A99F1D7,209B2A03	COD_ANIMATEDOBJECTS+L1_1_PLAYER	GPU plan: prefixes / named points / soldier definitions	
 2026-10-21 16:02:42	god	BC243CAA,839A6C89	COD_ANIMATEDOBJECTS+L1_1_PLAYER+COLLISIONDFF	animated object player root / parts / level siblings	
+2026-10-21 16:06:01	god	D353BAA6,549E47C3	COD_ANIMATEDOBJECTS+L1_1_VOLGADEBRIS	GPU plan: object roots / soldier roots from source and entity vocabulary	
+2026-10-21 16:06:01	god	342BA509,E7C84581	COD_ANIMATEDOBJECTS+L3_1_WHITEFLAG	GPU plan: object roots / soldier roots from source and entity vocabulary	
+2026-10-21 16:06:01	god	5471C2E4,9505FDBE	COD_ANIMATEDOBJECTS+L3_1_CORNERBUILDING	GPU plan: object roots / soldier roots from source and entity vocabulary	
+2026-10-21 16:06:14	god	D56F8CA4,0CC20E16	COD_ANIMATEDOBJECTS+L1_1_VOLGADEBRIS+COLLISIONDFF	animated object root from the source-vocabulary GPU plan: parts and siblings	
+2026-10-21 16:06:14	god	91E29433,0FA9CB6C	COD_ANIMATEDOBJECTS+L3_1_CORNERBUILDING+COLLISIONDFF	animated object root from the source-vocabulary GPU plan: parts and siblings	
+2026-10-21 16:06:14	god	279438A3,4BD0E21C	COD_ANIMATEDOBJECTS+L3_1_WHITEFLAG+COLLISIONDFF	animated object root from the source-vocabulary GPU plan: parts and siblings	
