@@ -34486,3 +34486,17 @@
 2026-10-20 16:38:04	god	B7E60857,1B846955	COD_ENEMYWEAPONS+SPRINGFIELD_SNIPER+ENEMYWEAPONMESH+SURFACETAG	box object MITM (plain container roots) and weapon-variant follow-up	
 2026-10-20 16:38:04	god	4B31B545,02869C0D	COD_ENEMYWEAPONS+SPRINGFIELD_SNIPER+ENEMYWEAPONMESH+TEXTUREDICTIONARY	box object MITM (plain container roots) and weapon-variant follow-up	
 2026-10-20 16:38:04	god	B4108FF5,5CB1ED06	COD_ENEMYWEAPONS+SPRINGFIELD_SNIPER+ENEMYWEAPONMESH+UVANIM	box object MITM (plain container roots) and weapon-variant follow-up	
+2026-10-20 17:17:02	god	35047AE3,58D604AF	COD_ANIMATEDOBJECTS+L1_1_ROLLINGPIPE	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	238B0369,58CC2082	COD_ANIMATEDOBJECTS+L1_1_ROLLINGPIPE+COLLISIONDFF	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	7E6C42F0,0CE9C5B3	COD_ANIMATEDOBJECTS+L1_1_ROLLINGPIPE+DFF	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	3E348D26,81016EE1	COD_ANIMATEDOBJECTS+L1_1_ROLLINGPIPE+PARTSFIELD	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	A98B6B0E,CE9AEE2A	COD_ANIMATEDOBJECTS+L1_1_ROLLINGPIPE+SURFACETAG	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	C9E9E814,5CDBA1A4	COD_ANIMATEDOBJECTS+L1_1_ROLLINGPIPE+TEXTUREDICTIONARY	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	DFB610F1,13295B50	COD_ANIMATEDOBJECTS+L1_1_ROLLINGPIPE+UVANIM	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	226D8CFF,17C8A135	COD_ANIMATEDOBJECTS+L1_5_TREE_FALL01	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	CD1EE7AD,559E46A0	COD_ANIMATEDOBJECTS+L1_5_TREE_FALL01+COLLISIONDFF	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	98686084,19C962C1	COD_ANIMATEDOBJECTS+L1_5_TREE_FALL01+DFF	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	D446F112,7AF041CF	COD_ANIMATEDOBJECTS+L1_5_TREE_FALL01+PARTSFIELD	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	F3704CBA,F10F8A90	COD_ANIMATEDOBJECTS+L1_5_TREE_FALL01+SURFACETAG	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	06C16B08,74EE67A2	COD_ANIMATEDOBJECTS+L1_5_TREE_FALL01+TEXTUREDICTIONARY	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
+2026-10-20 17:17:02	god	3287521D,64DF790A	COD_ANIMATEDOBJECTS+L1_5_TREE_FALL01+UVANIM	box two-word object MITM (container + level tag + vocabulary words) and sibling follow-up	
