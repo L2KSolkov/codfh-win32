@@ -36349,3 +36349,10 @@
 2026-10-22 08:19:42	god	B3B89D63,0B3450A0	COD_HELMETS+HGSO2_TURBAN+COLLISIONDFF	helmet part (the records only direct reference)	
 2026-10-22 10:54:55	god	F4EABC27,DAB24176	COD_BODIES+BM73_AVG_CIVTUNISIANKAREEM	bundle texture name BT73_Avg_CivTunisianKareem (D:\FH_Extract\__hashed asset bundle), COLLISIONDFF child in refs	
 2026-10-22 10:54:55	god	748E093A,98D2DA74	COD_BODIES+BM73_AVG_CIVTUNISIANKAREEM+COLLISIONDFF	bundle texture name BT73_Avg_CivTunisianKareem (D:\FH_Extract\__hashed asset bundle), COLLISIONDFF child in refs	
+2026-10-22 11:16:27	god	925065BA,F663B9FD	COD_SIMPLEMECHANICS+VM_OPEL_BARS_DEST_SNOW	lanebf4 props7 (depth-3 strings as starts; VT_Opel_* textures), unk 4-5, DFF/COLLISIONDFF children in refs	
+2026-10-22 11:16:27	god	AC036FA7,77DB4E19	COD_SIMPLEMECHANICS+VM_OPEL_BARS_DEST_SNOW+DFF	lanebf4 props7 (depth-3 strings as starts; VT_Opel_* textures), unk 4-5, DFF/COLLISIONDFF children in refs	
+2026-10-22 11:16:27	god	F21676F5,5A71B2CA	COD_SIMPLEMECHANICS+VM_OPEL_BARS_DEST_SNOW+TEXTUREDICTIONARY	lanebf4 props7 (depth-3 strings as starts; VT_Opel_* textures), unk 4-5, DFF/COLLISIONDFF children in refs	
+2026-10-22 11:16:27	god	5A3B4FED,E814C3B7	COD_SIMPLEMECHANICS+VM_OPEL_BARS_DEST_SNOW+PARTSFIELD	lanebf4 props7 (depth-3 strings as starts; VT_Opel_* textures), unk 4-5, DFF/COLLISIONDFF children in refs	
+2026-10-22 11:16:27	god	67DF1750,307C8F88	COD_SIMPLEMECHANICS+VM_OPEL_BARS_DEST_SNOW+COLLISIONDFF	lanebf4 props7 (depth-3 strings as starts; VT_Opel_* textures), unk 4-5, DFF/COLLISIONDFF children in refs	
+2026-10-22 11:16:27	god	6EAB04ED,BC4874D8	COD_SIMPLEMECHANICS+VM_OPEL_BARS_DEST_SNOW+SURFACETAG	lanebf4 props7 (depth-3 strings as starts; VT_Opel_* textures), unk 4-5, DFF/COLLISIONDFF children in refs	
+2026-10-22 11:16:27	god	26CBA0AE,C314DBD2	COD_SIMPLEMECHANICS+VM_OPEL_BARS_DEST_SNOW+UVANIM	lanebf4 props7 (depth-3 strings as starts; VT_Opel_* textures), unk 4-5, DFF/COLLISIONDFF children in refs	
