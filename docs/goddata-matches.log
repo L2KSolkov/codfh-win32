@@ -36381,3 +36381,5 @@
 2026-10-22 12:11:16	god	1CB8D8EA,D35E9C6F	GAMEWEAPONS+GRENADESHORTTHROWANIMS+STIELHANDGREN	direct: GameWeapons action container x throwable spelling (type-3 clip data P16A7C_GrenadeToss)	
 2026-10-22 12:11:16	god	CD16B77D,C6AB8606	GAMEWEAPONS+GRENADESHORTTHROWANIMS+TEDDYBEAR	direct: GameWeapons action container x throwable spelling (type-3 clip data P16A7C_GrenadeToss)	
 2026-10-22 12:11:16	god	79625865,B79CD531	GAMEWEAPONS+GRENADESHORTTHROWANIMS+TELLERMINE	direct: GameWeapons action container x throwable spelling (type-3 clip data P20A7B_TellerMine_Throw)	
+2026-10-22 12:23:27	god	E204CF36,3B62DB7E	COD_SIMPLEMECHANICS+CHAIR_WOOD_GREEN	lanebf4 props8 (bundle/record strings as starts), children in refs	
+2026-10-22 12:23:27	god	6F73E234,12DF2DD5	COD_SIMPLEMECHANICS+CHAIR_WOOD_GREEN+COLLISIONDFF	lanebf4 props8 (bundle/record strings as starts), children in refs	
