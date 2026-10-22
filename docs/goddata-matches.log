@@ -36114,3 +36114,45 @@
 2026-10-22 07:16:25	god	F8019DB0,C49391E7	COD_SIMPLEMECHANICS+MP_0_TARGET_RADIOBIG_D+COLLISIONDFF	multiplayer round mp1 (MP_0_ start + up to 14 unknown): the S&D radio meshes, entities targeta (pristine) / destroya (_D); part children confirm	
 2026-10-22 07:16:25	god	520F768D,6B1744C5	COD_SIMPLEMECHANICS+MP_0_TARGET_RADIOBIG_D+SURFACETAG	multiplayer round mp1 (MP_0_ start + up to 14 unknown): the S&D radio meshes, entities targeta (pristine) / destroya (_D); part children confirm	
 2026-10-22 07:16:25	god	B3B9E74E,7E92140F	COD_SIMPLEMECHANICS+MP_0_TARGET_RADIOBIG_D+UVANIM	multiplayer round mp1 (MP_0_ start + up to 14 unknown): the S&D radio meshes, entities targeta (pristine) / destroya (_D); part children confirm	
+2026-10-22 07:54:54	god	E1172541,CEB87A78	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_METAL	direct naming round ps1 (container + stem + up to 12 unknown); the AntiTankImpact particle systems; PARTICLEn children are the root record refs	
+2026-10-22 07:54:54	god	2D5DD01A,D5CA9635	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_METAL+PARTICLE1	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	2D5DD019,D5CA9635	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_METAL+PARTICLE2	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	2D5DD018,D5CA9635	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_METAL+PARTICLE3	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	2D5DD01F,D5CA9635	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_METAL+PARTICLE4	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	2D5DD01E,D5CA9635	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_METAL+PARTICLE5	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	C62EFF50,650A0BB9	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_WOOD	direct naming round ps1 (container + stem + up to 12 unknown); the AntiTankImpact particle systems; PARTICLEn children are the root record refs	
+2026-10-22 07:54:54	god	63E5ADED,52121E82	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_WOOD+PARTICLE1	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	63E5ADED,52121E81	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_WOOD+PARTICLE2	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	63E5ADED,52121E80	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_WOOD+PARTICLE3	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	63E5ADED,52121E87	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_WOOD+PARTICLE4	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	63E5ADED,52121E86	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_WOOD+PARTICLE5	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	09000A94,5F0A02DF	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_DIRT	direct naming round ps1 (container + stem + up to 12 unknown); the AntiTankImpact particle systems; PARTICLEn children are the root record refs	
+2026-10-22 07:54:54	god	F697E431,BEE6AB08	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_DIRT+PARTICLE1	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	F697E431,BEE6AB0B	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_DIRT+PARTICLE2	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	F697E431,BEE6AB0A	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_DIRT+PARTICLE3	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	F697E431,BEE6AB0D	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_DIRT+PARTICLE4	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	F697E431,BEE6AB0C	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_DIRT+PARTICLE5	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	E639BF0C,640A0A3D	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_SNOW	direct naming round ps1 (container + stem + up to 12 unknown); the AntiTankImpact particle systems; PARTICLEn children are the root record refs	
+2026-10-22 07:54:54	god	E62A2C69,24CD26FE	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_SNOW+PARTICLE1	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	E62A2C69,24CD26FD	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_SNOW+PARTICLE2	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	E62A2C69,24CD26FB	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_SNOW+PARTICLE4	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	E62A2C69,24CD26FA	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_SNOW+PARTICLE5	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	EEC029C2,3FBD2F6C	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_SNOW_TILLET	direct naming round ps1 (container + stem + up to 12 unknown); the AntiTankImpact particle systems; PARTICLEn children are the root record refs	
+2026-10-22 07:54:54	god	8BEB34B9,B9E510C9	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_SNOW_TILLET+PARTICLE1	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	8BEB34BA,B9E510C9	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_SNOW_TILLET+PARTICLE2	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	8BEB34BB,B9E510C9	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_SNOW_TILLET+PARTICLE3	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	8BEB34BC,B9E510C9	SURFACES+PARTICLES+PARTICLESYSTEMS+ANTITANKEXPLOSION_SNOW_TILLET+PARTICLE4	child of the ps1 particle system (direct reference of the root)	
+2026-10-22 07:54:54	god	7FE5D93C,835144E8	SURFACES+MATERIALS+METAL+BARREL_OIL_FILLED	direct naming round ps1; METAL material whose SOUND_ID is METAL_BARREL; the three field children are the record refs	
+2026-10-22 07:54:54	god	8CA497BB,341E7808	SURFACES+MATERIALS+METAL+BARREL_OIL_FILLED+PARTICLE_ID	field child of the ps1 material (direct reference)	
+2026-10-22 07:54:54	god	9F1D8C54,F04330CC	SURFACES+MATERIALS+METAL+BARREL_OIL_FILLED+SOUND_ID	field child of the ps1 material (direct reference)	
+2026-10-22 07:54:54	god	7BED31CB,4443B8B3	SURFACES+MATERIALS+METAL+BARREL_OIL_FILLED+SURFACE_ID	field child of the ps1 material (direct reference)	
+2026-10-22 07:54:54	god	F9D78E39,534650AB	SURFACES+SURFACE_IDS+METAL_BARREL_OIL_FILLED	surface id referenced by the SURFACE_ID field of the ps1 material	
+2026-10-22 07:54:55	god	64C01A03,6FF73912	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_OFF_LUGER	single-player scheme test with every level tag (mpsold.py): <level>_<class>_<role>_<rank>_<weapon>; part children confirm	
+2026-10-22 07:54:55	god	43E43906,94EB82CC	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_OFF_LUGER+PARTSFIELD	single-player scheme test with every level tag (mpsold.py): <level>_<class>_<role>_<rank>_<weapon>; part children confirm	
+2026-10-22 07:54:55	god	843B50C5,DA609810	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_OFF_LUGER+ALIGNMENT	single-player scheme test with every level tag (mpsold.py): <level>_<class>_<role>_<rank>_<weapon>; part children confirm	
+2026-10-22 07:54:55	god	B9E32C8A,F7CBFD70	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_OFF_LUGER+BODY	single-player scheme test with every level tag (mpsold.py): <level>_<class>_<role>_<rank>_<weapon>; part children confirm	
+2026-10-22 07:54:55	god	BAFCC603,FDCC06DF	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_OFF_LUGER+HEAD	single-player scheme test with every level tag (mpsold.py): <level>_<class>_<role>_<rank>_<weapon>; part children confirm	
+2026-10-22 07:54:55	god	83DF2527,5E2EC2B6	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_OFF_LUGER+HELMET	single-player scheme test with every level tag (mpsold.py): <level>_<class>_<role>_<rank>_<weapon>; part children confirm	
+2026-10-22 07:54:55	god	F6419ECF,F0961939	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_OFF_LUGER+HELMETOFFSETX	single-player scheme test with every level tag (mpsold.py): <level>_<class>_<role>_<rank>_<weapon>; part children confirm	
+2026-10-22 07:54:55	god	F6419ECE,F0961939	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_OFF_LUGER+HELMETOFFSETY	single-player scheme test with every level tag (mpsold.py): <level>_<class>_<role>_<rank>_<weapon>; part children confirm	
+2026-10-22 07:54:55	god	F6419ECD,F0961939	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_OFF_LUGER+HELMETOFFSETZ	single-player scheme test with every level tag (mpsold.py): <level>_<class>_<role>_<rank>_<weapon>; part children confirm	
