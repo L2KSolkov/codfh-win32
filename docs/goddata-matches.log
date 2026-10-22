@@ -36156,3 +36156,4 @@
 2026-10-22 07:54:55	god	F6419ECF,F0961939	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_OFF_LUGER+HELMETOFFSETX	single-player scheme test with every level tag (mpsold.py): <level>_<class>_<role>_<rank>_<weapon>; part children confirm	
 2026-10-22 07:54:55	god	F6419ECE,F0961939	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_OFF_LUGER+HELMETOFFSETY	single-player scheme test with every level tag (mpsold.py): <level>_<class>_<role>_<rank>_<weapon>; part children confirm	
 2026-10-22 07:54:55	god	F6419ECD,F0961939	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_OFF_LUGER+HELMETOFFSETZ	single-player scheme test with every level tag (mpsold.py): <level>_<class>_<role>_<rank>_<weapon>; part children confirm	
+2026-10-22 07:56:01	god	84B1342D,32673DD9	SURFACES+MATERIALS+METAL+BARREL_OIL_FILLED+DECAL_ID	DECAL_ID field of the ps1 material (direct reference; type-194 child)	
