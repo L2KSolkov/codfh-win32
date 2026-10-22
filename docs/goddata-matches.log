@@ -36021,3 +36021,5 @@
 2026-10-22 06:48:06	god	802B07E1,04E21E71	COD_SIMPLEMECHANICS+VM_OPEL_CANOPY_DEST_SNOW+UVANIM	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
 2026-10-22 06:48:06	god	FD708FCC,7A60D902	COD_SIMPLEMECHANICS+L1_5_SDKFZ251_DEST_SNOW	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
 2026-10-22 06:48:06	god	7863B41B,09BE7DC8	COD_SIMPLEMECHANICS+L1_5_SDKFZ251_DEST_SNOW+COLLISIONDFF	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:53:09	god	2913E42F,508BE27E	COD_ANIMATEDOBJECTS+L1_3_DOOR_TRAINSTATION_ART_PRISTINE	mesh string aTrainStationDoor + props5 seeded search (L1_3_DOOR_ + 12 unknown); the COLLISIONDFF child is in the root record refs	
+2026-10-22 06:53:09	god	F7484302,D1B47A2C	COD_ANIMATEDOBJECTS+L1_3_DOOR_TRAINSTATION_ART_PRISTINE+COLLISIONDFF	mesh string aTrainStationDoor + props5 seeded search (L1_3_DOOR_ + 12 unknown); the COLLISIONDFF child is in the root record refs	
