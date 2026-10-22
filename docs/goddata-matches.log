@@ -35955,3 +35955,4 @@
 2026-10-22 04:23:27	god	B226EA2A,B0813FBC	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_PRIVE_SHREK_02+HELMETOFFSETX	per-lane brute force (lanebf4 soldiers round 14: level tag + class + role + rank + unknown + tail; part children confirm)	
 2026-10-22 04:23:27	god	B226EA2A,B0813FBD	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_PRIVE_SHREK_02+HELMETOFFSETY	per-lane brute force (lanebf4 soldiers round 14: level tag + class + role + rank + unknown + tail; part children confirm)	
 2026-10-22 04:23:27	god	B226EA2A,B0813FBE	GAMECHARACTERS+L3_5_VOLKS_AVG_INFANTRY_PRIVE_SHREK_02+HELMETOFFSETZ	per-lane brute force (lanebf4 soldiers round 14: level tag + class + role + rank + unknown + tail; part children confirm)	
+2026-10-22 05:30:15	god	71E9EE05,D870370D	SCRIPTS+TASKLIST+L_1_1_REFINERY_OLEG_BLOWSHITUP+FILENAME	per-lane brute force (lanebf4 scripts round 5: caller stem L_1_1_REFINERY_ + unknown; callee of REFINERY_OLEGCON / REFINERYASSAULT_OLEG / REFINERY_TURKEYSHOOT_OLEG)	
