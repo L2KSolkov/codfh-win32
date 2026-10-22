@@ -36079,3 +36079,6 @@
 2026-10-22 07:04:37	god	A7859559,86251D08	GAMEWEAPONS+ARMMESHES+MP_7VOLKS+COLLISIONDFF	multiplayer arm mesh for MP_7 (Volkssturm arms; odd-lane hash differs from the WEHR group); part children confirm	
 2026-10-22 07:04:37	god	B5704FCF,B26FC155	GAMEWEAPONS+ARMMESHES+MP_7VOLKS+SURFACETAG	multiplayer arm mesh for MP_7 (Volkssturm arms; odd-lane hash differs from the WEHR group); part children confirm	
 2026-10-22 07:04:37	god	455D5E8D,1F678506	GAMEWEAPONS+ARMMESHES+MP_7VOLKS+UVANIM	multiplayer arm mesh for MP_7 (Volkssturm arms; odd-lane hash differs from the WEHR group); part children confirm	
+2026-10-22 07:09:06	god	01D78546,DF7A0173	SCRIPTS+TASKLIST+MP_4_GAMETYPES+FILENAME	multiplayer level scripts: MP_<n>_ + the same text (shared even-lane hash across MP_4/MP_5/MP_6); structured word test	
+2026-10-22 07:09:06	god	01D78546,AFDD0D3C	SCRIPTS+TASKLIST+MP_5_GAMETYPES+FILENAME	multiplayer level scripts: MP_<n>_ + the same text (shared even-lane hash across MP_4/MP_5/MP_6); structured word test	
+2026-10-22 07:09:06	god	01D78546,9EF75951	SCRIPTS+TASKLIST+MP_6_GAMETYPES+FILENAME	multiplayer level scripts: MP_<n>_ + the same text (shared even-lane hash across MP_4/MP_5/MP_6); structured word test	
