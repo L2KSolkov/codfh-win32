@@ -36356,3 +36356,4 @@
 2026-10-22 11:16:27	god	67DF1750,307C8F88	COD_SIMPLEMECHANICS+VM_OPEL_BARS_DEST_SNOW+COLLISIONDFF	lanebf4 props7 (depth-3 strings as starts; VT_Opel_* textures), unk 4-5, DFF/COLLISIONDFF children in refs	
 2026-10-22 11:16:27	god	6EAB04ED,BC4874D8	COD_SIMPLEMECHANICS+VM_OPEL_BARS_DEST_SNOW+SURFACETAG	lanebf4 props7 (depth-3 strings as starts; VT_Opel_* textures), unk 4-5, DFF/COLLISIONDFF children in refs	
 2026-10-22 11:16:27	god	26CBA0AE,C314DBD2	COD_SIMPLEMECHANICS+VM_OPEL_BARS_DEST_SNOW+UVANIM	lanebf4 props7 (depth-3 strings as starts; VT_Opel_* textures), unk 4-5, DFF/COLLISIONDFF children in refs	
+2026-10-22 12:00:06	god	1A5FCFF5,6E44ADF7	GAMEWEAPONS+DESELECTANIMS+STIELHANDGRENADE	direct: GameWeapons action container x throwable weapon spelling (type-3 clip; STIELHANDGRENADE vs WEAPONS leaf STIELHANDGRENATE)	
