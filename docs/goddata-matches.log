@@ -36345,3 +36345,5 @@
 2026-10-22 08:19:18	god	ACD29547,6DD11D8B	COD_HELMETS+HGS03_USHELMET_NO_STRAP+TEXTUREDICTIONARY	helmet part (direct reference)	
 2026-10-22 08:19:18	god	1DFBBBB3,19FB95AA	COD_HELMETS+HGS03_USHELMET_NO_STRAP+COLLISIONDFF	helmet part (direct reference)	
 2026-10-22 08:19:18	god	CE74757E,86BE92E7	COD_HELMETS+HGS03_USHELMET_NO_STRAP+PARTSFIELD	helmet part (direct reference)	
+2026-10-22 08:19:42	god	38CB89C9,A7B89F35	COD_HELMETS+HGSO2_TURBAN	bod2 round (HGS start + 9 unknown): the helmet referenced by L2_1_NPC_KAREEM+HELMET; spelled HGSO2 (letter O) in the original; its only child, COLLISIONDFF, is the record ref	
+2026-10-22 08:19:42	god	B3B89D63,0B3450A0	COD_HELMETS+HGSO2_TURBAN+COLLISIONDFF	helmet part (the records only direct reference)	
