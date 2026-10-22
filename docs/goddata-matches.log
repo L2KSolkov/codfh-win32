@@ -36338,3 +36338,10 @@
 2026-10-22 08:17:57	god	3111B839,4F41F2FF	GAMECHARACTERS+L1_4_WEHR_AVG_INFANTRY_PRIV_MP40_01+HELMETOFFSETX	single-player scheme test with every level tag (mpsold.py): the cut-level tag L1_4_ inside L_1_3_A; part children confirm	
 2026-10-22 08:17:57	god	3111B838,4F41F2FF	GAMECHARACTERS+L1_4_WEHR_AVG_INFANTRY_PRIV_MP40_01+HELMETOFFSETY	single-player scheme test with every level tag (mpsold.py): the cut-level tag L1_4_ inside L_1_3_A; part children confirm	
 2026-10-22 08:17:57	god	3111B83B,4F41F2FF	GAMECHARACTERS+L1_4_WEHR_AVG_INFANTRY_PRIV_MP40_01+HELMETOFFSETZ	single-player scheme test with every level tag (mpsold.py): the cut-level tag L1_4_ inside L_1_3_A; part children confirm	
+2026-10-22 08:19:18	god	A87DA164,AA0F8740	COD_HELMETS+HGS03_USHELMET_NO_STRAP	bod2 round (HGS03_USHELMET_ start + 8 unknown): the US helmet referenced by L3_1_NPC_PARKER / L3_1_US_PRIVATE_26TH / L3_3_NPC_HAMMOND +HELMET; parts are the record refs	
+2026-10-22 08:19:18	god	BA347A46,D80890A9	COD_HELMETS+HGS03_USHELMET_NO_STRAP+DFF	helmet part (direct reference)	
+2026-10-22 08:19:18	god	2AC4C063,0CC2F458	COD_HELMETS+HGS03_USHELMET_NO_STRAP+UVANIM	helmet part (direct reference)	
+2026-10-22 08:19:18	god	79FD9861,374A4287	COD_HELMETS+HGS03_USHELMET_NO_STRAP+SURFACETAG	helmet part (direct reference)	
+2026-10-22 08:19:18	god	ACD29547,6DD11D8B	COD_HELMETS+HGS03_USHELMET_NO_STRAP+TEXTUREDICTIONARY	helmet part (direct reference)	
+2026-10-22 08:19:18	god	1DFBBBB3,19FB95AA	COD_HELMETS+HGS03_USHELMET_NO_STRAP+COLLISIONDFF	helmet part (direct reference)	
+2026-10-22 08:19:18	god	CE74757E,86BE92E7	COD_HELMETS+HGS03_USHELMET_NO_STRAP+PARTSFIELD	helmet part (direct reference)	
