@@ -36322,3 +36322,10 @@
 2026-10-22 08:10:07	god	C22531D6,F6FADFEA	GAMECHARACTERS+L1_5_LUFT_AVG_MECH_PRIV_LUGER+HELMETOFFSETX	bod1 round (level tag + class stem + up to 14 unknown); part children confirm	
 2026-10-22 08:10:07	god	C22531D7,F6FADFEA	GAMECHARACTERS+L1_5_LUFT_AVG_MECH_PRIV_LUGER+HELMETOFFSETY	bod1 round (level tag + class stem + up to 14 unknown); part children confirm	
 2026-10-22 08:10:07	god	C22531D4,F6FADFEA	GAMECHARACTERS+L1_5_LUFT_AVG_MECH_PRIV_LUGER+HELMETOFFSETZ	bod1 round (level tag + class stem + up to 14 unknown); part children confirm	
+2026-10-22 08:12:37	god	0CCA9EF8,EA14267A	COD_BODIES+BM18D_FEM_RA_MEDIC	bod1 round (BM<nn>_FEM_ start + 8 unknown): the body of L1_1_PC_FEM_TANYA_MOSIN (texture BT18d_Al_RA_Stalin_up); parts are the record refs	
+2026-10-22 08:12:37	god	079C2DA7,994C7510	COD_BODIES+BM18D_FEM_RA_MEDIC+COLLISIONDFF	body part (direct reference)	
+2026-10-22 08:12:37	god	23550CCF,7AB85A6E	COD_BODIES+BM18D_FEM_RA_MEDIC+UVANIM	body part (direct reference)	
+2026-10-22 08:12:37	god	A9BD90DB,59842C35	COD_BODIES+BM18D_FEM_RA_MEDIC+TEXTUREDICTIONARY	body part (direct reference)	
+2026-10-22 08:12:37	god	8933EAA2,1E87C6AD	COD_BODIES+BM18D_FEM_RA_MEDIC+PARTSFIELD	body part (direct reference)	
+2026-10-22 08:12:37	god	9509340A,6EA3F1E7	COD_BODIES+BM18D_FEM_RA_MEDIC+DFF	body part (direct reference)	
+2026-10-22 08:12:37	god	BF547685,4C4430AD	COD_BODIES+BM18D_FEM_RA_MEDIC+SURFACETAG	body part (direct reference)	
