@@ -36383,3 +36383,10 @@
 2026-10-22 12:11:16	god	79625865,B79CD531	GAMEWEAPONS+GRENADESHORTTHROWANIMS+TELLERMINE	direct: GameWeapons action container x throwable spelling (type-3 clip data P20A7B_TellerMine_Throw)	
 2026-10-22 12:23:27	god	E204CF36,3B62DB7E	COD_SIMPLEMECHANICS+CHAIR_WOOD_GREEN	lanebf4 props8 (bundle/record strings as starts), children in refs	
 2026-10-22 12:23:27	god	6F73E234,12DF2DD5	COD_SIMPLEMECHANICS+CHAIR_WOOD_GREEN+COLLISIONDFF	lanebf4 props8 (bundle/record strings as starts), children in refs	
+2026-10-22 12:24:24	god	531C236C,5EB233C7	COD_SIMPLEMECHANICS+L2_1_TIMEDDEMOCHARGELARGE	lanebf4 props8 (bundle/record strings as starts), six part children in refs	
+2026-10-22 12:24:24	god	CF5EC4DE,6999566C	COD_SIMPLEMECHANICS+L2_1_TIMEDDEMOCHARGELARGE+DFF	lanebf4 props8 (bundle/record strings as starts), six part children in refs	
+2026-10-22 12:24:24	god	457D9DCF,FF411620	COD_SIMPLEMECHANICS+L2_1_TIMEDDEMOCHARGELARGE+TEXTUREDICTIONARY	lanebf4 props8 (bundle/record strings as starts), six part children in refs	
+2026-10-22 12:24:24	god	46A435E6,4F3A139A	COD_SIMPLEMECHANICS+L2_1_TIMEDDEMOCHARGELARGE+PARTSFIELD	lanebf4 props8 (bundle/record strings as starts), six part children in refs	
+2026-10-22 12:24:24	god	C82BB5BB,30ADF545	COD_SIMPLEMECHANICS+L2_1_TIMEDDEMOCHARGELARGE+COLLISIONDFF	lanebf4 props8 (bundle/record strings as starts), six part children in refs	
+2026-10-22 12:24:24	god	A1EBB029,50BEA042	COD_SIMPLEMECHANICS+L2_1_TIMEDDEMOCHARGELARGE+SURFACETAG	lanebf4 props8 (bundle/record strings as starts), six part children in refs	
+2026-10-22 12:24:24	god	C407FDEB,9AF8D7D5	COD_SIMPLEMECHANICS+L2_1_TIMEDDEMOCHARGELARGE+UVANIM	lanebf4 props8 (bundle/record strings as starts), six part children in refs	
