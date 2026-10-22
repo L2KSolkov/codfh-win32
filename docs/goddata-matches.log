@@ -36357,3 +36357,11 @@
 2026-10-22 11:16:27	god	6EAB04ED,BC4874D8	COD_SIMPLEMECHANICS+VM_OPEL_BARS_DEST_SNOW+SURFACETAG	lanebf4 props7 (depth-3 strings as starts; VT_Opel_* textures), unk 4-5, DFF/COLLISIONDFF children in refs	
 2026-10-22 11:16:27	god	26CBA0AE,C314DBD2	COD_SIMPLEMECHANICS+VM_OPEL_BARS_DEST_SNOW+UVANIM	lanebf4 props7 (depth-3 strings as starts; VT_Opel_* textures), unk 4-5, DFF/COLLISIONDFF children in refs	
 2026-10-22 12:00:06	god	1A5FCFF5,6E44ADF7	GAMEWEAPONS+DESELECTANIMS+STIELHANDGRENADE	direct: GameWeapons action container x throwable weapon spelling (type-3 clip; STIELHANDGRENADE vs WEAPONS leaf STIELHANDGRENATE)	
+2026-10-22 12:09:59	god	8136FC60,3AFE1270	GAMEWEAPONS+GRENADEPREPANIMS+RTD33	direct: GameWeapons action container x throwable spelling (type-3 clip data P15A7A_GrenadeReady)	
+2026-10-22 12:09:59	god	F233DCBD,58AADFA1	GAMEWEAPONS+GRENADEPREPANIMS+ST74	direct: GameWeapons action container x throwable spelling (type-3 clip data P19A7A_GrenadeReady)	
+2026-10-22 12:09:59	god	419D162D,5B752FFE	GAMEWEAPONS+GRENADEPREPANIMS+STICKYBEAR	direct: GameWeapons action container x throwable spelling (type-3 clip data P16A7A_GrenadeReady)	
+2026-10-22 12:09:59	god	7AE9DAC1,CEDA8591	GAMEWEAPONS+GRENADEPREPANIMS+TEDDYBEAR	direct: GameWeapons action container x throwable spelling (type-3 clip data P16A7A_GrenadeReady)	
+2026-10-22 12:09:59	god	3379CF71,5DE86CA6	GAMEWEAPONS+GRENADEPREPANIMS+TELLERMINE	direct: GameWeapons action container x throwable spelling (type-3 clip data P20A7A_TellerMineReady)	
+2026-10-22 12:09:59	god	EA33D042,8AE736D1	GAMEWEAPONS+GRENADEPREPANIMS+SMOKE	direct: GameWeapons action container x throwable spelling (type-3 clip data P18A7A_GrenadeReady)	
+2026-10-22 12:09:59	god	B6A0708E,2EC2689C	GAMEWEAPONS+GRENADEPREPANIMS+STIELHANDGREN	direct: GameWeapons action container x throwable spelling (type-3 clip data P16A7A_GrenadeReady)	
+2026-10-22 12:09:59	god	9D60765C,52CA5C95	GAMEWEAPONS+GRENADEPREPANIMS+MARK2	direct: GameWeapons action container x throwable spelling (type-3 clip data P17A7A_GrenadeReady)	
