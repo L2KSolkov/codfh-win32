@@ -36004,3 +36004,20 @@
 2026-10-22 06:34:23	god	2F532C73,44B4F09F	COD_ANIMATEDOBJECTS+L2_2B_LRDG_JEEP+COLLISIONDFF	per-lane brute force (lanebf4 props round 5: RenderWare mesh strings as seeds; part children confirm)	
 2026-10-22 06:34:23	god	DABF8F21,8AFEB41C	COD_ANIMATEDOBJECTS+L2_2B_LRDG_JEEP+SURFACETAG	per-lane brute force (lanebf4 props round 5: RenderWare mesh strings as seeds; part children confirm)	
 2026-10-22 06:34:23	god	3D5BB423,A3E5515F	COD_ANIMATEDOBJECTS+L2_2B_LRDG_JEEP+UVANIM	per-lane brute force (lanebf4 props round 5: RenderWare mesh strings as seeds; part children confirm)	
+2026-10-22 06:39:18	god	B3E04577,FFCDBF3F	SCRIPTS+TASKLIST+L_3_1C_BLDG01_ROOFISONFIRE_2NDFLOOR+FILENAME	named stem + English word (CPU MITM)	
+2026-10-22 06:48:06	god	D56EC9D5,117279D2	COD_SIMPLEMECHANICS+MP_0_EXPLOSIVE	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	C426AFBE,A8AD76CC	COD_SIMPLEMECHANICS+MP_0_EXPLOSIVE+DFF	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	B0E928C6,88A060CD	COD_SIMPLEMECHANICS+MP_0_EXPLOSIVE+TEXTUREDICTIONARY	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	39C7A5E4,EF7D450C	COD_SIMPLEMECHANICS+MP_0_EXPLOSIVE+PARTSFIELD	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	20B5F687,579BA309	COD_SIMPLEMECHANICS+MP_0_EXPLOSIVE+COLLISIONDFF	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	A57A3134,51EFBB7F	COD_SIMPLEMECHANICS+MP_0_EXPLOSIVE+SURFACETAG	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	D498BE67,48EAE09D	COD_SIMPLEMECHANICS+MP_0_EXPLOSIVE+UVANIM	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	3025A0D3,60A31B7E	COD_SIMPLEMECHANICS+VM_OPEL_CANOPY_DEST_SNOW	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	73AB5F00,CD8024C8	COD_SIMPLEMECHANICS+VM_OPEL_CANOPY_DEST_SNOW+DFF	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	6790DEE4,FE0DA169	COD_SIMPLEMECHANICS+VM_OPEL_CANOPY_DEST_SNOW+TEXTUREDICTIONARY	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	F48A1F16,2F0616F8	COD_SIMPLEMECHANICS+VM_OPEL_CANOPY_DEST_SNOW+PARTSFIELD	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	D1769D59,EFDDEDD5	COD_SIMPLEMECHANICS+VM_OPEL_CANOPY_DEST_SNOW+COLLISIONDFF	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	4A9BBF1E,D8CD07AB	COD_SIMPLEMECHANICS+VM_OPEL_CANOPY_DEST_SNOW+SURFACETAG	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	802B07E1,04E21E71	COD_SIMPLEMECHANICS+VM_OPEL_CANOPY_DEST_SNOW+UVANIM	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	FD708FCC,7A60D902	COD_SIMPLEMECHANICS+L1_5_SDKFZ251_DEST_SNOW	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
+2026-10-22 06:48:06	god	7863B41B,09BE7DC8	COD_SIMPLEMECHANICS+L1_5_SDKFZ251_DEST_SNOW+COLLISIONDFF	mesh strings (MP_SatchelCharge / VT_Opel) and the L1_5 _DEST_SNOW family; part children confirm	
