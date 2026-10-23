@@ -36559,3 +36559,28 @@
 2026-10-22 19:30:43	god	AE4E8F73,4B5971B9	SCRIPTS+TASKLIST+L_1_2_BACKDOORSNEAKATTACK+FILENAME	lanebf4 scr9 (tag + BACK start + 9 unknown + topic word ATTACK); reads as a phrase, level entity L_1_2_BackDoorEnemy_Trigger exists, references Names+L_1_2_Spotter / SewerRunnerSpline_01	
 2026-10-22 19:30:43	god	E029D867,4C411D1D	SCRIPTS+TASKLIST+L_3_1B_DIALOGGAG_RYAN+FILENAME	lanebf4 scr9 (two shapes); DIALOGGAG family confirmed by a second key (DOOM3); references Names+L31_PinnedDownBuddy_02	
 2026-10-22 19:30:43	god	BD564B32,BF297FD0	SCRIPTS+TASKLIST+L_3_1B_DIALOGGAG_DOOM3+FILENAME	lanebf4 scr9 (two shapes); DIALOGGAG family confirmed by a second key (RYAN); references Names+L31B_Buddy_Story	
+2026-10-22 20:03:16	god	8BFC4B69,0C617E27	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE01_ART_PRISTINE	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	D0447955,EE95DCCC	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE01_ART_PRISTINE+DFF	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	FED325D6,E4D53340	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE01_ART_PRISTINE+TEXTUREDICTIONARY	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	175C08B3,CA3319BA	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE01_ART_PRISTINE+PARTSFIELD	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	2D43D224,429008A5	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE01_ART_PRISTINE+COLLISIONDFF	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	00F7B9D4,E315F662	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE01_ART_PRISTINE+SURFACETAG	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	F4F34486,CB55B575	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE01_ART_PRISTINE+UVANIM	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	759C7ABC,0C617E27	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE02_ART_PRISTINE	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	F946AF0E,EE95DCCC	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE02_ART_PRISTINE+DFF	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	BAF44DBF,E4D53340	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE02_ART_PRISTINE+TEXTUREDICTIONARY	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	53F89D96,CA3319BA	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE02_ART_PRISTINE+PARTSFIELD	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	9D85634B,429008A5	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE02_ART_PRISTINE+COLLISIONDFF	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	FF81C0F9,E315F662	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE02_ART_PRISTINE+SURFACETAG	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	AC6CF41B,CB55B575	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE02_ART_PRISTINE+UVANIM	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	E7FB8317,0C617E27	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE03_ART_PRISTINE	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	F5B8862B,EE95DCCC	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE03_ART_PRISTINE+DFF	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	AEF55E4C,E4D53340	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE03_ART_PRISTINE+TEXTUREDICTIONARY	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	65215029,CA3319BA	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE03_ART_PRISTINE+PARTSFIELD	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	CA6C6D6A,429008A5	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE03_ART_PRISTINE+COLLISIONDFF	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	8B468BB2,E315F662	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE03_ART_PRISTINE+SURFACETAG	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	3852F1F8,CB55B575	COD_SIMPLEMECHANICS+L3_5_RATHAUSDAMAGE03_ART_PRISTINE+UVANIM	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	0B74C2C5,6B5E0176	COD_ANIMATEDOBJECTS+L3_1_COLUMNDESTROYED_00	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	4590DE30,BB369A74	COD_ANIMATEDOBJECTS+L3_1_COLUMNDESTROYED_00+COLLISIONDFF	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	D5F0E002,6F5B971E	COD_ANIMATEDOBJECTS+L2_1_GATE_BARBWIRE_ART	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:03:16	god	F0E864C8,449551F5	COD_ANIMATEDOBJECTS+L2_1_GATE_BARBWIRE_ART+COLLISIONDFF	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
