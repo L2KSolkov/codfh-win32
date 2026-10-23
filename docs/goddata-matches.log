@@ -37309,3 +37309,4 @@
 2026-10-23 11:29:32	god	C115CB26,21D9DEA6	MESSAGEFILTERS+DESTRUCTION+L12_DS_MOVABLEMGPARTS2+ID	same-entity message pair: lane-wise meet-in-the-middle on one key verified by the entity's other group key (gh/pairmitm2.py)	
 2026-10-23 11:34:09	god	CAD4185C,87004D49	SCRIPTS+TASKLIST+L_1_2_RUNNERHEADTOSEWERS+FILENAME	lanebf4 caller-stem + 12 unknown + suffix tails (scr13), readable and corroborated: caller L_1_2_SEWERRUNNER_02 shares the words	
 2026-10-23 11:34:09	god	62281938,3269EA82	SCRIPTS+TASKLIST+L_3_5_C_TOWER2UPPERDEFEND_MJ3+FILENAME	lanebf4 caller-stem + 12 unknown + suffix tails (scr13), readable and corroborated: sibling of TOWER2MIDDLEDEFEND_MJ3 / TOWER1BASEMENTDEFEND_MJ3	
+2026-10-23 12:02:54	god	2F135A88,447AAD1D	SCRIPTS+TASKLIST+L_3_1_B_PINNEDDOWN_BUDDIESGOBOOM+FILENAME	lanebf4 caller-stem PINNEDDOWN_ + 13 unknown (scr14): the one clean three-word phrase among 6.0M candidates (BUDDIES GO BOOM); no caller corroboration	
