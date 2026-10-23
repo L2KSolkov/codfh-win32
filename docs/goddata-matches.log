@@ -37303,3 +37303,7 @@
 2026-10-23 10:46:35	god	13A8E3A8,C9A965D3	MESSAGEFILTERS+CREATION+L13_CR_RS_ATSCENE+ID	trigger-message structure MESSAGEFILTERS+<Group>+L<em>_<code>_<name>+ID; glued three-word / four-word search (gh/boxmsgw6.py, boxmsgw5.py)	
 2026-10-23 10:46:35	god	90161A19,23068F20	MESSAGEFILTERS+CREATION+L13_CR_R2RS_RUSSIANCHARGE+ID	trigger-message structure MESSAGEFILTERS+<Group>+L<em>_<code>_<name>+ID; glued three-word / four-word search (gh/boxmsgw6.py, boxmsgw5.py)	
 2026-10-23 11:28:56	god	B017286B,5F4954A3	SCRIPTS+TASKLIST+L_2_1_B_LOCKEDDOORNOICON+FILENAME	lanebf4 caller-stem + 11 unknown + suffix tails (scr12), only readable candidate of 33,769; sibling of the known L_2_1_B_NODOORICON	
+2026-10-23 11:29:32	god	08BBDC2E,85270745	MESSAGEFILTERS+CREATION+L12_CR_MOVABLEMGPARTS2+ID	same-entity message pair: lane-wise meet-in-the-middle on one key verified by the entity's other group key (gh/pairmitm2.py)	
+2026-10-23 11:29:32	god	8C042EF0,719C163E	MESSAGEFILTERS+DESTRUCTION+L12_DS_MOVABLEMGPARTS+ID	same-entity message pair: lane-wise meet-in-the-middle on one key verified by the entity's other group key (gh/pairmitm2.py)	
+2026-10-23 11:29:32	god	9A5A1B56,E638E8F7	MESSAGEFILTERS+CREATION+L12_CR_MOVABLEMGPARTS+ID	same-entity message pair: lane-wise meet-in-the-middle on one key verified by the entity's other group key (gh/pairmitm2.py)	
+2026-10-23 11:29:32	god	C115CB26,21D9DEA6	MESSAGEFILTERS+DESTRUCTION+L12_DS_MOVABLEMGPARTS2+ID	same-entity message pair: lane-wise meet-in-the-middle on one key verified by the entity's other group key (gh/pairmitm2.py)	
