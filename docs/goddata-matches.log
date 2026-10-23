@@ -28335,7 +28335,6 @@
 2026-10-13 21:39:26	god	D28E41CD,0FAF9775	COD_HelpMessages+L_3_1B+LADDEROBJHINT+MSG_FIN	child of a named record (MITM leaf 4+4)	
 2026-10-13 21:39:26	god	D68E4819,0EAF95FA	COD_HelpMessages+L_3_1B+LADDEROBJHINT+MSG_GER	child of a named record (MITM leaf 4+4)	
 2026-10-13 21:39:26	god	DA8E4EA5,0BAF90BF	COD_HelpMessages+L_3_1B+LADDEROBJHINT+MSG_JAP	child of a named record (MITM leaf 4+4)	
-2026-10-13 21:42:15	god	D2581200,5696CC53	GameWeapons+Weapons+TELLER_MINE+WEAPONMESH+DFF	child of a named record (MITM leaf 4+4)	
 2026-10-13 21:50:12	god	55307CA5,80D36D56	COD_HelpMessages+Generic+Error_LevelFailABANDONEDOBJ+MSG_FRE	child of a named record (MITM leaf 4+4)	
 2026-10-13 21:50:12	god	55307CAE,6BD34C47	COD_HelpMessages+Generic+Error_LevelFailABANDONEDOBJ+MSG_FIN	child of a named record (MITM leaf 4+4)	
 2026-10-13 21:50:12	god	56307E21,6FD35293	COD_HelpMessages+Generic+Error_LevelFailABANDONEDOBJ+MSG_GER	child of a named record (MITM leaf 4+4)	
@@ -28777,17 +28776,6 @@
 2026-10-13 22:05:42	god	86D1CE6F,C6275075	Scripts+TASKLIST+L_3_5_C_MG42_01+Filename	script sibling: known prefix + 8 chars	
 2026-10-13 22:05:42	god	399C81A6,1922C63A	Scripts+TASKLIST+L_3_5_B_PITBLAST+Filename	script sibling: known prefix + 8 chars	
 2026-10-13 22:05:42	god	B12FE082,D2614888	Scripts+TASKLIST+L_3_5_B_GIMPTEST+Filename	script sibling: known prefix + 8 chars	
-2026-10-13 22:06:00	god	8A2D3A44,319E6DDE	COD_HelpMessages+Generic+TANKCENTERTURRET+MSG_DUT	child of a named record (MITM leaf 4+4)	
-2026-10-13 22:06:00	god	8B2D3BDB,269E5C78	COD_HelpMessages+Generic+TANKCENTERTURRET+MSG_ITA	child of a named record (MITM leaf 4+4)	
-2026-10-13 22:06:00	god	8D2D3F3D,2F9E6A21	COD_HelpMessages+Generic+TANKCENTERTURRET+MSG_FRE	child of a named record (MITM leaf 4+4)	
-2026-10-13 22:06:00	god	9A2D53B4,309E6BA5	COD_HelpMessages+Generic+TANKCENTERTURRET+MSG_GER	child of a named record (MITM leaf 4+4)	
-2026-10-13 22:06:00	god	9E2D59C0,239E57D0	COD_HelpMessages+Generic+TANKCENTERTURRET+MSG_JAP	child of a named record (MITM leaf 4+4)	
-2026-10-13 22:06:00	god	A02D5D2A,249E5941	COD_HelpMessages+Generic+TANKCENTERTURRET+MSG_KOR	child of a named record (MITM leaf 4+4)	
-2026-10-13 22:06:00	god	A02D5D2A,279E5D9E	COD_HelpMessages+Generic+TANKCENTERTURRET+MSG_NOR	child of a named record (MITM leaf 4+4)	
-2026-10-13 22:06:00	god	A02D5D2A,3D9E803C	COD_HelpMessages+Generic+TANKCENTERTURRET+MSG_POR	child of a named record (MITM leaf 4+4)	
-2026-10-13 22:06:00	god	A12D5EB9,329E6F5A	COD_HelpMessages+Generic+TANKCENTERTURRET+MSG_ENG	child of a named record (MITM leaf 4+4)	
-2026-10-13 22:06:00	god	A62D6658,2F9E6A2A	COD_HelpMessages+Generic+TANKCENTERTURRET+MSG_FIN	child of a named record (MITM leaf 4+4)	
-2026-10-13 22:06:00	god	A72D682F,2C9E65E2	COD_HelpMessages+Generic+TANKCENTERTURRET+MSG_CHI	child of a named record (MITM leaf 4+4)	
 2026-10-13 22:07:36	god	AC27E61C,9F90B101	Scripts+TaskList+L_1_3_HQ_TANYA+Filename	script sibling: known prefix + 8 chars	
 2026-10-13 22:07:36	god	22130A00,4A8A533E	Scripts+TaskList+L_1_3_WALLCOLLAPSE_GERMAND+Filename	script sibling: known prefix + 8 chars	
 2026-10-13 22:07:36	god	22130A00,885FC668	Scripts+TaskList+L_1_3_WALLCOLLAPSE_GERMANB+Filename	script sibling: known prefix + 8 chars	
@@ -28835,7 +28823,6 @@
 2026-10-13 22:09:12	god	DB944DCC,80D80923	Scripts+TaskList+L_1_1_TRENCH_COVERGUY+Filename	script sibling: known prefix + 8 chars	
 2026-10-13 22:09:12	god	0DB449E2,AB1F6C6C	Scripts+TaskList+L_1_1_TRAIN_ENEMYMG1+Filename	script sibling: known prefix + 8 chars	
 2026-10-13 22:09:12	god	0DB449E2,1AAFAAC3	Scripts+TaskList+L_1_1_TRAIN_E2E4Y3G9+Filename	script sibling: known prefix + 8 chars	
-2026-10-13 22:09:12	god	0DB449E2,1AAFAAC3	Scripts+TaskList+L_1_1_TRAIN_ENEMYMG2+Filename	script sibling: known prefix + 8 chars	
 2026-10-13 22:09:12	god	2E17BD5A,1C16D3FE	Scripts+TaskList+L_1_1_PARK_MG_PGEN+Filename	script sibling: known prefix + 8 chars	
 2026-10-13 22:09:52	god	05809104,3F52E84A	COD_Heads+HM02_Stocky	COD_Heads+<string from data, HT->HM / HTS->HGS>	
 2026-10-13 22:09:52	god	34B87508,76485AD3	COD_Heads+HM_Unique_Boat_NKVD	COD_Heads+<string from data, HT->HM / HTS->HGS>	
