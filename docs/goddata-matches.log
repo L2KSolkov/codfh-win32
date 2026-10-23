@@ -37183,3 +37183,5 @@
 2026-10-23 06:46:56	god	E9DB595B,BD809581	MESSAGEFILTERS+CCESSPOOLGROUP+L13_CP_R2RS_SPN02+ID	trigger-message structure MESSAGEFILTERS+<Group>+L<em>_<code>_<name>+ID (gh/grpcode3 differential + box rootc); word-level template search (gh/msgwrun.py, exact 1-3 word products)	
 2026-10-23 06:46:56	god	E9DB595B,F00A3CBA	MESSAGEFILTERS+CCESSPOOLGROUP+L13_CP_R2RS_SPN03+ID	trigger-message structure MESSAGEFILTERS+<Group>+L<em>_<code>_<name>+ID (gh/grpcode3 differential + box rootc); word-level template search (gh/msgwrun.py, exact 1-3 word products)	
 2026-10-23 06:46:56	god	E9DB595B,4E5418EB	MESSAGEFILTERS+CCESSPOOLGROUP+L13_CP_R2RS_SPN04+ID	trigger-message structure MESSAGEFILTERS+<Group>+L<em>_<code>_<name>+ID (gh/grpcode3 differential + box rootc); word-level template search (gh/msgwrun.py, exact 1-3 word products)	
+2026-10-23 06:54:00	god	51E53E5D,D52ED6ED	MESSAGEFILTERS+CREATION+L31C_CR_AMBUSH_PARTICLES01+ID	local GPU brute (stems)	
+2026-10-23 06:54:00	god	58F651AD,590726FF	MESSAGEFILTERS+CREATION+L31C_CR_BUILDING02_PROPS+ID	local GPU brute (stems)	
