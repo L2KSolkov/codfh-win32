@@ -37295,3 +37295,8 @@
 2026-10-23 09:39:27	god	133374E2,FABF2AD7	MESSAGEFILTERS+CREATION+L31_CR_SEWERS_AMBPARTICLE_02+ID	local GPU brute (stems)	
 2026-10-23 09:39:27	god	66097A27,FABF2AD7	MESSAGEFILTERS+CREATION+L31_CR_SEWERS_AMBPARTICLE_01+ID	local GPU brute (stems)	
 2026-10-23 09:41:30	god	F3FC9BB5,B5888857	MESSAGEFILTERS+CREATION+L11_CR_TRENCH_ALLIEDUPPER+ID	sibling of a named trigger message (number / letter / group / section variant), exact hash (gh/msgsib.py)	
+2026-10-23 09:57:21	god	CE0D8646,6B82EF38	MESSAGEFILTERS+CCESSPOOLGROUP+L11_CP_PARK_SPN_LEFTHILL+ID	trigger-message structure MESSAGEFILTERS+<Group>+L<em>_<code>_<name>+ID (gh/grpcode3 differential + box rootc); word-level template search (gh/msgwrun.py, exact 1-3 word products)	
+2026-10-23 09:57:21	god	41FA30EC,5475BF99	MESSAGEFILTERS+SCRIPTEDSCENE+L11_SS_PARK_ENEMIESSTART+ID	trigger-message structure MESSAGEFILTERS+<Group>+L<em>_<code>_<name>+ID (gh/grpcode3 differential + box rootc); word-level template search (gh/msgwrun.py, exact 1-3 word products)	
+2026-10-23 09:57:21	god	A176228F,BA163B78	MESSAGEFILTERS+SCRIPTEDSCENE+L11_SS_TRENCH_ALLIESRUNNER+ID	trigger-message structure MESSAGEFILTERS+<Group>+L<em>_<code>_<name>+ID (gh/grpcode3 differential + box rootc); word-level template search (gh/msgwrun.py, exact 1-3 word products)	
+2026-10-23 09:58:04	god	68306AEE,898B3B4F	MESSAGEFILTERS+DESTRUCTION+L31_DS_SEWERS_AMBPARTICLE_01+ID	sibling of a named trigger message (number / letter / group / section variant), exact hash (gh/msgsib.py)	
+2026-10-23 09:58:04	god	68306AEE,F6651FAA	MESSAGEFILTERS+DESTRUCTION+L31_DS_SEWERS_AMBPARTICLE_02+ID	sibling of a named trigger message (number / letter / group / section variant), exact hash (gh/msgsib.py)	
