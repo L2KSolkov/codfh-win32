@@ -36584,3 +36584,7 @@
 2026-10-22 20:03:16	god	4590DE30,BB369A74	COD_ANIMATEDOBJECTS+L3_1_COLUMNDESTROYED_00+COLLISIONDFF	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
 2026-10-22 20:03:16	god	D5F0E002,6F5B971E	COD_ANIMATEDOBJECTS+L2_1_GATE_BARBWIRE_ART	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
 2026-10-22 20:03:16	god	F0E864C8,449551F5	COD_ANIMATEDOBJECTS+L2_1_GATE_BARBWIRE_ART+COLLISIONDFF	lanebf4 md round (mesh/holder words + endings); numbered siblings share lane 1	
+2026-10-22 20:20:29	god	D5087134,62144169	COD_SIMPLEMECHANICS+L3_1_RATHAUSCHUNK02_PRISTINE_ART	direct dictionary test (mdtest2.py: holder words x tag prefixes x endings), confirmed by COLLISIONDFF child; pair kernel structure (lane 0 shared)	
+2026-10-22 20:20:29	god	0720CEB6,612A0424	COD_SIMPLEMECHANICS+L3_1_RATHAUSCHUNK02_PRISTINE_ART+COLLISIONDFF	direct dictionary test (mdtest2.py: holder words x tag prefixes x endings), confirmed by COLLISIONDFF child; pair kernel structure (lane 0 shared)	
+2026-10-22 20:20:29	god	D5087134,6D6EAE32	COD_SIMPLEMECHANICS+L3_1_RATHAUSCHUNK03_PRISTINE_ART	direct dictionary test (mdtest2.py: holder words x tag prefixes x endings), confirmed by COLLISIONDFF child; pair kernel structure (lane 0 shared)	
+2026-10-22 20:20:29	god	0720CEB6,8480A569	COD_SIMPLEMECHANICS+L3_1_RATHAUSCHUNK03_PRISTINE_ART+COLLISIONDFF	direct dictionary test (mdtest2.py: holder words x tag prefixes x endings), confirmed by COLLISIONDFF child; pair kernel structure (lane 0 shared)	
