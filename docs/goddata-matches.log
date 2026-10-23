@@ -37241,3 +37241,4 @@
 2026-10-23 08:24:31	god	9307C9FF,D001F6E9	SCRIPTS+TASKLIST+L_3_1C_ALLEYMG42WINDOWENEMY+FILENAME	script word-level template search: SCRIPTS+TASKLIST+<tag>+1-3 caller/reference/verb words, exact (gh/scrw_gen.py, boxscrw.py)	
 2026-10-23 08:24:31	god	9C58A78B,6A88E108	SCRIPTS+TASKLIST+L_3_5_C_TOWER2MIDDLEDEFEND_MJ3+FILENAME	script word-level template search: SCRIPTS+TASKLIST+<tag>+1-3 caller/reference/verb words, exact (gh/scrw_gen.py, boxscrw.py)	
 2026-10-23 08:24:31	god	FAABC51A,B296B762	SCRIPTS+TASKLIST+L_3_5_C_TOWER1BASEMENTDEFEND_MJ3+FILENAME	script word-level template search: SCRIPTS+TASKLIST+<tag>+1-3 caller/reference/verb words, exact (gh/scrw_gen.py, boxscrw.py)	
+2026-10-23 08:37:23	god	7D1498C5,ECB985B0	SCRIPTS+TASKLIST+L_1_1_TRAIN_BUDDIESFOLLOWOLEG+FILENAME	script word-level template search, four words (gh/boxscrw4.py)	
