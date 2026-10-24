@@ -37414,3 +37414,4 @@
 2026-10-23 22:19:38	god	23532C74,2E55D859	MESSAGEFILTERS+CCESSPOOLGROUP+L31C_CP_SPN_BLDG2OFFICE+ID	exact L31 area-word product around the BLDG/GATES/CITYGATES/AMBUSH families (gh inline), exact	
 2026-10-23 22:47:09	god	3B1A5A51,0E1D8C2B	MESSAGEFILTERS+DESTRUCTION+L11_DS_REF_TURKEYSHOOT+ID	glued three-word / four-word message search on the new box (gh/boxmsgw6.py, exact word product, no random preimages at word level)	
 2026-10-24 01:07:06	god	58A5EEBE,FCA12100	MESSAGEFILTERS+SCRIPTEDSCENE+L11_SS_MGNEST_MGBOTTOMPIECE+ID	glued three-word / four-word message search on the new box (gh/boxmsgw6.py, exact word product, no random preimages at word level)	
+2026-10-24 02:37:39	god	054A8D2F,B79F0CDC	MESSAGEFILTERS+DESTRUCTION+L11_DS_MGNEST_MGBOTTOMPIECE+ID	sibling of a named trigger message (number / letter / group / section variant), exact hash (gh/msgsib.py)	
