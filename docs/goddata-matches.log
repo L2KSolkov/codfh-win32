@@ -37429,3 +37429,13 @@
 2026-10-24 09:30:08	god	45AE4517,50909D90	Scripts+TaskList+L33_BUDDY_SHERMAN_A_PART_TROIS+Filename	holder-token deep round for scripts on the local CPU (gh/scrdeep.py: starts/tails from the holder entities, 6 unknown characters; three A/B/C keys per name share a lane and solve independently)	
 2026-10-24 09:31:28	god	70E60B00,F28181D6	Scripts+TaskList+L_3_1_SEWER_LADDERALIVEENEMY+Filename	holder-token deep round for scripts on the local CPU (gh/scrdeep.py: start SEWER_LADDER from the holder L31B_Sewer_LadderSpawner01, 10 unknown characters ALIVEENEMY read as two vocabulary words; glued <place>ENEMY scripts have precedents)	
 2026-10-24 09:50:57	god	615FC472,565A96E7	MESSAGEFILTERS+CCESSPOOLGROUP+L31C_CP_MGR_ALLEYSHOOTOUT+ID	deep holder-token round with bigram starts and tails on the old box (gh/nbrdeep2.py --holderbigrams: start MGR_ALLEY from the holder L31C_CP_MGR_Alley, 8 unknown characters SHOOTOUT; named siblings MGR_AMBUSHALLEY01, MGR_CITYGATES01, MGR_TUNNEL)	
+2026-10-24 10:35:26	god	8EED5B85,EDB5B6F8	SCRIPTS+TASKLIST+L33_BUDDY_SHERMAN_A_PART_DEUX_02+FILENAME	numbered siblings of named script stems	
+2026-10-24 10:35:26	god	8EED5B85,31F380CD	SCRIPTS+TASKLIST+L33_BUDDY_SHERMAN_A_PART_DEUX_03+FILENAME	numbered siblings of named script stems	
+2026-10-24 10:35:26	god	046AE9CC,7502130C	SCRIPTS+TASKLIST+L33_BUDDY_SHERMAN_A_PART_TROIS_02+FILENAME	numbered siblings of named script stems	
+2026-10-24 10:35:26	god	6BA182B6,EDB5B6F8	SCRIPTS+TASKLIST+L33_BUDDY_SHERMAN_B_PART_DEUX_02+FILENAME	numbered siblings of named script stems	
+2026-10-24 10:35:26	god	6BA182B6,31F380CD	SCRIPTS+TASKLIST+L33_BUDDY_SHERMAN_B_PART_DEUX_03+FILENAME	numbered siblings of named script stems	
+2026-10-24 10:35:26	god	FF7D69D9,7502130C	SCRIPTS+TASKLIST+L33_BUDDY_SHERMAN_B_PART_TROIS_02+FILENAME	numbered siblings of named script stems	
+2026-10-24 10:35:26	god	7C488C53,EDB5B6F8	SCRIPTS+TASKLIST+L33_BUDDY_SHERMAN_C_PART_DEUX_02+FILENAME	numbered siblings of named script stems	
+2026-10-24 10:35:26	god	7C488C53,31F380CD	SCRIPTS+TASKLIST+L33_BUDDY_SHERMAN_C_PART_DEUX_03+FILENAME	numbered siblings of named script stems	
+2026-10-24 10:35:26	god	FE6185AA,7502130C	SCRIPTS+TASKLIST+L33_BUDDY_SHERMAN_C_PART_TROIS_02+FILENAME	numbered siblings of named script stems	
+2026-10-24 10:36:12	god	58838C60,E82FB360	SCRIPTS+TASKLIST+L_3_1_SEWER_LADDERALIVEENEMY02+FILENAME	numbered siblings of named script stems	
