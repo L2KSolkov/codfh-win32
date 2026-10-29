@@ -37585,3 +37585,12 @@
 2026-10-28 20:58:33	god	AE9C4594,00853F83	MESSAGEFILTERS+CCESSPOOLGROUP+L_2_1_CP_POST_FORTRESS_MANAGER+ID	message: group + level + code + words from the entities that list it	
 2026-10-28 20:58:33	god	BA33005F,6C77B2B7	MESSAGEFILTERS+SCRIPTEDSCENE+L_2_1_CP_FORTRESS_SOLDIERS+ID	message: group + level + code + words from the entities that list it	
 2026-10-28 20:58:33	god	BEBA6AFB,C04F15AE	MESSAGEFILTERS+CCESSPOOLGROUP+L_1_5_CP_REPAIRWAREHOUSE+ID	message: group + level + code + words from the entities that list it	
+2026-10-28 21:02:50	god	19AE3B8E,904F8B0D	MESSAGEFILTERS+CREATION+L_1_3_CR_TRAINSTATION_DOORCOLLISION+ID	message: area stem respelled L_<e>_<m>_ + all group/code combinations + words	
+2026-10-28 21:02:50	god	22D0F61B,4A0FC0B0	MESSAGEFILTERS+CREATION+L_1_3_CR_FIRSTSTUKAS_PLANEA+ID	message: area stem respelled L_<e>_<m>_ + all group/code combinations + words	
+2026-10-28 21:02:50	god	22D0F61B,63ACDFC2	MESSAGEFILTERS+CREATION+L_1_3_CR_FIRSTSTUKAS_PLANEC+ID	message: area stem respelled L_<e>_<m>_ + all group/code combinations + words	
+2026-10-28 21:02:50	god	22D0F61B,D12434E9	MESSAGEFILTERS+CREATION+L_1_3_CR_FIRSTSTUKAS_PLANEB+ID	message: area stem respelled L_<e>_<m>_ + all group/code combinations + words	
+2026-10-28 21:02:50	god	2F9C4F5E,5A002A63	MESSAGEFILTERS+CREATION+L_1_3_CR_TRAINSTATION_ROOM3+ID	message: area stem respelled L_<e>_<m>_ + all group/code combinations + words	
+2026-10-28 21:02:50	god	2F9C4F5E,A3B11CF5	MESSAGEFILTERS+CREATION+L_1_3_CR_TRAINSTATION_ROOM1+ID	message: area stem respelled L_<e>_<m>_ + all group/code combinations + words	
+2026-10-28 21:02:50	god	2F9C4F5E,CC751B1C	MESSAGEFILTERS+CREATION+L_1_3_CR_TRAINSTATION_ROOM2+ID	message: area stem respelled L_<e>_<m>_ + all group/code combinations + words	
+2026-10-28 21:02:50	god	849849E8,5E99887E	MESSAGEFILTERS+PROJECTILEGENERATOR+L_1_2_PG_GERM01+ID	message: area stem respelled L_<e>_<m>_ + all group/code combinations + words	
+2026-10-28 21:02:56	god	3E7E8009,E7E9BE04	MESSAGEFILTERS+CREATION+L_1_3_CR_FIRSTSTUKAS+ID	sibling of L_e_m_ respelled messages	
