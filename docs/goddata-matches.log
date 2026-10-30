@@ -37597,3 +37597,4 @@
 2026-10-29 21:01:44	god	AE9C4594,3D6D2B4E	MESSAGEFILTERS+CCESSPOOLGROUP+L_2_2_CP_POST_FORTRESS_MANAGER+ID	message: known name segment (POST_FORTRESS_MANAGER, from another level) under the predicted group/code/level prefix	
 2026-10-30 00:49:53	god	FA078D6D,6B83E736	MESSAGEFILTERS+CCESSPOOLGROUP+L_2_2_CP_SCENARIO08_MANAGER+ID	message: three pieces of L_2_2 named keys (SCENARIO08 + MANAGER) under the predicted prefix, GPU	
 2026-10-30 03:29:17	god	1343A89E,8E2B7EF0	MESSAGEFILTERS+CCESSPOOLGROUP+L_2_2_CP_SCENARIO08_STOP+ID	message: L_2_2 pieces SCENARIO08 + STOP (word from another level) under the predicted prefix, GPU; sibling of SCENARIO08_MANAGER	
+2026-10-30 04:16:44	god	6BC17F28,1B614A75	MESSAGEFILTERS+VEHICLEENTEREXITGROUP+L1_5_VEE_PLAYER_01+ID	message: L1_5_ level spelling (all group/code/spelling combinations) + level piece + ending	
